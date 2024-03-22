@@ -1,32 +1,40 @@
-// ** React Imports
-import { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect } from 'react';
+import TreeView from '@mui/lab/TreeView';
+import TreeItem from '@mui/lab/TreeItem';
+import Icon from 'src/@core/components/icon';
+import authConfig from 'src/configs/auth';
+import axios from 'axios';
+import { Grid } from '@mui/material';
 
-// ** MUI Imports
-import TreeView from '@mui/lab/TreeView'
-import TreeItem from '@mui/lab/TreeItem'
-import authConfig from 'src/configs/auth'
+const TreeViewBasic = ({ direction }) => {
+  const ExpandIcon = direction === 'rtl' ? 'tabler:chevron-left' : 'tabler:chevron-right';
 
-// ** Icon Imports
-import Icon from 'src/@core/components/icon'
-import { useSnackbar } from 'notistack';
-import axios from 'axios'
-
-const TreeViewControlled = ({ direction }) => {
-  // ** States
-  const [expanded, setExpanded] = useState([])
-  const [selected, setSelected] = useState([])
+  // State để lưu trữ dữ liệu từ API
   const [groups, setGroups] = useState([]);
-  const [groupchild, setGroupChild] = useState([]);
+  const [selectedGroups, setSelectedGroups] = useState([]);
 
-  const { enqueueSnackbar } = useSnackbar();
-  const handleToggle = (event, nodeIds) => {
-    setExpanded(nodeIds)
-  }
+  const GroupCheckbox = ({ group, checked, onChange }) => {
+    return (
+      <div>
+        <input
+          type="checkbox"
+          id={`group-${group.groupId}`}
+          checked={checked}
+          onChange={(e) => onChange(group.groupId, e.target.checked)}
+        />
+        <label htmlFor={`group-${group.groupId}`}>{group.groupName}</label>
+      </div>
+    );
+  };
 
-  const handleSelect = (event, nodeIds) => {
-    setSelected(nodeIds)
-  }
-  const ExpandIcon = direction === 'rtl' ? 'tabler:chevron-left' : 'tabler:chevron-right'
+  const handleGroupCheckboxChange = (groupId, checked) => {
+    if (checked) {
+      setSelectedGroups(prevGroups => [...prevGroups, { groupId }]);
+    } else {
+      setSelectedGroups(prevGroups => prevGroups.filter(g => g.groupId !== groupId));
+    }
+  };
+
   useEffect(() => {
     const fetchGroupData = async () => {
       try {
@@ -40,77 +48,56 @@ const TreeViewControlled = ({ direction }) => {
           },
         };
 
-        // ** Gọi API với token
-        const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search?level=0', config);
-        setGroups(response.data.data);
-        console.log('group', response.data)
+        // ** Gọi API với token 
+        const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search', config);
+        const dataWithChildren = addChildrenField(response.data.data);
+        const rootGroups = findRootGroups(dataWithChildren);
+        setGroups(rootGroups);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
 
     fetchGroupData(); // ** Fetch data from API when component mounts
-  }, [enqueueSnackbar]);
-  const fetchChildren = async (groupId) => {
-    try {
-      // ** Lấy token từ local storage
-      const token = localStorage.getItem(authConfig.storageTokenKeyName)
-      console.log('token', token)
-      // ** Đặt header Authorization bằng token
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
+  }, []);
 
-      // ** Gọi API với token
-      const response = await axios.get(`https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/${groupId}/child`, config);
-      setGroupChild(response.data.data)
-      console.log('groupchild', response.data.data)
-
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
+  const addChildrenField = (data, parentId = null) => {
+    return data.map(group => {
+      const children = data.filter(child => child.parentId === group.groupId);
+      if (children.length > 0) {
+        group.children = children;
+      }
+      return group;
+    });
   };
-  const renderTreeItems = useMemo(() => {
-    return (group) => (
-      <TreeItem
-        nodeId={group.groupId}label={
-          <>
-            {groupchild && groupchild.length > 0 ? (
-              <Icon icon="tabler:chevron-right" />
-            ) : null}
-            {group.groupName}
-          </>
-        }
-        onLabelClick={async () => {
-          await fetchChildren(group.groupId);
 
-          // Thực hiện các xử lý khác tại đây nếu cần
-        }}
-      >
-        {groupchild && groupchild.map((child) => (
-          <TreeItem key={child.id} nodeId={child.id} label={child.groupName} />
-        ))}
-      </TreeItem>
-    );
-  }, [fetchChildren, groupchild]);
-  return (
-  <div>
-      <TreeView
-    expanded={expanded}
-    selected={selected}
-    sx={{ minHeight: 240 }}
-    onNodeToggle={handleToggle}
-    onNodeSelect={handleSelect}
-    defaultExpandIcon={<Icon icon={ExpandIcon} />}
-  >
-    {groups.map((group) => renderTreeItems(group))}
-  </TreeView>
-  
-  </div>
-   
+  const renderGroup = group => (
+    <TreeItem key={group.groupId} nodeId={group.groupId} label={<GroupCheckbox group={group} checked={selectedGroups.some(g => g.groupId === group.groupId)} onChange={handleGroupCheckboxChange} />}>
+      {group.children && group.children.map(childGroup => renderGroup(childGroup))}
+    </TreeItem>
   );
-}
 
-export default TreeViewControlled
+  const findRootGroups = (data) => {
+    const rootGroups = [];
+    data.forEach(group => {
+      if (!data.some(item => item.groupId === group.parentId)) {
+        rootGroups.push(group);
+      }
+    });
+    return rootGroups;
+  };
+
+  return (
+    <div>
+      <TreeView
+        sx={{ minHeight: 240 }}
+        defaultExpandIcon={<Icon icon={ExpandIcon} />}
+        defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
+      >
+        {groups.map(rootGroup => renderGroup(rootGroup))}
+      </TreeView>
+    </div>
+  );
+};
+
+export default TreeViewBasic;

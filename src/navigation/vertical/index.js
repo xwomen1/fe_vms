@@ -59,6 +59,13 @@ const navigation = () => {
       //   }
       // ]
     },
+    // {
+    //   path: '/apps/user/detail/',
+    //   // action: 'read',
+    //   // subject: 'acl-page',
+    //   title: 'Detail',
+    //   icon: 'tabler:phone',
+    // },
     {
       path: '/caller',
       // action: 'read',

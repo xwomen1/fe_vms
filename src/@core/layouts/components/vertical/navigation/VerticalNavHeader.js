@@ -12,6 +12,7 @@ import Icon from 'src/@core/components/icon'
 
 // ** Configs
 import themeConfig from 'src/configs/themeConfig'
+import UserDropdown from '../../shared-components/UserDropdown'
 
 // ** Styled Components
 const MenuHeaderWrapper = styled(Box)(({ theme }) => ({
@@ -106,8 +107,12 @@ const VerticalNavHeader = props => {
           <HeaderTitle variant='h4' sx={{ ...menuCollapsedStyles, ...(navCollapsed && !navHover ? {} : { ml: 2.5 }) }}>
             {/* {themeConfig.templateName} */} Camnet
           </HeaderTitle>
+
         </LinkStyled>
+        
       )}
+                {/* <UserDropdown settings={settings} /> */}
+
 
       {hidden ? (
         <IconButton

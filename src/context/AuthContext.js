@@ -38,37 +38,92 @@ const AuthProvider = ({ children }) => {
   };
   useEffect(() => {
     const initAuth = async () => {
-      const storedUserData = window.localStorage.getItem('userData')
-      const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+      const storedUserData = window.localStorage.getItem('userData');
+      const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName);
+      const refresh_token = localStorage.getItem(authConfig.onTokenExpiration)
 
       if (storedUserData && storedToken) {
-        const userData = JSON.parse(storedUserData)
-        setUser(userData)
+        const userData = JSON.parse(storedUserData);
+        setUser(userData);
+  
         const tokenExpired = checkTokenExpiration(storedToken);
         if (tokenExpired) {
-          // Token hết hạn, xóa thông tin người dùng và chuyển hướng đến trang đăng nhập
-          setUser(null);
-          window.localStorage.removeItem('userData');
-          window.localStorage.removeItem(authConfig.storageTokenKeyName);
-          setLoading(true);
-          router.push('/login');
-        } else {
-          setLoading(false);
+          try {
+            setLoading(true);
+            // Get the expiration time of the token
+            const tokenData = parseToken(storedToken);
+            const expirationTime = tokenData.exp * 1000;
+            const currentTime = Date.now();
+            const timeUntilExpiration = expirationTime - currentTime;
+  
+            // Schedule a refresh a few seconds before expiration
+            const refreshTime = timeUntilExpiration - (5 * 1000); // 5 seconds before expiration
+            if (refreshTime > 0) {
+              setTimeout(async () => {
+                try {
+                  const refreshedToken = await refreshAccessToken(refresh_token);
+                  localStorage.setItem(authConfig.storageTokenKeyName, refreshedToken);
+                  setLoading(false);
+                } catch (error) {
+                  console.error('Error refreshing token:', error);
+                  handleLogout();
+                }
+              }, refreshTime);
+            } else {
+              // Token has already expired, refresh immediately
+              const refreshedToken = await refreshAccessToken(refresh_token);
+              localStorage.setItem(authConfig.storageTokenKeyName, refreshedToken);
+              setLoading(false);
+            }
+          } catch (error) {
+            console.error('Error refreshing token:', error);
+            handleLogout(); // Đăng xuất người dùng nếu không thể làm mới token
+            return;
+          }
         }
-        setLoading(false)
+  
+        setLoading(false);
       } else {
-        setLoading(false)
+        setLoading(false);
       }
+    };
+  
+    initAuth();
+  }, []);
+  
+  
+  const refreshAccessToken = async (refreshToken) => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      console.log('token', token)
+      // ** Đặt header Authorization bằng token
+      const params = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        data: { refreshToken },
+
+      };
+      const response = await axios.post('https://dev-ivi.basesystem.one/smc/iam/api/v0/refresh-token', { refreshToken }, params);
+      const newAccessToken = response.data.access_token;
+      setExpire(response.data.expires_in);
+      return newAccessToken;
+    } catch (error) {
+      throw new Error('Error refreshing token');
     }
-    initAuth()
-  }, [])
+  };
+  
 
   const handleLogin = (params, errorCallback) => {
     axios
       .post(authConfig.loginEndpoint, params)
       .then(async response => {
         const tokenReturn = response.data.access_token
+        const refreshToken = response.data.refresh_token
         localStorage.setItem(authConfig.storageTokenKeyName, tokenReturn)
+        localStorage.setItem(authConfig.onTokenExpiration, refreshToken)
+
         console.log('tokenreturn', tokenReturn)
         const returnUrl = router.query.returnUrl
         setExpire(response.data.expires_in)
