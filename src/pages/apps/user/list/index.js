@@ -44,9 +44,11 @@ const UserList = ({ apiData }) => {
   const handlePageChange = (newPage) => {
     setPage(newPage);
   };
+  
   const handleViewDetails = (userId) => {
     router.push(`/${userId}`);
   };
+  
   function showAlertConfirm(options, intl) {
       const defaultProps = {
         title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
@@ -67,20 +69,25 @@ const UserList = ({ apiData }) => {
           confirmButton: 'swal-btn-confirm',
         },
       };
+      
       return Swal.fire({ ...defaultProps, ...options });
     }
-  const handleOpenMenu = (event) => {
+  
+    const handleOpenMenu = (event) => {
       setAnchorEl(event.currentTarget);
     };
-  const handleCloseMenu = () => {
+  
+    const handleCloseMenu = () => {
       setAnchorEl(null);
     };
-  const handleSelectPageSize = (size) => {
+  
+    const handleSelectPageSize = (size) => {
       setPageSize(size);
       setPage(1); 
       handleCloseMenu(); 
     };
-  const GroupCheckbox = ({ group, checked, onChange }) => {
+  
+    const GroupCheckbox = ({ group, checked, onChange }) => {
       return (
         <div>
           <input
@@ -93,7 +100,8 @@ const UserList = ({ apiData }) => {
         </div>
       );
     };
-  const handleGroupCheckboxChange = (groupId, checked) => {
+  
+    const handleGroupCheckboxChange = (groupId, checked) => {
       if (checked) {
         setSelectedGroups(prevGroups => [...prevGroups, { groupId }]);
       } else {
@@ -105,6 +113,7 @@ const UserList = ({ apiData }) => {
       try {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
         console.log('token', token)
+        
         const config = {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -124,12 +133,14 @@ const UserList = ({ apiData }) => {
 
     fetchGroupData(); 
   }, [pageSize, valueGroup]);
+  
   const addChildrenField = (data, parentId = null) => {
     return data.map(group => {
       const children = data.filter(child => child.parentId === group.groupId);
       if (children.length > 0) {
         group.children = children;
       }
+      
       return group;
     });
   };
@@ -147,17 +158,21 @@ const UserList = ({ apiData }) => {
         rootGroups.push(group);
       }
     });
+    
     return rootGroups;
   };
+  
   const handleFilter = useCallback(val => {
     setValue(val)
   }, [])
+  
   const handleFilterGroup = (event) => {setSearchGroup(event.target.value);
   };
 
  
  console.log(total, 'totalpage')
-  const handleDelete = (idDelete) => {
+  
+ const handleDelete = (idDelete) => {
     showAlertConfirm({
       text: 'Bạn có chắc chắn muốn xóa?',
     }).then(({ value }) => {
@@ -166,6 +181,7 @@ const UserList = ({ apiData }) => {
         if (!token) {
           return;
         }
+        
         const config = {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -192,7 +208,8 @@ const UserList = ({ apiData }) => {
     const fetchFilteredOrAllUsers = async () => {
       try {
         const token = localStorage.getItem(authConfig.storageTokenKeyName);
-          const config = {
+          
+        const config = {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -282,7 +299,7 @@ const UserList = ({ apiData }) => {
                         <IconButton
                           size='small'
                           component={Link}
-                          href={`/apps/user/detail/${user.userId}`} // Truyền userId vào đường dẫn
+                          href={`/apps/user/detail/${user.userId}`}
                           sx={{ color: 'text.secondary' }}
                         >
                           <Icon icon='tabler:eye' />
@@ -332,6 +349,7 @@ const UserList = ({ apiData }) => {
     </Grid>
   )
 }
+
 export const getStaticProps = async () => {
   const res = await axios.get('/cards/statistics')
   const apiData = res.data

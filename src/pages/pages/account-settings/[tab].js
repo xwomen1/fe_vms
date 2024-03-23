@@ -12,11 +12,13 @@ export const getStaticPaths = () => {
   return {
     paths: [
       { params: { tab: 'account' } },
+      
       // { params: { tab: 'security' } },
       // { params: { tab: 'billing' } },
       // { params: { tab: 'notifications' } },
       // { params: { tab: 'connections' } }
     ],
+
     fallback: false
   }
 }

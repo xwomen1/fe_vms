@@ -1,7 +1,7 @@
-import { createContext, useEffect, useState } from 'react'
-import axios from 'axios'
-import { useRouter } from 'next/router'
-import authConfig from 'src/configs/auth'
+import { createContext, useEffect, useState, useCallback } from 'react';
+import axios from 'axios';
+import { useRouter } from 'next/router';
+import authConfig from 'src/configs/auth';
 
 const defaultProvider = {
   user: null,
@@ -9,55 +9,61 @@ const defaultProvider = {
   setUser: () => null,
   setLoading: () => Boolean,
   login: () => Promise.resolve(),
-  logout: () => Promise.resolve()
-}
+  logout: () => Promise.resolve(),
+};
 
-const AuthContext = createContext(defaultProvider)
+const AuthContext = createContext(defaultProvider);
 
 const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(defaultProvider.user)
-  const [expire, setExpire] = useState('')
+  const [user, setUser] = useState(defaultProvider.user);
+  const [expire, setExpire] = useState('');
+  const [loading, setLoading] = useState(defaultProvider.loading);
+  const router = useRouter();
 
-  const [loading, setLoading] = useState(defaultProvider.loading)
-  const router = useRouter()
-  const checkTokenExpiration = (token) => {
+  const checkTokenExpiration = useCallback((token) => {
     if (!token) {
-      return true; // Nếu không có token, coi như token đã hết hạn
+      return true;
     }
-  
-    const tokenData = parseToken(token); // Hàm parseToken để lấy thông tin từ token, ví dụ lấy thời gian hết hạn
-    const expirationTime = tokenData.exp * 1000; // Convert expiration time to milliseconds
-  
-    return Date.now() >= expirationTime; // Trả về true nếu thời gian hiện tại lớn hơn hoặc bằng thời gian hết hạn
-  };
-  
+
+    const tokenData = parseToken(token);
+    const expirationTime = tokenData.exp * 1000;
+
+    return Date.now() >= expirationTime;
+  }, []);
+
   const parseToken = (token) => {
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+
     return JSON.parse(window.atob(base64));
   };
+
+  const handleLogout = useCallback(() => {
+    setUser(null);
+    window.localStorage.removeItem('userData');
+    window.localStorage.removeItem(authConfig.storageTokenKeyName);
+    router.push('/login');
+  }, [router]);
+
   useEffect(() => {
     const initAuth = async () => {
       const storedUserData = window.localStorage.getItem('userData');
       const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName);
-      const refresh_token = localStorage.getItem(authConfig.onTokenExpiration)
+      const refresh_token = localStorage.getItem(authConfig.onTokenExpiration);
 
       if (storedUserData && storedToken) {
         const userData = JSON.parse(storedUserData);
         setUser(userData);
-  
+
         const tokenExpired = checkTokenExpiration(storedToken);
         if (tokenExpired) {
           try {
             setLoading(true);
-            // Get the expiration time of the token
             const tokenData = parseToken(storedToken);
             const expirationTime = tokenData.exp * 1000;
             const currentTime = Date.now();
             const timeUntilExpiration = expirationTime - currentTime;
-  
-            // Schedule a refresh a few seconds before expiration
-            const refreshTime = timeUntilExpiration - (5 * 1000); // 5 seconds before expiration
+            const refreshTime = timeUntilExpiration - 5 * 1000;
             if (refreshTime > 0) {
               setTimeout(async () => {
                 try {
@@ -77,80 +83,75 @@ const AuthProvider = ({ children }) => {
             }
           } catch (error) {
             console.error('Error refreshing token:', error);
-            handleLogout(); // Đăng xuất người dùng nếu không thể làm mới token
+            handleLogout();
+
             return;
           }
         }
-  
+
         setLoading(false);
       } else {
         setLoading(false);
       }
     };
-  
+
     initAuth();
-  }, []);
-  
-  
+  }, [checkTokenExpiration, handleLogout]);
+
   const refreshAccessToken = async (refreshToken) => {
     try {
-      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+      const token = localStorage.getItem(authConfig.storageTokenKeyName);
 
-      console.log('token', token)
+      console.log('token', token);
+
       // ** Đặt header Authorization bằng token
+
       const params = {
         headers: {
           Authorization: `Bearer ${token}`,
         },
         data: { refreshToken },
-
       };
       const response = await axios.post('https://dev-ivi.basesystem.one/smc/iam/api/v0/refresh-token', { refreshToken }, params);
       const newAccessToken = response.data.access_token;
       setExpire(response.data.expires_in);
+
       return newAccessToken;
     } catch (error) {
       throw new Error('Error refreshing token');
     }
   };
-  
 
   const handleLogin = (params, errorCallback) => {
     axios
       .post(authConfig.loginEndpoint, params)
-      .then(async response => {
-        const tokenReturn = response.data.access_token
-        const refreshToken = response.data.refresh_token
-        localStorage.setItem(authConfig.storageTokenKeyName, tokenReturn)
-        localStorage.setItem(authConfig.onTokenExpiration, refreshToken)
+      .then(async (response) => {
+        const tokenReturn = response.data.access_token;
+        const refreshToken = response.data.refresh_token;
+        localStorage.setItem(authConfig.storageTokenKeyName, tokenReturn);
+        localStorage.setItem(authConfig.onTokenExpiration, refreshToken);
 
-        console.log('tokenreturn', tokenReturn)
-        const returnUrl = router.query.returnUrl
-        setExpire(response.data.expires_in)
-        console.log(response.data.expires_in)
+        console.log('tokenreturn', tokenReturn);
+        const returnUrl = router.query.returnUrl;
+        setExpire(response.data.expires_in);
+        console.log(response.data.expires_in);
+
         const apiUser = {
           username: params.username,
-          role: 'admin'
-        }
-        setUser(apiUser)
-        window.localStorage.setItem('userData', JSON.stringify(apiUser))
-        setLoading(false)
-  
-        const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
-        console.log('URL', redirectURL)
-        router.replace(redirectURL)
-      })
-      .catch(err => {
-        if (errorCallback) errorCallback(err)
-      })
-  }
+          role: 'admin',
+        };
+        setUser(apiUser);
+        window.localStorage.setItem('userData', JSON.stringify(apiUser));
+        setLoading(false);
 
-  const handleLogout = () => {
-    setUser(null)
-    window.localStorage.removeItem('userData')
-    window.localStorage.removeItem(authConfig.storageTokenKeyName)
-    router.push('/login')
-  }
+        const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/';
+        console.log('URL', redirectURL);
+        router.replace(redirectURL);
+      })
+      .catch((err) => {
+        if (errorCallback) errorCallback(err);
+      });
+  };
 
   const values = {
     user,
@@ -158,10 +159,10 @@ const AuthProvider = ({ children }) => {
     setUser,
     setLoading,
     login: handleLogin,
-    logout: handleLogout
-  }
+    logout: handleLogout,
+  };
 
-  return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>
-}
+  return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;
+};
 
-export { AuthContext, AuthProvider }
+export { AuthContext, AuthProvider };

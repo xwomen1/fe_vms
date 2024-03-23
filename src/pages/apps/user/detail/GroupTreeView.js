@@ -29,6 +29,7 @@ const GroupTreeView = ({
         if (children.length > 0) {
           group.children = children;
         }
+
         return group;
       });
     };
@@ -40,6 +41,7 @@ const GroupTreeView = ({
           rootGroups.push(group);
         }
       });
+
       return rootGroups;
     };
   
@@ -56,7 +58,9 @@ const GroupTreeView = ({
             : null}
         </TreeItem>
       );
+
     };
+    
     const renderGroups = group => (
         <TreeItem
         key={group?.groupId}
@@ -70,6 +74,7 @@ const GroupTreeView = ({
     
    
     return (
+
     //   <TreeView
     //     sx={{ minHeight: 240, width: 300 }}
     //     defaultExpandIcon={<Icon icon='tabler:chevron-right' />}

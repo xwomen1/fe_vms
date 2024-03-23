@@ -41,7 +41,9 @@ const TreeViewBasic = ({ direction }) => {
         // ** Lấy token từ local storage
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
         console.log('token', token)
+        
         // ** Đặt header Authorization bằng token
+        
         const config = {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -67,6 +69,7 @@ const TreeViewBasic = ({ direction }) => {
       if (children.length > 0) {
         group.children = children;
       }
+      
       return group;
     });
   };
@@ -84,6 +87,7 @@ const TreeViewBasic = ({ direction }) => {
         rootGroups.push(group);
       }
     });
+    
     return rootGroups;
   };
 

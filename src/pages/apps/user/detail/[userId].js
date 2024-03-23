@@ -50,12 +50,15 @@ const UserDetails = ( ) => {
       [option.groupId]: !prevExpanded[option.groupId], // Đảo ngược trạng thái mở hoặc đóng của TreeView khi người dùng bấm vào một option
     }));
   };
+  
   const toggleEdit = () => {
     setOriginalUser(user); // Lưu trữ giá trị người dùng ban đầu
 
     setReadOnly(false);
     setEditing(true);
+  
   };
+  
   const handleGroupChange = (event, newValue) => {
     setDefaultGroup(newValue); // Cập nhật giá trị defaultGroup thành giá trị mới được chọn
     console.log(newValue)
@@ -65,15 +68,19 @@ const UserDetails = ( ) => {
     setUser(originalUser); // Khôi phục giá trị người dùng ban đầu
 
     setReadOnly(true);
+  
     setEditing(false);
   };
+  
   const saveChanges = async () => {
     setOriginalUser(user); // Cập nhật giá trị người dùng ban đầu
 
     // Logic to save changes
+  
     setReadOnly(true);
     setEditing(false);
   };
+  
   const GroupCheckbox = ({ group, checked, onChange }) => {
     return (
       <div>
@@ -91,14 +98,17 @@ const UserDetails = ( ) => {
 const handleGroupCheckboxChange = (groupId, checked) => {
     if (checked) {
       setSelectedGroups(prevGroups => [...prevGroups, { groupId }]);
+
     } else {
       setSelectedGroups(prevGroups => prevGroups.filter(g => g.groupId !== groupId));
     }
   };
+  
 const handleFilterGroup = async val => {
   setValueGroup(val);
   try {
     const token = localStorage.getItem(authConfig.storageTokenKeyName);
+    
     const config = {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -122,18 +132,21 @@ const handleFilterGroup = async val => {
       if (children.length > 0) {
         group.children = children;
       }
+      
       return group;
     });
   };
 
 
   const findRootGroups = (data) => {
+    
     const rootGroups = [];
     data.forEach(group => {
       if (!data.some(item => item.groupId === group.parentId)) {
         rootGroups.push(group);
       }
     });
+
     return rootGroups;
   };
   useEffect(() => {
@@ -141,6 +154,7 @@ const handleFilterGroup = async val => {
       try {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
         console.log('token', token)
+        
         const config = {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -153,6 +167,7 @@ const handleFilterGroup = async val => {
         const dataWithChildren = addChildrenField(response.data.data);
         const rootGroups = findRootGroups(dataWithChildren);
         setGroups(rootGroups);
+  
         setGroupOptions(rootGroups); 
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -161,9 +176,11 @@ const handleFilterGroup = async val => {
 
     fetchGroupData(); 
   }, [valueGroup]);
+  
   const fetchUserData = async () => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName);
+      
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -187,6 +204,7 @@ const handleFilterGroup = async val => {
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem(authConfig.storageTokenKeyName);
+        
         const config = {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -209,14 +227,17 @@ const handleFilterGroup = async val => {
     if (userId) {
       fetchUserData();
     }
-  }, [userId]);
+  }, [userId, leaderOfUnit]);
+  
   const renderGroupInSelect = (group, selected) => (
     <TreeItem key={group.groupId} nodeId={group.groupId} label={group.groupName} selected={selected === group.groupName}>
       {group.children && group.children.map(childGroup => renderGroupInSelect(childGroup, selected))}
     </TreeItem>
   );
+  
   const renderOption = (option, { depth = 0 }) => {
     const spacer = Array(depth * 2).join(' ');
+    
     return (
       <div>
         <span>{spacer}{option.groupName}</span>
@@ -229,11 +250,13 @@ const handleFilterGroup = async val => {
     fetchUserData(); // Load lại dữ liệu từ API khi huỷ chỉnh sửa
     setReadOnly(true);
     setEditing(false);
+    
     // Reset các giá trị nhập về rỗng
     setUser({
       ...user,
       fullName: '', // Thêm các trường khác nếu cần
       email: '',
+      
       //Thêm các trường khác nếu cần
     });
   };

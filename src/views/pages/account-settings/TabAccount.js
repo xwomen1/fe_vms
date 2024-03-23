@@ -70,7 +70,6 @@ const ResetButtonStyled = styled(Button)(({ theme }) => ({
 }))
 
 const TabAccount = () => {
-  // ** State
   const [open, setOpen] = useState(false)
   const [inputValue, setInputValue] = useState('')
   const [userInput, setUserInput] = useState('yes')
@@ -80,8 +79,6 @@ const TabAccount = () => {
 
   // ** Hooks
   const {
-    control,
-    handleSubmit,
     formState: { errors }
   } = useForm({ defaultValues: { checkbox: false } })
   const handleClose = () => setOpen(false)
@@ -131,7 +128,6 @@ const TabAccount = () => {
                     fullWidth
                     label='First Name'
                     placeholder=''
-                    // value={formData.firstName}
                     onChange={e => handleFormChange('firstName', e.target.value)}
                   />
                 </Grid>
@@ -187,12 +183,7 @@ const TabAccount = () => {
             </CardContent>
           </form>
         </Card>
-      </Grid>
-
-      {/* Delete Account Card */}
-      
-
-      {/* Deactivate Account Dialogs */}
+      </Grid>      
       <Dialog fullWidth maxWidth='xs' open={open} onClose={handleClose}>
         <DialogContent
           sx={{

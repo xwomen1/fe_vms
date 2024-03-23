@@ -32,6 +32,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useAuth } from 'src/hooks/useAuth'
 import useBgColor from 'src/@core/hooks/useBgColor'
 import { useSettings } from 'src/@core/hooks/useSettings'
+
 // import { styled } from '@mui/material/styles';
 
 // ** Configs
@@ -102,6 +103,7 @@ const LoginPage = () => {
   const bgColors = useBgColor()
   const { settings } = useSettings()
   const hidden = useMediaQuery(theme.breakpoints.down('md'))
+  
   const ColoredCheckbox = styled(Checkbox)(({ theme }) => ({
     color: '#FF9C73',
     '&.Mui-checked': {
@@ -146,6 +148,7 @@ const LoginPage = () => {
             alignItems: 'center',
             borderRadius: '20px',
             justifyContent: 'center',
+            
             // backgroundColor: 'customColors.bodyBg',
             margin: theme => theme.spacing(8, 0, 8, 8)
           }}
@@ -213,6 +216,7 @@ const LoginPage = () => {
                       value={value}
                       onBlur={onBlur}
                       onChange={onChange}
+                      
                       // placeholder=''
                       error={Boolean(errors.username)}
                       {...(errors.username && { helperText: errors.username.message })}
