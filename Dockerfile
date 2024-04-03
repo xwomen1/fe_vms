@@ -1,7 +1,8 @@
 FROM node:lts as dependencies
 WORKDIR /parking-fe
-COPY package.json package-lock.json ./
-RUN yarn install --frozen-lockfile
+COPY package.json ./
+#RUN yarn install --frozen-lockfile
+RUN yarn install 
 
 FROM node:lts as builder
 WORKDIR /parking-fe
