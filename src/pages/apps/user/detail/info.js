@@ -359,6 +359,7 @@ const UserDetails = () => {
       email: ''
     })
   }
+  console.log('param', params)
 
   return (
     <div>

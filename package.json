@@ -81,9 +81,11 @@
     "react-popper": "2.3.0",
     "react-redux": "8.0.5",
     "react-responsive": "^10.0.0",
+    "react-treebeard": "^3.2.4",
     "recharts": "2.5.0",
     "stylis": "4.1.4",
     "stylis-plugin-rtl": "2.1.1",
+    "sweetalert2": "^11.10.7",
     "websocket": "^1.0.34",
     "yup": "1.1.1"
   },
