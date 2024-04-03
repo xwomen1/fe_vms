@@ -10,7 +10,9 @@ import MuiTabList from '@mui/lab/TabList'
 import Info from './info'
 import Identity from './identity'
 import AccessControl from './accessControl'
+
 import Parking from './parking'
+
 const TabList = styled(MuiTabList)(({ theme }) => ({
   borderBottom: '0 !important',
   '&, & .MuiTabs-scroller': {
@@ -34,6 +36,7 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
     }
   }
 }))
+
 const UserDetails = () => {
   const [value, setValue] = useState('1')
 

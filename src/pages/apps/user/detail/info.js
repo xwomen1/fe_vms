@@ -32,6 +32,7 @@ const UserDetails = () => {
   const [readOnly, setReadOnly] = useState(true)
   const [selectedRole, setSelectedRole] = useState(null)
 
+  const [params, setParams] = useState({})
   const [editing, setEditing] = useState(false)
   const [groupOptions, setGroupOptions] = useState([])
   const [defaultGroup, setDefaultGroup] = useState(null)
@@ -71,9 +72,18 @@ const UserDetails = () => {
 
     return Swal.fire({ ...defaultProps, ...options })
   }
+
+  const handleFieldChange = (field, value) => {
+    setParams(prevParams => ({
+      ...prevParams,
+      [field]: value
+    }))
+  }
+
   const handleClosePopupPolicy = () => {
     setOpenPopupPolicy(false) // Đóng Popup khi cần thiết
   }
+
   const handleAddRoleClick = () => {
     setOpenPopup(true)
   }
@@ -81,13 +91,16 @@ const UserDetails = () => {
   const handleClosePopup = () => {
     setOpenPopup(false) // Đóng Popup khi cần thiết
   }
+
   const handleRoleSelect = selectedRole => {
     console.log('Selected Role:', selectedRole)
   }
+
   const handleRoleSelectPolicy = selectedRole => {
     console.log('Selected Role:', selectedRole)
     fetchUserData()
   }
+
   const toggleEdit = () => {
     setReadOnly(false)
     setEditing(true)
@@ -101,7 +114,20 @@ const UserDetails = () => {
 
   const saveChanges = async () => {
     setReadOnly(true)
-    setEditing(false)
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+      await axios.put(`https://dev-ivi.basesystem.one/smc/iam/api/v0/users`, params, config)
+      Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
+    } catch (error) {
+      console.error('Error updating user details:', error)
+      Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi cập nhật dữ liệu.', 'error')
+    }
   }
 
   const convertTimeArrayToString = timeArray => {
@@ -116,12 +142,6 @@ const UserDetails = () => {
 
       return null
     }
-  }
-  const handleAddRow = () => {
-    setGroup(prevGroup => [...prevGroup, { groupName: '' }])
-  }
-  const handleAddRow1 = () => {
-    setGroup(prevGroup => [...prevGroup, { groupName: '' }])
   }
 
   useEffect(() => {
@@ -174,23 +194,27 @@ const UserDetails = () => {
       console.error('Error fetching user details:', error)
     }
   }
+
   const handleTimeChange = newValue => {
-    setDateTime(newValue) // Thay đổi từ time thành dateTime
+    setDateTime(newValue)
   }
+
   const handleAvailableChange = newValue => {
-    setTimeStart(newValue) // Thay đổi từ time thành dateTime
+    setTimeStart(newValue)
   }
+
   const handleTimeEndMorningChange = newValue => {
-    setTimeEndMorning(newValue) // Thay đổi từ time thành dateTime
+    setTimeEndMorning(newValue)
   }
 
   const handleTimeStartAfetrnoonChange = newValue => {
-    setTimeStartAfternoon(newValue) // Thay đổi từ time thành dateTime
+    setTimeStartAfternoon(newValue)
   }
 
   const handleTimeEndAfternoonChange = newValue => {
-    setTimeEndAfternoon(newValue) // Thay đổi từ time thành dateTime
+    setTimeEndAfternoon(newValue)
   }
+
   const handleDeleteRowPolicy = (piId, policyId) => {
     showAlertConfirm({
       text: 'Bạn có chắc chắn muốn xóa?'
@@ -216,7 +240,6 @@ const UserDetails = () => {
           .delete(urlDelete, config)
           .then(() => {
             Swal.fire('Xóa thành công', '', 'success')
-            // Tùy chỉnh việc cập nhật dữ liệu sau khi xóa
             fetchUserData()
           })
           .catch(err => {
@@ -225,6 +248,7 @@ const UserDetails = () => {
       }
     })
   }
+
   const handleDeleteRow = (userId, groupId) => {
     showAlertConfirm({
       text: 'Bạn có chắc chắn muốn xóa?'
@@ -246,6 +270,7 @@ const UserDetails = () => {
           .delete(urlDelete, config)
           .then(() => {
             Swal.fire('Xóa thành công', '', 'success')
+
             // Tùy chỉnh việc cập nhật dữ liệu sau khi xóa
             fetchUserData()
           })
@@ -306,6 +331,7 @@ const UserDetails = () => {
           defaultTime.setMinutes(minute)
           setTimeEndAfternoon(defaultTime)
         }
+
         // setDateTime(convertTimeArrayToString(response.data.data.timeEndMorning))
         console.log(convertTimeArrayToString(response.data.data.timeEndMorning))
         if (response.data.data.userGroups && response.data.data.userGroups.length > 0) {
@@ -422,12 +448,11 @@ const UserDetails = () => {
 
                 <Grid item xs={4}>
                   <Autocomplete
-                    value={defaultGroup} // Sử dụng defaultGroup làm giá trị của Autocomplete
-                    onChange={(event, newValue) => handleGroupChange(event, newValue)} // Xử lý sự kiện khi giá trị của Autocomplete thay đổi
+                    value={defaultGroup}
+                    onChange={(event, newValue) => handleGroupChange(event, newValue)}
                     disabled={readOnly}
-                    // onInputChange={(event, newInputValue) => handleFilterGroup(newInputValue)} // Gọi hàm handleFilterGroup khi người dùng nhập vào trường Autocomplete
-                    options={groupOptions} // Sử dụng groupOptions làm danh sách các nhóm cho Autocomplete
-                    getOptionLabel={option => option.groupName} // Lấy nhãn của mỗi option trong danh sách nhóm
+                    options={groupOptions}
+                    getOptionLabel={option => option.groupName}
                     renderInput={params => <TextField {...params} label='Nhóm' variant='outlined' />}
                   />
                 </Grid>
@@ -440,7 +465,7 @@ const UserDetails = () => {
                         onChange={e => setLeaderOfUnit(e.target.checked)}
                         disabled={readOnly}
                       />
-                    } // Sử dụng state leaderOfUnit để đánh dấu checkbox
+                    }
                     label='Là lãnh đạo đơn vị'
                   />
                 </Grid>

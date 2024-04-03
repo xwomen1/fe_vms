@@ -10,7 +10,7 @@ const RolePopup = ({ open, onClose, onSelect, userId }) => {
   const [defaultGroup, setDefaultGroup] = useState(null)
   const [selectedGroupId, setSelectedGroupId] = useState(null) // Thêm trạng thái để lưu trữ id của nhóm được chọn
   const [groupOptions, setGroupOptions] = useState([])
-  console.log(userId, 'userIDds')
+
   const handleGroupChange = (event, newValue) => {
     setDefaultGroup(newValue)
     console.log(newValue.groupId)
@@ -22,6 +22,7 @@ const RolePopup = ({ open, onClose, onSelect, userId }) => {
   const handleRoleSelect = async () => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
       const config = {
         headers: {
           Authorization: `Bearer ${token}`

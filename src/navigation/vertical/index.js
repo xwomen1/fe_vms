@@ -40,6 +40,7 @@ const navigation = () => {
       title: 'Tài sản',
       icon: 'tabler:moneybag'
     }
+
     // {
     //   title: 'Dashboards',
     //   icon: 'tabler:smart-home',
@@ -386,7 +387,6 @@ const navigation = () => {
     //   icon: 'tabler:brand-tabler'
     // },
     // {
-
     //   title: 'Cards',
     //   icon: 'tabler:id',
     //   children: [
@@ -497,7 +497,7 @@ const navigation = () => {
     //     {
     //       title: 'More',
     //       path: '/components/more'
-    //     },
+    //     }
     //   ]
     // },
     // {
@@ -558,7 +558,7 @@ const navigation = () => {
     //     {
     //       title: 'Input Mask',
     //       path: '/forms/form-elements/input-mask'
-    //     },
+    //     }
     //   ]
     // },
     // {

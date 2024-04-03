@@ -16,7 +16,9 @@ import TableHead from '@mui/material/TableHead'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import DatePicker from 'react-datepicker'
+
 import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
+
 const UserDetails = () => {
   const router = useRouter()
   const { userId } = router.query
@@ -67,6 +69,7 @@ const UserDetails = () => {
       return null
     }
   }
+
   const handleAddRow = () => {
     setGroup(prevGroup => [...prevGroup, { groupName: '' }])
   }
@@ -119,12 +122,15 @@ const UserDetails = () => {
       console.error('Error fetching user details:', error)
     }
   }
+
   const handleTimeChange = newValue => {
     setDateTime(newValue) // Thay đổi từ time thành dateTime
   }
+
   const handleAvailableChange = newValue => {
     setTimeStart(newValue) // Thay đổi từ time thành dateTime
   }
+
   const handleTimeEndMorningChange = newValue => {
     setTimeEndMorning(newValue) // Thay đổi từ time thành dateTime
   }
@@ -187,6 +193,7 @@ const UserDetails = () => {
           defaultTime.setMinutes(minute)
           setTimeEndAfternoon(defaultTime)
         }
+
         // setDateTime(convertTimeArrayToString(response.data.data.timeEndMorning))
         console.log(convertTimeArrayToString(response.data.data.timeEndMorning))
         if (response.data.data.userGroups && response.data.data.userGroups.length > 0) {
@@ -303,12 +310,11 @@ const UserDetails = () => {
 
                 <Grid item xs={4}>
                   <Autocomplete
-                    value={defaultGroup} // Sử dụng defaultGroup làm giá trị của Autocomplete
-                    onChange={(event, newValue) => handleGroupChange(event, newValue)} // Xử lý sự kiện khi giá trị của Autocomplete thay đổi
+                    value={defaultGroup}
+                    onChange={(event, newValue) => handleGroupChange(event, newValue)}
                     disabled={readOnly}
-                    // onInputChange={(event, newInputValue) => handleFilterGroup(newInputValue)} // Gọi hàm handleFilterGroup khi người dùng nhập vào trường Autocomplete
-                    options={groupOptions} // Sử dụng groupOptions làm danh sách các nhóm cho Autocomplete
-                    getOptionLabel={option => option.groupName} // Lấy nhãn của mỗi option trong danh sách nhóm
+                    options={groupOptions}
+                    getOptionLabel={option => option.groupName}
                     renderInput={params => <TextField {...params} label='Nhóm' variant='outlined' />}
                   />
                 </Grid>
@@ -321,7 +327,7 @@ const UserDetails = () => {
                         onChange={e => setLeaderOfUnit(e.target.checked)}
                         disabled={readOnly}
                       />
-                    } // Sử dụng state leaderOfUnit để đánh dấu checkbox
+                    }
                     label='Là lãnh đạo đơn vị'
                   />
                 </Grid>
