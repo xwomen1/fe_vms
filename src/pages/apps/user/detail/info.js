@@ -4,7 +4,20 @@ import { useState, useEffect, useMemo } from 'react'
 import axios from 'axios'
 import authConfig from 'src/configs/auth'
 import CustomTextField from 'src/@core/components/mui/text-field'
-import { Grid, IconButton, Button, FormControlLabel, Checkbox, Switch, TextField, Typography } from '@mui/material'
+import {
+  Grid,
+  IconButton,
+  Button,
+  FormControlLabel,
+  Checkbox,
+  Switch,
+  TextField,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
+} from '@mui/material'
 import Icon from 'src/@core/components/icon'
 import Autocomplete from '@mui/material/Autocomplete'
 import Box from '@mui/material/Box'
@@ -27,32 +40,59 @@ const UserDetails = () => {
   const { userId } = router.query
   const [openPopup, setOpenPopup] = useState(false)
   const [openPopupPolicy, setOpenPopupPolicy] = useState(false)
-
+  const [timeValidity, setTimeValidity] = useState('Custom')
   const [user, setUser] = useState(null)
   const [readOnly, setReadOnly] = useState(true)
-  const [selectedRole, setSelectedRole] = useState(null)
-
   const [params, setParams] = useState({})
   const [editing, setEditing] = useState(false)
   const [groupOptions, setGroupOptions] = useState([])
   const [defaultGroup, setDefaultGroup] = useState(null)
   const [leaderOfUnit, setLeaderOfUnit] = useState('')
   const [status, setStatus] = useState('')
+  const [status1, setStatus1] = useState('')
+  const [availableAt, setAvailableAt] = useState('')
+  const [expiredAt, setExpiredAt] = useState('')
+  const [note, setNote] = useState('')
+
   const [timeEndMorning, setTimeEndMorning] = useState('')
   const [timeStartAfternoon, setTimeStartAfternoon] = useState('')
   const [timeEndAfternoon, setTimeEndAfternoon] = useState('')
   const [showPlusColumn, setShowPlusColumn] = useState(false)
 
   const [dateTime, setDateTime] = useState('')
-  const [timeStart, setTimeStart] = useState(new Date())
+  const [startDate, setStartDate] = useState(new Date())
+  const [fullNameValue, setFullNameValue] = useState('')
+  const [email, setEmail] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('')
+  const [identityNumber, setIdentityNumber] = useState('')
+  const [userCode, setUserCode] = useState('')
+  const [syncCode, setSyncCode] = useState('')
 
   const [group, setGroup] = useState(null)
   const [policies, setPolicies] = useState(null)
   const [piId, setPiId] = useState(null)
+  const [ava1, setAva1] = useState(null)
+  const [ava2, setAva2] = useState(null)
 
   const handleAddRoleClickPolicy = () => {
     setOpenPopupPolicy(true)
   }
+  const handleStartDateChange = date => {
+    setAvailableAt(date)
+    setAva1(isoToEpoch(date))
+  }
+
+  const handleEndDateChange = date => {
+    setExpiredAt(date)
+    setAva2(isoToEpoch(date))
+  }
+  console.log('New start date:', isoToEpoch(availableAt))
+  function isoToEpoch(isoDateString) {
+    var milliseconds = Date.parse(isoDateString)
+    var epochSeconds = Math.round(milliseconds)
+    return epochSeconds
+  }
+
   function showAlertConfirm(options, intl) {
     const defaultProps = {
       title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
@@ -73,13 +113,45 @@ const UserDetails = () => {
     return Swal.fire({ ...defaultProps, ...options })
   }
 
-  const handleFieldChange = (field, value) => {
-    setParams(prevParams => ({
-      ...prevParams,
-      [field]: value
-    }))
+  const handleFullNameChange = event => {
+    setFullNameValue(event.target.value)
   }
-
+  const handleStatus1Change = async e => {
+    const newStatus = e.target.checked ? 'ACTIVE' : 'INACTIVE'
+    setStatus(newStatus)
+    try {
+      const response = await fetch(
+        `https://dev-ivi.basesystem.one/smc/iam/api/v0/users/${userId}/enable-account?enabled=${newStatus}`
+      )
+      if (!response.ok) {
+        // Handle error
+        console.error('Failed to update account status')
+      }
+    } catch (error) {
+      console.error('Failed to update account status', error)
+    }
+  }
+  const handleStatusChange = () => {
+    setStatus1(status1 === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE')
+  }
+  const handleEmailChange = event => {
+    setEmail(event.target.value)
+  }
+  const handlePhoneNumberChange = event => {
+    setPhoneNumber(event.target.value)
+  }
+  const handleNoteChange = event => {
+    setNote(event.target.value)
+  }
+  const handleIdentityNumberChange = event => {
+    setIdentityNumber(event.target.value)
+  }
+  const handleUserCodeChange = event => {
+    setUserCode(event.target.value)
+  }
+  const handleSyncCodeChange = event => {
+    setSyncCode(event.target.value)
+  }
   const handleClosePopupPolicy = () => {
     setOpenPopupPolicy(false) // Đóng Popup khi cần thiết
   }
@@ -91,9 +163,12 @@ const UserDetails = () => {
   const handleClosePopup = () => {
     setOpenPopup(false) // Đóng Popup khi cần thiết
   }
-
+  const handleTimeValidityChange = event => {
+    setTimeValidity(event.target.value)
+  }
   const handleRoleSelect = selectedRole => {
     console.log('Selected Role:', selectedRole)
+    fetchUserData()
   }
 
   const handleRoleSelectPolicy = selectedRole => {
@@ -114,15 +189,36 @@ const UserDetails = () => {
 
   const saveChanges = async () => {
     setReadOnly(true)
+    setEditing(false)
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
-
       const config = {
         headers: {
           Authorization: `Bearer ${token}`
         }
       }
-      await axios.put(`https://dev-ivi.basesystem.one/smc/iam/api/v0/users`, params, config)
+      await axios.put(
+        `https://dev-ivi.basesystem.one/smc/iam/api/v0/users`,
+        {
+          ...params,
+          userId: userId,
+          fullName: fullNameValue,
+          email: email,
+          phoneNumber: phoneNumber,
+          identityNumber: identityNumber,
+          userCode: userCode,
+          syncCode: syncCode,
+          userStatus: status1,
+          timeEndAfternoon: convertStringToTimeArray(timeEndAfternoon),
+          timeStartAfternoon: convertStringToTimeArray(timeStartAfternoon),
+          timeStartMorning: convertStringToTimeArray(dateTime),
+          timeEndMorning: convertStringToTimeArray(timeEndMorning),
+          availableAt: ava1,
+          expiredAt: ava2,
+          note: note
+        },
+        config
+      )
       Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
     } catch (error) {
       console.error('Error updating user details:', error)
@@ -143,6 +239,28 @@ const UserDetails = () => {
       return null
     }
   }
+  const convertStringToTimeArray = timeString => {
+    const date = new Date(timeString)
+    const hour = date.getHours()
+    const minute = date.getMinutes()
+
+    return [hour, minute]
+  }
+
+  // Sử dụng hàm
+  // console.log(timeArray, 'timearray')
+  // const convertStringToTimeArray = timeString => {
+  //   if (typeof timeString === 'string') {
+  //     const [hourStr, minuteStr] = timeString.split(':').map(str => parseInt(str, 10))
+
+  //     if (!isNaN(hourStr) && !isNaN(minuteStr)) {
+  //       return [hourStr, minuteStr]
+  //     }
+  //   }
+
+  //   console.error('Invalid timeString:', timeString)
+  //   return null
+  // }
 
   useEffect(() => {
     const fetchGroupData = async () => {
@@ -180,16 +298,25 @@ const UserDetails = () => {
       setGroup(response.data.data.userGroups)
       setPolicies(response.data.data.policies)
       setPiId(response.data.data.piId)
-
+      setFullNameValue(response.data.data.fullName)
+      setEmail(response.data.data.email)
+      setPhoneNumber(response.data.data.phoneNumber)
+      setIdentityNumber(response.data.data.identityNumber)
+      setUserCode(response.data.data.userCode)
+      setSyncCode(response.data.data.syncCode)
+      setStatus1(response.data.data.userStatus)
+      setAvailableAt(response.data.data.availableAt)
+      setExpiredAt(response.data.data.expiredAt)
       setUser(response.data.data)
+      setNote(response.data.data.note)
+      setStatus(response.data.data.userAccount.accStatus)
+
       if (response.data.data.userGroups && response.data.data.userGroups.length > 0) {
         setDefaultGroup(response.data.data.userGroups[0])
       }
       if (response.data.data.userAccount && response.data.data.userAccount.length > 0) {
         setStatus(response.data.data.userAccount.accStatus)
       }
-
-      console.log(response.data.data.userAccount.accStatus)
     } catch (error) {
       console.error('Error fetching user details:', error)
     }
@@ -200,7 +327,10 @@ const UserDetails = () => {
   }
 
   const handleAvailableChange = newValue => {
-    setTimeStart(newValue)
+    setAvailableAt(newValue)
+  }
+  const handleExpireChange = newValue => {
+    setExpiredAt(newValue)
   }
 
   const handleTimeEndMorningChange = newValue => {
@@ -295,8 +425,19 @@ const UserDetails = () => {
         setGroup(response.data.data.userGroups)
         setPolicies(response.data.data.policies)
         setPiId(response.data.data.piId)
-
+        setFullNameValue(response.data.data.fullName)
+        setEmail(response.data.data.email)
+        setPhoneNumber(response.data.data.phoneNumber)
+        setIdentityNumber(response.data.data.identityNumber)
+        setUserCode(response.data.data.userCode)
+        setSyncCode(response.data.data.syncCode)
+        setStatus1(response.data.data.userStatus)
+        setAvailableAt(response.data.data.availableAt)
+        setExpiredAt(response.data.data.expiredAt)
         setLeaderOfUnit(response.data.data.userGroups[0].isLeader)
+        setNote(response.data.data.note)
+        setStatus(response.data.data.userAccount.accStatus)
+
         if (response.data.data.timeStartMorning) {
           const [hour, minute] = response.data.data.timeStartMorning
           const timeString = `${hour}:${minute.toString().padStart(2, '0')}`
@@ -366,7 +507,7 @@ const UserDetails = () => {
       {user ? (
         <div>
           <Grid container spacing={3}>
-            <Grid style={{ backgroundColor: 'white', borderRadius: '0.05%' }}>
+            <Grid style={{ borderRadius: '0.05%' }}>
               <Grid container spacing={2}>
                 <h3 style={{ color: 'black', marginLeft: '1%' }}> Thông tin người dùng</h3>
               </Grid>
@@ -387,23 +528,22 @@ const UserDetails = () => {
                   </Button>
                 )}
               </Grid>
-              <Grid container spacing={2} style={{ marginLeft: 10 }}>
+              <Grid container spacing={2} component={Paper} style={{ marginLeft: 10, backgroundColor: 'white' }}>
                 <Grid item xs={4}>
                   <CustomTextField
                     label='Tên'
-                    defaultValue={user.fullName}
-                    id='form-props-read-only-input'
+                    value={fullNameValue}
                     InputProps={{ readOnly: readOnly }}
+                    onChange={handleFullNameChange}
                     fullWidth
                   />
                 </Grid>
                 {console.log(user.userAccount.accStatus)}
                 <Grid item xs={4}>
-                  {' '}
                   <CustomTextField
                     label='Email'
-                    defaultValue={user.email}
-                    id='form-props-read-only-input'
+                    value={email}
+                    onChange={handleEmailChange}
                     InputProps={{ readOnly: readOnly }}
                     fullWidth
                   />
@@ -413,8 +553,8 @@ const UserDetails = () => {
                   {/* Sửa đổi xs={4} thành xs={8} */}
                   <CustomTextField
                     label='Số điện thoại'
-                    defaultValue={user.phoneNumber}
-                    id='form-props-read-only-input'
+                    value={phoneNumber}
+                    onChange={handlePhoneNumberChange}
                     InputProps={{ readOnly: readOnly }}
                     fullWidth // Thêm thuộc tính fullWidth vào đây
                   />
@@ -422,8 +562,8 @@ const UserDetails = () => {
                 <Grid item xs={4}>
                   <CustomTextField
                     label='Số giấy tờ'
-                    defaultValue={user.identityNumber}
-                    id='form-props-read-only-input'
+                    value={identityNumber}
+                    onChange={handleIdentityNumberChange}
                     InputProps={{ readOnly: readOnly }}
                     fullWidth
                   />
@@ -431,8 +571,8 @@ const UserDetails = () => {
                 <Grid item xs={4}>
                   <CustomTextField
                     label='Mã người dùng'
-                    defaultValue={user.userCode}
-                    id='form-props-read-only-input'
+                    defaultValue={userCode}
+                    onChange={handleUserCodeChange}
                     InputProps={{ readOnly: readOnly }}
                     fullWidth
                   />
@@ -440,63 +580,28 @@ const UserDetails = () => {
                 <Grid item xs={3.8}>
                   <CustomTextField
                     label='Mã đồng bộ'
-                    defaultValue={user.syncCode}
-                    id='form-props-read-only-input'
+                    defaultValue={syncCode}
+                    onChange={handleSyncCodeChange}
                     InputProps={{ readOnly: readOnly }}
                     fullWidth
                   />
                 </Grid>
 
-                <Grid item xs={4}>
-                  <Autocomplete
-                    value={defaultGroup}
-                    onChange={(event, newValue) => handleGroupChange(event, newValue)}
-                    disabled={readOnly}
-                    options={groupOptions}
-                    getOptionLabel={option => option.groupName}
-                    renderInput={params => <TextField {...params} label='Nhóm' variant='outlined' />}
-                  />
-                </Grid>
-
                 <Grid item xs={2} style={{ marginTop: '1.1%' }}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={leaderOfUnit}
-                        onChange={e => setLeaderOfUnit(e.target.checked)}
-                        disabled={readOnly}
-                      />
-                    }
-                    label='Là lãnh đạo đơn vị'
-                  />
-                </Grid>
-                <Grid item xs={2} style={{ marginTop: '1.1%' }}>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={user.userAccount.accStatus === 'ACTIVE'} // Kiểm tra nếu trạng thái là ACTIVE thì switch = true, ngược lại là false
-                        onChange={() => setStatus(status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE')} // Đảo ngược trạng thái khi switch được bật hoặc tắt
-                        color='primary'
-                        disabled={readOnly}
-                      />
-                    }
+                  Trạng thái
+                  <Switch
+                    checked={status1 === 'ACTIVE'}
+                    onChange={handleStatusChange}
+                    color='primary'
                     label='Trạng thái'
-                    labelPlacement='start'
+                    disabled={readOnly}
                   />
                 </Grid>
-                <Grid item xs={3.8}>
-                  <CustomTextField
-                    label='Thời gian hiệu lực
-      '
-                    defaultValue={user?.customizeTime}
-                    id='form-props-read-only-input'
-                    InputProps={{ readOnly: readOnly }}
-                    fullWidth
-                  />
-                </Grid>
+
                 <Grid item xs={1} style={{ marginTop: '2%' }}>
                   Ca sáng:
                 </Grid>
+
                 <Grid item xs={1}>
                   <DatePickerWrapper>
                     <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
@@ -516,7 +621,6 @@ const UserDetails = () => {
                     </Box>
                   </DatePickerWrapper>
                 </Grid>
-                <Grid item xs={0.1}></Grid>
                 <Grid item xs={1}>
                   <DatePickerWrapper>
                     <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
@@ -536,9 +640,7 @@ const UserDetails = () => {
                     </Box>
                   </DatePickerWrapper>
                 </Grid>
-                <Grid item xs={1} style={{ marginTop: '2%' }}></Grid>
-                <Grid item xs={0.7} style={{ marginTop: '2%' }}>
-                  {' '}
+                <Grid item xs={1} style={{ marginTop: '2%' }}>
                   Ca chiều:
                 </Grid>
                 <Grid item xs={1}>
@@ -560,7 +662,6 @@ const UserDetails = () => {
                     </Box>
                   </DatePickerWrapper>
                 </Grid>
-                <Grid item xs={0.1}></Grid>
                 <Grid item xs={1}>
                   <DatePickerWrapper>
                     <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
@@ -580,43 +681,70 @@ const UserDetails = () => {
                     </Box>
                   </DatePickerWrapper>
                 </Grid>
-                <Grid item xs={1} style={{ marginTop: '2%' }}></Grid>
-                {user.availableAt && (
-                  <Grid item xs={2}>
-                    <DatePicker
-                      selected={new Date(user?.availableAt)}
-                      id='basic-input'
-                      onChange={date => handleAvailableChange(date)}
-                      placeholderText='Click to select a date'
-                      fullWidth
-                      customInput={<CustomInput label='Ngày bắt đầu' />}
-                    />
-                  </Grid>
-                )}
-                {user.expiredAt && (
-                  <Grid item xs={2}>
-                    <DatePicker
-                      selected={new Date(user?.expiredAt)}
-                      id='basic-input'
-                      onChange={date => handleAvailableChange(date)}
-                      placeholderText='Click to select a date'
-                      customInput={<CustomInput label='Ngày kết thúc' />}
-                    />
-                  </Grid>
-                )}
+                {/* <Grid item ={1} style={{ marginTop: '2%' }}></Grid> */}
+                <Grid item xs={3.8}>
+                  <FormControl fullWidth>
+                    <InputLabel id='time-validity-label'>Thời gian hiệu lực</InputLabel>
+                    <Select
+                      labelId='time-validity-label'
+                      id='time-validity-select'
+                      value={timeValidity}
+                      disabled={readOnly}
+                      onChange={handleTimeValidityChange}
+                    >
+                      <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
+                      <MenuItem value='Undefined'>Không xác định</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={8}>
+                  {timeValidity === 'Custom' && (
+                    <Grid container spacing={2}>
+                      {user.availableAt && (
+                        <Grid item xs={4}>
+                          <DatePicker
+                            selected={new Date(availableAt)}
+                            onChange={handleStartDateChange}
+                            showTimeSelect
+                            timeIntervals={15}
+                            timeCaption='Time'
+                            dateFormat='MMMM d, yyyy '
+                            disabled={readOnly}
+                            customInput={<CustomInput label='Ngày bắt đầu' />}
+                          />
+                        </Grid>
+                      )}
+                      {user.expiredAt && (
+                        <Grid item xs={4}>
+                          <DatePicker
+                            selected={new Date(expiredAt)}
+                            onChange={handleEndDateChange}
+                            showTimeSelect
+                            timeIntervals={15}
+                            timeCaption='Time'
+                            disabled={readOnly}
+                            dateFormat='MMMM d, yyyy '
+                            customInput={<CustomInput label='Ngày kết thúc' />}
+                          />
+                        </Grid>
+                      )}
+                    </Grid>
+                  )}
+                </Grid>
                 <Grid item xs={11.8}>
                   <CustomTextField
                     rows={4}
                     multiline
-                    label='Multiline'
-                    defaultValue={user?.note}
+                    label='Ghi chú'
+                    value={note}
+                    onChange={handleNoteChange}
                     id='textarea-outlined-static'
                     fullWidth
                     InputProps={{ readOnly: readOnly }}
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <Typography variant='h5'>Đơn vị kiêm nhiệm</Typography>
+                  <Typography variant='h5'>Đơn vị</Typography>
                 </Grid>
                 <Grid item xs={11.8}>
                   <TableContainer component={Paper}>
@@ -644,15 +772,8 @@ const UserDetails = () => {
                       <TableBody>
                         {group.map((group, index) => (
                           <TableRow key={index}>
-                            <TableCell>
-                              <Autocomplete
-                                value={groupOptions.find(option => option.groupName === group.groupName) || null}
-                                options={groupOptions}
-                                getOptionLabel={option => option.groupName}
-                                onChange={(event, newValue) => handleGroupChange(newValue)}
-                                renderInput={params => <CustomTextField {...params} />}
-                              />
-                            </TableCell>{' '}
+                            <TableCell>{group.groupName}</TableCell>
+
                             <TableCell>{group.groupCode}</TableCell>
                             <TableCell align='right'>
                               {/* Render formatted content in isLeader column */}
@@ -671,6 +792,9 @@ const UserDetails = () => {
                     </Table>
                   </TableContainer>
                 </Grid>
+              </Grid>
+              <br></br>
+              <Grid container spacing={2} component={Paper} style={{ marginLeft: 10, backgroundColor: 'white' }}>
                 <Grid item xs={12}>
                   <Typography variant='h5'>Thông tin tài khoản</Typography>
                 </Grid>
@@ -696,8 +820,34 @@ const UserDetails = () => {
                   <FormControlLabel
                     control={
                       <Switch
-                        checked={user.userAccount.accStatus}
-                        onChange={e => setStatus(e.target.checked)}
+                        checked={status === 'ACTIVE'}
+                        onChange={e => {
+                          setStatus(status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE')
+                          const newStatus = e.target.checked ? 'true' : 'false'
+                          const token = localStorage.getItem(authConfig.storageTokenKeyName)
+                          fetch(
+                            `https://dev-ivi.basesystem.one/smc/iam/api/v0/users/${userId}/enable-account?enabled=${newStatus}`,
+                            {
+                              method: 'PUT',
+                              headers: {
+                                'Content-Type': 'application/json',
+                                Authorization: `Bearer ${token}` // Passing the token as a bearer token
+                              }
+                            }
+                          )
+                            .then(response => {
+                              if (!response.ok) {
+                                throw new Error('Failed to update account status')
+                              }
+                              return response.json()
+                            })
+                            .then(data => {
+                              console.log('Account status updated:', data)
+                            })
+                            .catch(error => {
+                              console.error('Error updating account status:', error)
+                            })
+                        }}
                         color='primary'
                         disabled={readOnly}
                       />

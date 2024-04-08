@@ -8,10 +8,11 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 import { Grid } from '@mui/material'
+import Link from 'next/link'
 
 const TableHeader = props => {
   // ** Props
-  const { handleFilter, exportValue,importValue,toggle, value } = props
+  const { handleFilter, exportValue, importValue, toggle, value } = props
 
   return (
     <Box
@@ -26,31 +27,42 @@ const TableHeader = props => {
         justifyContent: 'space-between'
       }}
     >
-      <Box >
-        <Grid style={{fontSize: 30, color:'black'}}>Danh sách người dùng</Grid>
+      <Box>
+        <Grid style={{ fontSize: 30, color: 'black' }}>Danh sách người dùng</Grid>
       </Box>
       <Box sx={{ rowGap: 2, display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
-        
         <CustomTextField
-        
           value={value}
           sx={{ mr: 4 }}
           placeholder='Search User'
           onChange={e => handleFilter(e.target.value)}
         />
-         <Button style={{backgroundColor:'#A9A9A9'}} onClick={exportValue} variant='contained' sx={{ '& svg': { mr: 1 } }}>
-         <Icon fontSize='1.125rem' icon='tabler:file-export' />  
-
+        <Button
+          style={{ backgroundColor: '#A9A9A9' }}
+          onClick={exportValue}
+          variant='contained'
+          sx={{ '& svg': { mr: 1 } }}
+        >
+          <Icon fontSize='1.125rem' icon='tabler:file-export' />
         </Button>
         <hr></hr>
-        <Button  style={{backgroundColor:'#A9A9A9'}} onClick={importValue} variant='contained' sx={{ '& svg': { mr: 1 } }}>
-          <Icon fontSize='1.125rem' icon='tabler:file-upload' /> 
+        <Button
+          style={{ backgroundColor: '#A9A9A9' }}
+          onClick={importValue}
+          variant='contained'
+          sx={{ '& svg': { mr: 1 } }}
+        >
+          <Icon fontSize='1.125rem' icon='tabler:file-upload' />
         </Button>
         <hr></hr>
 
-        <Button  onClick={toggle} variant='contained' sx={{ '& svg': { mr: 2 } }}>
+        <Button
+          // component={Link} href={`/apps/user/add`}
+          variant='contained'
+          sx={{ '& svg': { mr: 2 } }}
+        >
           <Icon fontSize='1.125rem' icon='tabler:plus' />
-         Thêm mới
+          Thêm mới
         </Button>
       </Box>
     </Box>

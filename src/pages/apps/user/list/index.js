@@ -293,14 +293,14 @@ const UserList = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{user.mainGroupName}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>
                         <Grid container spacing={2}>
-                          {/* <IconButton
+                          <IconButton
                             size='small'
                             component={Link}
                             href={`/apps/user/detail/${user.userId}`}
                             sx={{ color: 'text.secondary' }}
                           >
-                            <Icon icon='tabler:eye' /> */}
-                          {/* </IconButton> */}
+                            <Icon icon='tabler:eye' />
+                          </IconButton>
                           <IconButton onClick={() => handleDelete(user.userId)}>
                             <Icon icon='tabler:trash' />
                           </IconButton>

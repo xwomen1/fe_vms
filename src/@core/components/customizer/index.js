@@ -171,15 +171,15 @@ const Customizer = () => {
               <Typography>Primary Color</Typography>
               <Box sx={{ display: 'flex' }}>
                 <ColorBox
-                  onClick={() => handleChange('themeColor', 'primary')}
+                  onClick={() => handleChange('themeColor', 'warning')}
                   sx={{
-                    backgroundColor: '#7367F0',
-                    ...(themeColor === 'primary'
+                    backgroundColor: 'warning.main',
+                    ...(themeColor === 'warning.main'
                       ? { width: 53, height: 53, m: theme => theme.spacing(1.5, 0.75, 0) }
                       : {})
                   }}
                 />
-                <ColorBox
+                {/* <ColorBox
                   onClick={() => handleChange('themeColor', 'secondary')}
                   sx={{
                     backgroundColor: 'secondary.main',
@@ -198,10 +198,10 @@ const Customizer = () => {
                   }}
                 />
                 <ColorBox
-                  onClick={() => handleChange('themeColor', 'error')}
+                  onClick={() => handleChange('themeColor', 'warning')}
                   sx={{
-                    backgroundColor: 'error.main',
-                    ...(themeColor === 'error'
+                    backgroundColor: 'warning.main',
+                    ...(themeColor === 'warning'
                       ? { width: 53, height: 53, m: theme => theme.spacing(1.5, 0.75, 0) }
                       : {})
                   }}
@@ -221,7 +221,7 @@ const Customizer = () => {
                     backgroundColor: 'info.main',
                     ...(themeColor === 'info' ? { width: 53, height: 53, m: theme => theme.spacing(1.5, 0.75, 0) } : {})
                   }}
-                />
+                /> */}
               </Box>
             </div>
           </CustomizerSpacing>
