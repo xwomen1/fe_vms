@@ -77,6 +77,7 @@ const UserDetails = () => {
   const handleAddRoleClickPolicy = () => {
     setOpenPopupPolicy(true)
   }
+
   const handleStartDateChange = date => {
     setAvailableAt(date)
     setAva1(isoToEpoch(date))
@@ -86,10 +87,13 @@ const UserDetails = () => {
     setExpiredAt(date)
     setAva2(isoToEpoch(date))
   }
+
   console.log('New start date:', isoToEpoch(availableAt))
+
   function isoToEpoch(isoDateString) {
     var milliseconds = Date.parse(isoDateString)
     var epochSeconds = Math.round(milliseconds)
+
     return epochSeconds
   }
 
@@ -116,42 +120,35 @@ const UserDetails = () => {
   const handleFullNameChange = event => {
     setFullNameValue(event.target.value)
   }
-  const handleStatus1Change = async e => {
-    const newStatus = e.target.checked ? 'ACTIVE' : 'INACTIVE'
-    setStatus(newStatus)
-    try {
-      const response = await fetch(
-        `https://dev-ivi.basesystem.one/smc/iam/api/v0/users/${userId}/enable-account?enabled=${newStatus}`
-      )
-      if (!response.ok) {
-        // Handle error
-        console.error('Failed to update account status')
-      }
-    } catch (error) {
-      console.error('Failed to update account status', error)
-    }
-  }
+
   const handleStatusChange = () => {
     setStatus1(status1 === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE')
   }
+
   const handleEmailChange = event => {
     setEmail(event.target.value)
   }
+
   const handlePhoneNumberChange = event => {
     setPhoneNumber(event.target.value)
   }
+
   const handleNoteChange = event => {
     setNote(event.target.value)
   }
+
   const handleIdentityNumberChange = event => {
     setIdentityNumber(event.target.value)
   }
+
   const handleUserCodeChange = event => {
     setUserCode(event.target.value)
   }
+
   const handleSyncCodeChange = event => {
     setSyncCode(event.target.value)
   }
+
   const handleClosePopupPolicy = () => {
     setOpenPopupPolicy(false) // Đóng Popup khi cần thiết
   }
@@ -163,9 +160,11 @@ const UserDetails = () => {
   const handleClosePopup = () => {
     setOpenPopup(false) // Đóng Popup khi cần thiết
   }
+
   const handleTimeValidityChange = event => {
     setTimeValidity(event.target.value)
   }
+
   const handleRoleSelect = selectedRole => {
     console.log('Selected Role:', selectedRole)
     fetchUserData()
@@ -192,6 +191,7 @@ const UserDetails = () => {
     setEditing(false)
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
       const config = {
         headers: {
           Authorization: `Bearer ${token}`
@@ -239,6 +239,7 @@ const UserDetails = () => {
       return null
     }
   }
+
   const convertStringToTimeArray = timeString => {
     const date = new Date(timeString)
     const hour = date.getHours()
@@ -324,13 +325,6 @@ const UserDetails = () => {
 
   const handleTimeChange = newValue => {
     setDateTime(newValue)
-  }
-
-  const handleAvailableChange = newValue => {
-    setAvailableAt(newValue)
-  }
-  const handleExpireChange = newValue => {
-    setExpiredAt(newValue)
   }
 
   const handleTimeEndMorningChange = newValue => {
@@ -839,6 +833,7 @@ const UserDetails = () => {
                               if (!response.ok) {
                                 throw new Error('Failed to update account status')
                               }
+
                               return response.json()
                             })
                             .then(data => {

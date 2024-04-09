@@ -48,6 +48,7 @@ const UserDetails = () => {
   const [showPlusColumn, setShowPlusColumn] = useState(false)
 
   const [isFaceEnabled, setIsFaceEnabled] = useState(false)
+
   const handleStartDateChange = date => {
     setAvailableAt(date)
   }
@@ -55,7 +56,9 @@ const UserDetails = () => {
   console.log('New start date:', isoToEpoch(availableAt))
   function isoToEpoch(isoDateString) {
     var milliseconds = Date.parse(isoDateString)
+
     var epochSeconds = Math.round(milliseconds)
+
     return epochSeconds
   }
 
@@ -74,8 +77,10 @@ const UserDetails = () => {
   const saveChanges = async () => {
     setReadOnly(true)
     setEditing(false)
+
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
       const config = {
         headers: {
           Authorization: `Bearer ${token}`
@@ -119,6 +124,7 @@ const UserDetails = () => {
           Authorization: `Bearer ${token}`
         }
       }
+
       const response = await axios.get(
         `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-access/${userId}/authentications`,
         config
@@ -140,6 +146,7 @@ const UserDetails = () => {
             Authorization: `Bearer ${token}`
           }
         }
+
         const response = await axios.get(
           `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-access/${userId}/authentications`,
           config

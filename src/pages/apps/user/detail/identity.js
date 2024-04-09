@@ -38,7 +38,7 @@ import Swal from 'sweetalert2'
 import Tooltip from 'src/@core/theme/overrides/tooltip'
 import useAxios from 'axios-hooks'
 import EditIcon from '@mui/icons-material/Edit'
-import { Popup } from 'devextreme-react/popup'
+import { Popup } from './popup/ImageForm'
 import ImageForm from './popup/ImageForm'
 
 const UserDetails = () => {
@@ -90,11 +90,13 @@ const UserDetails = () => {
   const [rows1, setRows1] = useState([])
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
   const [faceType, setFaceType] = useState(null) // State để lưu faceType của ảnh được chọn
+
   const config = {
     headers: {
       Authorization: `Bearer ${token}`
     }
   }
+
   const handleEditImageButtonClick = (faceType, imageUrl) => {
     setFaceType(faceType)
     setImageUrl(imageUrl)
@@ -127,6 +129,7 @@ const UserDetails = () => {
   }
 
   const statusText = isFaceEnabled ? 'Đang hoạt động' : 'Không hoạt động'
+
   const statusText1 = !fingerIdentifyUpdatedAt ? 'Đã định danh' : 'Chưa định danh'
 
   const toggleEdit = () => {
@@ -140,6 +143,7 @@ const UserDetails = () => {
     setEditing(false)
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
       const config = {
         headers: {
           Authorization: `Bearer ${token}`
@@ -187,6 +191,7 @@ const UserDetails = () => {
       return null
     }
   }
+
   const convertStringToTimeArray = timeString => {
     const date = new Date(timeString)
     const hour = date.getHours()
@@ -194,8 +199,10 @@ const UserDetails = () => {
 
     return [hour, minute]
   }
+
   const updateAccessCodeAndAvaibleAtByIdUser = async () => {
     const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
     const config = {
       headers: {
         Authorization: `Bearer ${token}`
@@ -211,24 +218,8 @@ const UserDetails = () => {
   useEffect(() => {
     if (userId) {
       updateAccessCodeAndAvaibleAtByIdUser()
-      // executeGetData()
     }
   }, [userId])
-  const callApiUpdateAuthenSettings = async dto => {
-    try {
-      await callApi(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-access/${userId}/authen-settings`,
-        'POST',
-        dto
-      )
-      utils.showToast('Cập nhật thành công')
-      // executeGetData()
-    } catch (error) {
-      utils.showToastErrorCallApi(error)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   useEffect(() => {
     if (user) {
@@ -251,14 +242,7 @@ const UserDetails = () => {
     setIdentityData(user)
     originIdentityData.current = user
   }, [user])
-  const handleChangeIdentity = e => {
-    const { name, checked } = e.target
-    if (identityData) {
-      identityData[name] = checked
-      setIdentityData({ ...identityData })
-    }
-    // console.log(`handleChangeIdentity ${name}, ${checked}`);
-  }
+
   const fetchUserData = async () => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -268,6 +252,7 @@ const UserDetails = () => {
           Authorization: `Bearer ${token}`
         }
       }
+
       const response = await axios.get(
         `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-access/${userId}/authentications`,
         config
@@ -280,22 +265,44 @@ const UserDetails = () => {
       console.error('Error fetching user details:', error)
     }
   }
+
   const ImgCards = ({ data, imgTitle }) => {
     const emptyImages = Array.from({ length: 5 }, (_, index) => ({
       // Tạo dữ liệu mẫu cho 5 ô ảnh trống
-
       imageFileUrl: '/images/user.jpg',
       imageBase64: null,
-      faceType: null
+      faceType: index === 0 ? 'LEFT' : index === 1 ? 'RIGHT' : index === 2 ? 'CENTER' : index === 3 ? 'ABOVE' : 'BOTTOM'
     }))
+
     const buildUrlWithToken = url => {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
       if (token) {
         return `${url}?token=${token}`
       }
+
       return url
     }
-    const imagesToShow = data.length > 0 ? data : emptyImages // Nếu có dữ liệu, sử dụng dữ liệu, ngược lại sử dụng 5 ô ảnh trống
+
+    // Tạo dữ liệu cho các ảnh từ API trả về hoặc dùng dữ liệu mẫu
+    const imagesToShow = useMemo(() => {
+      if (data.length === 0) {
+        return emptyImages
+      } else {
+        const filledImages = data.map((item, index) => ({
+          ...item,
+          faceType:
+            item.faceType ||
+            (index === 0 ? 'LEFT' : index === 1 ? 'RIGHT' : index === 2 ? 'CENTER' : index === 3 ? 'ABOVE' : 'BOTTOM')
+        }))
+
+        // Nếu dữ liệu ít hơn 5 ảnh, thêm các ô ảnh trống vào
+        while (filledImages.length < 5) {
+          filledImages.push(emptyImages[filledImages.length])
+        }
+
+        return filledImages
+      }
+    }, [data, emptyImages])
 
     return (
       <div style={{ display: 'flex', gap: '34px' }}>
@@ -324,6 +331,7 @@ const UserDetails = () => {
               <IconButton
                 size='small'
                 onClick={() => {
+                  setOpenPopup(true)
                   handleEditImageButtonClick(item.faceType, item.imageFileUrl)
                   setIsOpenUpdateImgUser(true)
                   setFaceType(item.faceType)
@@ -338,13 +346,14 @@ const UserDetails = () => {
       </div>
     )
   }
+
   const processImageData = data => {
     // Nếu data trống hoặc không tồn tại, trả về mảng rỗng
     if (!data || data.length === 0) {
       return Array.from({ length: 5 }, (_, index) => ({
         imageFileUrl: '/images/user.jpg', // Đường dẫn ảnh mặc định
         imageBase64: null,
-        faceType: null
+        faceType: getFaceTypeFromIndex(index)
       }))
     }
 
@@ -357,16 +366,48 @@ const UserDetails = () => {
       })
     }
 
-    // Trả về data sau khi xử lý
-    return data
+    // Lấy giá trị faceType từ ảnh đầu tiên của API
+    const firstImageFaceType = data[0].faceType
+
+    // Tạo một mảng chứa các giá trị faceType có thể được sử dụng cho các ảnh còn lại
+    const availableFaceTypes = ['LEFT', 'RIGHT', 'CENTER', 'ABOVE', 'BOTTOM'].filter(
+      type => type !== firstImageFaceType
+    )
+
+    // Lặp qua mảng data và điền các giá trị faceType
+    const processedData = data.map((item, index) => ({
+      ...item,
+      faceType: index === 0 ? firstImageFaceType : availableFaceTypes[index - 1]
+    }))
+
+    return processedData
+  }
+
+  const getFaceTypeFromIndex = index => {
+    // Xác định faceType dựa trên index của ảnh
+    switch (index) {
+      case 0:
+        return 'LEFT'
+      case 1:
+        return 'RIGHT'
+      case 2:
+        return 'CENTER'
+      case 3:
+        return 'ABOVE'
+      default:
+        return 'BOTTOM'
+    }
   }
 
   // Sử dụng useMemo để gọi hàm processImageData mỗi khi user thay đổi
+
   const processedImages = useMemo(() => processImageData(identityData?.faces), [identityData?.faces])
 
   const Img = React.memo(props => {
     const [loaded, setLoaded] = useState(false)
+
     const { src } = props
+
     return (
       <>
         <div
@@ -394,6 +435,7 @@ const UserDetails = () => {
       </>
     )
   })
+
   const handleDeleteRow = (userId, groupId) => {
     showAlertConfirm({
       text: 'Bạn có chắc chắn muốn xóa?'
@@ -436,6 +478,7 @@ const UserDetails = () => {
             Authorization: `Bearer ${token}`
           }
         }
+
         const response = await axios.get(
           `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-access/${userId}/authentications`,
           config
@@ -457,6 +500,7 @@ const UserDetails = () => {
     setReadOnly(true)
     setEditing(false)
     setShowPlusColumn(!showPlusColumn)
+
     // router.reload()
 
     setUser({
@@ -538,38 +582,26 @@ const UserDetails = () => {
                     {(identityData?.faces?.length && (
                       <>
                         <div style={{ display: 'flex' }}>
-                          <ImgCards data={identityData?.faces} imgTitle='Ảnh' />
+                          <ImgCards data={processedImages} imgTitle='Ảnh' />
                         </div>
                       </>
                     )) || (
                       <>
                         <h4 style={{ fontSize: '16px' }}>Hình ảnh khuôn mặt</h4>
                         <div style={{ display: 'flex' }}>
-                          <ImgCards data={[]} imgTitle='Ảnh' /> {/* Sử dụng 5 ô ảnh trống */}
+                          <ImgCards data={[]} imgTitle='Ảnh' />
                         </div>
                       </>
                     )}
+
                     {isOpenUpdateImgUser && (
-                      <Popup
-                        className='popup'
-                        visible={isOpenUpdateImgUser}
-                        // title='Cập nhật ảnh người dùng'
-                        showTitle
-                        onHidden={() => {
-                          setIsOpenUpdateImgUser(false)
-                        }}
-                        backgroundColor='rgba(0, 0, 0, 0.5)'
-                        width='50%'
-                        height='auto'
-                      >
-                        <ImageForm
-                          onClose={() => setIsOpenUpdateImgUser(false)}
-                          setReload={() => setReload(reload + 1)}
-                          userId={userId}
-                          faceType={faceType}
-                          imageUrl={imageUrl}
-                        />
-                      </Popup>
+                      <ImageForm
+                        onClose={() => setIsOpenUpdateImgUser(false)}
+                        open={openPopup}
+                        userId={userId}
+                        faceType={faceType}
+                        imageUrl={imageUrl}
+                      />
                     )}
                   </div>
                   <Grid item xs={12}>

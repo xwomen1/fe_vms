@@ -56,11 +56,7 @@ const TableHeader = props => {
         </Button>
         <hr></hr>
 
-        <Button
-          // component={Link} href={`/apps/user/add`}
-          variant='contained'
-          sx={{ '& svg': { mr: 2 } }}
-        >
+        <Button component={Link} href={`/apps/user`} variant='contained' sx={{ '& svg': { mr: 2 } }}>
           <Icon fontSize='1.125rem' icon='tabler:plus' />
           Thêm mới
         </Button>

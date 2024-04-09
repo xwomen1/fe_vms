@@ -21,14 +21,17 @@ const RolePopup = ({ open, onClose, onSelect, userId }) => {
       console.log(defaultGroup, 'nameee')
     }
   }
+
   const createNewGroup = async () => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
       const config = {
         headers: {
           Authorization: `Bearer ${token}`
         }
       }
+
       const response = await axios.post(
         'https://dev-ivi.basesystem.one/smc/iam/api/v0/groups',
         {
@@ -38,29 +41,35 @@ const RolePopup = ({ open, onClose, onSelect, userId }) => {
         },
         config
       )
+
       return response.data.data.groupId
     } catch (error) {
       throw error
     }
   }
+
   const searchGroupId = async groupName => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
       const config = {
         headers: {
           Authorization: `Bearer ${token}`
         }
       }
+
       const response = await axios.get(
         `https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search?keyword=${groupName}`,
         config
       )
       console.log(response.data.data[0].groupId)
+
       return response.data.data[0].groupId
     } catch (error) {
       throw error
     }
   }
+
   const handleRoleSelect = async () => {
     try {
       let newGroupId = await searchGroupId(defaultGroup.name)
@@ -113,6 +122,7 @@ const RolePopup = ({ open, onClose, onSelect, userId }) => {
             Authorization: `Bearer ${token}`
           }
         }
+
         const response = await axios.get(
           'https://sbs.basesystem.one/ivis/infrares/api/v0/regions?limit=25&page=1&parentID=f963e9d4-3d6b-45df-884d-15f93452f2a2',
           config

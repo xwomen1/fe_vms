@@ -79,6 +79,7 @@ const UserDetails = () => {
     const newRow1 = { policyName: '', description: '' }
     setRows1([...rows1, newRow1])
   }
+
   const handleCreateAccountChange = event => {
     setCreateAccount(event.target.checked)
   }
@@ -95,16 +96,20 @@ const UserDetails = () => {
   console.log('New start date:', isoToEpoch(availableAt))
   function isoToEpoch(isoDateString) {
     var milliseconds = Date.parse(isoDateString)
+
     var epochSeconds = Math.round(milliseconds)
+
     return epochSeconds
   }
 
   const handleFullNameChange = event => {
     setFullNameValue(event.target.value)
   }
+
   const handleAccountChange = event => {
     setAccount(event.target.value)
   }
+
   const handlePasswordChange = event => {
     setPassword(event.target.value)
   }
@@ -112,24 +117,31 @@ const UserDetails = () => {
   const handleConfirmPasswordChange = event => {
     setConfirmPassword(event.target.value)
   }
+
   const handleStatusChange = () => {
     setStatus1(status1 === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE')
   }
+
   const handleEmailChange = event => {
     setEmail(event.target.value)
   }
+
   const handlePhoneNumberChange = event => {
     setPhoneNumber(event.target.value)
   }
+
   const handleNoteChange = event => {
     setNote(event.target.value)
   }
+
   const handleIdentityNumberChange = event => {
     setIdentityNumber(event.target.value)
   }
+
   const handleUserCodeChange = event => {
     setUserCode(event.target.value)
   }
+
   const handleSyncCodeChange = event => {
     setSyncCode(event.target.value)
   }
@@ -137,28 +149,32 @@ const UserDetails = () => {
   const handleTimeValidityChange = event => {
     setTimeValidity(event.target.value)
   }
+
   const userGroups = rows.map(row => ({
     groupId: row.groupId,
     policyName: true,
     isLeader: false
   }))
+
   const userPolicy = rows1.map(row => ({
     policyId: row.policyId
   }))
 
-  console.log(userPolicy, 'ưors')
   const saveChanges = async () => {
     if (password !== confirmPassword) {
       Swal.fire('Lỗi!', 'Mật khẩu và xác nhận mật khẩu không khớp nhau.', 'error')
+
       return
     }
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
       const config = {
         headers: {
           Authorization: `Bearer ${token}`
         }
       }
+
       const response = await axios.post(
         `https://dev-ivi.basesystem.one/smc/iam/api/v0/users`,
         {
@@ -203,15 +219,11 @@ const UserDetails = () => {
 
     return [hour, minute]
   }
+
   const handleDeleteRow = index => {
     const updatedRows = [...rows]
     updatedRows.splice(index, 1)
     setRows(updatedRows)
-  }
-  const handleDeleteRow1 = index => {
-    const updatedRows1 = [...rows1]
-    updatedRows1.splice(index, 1)
-    setRows1(updatedRows1)
   }
 
   useEffect(() => {
