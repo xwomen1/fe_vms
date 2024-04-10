@@ -39,8 +39,17 @@ const navigation = () => {
       path: '/asset',
       title: 'Tài sản',
       icon: 'tabler:moneybag'
-    }
-
+    },
+    {
+      path: '/pages/report-month/list',
+      title: 'Báo cáo tháng',
+      icon: 'tabler:id'
+    },
+    {
+      path: '/pages/ac/list',
+      title: 'Quyền truy cập',
+      icon: 'tabler:shield',
+    },
     // {
     //   title: 'Dashboards',
     //   icon: 'tabler:smart-home',
