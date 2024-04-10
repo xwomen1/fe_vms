@@ -259,6 +259,7 @@ function ReportMonth({ history }) {
                 const matchingTimes = employee.timeValues.filter((time) => {
                     const startDate = format(new Date(time.timeMin), 'dd/MM/yyyy');
                     const endDate = format(new Date(time.timeMax), 'dd/MM/yyyy');
+
                     return isWithinInterval(parse(formattedDay, 'dd/MM/yyyy', new Date()), {
                         start: parse(startDate, 'dd/MM/yyyy', new Date()),
                         end: parse(endDate, 'dd/MM/yyyy', new Date()),
@@ -438,38 +439,39 @@ function ReportMonth({ history }) {
                                         {employee?.fullName}
                                     </TableCell>
                                     {daysInRange.map((day, dayIndex) => {
-                                        const formattedDay = format(parse(day, 'dd/MM/yyyy', new Date()), 'dd/MM/yyyy');
+                                        const formattedDay = format(parse(day, 'dd/MM/yyyy', new Date()), 'dd/MM/yyyy')
                                         const matchingTimes = employee.timeValues.filter((time) => {
-                                            const startDate = format(new Date(time.timeMin), 'dd/MM/yyyy');
-                                            const endDate = format(new Date(time.timeMax), 'dd/MM/yyyy');
+                                            const startDate = format(new Date(time.timeMin), 'dd/MM/yyyy')
+                                            const endDate = format(new Date(time.timeMax), 'dd/MM/yyyy')
+
                                             return isWithinInterval(parse(formattedDay, 'dd/MM/yyyy', new Date()), {
                                                 start: parse(startDate, 'dd/MM/yyyy', new Date()),
                                                 end: parse(endDate, 'dd/MM/yyyy', new Date()),
-                                            });
-                                        });
-
+                                            })
+                                        })
                                         const totalDuration = matchingTimes.reduce((sum, time) => {
-                                            const startTime = format(new Date(time.timeMin), 'HH:mm');
-                                            const endTime = format(new Date(time.timeMax), 'HH:mm');
+                                            const startTime = format(new Date(time.timeMin), 'HH:mm')
+                                            const endTime = format(new Date(time.timeMax), 'HH:mm')
 
-                                            const lunchStart = '12:00';
-                                            const lunchEnd = '13:30';
+                                            const lunchStart = '12:00'
+                                            const lunchEnd = '13:30'
 
                                             // Nếu thời gian nằm ngoài thời gian nghỉ trưa hoặc không nằm trong thời gian làm việc
                                             if (endTime <= lunchStart || startTime >= lunchEnd) {
-                                                sum += (time.timeMax - time.timeMin);
+                                                sum += (time.timeMax - time.timeMin)
                                             } else {
                                                 // Trường hợp còn lại, tính thời gian làm việc trừ thời gian nghỉ trưa
                                                 if (startTime < lunchStart) {
-                                                    sum += (parse(lunchStart, 'HH:mm', new Date()) - parse(startTime, 'HH:mm', new Date()));
+                                                    sum += (parse(lunchStart, 'HH:mm', new Date()) - parse(startTime, 'HH:mm', new Date()))
                                                 }
                                                 if (endTime > lunchEnd) {
-                                                    sum += (parse(endTime, 'HH:mm', new Date()) - parse(lunchEnd, 'HH:mm', new Date()));
+                                                    sum += (parse(endTime, 'HH:mm', new Date()) - parse(lunchEnd, 'HH:mm', new Date()))
                                                 }
                                             }
 
                                             return sum;
                                         }, 0)
+
                                         return (
                                             <TableCell
                                                 key={dayIndex}
@@ -510,29 +512,27 @@ const cellStyle = {
     padding: '20px',
     minWidth: '25%',
     textAlign: 'left',
-};
-
+}
 const headerCellStyle = {
     ...cellStyle,
     backgroundColor: '#f2f2f2',
-};
+}
 const fixedColumnStyle = {
     ...cellStyle,
-    width: 'auto', // Độ rộng tùy chỉnh cho cột nhân viên
-    minWidth: '150px', // Giả sử độ rộng tối thiểu bạn muốn giữ cho cột nhân viên
+    width: 'auto',
+    minWidth: '150px',
     position: 'sticky',
-
     left: 0,
     zIndex: 1,
-};
+}
 const fixedColumnStyles = {
     ...cellStyle,
-    width: 'auto', // Độ rộng tùy chỉnh cho cột nhân viên
-    minWidth: '200px', // Giả sử độ rộng tối thiểu bạn muốn giữ cho cột nhân viên
+    width: 'auto',
+    minWidth: '200px',
     position: 'sticky',
     backgroundColor: '#f2f2f2',
     left: 0,
     zIndex: 5,
-};
+}
 
 export default ReportMonth
