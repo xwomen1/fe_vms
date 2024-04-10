@@ -1,27 +1,23 @@
 import {
-    Autocomplete, Button, Card, CardContent, CardHeader, Grid, Box,
-    Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress
-} from "@mui/material";
-import React from "react";
+    Autocomplete, Button, Card, CardContent, CardHeader, Grid,
+    Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow
+} from "@mui/material"
+import React from "react"
 import { useEffect, useState } from "react"
 import authConfig from 'src/configs/auth'
-import axios from "axios";
-
+import axios from "axios"
 import 'react-datepicker/dist/react-datepicker.css'
 import 'react-perfect-scrollbar/dist/css/styles.css'
 import DatePicker from 'react-datepicker'
 import TreeItem from '@mui/lab/TreeItem'
-
-import * as XLSX from 'xlsx';
-
-// ** Icon Imports
+import * as XLSX from 'xlsx'
 import Icon from 'src/@core/components/icon'
-import CustomTextField from "src/@core/components/mui/text-field";
+import CustomTextField from "src/@core/components/mui/text-field"
 import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
-import { format, isWithinInterval, parse } from "date-fns";
-import TreeView from "@mui/lab/TreeView";
-import { Controller, useForm } from 'react-hook-form'
-import { useUrlState } from "../useUrlState"
+import { format, isWithinInterval, parse } from "date-fns"
+import TreeView from "@mui/lab/TreeView"
+import { useForm } from 'react-hook-form'
+import useUrlState from "../useUrlState"
 
 const initValueFilter = {
     limit: 100,
@@ -34,13 +30,12 @@ function ReportMonth({ history }) {
     const [valueFilter, setValueFilter, incrementPage] = useUrlState(initValueFilter)
     const [start, setStart] = useState(null)
     const [end, setEnd] = useState(null)
-    const [daysInRange, setDaysInRange] = useState([]);
+    const [daysInRange, setDaysInRange] = useState([])
     const [groups, setGroups] = useState([])
     const [valueGroup, setValueGroup] = useState('')
     const [selectedGroups, setSelectedGroups] = useState([])
     const [dataResource, setDataResource] = useState([])
     const [selectedGroupId, setSelectedGroupId] = useState(null)
-    const [date, setDate] = useState(new Date())
 
     const {
         handleSubmit,
@@ -54,15 +49,11 @@ function ReportMonth({ history }) {
         defaultValues: valueFilter
     })
 
-    // useEffect(() => {
-    //     fetchDataSource()
-    // }, [start, end])
-
     useEffect(() => {
         if (selectedGroupId !== null) {
-            setValueFilter({ ...valueFilter, page: 1 });
-            setDataResource([]);
-            fetchDataSource();
+            setValueFilter({ ...valueFilter, page: 1 })
+            setDataResource([])
+            fetchDataSource()
         }
     }, [selectedGroupId])
 
@@ -71,9 +62,9 @@ function ReportMonth({ history }) {
     }, [valueFilter.page])
 
     const fetchDataSource = async () => {
-        setLoading(true);
+        setLoading(true)
         try {
-            const token = localStorage.getItem(authConfig.storageTokenKeyName);
+            const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
             const config = {
                 headers: {
@@ -84,26 +75,26 @@ function ReportMonth({ history }) {
                     page: parseInt(valueFilter.page),
                     limit: parseInt(valueFilter.limit),
                 }
-            };
-            const response = await axios.post(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/event/search/user`, {}, config);
+            }
+            const response = await axios.post(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/event/search/user`, {}, config)
 
             if (response.data.data.rows.length > 0) {
                 // Cập nhật dữ liệu mới vào mảng tạm thời
-                setDataResource(prevData => [...prevData, ...response.data.data.rows]);
+                setDataResource(prevData => [...prevData, ...response.data.data.rows])
 
                 // Tăng trang
-                incrementPage();
+                incrementPage()
 
             } else {
-                console.log("No more data to fetch.");
+                console.log("No more data to fetch.")
             }
             reset(valueFilter)
         } catch (error) {
-            console.error('Error fetching data:', error);
+            console.error('Error fetching data:', error)
         } finally {
-            setLoading(false);
+            setLoading(false)
         }
-    };
+    }
 
     useEffect(() => {
         const fetchGroupData = async () => {
@@ -218,7 +209,7 @@ function ReportMonth({ history }) {
     const groupedDataArray = Object.values(groupedData)
 
     useEffect(() => {
-        const today = new Date();
+        const today = new Date()
         const startDate = new Date(today.getFullYear(), today.getMonth(), 1)
         const endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0)
 
@@ -227,11 +218,11 @@ function ReportMonth({ history }) {
     }, [])
     useEffect(() => {
         if (start && end && start instanceof Date && end instanceof Date) {
-            const days = [];
-            let currentDay = new Date(start);
+            const days = []
+            let currentDay = new Date(start)
 
             while (currentDay <= end) {
-                days.push(format(currentDay, 'dd/MM/yyyy')) // Sử dụng format từ date-fns để hiển thị đủ ngày tháng năm
+                days.push(format(currentDay, 'dd/MM/yyyy'))
                 currentDay.setDate(currentDay.getDate() + 1)
             }
             setDaysInRange(days)
@@ -241,111 +232,111 @@ function ReportMonth({ history }) {
     const tableStyle = {
         borderCollapse: 'collapse',
         width: '100%',
-        overflowX: 'auto',  // Thêm thuộc tính overflow-x để tạo thanh cuộn ngang
-    };
+        overflowX: 'auto',
+    }
 
     const exportToExcel = () => {
         // Tạo một workbook mới
-        const workbook = XLSX.utils.book_new();
+        const workbook = XLSX.utils.book_new()
 
         // Tạo một worksheet từ dữ liệu đã gộp cho khoảng ngày đã chọn
         const filteredData = groupedDataArray.map((employee) => {
             const row = {
                 'Họ tên nhân viên': employee.fullName,
-            };
+            }
 
             daysInRange.forEach((day) => {
-                const formattedDay = format(parse(day, 'dd/MM/yyyy', new Date()), 'dd/MM/yyyy');
+                const formattedDay = format(parse(day, 'dd/MM/yyyy', new Date()), 'dd/MM/yyyy')
 
                 const matchingTimes = employee.timeValues.filter((time) => {
-                    const startDate = format(new Date(time.timeMin), 'dd/MM/yyyy');
-                    const endDate = format(new Date(time.timeMax), 'dd/MM/yyyy');
+                    const startDate = format(new Date(time.timeMin), 'dd/MM/yyyy')
+                    const endDate = format(new Date(time.timeMax), 'dd/MM/yyyy')
 
                     return isWithinInterval(parse(formattedDay, 'dd/MM/yyyy', new Date()), {
                         start: parse(startDate, 'dd/MM/yyyy', new Date()),
                         end: parse(endDate, 'dd/MM/yyyy', new Date()),
-                    });
-                });
+                    })
+                })
 
                 const totalDuration = matchingTimes.reduce((sum, time) => {
-                    const startTime = format(new Date(time.timeMin), 'HH:mm');
-                    const endTime = format(new Date(time.timeMax), 'HH:mm');
+                    const startTime = format(new Date(time.timeMin), 'HH:mm')
+                    const endTime = format(new Date(time.timeMax), 'HH:mm')
 
-                    const lunchStart = '12:00';
-                    const lunchEnd = '13:30';
+                    const lunchStart = '12:00'
+                    const lunchEnd = '13:30'
 
                     // Nếu thời gian nằm ngoài thời gian nghỉ trưa hoặc không nằm trong thời gian làm việc
                     if (endTime <= lunchStart || startTime >= lunchEnd) {
-                        sum += (time.timeMax - time.timeMin);
+                        sum += (time.timeMax - time.timeMin)
                     } else {
                         // Trường hợp còn lại, tính thời gian làm việc trừ thời gian nghỉ trưa
                         if (startTime < lunchStart) {
-                            sum += (parse(lunchStart, 'HH:mm', new Date()) - parse(startTime, 'HH:mm', new Date()));
+                            sum += (parse(lunchStart, 'HH:mm', new Date()) - parse(startTime, 'HH:mm', new Date()))
                         }
                         if (endTime > lunchEnd) {
-                            sum += (parse(endTime, 'HH:mm', new Date()) - parse(lunchEnd, 'HH:mm', new Date()));
+                            sum += (parse(endTime, 'HH:mm', new Date()) - parse(lunchEnd, 'HH:mm', new Date()))
                         }
                     }
 
-                    return sum;
-                }, 0);
+                    return sum
+                }, 0)
 
 
-                const formattedTimes = matchingTimes.map((time) => `Vào: ${format(new Date(time.timeMin), 'HH:mm')} - Ra: ${format(new Date(time.timeMax), 'HH:mm')}`).join('\n');
-                const totalTime = formatDuration(totalDuration);
+                const formattedTimes = matchingTimes.map((time) => `Vào: ${format(new Date(time.timeMin), 'HH:mm')} - Ra: ${format(new Date(time.timeMax), 'HH:mm')}`).join('\n')
+                const totalTime = formatDuration(totalDuration)
 
                 // Thời gian vào, ra và tổng thời gian được thêm vào dòng tương ứng
-                row[`ThoiGian_${formattedDay}_`] = `${formattedTimes}\nTongThoiGian: ${totalTime}`;
-            });
+                row[`ThoiGian_${formattedDay}_`] = `${formattedTimes}\nTongThoiGian: ${totalTime}`
+            })
 
-            return row;
-        });
+            return row
+        })
 
-        const worksheet = XLSX.utils.json_to_sheet(filteredData);
+        const worksheet = XLSX.utils.json_to_sheet(filteredData)
 
         // Thêm worksheet vào workbook
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'DanhSachNhanVien');
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'DanhSachNhanVien')
 
         // Tạo buffer cho file Excel
-        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
 
         // Tạo Blob từ buffer
-        const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
+        const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheetcharset=UTF-8' })
 
         // Tạo đường dẫn URL cho Blob
-        const url = URL.createObjectURL(blob);
+        const url = URL.createObjectURL(blob)
 
         // Tạo một thẻ a để tải xuống
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'DanhSachNhanVien.xlsx';
+        const a = document.createElement('a')
+        a.href = url
+        a.download = 'DanhSachNhanVien.xlsx'
 
         // Thêm thẻ a vào body và click để bắt đầu tải xuống
-        document.body.appendChild(a);
-        a.click();
+        document.body.appendChild(a)
+        a.click()
 
         // Xóa thẻ a sau khi đã tải xuống
-        document.body.removeChild(a);
-    };
+        document.body.removeChild(a)
+    }
 
     const formatDuration = (durationInMilliseconds) => {
-        const seconds = Math.floor((durationInMilliseconds / 1000) % 60);
-        const minutes = Math.floor((durationInMilliseconds / (1000 * 60)) % 60);
-        const hours = Math.floor((durationInMilliseconds / (1000 * 60 * 60)) % 24);
+        const seconds = Math.floor((durationInMilliseconds / 1000) % 60)
+        const minutes = Math.floor((durationInMilliseconds / (1000 * 60)) % 60)
+        const hours = Math.floor((durationInMilliseconds / (1000 * 60 * 60)) % 24)
 
-        const formattedHours = hours.toString().padStart(2, '0');
-        const formattedMinutes = minutes.toString().padStart(2, '0');
-        const formattedSeconds = seconds.toString().padStart(2, '0');
+        const formattedHours = hours.toString().padStart(2, '0')
+        const formattedMinutes = minutes.toString().padStart(2, '0')
+        const formattedSeconds = seconds.toString().padStart(2, '0')
 
-        return `${formattedHours}:${formattedMinutes}`;
-    };
-    const emptyColumnCount = Math.max(0, 9 - daysInRange.length);
+        return `${formattedHours}:${formattedMinutes}`
+    }
+    const emptyColumnCount = Math.max(0, 9 - daysInRange.length)
 
     // Tạo một mảng chứa các cột rỗng
-    const emptyColumn = Array.from({ length: emptyColumnCount }, (_, index) => index);
+    const emptyColumn = Array.from({ length: emptyColumnCount }, (_, index) => index)
 
-    const cellWidth = 150;
-    const minCellWidth = 150; // Đặt giá trị tối thiểu cho chiều rộng 
+    const cellWidth = 150
+    const minCellWidth = 150
 
     return (
         <Card>
@@ -472,7 +463,7 @@ function ReportMonth({ history }) {
                                                 }
                                             }
 
-                                            return sum;
+                                            return sum
                                         }, 0)
 
                                         return (
