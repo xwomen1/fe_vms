@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
-import { TabContext, TabList, TabPanel } from "@mui/lab";
-import { Box, Button, Card, CardActions, CardContent, CardHeader, Divider, Grid, IconButton, Tab, useTheme } from "@mui/material";
-import { DataGrid } from '@mui/x-data-grid';
-import { FilterAlt, Label } from '@mui/icons-material';
-import Icon from 'src/@core/components/icon';
-import CustomTextField from "src/@core/components/mui/text-field";
-import Filter from '../popups/Filter';
-import { rows } from 'src/@fake-db/table/static-data';
+import React, { useState } from 'react'
+import { TabContext, TabList, TabPanel } from "@mui/lab"
+import { Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Tab } from "@mui/material"
+import { DataGrid } from '@mui/x-data-grid'
+import Icon from 'src/@core/components/icon'
+import CustomTextField from "src/@core/components/mui/text-field"
+import Filter from '../popups/Filter'
+import { rows } from 'src/@fake-db/table/static-data'
 
 const columns = [
     {
@@ -50,17 +49,15 @@ const columns = [
 ]
 
 const Access = () => {
-    const [value, setValue] = useState('overview');
-    const [keyword, setKeyword] = useState([]);
-    const [isOpenFilter, setIsOpenFilter] = useState(false);
-    const theme = useTheme();
+    const [value, setValue] = useState('overview')
+    const [keyword, setKeyword] = useState([])
+    const [isOpenFilter, setIsOpenFilter] = useState(false)
 
     const handleTabsChange = (event, newValue) => {
-        setValue(newValue);
+        setValue(newValue)
     }
-
     const handSearch = val => {
-        setKeyword(val);
+        setKeyword(val)
     }
 
     return (
@@ -142,8 +139,7 @@ const Access = () => {
                 )
             }
         </>
-
     )
 }
 
-export default Access;
+export default Access

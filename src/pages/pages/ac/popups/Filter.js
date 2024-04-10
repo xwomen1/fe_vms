@@ -1,22 +1,12 @@
 import { useState, forwardRef, useEffect } from 'react'
-
-
-// ** Custom Component Import
 import CustomTextField from 'src/@core/components/mui/text-field'
-
-// ** Icon Imports
 import Icon from 'src/@core/components/icon'
-import { Box, Button, Card, CardContent, CardHeader, Checkbox, Dialog, DialogActions, DialogContent, Fade, FormControl, FormControlLabel, FormHelperText, FormLabel, Grid, IconButton, InputAdornment, MenuItem, Radio, RadioGroup, Switch, Typography, styled } from '@mui/material'
-import CustomAutocomplete from 'src/@core/components/mui/autocomplete'
-
+import { Box, Button, Card, Dialog, DialogActions, DialogContent, Fade, Grid, IconButton, MenuItem, Typography, styled } from '@mui/material'
 import authConfig from 'src/configs/auth'
 import axios from 'axios'
-
 import { Controller, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
-import DatePicker from 'react-datepicker'
 import { TreeItem, TreeView } from '@mui/lab'
-
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Fade ref={ref} {...props} />
@@ -42,21 +32,11 @@ const defaultValues = {
     doorIn: null,
     doorOut: null
 }
-const CustomInput = forwardRef(({ ...props }, ref) => {
-    return <CustomTextField fullWidth inputRef={ref} {...props} sx={{ width: '100%' }} />
-})
 
 const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
     const API_REGIONS = `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/`
     const ExpandIcon = direction === 'rtl' ? 'tabler:chevron-left' : 'tabler:chevron-right'
-
-
     const [doorList, setDoorList] = useState([])
-    const [departmentList, setDepartmentList] = useState([])
-    const [groups, setGroups] = useState([])
-    const [selectedGroups, setSelectedGroups] = useState([])
-    const [selectedItem, setSelectedItem] = useState(null)
-
     const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
     const config = {
@@ -67,20 +47,11 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
         }
     }
 
-    const [state, setState] = useState({
-        password: '',
-        showPassword: false
-    })
-
     const {
         control,
         handleSubmit,
         formState: { errors }
     } = useForm({ defaultValues })
-
-    const handleClickShowPassword = () => {
-        setState({ ...state, showPassword: !state.showPassword })
-    }
 
     const fetchDoorList = async () => {
         try {
@@ -105,17 +76,8 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
         fetchDepartment()
     }, [])
 
-    const handleTreeSelect = (event, nodeIds) => {
-        setSelectedItem(nodeIds);
-    };
-
-    const handleAutocompleteChange = (event, newValue) => {
-        setSelectedItem(newValue ? [newValue] : []);
-    };
-
     const onSubmit = (values) => {
         console.log('v', values);
-        // callback()
         toast.success('Form Submitted')
         onClose()
     }
@@ -150,39 +112,6 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <Grid container spacing={3}>
                             <Grid item xs={12} sm={4}>
-                                <Controller
-                                    name='groupId'
-                                    control={control}
-                                    rules={{ required: true }}
-                                    render={({ field: { value, onChange } }) => (
-                                        <TreeView
-                                            aria-label='Phòng ban'
-                                            defaultExpandIcon={<Icon icon={ExpandIcon} />}
-                                            defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
-                                            id='validation-basic-select'
-                                            error={Boolean(errors.select)}
-                                            {...(errors.select && { helperText: 'This field is required' })}
-                                            value={value}
-                                            onChange={(event, newValue) => onChange(newValue)}
-                                        >
-                                            <TreeItem nodeId='1' label='Applications'>
-                                                <TreeItem nodeId='2' label='Calendar' />
-                                                <TreeItem nodeId='3' label='Chrome' />
-                                                <TreeItem nodeId='4' label='Webstorm' />
-                                            </TreeItem>
-                                            <TreeItem nodeId='5' label='Documents'>
-                                                <TreeItem nodeId='10' label='OSS' />
-                                                <TreeItem nodeId='6' label='MUI'>
-                                                    <TreeItem nodeId='7' label='src'>
-                                                        <TreeItem nodeId='8' label='index.js' />
-                                                        <TreeItem nodeId='9' label='tree-view.js' />
-                                                    </TreeItem>
-                                                </TreeItem>
-                                            </TreeItem>
-                                        </TreeView>
-                                    )}
-                                />
-
                             </Grid>
                             <Grid item xs={12} sm={4}>
                                 <Controller
@@ -213,7 +142,6 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                                     )}
                                 />
                             </Grid>
-
                             <Grid item xs={12} sm={4}>
                                 <Controller
                                     name='doorOut'
@@ -243,8 +171,6 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                                     )}
                                 />
                             </Grid>
-
-
                             <Grid item xs={12}>
                                 <DialogActions
                                     sx={{

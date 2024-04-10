@@ -24,5 +24,6 @@ export function useUrlState(initialState) {
         setUrlState({ page: (parseInt(state.page) || 0) + 1 })
     }
 
+
     return [state, setUrlState, incrementPage]
 }
