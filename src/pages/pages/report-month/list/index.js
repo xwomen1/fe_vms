@@ -256,6 +256,7 @@ function ReportMonth({ history }) {
 
             daysInRange.forEach((day) => {
                 const formattedDay = format(parse(day, 'dd/MM/yyyy', new Date()), 'dd/MM/yyyy');
+
                 const matchingTimes = employee.timeValues.filter((time) => {
                     const startDate = format(new Date(time.timeMin), 'dd/MM/yyyy');
                     const endDate = format(new Date(time.timeMax), 'dd/MM/yyyy');
@@ -440,6 +441,7 @@ function ReportMonth({ history }) {
                                     </TableCell>
                                     {daysInRange.map((day, dayIndex) => {
                                         const formattedDay = format(parse(day, 'dd/MM/yyyy', new Date()), 'dd/MM/yyyy')
+
                                         const matchingTimes = employee.timeValues.filter((time) => {
                                             const startDate = format(new Date(time.timeMin), 'dd/MM/yyyy')
                                             const endDate = format(new Date(time.timeMax), 'dd/MM/yyyy')
@@ -449,6 +451,7 @@ function ReportMonth({ history }) {
                                                 end: parse(endDate, 'dd/MM/yyyy', new Date()),
                                             })
                                         })
+
                                         const totalDuration = matchingTimes.reduce((sum, time) => {
                                             const startTime = format(new Date(time.timeMin), 'HH:mm')
                                             const endTime = format(new Date(time.timeMax), 'HH:mm')
@@ -513,10 +516,12 @@ const cellStyle = {
     minWidth: '25%',
     textAlign: 'left',
 }
+
 const headerCellStyle = {
     ...cellStyle,
     backgroundColor: '#f2f2f2',
 }
+
 const fixedColumnStyle = {
     ...cellStyle,
     width: 'auto',
@@ -525,6 +530,7 @@ const fixedColumnStyle = {
     left: 0,
     zIndex: 1,
 }
+
 const fixedColumnStyles = {
     ...cellStyle,
     width: 'auto',

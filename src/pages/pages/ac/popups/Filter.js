@@ -62,6 +62,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
             console.error('Error fetching data: ', error)
         }
     }
+
     const fetchDepartment = async () => {
         try {
             const res = await axios.get(`${API_REGIONS}/?parentId=342e46d6-abbb-4941-909e-3309e7487304`, config)

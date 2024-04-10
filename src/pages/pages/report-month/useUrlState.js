@@ -13,10 +13,12 @@ export function useUrlState(initialState) {
 
     const setUrlState = (newState) => {
         const { pathname } = router
+
         const url = {
             pathname,
             query: { ...router.query, ...newState }
         }
+
         router.push(url, undefined, { shallow: true })
     }
 
