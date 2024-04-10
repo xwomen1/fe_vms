@@ -1,7 +1,7 @@
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
 
-export function useUrlState(initialState) {
+function useUrlState(initialState) {
     const router = useRouter()
     const [state, setState] = useState(initialState)
 
@@ -29,3 +29,5 @@ export function useUrlState(initialState) {
 
     return [state, setUrlState, incrementPage]
 }
+
+export default useUrlState
