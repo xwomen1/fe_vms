@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { IconButton } from '@mui/material'
 import Icon from 'src/@core/components/icon'
 
-
 const convertTimeToMinute = (time) => {
     const res = (time / 1440) * 100;
+
     return res;
 };
 
@@ -169,12 +169,14 @@ const Daily = ({ dataDailyProps, callbackOfDaily, disabled }) => {
             return a.value - b.value;
         });
         const found = abc.find((e) => e.value === item.value - 1);
+
         const dto = {
             label: item.label,
             value: item.value,
             dayOfWeek: item.dayOfWeek,
             timePeriods: found.timePeriods || [],
         };
+
         setDataDaily([...abc.filter((e) => e.value !== item.value), dto]);
     };
 

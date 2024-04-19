@@ -169,7 +169,6 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
         values['endDate'] = format(end, 'yyyy-MM-dd')
 
         handleAddSchedule(values)
-        // handleAdd(values)
     }
 
     const handleAddSchedule = (values) => {
@@ -240,7 +239,6 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
             description: values?.nameCalendar,
             doorAccessIds: [doorAccessId],
             userGroupId: values?.groupId
-            // userGroupIds: [userGroupId],
         }
 
         axios.post(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/access-groups`, { ...params }, config)
@@ -263,7 +261,6 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
         setLoading(true)
         axios.post(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/calendar/configuration/create`, { ...params }, config)
             .then(() => {
-                // setIsHandleAdd(true);
                 toast.success('Thêm mới thành công')
                 setReload()
                 onClose()
@@ -281,13 +278,10 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
         <Card>
             <form>
                 <Dialog
-                    // fullWidth
                     open={show}
                     maxWidth='md'
                     scroll='body'
-                    // onClose={() => setShow(false)}
                     TransitionComponent={Transition}
-                    // onBackdropClick={() => setShow(false)}
                     sx={{ '& .MuiDialog-paper': { overflow: 'visible' } }}
                 >
                     <DialogContent

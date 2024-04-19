@@ -229,7 +229,6 @@ const View = ({ show, onClose, id, setReload, filter }) => {
         };
 
         useEffect(() => {
-            // Assuming detail is the API response
             if (detail && detail.calendarDays) {
                 const transformedData = transformCalendarDays(detail.calendarDays);
                 setDataDailyState(transformedData);
@@ -261,7 +260,6 @@ const View = ({ show, onClose, id, setReload, filter }) => {
                             color: 'rgba(0, 0, 0, 0.6)',
                             fontSize: 14,
                             display: 'flex',
-                            // borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
                         }}
                     >
                         {['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'].map((time, index) => (
@@ -304,13 +302,10 @@ const View = ({ show, onClose, id, setReload, filter }) => {
     return (
         <Card>
             <Dialog
-                // fullWidth
                 open={show}
                 maxWidth='md'
                 scroll='body'
-                // onClose={() => setShow(false)}
                 TransitionComponent={Transition}
-                // onBackdropClick={() => setShow(false)}
                 sx={{ '& .MuiDialog-paper': { overflow: 'visible' } }}
             >
                 <DialogContent
@@ -357,7 +352,7 @@ const View = ({ show, onClose, id, setReload, filter }) => {
                                 }
                                 if (item.type == 'Schedule') {
                                     return (
-                                        <Grid item xs={12}>
+                                        <Grid item xs={12} key={index}>
                                             <span style={{ color: "#f5963a", fontSize: 20, position: 'relative' }}>
                                                 Cấu hình thời gian hoạt động
                                                 <span style={{

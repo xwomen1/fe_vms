@@ -48,6 +48,7 @@ const AccessRight = () => {
     ]
 
     const [tab, setTab] = useState(tabList[0].id)
+
     const initValueFilter = {
         keyword: '',
         limit: 25,
@@ -56,6 +57,7 @@ const AccessRight = () => {
         doorOutId: null,
         groupId: null,
     }
+
     const [valueFilter, setValueFilter] = useState(initValueFilter)
 
     const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -330,6 +332,7 @@ const AccessRight = () => {
                     });
                 });
             }
+
             return acc;
         }, []);
 
@@ -344,7 +347,6 @@ const AccessRight = () => {
 
     const DeleteView = () => (
         <Dialog
-            // fullWidth
             open={isOpenDel}
             maxWidth='sm'
             scroll='body'
@@ -442,7 +444,6 @@ const AccessRight = () => {
                                 <CustomTextField
                                     value={keyword}
                                     placeholder='Search…'
-                                    // onChange={handSearch}
                                     InputProps={{
                                         startAdornment: (
                                             <Box sx={{ mr: 2, display: 'flex' }}>
