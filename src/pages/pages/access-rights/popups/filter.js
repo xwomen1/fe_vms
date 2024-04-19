@@ -122,9 +122,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                 open={show}
                 maxWidth='md'
                 scroll='body'
-                // onClose={() => setShow(false)}
                 TransitionComponent={Transition}
-                // onBackdropClick={() => setShow(false)}
                 sx={{ '& .MuiDialog-paper': { overflow: 'visible' } }}
             >
                 <DialogContent
@@ -148,7 +146,6 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                                 <Controller
                                     name='groupId'
                                     control={control}
-                                    // rules={{ required: true }}
                                     render={({ field: { value, onChange } }) => (
                                         <CustomTextField
                                             select
@@ -180,7 +177,6 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                                 <Controller
                                     name='doorInId'
                                     control={control}
-                                    // rules={{ required: true }}
                                     render={({ field: { value, onChange } }) => (
                                         <CustomTextField
                                             select
@@ -209,7 +205,6 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                                 <Controller
                                     name='doorOutId'
                                     control={control}
-                                    // rules={{ required: true }}
                                     render={({ field: { value, onChange } }) => (
                                         <CustomTextField
                                             select
