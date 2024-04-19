@@ -229,6 +229,7 @@ const Daily = ({ dataDailyProps, callbackOfDaily, disabled }) => {
                             </div>
                         );
                     }
+
                     return (
                         <div
                             key={index.toString()}
