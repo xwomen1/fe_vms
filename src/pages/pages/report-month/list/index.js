@@ -216,6 +216,7 @@ function ReportMonth({ history }) {
         setStart(startDate)
         setEnd(endDate)
     }, [])
+
     useEffect(() => {
         if (start && end && start instanceof Date && end instanceof Date) {
             const days = []
