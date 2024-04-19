@@ -46,7 +46,7 @@ const navigation = () => {
       icon: 'tabler:id'
     },
     {
-      path: '/pages/ac/list',
+      path: '/pages/access-rights/list',
       title: 'Quyền truy cập',
       icon: 'tabler:shield',
     }

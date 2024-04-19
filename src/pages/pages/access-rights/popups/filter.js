@@ -29,14 +29,16 @@ const CustomCloseButton = styled(IconButton)(({ theme }) => ({
 
 const defaultValues = {
     groupId: null,
-    doorIn: null,
-    doorOut: null
+    doorInId: null,
+    doorOutId: null
 }
 
 const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
+    const [loading, setLoading] = useState(false)
     const API_REGIONS = `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/`
     const ExpandIcon = direction === 'rtl' ? 'tabler:chevron-left' : 'tabler:chevron-right'
     const [doorList, setDoorList] = useState([])
+    const [groupName, setGroupName] = useState([])
     const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
     const config = {
@@ -64,11 +66,31 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
     }
 
     const fetchDepartment = async () => {
+        setLoading(true)
         try {
             const res = await axios.get(`${API_REGIONS}/?parentId=342e46d6-abbb-4941-909e-3309e7487304`, config)
-            setDepartmentList(res.data.data);
+            const group = res.data.data
+            groupName.push(...res.data.data)
+            group.map((item, index) => {
+                if (item.isParent == true) {
+                    fetchDepartmentChildren(item.id)
+                }
+            })
         } catch (error) {
             console.error('Error fetching data: ', error)
+        }
+    }
+
+    const fetchDepartmentChildren = async (idParent) => {
+        try {
+            const res = await axios.get(`${API_REGIONS}?parentId=${idParent}`, config)
+            const groupChildren = []
+            groupChildren.push(...res.data.data)
+            groupName.push(...groupChildren)
+        } catch (error) {
+            console.error('Error fetching data: ', error)
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -77,9 +99,19 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
         fetchDepartment()
     }, [])
 
+    const onReset = (values) => {
+        var detail = {
+            doorInId: '',
+            doorOutId: '',
+            groupId: ''
+        }
+        callback(detail)
+        onClose()
+    }
+
     const onSubmit = (values) => {
-        console.log('v', values);
-        toast.success('Form Submitted')
+        var detail = { ...values }
+        callback(detail)
         onClose()
     }
 
@@ -90,9 +122,9 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                 open={show}
                 maxWidth='md'
                 scroll='body'
-                onClose={() => setShow(false)}
+                // onClose={() => setShow(false)}
                 TransitionComponent={Transition}
-                onBackdropClick={() => setShow(false)}
+                // onBackdropClick={() => setShow(false)}
                 sx={{ '& .MuiDialog-paper': { overflow: 'visible' } }}
             >
                 <DialogContent
@@ -110,15 +142,45 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                             Bộ lọc
                         </Typography>
                     </Box>
-                    <form onSubmit={handleSubmit(onSubmit)}>
+                    <form>
                         <Grid container spacing={3}>
                             <Grid item xs={12} sm={4}>
+                                <Controller
+                                    name='groupId'
+                                    control={control}
+                                    // rules={{ required: true }}
+                                    render={({ field: { value, onChange } }) => (
+                                        <CustomTextField
+                                            select
+                                            fullWidth
+                                            defaultValue=''
+                                            label='Phòng ban'
+                                            SelectProps={{
+                                                value: value,
+                                                onChange: e => onChange(e)
+                                            }}
+                                            id='validation-basic-select'
+                                            error={Boolean(errors.select)}
+                                            aria-describedby='validation-basic-select'
+                                            {...(errors.select && { helperText: 'This field is required' })}
+                                        >
+                                            {groupName.map((item) => (
+                                                <MenuItem
+                                                    key={item.id}
+                                                    value={item.id}
+                                                >
+                                                    {item.name}
+                                                </MenuItem>
+                                            ))}
+                                        </CustomTextField>
+                                    )}
+                                />
                             </Grid>
                             <Grid item xs={12} sm={4}>
                                 <Controller
-                                    name='doorIn'
+                                    name='doorInId'
                                     control={control}
-                                    rules={{ required: true }}
+                                    // rules={{ required: true }}
                                     render={({ field: { value, onChange } }) => (
                                         <CustomTextField
                                             select
@@ -130,9 +192,9 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                                                 onChange: e => onChange(e)
                                             }}
                                             id='validation-basic-select'
-                                            error={Boolean(errors.select)}
+                                            error={Boolean(errors.doorInId)}
                                             aria-describedby='validation-basic-select'
-                                            {...(errors.select && { helperText: 'This field is required' })}
+                                            {...(errors.doorInId && { helperText: 'This field is required' })}
                                         >
                                             {doorList.map((door) => (
                                                 <MenuItem key={door.id} value={door.id}>
@@ -145,9 +207,9 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                             </Grid>
                             <Grid item xs={12} sm={4}>
                                 <Controller
-                                    name='doorOut'
+                                    name='doorOutId'
                                     control={control}
-                                    rules={{ required: true }}
+                                    // rules={{ required: true }}
                                     render={({ field: { value, onChange } }) => (
                                         <CustomTextField
                                             select
@@ -159,9 +221,9 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                                                 onChange: e => onChange(e)
                                             }}
                                             id='validation-basic-select'
-                                            error={Boolean(errors.select)}
+                                            error={Boolean(errors.doorOutId)}
                                             aria-describedby='validation-basic-select'
-                                            {...(errors.select && { helperText: 'This field is required' })}
+                                            {...(errors.doorOutId && { helperText: 'This field is required' })}
                                         >
                                             {doorList.map((door) => (
                                                 <MenuItem key={door.id} value={door.id}>
@@ -180,8 +242,11 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                                         pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
                                     }}
                                 >
-                                    <Button type='submit' variant='contained'>
+                                    <Button type='submit' variant='contained' onClick={handleSubmit(onSubmit)}>
                                         Lọc
+                                    </Button>
+                                    <Button variant='tonal' onClick={handleSubmit(onReset)}>
+                                        Mặc định
                                     </Button>
                                     <Button variant='tonal' color='secondary' onClick={onClose}>
                                         Hủy
