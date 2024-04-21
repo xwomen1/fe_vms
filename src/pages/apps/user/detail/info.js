@@ -367,7 +367,7 @@ const UserDetails = () => {
             fetchUserData()
           })
           .catch(err => {
-            Swal.fire('Đã xảy ra lỗi', err.message, 'error')
+            Swal.fire('Đã xảy ra lỗi', err.response.data.message, 'error')
           })
       }
     })

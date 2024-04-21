@@ -128,7 +128,7 @@ const UserDetails = () => {
     setIsFaceEnabled(!isFaceEnabled)
   }
 
-  const statusText = isFaceEnabled ? 'Đang hoạt động' : 'Không hoạt động'
+  const statusText = isFaceEnabled ? 'Không hoạt động' : 'Đang hoạt động'
 
   const statusText1 = !fingerIdentifyUpdatedAt ? 'Đã định danh' : 'Chưa định danh'
 
@@ -149,25 +149,16 @@ const UserDetails = () => {
           Authorization: `Bearer ${token}`
         }
       }
-      await axios.put(
-        `https://dev-ivi.basesystem.one/smc/iam/api/v0/users`,
+      await axios.post(
+        `
+        https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-access/${userId}/authen-settings
+        `,
         {
-          ...params,
-          userId: userId,
-          fullName: fullNameValue,
-          email: email,
-          phoneNumber: phoneNumber,
-          identityNumber: identityNumber,
-          userCode: userCode,
-          syncCode: syncCode,
-          userStatus: status1,
-          timeEndAfternoon: convertStringToTimeArray(timeEndAfternoon),
-          timeStartAfternoon: convertStringToTimeArray(timeStartAfternoon),
-          timeStartMorning: convertStringToTimeArray(dateTime),
-          timeEndMorning: convertStringToTimeArray(timeEndMorning),
-          availableAt: ava1,
-          expiredAt: ava2,
-          note: note
+          enableFaceAuthen: status1,
+          enableCardAuthen: false,
+          enableFingerprintAuthen: false,
+          listUpdateAssignCards: [],
+          listUpdateReturnCardIds: []
         },
         config
       )
@@ -209,6 +200,7 @@ const UserDetails = () => {
       }
     }
     const res = await axios.get(`https://dev-ivi.basesystem.one/smc/iam/api/v0/users/${userId}`, config)
+    setUserCode(res.data.data.accessCode)
 
     if (res && res.data) {
       accessCodeUser.current = res.data.accessCode
@@ -273,6 +265,7 @@ const UserDetails = () => {
       imageBase64: null,
       faceType: index === 0 ? 'LEFT' : index === 1 ? 'RIGHT' : index === 2 ? 'CENTER' : index === 3 ? 'ABOVE' : 'BOTTOM'
     }))
+    const hasFaceImages = data && data.length > 0
 
     const buildUrlWithToken = url => {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -601,6 +594,7 @@ const UserDetails = () => {
                         userId={userId}
                         faceType={faceType}
                         imageUrl={imageUrl}
+                        accessCode={userCode}
                       />
                     )}
                   </div>
@@ -702,7 +696,125 @@ const UserDetails = () => {
           <br></br>
         </div>
       ) : (
-        <p>Loading...</p>
+        <p>
+          <Grid container spacing={3}>
+            <Grid style={{ borderRadius: '0.05%' }}>
+              <Grid container spacing={2}>
+                <h3 style={{ color: 'black', marginLeft: '1%' }}> Thông tin người dùng</h3>
+              </Grid>
+              <Grid container spacing={2}>
+                <div style={{ width: '80%' }}></div>
+                {editing ? (
+                  <>
+                    <Button variant='contained' onClick={saveChanges} sx={{ marginRight: '10px' }}>
+                      Lưu
+                    </Button>
+                    <Button variant='contained' onClick={handleCancel}>
+                      Huỷ
+                    </Button>
+                  </>
+                ) : (
+                  <Button variant='contained' onClick={toggleEdit}>
+                    Chỉnh sửa
+                  </Button>
+                )}
+              </Grid>
+
+              <Grid container spacing={2} component={Paper} style={{ marginLeft: 10 }}>
+                <Grid container spacing={2}>
+                  <Grid item xs={9}>
+                    <h2 style={{ color: 'black', marginLeft: '1%' }}> Thông tin định danh khuôn mặt</h2>
+                  </Grid>
+                </Grid>
+                <Grid item xs={12} container spacing={2}>
+                  <Grid item xs={3}>
+                    <DatePicker
+                      showTimeSelect
+                      timeIntervals={15}
+                      timeCaption='Time'
+                      dateFormat='hh:mm dd/MM/yyyy'
+                      disabled={true}
+                      customInput={<CustomInput label='Thời gian cập nhật' />}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <CustomTextField
+                      label='Trạng thái'
+                      value={'Không hoạt động'}
+                      InputProps={{ readOnly: readOnly }}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={4}></Grid>
+                  <Grid item xs={12}>
+                    <h2 style={{ color: 'black', marginLeft: '1%' }}> Hình ảnh khuôn mặt</h2>
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <h2 style={{ color: 'black', marginLeft: '1%' }}> Thông tin định danh vân tay</h2>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <DatePicker
+                      showTimeSelect
+                      timeIntervals={15}
+                      timeCaption='Time'
+                      dateFormat='hh:mm dd/MM/yyyy'
+                      disabled={true}
+                      customInput={<CustomInput label='Thời gian cập nhật' />}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <CustomTextField
+                      label='Trạng thái'
+                      value={'Chưa định danh'}
+                      InputProps={{ readOnly: readOnly }}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={12} style={{ height: 20 }}></Grid>
+                  <Grid item xs={12} style={{ alignContent: 'center' }}>
+                    <img
+                      src='/images/finger.png'
+                      alt='Fingerprint'
+                      style={{ width: '15%', height: '100%', marginLeft: '20%' }}
+                    />
+                    <p style={{ color: 'black', marginLeft: '20%' }}> Chưa có định danh cho vân tay người này</p>
+                  </Grid>
+                  <Grid item xs={4}></Grid>
+                </Grid>
+              </Grid>
+              <br></br>
+              <br></br>
+              <Grid container spacing={2} component={Paper} style={{ marginLeft: 10 }}>
+                <Grid item xs={12}>
+                  <h2 style={{ color: 'black', marginLeft: '1%' }}> Danh sách thẻ</h2>
+                </Grid>
+                <Grid item xs={11.8}>
+                  <TableContainer component={Paper}>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>STT</TableCell>
+                          <TableCell>Thời gian</TableCell>
+                          <TableCell>Mã số thẻ</TableCell>
+                          <TableCell>Trạng thái</TableCell>
+
+                          <TableCell align='center'>
+                            <IconButton size='small' sx={{ marginLeft: '10px', color: 'blue' }}>
+                              Thêm thẻ <Icon icon='bi:plus' />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      </TableHead>
+                    </Table>
+                  </TableContainer>
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
+        </p>
       )}
     </div>
   )

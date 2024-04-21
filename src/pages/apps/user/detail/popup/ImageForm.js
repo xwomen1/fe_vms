@@ -8,10 +8,17 @@ import CloseIcon from '@mui/icons-material/Close'
 import { color } from '@mui/system'
 import { Dialog } from '@mui/material'
 import { Input } from '@mui/icons-material'
+import Swal from 'sweetalert2'
+import { useRouter } from 'next/router'
 
-const ImageForm = ({ faceType, imageUrl, onClose, userId }) => {
+const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode }) => {
   const [imageData, setImageData] = useState(null)
   const [imageNew, setImageDataNew] = useState(null)
+  const [imageId, setImageId] = useState(null)
+
+  const [showPopup, setShowPopup] = useState(true)
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
 
   const handleFileChange = async event => {
     const file = event.target.files[0]
@@ -32,7 +39,7 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId }) => {
       )
 
       const imageId = uploadResponse.data.data.id
-
+      setImageId(imageId)
       const downloadResponse = await axios.get(
         `https://dev-ivi.basesystem.one/smc/storage/api/v0/libraries/download/${imageId}`,
         {
@@ -47,6 +54,7 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId }) => {
       setImageDataNew(imageDataUrl)
     } catch (error) {
       console.error('Error uploading image:', error)
+      Swal.fire('Đã xảy ra lỗi', error.response.data.message, 'error')
     }
   }
 
@@ -64,18 +72,119 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId }) => {
 
         const base64Image = Buffer.from(response.data, 'binary').toString('base64')
         const imageDataUrl = `data:${response.headers['content-type'].toLowerCase()};base64,${base64Image}`
+        setLoading(true)
 
         setImageData(imageDataUrl)
+        setShowPopup(true)
       } catch (error) {
         console.error('Error fetching image:', error)
+        setShowPopup(false)
+        setLoading(false)
       }
     }
 
     fetchImage()
   }, [imageUrl])
 
-  const handleSave = () => {
-    // Thực hiện hành động lưu ở đây
+  const handleSave = async () => {
+    try {
+      setLoading(true) // Bắt đầu loading khi gửi request
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      // Chuẩn bị data để gửi đi
+      const requestData1 = {
+        faceFeatures: [
+          {
+            faceType: faceType, // Sử dụng biến faceType được truyền vào từ props
+            imageFileId: imageId
+          }
+        ],
+        updateType: 'ADD',
+        userId: userId // Sử dụng biến userId được truyền vào từ props
+      }
+
+      // Gửi request API
+      const response1 = await axios.post(
+        'https://dev-ivi.basesystem.one/smc/iam/api/v0/mi-se/user-faces',
+        requestData1,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+
+      console.log('API Response:', response1.data)
+      if (imageUrl == '/images/user.jpg') {
+        try {
+          const requestData2 = {
+            accessCode: accessCode, // Sử dụng biến accessCode được truyền vào từ props
+            faces: [
+              {
+                faceType: faceType, // Sử dụng biến faceType từ props
+                featureType: 'ACCESS',
+                imageFileId: imageId // Sử dụng id của ảnh từ phản hồi API đầu tiên
+              }
+            ],
+            updateType: 'ADD'
+          }
+
+          const response2 = await axios.post(
+            'https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-faces/detect-face',
+            requestData2,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              }
+            }
+          )
+          console.log('API Response 2:', response2.data)
+          Swal.fire('Thêm thành công', '', 'success')
+        } catch (error) {
+          Swal.fire('Đã xảy ra lỗi', error.response.data.message, 'error')
+
+          console.error('Error saving data:', error)
+        } finally {
+          setLoading(false) // Dừng loading sau khi hoàn thành request
+        }
+      } else {
+        try {
+          const url = `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-faces/update/face?faceType=${faceType}&imageId=${imageId}&userId=${userId}`
+          const response2 = await axios.post(
+            url,
+            {},
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              }
+            }
+          )
+          Swal.fire('Sửa thành công', '', 'success')
+
+          router.reload()
+        } catch (error) {
+          Swal.fire('Đã xảy ra lỗi', error.response.data.message, 'error')
+          onClose()
+
+          console.error('Error saving data:', error)
+        } finally {
+          setLoading(false) // Dừng loading sau khi hoàn thành request
+        }
+      }
+
+      // Đóng dialog sau khi lưu thành công
+      onClose()
+    } catch (error) {
+      Swal.fire('Đã xảy ra lỗi', error.response.data.message, 'error')
+      onClose()
+
+      console.error('Error saving data:', error)
+    } finally {
+      setLoading(false) // Dừng loading sau khi hoàn thành request
+    }
   }
 
   return (
@@ -85,19 +194,19 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId }) => {
           <IconButton onClick={onClose}>{/* <CloseIcon /> */}</IconButton>
           <div>faceType: {faceType}</div>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'white' }}>
-            {imageData && imageNew == null && faceType != null && (
+            {imageData && imageNew == null && imageUrl != '/images/user.jpg' && (
               <div>
                 <img src={imageData} alt='Ảnh' style={{ height: '50%', width: '50%' }} />
               </div>
             )}
-            {imageData && imageNew !== null && faceType != null && (
+            {imageData && imageNew !== null && !loading && (
               <div style={{ marginRight: 50 }}>
-                <img src={imageData} alt='Ảnh' style={{ height: '100%', width: '100%' }} />
+                <img src={imageData} alt='Ảnh' style={{ height: '200px', width: '200px' }} />
               </div>
             )}
             {imageNew && (
               <div>
-                <img src={imageNew} alt='Ảnh' style={{ height: '50%', width: '50%' }} />
+                <img src={imageNew} alt='Ảnh' style={{ height: '200px', width: '200px' }} />
                 <Button component='label'>
                   Đổi ảnh
                   <input type='file' onChange={handleFileChange} style={{ display: 'none' }} />
@@ -109,7 +218,7 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId }) => {
                 style={{
                   margin: 'auto',
                   width: '300px',
-                  height: '200px',
+                  height: '300px',
                   border: '1px dashed rgb(0, 0, 0)',
                   display: 'flex',
                   flexDirection: 'row',
@@ -132,6 +241,11 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId }) => {
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '60px' }}>
             <Button variant='contained' color='secondary' onClick={onClose}>
               Đóng
+            </Button>
+            <div style={{ width: 20 }}></div>
+
+            <Button variant='contained' color='primary' onClick={handleSave}>
+              Lưu
             </Button>
           </div>
         </div>

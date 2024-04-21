@@ -68,7 +68,7 @@ const UserDetails = () => {
             <Info />
           </TabPanel>
           <TabPanel value='2'>
-            <Info />
+            <Identity />
           </TabPanel>
           <TabPanel value='3'>
             <AccessControl />
