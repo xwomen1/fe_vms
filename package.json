@@ -67,6 +67,7 @@
     "nprogress": "0.2.0",
     "payment": "2.4.6",
     "prismjs": "1.29.0",
+    "query-string": "^9.0.0",
     "react": "18.2.0",
     "react-apexcharts": "1.4.0",
     "react-chartjs-2": "5.2.0",
@@ -78,6 +79,7 @@
     "react-dom": "18.2.0",
     "react-draft-wysiwyg": "1.15.0",
     "react-dropzone": "14.2.3",
+    "react-google-maps": "^9.4.5",
     "react-hook-form": "7.43.9",
     "react-hot-toast": "2.4.1",
     "react-i18next": "12.2.2",
@@ -91,6 +93,7 @@
     "stylis-plugin-rtl": "2.1.1",
     "sweetalert2": "^11.10.7",
     "websocket": "^1.0.34",
+    "xlsx": "^0.18.5",
     "yup": "1.1.1"
   },
   "devDependencies": {
