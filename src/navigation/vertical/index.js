@@ -51,6 +51,16 @@ const navigation = () => {
       ]
     },
     {
+      path: '/pages/report-month/list',
+      title: 'Báo cáo tháng',
+      icon: 'tabler:id'
+    },
+    {
+      path: '/pages/access-rights/list',
+      title: 'Quyền truy cập',
+      icon: 'tabler:shield'
+    },
+    {
       title: 'Dashboards',
       icon: 'tabler:smart-home',
       badgeContent: 'new',
