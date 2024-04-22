@@ -112,6 +112,7 @@ const UserDetails = () => {
             if (rowIndex !== -1) {
               updatedRows[rowIndex].description = description
             }
+
             return updatedRows
           })
         }
@@ -127,11 +128,13 @@ const UserDetails = () => {
 
   const getListAccessGroupNamesByUserGroupId = async userGroupId => {
     const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
     const config = {
       headers: {
         Authorization: `Bearer ${token}`
       }
     }
+
     const res = await axios.get(
       `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups/${userGroupId}`,
       config
@@ -193,6 +196,7 @@ const UserDetails = () => {
     const fetchGroupData = async () => {
       try {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
         const config = {
           headers: {
             Authorization: `Bearer ${token}`

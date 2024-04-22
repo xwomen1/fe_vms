@@ -30,11 +30,13 @@ const AssetTypeDetail = () => {
   const handleNameChange = event => {
     setName(event.target.value)
   }
+
   const toggleEdit = () => {
     setReadOnly(false)
     setEditing(true)
     setShowPlusColumn(!showPlusColumn)
   }
+
   const handleCodeChange = event => {
     setCode(event.target.value)
   }
@@ -75,6 +77,7 @@ const AssetTypeDetail = () => {
           Authorization: `Bearer ${token}`
         }
       }
+
       const response = await axios.get(
         `http://192.168.11.106:8089/smc/smart-parking/api/v0/asset/type/find/${id}`,
         config
@@ -94,6 +97,7 @@ const AssetTypeDetail = () => {
             Authorization: `Bearer ${token}`
           }
         }
+
         const response = await axios.get(
           `http://192.168.11.106:8089/smc/smart-parking/api/v0/asset/type/find/${id}`,
           config

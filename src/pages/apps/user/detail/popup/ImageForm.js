@@ -40,6 +40,7 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode }) => {
 
       const imageId = uploadResponse.data.data.id
       setImageId(imageId)
+
       const downloadResponse = await axios.get(
         `https://dev-ivi.basesystem.one/smc/storage/api/v0/libraries/download/${imageId}`,
         {
@@ -152,6 +153,7 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode }) => {
       } else {
         try {
           const url = `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-faces/update/face?faceType=${faceType}&imageId=${imageId}&userId=${userId}`
+
           const response2 = await axios.post(
             url,
             {},

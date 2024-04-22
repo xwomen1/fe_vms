@@ -11,6 +11,21 @@ const navigation = () => {
       path: '/apps/user/list'
     },
     {
+      path: '/asset',
+      title: 'VMS',
+      icon: 'tabler:camera',
+      children: [
+        {
+          title: 'Cấu hình camera',
+          path: '/vms/camera-config'
+        },
+        {
+          title: 'Cấu hình nvr',
+          path: '/vms/nvr-config'
+        }
+      ]
+    },
+    {
       path: '/caller',
       title: 'Thuê bao',
       icon: 'tabler:phone'
