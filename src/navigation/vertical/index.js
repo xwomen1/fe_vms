@@ -71,6 +71,11 @@ const navigation = () => {
       icon: 'tabler:id'
     },
     {
+      path: '/pages/face_management/list',
+      title: 'Quản lý khuôn mặt',
+      icon: 'tabler:users'
+    },
+    {
       path: '/pages/access-rights/list',
       title: 'Quyền truy cập',
       icon: 'tabler:shield'
