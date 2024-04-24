@@ -136,11 +136,11 @@ const navigation = () => {
         },
         {
           title: 'OTA',
-          path: '/ota/version-management'
+          path: '/ota'
         },
         {
           title: 'Logs',
-          path: '/alert-management'
+          path: '/logs'
         }
       ]
     },
