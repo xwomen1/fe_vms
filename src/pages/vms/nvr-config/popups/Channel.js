@@ -57,9 +57,11 @@ const UserList = ({ apiData }) => {
 
     return Swal.fire({ ...defaultProps, ...options })
   }
+  
   const createData = (name, ch1, ch2) => {
     return { name, ch1, ch2 }
   }
+  
   const assetTypes = [
     createData('Frozen Encoding Paramenter	    ', 'Main Stream(Continuous)    ', 'Main Stream(Event)    '),
     createData('Stream Type	    ',  <FormControl fullWidth>
@@ -148,6 +150,7 @@ const UserList = ({ apiData }) => {
   </FormControl>),
 
   ]
+  
   const handleOpenMenu = event => {
     setAnchorEl(event.currentTarget)
   }

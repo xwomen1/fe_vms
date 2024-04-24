@@ -21,7 +21,9 @@ import axios from 'axios'
 import TableHeader from 'src/views/apps/asset/TableHeader'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import Link from 'next/link'
+
 import Daily from 'src/pages/pages/access-rights/mocdata/daily'
+
 const dataDailyDefault = [
   {
       label: '',
@@ -63,6 +65,7 @@ const dataDailyDefault = [
       value: 8,
   },
 ]
+
 const UserList = ({ apiData }) => {
   const [value, setValue] = useState('')
   const [dataDaily, setDataDaily] = useState([])
@@ -100,6 +103,7 @@ const UserList = ({ apiData }) => {
 
     return Swal.fire({ ...defaultProps, ...options })
   }
+  
   const createData = (name, ch1, ch2) => {
     return { name, ch1, ch2 }
   }

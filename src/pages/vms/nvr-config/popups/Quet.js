@@ -57,9 +57,11 @@ const UserList = ({ apiData }) => {
 
     return Swal.fire({ ...defaultProps, ...options })
   }
+  
   const createData = (name, type, ip,aibox,mac,vitri, status) => {
     return {name, type, ip,aibox,mac,vitri, status}
   }
+  
   const assetTypes = [
     createData('Cam POC1', '', '192.168.1.1','','','Ha Noi','Khong hoat dong'),
     createData('Cam POC2', '', '192.168.1.1','','','Ha Noi','Khong hoat dong'),
@@ -69,6 +71,7 @@ const UserList = ({ apiData }) => {
 
 
   ]
+  
   const handleOpenMenu = event => {
     setAnchorEl(event.currentTarget)
   }

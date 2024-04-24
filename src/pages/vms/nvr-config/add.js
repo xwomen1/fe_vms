@@ -65,6 +65,7 @@ const UserList = ({ apiData }) => {
     setSelectedValue(event.target.value);
     console.log(selectedValue)
   }; 
+  
   const handlePageChange = newPage => {
     setPage(newPage)
   }
@@ -83,12 +84,15 @@ const UserList = ({ apiData }) => {
   const handleAddRoleClick = () => {
     setOpenPopup(true)
   }
+  
   const handleAddRolesClick = () => {
     setOpenPopup(true)
   }
+  
   const handleClosePopup = () => {
     setOpenPopup(false) // Đóng Popup khi cần thiết
   }
+  
   const handleAddPClick = () => {
     setOpenPopupP(true)
   }
@@ -96,6 +100,7 @@ const UserList = ({ apiData }) => {
   const handleClosePPopup = () => {
     setOpenPopupP(false) // Đóng Popup khi cần thiết
   }
+  
   const handleAddNetworkClick = () => {
     setOpenPopupNetwork(true)
   }
@@ -119,6 +124,7 @@ const UserList = ({ apiData }) => {
   const handleCloseImagePopup = () => {
     setOpenPopupImage(false) // Đóng Popup khi cần thiết
   }
+  
   const handleAddCloudClick = () => {
     setOpenPopupCloud(true)
   }
@@ -126,6 +132,7 @@ const UserList = ({ apiData }) => {
   const handleCloseCloudPopup = () => {
     setOpenPopupCloud(false) // Đóng Popup khi cần thiết
   }
+  
   const handleAddConnectCameraClick = () => {
     setOpenPopupConnectCamera(true)
   }
@@ -133,6 +140,7 @@ const UserList = ({ apiData }) => {
   const handleCloseConnectCameraPopup = () => {
     setOpenPopupConnectCamera(false) // Đóng Popup khi cần thiết
   }
+  
   const handleAddVideoConnectClick = () => {
     setOpenPopupVideoConnectCamera(true)
   }
