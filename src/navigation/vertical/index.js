@@ -113,7 +113,7 @@ const navigation = () => {
           path: 'broadcast/local'
         },
         {
-          title: 'Vai trò',
+          title: 'Vai Trò',
           icon: 'tabler:users',
           path: '/list-policy'
         }
