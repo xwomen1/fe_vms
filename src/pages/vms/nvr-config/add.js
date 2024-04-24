@@ -13,7 +13,7 @@ import authConfig from 'src/configs/auth'
 import Table from '@mui/material/Table'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
-import { IconButton } from '@mui/material'
+import { FormControl, IconButton, InputLabel, Paper, Select } from '@mui/material'
 import Swal from 'sweetalert2'
 import { fetchData } from 'src/store/apps/user'
 import { useRouter } from 'next/router'
@@ -23,6 +23,7 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 import Link from 'next/link'
 import RolePopup from './popups/ChangePassword'
 import Passwords from './popups/PassWord'
+import { Radio, RadioGroup, FormControlLabel } from '@mui/material';
 
 import Network from './popups/Network'
 import Video from './popups/video'
@@ -58,7 +59,12 @@ const UserList = ({ apiData }) => {
 
   const pageSizeOptions = [25, 50, 100]
   const [anchorEl, setAnchorEl] = useState(null)
+  const [selectedValue, setSelectedValue] = useState('');
 
+  const handleRadioChange = (event) => {
+    setSelectedValue(event.target.value);
+    console.log(selectedValue)
+  }; 
   const handlePageChange = newPage => {
     setPage(newPage)
   }
@@ -134,25 +140,7 @@ const UserList = ({ apiData }) => {
   const handleCloseVideoConnectPopup = () => {
     setOpenPopupVideoConnectCamera(false) // Đóng Popup khi cần thiết
   }
-  function showAlertConfirm(options, intl) {
-    const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
-      imageWidth: 213,
-      showCancelButton: true,
-      showCloseButton: true,
-      showConfirmButton: true,
-      focusCancel: true,
-      reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
-      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
-      customClass: {
-        content: 'content-class',
-        confirmButton: 'swal-btn-confirm'
-      }
-    }
 
-    return Swal.fire({ ...defaultProps, ...options })
-  }
 
   const handleOpenMenu = event => {
     setAnchorEl(event.currentTarget)
@@ -176,38 +164,6 @@ const UserList = ({ apiData }) => {
 
   const statusText = status1 ? 'Đang hoạt động' : 'Không hoạt động'
 
-  const handleDelete = idDelete => {
-    showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
-    }).then(({ value }) => {
-      if (value) {
-        const token = localStorage.getItem(authConfig.storageTokenKeyName)
-        if (!token) {
-          return
-        }
-
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-        let urlDelete = `https://dev-ivi.basesystem.one/smc/smart-parking/api/v0/asset/type/delete/${idDelete}`
-        axios
-          .delete(urlDelete, config)
-          .then(() => {
-            Swal.fire('Xóa thành công', '', 'success')
-            const updatedData = assettype.filter(assettype => assettype.id !== idDelete)
-            setAssetType(updatedData)
-            fetchData()
-          })
-          .catch(err => {
-            Swal.fire('Đã xảy ra lỗi', err.message, 'error')
-          })
-      }
-    })
-  }
-
-  const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen)
   useEffect(() => {
     const fetchFilteredOrAllUsers = async () => {
       try {
@@ -237,22 +193,66 @@ const UserList = ({ apiData }) => {
   }, [page, pageSize, total, value])
 
   return (
-    <Grid container spacing={6.5}>
-      <Grid item xs={12}>
+    <Grid container spacing={6.5} >
+      <Grid item xs={12} >
         <Card>
-          {selectedIds === null ? (
-            <TableHeader />
-          ) : (
-            <TableHeader
-              value={value}
-              passwords={handleAddRoleClick}
-              networks={handleAddNetworkClick}
-              images={handleAddImageClick}
-              videos={handleAddVideoClick}
-              cloud={handleAddCloudClick}
-
+        <div>
+      <RadioGroup value={selectedValue} onChange={handleRadioChange} style={{marginLeft: 50}}>
+      <Grid container spacing={2}>
+        <Grid item>
+          <FormControlLabel value="option1" control={<Radio />} label="Dùng IP" />
+        </Grid>
+        <Grid item>
+          <FormControlLabel value="option2" control={<Radio />} label="Dải IP" />
+        </Grid>
+        <Grid item>
+          <FormControlLabel value="option3" control={<Radio />} label="ON VIF" />
+        </Grid>
+      </Grid>
+      </RadioGroup>
+      {selectedValue === 'option1' && (
+        <Grid container item component={Paper} style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
+ <Grid item xs={2.8}>
+  <FormControl fullWidth>
+    <InputLabel id='time-validity-label'>Chọn</InputLabel>
+    <Select
+      labelId='time-validity-label'
+      id='time-validity-select'
+     
+    >
+      <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
+      <MenuItem value='Undefined'>Không xác định</MenuItem>
+    </Select>
+  </FormControl>
+</Grid>  
+<Grid item xs = {0.4}></Grid>
+        <Grid item xs={2.8}>
+            <CustomTextField
+              label='Địa chỉ IP'
+              fullWidth
             />
-          )}{' '}
+            </Grid>
+            <Grid item xs = {0.4}></Grid>
+        <Grid item xs={2.8}>
+            <CustomTextField
+              label='Cổng'
+              fullWidth
+            />
+            </Grid>
+            <Grid item xs = {0.4}></Grid>
+        <Grid item xs={2.8}>
+            <CustomTextField
+              label='Đăng nhập'
+              fullWidth
+            />
+            </Grid>
+            <Grid item xs = {0.4}></Grid>
+        <Grid item xs={2.8}>
+        <CustomTextField label='Mật khẩu' type='password'fullWidth />
+
+            </Grid>
+  </Grid>
+   )}    </div>
           <Grid container spacing={2}>
             <Grid item xs={0.1}></Grid>
 
