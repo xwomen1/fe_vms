@@ -1,6 +1,8 @@
 import React, {Fragment, useEffect, useState } from 'react';
 import { TabContext, TabList, TabPanel } from "@mui/lab"
+
 // import { HashRouter as Router, Link } from 'react-router-dom';
+
 import {
     Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Tab, TableContainer, Paper,
     Table, TableHead, TableRow, TableCell, TableBody, Pagination, Menu, MenuItem, Dialog, DialogContent,
@@ -17,16 +19,21 @@ import toast from 'react-hot-toast'
 import * as XLSX from 'xlsx';
 import Checkbox from '@mui/material/Checkbox'
 import Link from 'next/link'
+
 import { color } from '@mui/system';
-const faceManagement=() => {
+
+const FaceManagement=() => {
+
     //khai báo
-    const [reload, setReload] = useState(0);
+    // const [reload, setReload] = useState(0);
     const [keyword, setKeyword] = useState('');
+
     const [userData, setUserData] = useState([]);
     const [selectedRows, setSelectedRows] = useState([]);
     const [loading, setLoading] = useState(false)
     const [listImage, setListImage] = useState([]);
     const [selectAllChecked, setSelectAllChecked] = useState(false);
+
     const initValueFilter = {
         keyword: '',
         limit: 25,
@@ -34,6 +41,7 @@ const faceManagement=() => {
     }
 
     const [valueFilter, setValueFilter] = useState(initValueFilter)
+
     // useEffect(() => {
     //     fetchFilteredOrAllUsers();
     // }, [valueFilter,reload])
@@ -48,10 +56,12 @@ const faceManagement=() => {
         setValueFilter(newDto)
         setIsOpenFilter(false)
     }
+
     const exportToExcel = async () => {
         setLoading(true);
     
         try {
+
             const token = localStorage.getItem(authConfig.storageTokenKeyName)
   
           const config = {
@@ -64,6 +74,7 @@ const faceManagement=() => {
                 limit: valueFilter.limit,
             }
           }
+
           const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/blacklist?sort=%2Bcreated_at&page=1', config)
 
             const data = response.data.data.map(item => ({
@@ -71,7 +82,9 @@ const faceManagement=() => {
                 name: item.name,
                 time: item.time,
             }));
+
             console.log(data,'data');
+
             const exportData = [
                 ['Mã ảnh', 'Tên', 'Lần cuối xuất hiện'],
                 ...data.map(item => [item.mainImageId, item.name, item.time]),
@@ -112,6 +125,7 @@ const faceManagement=() => {
     };
 
         function showAlertConfirm(options, intl) {
+
         const defaultProps = {
       title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
       imageWidth: 213,
@@ -132,6 +146,7 @@ const faceManagement=() => {
   }
 
 useEffect(() => {
+
     const fetchFilteredOrAllUsers = async () => {
         setLoading(true)
         try {
@@ -153,10 +168,12 @@ useEffect(() => {
           const imageFaces = response.data.data[0].mainImageUrl;
           console.log(imageFaces,'imageFaces');
           setListImage(imageFaces)
+
         //   const centerFace = imageFaces.find((face) => face.faceType === 'CENTER');
         //   if (centerFace) {
         //     imageUrls.push(centerFace.imageFileUrl);
         //   }
+
           console.log(response.data.data,'response.data');
         } catch (error) {
             console.error('Error fetching data:', error)
@@ -165,8 +182,11 @@ useEffect(() => {
             setLoading(false)
         }
     }
+
     fetchFilteredOrAllUsers();
+
 },[keyword])
+
 const handleDelete = idDelete => {
     showAlertConfirm({
       text: 'Bạn có chắc chắn muốn xóa?'
@@ -174,6 +194,7 @@ const handleDelete = idDelete => {
       if (value) {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
         if (!token) {
+
           return
         }
 
@@ -196,17 +217,23 @@ const handleDelete = idDelete => {
       }
     })
   }
+
 const buildUrlWithToken = url => {
+
     const token = localStorage.getItem(authConfig.storageTokenKeyName);
     if (token) {
+
       return `${url}?token=${token}`;
     }
+
     return url;
   };
+
 const Img = React.memo(props => {
     const [loaded, setLoaded] = useState(false)
 
     const { src } = props
+
     return (
       <>
         <div
@@ -234,14 +261,15 @@ const Img = React.memo(props => {
       </>
     )
   })
+
   const handleDeletee = () => {
     // Xử lý logic khi nút "Xóa" được nhấn
 };
 
     return(
         <>
+
         {loading ? (
-                // Hiển thị thông báo "Loading..." khi đang tải dữ liệu
                 <div>Loading...</div>
             ) : (
                 <Grid container spacing={6.5}>
@@ -376,6 +404,7 @@ const Img = React.memo(props => {
     );
     
 }
+
 // export const getStaticProps = async () => {
 //     const res = await axios.get('/cards/statistics')
 //     const apiData = res.data
@@ -386,4 +415,5 @@ const Img = React.memo(props => {
 //       }
 //     }
 //   }
-export default faceManagement
+
+export default FaceManagement

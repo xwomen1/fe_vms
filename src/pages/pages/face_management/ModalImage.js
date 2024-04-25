@@ -33,6 +33,7 @@ function ModalImage({ onClose, imageUrl }) {
       setUrl(MaskGroup);
     }
   }, [imageUrl]);
+  
   return (
     <Popup
     visible

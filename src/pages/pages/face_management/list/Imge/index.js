@@ -6,6 +6,7 @@ const Img = props => {
   const [loaded, setLoaded] = useState(false);
   const { src, style } = props;
   const [url, setUrl] = useState(null);
+  
   useEffect(() => {
     if (src) {
       setUrl(src);
@@ -13,6 +14,7 @@ const Img = props => {
       setUrl(MaskGroup);
     }
   }, [src]);
+
   return (
     <div style={{ ...style, display: 'inline-block' }}>
       <div
@@ -42,4 +44,6 @@ const Img = props => {
     </div>
   );
 };
+
+
 export default React.memo(Img);

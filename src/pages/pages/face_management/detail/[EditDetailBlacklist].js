@@ -7,7 +7,6 @@ import toast from 'react-hot-toast';
 import CustomTextField from "src/@core/components/mui/text-field";
 import { TextBox } from 'devextreme-react/text-box';
 import FileUploader from 'devextreme-react/file-uploader';
-// import { useHistory } from 'react-router-dom';
 import ModalImage from '../ModalImage';
 import Link from 'next/link'
 import PlusIcon from '../list/Imge/Icon_Plus.svg';
@@ -20,10 +19,14 @@ import {
 import Icon from 'src/@core/components/icon';
 import DragdropBG from '../list/Imge/dragndrop-1.svg';
 import Fullscreen from '@material-ui/icons/Fullscreen';
+
 const EditFaceManagement = () => {
+
     const classes = useStyles();
     const router = useRouter();
+
     // const history = useHistory();
+
     const id = router.query.EditDetailBlacklist;
     const [loading, setLoading] = useState(false);
     const [avatarImage, setAvatarImage] = useState(null);
@@ -46,20 +49,23 @@ const EditFaceManagement = () => {
     const [img2, setImg2] = useState(null);
     const [img3, setImg3] = useState(null);
     const [img4, setImg4] = useState(null);
+
     console.log(id,'id'); 
 
     const buildUrlWithToken = url => {
         const token = localStorage.getItem(authConfig.storageTokenKeyName);
         if (token) {
+
           return `${url}?token=${token}`;
+
         }
+
         return url;
       };
       
       useEffect(() => {
         setListImage([img0, img1, img2, img3, img4]);
     }, []);
-
 
     useEffect(() => {
         const listImg = listFileId.map((id) => buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${id}`));
@@ -108,13 +114,16 @@ const EditFaceManagement = () => {
     //         txtButton="Đồng ý"
     //     />
     // );
+
       const onDragDropImage = (e) => {
         if (e.value.length > 0) {
             if (e.value.length + listFileUpload.length > 5) {
                 Swal.fire({
                     text: 'Tối đa 5 file',
                     icon: 'error',
+
                     // imageWidth: 213,
+
                     showCancelButton: false,
                     showCloseButton: false,
                     showConfirmButton: true,
@@ -127,10 +136,13 @@ const EditFaceManagement = () => {
                 });
             } else {
                 const files = listFileUpload.concat(e.value);
+
                 // call API validate file
                 const formData = new FormData();
+
                 // eslint-disable-next-line no-restricted-syntax
                 for (const file of files) {
+
                     // formData.append('detectedImages', file, file.name);
                     formData.append('files', file);
                 }
@@ -139,7 +151,9 @@ const EditFaceManagement = () => {
                     .then((res) => {
                         setListFileUpload(files);
                         console.log(res,'res');
+
                         // listFileUpload.push(...files);
+
                         const fileIds = res.data.map((x) => x.id);
                         const arr = [...listFileId, ...fileIds]
                         setListFileId([...arr].slice(0, 5));
@@ -159,6 +173,7 @@ const EditFaceManagement = () => {
             }
         }
     };
+
     useEffect(() => {
         const fetchFilteredOrAllUsers = async () => {
             setLoading(true);
@@ -175,7 +190,10 @@ const EditFaceManagement = () => {
                     }
                 };
 
-                if (id) { // Thêm điều kiện kiểm tra id tồn tại trước khi gửi yêu cầu
+                if (id) { 
+
+                    // Thêm điều kiện kiểm tra id tồn tại trước khi gửi yêu cầu
+                    
                     const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${id}`, config);
                     const imgs = [...response.data.data.imgs];
                     setFileAvatarId(response.data.data.mainImageId);
@@ -200,15 +218,20 @@ const EditFaceManagement = () => {
         };
 
         fetchFilteredOrAllUsers();
-    }, [id]); // Thêm id vào mảng dependencies để useEffect gọi lại mỗi khi id thay đổi
+    }, [id]); 
+
+    // Thêm id vào mảng dependencies để useEffect gọi lại mỗi khi id thay đổi
     console.log(name);
+
     const handleUpdate = () => {
         setLoading(true);
 
         const params = {
             name: name,
             mainImageId: fileAvatarId,
+
             // mainImageUrl: fileAvatarUrl,
+
             imgs: listFileId.map((id, index) => ({
                 id: id,
                 urlImage: listFileUrl[id],
@@ -228,7 +251,6 @@ const EditFaceManagement = () => {
     return (
         <>
             {showLoading || loading ? (
-                // Hiển thị thông báo "Loading..." khi đang tải dữ liệu
                 <div>Loading...</div>
            ):(
             <>
@@ -499,6 +521,7 @@ const EditFaceManagement = () => {
         </>
     );
 };
+
 const useStyles = makeStyles(() => ({
     cancelBtn: {
         width: '116px',
@@ -614,4 +637,5 @@ const useStyles = makeStyles(() => ({
         },
     },
 }));
+
 export default EditFaceManagement;
