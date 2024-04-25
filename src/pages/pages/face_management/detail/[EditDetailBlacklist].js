@@ -4,12 +4,12 @@ import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import authConfig from 'src/configs/auth';
 import toast from 'react-hot-toast';
+import Swal from 'sweetalert2'
 import CustomTextField from "src/@core/components/mui/text-field";
 import { TextBox } from 'devextreme-react/text-box';
 import FileUploader from 'devextreme-react/file-uploader';
 import ModalImage from '../ModalImage';
 import Link from 'next/link'
-import PlusIcon from '../list/Imge/dragndrop';
 import {
     Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Tab, TableContainer, Paper,
     Table, TableHead, TableRow, TableCell, TableBody, Pagination, Menu, MenuItem, Dialog, DialogContent,
@@ -17,7 +17,6 @@ import {
     Typography
 } from "@mui/material";
 import Icon from 'src/@core/components/icon';
-import DragdropBG from '../list/Imge/dragndrop.js';
 import Fullscreen from '@material-ui/icons/Fullscreen';
 import { UploadFile } from '@mui/icons-material';
 
@@ -116,15 +115,12 @@ const EditFaceManagement = () => {
     //     />
     // );
 
-      const onDragDropImage = (e) => {
+    const onDragDropImage = async (e) => {
         if (e.value.length > 0) {
             if (e.value.length + listFileUpload.length > 5) {
                 Swal.fire({
                     text: 'Tối đa 5 file',
                     icon: 'error',
-
-                    // imageWidth: 213,
-
                     showCancelButton: false,
                     showCloseButton: false,
                     showConfirmButton: true,
@@ -136,36 +132,50 @@ const EditFaceManagement = () => {
                     },
                 });
             } else {
+
                 const files = listFileUpload.concat(e.value);
+                console.log(files, 'files');
 
                 // call API validate file
                 const formData = new FormData();
 
+                console.log(formData, 'formData');
+
                 // eslint-disable-next-line no-restricted-syntax
                 for (const file of files) {
-
-                    // formData.append('detectedImages', file, file.name);
                     formData.append('files', file);
+                    console.log(file, 'file');
                 }
                 setShowLoading(true);
-                axios.post(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/upload/multi`, formData)
-                    .then((res) => {
-                        setListFileUpload(files);
 
-                        console.log(res,'res');
+                const token = localStorage.getItem(authConfig.storageTokenKeyName);
+                
+                const config = {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                };
+    
+                try {
 
-                        // listFileUpload.push(...files);
+                    const res = await axios.post(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/upload/multi`, formData, config);
+                    setListFileUpload(files);
+                    console.log(res.data, 'res');
+    
+                    const fileIds = res.data.data.map((x) => x.id);
+                    console.log(fileIds, 'fileIds');
+    
+                    const arr = [...listFileId, ...fileIds];
+                    console.log(arr, 'arr');
+    
+                    setListFileId([...arr].slice(0, 5));
+                } catch (error) {
 
-                        const fileIds = res.data.map((x) => x.id);
-                        const arr = [...listFileId, ...fileIds]
-                        setListFileId([...arr].slice(0, 5));
-                    })
-                    .catch((err) => {
-                        (err);
-                    })
-                    .finally(() => {
-                        setShowLoading(false);
-                    });
+                    console.error('Error occurred during upload:', error);
+
+                } finally {
+                    setShowLoading(false);
+                }
             }
             if (fileUploader2?.current?.instance) {
                 fileUploader2.current.instance.reset();
@@ -175,13 +185,12 @@ const EditFaceManagement = () => {
             }
         }
     };
-
     useEffect(() => {
         const fetchFilteredOrAllUsers = async () => {
             setLoading(true);
             try {
                 const token = localStorage.getItem(authConfig.storageTokenKeyName);
-                
+
                 const config = {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -400,7 +409,7 @@ const EditFaceManagement = () => {
                                                     }}
                                                 >
                                                     <div>
-                                                        <img alt="" src={"DragdropBG"} />
+                                                        <img alt="" src={`aaaa`} />
                                                     </div>
                                                     <p
                                                         style={{
