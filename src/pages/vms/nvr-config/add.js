@@ -220,19 +220,7 @@ const UserList = ({ apiData }) => {
       </RadioGroup>
       {selectedValue === 'dungIp' && (
         <Grid container item component={Paper} style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
- <Grid item xs={2.8}>
-  <FormControl fullWidth>
-    <InputLabel id='time-validity-label'>Chọn</InputLabel>
-    <Select
-      labelId='time-validity-label'
-      id='time-validity-select'
-     
-    >
-      <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
-      <MenuItem value='Undefined'>Không xác định</MenuItem>
-    </Select>
-  </FormControl>
-</Grid>  
+ 
 <Grid item xs = {0.4}></Grid>
         <Grid item xs={2.8}>
             <CustomTextField
