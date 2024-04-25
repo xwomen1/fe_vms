@@ -9,7 +9,7 @@ import { TextBox } from 'devextreme-react/text-box';
 import FileUploader from 'devextreme-react/file-uploader';
 import ModalImage from '../ModalImage';
 import Link from 'next/link'
-import PlusIcon from '../list/Imge/Icon_Plus.svg';
+import PlusIcon from '../list/Imge/dragndrop';
 import {
     Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Tab, TableContainer, Paper,
     Table, TableHead, TableRow, TableCell, TableBody, Pagination, Menu, MenuItem, Dialog, DialogContent,
@@ -17,8 +17,9 @@ import {
     Typography
 } from "@mui/material";
 import Icon from 'src/@core/components/icon';
-import DragdropBG from '../list/Imge/dragndrop-1.svg';
+import DragdropBG from '../list/Imge/dragndrop.js';
 import Fullscreen from '@material-ui/icons/Fullscreen';
+import { UploadFile } from '@mui/icons-material';
 
 const EditFaceManagement = () => {
 
@@ -150,6 +151,7 @@ const EditFaceManagement = () => {
                 axios.post(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/upload/multi`, formData)
                     .then((res) => {
                         setListFileUpload(files);
+
                         console.log(res,'res');
 
                         // listFileUpload.push(...files);
@@ -179,6 +181,7 @@ const EditFaceManagement = () => {
             setLoading(true);
             try {
                 const token = localStorage.getItem(authConfig.storageTokenKeyName);
+                
                 const config = {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -210,6 +213,7 @@ const EditFaceManagement = () => {
                     console.log(imgs);
                 }
             } catch (error) {
+
                 console.error('Error fetching data:', error);
                 toast.error(error);
             } finally {
@@ -396,7 +400,7 @@ const EditFaceManagement = () => {
                                                     }}
                                                 >
                                                     <div>
-                                                        <img alt="" src={DragdropBG} />
+                                                        <img alt="" src={"DragdropBG"} />
                                                     </div>
                                                     <p
                                                         style={{
@@ -450,7 +454,8 @@ const EditFaceManagement = () => {
                                             {listImage.length < 5 && (
                                                 <div className="add-btn card-img" id="dropzone-external-2">
                                                     <div style={{ alignSelf: 'center', margin: 'auto' }}>
-                                                        <img src={PlusIcon} alt="" />
+                                                    <img style={{background:'red',marginLeft:'100px'}} src="data:image/svg+xml,%3Csvg width='32' height='34' viewBox='0 0 32 34' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M17.9 15.1665H31.7441V18.6665H17.9V33.729H14.1191V18.6665H0.556641V15.1665H14.1191V0.604004H17.9V15.1665Z' fill='black' fill-opacity='0.6'/%3E%3C/svg%3E" alt="" />
+                                                    
                                                     </div>
                                                     <FileUploader
                                                         id="file-uploader-2"
@@ -521,6 +526,7 @@ const EditFaceManagement = () => {
         </>
     );
 };
+
 
 const useStyles = makeStyles(() => ({
     cancelBtn: {
