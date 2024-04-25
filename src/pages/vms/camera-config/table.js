@@ -21,19 +21,30 @@ import axios from 'axios'
 import TableHeader from 'src/views/apps/vms/nvr-config/TableHeader'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import Link from 'next/link'
-import RolePopup from './popups/AddGroup'
+import RolePopup from './popups/ChangePassword'
+import Passwords from './popups/PassWord'
+
 import Network from './popups/Network'
 import Video from './popups/video'
 import Image from './popups/Image'
 import Checkbox from '@mui/material/Checkbox'
+import Cloud from './popups/Cloud'
+import ConnectCamera from './popups/ConnectCamera'
+import VideoConnectCamera from './popups/VideoConnectCamera'
+import { Password } from '@mui/icons-material'
 
 const UserList = ({ apiData }) => {
   const [value, setValue] = useState('')
   const [selectedIds, setSelectedIds] = useState([])
   const [openPopup, setOpenPopup] = useState(false)
+  const [openPopupP, setOpenPopupP] = useState(false)
+
   const [openPopupNetwork, setOpenPopupNetwork] = useState(false)
   const [openPopupVideo, setOpenPopupVideo] = useState(false)
   const [openPopupImage, setOpenPopupImage] = useState(false)
+  const [openPopupCloud, setOpenPopupCloud] = useState(false)
+  const [openPopupConnectCamera, setOpenPopupConnectCamera] = useState(false)
+  const [openPopupVideoConnectCamera, setOpenPopupVideoConnectCamera] = useState(false)
 
   const [selectedNvrId, setSelectedNvrId] = useState(null)
   const [addUserOpen, setAddUserOpen] = useState(false)
@@ -66,11 +77,23 @@ const UserList = ({ apiData }) => {
   const handleAddRoleClick = () => {
     setOpenPopup(true)
   }
-
+  
+  const handleAddRolesClick = () => {
+    setOpenPopup(true)
+  }
+  
   const handleClosePopup = () => {
     setOpenPopup(false) // Đóng Popup khi cần thiết
   }
+  
+  const handleAddPClick = () => {
+    setOpenPopupP(true)
+  }
 
+  const handleClosePPopup = () => {
+    setOpenPopupP(false) // Đóng Popup khi cần thiết
+  }
+  
   const handleAddNetworkClick = () => {
     setOpenPopupNetwork(true)
   }
@@ -93,6 +116,30 @@ const UserList = ({ apiData }) => {
 
   const handleCloseImagePopup = () => {
     setOpenPopupImage(false) // Đóng Popup khi cần thiết
+  }
+  
+  const handleAddCloudClick = () => {
+    setOpenPopupCloud(true)
+  }
+
+  const handleCloseCloudPopup = () => {
+    setOpenPopupCloud(false) // Đóng Popup khi cần thiết
+  }
+  
+  const handleAddConnectCameraClick = () => {
+    setOpenPopupConnectCamera(true)
+  }
+
+  const handleCloseConnectCameraPopup = () => {
+    setOpenPopupConnectCamera(false) // Đóng Popup khi cần thiết
+  }
+  
+  const handleAddVideoConnectClick = () => {
+    setOpenPopupVideoConnectCamera(true)
+  }
+
+  const handleCloseVideoConnectPopup = () => {
+    setOpenPopupVideoConnectCamera(false) // Đóng Popup khi cần thiết
   }
   function showAlertConfirm(options, intl) {
     const defaultProps = {
@@ -183,7 +230,7 @@ const UserList = ({ apiData }) => {
             keyword: value
           }
         }
-        const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/nvrs', config)
+        const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/cameras', config)
         setStatus1(response.data.data.isOfflineSetting)
         setNvr(response.data.data[0].id)
         setAssetType(response.data.data)
@@ -209,6 +256,8 @@ const UserList = ({ apiData }) => {
               networks={handleAddNetworkClick}
               images={handleAddImageClick}
               videos={handleAddVideoClick}
+              cloud={handleAddCloudClick}
+
             />
           )}{' '}
           <Grid container spacing={2}>
@@ -263,36 +312,25 @@ const UserList = ({ apiData }) => {
 
                       <TableCell sx={{ padding: '16px' }}>
                         <Grid container spacing={2}>
-                          <IconButton size='small' onClick={handleAddRoleClick}>
+                          <IconButton size='small' onClick={handleAddPClick}>
                             <Icon icon='tabler:key' />
                           </IconButton>
-                          <IconButton
-                            size='small'
-                            component={Link}
-                            href={`/assetType/${assetType.id}`}
-                            sx={{ color: 'text.secondary' }}
-                          >
+                          <IconButton size='small' onClick={handleAddVideoConnectClick}>
+
                             <Icon icon='tabler:camera' />
                           </IconButton>
-                          <IconButton
-                            size='small'
-                            component={Link}
-                            href={`/assetType/${assetType.id}`}
-                            sx={{ color: 'text.secondary' }}
-                          >
+                          <IconButton size='small' onClick={handleAddConnectCameraClick}>
+
                             <Icon icon='tabler:link' />
                           </IconButton>
                           <IconButton
                             size='small'
-                            component={Link}
-                            href={`/assetType/${assetType.id}`}
+                           
                             sx={{ color: 'text.secondary' }}
                           >
                             <Icon icon='tabler:reload' />
                           </IconButton>
-                          <IconButton onClick={() => handleDelete(user.userId)}>
-                            <Icon icon='tabler:trash' />
-                          </IconButton>
+                         
                         </Grid>
                       </TableCell>
                     </TableRow>
@@ -326,10 +364,18 @@ const UserList = ({ apiData }) => {
           <>
             <RolePopup open={openPopup} onClose={handleClosePopup} nvr={selectedIds} />
             <Network open={openPopupNetwork} onClose={handleCloseNetWorkPopup} nvr={selectedIds} />
-            <RolePopup open={openPopupVideo} onClose={handleCloseVideoPopup} nvr={selectedIds} />
-            <RolePopup open={openPopupImage} onClose={handleCloseImagePopup} nvr={selectedIds} />
+            <Video open={openPopupVideo} onClose={handleCloseVideoPopup} nvr={selectedIds} />
+            <Image open={openPopupImage} onClose={handleCloseImagePopup} nvr={selectedIds} />
+            <Cloud open={openPopupCloud} onClose={handleCloseCloudPopup} nvr={selectedIds} />
+            
           </>
-        )}
+
+        )} 
+         <Passwords open={openPopupP} onClose={handleClosePPopup} nvr={selectedIds} />
+
+        <ConnectCamera open={openPopupConnectCamera} onClose={handleCloseConnectCameraPopup} nvr={selectedIds} />
+            <VideoConnectCamera open={openPopupVideoConnectCamera} onClose={handleCloseVideoConnectPopup} nvr={selectedIds} />
+
       </Grid>
     </Grid>
   )
