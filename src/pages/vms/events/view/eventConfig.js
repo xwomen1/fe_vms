@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import axios from "axios"
 import { TreeItem, TreeView } from "@mui/lab"
 import Icon from 'src/@core/components/icon'
-import { Box, Button, Card, CardContent, CardMedia, DialogActions, Divider, Grid, IconButton, MenuItem, Slider, Tooltip, Typography, styled } from "@mui/material"
+import { Box, Button, Card, CardContent, CardHeader, CardMedia, DialogActions, Divider, Grid, IconButton, MenuItem, Slider, Tooltip, Typography, styled } from "@mui/material"
 import authConfig from 'src/configs/auth'
 import ViewCamera from "./viewCamera"
 import { AddBox, CameraAlt, FastForward, FastRewind, IndeterminateCheckBox, Pause, PlayArrow, SkipNext, SkipPrevious } from "@mui/icons-material"
@@ -10,6 +10,7 @@ import { format } from "date-fns"
 import CustomTextField from "src/@core/components/mui/text-field"
 import Schedule from "../popups/schedule"
 import CustomAutocomplete from "src/@core/components/mui/autocomplete"
+import toast from "react-hot-toast"
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     '&:hover > .MuiTreeItem-content:not(.Mui-selected)': {
@@ -57,21 +58,6 @@ const StyledTreeItem = props => {
         />
     )
 }
-
-const alertList = [
-    {
-        id: 1,
-        name: 'Cảnh báo chuyển động',
-        gain: '30',
-        objectName: 'Người',
-    },
-    {
-        id: 2,
-        name: 'Thiết lập hàng rào ảo',
-        gain: '30',
-        objectName: 'Xe',
-    },
-]
 
 const areaExample = [
     {
@@ -128,6 +114,9 @@ const EventConfig = () => {
     const [isPlaying, setIsPlaying] = useState(false)
     const [zoom, setZoom] = useState(100)
     const [idCameraSelect, setIdCameraSelect] = useState(null)
+    const [nameCameraSelect, setNameCameraSelect] = useState(null)
+    const [alertAIList, setAlertAIList] = useState([])
+    const [cameraAIProperty, setCameraAIProperty] = useState([])
 
     const [direction, setDirection] = useState({
         value: '1',
@@ -162,12 +151,29 @@ const EventConfig = () => {
         fetchCameraGroup()
     }, [keyword])
 
+
     const fetchCameraGroup = async () => {
         try {
             const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/camera-groups?deviceTypes=NVR&keyword=${keyword}&limit=25&page=1`, config)
             setCameraGroup(res.data.data)
         } catch (error) {
             console.error('Error fetching data: ', error)
+        }
+    }
+
+    useEffect(() => {
+        if (idCameraSelect != null) {
+            fetchModelAICamera()
+        }
+    }, [idCameraSelect])
+
+    const fetchModelAICamera = async () => {
+        try {
+            const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties/camera/${idCameraSelect}`, config)
+            setAlertAIList(res.data.data)
+        } catch (error) {
+            console.error('Error fetching data: ', error)
+            toast(error)
         }
     }
 
@@ -425,12 +431,52 @@ const EventConfig = () => {
     }
     const marks = createSilder(startDate)
 
-    const handleItemClick = (cameraId) => {
+    const handleItemClick = (cameraId, cameraName) => {
         setIdCameraSelect(cameraId)
+        setNameCameraSelect(cameraName)
     }
 
     const handleSearch = e => {
         setKeyword(e.target.value)
+    }
+
+    const alertAIListView = () => {
+        console.log('data', data)
+        const alertList = []
+        if (alertAIList && alertAIList[0] && alertAIList[0].cameraaiproperty) {
+            alertList.push(...alertAIList[0].cameraaiproperty)
+        }
+
+        return (
+            alertList.map((alert, index) => (
+                <Box
+                    key={index}
+                    onClick={() => {
+                        setEventSelect(alert?.aitype)
+                    }}
+                    style={{
+                        background:
+                            eventSelect === alert?.aitype
+                                ? 'rgb(0, 123, 255, 0.5)'
+                                : '#fff',
+                    }}
+                    display="flex"
+                    flexDirection="column"
+                    mt={2}
+                    p={1}
+                >
+                    <Typography variant="h5">{alert?.aitype}</Typography>
+                    <Typography variant="body1" alignLeft={2}>
+                        Độ nhạy: {alert?.sensitivity}
+                    </Typography>
+                    <Typography variant="body1" alignLeft={2}>
+                        Đối tượng: {alert?.target}
+                    </Typography>
+
+                    <br />
+                    <Divider />
+                </Box>
+            )))
     }
 
     const renderTree = group => (
@@ -442,7 +488,7 @@ const EventConfig = () => {
                         nodeId={camera.id}
                         labelText={camera.deviceName}
                         labelIcon='tabler:camera'
-                        onClick={() => handleItemClick(camera.id)} />
+                        onClick={() => handleItemClick(camera.id, camera.deviceName)} />
                 ))
             ) : null}
         </StyledTreeItem>
@@ -451,8 +497,12 @@ const EventConfig = () => {
     return (
         <>
             <Grid container spacing={2}>
-                <Grid item xs={12} sm={2}>
+                <Grid item xs={12} sm={3}>
                     <Card>
+                        <CardHeader
+                            title='Danh sách Camera'
+
+                        />
                         <CardContent>
                             <CustomTextField
                                 value={keyword}
@@ -480,52 +530,29 @@ const EventConfig = () => {
                                     }
                                 }}
                             />
-                            <Typography variant='h5' sx={{ mb: 2, mt: 2 }}>
-                                CAM Tầng 1
-                            </Typography>
-                            <TreeView
-                                sx={{ minHeight: 240 }}
-                                defaultExpanded={['root']}
-                                defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
-                                defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
-                            >
-                                {cameraGroup.map((group) => renderTree(group))}
-                            </TreeView>
+                            <Box sx={{ height: '400px', overflow: 'auto' }}>
+                                <Typography variant='h5' sx={{ mb: 2, mt: 2 }}>
+                                    CAM Tầng 1
+                                </Typography>
+                                <TreeView
+                                    sx={{ minHeight: 240 }}
+                                    defaultExpanded={['root']}
+                                    defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
+                                    defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
+                                >
+                                    {cameraGroup.map((group) => renderTree(group))}
+                                </TreeView>
+                            </Box>
                         </CardContent>
                     </Card>
                 </Grid>
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={3}>
                     <Card>
+                        <CardHeader
+                            title='Cảnh báo AI'
+                        />
                         <CardContent>
-                            {alertList.map((alert, index) => (
-                                <Box
-                                    key={index}
-                                    onClick={() => {
-                                        setEventSelect(alert?.id)
-                                    }}
-                                    style={{
-                                        background:
-                                            eventSelect == alert?.id
-                                                ? 'rgb(0, 123, 255, 0.5)'
-                                                : '#fff',
-                                    }}
-                                    display="flex"
-                                    flexDirection="column"
-                                    mt={2}
-                                    p={1}
-                                >
-                                    <Typography variant="h5">{alert?.name}</Typography>
-                                    <Typography variant="body1" alignLeft={2}>
-                                        Độ nhạy: {alert?.gain}
-                                    </Typography>
-                                    <Typography variant="body1" alignLeft={2}>
-                                        Đối tượng: {alert?.objectName}
-                                    </Typography>
-
-                                    <br />
-                                    <Divider />
-                                </Box>
-                            ))}
+                            {alertAIListView()}
                             <Button
                                 style={{ width: '100%' }}
                                 variant="outlined"
@@ -656,6 +683,20 @@ const EventConfig = () => {
                                         id="cameraEdit"
                                     />
                                 </Box>
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <Typography variant="h5" >{nameCameraSelect}</Typography>
+                                    {nameCameraSelect != null && (
+                                        <IconButton
+                                            variant="outlined"
+                                            onClick={() => {
+                                                setIdCameraSelect(null)
+                                                setNameCameraSelect(null)
+                                            }} >
+                                            <Icon icon="tabler:trash-x" />
+                                        </IconButton>
+                                    )}
+                                </Box>
+
                                 <div style={{ width: '100%', marginTop: 20, padding: 5 }}>
                                     <Box display="flex" flexDirection="column" position="relative">
                                         <div style={{ position: 'absolute', top: -30, right: -30 }}>
