@@ -441,7 +441,6 @@ const EventConfig = () => {
     }
 
     const alertAIListView = () => {
-        console.log('data', data)
         const alertList = []
         if (alertAIList && alertAIList[0] && alertAIList[0].cameraaiproperty) {
             alertList.push(...alertAIList[0].cameraaiproperty)
