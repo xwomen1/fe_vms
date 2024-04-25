@@ -14,7 +14,7 @@ const navigation = () => {
           title: 'Sự kiện',
           path: '/event-management'
         },
-        
+
         {
           title: 'Chấm công',
           path: '/timekeeping'
@@ -65,7 +65,7 @@ const navigation = () => {
         },
         {
           title: 'Sự kiện AI',
-          path: 'vms/live-view-p2p-private'
+          path: '/vms/events'
         },
         {
           title: 'Sự cố hệ thống',
@@ -258,7 +258,7 @@ const navigation = () => {
         }
       ]
     },
-    
+
 
     // {
     //   path: '/caller',
@@ -300,8 +300,8 @@ const navigation = () => {
     //     }
     //   ]
     // },
-    
-    
+
+
     // {
     //   title: 'Dashboards',
     //   icon: 'tabler:smart-home',
