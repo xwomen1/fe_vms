@@ -446,35 +446,45 @@ const EventConfig = () => {
             alertList.push(...alertAIList[0].cameraaiproperty)
         }
 
+        console.log(alertList)
         return (
             alertList.map((alert, index) => (
-                <Box
-                    key={index}
-                    onClick={() => {
-                        setEventSelect(alert?.aitype)
-                    }}
-                    style={{
-                        background:
-                            eventSelect === alert?.aitype
-                                ? 'rgb(0, 123, 255, 0.5)'
-                                : '#fff',
-                    }}
-                    display="flex"
-                    flexDirection="column"
-                    mt={2}
-                    p={1}
-                >
-                    <Typography variant="h5">{alert?.aitype}</Typography>
-                    <Typography variant="body1" alignLeft={2}>
-                        Độ nhạy: {alert?.sensitivity}
-                    </Typography>
-                    <Typography variant="body1" alignLeft={2}>
-                        Đối tượng: {alert?.target}
-                    </Typography>
+                <>
+                    <Box
+                        key={index}
+                        onClick={() => {
+                            setEventSelect(alert?.aitype)
+                        }}
+                        style={{
+                            background:
+                                eventSelect === alert?.aitype
+                                    ? 'rgb(0, 123, 255, 0.5)'
+                                    : '#fff',
+                        }}
+                        display="flex"
+                        flexDirection="column"
+                        mt={2}
+                        p={1}
+                    >
+                        <Typography variant="h5">{alert?.aitype}</Typography>
+                        <Typography variant="body1" alignLeft={2}>
+                            Độ nhạy: {alert?.sensitivity}
+                        </Typography>
+                        <Typography variant="body1" alignLeft={2}>
+                            Đối tượng: {alert?.target}
+                        </Typography>
 
-                    <br />
-                    <Divider />
-                </Box>
+                        <br />
+                        <Divider />
+                    </Box>
+                    <Button
+                        style={{ width: '100%' }}
+                        variant="outlined"
+                        color="primary"
+                    >
+                        {alert.isactive == true ? 'Xóa cảnh báo ' : 'Thêm cảnh báo'}
+                    </Button>
+                </>
             )))
     }
 
@@ -552,14 +562,7 @@ const EventConfig = () => {
                         />
                         <CardContent>
                             {alertAIListView()}
-                            <Button
-                                style={{ width: '100%' }}
-                                variant="outlined"
-                                color="primary"
-                            >
-                                Thêm cảnh báo
-                            </Button>
-                            <DialogActions style={{ marginTop: 16 }}>
+                            <Box style={{ marginTop: 16 }}>
                                 {isDraw && (
                                     <>
                                         <Button
@@ -641,7 +644,7 @@ const EventConfig = () => {
                                         </Button>
                                     </>
                                 )}
-                            </DialogActions>
+                            </Box>
                         </CardContent>
                     </Card>
                 </Grid>
