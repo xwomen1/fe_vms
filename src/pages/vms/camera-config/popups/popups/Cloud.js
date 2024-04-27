@@ -9,8 +9,8 @@ import { styled } from '@mui/material/styles'
 import MuiTabList from '@mui/lab/TabList'
 import authConfig from 'src/configs/auth'
 import axios from 'axios'
-import TCP from './TCP-IP'
-import DDNs from './DDNS'
+import Camera from './Camera'
+import Channel from './Channel'
 import Port from './Port'
 import NTP from './NTP'
 
@@ -50,81 +50,43 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
 }))
 import Swal from 'sweetalert2'
 
-const Network = ({ open, onClose, onSelect, camera }) => {
+const RolePopup = ({ open, onClose, onSelect, nvr }) => {
   const [selectedRole, setSelectedRole] = useState(null)
   const [groupName, setGroupName] = useState([])
   const [defaultGroup, setDefaultGroup] = useState(null)
   const [selectedGroupId, setSelectedGroupId] = useState(null) // Thêm trạng thái để lưu trữ id của nhóm được chọn
-  const [cameras, setCamera] = useState([])
+  const [nvrs, setNvrs] = useState([])
   const [groupCode, setGroupCode] = useState([])
   const [value, setValue] = useState('1')
 
   const handleChange = (event, newValue) => {
     setValue(newValue)
   }
-  console.log(camera, 'camera')
 
   const handleCancel = () => {
     onClose()
   }
-  useEffect(() => {
-    const fetchGroupData = async () => {
-      try {
-        if (camera != null) { // Kiểm tra xem popup Network đã mở chưa
-          const token = localStorage.getItem(authConfig.storageTokenKeyName)
-          console.log('token', token)
-  
-          const config = {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-  
-          const response = await axios.get(
-            `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/{idCamera}?idCamera=${camera}`,
-            config
-          )
-  
-          setCamera(response.data.data)
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
-    }
-  
-    fetchGroupData()
-  }, [camera]) // Thêm openPopupNetwork vào dependency array để useEffect được gọi khi openPopupNetwork thay đổi
-  
+
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Cấu hình mạng</DialogTitle>
+      <DialogTitle>Cấu hình luu tru</DialogTitle>
       <DialogContent>
         <TabContext value={value}>
           <Grid>
             {' '}
             <TabList onChange={handleChange} aria-label='customized tabs example'>
-              <Tab value='1' label='TCP/IP' />
-              <Tab value='2' label='DDNS' />
-              <Tab value='3' label='PORT' />
-              <Tab value='4' label='NTP' />
+              <Tab value='1' label='Lich ghi' />
+              <Tab value='2' label='Chat luong ghi' />
+            
             </TabList>
           </Grid>
           <TabPanel value='1'>
-            {' '}
-            <TCP camera={cameras} />
+            <Camera  />
           </TabPanel>
           <TabPanel value='2'>
-            {' '}
-            <DDNs nvrs={cameras} />
+            <Channel  />
           </TabPanel>
-          <TabPanel value='3'>
-            {' '}
-            <Port nvrs={cameras} />
-          </TabPanel>
-          <TabPanel value='4'>
-            {' '}
-            <NTP nvrs={cameras} />
-          </TabPanel>
+         
         </TabContext>
       </DialogContent>
       <DialogActions>
@@ -135,4 +97,4 @@ const Network = ({ open, onClose, onSelect, camera }) => {
   )
 }
 
-export default Network
+export default RolePopup

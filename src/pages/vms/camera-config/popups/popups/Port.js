@@ -36,7 +36,7 @@ import Swal from 'sweetalert2'
 import Link from 'next/link'
 import Alert from '@mui/material/Alert'
 
-const UserDetails = (cameras) => {
+const UserDetails = nvrs => {
   const router = useRouter()
   const { id } = router.query
   const [timeValidity, setTimeValidity] = useState('Custom')
@@ -69,33 +69,6 @@ const UserDetails = (cameras) => {
   const [ava2, setAva2] = useState(null)
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-
-  // useEffect(() => {
-  //   const fetchGroupData = async () => {
-  //     try {
-  //       const token = localStorage.getItem(authConfig.storageTokenKeyName)
-  //       console.log('token', token)
-
-  //       const config = {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`
-  //         }
-  //       }
-
-  //       const response = await axios.get(
-  //         `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/{idCamera}?idCamera=${cameras.camera}`,
-  //         config
-  //       )
-
-  //       setNvrs(response.data.data)
-  //     } catch (error) {
-  //       console.error('Error fetching data:', error)
-  //     }
-  //   }
-
-  //   fetchGroupData()
-  // }, [])
-  console.log(cameras)
 
   const handleAddRow = () => {
     const newRow = { groupName: '', groupCode: '', groupId: '' } // Thêm groupId vào đây
@@ -165,6 +138,7 @@ const UserDetails = (cameras) => {
     setIdentityNumber(event.target.value)
   }
 
+  console.log('param', nvrs.nvrs.ddnsType)
   const formatDDNS = ddns => <Checkbox checked={ddns} disabled />
 
   return (
@@ -172,59 +146,20 @@ const UserDetails = (cameras) => {
       <Grid container spacing={3}>
         <Grid container item component={Paper} style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
           <Grid item xs={5.8}>
-            <CustomTextField value={cameras.camera?.nicType?.name} label='Loại NIC' onChange={handleFullNameChange} fullWidth />
+            <CustomTextField label='HTTP Port' value={nvrs.nvrs.http} onChange={handleFullNameChange} fullWidth />
           </Grid>
           <Grid item xs={0.4}></Grid>
-        
           <Grid item xs={5.8}>
-          <Switch checked={cameras.camera?.dhcp} color='primary' />
- DHCP
+            <CustomTextField label='RTSP Port' value={nvrs.nvrs.rtsp} onChange={handleEmailChange} fullWidth />
           </Grid>
           <Grid item xs={5.8}>
-            <CustomTextField label='MTU' value={cameras.camera.mtu} onChange={handleEmailChange} fullWidth />
+            <CustomTextField label='HTTPS Port' value={nvrs.nvrs.https} onChange={handleFullNameChange} fullWidth />
           </Grid>
           <Grid item xs={0.4}></Grid>
-
           <Grid item xs={5.8}>
-            <CustomTextField
-              label='Multicast Address'
-              // value={cameras.camera.ipv4SubnetMask}
-              onChange={handleFullNameChange}
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={5.8}>
-            <CustomTextField
-              label='Multicast Discovery              '
-              // value={cameras.camera.ipv4DefaultGateway}
-              onChange={handleEmailChange}
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={0.4}></Grid>
-
-          <Grid item xs={5.8}>
-            <CustomTextField
-              label='Preferred DNS Server              '
-              value={cameras.camera.prefDNS}
-              onChange={handleFullNameChange}
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={5.8}>
-            <CustomTextField
-              label='Alternate DNS Server
-              '
-              value={cameras.camera.alterDNS}
-              onChange={handleEmailChange}
-              fullWidth
-            />
+            <CustomTextField label='Server Port' value={nvrs.nvrs.server} onChange={handleEmailChange} fullWidth />
           </Grid>
         </Grid>
-        <Grid item xs={0.4}></Grid>
-
-      
-       
       </Grid>
       <br />
     </div>

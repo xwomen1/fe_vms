@@ -18,7 +18,7 @@ import Swal from 'sweetalert2'
 import { fetchData } from 'src/store/apps/user'
 import { useRouter } from 'next/router'
 import axios from 'axios'
-import TableHeader from 'src/views/apps/vms/nvr-config/TableHeader'
+import TableHeader from 'src/views/apps/vms/camera-config/TableHeader'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import Link from 'next/link'
 import RolePopup from './popups/ChangePassword'
@@ -32,8 +32,7 @@ import Cloud from './popups/Cloud'
 import ConnectCamera from './popups/ConnectCamera'
 import VideoConnectCamera from './popups/VideoConnectCamera'
 import { Password } from '@mui/icons-material'
-
-const UserList = ({ apiData }) => {
+const Camera = ({ apiData }) => {
   const [value, setValue] = useState('')
   const [selectedIds, setSelectedIds] = useState([])
   const [openPopup, setOpenPopup] = useState(false)
@@ -49,7 +48,7 @@ const UserList = ({ apiData }) => {
   const [selectedNvrId, setSelectedNvrId] = useState(null)
   const [addUserOpen, setAddUserOpen] = useState(false)
   const [assettype, setAssetType] = useState([])
-  const [nvr, setNvr] = useState([1])
+  const [camera, setCamera] = useState([1])
 
   const [total, setTotal] = useState([1])
   const [page, setPage] = useState(1)
@@ -73,6 +72,7 @@ const UserList = ({ apiData }) => {
       setSelectedNvrId(id)
     }
   }
+  console.log(selectedIds)
 
   const handleAddRoleClick = () => {
     setOpenPopup(true)
@@ -232,7 +232,7 @@ const UserList = ({ apiData }) => {
         }
         const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/cameras', config)
         setStatus1(response.data.data.isOfflineSetting)
-        setNvr(response.data.data[0].id)
+        setCamera(response.data.data[0].id)
         setAssetType(response.data.data)
         setTotal(response.data.data.page)
         console.log(response.data.data[0].id)
@@ -360,21 +360,21 @@ const UserList = ({ apiData }) => {
             </Grid>
           </Grid>
         </Card>
-        {selectedIds.length > 0 && (
-          <>
-            <RolePopup open={openPopup} onClose={handleClosePopup} nvr={selectedIds} />
-            <Network open={openPopupNetwork} onClose={handleCloseNetWorkPopup} nvr={selectedIds} />
-            <Video open={openPopupVideo} onClose={handleCloseVideoPopup} nvr={selectedIds} />
-            <Image open={openPopupImage} onClose={handleCloseImagePopup} nvr={selectedIds} />
-            <Cloud open={openPopupCloud} onClose={handleCloseCloudPopup} nvr={selectedIds} />
-            
-          </>
+        
+        {selectedIds.length < 2 && selectedIds.length >= 0 && (
+    <>
+      <RolePopup open={openPopup} onClose={handleClosePopup} camera={selectedIds} />
+      <Network open={openPopupNetwork} onClose={handleCloseNetWorkPopup} camera={selectedIds} />
+      <Video open={openPopupVideo} onClose={handleCloseVideoPopup} camera={selectedIds} />
+      <Image open={openPopupImage} onClose={handleCloseImagePopup} camera={selectedIds} />
+      <Cloud open={openPopupCloud} onClose={handleCloseCloudPopup} camera={selectedIds} />
+    </>
+  )}
 
-        )} 
-         <Passwords open={openPopupP} onClose={handleClosePPopup} nvr={selectedIds} />
+         <Passwords open={openPopupP} onClose={handleClosePPopup} camera={selectedIds} />
 
-        <ConnectCamera open={openPopupConnectCamera} onClose={handleCloseConnectCameraPopup} nvr={selectedIds} />
-            <VideoConnectCamera open={openPopupVideoConnectCamera} onClose={handleCloseVideoConnectPopup} nvr={selectedIds} />
+        <ConnectCamera open={openPopupConnectCamera} onClose={handleCloseConnectCameraPopup} camera={selectedIds} />
+            <VideoConnectCamera open={openPopupVideoConnectCamera} onClose={handleCloseVideoConnectPopup} camera={selectedIds} />
 
       </Grid>
     </Grid>
@@ -392,4 +392,4 @@ export const getStaticProps = async () => {
   }
 }
 
-export default UserList
+export default Camera
