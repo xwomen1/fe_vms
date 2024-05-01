@@ -109,14 +109,16 @@ const EventConfig = () => {
     const [keyword, setKeyword] = useState('')
     const [cameraGroup, setCameraGroup] = useState([])
     const [isOpenSchedule, setIsOpenSchedule] = useState(false)
-    const [deviceList, setDeviceList] = useState(null)
     const [reload, setReload] = useState(0)
     const [isPlaying, setIsPlaying] = useState(false)
     const [zoom, setZoom] = useState(100)
     const [idCameraSelect, setIdCameraSelect] = useState(null)
     const [nameCameraSelect, setNameCameraSelect] = useState(null)
     const [alertAIList, setAlertAIList] = useState([])
-    const [cameraAIProperty, setCameraAIProperty] = useState([])
+    const [alertList, setAlertList] = useState([])
+    const [cameraAIPropertyId, setCameraAIPropertyId] = useState(null)
+    const [calendar, setCalender] = useState([])
+    const [isActive, setIsActive] = useState(null)
 
     const [direction, setDirection] = useState({
         value: '1',
@@ -178,6 +180,15 @@ const EventConfig = () => {
     }
 
     useEffect(() => {
+        if (alertAIList && alertAIList[0] && alertAIList[0].cameraaiproperty) {
+            setAlertList(alertAIList[0].cameraaiproperty)
+
+            // set camera ai property id
+            setCameraAIPropertyId(alertAIList[0].id)
+        }
+    }, [alertAIList])
+
+    useEffect(() => {
         const canvas = canvasRef.current
         const ctx = canvas.getContext('2d')
         canvas.addEventListener('click', draw)
@@ -203,42 +214,6 @@ const EventConfig = () => {
             canvas.removeEventListener('click', draw)
         }
     }, [isDraw, eventSelect, areaSelect, lineSelect, direction])
-
-    useEffect(() => {
-        if (deviceList) {
-            let dataRows = []
-            deviceList.forEach((element) => {
-                if (element?.cameras) {
-                    dataRows.push({
-                        id: element?.id,
-                        name: element?.name,
-                        icon: 'activefolder',
-                        isDirectory: true,
-                        cameras: [...element?.cameras],
-                        expanded: true,
-                    })
-                    if (element?.cameras) {
-                        element?.cameras.forEach((elem) => {
-                            if (elem.id && element.id) {
-                                dataRows.push({
-                                    id: elem?.id + '+' + element.id,
-                                    idRoot: elem?.id,
-                                    parentId: element.id,
-                                    name: elem?.deviceName,
-                                    icon: 'video',
-                                    isDirectory: false,
-                                    expanded: false,
-                                })
-                            }
-                        })
-                    }
-                }
-
-
-            })
-            setCameraTreeViewGroup(dataRows)
-        }
-    }, [deviceList])
 
     const clearAction = () => {
         setAreaSelect([])
@@ -381,6 +356,10 @@ const EventConfig = () => {
         }
     }
 
+    // console.log('alertList', alertList)
+    // console.log('lineSelect', lineSelect)
+    // console.log('areaSelect', areaSelect)
+
     const handlePlayClick = () => {
         setIsPlaying(!isPlaying)
     }
@@ -440,13 +419,25 @@ const EventConfig = () => {
         setKeyword(e.target.value)
     }
 
-    const alertAIListView = () => {
-        const alertList = []
-        if (alertAIList && alertAIList[0] && alertAIList[0].cameraaiproperty) {
-            alertList.push(...alertAIList[0].cameraaiproperty)
-        }
+    const handleSetSchedule = (data) => {
+        // console.log('schedule', data)
+    }
 
-        console.log(alertList)
+    const handleActiveAlertAI = async (isactive) => {
+        // console.log('active', isactive)
+        // setLoading(true)
+        // try {
+        //     const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties/4fa9a51c-e904-4ab0-acad-169ed4c9aeab`, config)
+        //     setAlertAIList(res.data.data)
+        // } catch (error) {
+        //     console.error('Error fetching data: ', error)
+        //     toast(error)
+        // } finally {
+        //     setLoading(false)
+        // }
+    }
+
+    const alertAIListView = () => {
         return (
             alertList.map((alert, index) => (
                 <>
@@ -481,7 +472,7 @@ const EventConfig = () => {
                         style={{ width: '100%' }}
                         variant="outlined"
                         color="primary"
-                    >
+                        onClick={() => handleActiveAlertAI(!alert.isactive)}                    >
                         {alert.isactive == true ? 'Xóa cảnh báo ' : 'Thêm cảnh báo'}
                     </Button>
                 </>
@@ -562,40 +553,46 @@ const EventConfig = () => {
                         />
                         <CardContent>
                             {alertAIListView()}
-                            <Box style={{ marginTop: 16 }}>
+                            <Box sx={{ marginTop: 5 }}>
                                 {isDraw && (
-                                    <>
-                                        <Button
-                                            onClick={() => {
-                                                clearAction()
-                                                setLineSelect([])
-                                                setAreaSelect([])
-                                            }}
-                                            variant="outlined"
-                                            disabled={!eventSelect}
-                                        >
-                                            Clear
-                                        </Button>
-                                        <Button
-                                            onClick={() => {
-                                                setIsDraw('')
-                                            }}
-                                            variant="outlined"
-                                            disabled={!eventSelect}
-                                        >
-                                            Hủy
-                                        </Button>
-                                        <Button
-                                            onClick={() => {
-                                                setIsDraw('')
-                                            }}
-                                            variant="outlined"
-                                            disabled={!eventSelect}
-                                        >
-                                            Lưu
-                                        </Button>
+                                    <Grid container spacing={2}>
+                                        <Grid item xs={12} sm={4}>
+                                            <Button
+                                                onClick={() => {
+                                                    clearAction()
+                                                    setLineSelect([])
+                                                    setAreaSelect([])
+                                                }}
+                                                variant="outlined"
+                                                disabled={!eventSelect}
+                                            >
+                                                Clear
+                                            </Button>
+                                        </Grid>
+                                        <Grid item xs={12} sm={4}>
+                                            <Button
+                                                onClick={() => {
+                                                    setIsDraw('')
+                                                }}
+                                                variant="outlined"
+                                                disabled={!eventSelect}
+                                            >
+                                                Hủy
+                                            </Button>
+                                        </Grid>
+                                        <Grid item xs={12} sm={4}>
+                                            <Button
+                                                onClick={() => {
+                                                    setIsDraw('')
+                                                }}
+                                                variant="outlined"
+                                                disabled={!eventSelect}
+                                            >
+                                                Lưu
+                                            </Button>
+                                        </Grid>
                                         {isDraw == 'line' && (
-                                            <div style={{ width: '120px', marginLeft: 5 }}>
+                                            <Grid item xs={12}>
                                                 <CustomAutocomplete
                                                     options={data}
                                                     id='autocomplete-custom'
@@ -607,42 +604,51 @@ const EventConfig = () => {
                                                         }
                                                     }}
                                                 />
-                                            </div>
+                                            </Grid>
                                         )}
-                                    </>
+                                    </Grid>
                                 )}
                                 {!isDraw && (
-                                    <>
-                                        <Button
-                                            onClick={() => {
-                                                setIsDraw('rectangle')
-                                                clearAction()
-                                            }}
-                                            variant="outlined"
-                                            disabled={!eventSelect}
-                                        >
-                                            Khoanh vùng
-                                        </Button>
-                                        <Button
-                                            onClick={() => {
-                                                setIsDraw('line')
-                                                clearAction()
-                                            }}
-                                            variant="outlined"
-                                            disabled={!eventSelect}
-                                        >
-                                            Rào ảo
-                                        </Button>
-                                        <Button
-                                            onClick={() => {
-                                                setIsOpenSchedule(true)
-                                            }}
-                                            variant="outlined"
-                                            disabled={!eventSelect}
-                                        >
-                                            Lịch
-                                        </Button>
-                                    </>
+                                    <Grid container spacing={2}>
+                                        <Grid item xs={12} sm={12}>
+                                            <Button
+                                                style={{ width: '100%' }}
+                                                onClick={() => {
+                                                    setIsDraw('rectangle')
+                                                    clearAction()
+                                                }}
+                                                variant="outlined"
+                                                disabled={!eventSelect}
+                                            >
+                                                Khoanh vùng
+                                            </Button>
+                                        </Grid>
+                                        <Grid item xs={12} sm={6}>
+                                            <Button
+                                                style={{ width: '100%' }}
+                                                onClick={() => {
+                                                    setIsDraw('line')
+                                                    clearAction()
+                                                }}
+                                                variant="outlined"
+                                                disabled={!eventSelect}
+                                            >
+                                                Rào ảo
+                                            </Button>
+                                        </Grid>
+                                        <Grid item xs={12} sm={6}>
+                                            <Button
+                                                style={{ width: '100%' }}
+                                                onClick={() => {
+                                                    setIsOpenSchedule(true)
+                                                }}
+                                                variant="outlined"
+                                                disabled={!eventSelect}
+                                            >
+                                                Lịch
+                                            </Button>
+                                        </Grid>
+                                    </Grid>
                                 )}
                             </Box>
                         </CardContent>
@@ -686,17 +692,7 @@ const EventConfig = () => {
                                     />
                                 </Box>
                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <Typography variant="h5" >{nameCameraSelect}</Typography>
-                                    {nameCameraSelect != null && (
-                                        <IconButton
-                                            variant="outlined"
-                                            onClick={() => {
-                                                setIdCameraSelect(null)
-                                                setNameCameraSelect(null)
-                                            }} >
-                                            <Icon icon="tabler:trash-x" />
-                                        </IconButton>
-                                    )}
+                                    <Typography variant="h5" >{idCameraSelect}</Typography>
                                 </Box>
 
                                 <div style={{ width: '100%', marginTop: 20, padding: 5 }}>
@@ -789,7 +785,7 @@ const EventConfig = () => {
             </Grid>
 
             {isOpenSchedule && (
-                <Schedule onClose={() => setIsOpenSchedule(false)} show={isOpenSchedule} />
+                <Schedule onClose={() => setIsOpenSchedule(false)} show={isOpenSchedule} callback={handleSetSchedule} />
             )}
         </>
     )
