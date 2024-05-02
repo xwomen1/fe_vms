@@ -17,15 +17,20 @@ import { HiOutlineDownload } from 'react-icons/hi';
 import MaskGroup from './list/Imge/NoAvatar.svg';
 
 function ModalImage({ onClose, imageUrl }) {
+
   const onDownloadBtnClick = () => {
+
     const link = document.createElement('a');
+    
     link.href = url;
     link.download = 'Download.jpg';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
+
   const [url, setUrl] = useState(null);
+
   useEffect(() => {
     if (imageUrl) {
       setUrl(imageUrl);
@@ -39,7 +44,6 @@ function ModalImage({ onClose, imageUrl }) {
     visible
     onHiding={() => onClose()}
     dragEnabled
-    /* eslint-disable-next-line */
     closeOnOutsideClick
     showCloseButton
     height="100%"
