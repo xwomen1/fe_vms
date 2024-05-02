@@ -1,8 +1,5 @@
 import React, {Fragment, useEffect, useState } from 'react';
 import { TabContext, TabList, TabPanel } from "@mui/lab"
-
-// import { HashRouter as Router, Link } from 'react-router-dom';
-
 import {
     Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Tab, TableContainer, Paper,
     Table, TableHead, TableRow, TableCell, TableBody, Pagination, Menu, MenuItem, Dialog, DialogContent,
@@ -20,19 +17,16 @@ import * as XLSX from 'xlsx';
 import Checkbox from '@mui/material/Checkbox'
 import Link from 'next/link'
 
-import { color } from '@mui/system';
-
 const FaceManagement=() => {
 
-    //khai báo
-    // const [reload, setReload] = useState(0);
     const [keyword, setKeyword] = useState('');
-
+    const [selectedIds, setSelectedIds] = useState([]);
+    const [selectAll, setSelectAll] = useState(false);
     const [userData, setUserData] = useState([]);
     const [selectedRows, setSelectedRows] = useState([]);
     const [loading, setLoading] = useState(false)
     const [listImage, setListImage] = useState([]);
-    const [selectAllChecked, setSelectAllChecked] = useState(false);
+    const [isDeleteDisabled, setIsDeleteDisabled] = useState(true);
 
     const initValueFilter = {
         keyword: '',
@@ -42,20 +36,73 @@ const FaceManagement=() => {
 
     const [valueFilter, setValueFilter] = useState(initValueFilter)
 
-    // useEffect(() => {
-    //     fetchFilteredOrAllUsers();
-    // }, [valueFilter,reload])
+    useEffect(() => {
 
-    const handleSetValueFilter = (data) => {
-        const newDto = {
-            ...valueFilter,
-            ...data,
-            page: 1,
-        };
+        const atLeastOneSelected = selectedIds.length > 0;
 
-        setValueFilter(newDto)
-        setIsOpenFilter(false)
-    }
+        setSelectAll(atLeastOneSelected);
+      }, [selectedIds]);
+    
+    const handleCheckboxChange = (event, id) => {
+
+        const { checked } = event.target;
+
+        let updatedIds = [...selectedIds];
+        if (checked && !updatedIds.includes(id)) {
+        updatedIds.push(id);
+        } else {
+        updatedIds = updatedIds.filter(selectedId => selectedId !== id);
+        }
+        setSelectedIds(updatedIds);
+        setIsDeleteDisabled(updatedIds.length === 0);
+        console.log(updatedIds,'updatedIds');   
+    };
+    
+    const handleSelectAllChange = (event) => {
+
+        const { checked } = event.target;
+
+        const updatedIds = checked ? userData.map(user => user.id) : [];
+
+        setSelectedIds(updatedIds);
+        setSelectAll(checked);
+    };
+    
+    const handleDeleteSelected = () => {
+        showAlertConfirm({
+          text: 'Bạn có chắc chắn muốn xóa?'
+        }).then(({ value }) => {
+          if (value) {
+
+            const token = localStorage.getItem(authConfig.storageTokenKeyName);
+            if (!token) {
+              return;
+            }
+            
+            const config = {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            };
+            selectedIds.forEach(idDelete => {
+              let urlDelete = `https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${idDelete}`;
+              axios
+                .delete(urlDelete, config)
+                .then(() => {
+                    
+                  const updatedData = userData.filter(user => user.id !== idDelete);
+                  setUserData(updatedData);
+                })
+                .catch(err => {
+                  Swal.fire('Đã xảy ra lỗi', err.message, 'error');
+                });
+            });
+
+            setSelectedIds([]);
+          }
+          
+        });
+      };
 
     const exportToExcel = async () => {
         setLoading(true);
@@ -103,30 +150,10 @@ const FaceManagement=() => {
             setLoading(false);
         }
     };
-    
-    const handleCheckboxChange = (index) => {
-        const selectedIndex = selectedRows.indexOf(index);
-        let newSelected = [...selectedRows];
 
-        if (selectedIndex === -1) {
-            newSelected.push(index);
-        } else {
-            newSelected.splice(selectedIndex, 1);
-        }
+    function showAlertConfirm(options, intl) {
 
-        setSelectedRows(newSelected);
-        setSelectAllChecked(newSelected.length > 0); // Kiểm tra nếu có ít nhất một hàng được chọn
-    };
-
-    const handleSelectAllChange = (event) => {
-        setSelectAllChecked(event.target.checked);
-        const newSelecteds = event.target.checked ? Array.from({ length: userData.length }, (_, index) => index) : [];
-        setSelectedRows(newSelecteds);
-    };
-
-        function showAlertConfirm(options, intl) {
-
-        const defaultProps = {
+    const defaultProps = {
       title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
       imageWidth: 213,
       showCancelButton: true,
@@ -150,6 +177,7 @@ useEffect(() => {
     const fetchFilteredOrAllUsers = async () => {
         setLoading(true)
         try {
+
           const token = localStorage.getItem(authConfig.storageTokenKeyName)
   
           const config = {
@@ -192,6 +220,7 @@ const handleDelete = idDelete => {
       text: 'Bạn có chắc chắn muốn xóa?'
     }).then(({ value }) => {
       if (value) {
+
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
         if (!token) {
 
@@ -262,10 +291,6 @@ const Img = React.memo(props => {
     )
   })
 
-  const handleDeletee = () => {
-    // Xử lý logic khi nút "Xóa" được nhấn
-};
-
     return(
         <>
 
@@ -285,8 +310,8 @@ const Img = React.memo(props => {
                                         <IconButton 
                                          aria-label='Xóa'
                                          color='primary'
-                                         disabled={selectedRows.length === 0} // Vô hiệu hóa nút khi không có hàng nào được chọn
-                                         onClick={handleDelete} >
+                                         disabled={isDeleteDisabled}
+                                         onClick={handleDeleteSelected} >
                                             <Icon icon="tabler:trash" />
                                         </IconButton>
                                         <IconButton
@@ -295,7 +320,11 @@ const Img = React.memo(props => {
                                         onClick={exportToExcel} >
                                             <Icon icon="tabler:file-export" />
                                         </IconButton>
-                                        <IconButton aria-label='Thêm mới' color='primary'>
+                                        <IconButton aria-label='Thêm mới' color='primary'
+                                        component={Link}
+                                        href={`/pages/face_management/detail/add`}
+                                        sx={{ color: 'blue' }}
+                                        >
                                             <Icon icon="tabler:square-plus" />
                                         </IconButton>
                                     </Box>
@@ -343,14 +372,16 @@ const Img = React.memo(props => {
                                 <TableRow>
                                     <TableCell>
                                     <Checkbox
-                                        checked={selectAllChecked}
-                                        onChange={handleSelectAllChange}
+                                                     onChange={handleSelectAllChange}
+                                                     checked={selectAll}
                                      />
                                     </TableCell>
                                     <TableCell sx={{ padding: '16px' }}>STT</TableCell>
                                     <TableCell sx={{ padding: '16px' }}>Ảnh đối tượng</TableCell>
                                     <TableCell sx={{ padding: '16px' }}>Tên Đối tượng</TableCell>
                                     <TableCell sx={{ padding: '16px' }}>Lần cuối xuất hiện</TableCell>
+                                    <TableCell sx={{ padding: '16px',textAlign:'center' }}>Chi tiết</TableCell>
+                                    <TableCell sx={{ padding: '16px' }}>Xóa</TableCell>
                                 </TableRow>
                            </TableHead>
                            <TableBody>
@@ -359,8 +390,8 @@ const Img = React.memo(props => {
                                 <TableRow key={user.id}>
                                     <TableCell>
                                     <Checkbox
-                                     checked={selectedRows.includes(index)}
-                                     onChange={() => handleCheckboxChange(index)}
+                                                    onChange={(event) => handleCheckboxChange(event, user.id)}
+                                                    checked={selectedIds.includes(user.id)}
                                      />
                                     </TableCell>
                                     <TableCell>{index + 1}</TableCell>
@@ -373,14 +404,14 @@ const Img = React.memo(props => {
                                     <TableCell>{user.name}</TableCell>
                                     <TableCell>{user.lastAppearance}</TableCell>
                                     <TableCell>
-                                        <IconButton
+                                        <Button
                                             size='small'
                                             component={Link}
                                             href={`/pages/face_management/detail/${user.id}`}
-                                            sx={{ color: 'blue' }}
+                                            sx={{ color: 'blue',left:'45px'}}
                                         >
                                             Xem chi tiết
-                                        </IconButton>
+                                        </Button>
                                     </TableCell>
                                     <TableCell sx={{ padding: '16px' }}>
                                         <Grid container spacing={2}>
@@ -405,15 +436,5 @@ const Img = React.memo(props => {
     
 }
 
-// export const getStaticProps = async () => {
-//     const res = await axios.get('/cards/statistics')
-//     const apiData = res.data
-  
-//     return {
-//       props: {
-//         apiData
-//       }
-//     }
-//   }
 
 export default FaceManagement
