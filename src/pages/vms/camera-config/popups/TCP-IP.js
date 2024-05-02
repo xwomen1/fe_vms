@@ -188,14 +188,14 @@ const UserDetails = (cameras) => {
           <Grid item xs={5.8}>
             <CustomTextField
               label='Multicast Address'
-              // value={cameras.camera.ipv4SubnetMask}
               onChange={handleFullNameChange}
               fullWidth
             />
           </Grid>
           <Grid item xs={5.8}>
             <CustomTextField
-              label='Multicast Discovery              '
+              label='Multicast Discovery'
+              
               // value={cameras.camera.ipv4DefaultGateway}
               onChange={handleEmailChange}
               fullWidth

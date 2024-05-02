@@ -44,6 +44,7 @@ const RolePopup = ({ open, onClose, onSelect, nvr }) => {
   const handleCancel = () => {
     onClose()
   }
+  
   // useEffect(() => {
   //   const fetchGroupData = async () => {
   //     try {
