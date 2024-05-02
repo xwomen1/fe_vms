@@ -12,8 +12,7 @@ import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import authConfig from 'src/configs/auth';
 import Fullscreen from '@material-ui/icons/Fullscreen';
-import Swal from 'sweetalert2'
-import Loading from '../Loading';
+import Swal from 'sweetalert2';
 import FileUploader from 'devextreme-react/file-uploader';
 import ModalImage from '../ModalImage';
 import ImageCropper from '../ImageCropperPopup';
@@ -122,7 +121,7 @@ const AddFaceManagement = () => {
                 onClick={() => {
 
                   const listFileUploadTmp = [...listFileUpload];
-                  
+
                   listFileUploadTmp.splice(listImage.indexOf(image), 1);
                   setListFileUpload(listFileUploadTmp);
                 }}
@@ -212,6 +211,7 @@ const AddFaceManagement = () => {
     };
 
     const handleAddBlacklist = async () =>{
+        setLoading(false);
         setShowLoading(true);
         try {
 
@@ -282,7 +282,7 @@ const AddFaceManagement = () => {
                             }}
                         />
                     <Grid item xs={12}>
-                    {(showLoading || loading) && <Loading />}
+                    {(showLoading || loading)}
                     {modalImage && (
                         <ModalImage
                         imageUrl={modalImage}
