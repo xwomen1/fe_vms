@@ -10,7 +10,6 @@ import Cropper from 'react-cropper';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Slider from '@material-ui/core/Slider';
 import styled from 'styled-components';
-import Loading from './Loading';
 
 function ImageCropper({ onClose, fileAvatar, setFileAvatar, setAvatarImage }) {
 
@@ -61,7 +60,7 @@ function ImageCropper({ onClose, fileAvatar, setFileAvatar, setAvatarImage }) {
       const canvas = cropper.getCroppedCanvas();
 
       const canvasBlob = getCanvasBlob(canvas);
-      
+
       canvasBlob.then(
         blob => {
 
@@ -88,7 +87,7 @@ function ImageCropper({ onClose, fileAvatar, setFileAvatar, setAvatarImage }) {
 
   return (
     <Modal>
-      {loading && <Loading />}
+      {loading}
       <div className={classes.imageContainer}>
         <span
           className="close"
