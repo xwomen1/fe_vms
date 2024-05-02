@@ -11,14 +11,14 @@ import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Slider from '@material-ui/core/Slider';
 import styled from 'styled-components';
 import Loading from './Loading';
-import { textAlign } from '@mui/system';
 
 function ImageCropper({ onClose, fileAvatar, setFileAvatar, setAvatarImage }) {
+
   const classes = useStyles();
   const [image, setImage] = useState(null);
   const [cropper, setCropper] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [ratio, setRatio] = useState(0.9); // reduce image size
+  const [ratio, setRatio] = useState(0.9);
   const { innerWidth } = window;
 
   useEffect(() => {
@@ -42,6 +42,7 @@ function ImageCropper({ onClose, fileAvatar, setFileAvatar, setAvatarImage }) {
   }, []);
 
   const getCanvasBlob = canvas => {
+
     return new Promise(resolve => {
       canvas.toBlob(
         blob => {
@@ -56,10 +57,14 @@ function ImageCropper({ onClose, fileAvatar, setFileAvatar, setAvatarImage }) {
   const onCrop = () => {
     setLoading(true);
     if (typeof cropper !== 'undefined') {
+
       const canvas = cropper.getCroppedCanvas();
+
       const canvasBlob = getCanvasBlob(canvas);
+      
       canvasBlob.then(
         blob => {
+
           const file = new File([blob], fileAvatar.name, {
             type: 'image/jpeg',
           });
@@ -76,6 +81,7 @@ function ImageCropper({ onClose, fileAvatar, setFileAvatar, setAvatarImage }) {
   };
 
   const handleSliderChange = (event, newValue) => {
+
     const scaleVal = 1 + newValue / 100;
     cropper.scale(scaleVal, scaleVal);
   };
@@ -84,7 +90,6 @@ function ImageCropper({ onClose, fileAvatar, setFileAvatar, setAvatarImage }) {
     <Modal>
       {loading && <Loading />}
       <div className={classes.imageContainer}>
-        {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions,jsx-a11y/click-events-have-key-events */}
         <span
           className="close"
           onClick={() => {
@@ -95,8 +100,6 @@ function ImageCropper({ onClose, fileAvatar, setFileAvatar, setAvatarImage }) {
         </span>
         <Cropper
           style={{ height: '100%', width: '100%' }}
-
-          // zoomable={false}
           initialAspectRatio={1}
           preview=".img-preview"
           src={image}
@@ -116,8 +119,6 @@ function ImageCropper({ onClose, fileAvatar, setFileAvatar, setAvatarImage }) {
           <CustomSlider
             orientation="vertical"
             defaultValue={0}
-
-            // valueLabelDisplay="auto"
             onChange={handleSliderChange}
           />
         </div>

@@ -10,9 +10,7 @@ import {
 import {Fragment, useState, useEffect,useRef } from 'react';
 import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
-import { TextBox } from 'devextreme-react/text-box';
 import authConfig from 'src/configs/auth';
-import toast from 'react-hot-toast';
 import Fullscreen from '@material-ui/icons/Fullscreen';
 import Swal from 'sweetalert2'
 import Loading from '../Loading';
@@ -31,7 +29,6 @@ const AddFaceManagement = () => {
     const listFileUrl = [];
     const [listImage, setListImage] = useState([]);
     const [fileAvatarId, setFileAvatarId] = useState(null);
-    const [showInvalidImagePopup, setShowInvalidImagePopup] = useState(null);
     const [listFileUpload, setListFileUpload] = useState([]);
     const [name, setName] = useState(null);
     const [showCropper, setShowCopper] = useState(false);
@@ -42,32 +39,6 @@ const AddFaceManagement = () => {
     const ALLOWED_FILE_EXTENSIONS = ['.jpg', '.jpeg', '.gif', '.png'];
     const [isDoubleClick, setIsDoubleClick] = useState(false);
 
-    const handleSingleClick = (image) => {
-        if (!isDoubleClick) {
-          setModalImage(image);
-        }
-        setIsDoubleClick(false);
-      };
-    
-      const handleDoubleClick = (image) => {
-        setAvatarImage(image);
-        setFileAvatarImg(listFileUpload[listImage.indexOf(image)]);
-        setFileAvatarId(listFileId[listImage.indexOf(image)]);
-        setShowCopper(true);
-        setIsDoubleClick(true);
-      };
-    
-      const handleClick = (image) => {
-        const currentTime = new Date().getTime();
-        const clickDuration = currentTime - lastClickTime;
-        if (clickDuration < 3000) {
-          handleDoubleClick(image);
-        } else {
-          handleSingleClick(image);
-        }
-        setLastClickTime(currentTime);
-      };
-    
       useEffect(() => {
         if (!showCropper) {
           setIsDoubleClick(false);
@@ -76,6 +47,7 @@ const AddFaceManagement = () => {
     
       const fileListToBase64 = async (fileList) => {
         function getBase64(file) {
+
           const reader = new FileReader();
 
           return new Promise((resolve) => {
@@ -85,30 +57,23 @@ const AddFaceManagement = () => {
             reader.readAsDataURL(file);
           });
         }
+
         const promises = [];
+
         for (let i = 0; i < fileList.length; i++) {
           promises.push(getBase64(fileList[i]));
         }
+
         const data = await Promise.all(promises);
 
         return data;
       };
     
-    //   const invalidPopup = () => (
-        
-    //     <InvaliteImagePopup
-    //       onClose={() => {
-    //         setShowInvalidImagePopup(null);
-    //       }}
-    //       title={showInvalidImagePopup.title}
-    //       content={showInvalidImagePopup.content}
-    //       txtButton="Đồng ý"
-    //     />
-    //   );
       useEffect(() => {
         async function fetchData() {
 
           const arrayOfBase64 = await fileListToBase64(listFileUpload);
+          
           setListImage(arrayOfBase64);
         }
         if (listFileUpload.length > 0) {
@@ -155,7 +120,9 @@ const AddFaceManagement = () => {
               <IconButton
                 className="close"
                 onClick={() => {
+
                   const listFileUploadTmp = [...listFileUpload];
+                  
                   listFileUploadTmp.splice(listImage.indexOf(image), 1);
                   setListFileUpload(listFileUploadTmp);
                 }}
@@ -194,17 +161,15 @@ const AddFaceManagement = () => {
             } else {
 
                 const files = listFileUpload.concat(e.value);
+
                 console.log(files, 'files');
 
-                // call API validate file
                 const formData = new FormData();
 
                 console.log(formData, 'formData');
 
-                // eslint-disable-next-line no-restricted-syntax
                 for (const file of files) {
                     formData.append('files', file);
-                    console.log(file, 'file');
                 }
                 setShowLoading(true);
 
@@ -246,7 +211,7 @@ const AddFaceManagement = () => {
         }
     };
 
-      const handleAddBlacklist = async () =>{
+    const handleAddBlacklist = async () =>{
         setShowLoading(true);
         try {
 
@@ -261,8 +226,6 @@ const AddFaceManagement = () => {
             const params ={
                 name: name,
                 mainImageId: fileAvatarId,
-
-                // mainImageUrl: fileAvatarUrl,
                 imgs: listFileId.map((id, index) => ({
                     id: id,
                     urlImage: listFileUrl[id],
@@ -270,8 +233,6 @@ const AddFaceManagement = () => {
             }
             await axios.post(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist`,params,config)
             Swal.fire('Thêm đối tượng thành công', '', 'success')
-
-            // fetchFilteredOrAllUserss();
             window.location.href = '/pages/face_management/list';
         } catch (error) {
             Swal.fire('Đã xảy ra lỗi', error.message, 'error')
@@ -280,7 +241,7 @@ const AddFaceManagement = () => {
         }
 
    }
-   
+
     return(
         <>
          <Grid container spacing={6.5}>
@@ -329,10 +290,7 @@ const AddFaceManagement = () => {
                             setModalImage(null);
                         }}
                         />
-                         )}
-
-                    {/* {showInvalidImagePopup && invalidPopup()}      */}
-
+                    )}
                     {showCropper && (
                     <ImageCropper
                     onClose={() => {
@@ -467,7 +425,6 @@ const AddFaceManagement = () => {
                                     >
                                         {`Hoặc`}
                                     </p>
-                                    {/* eslint-disable-next-line react/button-has-type */}
                                     <button
                                         style={{
                                         background: '#00554A',
@@ -674,5 +631,4 @@ const useStyles = makeStyles(() => ({
     },
 }));
 
-  
 export default AddFaceManagement
