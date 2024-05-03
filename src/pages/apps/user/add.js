@@ -168,17 +168,19 @@ const Add = () => {
     }
     if (!fullNameValue || !email || !phoneNumber || !identityNumber || !userCode || !syncCode || !userGroups) {
       Swal.fire('Lỗi!', 'Vui lòng điền đầy đủ thông tin.', 'error')
+
       return
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
       Swal.fire('Lỗi!', 'Địa chỉ email không hợp lệ.', 'error')
+
       return
     }
 
-    // Kiểm tra độ dài mật khẩu
     if (password.length < 6) {
       Swal.fire('Lỗi!', 'Mật khẩu phải chứa ít nhất 6 ký tự.', 'error')
+
       return
     }
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,}$/
@@ -188,6 +190,7 @@ const Add = () => {
         'Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt.',
         'error'
       )
+
       return
     }
     try {
