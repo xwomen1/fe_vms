@@ -58,15 +58,15 @@ const navigation = () => {
       children: [
         {
           title: 'Xem trực tiếp',
-          path: 'vms/cameraGroup'
+          path: '/vms/cameraGroup'
         },
         {
           title: 'Xem trực tiếp 2',
-          path: 'vms/live-view-p2p-private'
+          path: '/vms/live-view-p2p-private'
         },
         {
           title: 'Xem lại',
-          path: 'vms/playback-camera'
+          path: '/vms/playback-camera'
         },
         {
           title: 'Nhóm camera',
@@ -78,11 +78,11 @@ const navigation = () => {
         },
         {
           title: 'Sự cố hệ thống',
-          path: 'vms/problems'
+          path: '/vms/problems'
         },
         {
           title: 'Danh sách đen',
-          path: 'vms/black-list'
+          path: '/vms/black-list'
         },
         {
           title: 'Cấu hình camera',
@@ -94,15 +94,15 @@ const navigation = () => {
         },
         {
           title: 'Quản lý lưu trữ',
-          path: 'vms/stores'
+          path: '/vms/stores'
         },
         {
           title: 'Thư viện media',
-          path: 'vms/library'
+          path: '/vms/library'
         },
         {
           title: 'Bản đồ số',
-          path: 'vms/map'
+          path: '/vms/map'
         }
       ]
     },
