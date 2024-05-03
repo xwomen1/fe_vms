@@ -9,11 +9,8 @@ import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 import { Popup } from 'devextreme-react';
 import Grid from '@material-ui/core/Grid';
 import { IconButton, Tooltip } from '@material-ui/core';
-import ZoomInIcon from '@material-ui/icons/ZoomIn';
-import ZoomOutIcon from '@material-ui/icons/ZoomOut';
+import Icon from 'src/@core/components/icon'
 import MyLocationIcon from '@material-ui/icons/MyLocation';
-import CachedIcon from '@material-ui/icons/Cached';
-import { HiOutlineDownload } from 'react-icons/hi';
 import MaskGroup from './list/Imge/NoAvatar.svg';
 
 function ModalImage({ onClose, imageUrl }) {
@@ -55,11 +52,11 @@ function ModalImage({ onClose, imageUrl }) {
         alignItems="center"
         style={{ width: '100%', height: '100%' }}
       >
-                <IconButton
-          style={{ position: 'absolute', top: '8px', right: '8px', zIndex: 9999 }}
+          <IconButton
+          style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 9999 }}
           onClick={onClose}
         >
-          X
+          <Icon icon='tabler:circle-letter-x'/>
         </IconButton>
         <Grid item xs={12} style={{ height: '100%' }}>
           <TransformWrapper
@@ -73,17 +70,17 @@ function ModalImage({ onClose, imageUrl }) {
                   <Grid item>
                     <Tooltip title="Tải xuống">
                       <IconButton onClick={() => onDownloadBtnClick()}>
-                        <HiOutlineDownload fontSize="normal" />
+                      <Icon icon='tabler:download' />
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Phóng to">
                       <IconButton onClick={() => zoomIn()}>
-                        <ZoomInIcon fontSize="small" />
+                        <Icon icon='tabler:camera-minus' />
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Thu nhỏ">
                       <IconButton onClick={() => zoomOut()}>
-                        <ZoomOutIcon fontSize="small" />
+                        <Icon icon='tabler:camera-plus' />
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Trung tâm">
@@ -93,7 +90,7 @@ function ModalImage({ onClose, imageUrl }) {
                     </Tooltip>
                     <Tooltip title="Quay về mặc định">
                       <IconButton onClick={() => resetTransform()}>
-                        <CachedIcon fontSize="small" />
+                      <Icon icon='tabler:rotate' />
                       </IconButton>
                     </Tooltip>
                   </Grid>

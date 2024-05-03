@@ -108,11 +108,6 @@ const navigation = () => {
       icon: 'tabler:cards'
     },
     {
-      path: '/vehicle',
-      title: 'Phương tiện',
-      icon: 'tabler:car'
-    },
-    {
       path: '/service',
       title: 'Dịch vụ',
       icon: 'tabler:zoom-money'
@@ -146,6 +141,11 @@ const navigation = () => {
       path: '/pages/face_management/list',
       title: 'Quản lý khuôn mặt',
       icon: 'tabler:users'
+    },
+    {
+      path: '/pages/face_management/list',
+      title: 'Quản lý Biển số',
+      icon: 'tabler:car'
     },
     {
       path: '/pages/access-rights/list',
