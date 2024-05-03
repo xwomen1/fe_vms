@@ -44,32 +44,31 @@ const RolePopup = ({ open, onClose, onSelect, nvr }) => {
   const handleCancel = () => {
     onClose()
   }
-  
-  // useEffect(() => {
-  //   const fetchGroupData = async () => {
-  //     try {
-  //       const token = localStorage.getItem(authConfig.storageTokenKeyName)
-  //       console.log('token', token)
+  useEffect(() => {
+    const fetchGroupData = async () => {
+      try {
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+        console.log('token', token)
 
-  //       const config = {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`
-  //         }
-  //       }
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
 
-  //       const response = await axios.get(
-  //         `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/{idCamera}?idCamera=${nvr}`,
-  //         config
-  //       )
+        const response = await axios.get(
+          `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/config/networkconfig/{idNVR}?idNVR=${nvr}`,
+          config
+        )
 
-  //       setNvrs(response.data.data)
-  //     } catch (error) {
-  //       console.error('Error fetching data:', error)
-  //     }
-  //   }
+        setNvrs(response.data.data)
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
 
-  //   fetchGroupData()
-  // }, [])
+    fetchGroupData()
+  }, [])
 
   return (
     <Dialog open={open} onClose={onClose}>

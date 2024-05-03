@@ -4,7 +4,6 @@ import axios from 'axios'
 import authConfig from 'src/configs/auth'
 import Swal from 'sweetalert2'
 import CustomTextField from 'src/@core/components/mui/text-field'
-import { minWidth } from '@mui/system'
 
 const RolePopup = ({ open, onClose, onSelect, nvr }) => {
   const [password, setPassword] = useState('')
@@ -40,7 +39,7 @@ const RolePopup = ({ open, onClose, onSelect, nvr }) => {
       }
 
       const response = await axios.put(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/config/changepassword?idCamera=${nvr}`,
+        `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/config/changepassword?idNVR=${nvr}`,
         {
           password: password
         },
@@ -59,20 +58,12 @@ const RolePopup = ({ open, onClose, onSelect, nvr }) => {
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Đổi mật khẩu</DialogTitle>
       <DialogContent>
-      <Grid container spacing={2} style={{minWidth: 500}}>
-        <Grid container item  style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
-<Grid item xs = {12}>
-<CustomTextField label='Mật khẩu' type='password' onChange={handlePasswordChange}  fullWidth/>
-
-      </Grid>
-      <Grid item xs={12}>
-      <CustomTextField label='Xác nhận mật khẩu' type='password' onChange={handleConfirmPasswordChange} fullWidth />
-     
-      </Grid>
-    
-      </Grid>
-    </Grid>
-    
+        <Grid item xs={4}>
+          <CustomTextField label='Mật khẩu' type='password' onChange={handlePasswordChange} fullWidth />
+        </Grid>
+        <Grid item xs={4}>
+          <CustomTextField label='Xác nhận mật khẩu' type='password' onChange={handleConfirmPasswordChange} fullWidth />
+        </Grid>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleCancel}>Cancel</Button>

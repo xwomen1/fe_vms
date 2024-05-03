@@ -50,19 +50,18 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
 }))
 import Swal from 'sweetalert2'
 
-const Network = ({ open, onClose, onSelect, camera }) => {
+const RolePopup = ({ open, onClose, onSelect, nvr }) => {
   const [selectedRole, setSelectedRole] = useState(null)
   const [groupName, setGroupName] = useState([])
   const [defaultGroup, setDefaultGroup] = useState(null)
   const [selectedGroupId, setSelectedGroupId] = useState(null) // Thêm trạng thái để lưu trữ id của nhóm được chọn
-  const [cameras, setCamera] = useState([])
+  const [nvrs, setNvrs] = useState([])
   const [groupCode, setGroupCode] = useState([])
   const [value, setValue] = useState('1')
 
   const handleChange = (event, newValue) => {
     setValue(newValue)
   }
-  console.log(camera, 'camera')
 
   const handleCancel = () => {
     onClose()
@@ -70,31 +69,29 @@ const Network = ({ open, onClose, onSelect, camera }) => {
   useEffect(() => {
     const fetchGroupData = async () => {
       try {
-        if (camera != null) { // Kiểm tra xem popup Network đã mở chưa
-          const token = localStorage.getItem(authConfig.storageTokenKeyName)
-          console.log('token', token)
-  
-          const config = {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+        console.log('token', token)
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
           }
-  
-          const response = await axios.get(
-            `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/{idCamera}?idCamera=${camera}`,
-            config
-          )
-  
-          setCamera(response.data.data)
         }
+
+        const response = await axios.get(
+          `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/config/networkconfig/{idNVR}?idNVR=${nvr}`,
+          config
+        )
+
+        setNvrs(response.data.data)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
     }
-  
+
     fetchGroupData()
-  }, [camera]) // Thêm openPopupNetwork vào dependency array để useEffect được gọi khi openPopupNetwork thay đổi
-  
+  }, [])
+
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Cấu hình mạng</DialogTitle>
@@ -104,26 +101,26 @@ const Network = ({ open, onClose, onSelect, camera }) => {
             {' '}
             <TabList onChange={handleChange} aria-label='customized tabs example'>
               <Tab value='1' label='TCP/IP' />
-              <Tab value='2' label='DDNS' />
+              <Tab value='2' label='DNS' />
               <Tab value='3' label='PORT' />
               <Tab value='4' label='NTP' />
             </TabList>
           </Grid>
           <TabPanel value='1'>
             {' '}
-            <TCP camera={cameras} />
+            <TCP nvrs={nvrs} />
           </TabPanel>
           <TabPanel value='2'>
             {' '}
-            <DDNs nvrs={cameras} />
+            <DDNs nvrs={nvrs} />
           </TabPanel>
           <TabPanel value='3'>
             {' '}
-            <Port nvrs={cameras} />
+            <Port nvrs={nvrs} />
           </TabPanel>
           <TabPanel value='4'>
             {' '}
-            <NTP nvrs={cameras} />
+            <NTP nvrs={nvrs} />
           </TabPanel>
         </TabContext>
       </DialogContent>
@@ -135,4 +132,4 @@ const Network = ({ open, onClose, onSelect, camera }) => {
   )
 }
 
-export default Network
+export default RolePopup

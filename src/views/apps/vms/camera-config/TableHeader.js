@@ -1,66 +1,63 @@
-// ** MUI Imports
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-
-// ** Custom Component Import
-import CustomTextField from 'src/@core/components/mui/text-field'
-
-// ** Icon Imports
 import Icon from 'src/@core/components/icon'
 import { Grid } from '@mui/material'
 import Link from 'next/link'
 
 const TableHeader = props => {
   // ** Props
-  const { handleFilter, exportValue, importValue, toggle, value } = props
+  const { passwords, videos, images, networks, cloud } = props
 
   return (
     <Box
       sx={{
-        py: 4,
+        py: 5,
         px: 6,
-        rowGap: 2,
-        columnGap: 4,
         display: 'flex',
-        flexWrap: 'wrap',
         alignItems: 'center',
-        justifyContent: 'space-between'
+        justifyContent: 'center', // Center the buttons horizontally
       }}
     >
-      <Box>
-        <Grid style={{ fontSize: 30, color: 'black' }}>Loại tài sản</Grid>
-      </Box>
-      <Box sx={{ rowGap: 2, display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
-        <CustomTextField
-          value={value}
-          sx={{ mr: 4 }}
-          placeholder='Search '
-          onChange={e => handleFilter(e.target.value)}
-        />
-        <Button
-          style={{ backgroundColor: '#A9A9A9' }}
-          onClick={exportValue}
-          variant='contained'
-          sx={{ '& svg': { mr: 1 } }}
-        >
-          <Icon fontSize='1.125rem' icon='tabler:file-export' />
-        </Button>
-        <hr></hr>
-        <Button
-          style={{ backgroundColor: '#A9A9A9' }}
-          onClick={importValue}
-          variant='contained'
-          sx={{ '& svg': { mr: 1 } }}
-        >
-          <Icon fontSize='1.125rem' icon='tabler:file-upload' />
-        </Button>
-        <hr></hr>
-
-        <Button component={Link} href={`/asset/add`} variant='contained' sx={{ '& svg': { mr: 2 } }}>
-          <Icon fontSize='1.125rem' icon='tabler:plus' />
-          Thêm mới
-        </Button>
-      </Box>
+      <Button
+        style={{ backgroundColor: '#A9A9A9', flex: '0 0 auto', margin: '0 4px' }} // Adjusted button size and spacing
+        onClick={passwords}
+        variant='contained'
+        sx={{ '& svg': { mr: 1 } }}
+      >
+        <Icon fontSize='1rem' icon='tabler:key' /> Mật khẩu
+      </Button>
+      <Button
+        style={{ backgroundColor: '#A9A9A9', flex: '0 0 auto', margin: '0 4px' }} // Adjusted button size and spacing
+        onClick={networks}
+        variant='contained'
+        sx={{ '& svg': { mr: 1 } }}
+      >
+        <Icon fontSize='1rem' icon='tabler:network' /> Mạng
+      </Button>
+      <Button
+        style={{ backgroundColor: '#A9A9A9', flex: '0 0 auto', margin: '0 4px' }} // Adjusted button size and spacing
+        onClick={videos}
+        variant='contained'
+        sx={{ '& svg': { mr: 1 } }}
+      >
+        <Icon fontSize='1rem' icon='tabler:video' /> Video
+      </Button>
+      <Button
+        style={{ backgroundColor: '#A9A9A9', flex: '0 0 auto', margin: '0 4px' }} // Adjusted button size and spacing
+        onClick={images}
+        variant='contained'
+        sx={{ '& svg': { mr: 1 } }}
+      >
+        <Icon fontSize='1rem' icon='tabler:camera' /> Hình ảnh
+      </Button>
+      <Button
+        style={{ backgroundColor: '#A9A9A9', flex: '0 0 auto', margin: '0 4px' }} // Adjusted button size and spacing
+        onClick={cloud}
+        variant='contained'
+        sx={{ '& svg': { mr: 1 } }}
+      >
+        <Icon fontSize='1rem' icon='tabler:cloud' /> Bộ nhớ
+      </Button>
     </Box>
   )
 }
