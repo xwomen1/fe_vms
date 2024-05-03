@@ -31,8 +31,11 @@ import Checkbox from '@mui/material/Checkbox'
 import Cloud from './popups/Cloud'
 import ConnectCamera from './popups/ConnectCamera'
 import VideoConnectCamera from './popups/VideoConnectCamera'
-import { Password } from '@mui/icons-material'
+
+// import { Password } from '@mui/icons-material'
+
 const Camera = ({ apiData }) => {
+
   const [value, setValue] = useState('')
   const [selectedIds, setSelectedIds] = useState([])
   const [openPopup, setOpenPopup] = useState(false)
