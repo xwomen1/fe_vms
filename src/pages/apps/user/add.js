@@ -36,7 +36,7 @@ import PolicyPopup from './detail/popup/AddPolicy'
 import Swal from 'sweetalert2'
 import Link from 'next/link'
 
-const UserDetails = () => {
+const Add = () => {
   const router = useRouter()
   const { userId } = router.query
   const [timeValidity, setTimeValidity] = useState('Custom')
@@ -166,6 +166,30 @@ const UserDetails = () => {
 
       return
     }
+    if (!fullNameValue || !email || !phoneNumber || !identityNumber || !userCode || !syncCode || !userGroups) {
+      Swal.fire('Lỗi!', 'Vui lòng điền đầy đủ thông tin.', 'error')
+      return
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      Swal.fire('Lỗi!', 'Địa chỉ email không hợp lệ.', 'error')
+      return
+    }
+
+    // Kiểm tra độ dài mật khẩu
+    if (password.length < 6) {
+      Swal.fire('Lỗi!', 'Mật khẩu phải chứa ít nhất 6 ký tự.', 'error')
+      return
+    }
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,}$/
+    if (!passwordRegex.test(password)) {
+      Swal.fire(
+        'Lỗi!',
+        'Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt.',
+        'error'
+      )
+      return
+    }
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -290,7 +314,7 @@ const UserDetails = () => {
 
   return (
     <div>
-      <Grid container spacing={3}>
+      <Grid container spacing={3} component={Paper}>
         <Grid style={{ borderRadius: '0.05%' }}>
           <Grid container spacing={2} item xs={5}>
             <IconButton size='small' component={Link} href={`/apps/user/list`} sx={{ color: 'text.secondary' }}>
@@ -310,7 +334,7 @@ const UserDetails = () => {
               </Button>
             </>
           </Grid>
-          <Grid container spacing={2} component={Paper} style={{ marginLeft: 10, backgroundColor: 'white' }}>
+          <Grid container spacing={2} style={{ marginLeft: 10 }}>
             <Grid item xs={4}>
               <CustomTextField label='Tên' onChange={handleFullNameChange} fullWidth />
             </Grid>
@@ -461,7 +485,7 @@ const UserDetails = () => {
               <Typography variant='h5'>Đơn vị</Typography>
             </Grid>
             <Grid item xs={11.8}>
-              <TableContainer component={Paper}>
+              <TableContainer>
                 <Table>
                   <TableHead>
                     <TableRow>
@@ -510,7 +534,7 @@ const UserDetails = () => {
             </Grid>
           </Grid>
 
-          <Grid container spacing={2} component={Paper} style={{ marginLeft: 10, backgroundColor: 'white' }}></Grid>
+          <Grid container spacing={2} style={{ marginLeft: 10 }}></Grid>
           <br></br>
           <Grid item xs={12}>
             <FormControlLabel
@@ -520,7 +544,7 @@ const UserDetails = () => {
             />
           </Grid>
           {createAccount && (
-            <Grid container spacing={2} component={Paper} style={{ marginLeft: 10, backgroundColor: 'white' }}>
+            <Grid container spacing={2} style={{ marginLeft: 10 }}>
               <Grid item xs={12}>
                 <Typography variant='h5'>Thông tin tài khoản</Typography>
               </Grid>
@@ -530,7 +554,7 @@ const UserDetails = () => {
               <Grid item xs={4}>
                 <CustomTextField label='Mật khẩu' type='password' onChange={handlePasswordChange} fullWidth />
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={3.8}>
                 <CustomTextField
                   label='Xác nhận mật khẩu'
                   type='password'
@@ -557,7 +581,7 @@ const UserDetails = () => {
                 <Typography variant='h5'>Vai trò</Typography>
               </Grid>
               <Grid item xs={11.8}>
-                <TableContainer component={Paper}>
+                <TableContainer>
                   <Table>
                     <TableHead>
                       <TableRow>
@@ -611,4 +635,4 @@ const UserDetails = () => {
   )
 }
 
-export default UserDetails
+export default Add

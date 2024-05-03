@@ -494,7 +494,7 @@ const UserDetails = () => {
     setEditing(false)
     setShowPlusColumn(!showPlusColumn)
 
-    // router.reload()
+    router.reload()
 
     setUser({
       ...user,
@@ -509,28 +509,11 @@ const UserDetails = () => {
         <div>
           <Grid container spacing={3}>
             <Grid style={{ borderRadius: '0.05%' }}>
-              <Grid container spacing={2}>
+              {/* <Grid container spacing={2}>
                 <h3 style={{ color: 'black', marginLeft: '1%' }}> Thông tin người dùng</h3>
-              </Grid>
-              <Grid container spacing={2}>
-                <div style={{ width: '80%' }}></div>
-                {editing ? (
-                  <>
-                    <Button variant='contained' onClick={saveChanges} sx={{ marginRight: '10px' }}>
-                      Lưu
-                    </Button>
-                    <Button variant='contained' onClick={handleCancel}>
-                      Huỷ
-                    </Button>
-                  </>
-                ) : (
-                  <Button variant='contained' onClick={toggleEdit}>
-                    Chỉnh sửa
-                  </Button>
-                )}
-              </Grid>
+              </Grid> */}
 
-              <Grid container spacing={2} component={Paper} style={{ marginLeft: 10 }}>
+              <Grid container spacing={2} style={{ marginLeft: 10 }}>
                 <Grid container spacing={2}>
                   {' '}
                   <Grid item xs={9}>
@@ -544,6 +527,23 @@ const UserDetails = () => {
                       label='Trạng thái'
                       disabled={readOnly}
                     />
+                  </Grid>
+                  <Grid container spacing={2}>
+                    <div style={{ width: '80%' }}></div>
+                    {editing ? (
+                      <>
+                        <Button variant='contained' onClick={saveChanges} sx={{ marginRight: '10px' }}>
+                          Lưu
+                        </Button>
+                        <Button variant='contained' onClick={handleCancel}>
+                          Huỷ
+                        </Button>
+                      </>
+                    ) : (
+                      <Button variant='contained' onClick={toggleEdit}>
+                        Chỉnh sửa
+                      </Button>
+                    )}
                   </Grid>
                 </Grid>
                 <Grid item xs={12} container spacing={2}>
@@ -637,12 +637,12 @@ const UserDetails = () => {
               </Grid>
               <br></br>
               <br></br>
-              <Grid container spacing={2} component={Paper} style={{ marginLeft: 10 }}>
+              <Grid container spacing={2} style={{ marginLeft: 10 }}>
                 <Grid item xs={12}>
                   <h2 style={{ color: 'black', marginLeft: '1%' }}> Danh sách thẻ</h2>
                 </Grid>
                 <Grid item xs={11.8}>
-                  <TableContainer component={Paper}>
+                  <TableContainer>
                     <Table>
                       <TableHead>
                         <TableRow>
@@ -700,7 +700,7 @@ const UserDetails = () => {
           <Grid container spacing={3}>
             <Grid style={{ borderRadius: '0.05%' }}>
               <Grid container spacing={2}>
-                <h3 style={{ color: 'black', marginLeft: '1%' }}> Thông tin người dùng</h3>
+                {/* <h3 style={{ color: 'black', marginLeft: '1%' }}> Thông tin người dùng</h3> */}
               </Grid>
               <Grid container spacing={2}>
                 <div style={{ width: '80%' }}></div>
@@ -720,7 +720,7 @@ const UserDetails = () => {
                 )}
               </Grid>
 
-              <Grid container spacing={2} component={Paper} style={{ marginLeft: 10 }}>
+              <Grid container spacing={2} style={{ marginLeft: 10 }}>
                 <Grid container spacing={2}>
                   <Grid item xs={9}>
                     <h2 style={{ color: 'black', marginLeft: '1%' }}> Thông tin định danh khuôn mặt</h2>
@@ -787,12 +787,12 @@ const UserDetails = () => {
               </Grid>
               <br></br>
               <br></br>
-              <Grid container spacing={2} component={Paper} style={{ marginLeft: 10 }}>
+              <Grid container spacing={2} style={{ marginLeft: 10 }}>
                 <Grid item xs={12}>
                   <h2 style={{ color: 'black', marginLeft: '1%' }}> Danh sách thẻ</h2>
                 </Grid>
                 <Grid item xs={11.8}>
-                  <TableContainer component={Paper}>
+                  <TableContainer>
                     <Table>
                       <TableHead>
                         <TableRow>

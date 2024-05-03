@@ -146,7 +146,12 @@ const UserDetails = nvrs => {
       <Grid container spacing={3}>
         <Grid container item component={Paper} style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
           <Grid item xs={5.8}>
-            <CustomTextField value={nvrs.nvrs.ddnsType} label='Loại NIC' onChange={handleFullNameChange} fullWidth />
+            <CustomTextField
+              value={nvrs.nvrs.ddnsType.name}
+              label='Loại NIC'
+              onChange={handleFullNameChange}
+              fullWidth
+            />
           </Grid>
           <Grid item xs={0.4}></Grid>
           <Grid item xs={5.8}>

@@ -4,21 +4,16 @@ import { useState, useEffect, useMemo } from 'react'
 import axios from 'axios'
 import authConfig from 'src/configs/auth'
 import CustomTextField from 'src/@core/components/mui/text-field'
-import {
-  Grid,
-  
-  Checkbox,
-
-} from '@mui/material'
+import { Grid, Checkbox } from '@mui/material'
 
 import Paper from '@mui/material/Paper'
 
-const UserDetails = nvrs => {
+const UserDetails = cameras => {
   const router = useRouter()
 
   const [status1, setStatus1] = useState('ACTIVE')
   const [availableAt, setAvailableAt] = useState('')
-  
+
   console.log('New start date:', isoToEpoch(availableAt))
   function isoToEpoch(isoDateString) {
     var milliseconds = Date.parse(isoDateString)
@@ -45,7 +40,7 @@ const UserDetails = nvrs => {
   //       }
 
   //       const response = await axios.get(
-  //         `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/{idCamera}?idCamera=${nvr.nvr}`,
+  //         `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/{idCamera}?idCamera=${camera.camera}`,
   //         config
   //       )
 
@@ -74,7 +69,7 @@ const UserDetails = nvrs => {
     setIdentityNumber(event.target.value)
   }
 
-  console.log('param', nvrs.nvrs.ddnsType)
+  console.log('param', cameras.camera.ddnsType)
   const formatDDNS = ddns => <Checkbox checked={ddns} disabled />
 
   return (
@@ -82,38 +77,43 @@ const UserDetails = nvrs => {
       <Grid container spacing={3}>
         <Grid container item component={Paper} style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
           <Grid item xs={5.8}>
-            {formatDDNS(nvrs.nvrs.ddns)} Enable DDNS
+            {formatDDNS(cameras.camera.ddns)} Enable DDNS
           </Grid>
           <Grid item xs={0.4}></Grid>
           <Grid item xs={5.8}></Grid>
           <Grid item xs={5.8}>
-            <CustomTextField label='DDNS Type' value={nvrs.nvrs.ddnsType} onChange={handleFullNameChange} fullWidth />
-          </Grid>
-          <Grid item xs={0.4}></Grid>
-          <Grid item xs={5.8}>
-            <CustomTextField label='User Name' value={nvrs.nvrs.userName} onChange={handleEmailChange} fullWidth />
-          </Grid>
-          <Grid item xs={5.8}>
             <CustomTextField
-              label='Server Address'
-              value={nvrs.nvrs.serverAddressNTP}
+              label='DDNS Type'
+              value={cameras.camera.ddnsType.name}
               onChange={handleFullNameChange}
               fullWidth
             />
           </Grid>
           <Grid item xs={0.4}></Grid>
           <Grid item xs={5.8}>
-            <CustomTextField label='Password' value={nvrs.nvrs.password} onChange={handleEmailChange} fullWidth />
+            <CustomTextField label='User Name' value={cameras.camera.userName} onChange={handleEmailChange} fullWidth />
           </Grid>
           <Grid item xs={5.8}>
-            <CustomTextField label='Port' value={nvrs.nvrs.port} onChange={handleFullNameChange} fullWidth />
+            <CustomTextField
+              label='Server Address'
+              value={cameras.camera.serverAddressNTP}
+              onChange={handleFullNameChange}
+              fullWidth
+            />
           </Grid>
           <Grid item xs={0.4}></Grid>
           <Grid item xs={5.8}>
-            <CustomTextField label='User Name' value={nvrs.nvrs.userName} onChange={handleEmailChange} fullWidth />
+            <CustomTextField label='Password' value={cameras.camera.password} onChange={handleEmailChange} fullWidth />
           </Grid>
           <Grid item xs={5.8}>
-            <CustomTextField label='Domain' value={nvrs.nvrs.domain} onChange={handleFullNameChange} fullWidth />
+            <CustomTextField label='Port' value={cameras.camera.port} onChange={handleFullNameChange} fullWidth />
+          </Grid>
+          <Grid item xs={0.4}></Grid>
+          <Grid item xs={5.8}>
+            <CustomTextField label='Confirm' value={cameras.camera.confirm} onChange={handleEmailChange} fullWidth />
+          </Grid>
+          <Grid item xs={5.8}>
+            <CustomTextField label='Domain' value={cameras.camera.domain} onChange={handleFullNameChange} fullWidth />
           </Grid>
         </Grid>
       </Grid>

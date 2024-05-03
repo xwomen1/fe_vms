@@ -70,31 +70,32 @@ const Network = ({ open, onClose, onSelect, camera }) => {
   useEffect(() => {
     const fetchGroupData = async () => {
       try {
-        if (camera != null) { // Kiểm tra xem popup Network đã mở chưa
+        if (camera != null) {
+          // Kiểm tra xem popup Network đã mở chưa
           const token = localStorage.getItem(authConfig.storageTokenKeyName)
           console.log('token', token)
-  
+
           const config = {
             headers: {
               Authorization: `Bearer ${token}`
             }
           }
-  
+
           const response = await axios.get(
             `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/{idCamera}?idCamera=${camera}`,
             config
           )
-  
+
           setCamera(response.data.data)
         }
       } catch (error) {
         console.error('Error fetching data:', error)
       }
     }
-  
+
     fetchGroupData()
   }, [camera]) // Thêm openPopupNetwork vào dependency array để useEffect được gọi khi openPopupNetwork thay đổi
-  
+
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Cấu hình mạng</DialogTitle>
@@ -106,7 +107,7 @@ const Network = ({ open, onClose, onSelect, camera }) => {
               <Tab value='1' label='TCP/IP' />
               <Tab value='2' label='DDNS' />
               <Tab value='3' label='PORT' />
-              <Tab value='4' label='NTP' />
+              {/* <Tab value='4' label='NTP' /> */}
             </TabList>
           </Grid>
           <TabPanel value='1'>
@@ -115,16 +116,16 @@ const Network = ({ open, onClose, onSelect, camera }) => {
           </TabPanel>
           <TabPanel value='2'>
             {' '}
-            <DDNs nvrs={cameras} />
+            <DDNs camera={cameras} />
           </TabPanel>
           <TabPanel value='3'>
             {' '}
             <Port nvrs={cameras} />
           </TabPanel>
-          <TabPanel value='4'>
+          {/* <TabPanel value='4'>
             {' '}
             <NTP nvrs={cameras} />
-          </TabPanel>
+          </TabPanel> */}
         </TabContext>
       </DialogContent>
       <DialogActions>
