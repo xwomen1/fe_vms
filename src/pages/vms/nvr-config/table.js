@@ -77,15 +77,15 @@ const UserList = ({ apiData }) => {
   const handleAddRoleClick = () => {
     setOpenPopup(true)
   }
-  
+
   const handleAddRolesClick = () => {
     setOpenPopup(true)
   }
-  
+
   const handleClosePopup = () => {
     setOpenPopup(false) // Đóng Popup khi cần thiết
   }
-  
+
   const handleAddPClick = () => {
     setOpenPopupP(true)
   }
@@ -93,7 +93,7 @@ const UserList = ({ apiData }) => {
   const handleClosePPopup = () => {
     setOpenPopupP(false) // Đóng Popup khi cần thiết
   }
-  
+
   const handleAddNetworkClick = () => {
     setOpenPopupNetwork(true)
   }
@@ -117,7 +117,7 @@ const UserList = ({ apiData }) => {
   const handleCloseImagePopup = () => {
     setOpenPopupImage(false) // Đóng Popup khi cần thiết
   }
-  
+
   const handleAddCloudClick = () => {
     setOpenPopupCloud(true)
   }
@@ -125,7 +125,7 @@ const UserList = ({ apiData }) => {
   const handleCloseCloudPopup = () => {
     setOpenPopupCloud(false) // Đóng Popup khi cần thiết
   }
-  
+
   const handleAddConnectCameraClick = () => {
     setOpenPopupConnectCamera(true)
   }
@@ -133,7 +133,7 @@ const UserList = ({ apiData }) => {
   const handleCloseConnectCameraPopup = () => {
     setOpenPopupConnectCamera(false) // Đóng Popup khi cần thiết
   }
-  
+
   const handleAddVideoConnectClick = () => {
     setOpenPopupVideoConnectCamera(true)
   }
@@ -257,7 +257,6 @@ const UserList = ({ apiData }) => {
               images={handleAddImageClick}
               videos={handleAddVideoClick}
               cloud={handleAddCloudClick}
-
             />
           )}{' '}
           <Grid container spacing={2}>
@@ -316,21 +315,14 @@ const UserList = ({ apiData }) => {
                             <Icon icon='tabler:key' />
                           </IconButton>
                           <IconButton size='small' onClick={handleAddVideoConnectClick}>
-
                             <Icon icon='tabler:camera' />
                           </IconButton>
                           <IconButton size='small' onClick={handleAddConnectCameraClick}>
-
                             <Icon icon='tabler:link' />
                           </IconButton>
-                          <IconButton
-                            size='small'
-                           
-                            sx={{ color: 'text.secondary' }}
-                          >
+                          <IconButton size='small' sx={{ color: 'text.secondary' }}>
                             <Icon icon='tabler:reload' />
                           </IconButton>
-                         
                         </Grid>
                       </TableCell>
                     </TableRow>
@@ -360,7 +352,13 @@ const UserList = ({ apiData }) => {
             </Grid>
           </Grid>
         </Card>
-        {selectedIds.length > 0 && (
+        {openPopupNetwork && (
+          <>
+            {/* <RolePopup open={openPopup} onClose={handleClosePopup} nvr={selectedIds} /> */}
+            <Network open={openPopupNetwork} onClose={handleCloseNetWorkPopup} nvr={selectedIds} />
+          </>
+        )}
+        {/* {selectedIds.length > 0 && (
           <>
             <RolePopup open={openPopup} onClose={handleClosePopup} nvr={selectedIds} />
             <Network open={openPopupNetwork} onClose={handleCloseNetWorkPopup} nvr={selectedIds} />
@@ -370,12 +368,15 @@ const UserList = ({ apiData }) => {
             
           </>
 
-        )} 
-         <Passwords open={openPopupP} onClose={handleClosePPopup} nvr={selectedIds} />
+        )}  */}
+        <Passwords open={openPopupP} onClose={handleClosePPopup} nvr={selectedIds} />
 
         <ConnectCamera open={openPopupConnectCamera} onClose={handleCloseConnectCameraPopup} nvr={selectedIds} />
-            <VideoConnectCamera open={openPopupVideoConnectCamera} onClose={handleCloseVideoConnectPopup} nvr={selectedIds} />
-
+        <VideoConnectCamera
+          open={openPopupVideoConnectCamera}
+          onClose={handleCloseVideoConnectPopup}
+          nvr={selectedIds}
+        />
       </Grid>
     </Grid>
   )

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Grid, IconButton } from '@mui/material'
+import { Grid, IconButton, Paper } from '@mui/material'
 import Icon from 'src/@core/components/icon'
 import Link from 'next/link'
 import Tab from '@mui/material/Tab'
@@ -46,7 +46,7 @@ const UserDetails = () => {
 
   return (
     <div>
-      <Grid container spacing={3} style={{ marginTop: 10 }}>
+      <Grid container spacing={3} style={{ marginTop: 10 }} component={Paper}>
         <TabContext value={value}>
           <Grid container spacing={2} item xs={3}>
             <IconButton size='small' component={Link} href={`/apps/user/list`} sx={{ color: 'text.secondary' }}>

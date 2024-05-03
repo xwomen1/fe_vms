@@ -501,7 +501,7 @@ const UserDetails = () => {
       {user ? (
         <div>
           <Grid container spacing={3}>
-            <Grid style={{ borderRadius: '0.05%' }}>
+            <Grid style={{ borderRadius: '0.05%', marginLeft: 10 }}>
               <Grid container spacing={2}>
                 <h3 style={{ color: 'black', marginLeft: '1%' }}> Thông tin người dùng</h3>
               </Grid>
@@ -522,7 +522,7 @@ const UserDetails = () => {
                   </Button>
                 )}
               </Grid>
-              <Grid container spacing={2} component={Paper} style={{ marginLeft: 10, backgroundColor: 'white' }}>
+              <Grid container spacing={2}>
                 <Grid item xs={4}>
                   <CustomTextField
                     label='Tên'
@@ -741,7 +741,7 @@ const UserDetails = () => {
                   <Typography variant='h5'>Đơn vị</Typography>
                 </Grid>
                 <Grid item xs={11.8}>
-                  <TableContainer component={Paper}>
+                  <TableContainer>
                     <Table>
                       <TableHead>
                         <TableRow>
@@ -788,7 +788,7 @@ const UserDetails = () => {
                 </Grid>
               </Grid>
               <br></br>
-              <Grid container spacing={2} component={Paper} style={{ marginLeft: 10, backgroundColor: 'white' }}>
+              <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <Typography variant='h5'>Thông tin tài khoản</Typography>
                 </Grid>
@@ -855,7 +855,7 @@ const UserDetails = () => {
                   <Typography variant='h5'>Vai trò</Typography>
                 </Grid>
                 <Grid item xs={11.8}>
-                  <TableContainer component={Paper}>
+                  <TableContainer>
                     <Table>
                       <TableHead>
                         <TableRow>

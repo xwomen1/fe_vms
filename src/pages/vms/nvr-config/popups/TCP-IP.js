@@ -34,9 +34,18 @@ import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInpu
 
 import Swal from 'sweetalert2'
 import Link from 'next/link'
+
 import Alert from '@mui/material/Alert'
 
-const UserDetails = nvrs => {
+const nicTypeOptions = [
+  { label: 'Auto', value: 'option1' },
+  { label: '10M Half-Dup', value: 'option2' },
+  { label: '10M Full-Dup', value: 'option3' },
+  { label: '100M Half-Dup', value: 'option4' },
+  { label: '100M Full-Dup', value: 'option5' }
+]
+
+const TCPIP = nvrs => {
   const router = useRouter()
   const { id } = router.query
   const [timeValidity, setTimeValidity] = useState('Custom')
@@ -69,6 +78,11 @@ const UserDetails = nvrs => {
   const [ava2, setAva2] = useState(null)
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [selectedNicType, setSelectedNicType] = useState(nvrs.nvrs.ddnsType.name)
+
+  const handleNicTypeChange = (event, newValue) => {
+    setSelectedNicType(newValue)
+  }
 
   const handleAddRow = () => {
     const newRow = { groupName: '', groupCode: '', groupId: '' } // Thêm groupId vào đây
@@ -146,7 +160,12 @@ const UserDetails = nvrs => {
       <Grid container spacing={3}>
         <Grid container item component={Paper} style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
           <Grid item xs={5.8}>
-            <CustomTextField value={nvrs.nvrs.ddnsType} label='Loại NIC' onChange={handleFullNameChange} fullWidth />
+            <Autocomplete
+              value={selectedNicType}
+              onChange={handleNicTypeChange}
+              options={nicTypeOptions.map(option => option.label)}
+              renderInput={params => <TextField {...params} label='Loại NIC' fullWidth />}
+            />
           </Grid>
           <Grid item xs={0.4}></Grid>
           <Grid item xs={5.8}>
@@ -227,4 +246,4 @@ const UserDetails = nvrs => {
   )
 }
 
-export default UserDetails
+export default TCPIP

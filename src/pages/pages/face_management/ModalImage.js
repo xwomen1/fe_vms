@@ -14,28 +14,26 @@ import MyLocationIcon from '@material-ui/icons/MyLocation';
 import MaskGroup from './list/Imge/NoAvatar.svg';
 
 function ModalImage({ onClose, imageUrl }) {
-
   const onDownloadBtnClick = () => {
+    const link = document.createElement('a')
 
-    const link = document.createElement('a');
-    
-    link.href = url;
-    link.download = 'Download.jpg';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+    link.href = url
+    link.download = 'Download.jpg'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
 
-  const [url, setUrl] = useState(null);
+  const [url, setUrl] = useState(null)
 
   useEffect(() => {
     if (imageUrl) {
-      setUrl(imageUrl);
+      setUrl(imageUrl)
     } else {
-      setUrl(MaskGroup);
+      setUrl(MaskGroup)
     }
-  }, [imageUrl]);
-  
+  }, [imageUrl])
+
   return (
     <Popup
     visible
@@ -59,36 +57,32 @@ function ModalImage({ onClose, imageUrl }) {
           <Icon icon='tabler:circle-letter-x'/>
         </IconButton>
         <Grid item xs={12} style={{ height: '100%' }}>
-          <TransformWrapper
-            defaultScale={1}
-            defaultPositionX={0}
-            defaultPositionY={0}
-          >
+          <TransformWrapper defaultScale={1} defaultPositionX={0} defaultPositionY={0}>
             {({ zoomIn, zoomOut, resetTransform, centerView }) => (
               <React.Fragment>
-                <Grid item container justifyContent="center" alignItems="center">
+                <Grid item container justifyContent='center' alignItems='center'>
                   <Grid item>
-                    <Tooltip title="Tải xuống">
+                    <Tooltip title='Tải xuống'>
                       <IconButton onClick={() => onDownloadBtnClick()}>
                       <Icon icon='tabler:download' />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Phóng to">
+                    <Tooltip title='Phóng to'>
                       <IconButton onClick={() => zoomIn()}>
                         <Icon icon='tabler:camera-minus' />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Thu nhỏ">
+                    <Tooltip title='Thu nhỏ'>
                       <IconButton onClick={() => zoomOut()}>
                         <Icon icon='tabler:camera-plus' />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Trung tâm">
+                    <Tooltip title='Trung tâm'>
                       <IconButton onClick={() => centerView()}>
-                        <MyLocationIcon fontSize="small" />
+                        <MyLocationIcon fontSize='small' />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Quay về mặc định">
+                    <Tooltip title='Quay về mặc định'>
                       <IconButton onClick={() => resetTransform()}>
                       <Icon icon='tabler:rotate' />
                       </IconButton>
@@ -101,17 +95,17 @@ function ModalImage({ onClose, imageUrl }) {
                     display: 'flex',
                     width: '100%',
                     height: '100%',
-                    background:'#FFFFFF',
+                    background: '#FFFFFF',
                     justifyContent: 'center',
-                    flexWrap: 'nowrap',
+                    flexWrap: 'nowrap'
                   }}
                 >
                   <img
                     src={url}
-                    alt="test"
+                    alt='test'
                     style={{
                       maxHeight: '100%',
-                      maxWidth: '100%',
+                      maxWidth: '100%'
                     }}
                     onError={() => setUrl(MaskGroup)}
                   />
@@ -122,9 +116,9 @@ function ModalImage({ onClose, imageUrl }) {
         </Grid>
       </Grid>
     </Popup>
-  );
+  )
 }
 
-ModalImage.propTypes = {};
+ModalImage.propTypes = {}
 
-export default ModalImage;
+export default ModalImage

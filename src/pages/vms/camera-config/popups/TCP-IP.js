@@ -36,7 +36,17 @@ import Swal from 'sweetalert2'
 import Link from 'next/link'
 import Alert from '@mui/material/Alert'
 
-const UserDetails = (cameras) => {
+const multicastOption = [
+  { label: 'ENABLE', value: 'option1' },
+  { label: 'DISABLE', value: 'option2' }
+]
+
+const nicTypeOptions = [
+  { label: 'Auto', value: 'option1' },
+  { label: 'Manual', value: 'option2' }
+]
+
+const UserDetails = cameras => {
   const router = useRouter()
   const { id } = router.query
   const [timeValidity, setTimeValidity] = useState('Custom')
@@ -69,6 +79,16 @@ const UserDetails = (cameras) => {
   const [ava2, setAva2] = useState(null)
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [selectedNicType, setSelectedNicType] = useState(cameras.camera?.nicType?.name)
+  const [multicast, setMulticast] = useState(cameras.camera.multicast)
+
+  const handleMulticastChange = (event, newValue) => {
+    setMulticast(newValue)
+  }
+
+  const handleNicTypeChange = (event, newValue) => {
+    setSelectedNicType(newValue)
+  }
 
   // useEffect(() => {
   //   const fetchGroupData = async () => {
@@ -172,13 +192,19 @@ const UserDetails = (cameras) => {
       <Grid container spacing={3}>
         <Grid container item component={Paper} style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
           <Grid item xs={5.8}>
-            <CustomTextField value={cameras.camera?.nicType?.name} label='Loại NIC' onChange={handleFullNameChange} fullWidth />
+            <Autocomplete
+              value={selectedNicType}
+              onChange={handleNicTypeChange}
+              options={nicTypeOptions.map(option => option.label)}
+              renderInput={params => <CustomTextField {...params} label='Loại NIC' fullWidth />}
+            />
           </Grid>
+
           <Grid item xs={0.4}></Grid>
-        
+
           <Grid item xs={5.8}>
-          <Switch checked={cameras.camera?.dhcp} color='primary' />
- DHCP
+            <Switch checked={cameras.camera?.dhcp} color='primary' />
+            DHCP
           </Grid>
           <Grid item xs={5.8}>
             <CustomTextField label='MTU' value={cameras.camera.mtu} onChange={handleEmailChange} fullWidth />
@@ -186,20 +212,15 @@ const UserDetails = (cameras) => {
           <Grid item xs={0.4}></Grid>
 
           <Grid item xs={5.8}>
-            <CustomTextField
-              label='Multicast Address'
-              onChange={handleFullNameChange}
-              fullWidth
-            />
+            <CustomTextField label='Multicast Address' onChange={handleFullNameChange} fullWidth />
           </Grid>
           <Grid item xs={5.8}>
-            <CustomTextField
-              label='Multicast Discovery'
-              
-              // value={cameras.camera.ipv4DefaultGateway}
-              onChange={handleEmailChange}
-              fullWidth
-            />
+            <Autocomplete
+              value={selectedNicType}
+              onChange={handleMulticastChange}
+              options={multicastOption.map(option => option.label)}
+              renderInput={params => <CustomTextField {...params} label='Multicast Discovery' fullWidth />}
+            />{' '}
           </Grid>
           <Grid item xs={0.4}></Grid>
 
@@ -222,9 +243,6 @@ const UserDetails = (cameras) => {
           </Grid>
         </Grid>
         <Grid item xs={0.4}></Grid>
-
-      
-       
       </Grid>
       <br />
     </div>
