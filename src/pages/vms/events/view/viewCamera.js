@@ -58,7 +58,7 @@ export const ViewCamera = ({ id, channel }) => {
             websocket.close()
             createWsConnection()
         }
-    }, [channel])
+    }, [id, channel])
     useEffect(() => {
         createWsConnection()
 

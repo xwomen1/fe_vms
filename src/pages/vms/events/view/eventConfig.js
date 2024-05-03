@@ -80,12 +80,12 @@ const areaExample = [
 
 const lineExample = [
     // {
-    //   x: 10,
-    //   y: 10
+    //     x: 10,
+    //     y: 10
     // },
     // {
-    //   x: 300,
-    //   y: 300
+    //     x: 300,
+    //     y: 300
     // },
 ]
 
@@ -148,7 +148,6 @@ const EventConfig = () => {
         },
     }
 
-
     useEffect(() => {
         fetchCameraGroup()
     }, [keyword])
@@ -167,7 +166,7 @@ const EventConfig = () => {
         if (idCameraSelect != null) {
             fetchModelAICamera()
         }
-    }, [idCameraSelect])
+    }, [idCameraSelect, reload])
 
     const fetchModelAICamera = async () => {
         try {
@@ -183,8 +182,10 @@ const EventConfig = () => {
         if (alertAIList && alertAIList[0] && alertAIList[0].cameraaiproperty) {
             setAlertList(alertAIList[0].cameraaiproperty)
 
-            // set camera ai property id
             setCameraAIPropertyId(alertAIList[0].id)
+        } else {
+            setAlertList([])
+            setCameraAIPropertyId(null)
         }
     }, [alertAIList])
 
@@ -213,6 +214,7 @@ const EventConfig = () => {
         return () => {
             canvas.removeEventListener('click', draw)
         }
+
     }, [isDraw, eventSelect, areaSelect, lineSelect, direction])
 
     const clearAction = () => {
@@ -356,10 +358,6 @@ const EventConfig = () => {
         }
     }
 
-    // console.log('alertList', alertList)
-    // console.log('lineSelect', lineSelect)
-    // console.log('areaSelect', areaSelect)
-
     const handlePlayClick = () => {
         setIsPlaying(!isPlaying)
     }
@@ -419,22 +417,113 @@ const EventConfig = () => {
         setKeyword(e.target.value)
     }
 
-    const handleSetSchedule = (data) => {
-        // console.log('schedule', data)
+    const updateAlertList = async (changedAlerts) => {
+        const params = {
+            cameraaiproperty: [...changedAlerts]
+        }
+
+        try {
+            await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties/${cameraAIPropertyId}`, { ...params }, config)
+            setReload(reload + 1)
+            toast.success('Thao tác thành công')
+        } catch (error) {
+            console.log('Error fetching data: ', error)
+            toast.error(error)
+        } finally {
+            setLoading(false)
+        }
     }
 
-    const handleActiveAlertAI = async (isactive) => {
-        // console.log('active', isactive)
-        // setLoading(true)
-        // try {
-        //     const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties/4fa9a51c-e904-4ab0-acad-169ed4c9aeab`, config)
-        //     setAlertAIList(res.data.data)
-        // } catch (error) {
-        //     console.error('Error fetching data: ', error)
-        //     toast(error)
-        // } finally {
-        //     setLoading(false)
-        // }
+    const handleSetSchedule = async (data) => {
+        setLoading(true)
+
+        let calendar = {
+            mondayschedule: [],
+            tuesdayschedule: [],
+            wednesdayschedule: [],
+            thursdayschedule: [],
+            fridayschedule: [],
+            saturdayschedule: [],
+            sundayschedule: []
+        }
+
+        calendar = data?.calendarDays?.reduce((acc, item) => {
+            switch (item.StringValue) {
+                case 'MONDAY':
+                    return { ...acc, mondayschedule: item?.times }
+                case 'TUESDAY':
+                    return { ...acc, tuesdayschedule: item?.times }
+                case 'WEDNESDAY':
+                    return { ...acc, wednesdayschedule: item?.times }
+                case 'THURSDAY':
+                    return { ...acc, thursdayschedule: item?.times }
+                case 'FRIDAY':
+                    return { ...acc, fridayschedule: item?.times }
+                case 'SATURDAY':
+                    return { ...acc, saturdayschedule: item?.times }
+                case 'SUNDAY':
+                    return { ...acc, sundayschedule: item?.times }
+                default:
+                    return acc
+            }
+        }, calendar)
+
+        const changedAlerts = alertList.map(alert => {
+            return alert.aitype === eventSelect ? { ...alert, cameraschedules: calendar } : alert
+        })
+
+        await updateAlertList(changedAlerts)
+    }
+
+    const handleActiveAlertAI = async (typeAI) => {
+        setLoading(true)
+
+        const changedAlerts = alertList.map(alert => {
+            return alert.aitype === typeAI ? { ...alert, isactive: !alert.isactive } : alert
+        })
+
+        await updateAlertList(changedAlerts)
+    }
+
+    const handleZoning = async (data) => {
+        setLoading(true)
+
+        const cameraAiZone = {
+            vfences: null,
+            vzone: {
+                point_a: { ...data[0] },
+                point_b: { ...data[1] },
+                point_c: { ...data[2] },
+                point_d: { ...data[3] }
+            }
+        }
+
+        const changedAlerts = alertList.map(alert => {
+            return alert.aitype === eventSelect ? { ...alert, cameraaizone: cameraAiZone } : alert
+        })
+
+        await updateAlertList(changedAlerts)
+    }
+
+    const handleVirtualFence = async (data) => {
+        setLoading(true)
+
+        const cameraAiZone = {
+            vfences: [],
+            vzone: null
+        }
+
+        for (let i = 0; i < data?.length; i += 2) {
+            const dx = data[i]
+            const dy = data[i + 1]
+            cameraAiZone.vfences.push({ dx: { x: dx.x, y: dx.y }, dy: { x: dy.x, y: dy.y }, vector: 0 })
+        }
+
+        const changedAlerts = alertList.map(alert => {
+            return alert.aitype === eventSelect ? { ...alert, cameraaizone: cameraAiZone } : alert
+        })
+
+        await updateAlertList(changedAlerts)
     }
 
     const alertAIListView = () => {
@@ -444,7 +533,9 @@ const EventConfig = () => {
                     <Box
                         key={index}
                         onClick={() => {
-                            setEventSelect(alert?.aitype)
+                            if (alert.isactive == true) {
+                                setEventSelect(alert?.aitype)
+                            }
                         }}
                         style={{
                             background:
@@ -456,6 +547,7 @@ const EventConfig = () => {
                         flexDirection="column"
                         mt={2}
                         p={1}
+
                     >
                         <Typography variant="h5">{alert?.aitype}</Typography>
                         <Typography variant="body1" alignLeft={2}>
@@ -472,7 +564,8 @@ const EventConfig = () => {
                         style={{ width: '100%' }}
                         variant="outlined"
                         color="primary"
-                        onClick={() => handleActiveAlertAI(!alert.isactive)}                    >
+                        onClick={() => handleActiveAlertAI(alert?.aitype)}
+                    >
                         {alert.isactive == true ? 'Xóa cảnh báo ' : 'Thêm cảnh báo'}
                     </Button>
                 </>
@@ -583,6 +676,12 @@ const EventConfig = () => {
                                         <Grid item xs={12} sm={4}>
                                             <Button
                                                 onClick={() => {
+                                                    if (isDraw == 'rectangle') {
+                                                        handleZoning(areaSelect)
+                                                    }
+                                                    if (isDraw == 'line') {
+                                                        handleVirtualFence(lineSelect)
+                                                    }
                                                     setIsDraw('')
                                                 }}
                                                 variant="outlined"
@@ -692,7 +791,7 @@ const EventConfig = () => {
                                     />
                                 </Box>
                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <Typography variant="h5" >{idCameraSelect}</Typography>
+                                    <Typography variant="h5" >{nameCameraSelect}</Typography>
                                 </Box>
 
                                 <div style={{ width: '100%', marginTop: 20, padding: 5 }}>
