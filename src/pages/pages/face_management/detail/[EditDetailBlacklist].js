@@ -19,12 +19,6 @@ import {
 } from "@mui/material";
 import Icon from 'src/@core/components/icon';
 import Fullscreen from '@material-ui/icons/Fullscreen';
-import { Opacity } from '@mui/icons-material';
-
-// import { UploadFile } from '@mui/icons-material';
-// import { height, width } from '@mui/system';
-// import { TextBox } from 'devextreme-react';
-// import link from 'src/@core/theme/overrides/link';
 
 const EditFaceManagement = () => {
 
@@ -346,7 +340,7 @@ const EditFaceManagement = () => {
                                             </Button>
                                             <Button
                                             onClick={handleUpdate}
-                                             style={{background:'#3B2828',color:'#FFFFFF'}}>
+                                            variant='contained'>
                                             Cập nhật
                                             </Button>
                                         </Box>
@@ -409,24 +403,30 @@ const EditFaceManagement = () => {
                                                 }}
                                             />
                                         </div>
-                                        <Input
-                                            id="eventName"
-                                            eventname="eventName"
-                                            placeholder={`Tên đối tượng`}
-                                            stylingmode="outlined"
-                                            defaultValue=""
-                                            value={name || ''}
-                                            mode="text"
+                                        <div 
                                             style={{
-                                                background: '#FFFFFF',
                                                 border: '1px solid rgba(0, 0, 0, 0.12)',
                                                 borderRadius: '4px',
-                                                marginTop: '10px',
+                                                marginTop:'10px',
+                                                background: '#FFFFFF',
+                                                textAlign:'center',
                                             }}
-                                            onInput={(e) => {
-                                                setName(e.target.value);
-                                            }}
-                                        />
+                                        >
+                                            <Input
+                                                id="eventName"
+                                                eventname="eventName"
+                                                placeholder={`Tên đối tượng`}
+                                                defaultValue=""
+                                                value={name || ''}
+                                                style={{
+                                                    textAlign:'center'
+                                                }}
+                                                onInput={(e) => {
+                                                    setName(e.target.value);
+                                                }}
+                                            />
+                                        </div>
+                                       
                                     </div>
                                 </div>
                                 {listFileUpload.length === 0 && (
@@ -565,6 +565,7 @@ const EditFaceManagement = () => {
                                                             setListFileUpload(listFileUploadTmp);
                                                             setListImage(listFileUploadTmp);
                                                         }}
+                                                        style={{color:'blue'}}
                                                     >
                                                         -
                                                     </IconButton>
@@ -574,7 +575,7 @@ const EditFaceManagement = () => {
                                                             setModalImage(image);
                                                         }}
                                                     >
-                                                        <Fullscreen />
+                                                        <Fullscreen style={{color:'blue'}} />
                                                     </IconButton>
                                                 </div>
                                             ))}
