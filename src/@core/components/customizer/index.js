@@ -32,7 +32,7 @@ const Toggler = styled(Box)(({ theme }) => ({
   zIndex: theme.zIndex.modal,
   transform: 'translateY(-50%)',
   color: theme.palette.common.white,
-  backgroundColor: theme.palette.primary.main,
+  backgroundColor: theme.palette.warning.main,
   borderTopLeftRadius: theme.shape.borderRadius,
   borderBottomLeftRadius: theme.shape.borderRadius
 }))
