@@ -62,7 +62,6 @@ const AppBarContent = props => {
           </Typography>
         </LinkStyled>
       )}
-      {userAppBarContent ? userAppBarContent(props) : null}
     </Box>
   )
 }
