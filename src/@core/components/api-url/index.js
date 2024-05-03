@@ -1,10 +1,9 @@
-const { ex } = require('@fullcalendar/core/internal-common')
-
 const API_HOST = process.env.NEXT_PUBLIC_API_HOST
 
 const USER_API = {
   ME: `${API_HOST}/auth/me`,
-  LOGIN: `${API_HOST}/login-with-local`
+  LOGIN: `${API_HOST}/login-with-local`,
+  REFREST: `${API_HOST}/refresh-token`
 }
 
 const GROUP_API = {
