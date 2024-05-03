@@ -36,6 +36,11 @@ import Swal from 'sweetalert2'
 import Link from 'next/link'
 import Alert from '@mui/material/Alert'
 
+const multicastOption = [
+  { label: 'ENABLE', value: 'option1' },
+  { label: 'DISABLE', value: 'option2' }
+]
+
 const nicTypeOptions = [
   { label: 'Auto', value: 'option1' },
   { label: 'Manual', value: 'option2' }
@@ -75,6 +80,11 @@ const UserDetails = cameras => {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [selectedNicType, setSelectedNicType] = useState(cameras.camera?.nicType?.name)
+  const [multicast, setMulticast] = useState(cameras.camera.multicast)
+
+  const handleMulticastChange = (event, newValue) => {
+    setMulticast(newValue)
+  }
 
   const handleNicTypeChange = (event, newValue) => {
     setSelectedNicType(newValue)
@@ -186,7 +196,7 @@ const UserDetails = cameras => {
               value={selectedNicType}
               onChange={handleNicTypeChange}
               options={nicTypeOptions.map(option => option.label)}
-              renderInput={params => <TextField {...params} label='Loại NIC' fullWidth />}
+              renderInput={params => <CustomTextField {...params} label='Loại NIC' fullWidth />}
             />
           </Grid>
 
@@ -205,7 +215,12 @@ const UserDetails = cameras => {
             <CustomTextField label='Multicast Address' onChange={handleFullNameChange} fullWidth />
           </Grid>
           <Grid item xs={5.8}>
-            <CustomTextField label='Multicast Discovery' onChange={handleEmailChange} fullWidth />
+            <Autocomplete
+              value={selectedNicType}
+              onChange={handleMulticastChange}
+              options={multicastOption.map(option => option.label)}
+              renderInput={params => <CustomTextField {...params} label='Multicast Discovery' fullWidth />}
+            />{' '}
           </Grid>
           <Grid item xs={0.4}></Grid>
 

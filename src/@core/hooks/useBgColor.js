@@ -9,13 +9,13 @@ const UseBgColor = () => {
   const theme = useTheme()
 
   return {
-    warningFilled: {
-      color: theme.palette.warning.contrastText,
-      backgroundColor: theme.palette.warning.main
+    primaryFilled: {
+      color: theme.palette.primary.contrastText,
+      backgroundColor: theme.palette.primary.main
     },
-    warningLight: {
-      color: theme.palette.warning.main,
-      backgroundColor: hexToRGBA(theme.palette.warning.main, 0.16)
+    primaryLight: {
+      color: theme.palette.primary.main,
+      backgroundColor: hexToRGBA(theme.palette.primary.main, 0.16)
     },
     secondaryFilled: {
       color: theme.palette.secondary.contrastText,

@@ -69,7 +69,7 @@ const UserDetails = cameras => {
     setIdentityNumber(event.target.value)
   }
 
-  console.log('param', cameras.camera.ddnsType)
+  console.log('param', cameras?.camera.ddnsType)
   const formatDDNS = ddns => <Checkbox checked={ddns} disabled />
 
   return (
@@ -77,43 +77,48 @@ const UserDetails = cameras => {
       <Grid container spacing={3}>
         <Grid container item component={Paper} style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
           <Grid item xs={5.8}>
-            {formatDDNS(cameras.camera.ddns)} Enable DDNS
+            {formatDDNS(cameras?.camera.ddns)} Enable DDNS
           </Grid>
           <Grid item xs={0.4}></Grid>
           <Grid item xs={5.8}></Grid>
           <Grid item xs={5.8}>
             <CustomTextField
               label='DDNS Type'
-              value={cameras.camera.ddnsType.name}
+              value={cameras?.camera.ddnsType?.name}
               onChange={handleFullNameChange}
               fullWidth
             />
           </Grid>
           <Grid item xs={0.4}></Grid>
           <Grid item xs={5.8}>
-            <CustomTextField label='User Name' value={cameras.camera.userName} onChange={handleEmailChange} fullWidth />
+            <CustomTextField
+              label='User Name'
+              value={cameras?.camera?.userName}
+              onChange={handleEmailChange}
+              fullWidth
+            />
           </Grid>
           <Grid item xs={5.8}>
             <CustomTextField
               label='Server Address'
-              value={cameras.camera.serverAddressNTP}
+              value={cameras?.camera.serverAddressNTP}
               onChange={handleFullNameChange}
               fullWidth
             />
           </Grid>
           <Grid item xs={0.4}></Grid>
           <Grid item xs={5.8}>
-            <CustomTextField label='Password' value={cameras.camera.password} onChange={handleEmailChange} fullWidth />
+            <CustomTextField label='Password' value={cameras?.camera.password} onChange={handleEmailChange} fullWidth />
           </Grid>
           <Grid item xs={5.8}>
-            <CustomTextField label='Port' value={cameras.camera.port} onChange={handleFullNameChange} fullWidth />
+            <CustomTextField label='Port' value={cameras?.camera.port} onChange={handleFullNameChange} fullWidth />
           </Grid>
           <Grid item xs={0.4}></Grid>
           <Grid item xs={5.8}>
-            <CustomTextField label='Confirm' value={cameras.camera.confirm} onChange={handleEmailChange} fullWidth />
+            <CustomTextField label='Confirm' value={cameras?.camera.confirm} onChange={handleEmailChange} fullWidth />
           </Grid>
           <Grid item xs={5.8}>
-            <CustomTextField label='Domain' value={cameras.camera.domain} onChange={handleFullNameChange} fullWidth />
+            <CustomTextField label='Domain' value={cameras?.camera.domain} onChange={handleFullNameChange} fullWidth />
           </Grid>
         </Grid>
       </Grid>
