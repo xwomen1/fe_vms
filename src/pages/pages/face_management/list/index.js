@@ -190,7 +190,7 @@ useEffect(() => {
                 limit: valueFilter.limit,
             }
           }
-         
+         console.log(token,'token');
           const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/blacklist?sort=%2Bcreated_at&page=1', config)
           setUserData(response.data.data)
           const imageFaces = response.data.data[0].mainImageUrl;

@@ -24,7 +24,11 @@ const navigation = () => {
           title: 'Quản lý khuôn mặt',
           icon: 'tabler:users'
         },
-
+        {
+          path: '/pages/car_management/list',
+          title: 'Quản lý Biển số',
+          icon: 'tabler:id-badge-2'
+        },
         {
           title: 'Chấm công',
           path: '/timekeeping'
