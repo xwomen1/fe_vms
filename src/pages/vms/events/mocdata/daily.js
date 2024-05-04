@@ -61,7 +61,9 @@ const Daily = ({ dataDailyProps, callbackOfDaily }) => {
         const abc = dataDaily.sort(function (a, b) {
             return a.value - b.value
         })
+
         const found = abc.find((e) => e.value === item.value - 1)
+
         const dto = {
             label: item.label,
             value: item.value,
@@ -120,6 +122,7 @@ const Daily = ({ dataDailyProps, callbackOfDaily }) => {
                             </div>
                         )
                     }
+
                     return (
                         <div
                             key={index.toString()}
@@ -188,7 +191,6 @@ const Daily = ({ dataDailyProps, callbackOfDaily }) => {
                                     <div
                                         style={{
                                             width: `${100 / 6}%`,
-                                            // backgroundColor: b === 1 || b === 2 ? '#7EBBFC' : '',
                                             cursor: 'pointer',
                                         }}
                                         onClick={() => {
@@ -216,7 +218,6 @@ const Daily = ({ dataDailyProps, callbackOfDaily }) => {
                                             left: `${convertTimeToMinute(a.starttime)}%`,
                                             height: 36,
                                             background: '#7EBBFC',
-                                            // borderRadius: 4,
                                             cursor: 'pointer',
                                             opacity: 0.8,
                                             width: `${convertTimeToMinute(a.endtime - a.starttime)}%`,
