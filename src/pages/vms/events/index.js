@@ -42,13 +42,13 @@ const Events = () => {
         <div>
             <Grid container spacing={0} style={{ marginTop: 10 }}>
                 <TabContext value={value}>
-                    <Grid xs={12}>
+                    <Grid item xs={12}>
                         {' '}
                         <TabList onChange={handleChange} aria-label='customized tabs example'>
-                            <Tab value='1' label='Tổng Quan' />
-                            <Tab value='2' label='Danh sách' />
-                            <Tab value='3' label='Cấu hình' />
-                            <Tab value='4' label='Bản đồ' />
+                            <Tab value='1' label='Tổng Quan' key={1} />
+                            <Tab value='2' label='Danh sách' key={2} />
+                            <Tab value='3' label='Cấu hình' key={3} />
+                            <Tab value='4' label='Bản đồ' key={4} />
                         </TabList>
                     </Grid>
                     <Grid item xs={12}>

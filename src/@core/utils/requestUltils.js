@@ -12,6 +12,7 @@ export const METHODS = {
 async function getToken() {
   if (typeof window === 'undefined') return ''
   const token = window.localStorage.getItem('accessToken')
+
   return token && token.length ? `Bearer ${token}` : ''
 }
 
@@ -19,13 +20,16 @@ axios.interceptors.request.use(async config => {
   const token = await getToken()
   config.headers.Authorization = token
   config.withCredentials = false
+
   // config.headers['Accept-Language'] = localStorage.getItem('lng');
   // if (!config.paramsSerializer) {
   //   config.paramsSerializer = (p) => qs.stringify(p, { arrayFormat: 'comma' });
   // }
+
   if (config.status === 401) {
     // alert("You are not authorized");
   }
+
   return config
 })
 
@@ -35,10 +39,13 @@ axios.interceptors.response.use(
     if (error.response?.status === 401 && !window?.location?.pathname?.includes('login')) {
       window?.localStorage?.clear()
       window?.location?.reload()
+
       // const pathNameLogin =
       //   window?.location?.protocol + '//' + window?.location?.host + '/login'
       // window.location.replace(pathNameLogin)
+
     }
+
     return Promise.reject(error)
   }
 )
@@ -92,10 +99,12 @@ export function getApiWithHeader(url, params = {}, headers = {}, arrayFormat = '
 export function postApi(url, payload = {}, other) {
   return axios.post(url, payload, {
     ...other
+
     // headers: {
     //   'Access-Control-Allow-Origin': '*'
     // },
     // withCredentials: true ,
+
   })
 }
 
