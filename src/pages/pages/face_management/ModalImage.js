@@ -3,15 +3,18 @@
  * ModalImage
  *
  */
-
-import React, { useEffect, useState } from 'react';
-import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
-import { Popup } from 'devextreme-react';
-import Grid from '@material-ui/core/Grid';
-import { IconButton, Tooltip } from '@material-ui/core';
-import Icon from 'src/@core/components/icon'
-import MyLocationIcon from '@material-ui/icons/MyLocation';
-import MaskGroup from './list/Imge/NoAvatar.svg';
+//review và dùng thuần bên Vuexy, cần thiết thì thay đổi UI
+import React, { useEffect, useState } from 'react'
+import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch'
+import { Popup } from 'devextreme-react'
+import Grid from '@material-ui/core/Grid'
+import { IconButton, Tooltip } from '@material-ui/core'
+import ZoomInIcon from '@material-ui/icons/ZoomIn'
+import ZoomOutIcon from '@material-ui/icons/ZoomOut'
+import MyLocationIcon from '@material-ui/icons/MyLocation'
+import CachedIcon from '@material-ui/icons/Cached'
+import { HiOutlineDownload } from 'react-icons/hi'
+import MaskGroup from './list/Imge/NoAvatar.svg'
 
 function ModalImage({ onClose, imageUrl }) {
   const onDownloadBtnClick = () => {
@@ -36,25 +39,17 @@ function ModalImage({ onClose, imageUrl }) {
 
   return (
     <Popup
-    visible
-    onHiding={() => onClose()}
-    dragEnabled
-    closeOnOutsideClick
-    showCloseButton
-    height="100%"
-    width="100%"
-  >
-      <Grid
-        container
-        justifyContent="center"
-        alignItems="center"
-        style={{ width: '100%', height: '100%' }}
-      >
-          <IconButton
-          style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 9999 }}
-          onClick={onClose}
-        >
-          <Icon icon='tabler:circle-letter-x'/>
+      visible
+      onHiding={() => onClose()}
+      dragEnabled
+      closeOnOutsideClick
+      showCloseButton
+      height='100%'
+      width='100%'
+    >
+      <Grid container justifyContent='center' alignItems='center' style={{ width: '100%', height: '100%' }}>
+        <IconButton style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 9999 }} onClick={onClose}>
+          <Icon icon='tabler:circle-letter-x' />
         </IconButton>
         <Grid item xs={12} style={{ height: '100%' }}>
           <TransformWrapper defaultScale={1} defaultPositionX={0} defaultPositionY={0}>
@@ -64,7 +59,7 @@ function ModalImage({ onClose, imageUrl }) {
                   <Grid item>
                     <Tooltip title='Tải xuống'>
                       <IconButton onClick={() => onDownloadBtnClick()}>
-                      <Icon icon='tabler:download' />
+                        <Icon icon='tabler:download' />
                       </IconButton>
                     </Tooltip>
                     <Tooltip title='Phóng to'>
@@ -84,7 +79,7 @@ function ModalImage({ onClose, imageUrl }) {
                     </Tooltip>
                     <Tooltip title='Quay về mặc định'>
                       <IconButton onClick={() => resetTransform()}>
-                      <Icon icon='tabler:rotate' />
+                        <Icon icon='tabler:rotate' />
                       </IconButton>
                     </Tooltip>
                   </Grid>

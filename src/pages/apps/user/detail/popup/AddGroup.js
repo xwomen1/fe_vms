@@ -62,9 +62,12 @@ const RolePopup = ({ open, onClose, onSelect, userId }) => {
         `https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search?keyword=${groupName}`,
         config
       )
-      console.log(response.data.data[0].groupId)
 
-      return response.data.data[0].groupId
+      if (response.data.data.length > 0) {
+        return response.data.data[0].groupId
+      } else {
+        return null // Trả về null nếu không tìm thấy groupId
+      }
     } catch (error) {
       throw error
     }
@@ -73,36 +76,42 @@ const RolePopup = ({ open, onClose, onSelect, userId }) => {
   const handleRoleSelect = async () => {
     try {
       let newGroupId = await searchGroupId(defaultGroup.name)
+      console.log(newGroupId, ' newgrouid')
 
-      if (!newGroupId) {
+      // Kiểm tra xem newGroupId có giá trị null không
+      if (newGroupId === null) {
         // Nếu nhóm chưa tồn tại, tạo mới
         newGroupId = await createNewGroup()
       }
-      const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
+      if (newGroupId) {
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
-      }
-      await axios.post(
-        `https://dev-ivi.basesystem.one/smc/iam/api/v0/user-groups`,
-        {
-          groupId: newGroupId,
-          default: false,
-          leader: false,
-          userId: userId
-        },
-        config
-      )
-      Swal.fire('Thêm thành công', '', 'success')
 
-      onSelect(selectedRole)
-      onClose()
+        await axios.post(
+          `https://dev-ivi.basesystem.one/smc/iam/api/v0/user-groups`,
+          {
+            groupId: newGroupId,
+            default: false,
+            leader: false,
+            userId: userId
+          },
+          config
+        )
+        Swal.fire('Thêm thành công', '', 'success')
+
+        onSelect(selectedRole)
+        onClose()
+      } else {
+        console.error('Error: Cannot get groupId for the selected group.')
+      }
     } catch (error) {
       onClose()
-
-      Swal.fire('Đã xảy ra lỗi', error.response.data.message || 'Unknown error', 'error')
 
       console.error('Error adding member to group:', error.message)
     }
@@ -129,6 +138,7 @@ const RolePopup = ({ open, onClose, onSelect, userId }) => {
         )
 
         setGroupOptions(response.data.data)
+        console.log(response.data.data, 'go')
       } catch (error) {
         console.error('Error fetching data:', error)
       }

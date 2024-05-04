@@ -24,6 +24,7 @@ import Link from 'next/link'
 import RolePopup from './popups/ChangePassword'
 import Passwords from './popups/PassWord'
 import { Radio, RadioGroup, FormControlLabel } from '@mui/material'
+import toast from 'react-hot-toast'
 
 import Network from './popups/Network'
 import Video from './popups/video'
@@ -33,6 +34,7 @@ import Cloud from './popups/Cloud'
 import ConnectCamera from './popups/ConnectCamera'
 import VideoConnectCamera from './popups/VideoConnectCamera'
 import { Password } from '@mui/icons-material'
+import PopupScan from './popups/Add'
 
 const Add = ({ apiData }) => {
   const [value, setValue] = useState('')
@@ -60,6 +62,49 @@ const Add = ({ apiData }) => {
   const pageSizeOptions = [25, 50, 100]
   const [anchorEl, setAnchorEl] = useState(null)
   const [selectedValue, setSelectedValue] = useState('')
+  const [ipAddress, setIpAddress] = useState('')
+  const [port, setPort] = useState('')
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [response, setResponse] = useState('')
+  const [openPopupResponse, setOpenPopupResponse] = useState(false)
+
+  const handleScan = async () => {
+    setOpenPopupResponse(true) // Mở popup hiển thị response
+
+    try {
+      const payload = {
+        ipAddress,
+        port,
+        username,
+        password
+      }
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.post(
+        'https://sbs.basesystem.one/ivis/vms/api/v0/device/onvif/scandevicestaticip',
+        payload,
+        config
+      )
+
+      setResponse(response.data)
+      toast.success('Thành công')
+
+      setOpenPopupResponse(true) // Mở popup hiển thị response
+      // Swal.fire(' thành công', '', 'success')
+    } catch (error) {
+      console.error('Error scanning device:', error)
+      Swal.fire('Đã xảy ra lỗi', error.response.statusText, 'error')
+
+      // toast.error(`Đã xảy ra lỗi: ${error.response.statusText}`)
+    }
+  }
 
   const handleRadioChange = event => {
     setSelectedValue(event.target.value)
@@ -81,6 +126,7 @@ const Add = ({ apiData }) => {
     }
   }
 
+  //Xoá hàm ko dùng và bị double
   const handleAddRoleClick = () => {
     setOpenPopup(true)
   }
@@ -228,28 +274,52 @@ const Add = ({ apiData }) => {
                 style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
               >
                 <Grid item xs={2}>
-                  <CustomTextField label='Địa chỉ IP' fullWidth />
+                  <CustomTextField
+                    value={ipAddress}
+                    onChange={e => setIpAddress(e.target.value)}
+                    label='Địa chỉ IP'
+                    fullWidth
+                  />
                 </Grid>
                 <Grid item xs={0.2}></Grid>
                 <Grid item xs={2}>
-                  <CustomTextField label='Cổng' fullWidth />
+                  <CustomTextField value={port} onChange={e => setPort(e.target.value)} label='Cổng' fullWidth />
                 </Grid>
                 <Grid item xs={0.2}></Grid>
                 <Grid item xs={2}>
-                  <CustomTextField label='Đăng nhập' fullWidth />
+                  <CustomTextField
+                    value={username}
+                    onChange={e => setUsername(e.target.value)}
+                    label='Đăng nhập'
+                    fullWidth
+                  />
                 </Grid>
                 <Grid item xs={0.2}></Grid>
                 <Grid item xs={2}>
-                  <CustomTextField label='Mật khẩu' type='password' fullWidth />
+                  <CustomTextField
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    label='Mật khẩu'
+                    type='password'
+                    fullWidth
+                  />
                 </Grid>
                 <Grid item xs={0.2}></Grid>
 
                 <Grid item xs={3} style={{ marginTop: '2%' }}>
                   <Button>Cancel</Button>
-                  <Button variant='contained'>Quét</Button>
+                  <Button onClick={handleScan} variant='contained'>
+                    Quét
+                  </Button>
                 </Grid>
               </Grid>
             )}
+            {openPopupResponse && (
+              <>
+                <PopupScan open={openPopupResponse} response={response} onClose={() => setOpenPopupResponse(false)} />{' '}
+              </>
+            )}
+
             {selectedValue === 'daiIp' && (
               <Grid
                 container

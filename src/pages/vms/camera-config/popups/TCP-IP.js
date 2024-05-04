@@ -79,7 +79,7 @@ const UserDetails = cameras => {
   const [ava2, setAva2] = useState(null)
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [selectedNicType, setSelectedNicType] = useState(cameras.camera?.nicType?.name)
+  const [selectedNicType, setSelectedNicType] = useState(cameras.camera.nicType?.name)
   const [multicast, setMulticast] = useState(cameras.camera.multicast)
 
   const handleMulticastChange = (event, newValue) => {
@@ -196,7 +196,7 @@ const UserDetails = cameras => {
               value={selectedNicType}
               onChange={handleNicTypeChange}
               options={nicTypeOptions.map(option => option.label)}
-              renderInput={params => <CustomTextField {...params} label='Loại NIC' fullWidth />}
+              renderInput={params => <CustomTextField {...params} value={selectedNicType} label='Loại NIC' fullWidth />}
             />
           </Grid>
 
@@ -216,7 +216,7 @@ const UserDetails = cameras => {
           </Grid>
           <Grid item xs={5.8}>
             <Autocomplete
-              value={selectedNicType}
+              value={multicast}
               onChange={handleMulticastChange}
               options={multicastOption.map(option => option.label)}
               renderInput={params => <CustomTextField {...params} label='Multicast Discovery' fullWidth />}
