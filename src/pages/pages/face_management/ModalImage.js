@@ -15,6 +15,7 @@ import MyLocationIcon from '@material-ui/icons/MyLocation'
 import CachedIcon from '@material-ui/icons/Cached'
 import { HiOutlineDownload } from 'react-icons/hi'
 import MaskGroup from './list/Imge/NoAvatar.svg'
+import { Icon } from '@mui/material'
 
 function ModalImage({ onClose, imageUrl }) {
   const onDownloadBtnClick = () => {
