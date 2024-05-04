@@ -220,10 +220,10 @@ const UserDetails = () => {
   return (
     <Grid container spacing={3}>
       <Grid container spacing={2} item xs={12}>
-        <IconButton size='small' component={Link} href={`/apps/user/list`} sx={{ color: 'text.secondary' }}>
+        {/* <IconButton size='small' component={Link} href={`/apps/user/list`} sx={{ color: 'text.secondary' }}>
           <Icon icon='tabler:chevron-left' />
-        </IconButton>
-        <h2 style={{ color: 'black' }}>Thêm mới người dùng: </h2>
+        </IconButton> */}
+        {/* <h2 style={{ color: 'black' }}>Thêm mới người dùng: </h2> */}
       </Grid>
       <Grid container spacing={2}>
         <div style={{ width: '80%' }}></div>
@@ -244,7 +244,7 @@ const UserDetails = () => {
       </Grid>
 
       <Grid item xs={12}>
-        <TableContainer component={Paper} style={{ width: '100%' }}>
+        <TableContainer style={{ width: '100%' }}>
           <Table>
             <TableHead>
               <TableRow>

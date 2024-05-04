@@ -3,97 +3,84 @@
  * ModalImage
  *
  */
-
-import React, { useEffect, useState } from 'react';
-import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
-import { Popup } from 'devextreme-react';
-import Grid from '@material-ui/core/Grid';
-import { IconButton, Tooltip } from '@material-ui/core';
-import ZoomInIcon from '@material-ui/icons/ZoomIn';
-import ZoomOutIcon from '@material-ui/icons/ZoomOut';
-import MyLocationIcon from '@material-ui/icons/MyLocation';
-import CachedIcon from '@material-ui/icons/Cached';
-import { HiOutlineDownload } from 'react-icons/hi';
-import MaskGroup from './list/Imge/NoAvatar.svg';
+//review và dùng thuần bên Vuexy, cần thiết thì thay đổi UI
+import React, { useEffect, useState } from 'react'
+import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch'
+import { Popup } from 'devextreme-react'
+import Grid from '@material-ui/core/Grid'
+import { IconButton, Tooltip } from '@material-ui/core'
+import ZoomInIcon from '@material-ui/icons/ZoomIn'
+import ZoomOutIcon from '@material-ui/icons/ZoomOut'
+import MyLocationIcon from '@material-ui/icons/MyLocation'
+import CachedIcon from '@material-ui/icons/Cached'
+import { HiOutlineDownload } from 'react-icons/hi'
+import MaskGroup from './list/Imge/NoAvatar.svg'
+import { Icon } from '@mui/material'
 
 function ModalImage({ onClose, imageUrl }) {
-
   const onDownloadBtnClick = () => {
+    const link = document.createElement('a')
 
-    const link = document.createElement('a');
-    
-    link.href = url;
-    link.download = 'Download.jpg';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+    link.href = url
+    link.download = 'Download.jpg'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
 
-  const [url, setUrl] = useState(null);
+  const [url, setUrl] = useState(null)
 
   useEffect(() => {
     if (imageUrl) {
-      setUrl(imageUrl);
+      setUrl(imageUrl)
     } else {
-      setUrl(MaskGroup);
+      setUrl(MaskGroup)
     }
-  }, [imageUrl]);
-  
+  }, [imageUrl])
+
   return (
     <Popup
-    visible
-    onHiding={() => onClose()}
-    dragEnabled
-    closeOnOutsideClick
-    showCloseButton
-    height="100%"
-    width="100%"
-  >
-      <Grid
-        container
-        justifyContent="center"
-        alignItems="center"
-        style={{ width: '100%', height: '100%' }}
-      >
-                <IconButton
-          style={{ position: 'absolute', top: '8px', right: '8px', zIndex: 9999 }}
-          onClick={onClose}
-        >
-          X
+      visible
+      onHiding={() => onClose()}
+      dragEnabled
+      closeOnOutsideClick
+      showCloseButton
+      height='100%'
+      width='100%'
+    >
+      <Grid container justifyContent='center' alignItems='center' style={{ width: '100%', height: '100%' }}>
+        <IconButton style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 9999 }} onClick={onClose}>
+          <Icon icon='tabler:circle-letter-x' />
         </IconButton>
         <Grid item xs={12} style={{ height: '100%' }}>
-          <TransformWrapper
-            defaultScale={1}
-            defaultPositionX={0}
-            defaultPositionY={0}
-          >
+          <TransformWrapper defaultScale={1} defaultPositionX={0} defaultPositionY={0}>
             {({ zoomIn, zoomOut, resetTransform, centerView }) => (
               <React.Fragment>
-                <Grid item container justifyContent="center" alignItems="center">
+                <Grid item container justifyContent='center' alignItems='center'>
                   <Grid item>
-                    <Tooltip title="Tải xuống">
+                    <Tooltip title='Tải xuống'>
                       <IconButton onClick={() => onDownloadBtnClick()}>
-                        <HiOutlineDownload fontSize="normal" />
+                        <Icon icon='tabler:download' />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Phóng to">
+                    <Tooltip title='Phóng to'>
                       <IconButton onClick={() => zoomIn()}>
-                        <ZoomInIcon fontSize="small" />
+                        <Icon icon='tabler:camera-minus' />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Thu nhỏ">
+                    <Tooltip title='Thu nhỏ'>
                       <IconButton onClick={() => zoomOut()}>
-                        <ZoomOutIcon fontSize="small" />
+                        <Icon icon='tabler:camera-plus' />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Trung tâm">
+                    <Tooltip title='Trung tâm'>
                       <IconButton onClick={() => centerView()}>
-                        <MyLocationIcon fontSize="small" />
+                        <MyLocationIcon fontSize='small' />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Quay về mặc định">
+                    <Tooltip title='Quay về mặc định'>
                       <IconButton onClick={() => resetTransform()}>
-                        <CachedIcon fontSize="small" />
+                        <Icon icon='tabler:rotate' />
                       </IconButton>
                     </Tooltip>
                   </Grid>
@@ -104,17 +91,17 @@ function ModalImage({ onClose, imageUrl }) {
                     display: 'flex',
                     width: '100%',
                     height: '100%',
-                    background:'#FFFFFF',
+                    background: '#FFFFFF',
                     justifyContent: 'center',
-                    flexWrap: 'nowrap',
+                    flexWrap: 'nowrap'
                   }}
                 >
                   <img
                     src={url}
-                    alt="test"
+                    alt='test'
                     style={{
                       maxHeight: '100%',
-                      maxWidth: '100%',
+                      maxWidth: '100%'
                     }}
                     onError={() => setUrl(MaskGroup)}
                   />
@@ -125,9 +112,9 @@ function ModalImage({ onClose, imageUrl }) {
         </Grid>
       </Grid>
     </Popup>
-  );
+  )
 }
 
-ModalImage.propTypes = {};
+ModalImage.propTypes = {}
 
-export default ModalImage;
+export default ModalImage

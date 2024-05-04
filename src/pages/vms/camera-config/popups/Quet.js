@@ -22,7 +22,7 @@ import TableHeader from 'src/views/apps/asset/TableHeader'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import Link from 'next/link'
 
-const UserList = ({ apiData }) => {
+const ScanDevice = ({ apiData, response }) => {
   const [value, setValue] = useState('')
 
   const [addUserOpen, setAddUserOpen] = useState(false)
@@ -57,21 +57,19 @@ const UserList = ({ apiData }) => {
 
     return Swal.fire({ ...defaultProps, ...options })
   }
-  
-  const createData = (name, type, ip,aibox,mac,vitri, status) => {
-    return {name, type, ip,aibox,mac,vitri, status}
+
+  const createData = (name, type, ip, aibox, mac, vitri, status) => {
+    return { name, type, ip, aibox, mac, vitri, status }
   }
-  
+
   const assetTypes = [
-    createData('Cam POC1', '', '192.168.1.1','','','Ha Noi','Khong hoat dong'),
-    createData('Cam POC2', '', '192.168.1.1','','','Ha Noi','Khong hoat dong'),
-    createData('Cam POC3', '', '192.168.1.1','','','Ha Noi','Khong hoat dong'),
-    createData('Cam POC4', '', '192.168.1.1','','','Ha Noi','Khong hoat dong'),
-    createData('Cam POC5', '', '192.168.1.1','','','Ha Noi','Khong hoat dong'),
-
-
+    createData('Cam POC1', '', '192.168.1.1', '', '', 'Ha Noi', 'Khong hoat dong'),
+    createData('Cam POC2', '', '192.168.1.1', '', '', 'Ha Noi', 'Khong hoat dong'),
+    createData('Cam POC3', '', '192.168.1.1', '', '', 'Ha Noi', 'Khong hoat dong'),
+    createData('Cam POC4', '', '192.168.1.1', '', '', 'Ha Noi', 'Khong hoat dong'),
+    createData('Cam POC5', '', '192.168.1.1', '', '', 'Ha Noi', 'Khong hoat dong')
   ]
-  
+
   const handleOpenMenu = event => {
     setAnchorEl(event.currentTarget)
   }
@@ -92,7 +90,6 @@ const UserList = ({ apiData }) => {
 
   console.log(total, 'totalpage')
 
-
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
@@ -108,7 +105,6 @@ const UserList = ({ apiData }) => {
               <TableCell>Vi tri</TableCell>
               <TableCell>Trang thai</TableCell>
               <TableCell>Thao tac</TableCell>
-
             </TableRow>
           </TableHead>
           <TableBody>
@@ -116,41 +112,24 @@ const UserList = ({ apiData }) => {
               <TableRow key={index}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>{assetType.name}</TableCell>
-                <TableCell>
-                {assetType.type}
-                </TableCell>
-                <TableCell>
-                {assetType.ip}
-
-                </TableCell>
-                <TableCell>
-                {assetType.aibox}
-
-                </TableCell>  <TableCell>
-                {assetType.mac}
-
-                </TableCell>  <TableCell>
-                {assetType.vitri}
-
-                </TableCell>  <TableCell>
-                {assetType.status}
-
-                </TableCell>
+                <TableCell>{assetType.type}</TableCell>
+                <TableCell>{assetType.ip}</TableCell>
+                <TableCell>{assetType.aibox}</TableCell> <TableCell>{assetType.mac}</TableCell>{' '}
+                <TableCell>{assetType.vitri}</TableCell> <TableCell>{assetType.status}</TableCell>
                 <TableCell sx={{ padding: '16px' }}>
-                        <Grid container spacing={2}>
-                        
-                          <IconButton >
-                            <Icon icon='tabler:plus' />
-                          </IconButton>
-                        </Grid>
-                      </TableCell>
+                  <Grid container spacing={2}>
+                    <IconButton>
+                      <Icon icon='tabler:plus' />
+                    </IconButton>
+                  </Grid>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </Grid>
     </Grid>
-  );
+  )
 }
 
 export const getStaticProps = async () => {
@@ -164,4 +143,4 @@ export const getStaticProps = async () => {
   }
 }
 
-export default UserList
+export default ScanDevice

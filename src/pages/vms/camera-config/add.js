@@ -18,12 +18,13 @@ import Swal from 'sweetalert2'
 import { fetchData } from 'src/store/apps/user'
 import { useRouter } from 'next/router'
 import axios from 'axios'
-import TableHeader from 'src/views/apps/vms/nvr-config/TableHeader'
+import TableHeader from 'src/views/apps/vms/camera-config/TableHeader'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import Link from 'next/link'
 import RolePopup from './popups/ChangePassword'
 import Passwords from './popups/PassWord'
-import { Radio, RadioGroup, FormControlLabel } from '@mui/material';
+import { Radio, RadioGroup, FormControlLabel } from '@mui/material'
+import toast from 'react-hot-toast'
 
 import Network from './popups/Network'
 import Video from './popups/video'
@@ -33,8 +34,9 @@ import Cloud from './popups/Cloud'
 import ConnectCamera from './popups/ConnectCamera'
 import VideoConnectCamera from './popups/VideoConnectCamera'
 import { Password } from '@mui/icons-material'
+import PopupScan from './popups/Add'
 
-const UserList = ({ apiData }) => {
+const Add = ({ apiData }) => {
   const [value, setValue] = useState('')
   const [selectedIds, setSelectedIds] = useState([])
   const [openPopup, setOpenPopup] = useState(false)
@@ -50,7 +52,7 @@ const UserList = ({ apiData }) => {
   const [selectedNvrId, setSelectedNvrId] = useState(null)
   const [addUserOpen, setAddUserOpen] = useState(false)
   const [assettype, setAssetType] = useState([])
-  const [nvr, setNvr] = useState([1])
+  const [camera, setCamera] = useState([1])
 
   const [total, setTotal] = useState([1])
   const [page, setPage] = useState(1)
@@ -59,13 +61,56 @@ const UserList = ({ apiData }) => {
 
   const pageSizeOptions = [25, 50, 100]
   const [anchorEl, setAnchorEl] = useState(null)
-  const [selectedValue, setSelectedValue] = useState('');
+  const [selectedValue, setSelectedValue] = useState('')
+  const [ipAddress, setIpAddress] = useState('')
+  const [port, setPort] = useState('')
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [response, setResponse] = useState('')
+  const [openPopupResponse, setOpenPopupResponse] = useState(false)
 
-  const handleRadioChange = (event) => {
-    setSelectedValue(event.target.value);
+  const handleScan = async () => {
+    setOpenPopupResponse(true) // Mở popup hiển thị response
+
+    try {
+      const payload = {
+        ipAddress,
+        port,
+        username,
+        password
+      }
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.post(
+        'https://sbs.basesystem.one/ivis/vms/api/v0/device/onvif/scandevicestaticip',
+        payload,
+        config
+      )
+
+      setResponse(response.data)
+      toast.success('Thành công')
+
+      setOpenPopupResponse(true) // Mở popup hiển thị response
+      // Swal.fire(' thành công', '', 'success')
+    } catch (error) {
+      console.error('Error scanning device:', error)
+      Swal.fire('Đã xảy ra lỗi', error.response.statusText, 'error')
+
+      // toast.error(`Đã xảy ra lỗi: ${error.response.statusText}`)
+    }
+  }
+
+  const handleRadioChange = event => {
+    setSelectedValue(event.target.value)
     console.log(selectedValue)
-  }; 
-  
+  }
+
   const handlePageChange = newPage => {
     setPage(newPage)
   }
@@ -81,18 +126,19 @@ const UserList = ({ apiData }) => {
     }
   }
 
+  //Xoá hàm ko dùng và bị double
   const handleAddRoleClick = () => {
     setOpenPopup(true)
   }
-  
+
   const handleAddRolesClick = () => {
     setOpenPopup(true)
   }
-  
+
   const handleClosePopup = () => {
     setOpenPopup(false) // Đóng Popup khi cần thiết
   }
-  
+
   const handleAddPClick = () => {
     setOpenPopupP(true)
   }
@@ -100,7 +146,7 @@ const UserList = ({ apiData }) => {
   const handleClosePPopup = () => {
     setOpenPopupP(false) // Đóng Popup khi cần thiết
   }
-  
+
   const handleAddNetworkClick = () => {
     setOpenPopupNetwork(true)
   }
@@ -124,7 +170,7 @@ const UserList = ({ apiData }) => {
   const handleCloseImagePopup = () => {
     setOpenPopupImage(false) // Đóng Popup khi cần thiết
   }
-  
+
   const handleAddCloudClick = () => {
     setOpenPopupCloud(true)
   }
@@ -132,7 +178,7 @@ const UserList = ({ apiData }) => {
   const handleCloseCloudPopup = () => {
     setOpenPopupCloud(false) // Đóng Popup khi cần thiết
   }
-  
+
   const handleAddConnectCameraClick = () => {
     setOpenPopupConnectCamera(true)
   }
@@ -140,7 +186,7 @@ const UserList = ({ apiData }) => {
   const handleCloseConnectCameraPopup = () => {
     setOpenPopupConnectCamera(false) // Đóng Popup khi cần thiết
   }
-  
+
   const handleAddVideoConnectClick = () => {
     setOpenPopupVideoConnectCamera(true)
   }
@@ -148,7 +194,6 @@ const UserList = ({ apiData }) => {
   const handleCloseVideoConnectPopup = () => {
     setOpenPopupVideoConnectCamera(false) // Đóng Popup khi cần thiết
   }
-
 
   const handleOpenMenu = event => {
     setAnchorEl(event.currentTarget)
@@ -187,9 +232,9 @@ const UserList = ({ apiData }) => {
             keyword: value
           }
         }
-        const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/nvrs', config)
+        const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/cameras', config)
         setStatus1(response.data.data.isOfflineSetting)
-        setNvr(response.data.data[0].id)
+        setCamera(response.data.data[0].id)
         setAssetType(response.data.data)
         setTotal(response.data.data.page)
         console.log(response.data.data[0].id)
@@ -201,182 +246,188 @@ const UserList = ({ apiData }) => {
   }, [page, pageSize, total, value])
 
   return (
-    <Grid container spacing={6.5} >
-      <Grid item xs={12} >
+    <Grid container spacing={6.5}>
+      <Grid item xs={12}>
         <Card>
-        <div>
-      <RadioGroup value={selectedValue} onChange={handleRadioChange} style={{marginLeft: 50}}>
-      <Grid container spacing={2}>
-        <Grid item>
-          <FormControlLabel value="dungIp" control={<Radio />} label="Dùng IP" />
-        </Grid>
-        <Grid item>
-          <FormControlLabel value="daiIp" control={<Radio />} label="Dải IP" />
-        </Grid>
-        <Grid item>
-          <FormControlLabel value="onvif" control={<Radio />} label="ON VIF" />
-        </Grid>
-      </Grid>
-      </RadioGroup>
-      {selectedValue === 'dungIp' && (
-        <Grid container item component={Paper} style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
- <Grid item xs={2.8}>
-  <FormControl fullWidth>
-    <InputLabel id='time-validity-label'>Chọn</InputLabel>
-    <Select
-      labelId='time-validity-label'
-      id='time-validity-select'
-     
-    >
-      <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
-      <MenuItem value='Undefined'>Không xác định</MenuItem>
-    </Select>
-  </FormControl>
-</Grid>  
-<Grid item xs = {0.4}></Grid>
-        <Grid item xs={2.8}>
-            <CustomTextField
-              label='Địa chỉ IP'
-              fullWidth
-            />
-            </Grid>
-            <Grid item xs = {0.4}></Grid>
-        <Grid item xs={2.8}>
-            <CustomTextField
-              label='Cổng'
-              fullWidth
-            />
-            </Grid>
-            <Grid item xs = {0.4}></Grid>
-        <Grid item xs={2.8}>
-            <CustomTextField
-              label='Đăng nhập'
-              fullWidth
-            />
-            </Grid>
-            <Grid item xs = {0.4}></Grid>
-        <Grid item xs={2.8}>
-        <CustomTextField label='Mật khẩu' type='password'fullWidth />
+          <div>
+            <RadioGroup value={selectedValue} onChange={handleRadioChange} style={{ marginLeft: 50 }}>
+              <Grid container spacing={2}>
+                <Grid item>
+                  <FormControlLabel value='dungIp' control={<Radio />} label='Dùng IP' />
+                </Grid>
+                <Grid item>
+                  <FormControlLabel value='daiIp' control={<Radio />} label='Dải IP' />
+                </Grid>
+                <Grid item>
+                  <FormControlLabel value='onvif' control={<Radio />} label='ON VIF' />
+                </Grid>
+                <Grid item>
+                  <FormControlLabel value='khac' control={<Radio />} label='Khác' />
+                </Grid>
+              </Grid>
+            </RadioGroup>
+            {selectedValue === 'dungIp' && (
+              <Grid
+                container
+                item
+                component={Paper}
+                style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
+              >
+                <Grid item xs={2}>
+                  <CustomTextField
+                    value={ipAddress}
+                    onChange={e => setIpAddress(e.target.value)}
+                    label='Địa chỉ IP'
+                    fullWidth
+                  />
+                </Grid>
+                <Grid item xs={0.2}></Grid>
+                <Grid item xs={2}>
+                  <CustomTextField value={port} onChange={e => setPort(e.target.value)} label='Cổng' fullWidth />
+                </Grid>
+                <Grid item xs={0.2}></Grid>
+                <Grid item xs={2}>
+                  <CustomTextField
+                    value={username}
+                    onChange={e => setUsername(e.target.value)}
+                    label='Đăng nhập'
+                    fullWidth
+                  />
+                </Grid>
+                <Grid item xs={0.2}></Grid>
+                <Grid item xs={2}>
+                  <CustomTextField
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    label='Mật khẩu'
+                    type='password'
+                    fullWidth
+                  />
+                </Grid>
+                <Grid item xs={0.2}></Grid>
 
-            </Grid>
-            <Grid item xs={0.2}></Grid>
+                <Grid item xs={3} style={{ marginTop: '2%' }}>
+                  <Button>Cancel</Button>
+                  <Button onClick={handleScan} variant='contained'>
+                    Quét
+                  </Button>
+                </Grid>
+              </Grid>
+            )}
+            {openPopupResponse && (
+              <>
+                <PopupScan open={openPopupResponse} response={response} onClose={() => setOpenPopupResponse(false)} />{' '}
+              </>
+            )}
 
-<Grid item xs={4} style={{marginTop:'2%'}}><Button >Cancel</Button>
-<Button  variant='contained'>Quét</Button></Grid>
-  </Grid>
-   
-   )}   
-     {selectedValue === 'daiIp' && (
-        <Grid container item component={Paper} style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
- <Grid item xs={2}>
-  <FormControl fullWidth>
-    <InputLabel id='time-validity-label'>Chọn</InputLabel>
-    <Select
-      labelId='time-validity-label'
-      id='time-validity-select'
-     
-    >
-      <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
-      <MenuItem value='Undefined'>Không xác định</MenuItem>
-    </Select>
-  </FormControl>
-</Grid>  
-<Grid item xs = {0.4}></Grid>
-        <Grid item xs={2}>
-            <CustomTextField
-              label='Địa chỉ IP bắt đầu'
-              fullWidth
-            />
-            </Grid>
-            <Grid item xs = {0.2} ></Grid>
+            {selectedValue === 'daiIp' && (
+              <Grid
+                container
+                item
+                component={Paper}
+                style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
+              >
+                <Grid item xs={2}>
+                  <CustomTextField label='Địa chỉ IP bắt đầu' fullWidth />
+                </Grid>
+                <Grid item xs={0.2}></Grid>
 
-            <Grid item xs = {0.4} style={{marginTop: '2%'}}>----</Grid>
-        <Grid item xs={2}>
-            <CustomTextField
-                          label='Địa chỉ IP kết thúc'
+                <Grid item xs={0.4} style={{ marginTop: '2%' }}>
+                  ----
+                </Grid>
+                <Grid item xs={2}>
+                  <CustomTextField label='Địa chỉ IP kết thúc' fullWidth />
+                </Grid>
+                <Grid item xs={0.2}></Grid>
 
-              fullWidth
-            />
-            
-            </Grid>
-            <Grid item xs = {0.2} ></Grid>
+                <Grid item xs={2}>
+                  <CustomTextField label='Cổng bắt đầu' fullWidth />
+                </Grid>
+                <Grid item xs={0.2}></Grid>
 
-            <Grid item xs={2}>
-            <CustomTextField
-              label='Cổng bắt đầu'
-              fullWidth
-            />
-            </Grid>
-            <Grid item xs = {0.2} ></Grid>
+                <Grid item xs={0.4} style={{ marginTop: '2%' }}>
+                  ----
+                </Grid>
+                <Grid item xs={2}>
+                  <CustomTextField label='Cổng kết thúc' fullWidth />
+                </Grid>
+                <Grid item xs={2}></Grid>
+                <Grid item xs={2}>
+                  <CustomTextField label='Đăng nhập' fullWidth />
+                </Grid>
+                <Grid item xs={0.4}></Grid>
+                <Grid item xs={2}>
+                  <CustomTextField label='Mật khẩu' type='password' fullWidth />
+                </Grid>
+                <Grid item xs={0.2}></Grid>
 
-            <Grid item xs = {0.4} style={{marginTop: '2%'}}>----</Grid>
-        <Grid item xs={2}>
-            <CustomTextField
-                          label='Cổng kết thúc'
+                <Grid item xs={4} style={{ marginTop: '2%' }}>
+                  <Button>Cancel</Button>
+                  <Button variant='contained'>Quét</Button>
+                </Grid>
+              </Grid>
+            )}
+            {selectedValue === 'onvif' && (
+              <Grid
+                container
+                item
+                component={Paper}
+                style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
+              >
+                <Grid item xs={0.4}></Grid>
 
-              fullWidth
-            />
-            </Grid>
-        <Grid item xs={2}>
-            <CustomTextField
-              label='Đăng nhập'
-              fullWidth
-            />
-            </Grid>
-            <Grid item xs = {0.4}></Grid>
-        <Grid item xs={2}>
-        <CustomTextField label='Mật khẩu' type='password'fullWidth />
+                <Grid item xs={0.4}></Grid>
+                <Grid item xs={2}>
+                  <CustomTextField label='Đăng nhập' fullWidth />
+                </Grid>
+                <Grid item xs={0.4}></Grid>
+                <Grid item xs={2}>
+                  <CustomTextField label='Mật khẩu' type='password' fullWidth />
+                </Grid>
+                <Grid item xs={0.2}></Grid>
 
-            </Grid>
-            <Grid item xs={0.2}></Grid>
+                <Grid item xs={4} style={{ marginTop: '2%' }}>
+                  <Button>Cancel</Button>
+                  <Button variant='contained'>Quét</Button>
+                </Grid>
+              </Grid>
+            )}
+            {selectedValue === 'khac' && (
+              <Grid
+                container
+                item
+                component={Paper}
+                style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
+              >
+                <Grid item xs={2}>
+                  <FormControl fullWidth>
+                    <InputLabel id='time-validity-label'>Chọn</InputLabel>
+                    <Select labelId='time-validity-label' id='time-validity-select'>
+                      <MenuItem value='Custom'>Dahua</MenuItem>
+                      <MenuItem value='Undefined'>Hikvision</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={0.4}></Grid>
 
-            <Grid item xs={4} style={{marginTop:'2%'}}><Button >Cancel</Button>
-        <Button  variant='contained'>Quét</Button></Grid>
+                <Grid item xs={0.4}></Grid>
+                <Grid item xs={2}>
+                  <CustomTextField label='Đăng nhập' fullWidth />
+                </Grid>
+                <Grid item xs={0.4}></Grid>
+                <Grid item xs={2}>
+                  <CustomTextField label='Mật khẩu' type='password' fullWidth />
+                </Grid>
+                <Grid item xs={0.2}></Grid>
 
-            
-  </Grid>
-  
-   )}    
-      {selectedValue === 'onvif' && (
-        <Grid container item component={Paper} style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
- <Grid item xs={2}>
-  <FormControl fullWidth>
-    <InputLabel id='time-validity-label'>Chọn</InputLabel>
-    <Select
-      labelId='time-validity-label'
-      id='time-validity-select'
-     
-    >
-      <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
-      <MenuItem value='Undefined'>Không xác định</MenuItem>
-    </Select>
-  </FormControl>
-</Grid>  
-<Grid item xs = {0.4}></Grid>
-  
-            <Grid item xs = {0.4}></Grid>
-        <Grid item xs={2}>
-            <CustomTextField
-              label='Đăng nhập'
-              fullWidth
-            />
-            </Grid>
-            <Grid item xs = {0.4}></Grid>
-        <Grid item xs={2}>
-        <CustomTextField label='Mật khẩu' type='password'fullWidth />
-
-            </Grid>
-            <Grid item xs={0.2}></Grid>
-
-<Grid item xs={4} style={{marginTop:'2%'}}><Button >Cancel</Button>
-<Button  variant='contained'>Quét</Button></Grid>
-  </Grid>
-   
-   )}   
-
-   </div>
+                <Grid item xs={4} style={{ marginTop: '2%' }}>
+                  <Button>Cancel</Button>
+                  <Button variant='contained'>Quét</Button>
+                </Grid>
+              </Grid>
+            )}
+          </div>
           <Grid container spacing={2}>
-           
             <Grid item xs={12}>
               <div></div>
 
@@ -430,21 +481,14 @@ const UserList = ({ apiData }) => {
                             <Icon icon='tabler:key' />
                           </IconButton>
                           <IconButton size='small' onClick={handleAddVideoConnectClick}>
-
                             <Icon icon='tabler:camera' />
                           </IconButton>
                           <IconButton size='small' onClick={handleAddConnectCameraClick}>
-
                             <Icon icon='tabler:link' />
                           </IconButton>
-                          <IconButton
-                            size='small'
-                           
-                            sx={{ color: 'text.secondary' }}
-                          >
+                          <IconButton size='small' sx={{ color: 'text.secondary' }}>
                             <Icon icon='tabler:reload' />
                           </IconButton>
-                         
                         </Grid>
                       </TableCell>
                     </TableRow>
@@ -476,20 +520,21 @@ const UserList = ({ apiData }) => {
         </Card>
         {selectedIds.length > 0 && (
           <>
-            <RolePopup open={openPopup} onClose={handleClosePopup} nvr={selectedIds} />
-            <Network open={openPopupNetwork} onClose={handleCloseNetWorkPopup} nvr={selectedIds} />
-            <Video open={openPopupVideo} onClose={handleCloseVideoPopup} nvr={selectedIds} />
-            <Image open={openPopupImage} onClose={handleCloseImagePopup} nvr={selectedIds} />
-            <Cloud open={openPopupCloud} onClose={handleCloseCloudPopup} nvr={selectedIds} />
-            
+            <RolePopup open={openPopup} onClose={handleClosePopup} camera={selectedIds} />
+            <Network open={openPopupNetwork} onClose={handleCloseNetWorkPopup} camera={selectedIds} />
+            <Video open={openPopupVideo} onClose={handleCloseVideoPopup} camera={selectedIds} />
+            <Image open={openPopupImage} onClose={handleCloseImagePopup} camera={selectedIds} />
+            <Cloud open={openPopupCloud} onClose={handleCloseCloudPopup} camera={selectedIds} />
           </>
+        )}
+        <Passwords open={openPopupP} onClose={handleClosePPopup} camera={selectedIds} />
 
-        )} 
-         <Passwords open={openPopupP} onClose={handleClosePPopup} nvr={selectedIds} />
-
-        <ConnectCamera open={openPopupConnectCamera} onClose={handleCloseConnectCameraPopup} nvr={selectedIds} />
-            <VideoConnectCamera open={openPopupVideoConnectCamera} onClose={handleCloseVideoConnectPopup} nvr={selectedIds} />
-
+        <ConnectCamera open={openPopupConnectCamera} onClose={handleCloseConnectCameraPopup} camera={selectedIds} />
+        <VideoConnectCamera
+          open={openPopupVideoConnectCamera}
+          onClose={handleCloseVideoConnectPopup}
+          camera={selectedIds}
+        />
       </Grid>
     </Grid>
   )
@@ -506,4 +551,4 @@ export const getStaticProps = async () => {
   }
 }
 
-export default UserList
+export default Add

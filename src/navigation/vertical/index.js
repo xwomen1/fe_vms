@@ -14,6 +14,16 @@ const navigation = () => {
           title: 'Sự kiện',
           path: '/event-management'
         },
+        {
+          path: '/pages/access-rights/list',
+          title: 'Quyền truy cập',
+          icon: 'tabler:shield'
+        },
+        {
+          path: '/pages/face_management/list',
+          title: 'Quản lý khuôn mặt',
+          icon: 'tabler:users'
+        },
 
         {
           title: 'Chấm công',
@@ -32,14 +42,13 @@ const navigation = () => {
         {
           path: '/pages/access-rights/list',
           title: 'Thống kê',
-          icon: 'tabler:statistics/time?tab=%2Fstatistics%2Ftime',
-
+          icon: 'tabler:statistics/time?tab=%2Fstatistics%2Ftime'
         },
         {
           path: '/pages/access-rights/list',
           title: 'Hẹn lịch',
           icon: 'tabler:guest-registrations'
-        },
+        }
       ]
     },
     {
@@ -49,19 +58,19 @@ const navigation = () => {
       children: [
         {
           title: 'Xem trực tiếp',
-          path: 'vms/live-view-p2p'
+          path: '/vms/cameraGroup'
         },
         {
           title: 'Xem trực tiếp 2',
-          path: 'vms/live-view-p2p-private'
+          path: '/vms/live-view-p2p-private'
         },
         {
           title: 'Xem lại',
-          path: 'vms/playback-camera'
+          path: '/vms/playback-camera'
         },
         {
           title: 'Nhóm camera',
-          path: 'vms/cameraGroup'
+          path: '/cameraGroup'
         },
         {
           title: 'Sự kiện AI',
@@ -69,11 +78,11 @@ const navigation = () => {
         },
         {
           title: 'Sự cố hệ thống',
-          path: 'vms/problems'
+          path: '/vms/problems'
         },
         {
           title: 'Danh sách đen',
-          path: 'vms/black-list'
+          path: '/vms/black-list'
         },
         {
           title: 'Cấu hình camera',
@@ -85,180 +94,18 @@ const navigation = () => {
         },
         {
           title: 'Quản lý lưu trữ',
-          path: 'vms/stores'
+          path: '/vms/stores'
         },
         {
           title: 'Thư viện media',
-          path: 'vms/library'
+          path: '/vms/library'
         },
         {
           title: 'Bản đồ số',
-          path: 'vms/map'
-        },
-      ]
-    },
-    {
-      path: '/caller',
-      title: 'Thuê bao',
-      icon: 'tabler:phone'
-    },
-    {
-      path: '/cards',
-      title: 'Thẻ',
-      icon: 'tabler:cards'
-    },
-    {
-      path: '/vehicle',
-      title: 'Phương tiện',
-      icon: 'tabler:car'
-    },
-    {
-      path: '/service',
-      title: 'Dịch vụ',
-      icon: 'tabler:zoom-money'
-    },
-    {
-      path: '/parking',
-      title: 'Bãi đỗ xe',
-      icon: 'tabler:parking'
-    },
-    {
-      path: '/asset',
-      title: 'Tài sản',
-      icon: 'tabler:moneybag',
-      children: [
-        {
-          title: 'Loại tài sản',
-          path: '/assetType'
-        },
-        {
-          title: 'Tài sản',
-          path: '/asset'
+          path: '/vms/map'
         }
       ]
     },
-    {
-      path: '/pages/report-month/list',
-      title: 'Báo cáo tháng',
-      icon: 'tabler:id'
-    },
-    {
-      path: '/pages/face_management/list',
-      title: 'Quản lý khuôn mặt',
-      icon: 'tabler:users'
-    },
-    {
-      path: '/pages/access-rights/list',
-      title: 'Quyền truy cập',
-      icon: 'tabler:shield'
-    },
-    {
-      title: 'Dashboards',
-      icon: 'tabler:smart-home',
-      badgeContent: 'new',
-      badgeColor: 'error',
-      children: [
-        {
-          title: 'Analytics',
-          path: '/dashboards/analytics'
-        },
-        {
-          title: 'CRM',
-          path: '/dashboards/crm'
-        },
-        {
-          title: 'eCommerce',
-          path: '/dashboards/ecommerce'
-        }
-      ]
-    },
-    {
-      sectionTitle: 'Apps & Pages'
-    },
-    {
-      title: 'Email',
-      icon: 'tabler:mail',
-      path: '/apps/email'
-    },
-    {
-      title: 'Chat',
-      icon: 'tabler:messages',
-      path: '/apps/chat'
-    },
-    {
-      title: 'Calendar',
-      icon: 'tabler:calendar',
-      path: '/apps/calendar'
-    },
-    {
-      title: 'Invoice',
-      icon: 'tabler:file-dollar',
-      children: [
-        {
-          title: 'List',
-          path: '/apps/invoice/list'
-        },
-        {
-          title: 'Preview',
-          path: '/apps/invoice/preview'
-        },
-        {
-          title: 'Edit',
-          path: '/apps/invoice/edit'
-        },
-        {
-          title: 'Add',
-          path: '/apps/invoice/add'
-        }
-      ]
-    },
-    {
-      title: 'User',
-      icon: 'tabler:user',
-      children: [
-        {
-          title: 'Người dùng',
-          icon: 'tabler:user',
-          path: '/apps/user/list'
-        },
-        {
-          title: 'Cơ cấu tổ chức',
-          icon: 'tabler:users',
-          path: 'broadcast/local'
-        },
-        {
-          title: 'Vai Trò',
-          icon: 'tabler:users',
-          path: '/list-policy'
-        }
-
-      ]
-
-    },
-    {
-      title: 'Quản lý hệ thống',
-      path: '/alert-management',
-      icon: 'tabler:settings-automation',
-      children: [
-        {
-          title: 'Quản lý thiết bị',
-          path: '/access-control/devices'
-        },
-        {
-          title: 'Cảnh báo hệ thống',
-          path: '/alert-management'
-        },
-        {
-          title: 'OTA',
-          path: '/ota'
-        },
-        {
-          title: 'Logs',
-          path: '/logs'
-        }
-      ]
-    },
-
 
     // {
     //   path: '/caller',
@@ -300,7 +147,157 @@ const navigation = () => {
     //     }
     //   ]
     // },
+    // {
+    //   path: '/pages/report-month/list',
+    //   title: 'Báo cáo tháng',
+    //   icon: 'tabler:id'
+    // },
 
+    // {
+    //   title: 'Dashboards',
+    //   icon: 'tabler:smart-home',
+    //   badgeContent: 'new',
+    //   badgeColor: 'error',
+    //   children: [
+    //     {
+    //       title: 'Analytics',
+    //       path: '/dashboards/analytics'
+    //     },
+    //     {
+    //       title: 'CRM',
+    //       path: '/dashboards/crm'
+    //     },
+    //     {
+    //       title: 'eCommerce',
+    //       path: '/dashboards/ecommerce'
+    //     }
+    //   ]
+    // },
+    // {
+    //   sectionTitle: 'Apps & Pages'
+    // },
+    // {
+    //   title: 'Email',
+    //   icon: 'tabler:mail',
+    //   path: '/apps/email'
+    // },
+    // {
+    //   title: 'Chat',
+    //   icon: 'tabler:messages',
+    //   path: '/apps/chat'
+    // },
+    // {
+    //   title: 'Calendar',
+    //   icon: 'tabler:calendar',
+    //   path: '/apps/calendar'
+    // },
+    // {
+    //   title: 'Invoice',
+    //   icon: 'tabler:file-dollar',
+    //   children: [
+    //     {
+    //       title: 'List',
+    //       path: '/apps/invoice/list'
+    //     },
+    //     {
+    //       title: 'Preview',
+    //       path: '/apps/invoice/preview'
+    //     },
+    //     {
+    //       title: 'Edit',
+    //       path: '/apps/invoice/edit'
+    //     },
+    //     {
+    //       title: 'Add',
+    //       path: '/apps/invoice/add'
+    //     }
+    //   ]
+    // },
+    {
+      title: 'User',
+      icon: 'tabler:user',
+      children: [
+        {
+          title: 'Người dùng',
+          icon: 'tabler:user',
+          path: '/apps/user/list'
+        },
+        {
+          title: 'Cơ cấu tổ chức',
+          icon: 'tabler:users',
+          path: 'broadcast/local'
+        },
+        {
+          title: 'Vai Trò',
+          icon: 'tabler:users',
+          path: '/list-policy'
+        }
+      ]
+    },
+    {
+      title: 'Quản lý hệ thống',
+      path: '/alert-management',
+      icon: 'tabler:settings-automation',
+      children: [
+        {
+          title: 'Quản lý thiết bị',
+          path: '/access-control/devices'
+        },
+        {
+          title: 'Cảnh báo hệ thống',
+          path: '/alert-management'
+        },
+        {
+          title: 'OTA',
+          path: '/ota'
+        },
+        {
+          title: 'Logs',
+          path: '/logs'
+        }
+      ]
+    }
+
+    // {
+    //   path: '/caller',
+    //   title: 'Thuê bao',
+    //   icon: 'tabler:phone'
+    // },
+    // {
+    //   path: '/cards',
+    //   title: 'Thẻ',
+    //   icon: 'tabler:cards'
+    // },
+    // {
+    //   path: '/vehicle',
+    //   title: 'Phương tiện',
+    //   icon: 'tabler:car'
+    // },
+    // {
+    //   path: '/service',
+    //   title: 'Dịch vụ',
+    //   icon: 'tabler:zoom-money'
+    // },
+    // {
+    //   path: '/parking',
+    //   title: 'Bãi đỗ xe',
+    //   icon: 'tabler:parking'
+    // },
+    // {
+    //   path: '/asset',
+    //   title: 'Tài sản',
+    //   icon: 'tabler:moneybag',
+    //   children: [
+    //     {
+    //       title: 'Loại tài sản',
+    //       path: '/assetType'
+    //     },
+    //     {
+    //       title: 'Tài sản',
+    //       path: '/asset'
+    //     }
+    //   ]
+    // },
 
     // {
     //   title: 'Dashboards',

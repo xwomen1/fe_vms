@@ -320,10 +320,10 @@ const Img = React.memo(props => {
                                         onClick={exportToExcel} >
                                             <Icon icon="tabler:file-export" />
                                         </IconButton>
-                                        <IconButton aria-label='Thêm mới' color='primary'
+                                        <IconButton aria-label='Thêm mới'
                                         component={Link}
                                         href={`/pages/face_management/detail/add`}
-                                        sx={{ color: 'blue' }}
+                                        color='primary'
                                         >
                                             <Icon icon="tabler:square-plus" />
                                         </IconButton>
@@ -368,12 +368,12 @@ const Img = React.memo(props => {
                     />
                     <Grid item xs={12}>
                         <Table>
-                           < TableHead>
+                           < TableHead style={{background:'#f6f6f7'}}>
                                 <TableRow>
                                     <TableCell>
                                     <Checkbox
-                                                     onChange={handleSelectAllChange}
-                                                     checked={selectAll}
+                                      onChange={handleSelectAllChange}
+                                      checked={selectAll}
                                      />
                                     </TableCell>
                                     <TableCell sx={{ padding: '16px' }}>STT</TableCell>
