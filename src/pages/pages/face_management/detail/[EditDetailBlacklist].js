@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import Swal from 'sweetalert2'
 import CustomTextField from "src/@core/components/mui/text-field";
 import FileUploader from 'devextreme-react/file-uploader';
+import Icon from 'src/@core/components/icon'
 import ModalImage from '../ModalImage';
 import Link from 'next/link'
 import {
@@ -18,8 +19,6 @@ import {
     Input,
     TextareaAutosize
 } from "@mui/material";
-import Icon from 'src/@core/components/icon';
-import Fullscreen from '@material-ui/icons/Fullscreen';
 
 const EditFaceManagement = () => {
 
@@ -33,14 +32,12 @@ const EditFaceManagement = () => {
     const listFileUrl = [];
     const [listFileUpload, setListFileUpload] = useState([]);
     const [fileAvatarImg, setFileAvatarImg] = useState(null);
-    const [showCropper, setShowCopper] = useState(false);
     const [fileAvatarId, setFileAvatarId] = useState(null);
     const [name, setName] = useState(null);
     const [note, setNote] = useState(null);
     const fileUploader1 = useRef(null);
     const fileUploader2 = useRef(null);
     const [showLoading, setShowLoading] = useState(false);
-    const [isDoubleClick, setIsDoubleClick] = useState(false);
     const ALLOWED_FILE_EXTENSIONS = ['.jpg', '.jpeg', '.gif', '.png'];
     const [modalImage, setModalImage] = useState(null);
     const [img0, setImg0] = useState(null);
@@ -49,7 +46,6 @@ const EditFaceManagement = () => {
     const [img3, setImg3] = useState(null);
     const [img4, setImg4] = useState(null);
 
-    console.log(id,'id'); 
 
     const buildUrlWithToken = url => {
         const token = localStorage.getItem(authConfig.storageTokenKeyName);
@@ -71,49 +67,6 @@ const EditFaceManagement = () => {
         setListImage(listImg);
     }, [listFileId]);
 
-    // useEffect(() => {
-    //     if (!showCropper) {
-    //         setIsDoubleClick(false);
-    //     }
-    // }, [showCropper]);
-    // const fileListToBase64 = async (fileList) => {
-    //     function getBase64(file) {
-    //         const reader = new FileReader();
-    //         return new Promise((resolve) => {
-    //             reader.onload = (ev) => {
-    //                 resolve(ev.target.result);
-    //             };
-    //             reader.readAsDataURL(file);
-    //         });
-    //     }
-    //     const promises = [];
-    //     for (let i = 0; i < fileList.length; i++) {
-    //         promises.push(getBase64(fileList[i]));
-    //     }
-    //     const data = await Promise.all(promises);
-    //     return data;
-    // };
-    // useEffect(() => {
-    //     async function fetchData() {
-    //         const arrayOfBase64 = await fileListToBase64(listFileUpload);
-    //         setListImage(arrayOfBase64);
-    //     }
-
-    //     if (listFileUpload.length > 0) {
-    //         fetchData();
-    //     }
-    // }, [listFileUpload]);
-    // const invalidPopup = () => (
-    //     <InvaliteImagePopup
-    //         onClose={() => {
-    //             setShowInvalidImagePopup(null);
-    //         }}
-    //         title={showInvalidImagePopup.title}
-    //         content={showInvalidImagePopup.content}
-    //         txtButton="Đồng ý"
-    //     />
-    // );
-
     const onDragDropImage = async (e) => {
         if (e.value.length > 0) {
             if (e.value.length + listFileUpload.length > 5) {
@@ -133,17 +86,11 @@ const EditFaceManagement = () => {
             } else {
 
                 const files = listFileUpload.concat(e.value);
-                console.log(files, 'files');
 
-                // call API validate file
                 const formData = new FormData();
 
-                console.log(formData, 'formData');
-
-                // eslint-disable-next-line no-restricted-syntax
                 for (const file of files) {
                     formData.append('files', file);
-                    console.log(file, 'file');
                 }
                 setShowLoading(true);
 
@@ -159,13 +106,10 @@ const EditFaceManagement = () => {
 
                     const res = await axios.post(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/upload/multi`, formData, config);
                     setListFileUpload(files);
-                    console.log(res.data, 'res');
     
                     const fileIds = res.data.data.map((x) => x.id);
-                    console.log(fileIds, 'fileIds');
     
                     const arr = [...listFileId, ...fileIds];
-                    console.log(arr, 'arr');
     
                     setListFileId([...arr].slice(0, 5));
                 } catch (error) {
@@ -202,9 +146,6 @@ const EditFaceManagement = () => {
             };
 
             if (id) { 
-
-                // Thêm điều kiện kiểm tra id tồn tại trước khi gửi yêu cầu
-                
                 const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${id}`, config);
                 const imgs = [...response.data.data.imgs];
                 setFileAvatarId(response.data.data.mainImageId);
@@ -219,7 +160,6 @@ const EditFaceManagement = () => {
                 setImg4(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[4]?.id}`));
                 setName(response.data.data.name);
                 setNote(response.data.data.note);
-                console.log(imgs);
             }
         } catch (error) {
 
@@ -249,8 +189,6 @@ const EditFaceManagement = () => {
 
                 if (id) { 
 
-                    // Thêm điều kiện kiểm tra id tồn tại trước khi gửi yêu cầu
-                    
                     const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${id}`, config);
                     const imgs = [...response.data.data.imgs];
                     setFileAvatarId(response.data.data.mainImageId);
@@ -264,7 +202,7 @@ const EditFaceManagement = () => {
                     setImg3(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[3]?.id}`));
                     setImg4(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[4]?.id}`));
                     setName(response.data.data.name);
-                    console.log(imgs);
+                    setNote(response.data.data.note);
                 }
             } catch (error) {
 
@@ -277,8 +215,6 @@ const EditFaceManagement = () => {
 
         fetchFilteredOrAllUsers();
     }, [id]); 
-
-    console.log(name);
 
    const handleUpdate = async () =>{
         setLoading(true);
@@ -376,7 +312,6 @@ const EditFaceManagement = () => {
                                             style={{
                                                 fontSize: '18px',
                                                 lineHeight: '22px',
-                                                color: 'rgba(0, 0, 0, 0.6)',
                                                 margin: '0px',
                                             }}
                                         >
@@ -408,7 +343,6 @@ const EditFaceManagement = () => {
                                                 border: '1px solid rgba(0, 0, 0, 0.12)',
                                                 borderRadius: '10px',
                                                 marginTop:'10px',
-                                                background: '#FFFFFF',
                                                 textAlign:'center',
                                             }}
                                         >
@@ -430,18 +364,14 @@ const EditFaceManagement = () => {
                                 <div
                                 style={{
                                     marginLeft:'300px',
-                                    width:'940px',
+                                    width:'65%',
                                     marginTop:'-265px'
-                                    
-                                    // height:'250px',
-                                    // border: '1px solid rgba(0, 0, 0, 0.12)',
                                 }}
                                 >
                                      <p
                                             style={{
                                                 fontSize: '18px',
                                                 lineHeight: '22px',
-                                                color: 'rgba(0, 0, 0, 0.6)',
                                                 margin: '0px',
                                             }}
                                         >
@@ -455,11 +385,11 @@ const EditFaceManagement = () => {
                                     style={{
                                         border: '1px solid rgba(0, 0, 0, 0.12)',
                                         borderRadius: '10px',
-                                        width:'950px'
+                                        width:'100%'
                                     }}
                                     defaultValue=''
                                     placeholder='  Nhập ghi chú ...!'
-                                    value={note || ''}
+                                    value={` ${note}` || ''}
                                     onInput={(e) => {
                                         setNote(e.target.value);
                                     }}
@@ -510,7 +440,6 @@ const EditFaceManagement = () => {
                                                         style={{
                                                             fontSize: '16px',
                                                             lineHeight: '19px',
-                                                            color: 'rgba(37, 37, 37, 0.6)',
                                                         }}
                                                     >
                                                         {`Kéo thả ảnh`}
@@ -519,7 +448,6 @@ const EditFaceManagement = () => {
                                                         style={{
                                                             fontSize: '16px',
                                                             lineHeight: '19px',
-                                                            color: 'rgba(37, 37, 37, 0.84)',
                                                         }}
                                                     >
                                                         {`Hoặc`}
@@ -557,8 +485,8 @@ const EditFaceManagement = () => {
                                         <div className={classes.cardImageContainer}>
                                             {listImage.length < 5 && (
                                                 <div className="add-btn card-img" id="dropzone-external-2">
-                                                    <div style={{ alignSelf: 'center', margin: 'auto' }}>
-                                                    <img style={{alignSelf: 'center',marginLeft:'100px'}} src="data:image/svg+xml,%3Csvg width='32' height='34' viewBox='0 0 32 34' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M17.9 15.1665H31.7441V18.6665H17.9V33.729H14.1191V18.6665H0.556641V15.1665H14.1191V0.604004H17.9V15.1665Z' fill='black' fill-opacity='0.6'/%3E%3C/svg%3E" alt="" />   
+                                                    <div style={{ alignSelf: 'center', margin: 'auto',marginLeft:'100px' }}>
+                                                    <Icon icon='tabler:plus' />
                                                     </div>
                                                     <FileUploader
                                                         style={{opacity:'0'}}
@@ -603,18 +531,19 @@ const EditFaceManagement = () => {
                                                             setListFileUpload(listFileUploadTmp);
                                                             setListImage(listFileUploadTmp);
                                                         }}
-                                                        style={{color:'blue'}}
-                                                    >
-                                                        -
-                                                    </IconButton>
-                                                    <IconButton
-                                                        className="full"
-                                                        onClick={() => {
-                                                            setModalImage(image);
-                                                        }}
-                                                    >
-                                                        <Fullscreen style={{color:'blue'}} />
-                                                    </IconButton>
+                                                        color='primary'
+                                                        >
+                                                            -
+                                                        </IconButton>
+                                                        <IconButton
+                                                            className="full"
+                                                            color='primary'
+                                                            onClick={() => {
+                                                                setModalImage(image);
+                                                            }}
+                                                        >
+                                                            <Icon icon='tabler:maximize' />
+                                                        </IconButton>
                                                 </div>
                                             ))}
 
@@ -687,7 +616,6 @@ const useStyles = makeStyles(() => ({
     },
     container: {
         padding: '30px 50px 0px 50px',
-        background: '#FFFFFF',
         boxShadow: '0px 6px 18px rgba(0, 0, 0, 0.06)',
         borderRadius: '10px',
     },
@@ -754,7 +682,6 @@ const useStyles = makeStyles(() => ({
             top: '10px',
             width:'25px',
             right: '5px',
-            color: '#000',
             backgroundColor: '#fff',
             '& .MuiIconButton-label': {
                 width: '24px',
@@ -772,7 +699,6 @@ const useStyles = makeStyles(() => ({
             bottom: '5px',
             width:'25px',
             height:'25px',
-            color: '#000',
             backgroundColor: '#fff',
             '& .MuiIconButton-label': {
                 width: '24px',

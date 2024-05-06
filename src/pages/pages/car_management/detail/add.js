@@ -12,9 +12,9 @@ import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import authConfig from 'src/configs/auth';
 import Swal from 'sweetalert2';
-import Icon from 'src/@core/components/icon'
 import FileUploader from 'devextreme-react/file-uploader';
 import ModalImage from '../ModalImage';
+import Icon from 'src/@core/components/icon'
 import ImageCropper from '../ImageCropperPopup';
 import Link from 'next/link';
 
@@ -26,13 +26,13 @@ const AddFaceManagement = () => {
     const [modalImage, setModalImage] = useState(null);
     const [listFileId, setListFileId] = useState([]);
     const listFileUrl = [];
-    const [isNameEntered, setIsNameEntered] = useState(false);
     const [listImage, setListImage] = useState([]);
     const [fileAvatarId, setFileAvatarId] = useState(null);
     const [listFileUpload, setListFileUpload] = useState([]);
     const [name, setName] = useState(null);
     const [note, setNote] = useState(null);
     const [showCropper, setShowCopper] = useState(false);
+    const [isNameEntered, setIsNameEntered] = useState(false);
     const fileUploader1 = useRef(null);
     const fileUploader2 = useRef(null);
     const [avatarImage, setAvatarImage] = useState(null);
@@ -170,7 +170,9 @@ const AddFaceManagement = () => {
 
                 const files = listFileUpload.concat(e.value);
 
+
                 const formData = new FormData();
+
 
                 for (const file of files) {
                     formData.append('files', file);
@@ -234,9 +236,9 @@ const AddFaceManagement = () => {
           })),
                 note:note,
             }
-            await axios.post(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist`,params,config)
+            await axios.post(`https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates`,params,config)
             Swal.fire('Thêm đối tượng thành công', '', 'success')
-            window.location.href = '/pages/face_management/list';
+            window.location.href = '/pages/car_management/list';
         } catch (error) {
             Swal.fire('Đã xảy ra lỗi', error.message, 'error')
 
@@ -251,7 +253,7 @@ const AddFaceManagement = () => {
             <Grid item xs={12}>
                 <Card>
                 <CardHeader
-                            title='Thêm mới đối tượng'
+                            title='Thêm mới biển số xe'
                             titleTypographyProps={{ sx: { mb: [2, 0] } }}
                             action={
                                 <Grid container spacing={2}>
@@ -262,7 +264,7 @@ const AddFaceManagement = () => {
                                             color:'#000000',
                                             right:'20px'}}
                                             component={Link}
-                                            href={`/pages/face_management/list`}
+                                            href={`/pages/car_management/list`}
                                             sx={{ color: 'blue' }}
                                              >
                                             Hủy
@@ -354,7 +356,6 @@ const AddFaceManagement = () => {
                                 defaultValue=""
                                 mode="text"
                                 style={{
-                                    background: '#FFFFFF',
                                     border: '1px solid rgba(0, 0, 0, 0.12)',
                                     borderRadius: '4px',
                                     marginTop: '10px',
@@ -399,7 +400,6 @@ const AddFaceManagement = () => {
                                     id='textarea-standard-static'
                                     />
                                 </div>
-
                             <div style={{ color: 'red', float: 'left', position: 'absolute', bottom: '50% ', left: '50%', fontSize: 20 }}>
                                 {`Nhấn đúp chuột vào ảnh để tạo Avatar`}
                             </div>
@@ -452,7 +452,6 @@ const AddFaceManagement = () => {
                                         style={{
                                         fontSize: '16px',
                                         lineHeight: '19px',
-                                        color: 'rgba(37, 37, 37, 0.6)',
                                         }}
                                     >
                                         {`Kéo thả ảnh`}
@@ -461,7 +460,6 @@ const AddFaceManagement = () => {
                                         style={{
                                         fontSize: '16px',
                                         lineHeight: '19px',
-                                        color: 'rgba(37, 37, 37, 0.84)',
                                         }}
                                     >
                                         {`Hoặc`}
@@ -473,7 +471,6 @@ const AddFaceManagement = () => {
                                         borderRadius: '8px',
                                         width: '104px',
                                         height: '40px',
-
                                         border: 'none',
                                         color: '#fff',
                                         }}
@@ -570,8 +567,8 @@ const useStyles = makeStyles(() => ({
         '& .dx-button-content': { display: 'block' },
     },
     container: {
+        width:'100%',
         padding: '30px 50px 0px 50px',
-        background: '#FFFFFF',
         boxShadow: '0px 6px 18px rgba(0, 0, 0, 0.06)',
         borderRadius: '10px',
     },

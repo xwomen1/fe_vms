@@ -1,5 +1,4 @@
 import React, {Fragment, useEffect, useState } from 'react';
-import { TabContext, TabList, TabPanel } from "@mui/lab"
 import {
     Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Tab, TableContainer, Paper,
     Table, TableHead, TableRow, TableCell, TableBody, Pagination, Menu, MenuItem, Dialog, DialogContent,
@@ -23,7 +22,6 @@ const FaceManagement=() => {
     const [selectedIds, setSelectedIds] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
     const [userData, setUserData] = useState([]);
-    const [selectedRows, setSelectedRows] = useState([]);
     const [loading, setLoading] = useState(false)
     const [listImage, setListImage] = useState([]);
     const [isDeleteDisabled, setIsDeleteDisabled] = useState(true);
@@ -55,7 +53,6 @@ const FaceManagement=() => {
         }
         setSelectedIds(updatedIds);
         setIsDeleteDisabled(updatedIds.length === 0);
-        console.log(updatedIds,'updatedIds');   
     };
     
     const handleSelectAllChange = (event) => {
@@ -130,8 +127,6 @@ const FaceManagement=() => {
                 time: item.time,
             }));
 
-            console.log(data,'data');
-
             const exportData = [
                 ['Mã ảnh', 'Tên', 'Lần cuối xuất hiện'],
                 ...data.map(item => [item.mainImageId, item.name, item.time]),
@@ -144,6 +139,7 @@ const FaceManagement=() => {
             const fileName = 'Danh sách đen.xlsx';
             XLSX.writeFile(wb, fileName);
         } catch (error) {
+
             console.error('Error exporting to Excel:', error);
             toast.error(error)
         } finally {
@@ -172,48 +168,43 @@ const FaceManagement=() => {
     return Swal.fire({ ...defaultProps, ...options })
   }
 
-useEffect(() => {
-
+  useEffect(() => {
     const fetchFilteredOrAllUsers = async () => {
-        setLoading(true)
+        setLoading(true);
         try {
+            const token = localStorage.getItem(authConfig.storageTokenKeyName);
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
+                params: {
+                    keyword: keyword,
+                    page: valueFilter.page,
+                    limit: valueFilter.limit,
+                }
+            };
 
-          const token = localStorage.getItem(authConfig.storageTokenKeyName)
-  
-          const config = {
-            headers: {
-              Authorization: `Bearer ${token}`
-            },
-            params: {
-                keyword: keyword,
-                page: valueFilter.page,
-                limit: valueFilter.limit,
+            const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/blacklist?sort=%2Bcreated_at&page=1', config)
+            if (response.data.data && response.data.data.length > 0) {
+                setUserData(response.data.data);
+                const imageFaces = response.data.data[0].mainImageUrl;
+                setListImage(imageFaces);
+            } else {
+                setUserData([]);
+                setListImage(null);
             }
-          }
-         console.log(token,'token');
-          const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/blacklist?sort=%2Bcreated_at&page=1', config)
-          setUserData(response.data.data)
-          const imageFaces = response.data.data[0].mainImageUrl;
-          console.log(imageFaces,'imageFaces');
-          setListImage(imageFaces)
-
-        //   const centerFace = imageFaces.find((face) => face.faceType === 'CENTER');
-        //   if (centerFace) {
-        //     imageUrls.push(centerFace.imageFileUrl);
-        //   }
-
-          console.log(response.data.data,'response.data');
         } catch (error) {
-            console.error('Error fetching data:', error)
-            toast.error(error)
+          
+            console.error('Error fetching data:', error);
+            toast.error(error);
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
+    };
 
     fetchFilteredOrAllUsers();
+}, [keyword]);
 
-},[keyword])
 
 const handleDelete = idDelete => {
     showAlertConfirm({
@@ -307,26 +298,41 @@ const Img = React.memo(props => {
                             <Grid container spacing={2}>
                                 <Grid item>
                                     <Box sx={{ float: 'right' }}>
-                                        <IconButton 
+                                    <Button 
                                          aria-label='Xóa'
-                                         color='primary'
+                                         style={{
+                                            background:'#a9a9a9',
+                                            color:'#ffffff',
+                                            marginRight:'5px',
+                                        }}
+
                                          disabled={isDeleteDisabled}
-                                         onClick={handleDeleteSelected} >
+                                         onClick={handleDeleteSelected}
+                                          >
                                             <Icon icon="tabler:trash" />
-                                        </IconButton>
-                                        <IconButton
+                                        </Button>
+                                        <Button
                                         aria-label='export file'
-                                        color='primary'
-                                        onClick={exportToExcel} >
+                                        style={{
+                                            background:'#a9a9a9',
+                                            color:'#ffffff',
+                                            marginRight:'5px',
+                                        }}
+
+                                        onClick={exportToExcel}
+                                         >
                                             <Icon icon="tabler:file-export" />
-                                        </IconButton>
-                                        <IconButton aria-label='Thêm mới'
+                                        </Button>
+                                        <Button
+                                        variant='contained'
+                                        style={{
+                                          
+                                        }}
                                         component={Link}
                                         href={`/pages/face_management/detail/add`}
-                                        color='primary'
                                         >
-                                            <Icon icon="tabler:square-plus" />
-                                        </IconButton>
+                                            <Icon icon="tabler:plus" />Thêm mới
+                                        </Button>
                                     </Box>
                                 </Grid>
                                 <Grid item>
@@ -368,7 +374,7 @@ const Img = React.memo(props => {
                     />
                     <Grid item xs={12}>
                         <Table>
-                           < TableHead style={{background:'#f6f6f7'}}>
+                           < TableHead>
                                 <TableRow>
                                     <TableCell>
                                     <Checkbox
@@ -385,45 +391,52 @@ const Img = React.memo(props => {
                                 </TableRow>
                            </TableHead>
                            <TableBody>
-                           {Array.isArray(userData) && userData.map((user, index) => (
-                            console.log(user.mainImageUrl),
-                                <TableRow key={user.id}>
-                                    <TableCell>
-                                    <Checkbox
+                                {Array.isArray(userData) && userData.length > 0 ? (
+                                    userData.map((user, index) => (
+                                        <TableRow key={user.id}>
+                                            <TableCell>
+                                                <Checkbox
                                                     onChange={(event) => handleCheckboxChange(event, user.id)}
                                                     checked={selectedIds.includes(user.id)}
-                                     />
-                                    </TableCell>
-                                    <TableCell>{index + 1}</TableCell>
-                                    <TableCell>
-                                    <Img
-                                            src={buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${user.mainImageId}`)}
-                                            style={{ maxWidth: '91px', height: '56px', minWidth: '56px' }}
-                                        />
-                                    </TableCell>
-                                    <TableCell>{user.name}</TableCell>
-                                    <TableCell>{user.lastAppearance}</TableCell>
-                                    <TableCell>
-                                        <Button
-                                            size='small'
-                                            component={Link}
-                                            href={`/pages/face_management/detail/${user.id}`}
-                                            sx={{ color: 'blue',left:'45px'}}
-                                        >
-                                            Xem chi tiết
-                                        </Button>
-                                    </TableCell>
-                                    <TableCell sx={{ padding: '16px' }}>
-                                        <Grid container spacing={2}>
-                                        <IconButton
-                                        onClick={() => handleDelete(user.id)}
-                                         >
-                                            <Icon icon='tabler:trash' />
-                                        </IconButton>
-                                        </Grid>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
+                                                />
+                                            </TableCell>
+                                            <TableCell>{index + 1}</TableCell>
+                                            <TableCell>
+                                                <Img
+                                                    src={buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${user.mainImageId}`)}
+                                                    style={{ maxWidth: '91px', height: '56px', minWidth: '56px' }}
+                                                />
+                                            </TableCell>
+                                            <TableCell>{user.name}</TableCell>
+                                            <TableCell>{user.lastAppearance}</TableCell>
+                                            <TableCell>
+                                                <Button
+                                                    size='small'
+                                                    component={Link}
+                                                    href={`/pages/face_management/detail/${user.id}`}
+                                                    sx={{ color: 'blue', left: '45px' }}
+                                                >
+                                                    Xem chi tiết
+                                                </Button>
+                                            </TableCell>
+                                            <TableCell sx={{ padding: '16px' }}>
+                                                <Grid container spacing={2}>
+                                                    <IconButton
+                                                        onClick={() => handleDelete(user.id)}
+                                                    >
+                                                        <Icon icon='tabler:trash' />
+                                                    </IconButton>
+                                                </Grid>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={7} align="center">
+                                            Không có dữ liệu
+                                        </TableCell>
+                                    </TableRow>
+                                )}
                             </TableBody>
                         </Table>
                     </Grid>
