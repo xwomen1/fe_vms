@@ -9,8 +9,8 @@ import { styled } from '@mui/material/styles'
 import MuiTabList from '@mui/lab/TabList'
 import authConfig from 'src/configs/auth'
 import axios from 'axios'
-import TCP from './TCP-IP'
-import DDNs from './DDNS'
+import Camera from './Camera'
+import Channel from './Channel'
 import Port from './Port'
 import NTP from './NTP'
 
@@ -66,69 +66,23 @@ const RolePopup = ({ open, onClose, onSelect, nvr }) => {
   const handleCancel = () => {
     onClose()
   }
-  useEffect(() => {
-    const fetchGroupData = async () => {
-      try {
-        const token = localStorage.getItem(authConfig.storageTokenKeyName)
-        console.log('token', token)
-
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-
-        const response = await axios.get(
-          `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/config/networkconfig/{idNVR}?idNVR=${nvr}`,
-          config
-        )
-
-        setNvrs(response.data.data)
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
-    }
-
-    fetchGroupData()
-  }, [])
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Cấu hình mạng</DialogTitle>
-      <DialogContent>
-        <TabContext value={value}>
-          <Grid>
-            {' '}
-            <TabList onChange={handleChange} aria-label='customized tabs example'>
-              <Tab value='1' label='TCP/IP' />
-              <Tab value='2' label='DNS' />
-              <Tab value='3' label='PORT' />
-              <Tab value='4' label='NTP' />
-            </TabList>
-          </Grid>
-          <TabPanel value='1'>
-            {' '}
-            <TCP nvrs={nvrs} />
-          </TabPanel>
-          <TabPanel value='2'>
-            {' '}
-            <DDNs nvrs={nvrs} />
-          </TabPanel>
-          <TabPanel value='3'>
-            {' '}
-            <Port nvrs={nvrs} />
-          </TabPanel>
-          <TabPanel value='4'>
-            {' '}
-            <NTP nvrs={nvrs} />
-          </TabPanel>
-        </TabContext>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCancel}>Cancel</Button>
-        <Button>OK</Button>
-      </DialogActions>
-    </Dialog>
+    <TabContext value={value}>
+      <Grid>
+        {' '}
+        <TabList onChange={handleChange} aria-label='customized tabs example'>
+          <Tab value='1' label='Lich ghi' />
+          <Tab value='2' label='Chat luong ghi' />
+        </TabList>
+      </Grid>
+      <TabPanel value='1'>
+        <Camera />
+      </TabPanel>
+      <TabPanel value='2'>
+        <Channel />
+      </TabPanel>
+    </TabContext>
   )
 }
 

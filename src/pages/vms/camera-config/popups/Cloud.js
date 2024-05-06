@@ -77,16 +77,14 @@ const RolePopup = ({ open, onClose, onSelect, nvr }) => {
             <TabList onChange={handleChange} aria-label='customized tabs example'>
               <Tab value='1' label='Lich ghi' />
               <Tab value='2' label='Chat luong ghi' />
-            
             </TabList>
           </Grid>
           <TabPanel value='1'>
-            <Camera  />
+            <Camera />
           </TabPanel>
           <TabPanel value='2'>
-            <Channel  />
+            <Channel />
           </TabPanel>
-         
         </TabContext>
       </DialogContent>
       <DialogActions>

@@ -166,11 +166,42 @@ const Add = () => {
 
       return
     }
-    if (!fullNameValue || !email || !phoneNumber || !identityNumber || !userCode || !syncCode || !userGroups) {
-      Swal.fire('Lỗi!', 'Vui lòng điền đầy đủ thông tin.', 'error')
+    if (!fullNameValue) {
+      Swal.fire('Lỗi!', 'Tên không được để trống', 'error')
 
       return
     }
+    if (!email) {
+      Swal.fire('Lỗi!', 'Email không được để trống', 'error')
+
+      return
+    }
+    if (!phoneNumber) {
+      Swal.fire('Lỗi!', 'Số điện thoại không được để trống', 'error')
+
+      return
+    }
+    if (!identityNumber) {
+      Swal.fire('Lỗi!', 'Số giấy tờ không được để trống', 'error')
+
+      return
+    }
+    if (!userCode) {
+      Swal.fire('Lỗi!', 'Mã người dùng không được để trống', 'error')
+
+      return
+    }
+    if (!syncCode) {
+      Swal.fire('Lỗi!', 'Mã đồng bộ không được để trống', 'error')
+
+      return
+    }
+    if (!userGroups) {
+      Swal.fire('Lỗi!', 'Nhóm người dùng không được để trống', 'error')
+
+      return
+    }
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
       Swal.fire('Lỗi!', 'Địa chỉ email không hợp lệ.', 'error')

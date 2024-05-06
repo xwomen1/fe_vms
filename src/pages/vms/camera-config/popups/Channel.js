@@ -57,100 +57,83 @@ const UserList = ({ apiData }) => {
 
     return Swal.fire({ ...defaultProps, ...options })
   }
-  
+
   const createData = (name, ch1, ch2) => {
     return { name, ch1, ch2 }
   }
-  
+
   const assetTypes = [
     createData('Frozen Encoding Paramenter	    ', 'Main Stream(Continuous)    ', 'Main Stream(Event)    '),
-    createData('Stream Type	    ',  <FormControl fullWidth>
-    <InputLabel id='time-validity-label'>Video & Audio</InputLabel>
-    <Select
-      labelId='time-validity-label'
-      id='time-validity-select'
-     
-    >
-      <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
-      <MenuItem value='Undefined'>Không xác định</MenuItem>
-    </Select>
-  </FormControl>, <FormControl fullWidth>
-    <InputLabel id='time-validity-label'>Video & Audio</InputLabel>
-    <Select
-      labelId='time-validity-label'
-      id='time-validity-select'
-     
-    >
-      <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
-      <MenuItem value='Undefined'>Không xác định</MenuItem>
-    </Select>
-  </FormControl>),
-    createData('Resolution',  <FormControl fullWidth>
-    <InputLabel id='time-validity-label'>1920'1090(1080P)</InputLabel>
-    <Select
-      labelId='time-validity-label'
-      id='time-validity-select'
-     
-    >
-      <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
-      <MenuItem value='Undefined'>Không xác định</MenuItem>
-    </Select>
-  </FormControl>,  <FormControl fullWidth>
-    <InputLabel id='time-validity-label'>1920'1080(1080P)</InputLabel>
-    <Select
-      labelId='time-validity-label'
-      id='time-validity-select'
-     
-    >
-      <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
-      <MenuItem value='Undefined'>Không xác định</MenuItem>
-    </Select>
-  </FormControl>),
-    createData('Bitrate Type',  <FormControl fullWidth>
-    <InputLabel id='time-validity-label'>Constant</InputLabel>
-    <Select
-      labelId='time-validity-label'
-      id='time-validity-select'
-     
-    >
-      <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
-      <MenuItem value='Undefined'>Không xác định</MenuItem>
-    </Select>
-  </FormControl>,  <FormControl fullWidth>
-    <InputLabel id='time-validity-label'>Constant</InputLabel>
-    <Select
-      labelId='time-validity-label'
-      id='time-validity-select'
-     
-    >
-      <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
-      <MenuItem value='Undefined'>Không xác định</MenuItem>
-    </Select>
-  </FormControl>),
-    createData('Max. Bitrate Range Reacommender',  <FormControl fullWidth>
-    <InputLabel id='time-validity-label'>3840~6400(kbps)</InputLabel>
-    <Select
-      labelId='time-validity-label'
-      id='time-validity-select'
-     
-    >
-      <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
-      <MenuItem value='Undefined'>Không xác định</MenuItem>
-    </Select>
-  </FormControl>, <FormControl fullWidth>
-    <InputLabel id='time-validity-label'>3840~6400(kbps)</InputLabel>
-    <Select
-      labelId='time-validity-label'
-      id='time-validity-select'
-     
-    >
-      <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
-      <MenuItem value='Undefined'>Không xác định</MenuItem>
-    </Select>
-  </FormControl>),
-
+    createData(
+      'Stream Type	    ',
+      <FormControl fullWidth>
+        <InputLabel id='time-validity-label'>Video & Audio</InputLabel>
+        <Select labelId='time-validity-label' id='time-validity-select'>
+          <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
+          <MenuItem value='Undefined'>Không xác định</MenuItem>
+        </Select>
+      </FormControl>,
+      <FormControl fullWidth>
+        <InputLabel id='time-validity-label'>Video & Audio</InputLabel>
+        <Select labelId='time-validity-label' id='time-validity-select'>
+          <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
+          <MenuItem value='Undefined'>Không xác định</MenuItem>
+        </Select>
+      </FormControl>
+    ),
+    createData(
+      'Resolution',
+      <FormControl fullWidth>
+        <InputLabel id='time-validity-label'>1920'1090(1080P)</InputLabel>
+        <Select labelId='time-validity-label' id='time-validity-select'>
+          <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
+          <MenuItem value='Undefined'>Không xác định</MenuItem>
+        </Select>
+      </FormControl>,
+      <FormControl fullWidth>
+        <InputLabel id='time-validity-label'>1920'1080(1080P)</InputLabel>
+        <Select labelId='time-validity-label' id='time-validity-select'>
+          <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
+          <MenuItem value='Undefined'>Không xác định</MenuItem>
+        </Select>
+      </FormControl>
+    ),
+    createData(
+      'Bitrate Type',
+      <FormControl fullWidth>
+        <InputLabel id='time-validity-label'>Constant</InputLabel>
+        <Select labelId='time-validity-label' id='time-validity-select'>
+          <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
+          <MenuItem value='Undefined'>Không xác định</MenuItem>
+        </Select>
+      </FormControl>,
+      <FormControl fullWidth>
+        <InputLabel id='time-validity-label'>Constant</InputLabel>
+        <Select labelId='time-validity-label' id='time-validity-select'>
+          <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
+          <MenuItem value='Undefined'>Không xác định</MenuItem>
+        </Select>
+      </FormControl>
+    ),
+    createData(
+      'Max. Bitrate Range Reacommender',
+      <FormControl fullWidth>
+        <InputLabel id='time-validity-label'>3840~6400(kbps)</InputLabel>
+        <Select labelId='time-validity-label' id='time-validity-select'>
+          <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
+          <MenuItem value='Undefined'>Không xác định</MenuItem>
+        </Select>
+      </FormControl>,
+      <FormControl fullWidth>
+        <InputLabel id='time-validity-label'>3840~6400(kbps)</InputLabel>
+        <Select labelId='time-validity-label' id='time-validity-select'>
+          <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
+          <MenuItem value='Undefined'>Không xác định</MenuItem>
+        </Select>
+      </FormControl>
+    )
   ]
-  
+
   const handleOpenMenu = event => {
     setAnchorEl(event.currentTarget)
   }
@@ -171,7 +154,6 @@ const UserList = ({ apiData }) => {
 
   console.log(total, 'totalpage')
 
-
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
@@ -185,9 +167,9 @@ const UserList = ({ apiData }) => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ padding: '16px' }}>Ten</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Cau hinh 1</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Cau hinh 2</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Tên</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Cấu hình 1</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Cấu hình 2</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -196,12 +178,10 @@ const UserList = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{assetType.name}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.ch1}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.ch2}</TableCell>
-                     
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-        
             </Grid>
           </Grid>
         </Card>

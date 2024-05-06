@@ -22,7 +22,7 @@ import TableHeader from 'src/views/apps/vms/camera-config/TableHeader'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import Link from 'next/link'
 import RolePopup from './popups/ChangePassword'
-import Passwords from './popups/PassWord'
+import Passwords from './popups/Edit'
 
 import Network from './popups/Network'
 import Video from './popups/video'
@@ -35,7 +35,6 @@ import VideoConnectCamera from './popups/VideoConnectCamera'
 // import { Password } from '@mui/icons-material'
 
 const Camera = ({ apiData }) => {
-
   const [value, setValue] = useState('')
   const [selectedIds, setSelectedIds] = useState([])
   const [openPopup, setOpenPopup] = useState(false)
@@ -201,7 +200,7 @@ const Camera = ({ apiData }) => {
             Authorization: `Bearer ${token}`
           }
         }
-        let urlDelete = `https://dev-ivi.basesystem.one/smc/smart-parking/api/v0/asset/type/delete/${idDelete}`
+        let urlDelete = `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${idDelete}`
         axios
           .delete(urlDelete, config)
           .then(() => {
@@ -313,20 +312,12 @@ const Camera = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{statusText}</TableCell>
 
                       <TableCell sx={{ padding: '16px' }}>
-                        <Grid container spacing={2}>
-                          <IconButton size='small' onClick={handleAddPClick}>
-                            <Icon icon='tabler:key' />
-                          </IconButton>
-                          <IconButton size='small' onClick={handleAddVideoConnectClick}>
-                            <Icon icon='tabler:camera' />
-                          </IconButton>
-                          <IconButton size='small' onClick={handleAddConnectCameraClick}>
-                            <Icon icon='tabler:link' />
-                          </IconButton>
-                          <IconButton size='small' sx={{ color: 'text.secondary' }}>
-                            <Icon icon='tabler:reload' />
-                          </IconButton>
-                        </Grid>
+                        <IconButton size='small' onClick={handleAddPClick}>
+                          <Icon icon='tabler:edit' />
+                        </IconButton>
+                        <IconButton onClick={() => handleDelete(assetType.id)}>
+                          <Icon icon='tabler:trash' />
+                        </IconButton>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -366,6 +357,21 @@ const Camera = ({ apiData }) => {
             <RolePopup open={openPopup} onClose={handleClosePopup} nvr={selectedIds} />
           </>
         )}
+        {openPopupVideo && (
+          <>
+            <Video open={openPopupVideo} onClose={handleCloseVideoPopup} nvr={selectedIds} />
+          </>
+        )}{' '}
+        {openPopupImage && (
+          <>
+            <Image open={openPopupImage} onClose={handleCloseImagePopup} nvr={selectedIds} />
+          </>
+        )}{' '}
+        {openPopupCloud && (
+          <>
+            <Cloud open={openPopupCloud} onClose={handleCloseCloudPopup} nvr={selectedIds} />
+          </>
+        )}
         {/* {selectedIds.length < 2 && selectedIds.length >= 0 && (
     <>
       <RolePopup open={openPopup} onClose={handleClosePopup} camera={selectedIds} />
@@ -375,9 +381,7 @@ const Camera = ({ apiData }) => {
       <Cloud open={openPopupCloud} onClose={handleCloseCloudPopup} camera={selectedIds} />
     </>
   )} */}
-
         <Passwords open={openPopupP} onClose={handleClosePPopup} camera={selectedIds} />
-
         <ConnectCamera open={openPopupConnectCamera} onClose={handleCloseConnectCameraPopup} camera={selectedIds} />
         <VideoConnectCamera
           open={openPopupVideoConnectCamera}
