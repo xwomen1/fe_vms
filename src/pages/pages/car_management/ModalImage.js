@@ -1,12 +1,23 @@
+/**
+ *
+ * ModalImage
+ *
+ */
+
 import React, { useEffect, useState } from 'react';
 import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 import { Popup } from 'devextreme-react';
 import {
   Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Tab, TableContainer, Paper,
   Table, TableHead, TableRow, TableCell, TableBody, Pagination, Menu, MenuItem, Dialog, DialogContent,
+  DialogActions,
+  Typography,
+  TextField,
+  Input,
+  TextareaAutosize
 } from "@mui/material";
 import Icon from 'src/@core/components/icon'
-import MaskGroup from './list/Imge/NoAvatar.svg';
+import MaskGroup from './Imge/NoAvatar.svg';
 
 function ModalImage({ onClose, imageUrl }) {
   const onDownloadBtnClick = () => {
@@ -62,15 +73,19 @@ function ModalImage({ onClose, imageUrl }) {
                       <IconButton style={{ background:'#fff',width:'40px',height:'40px'}} color='primary' onClick={() => onDownloadBtnClick()}>
                       <Icon icon='tabler:download' />
                       </IconButton>
+
                       <IconButton style={{ background:'#fff',width:'40px',height:'40px'}}  color='primary' onClick={() => zoomIn()}>
                         <Icon icon='tabler:zoom-in' />
                       </IconButton>
+
                       <IconButton style={{ background:'#fff',width:'40px',height:'40px'}} color='primary' onClick={() => zoomOut()}>
                         <Icon icon='tabler:zoom-out' />
                       </IconButton>
+
                       <IconButton style={{ background:'#fff',width:'40px',height:'40px'}} color='primary' onClick={() => resetTransform()}>
                       <Icon icon='tabler:rotate' />
                       </IconButton>
+
                   </Grid>
                 </Grid>
                 <TransformComponent

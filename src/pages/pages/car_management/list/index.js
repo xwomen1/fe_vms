@@ -16,7 +16,7 @@ import * as XLSX from 'xlsx';
 import Checkbox from '@mui/material/Checkbox'
 import Link from 'next/link'
 
-const FaceManagement=() => {
+const Car_management = () => {
 
     const [keyword, setKeyword] = useState('');
     const [selectedIds, setSelectedIds] = useState([]);
@@ -82,7 +82,7 @@ const FaceManagement=() => {
               }
             };
             selectedIds.forEach(idDelete => {
-              let urlDelete = `https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${idDelete}`;
+              let urlDelete = `https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates/${idDelete}`;
               axios
                 .delete(urlDelete, config)
                 .then(() => {
@@ -119,7 +119,7 @@ const FaceManagement=() => {
             }
           }
 
-          const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/blacklist?sort=%2Bcreated_at&page=1', config)
+          const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates?sort=%2Bcreated_at&page=1', config)
 
             const data = response.data.data.map(item => ({
                 mainImageId: item.mainImageId,
@@ -128,18 +128,18 @@ const FaceManagement=() => {
             }));
 
             const exportData = [
-                ['Mã ảnh', 'Tên', 'Lần cuối xuất hiện'],
+                ['Mã ảnh', 'Biển số xe', 'Lần cuối xuất hiện'],
                 ...data.map(item => [item.mainImageId, item.name, item.time]),
             ];
     
             const ws = XLSX.utils.aoa_to_sheet(exportData);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Danh sách đen');
+            XLSX.utils.book_append_sheet(wb, ws, 'Danh biển số');
     
-            const fileName = 'Danh sách đen.xlsx';
+            const fileName = 'Danh sách biển số.xlsx';
             XLSX.writeFile(wb, fileName);
         } catch (error) {
-
+            
             console.error('Error exporting to Excel:', error);
             toast.error(error)
         } finally {
@@ -185,17 +185,21 @@ const FaceManagement=() => {
                 }
             };
 
-            const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/blacklist?sort=%2Bcreated_at&page=1', config)
+            const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates?sort=%2Bcreated_at&page=1', config);
             if (response.data.data && response.data.data.length > 0) {
                 setUserData(response.data.data);
                 const imageFaces = response.data.data[0].mainImageUrl;
+
                 setListImage(imageFaces);
+
             } else {
+
+                console.log("No data returned from the server.");
                 setUserData([]);
-                setListImage(null);
+                setListImage(null); 
             }
         } catch (error) {
-          
+
             console.error('Error fetching data:', error);
             toast.error(error);
         } finally {
@@ -205,7 +209,6 @@ const FaceManagement=() => {
 
     fetchFilteredOrAllUsers();
 }, [keyword]);
-
 
 const handleDelete = idDelete => {
     showAlertConfirm({
@@ -224,7 +227,7 @@ const handleDelete = idDelete => {
             Authorization: `Bearer ${token}`
           }
         }
-        let urlDelete = `https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${idDelete}`
+        let urlDelete = `https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates/${idDelete}`
         axios
           .delete(urlDelete, config)
           .then(() => {
@@ -289,17 +292,17 @@ const Img = React.memo(props => {
         {loading ? (
                 <div>Loading...</div>
             ) : (
-                <Grid container spacing={6.5}>
+            <Grid container spacing={6.5}>
                 <Grid item xs={12}>
                     <Card>
                     <CardHeader
-                        title='Quản lý khuôn mặt'
+                        title='Quản lý Biển số'
                         titleTypographyProps={{ sx: { mb: [2, 0] } }}
                         action={
                             <Grid container spacing={2}>
                                 <Grid item>
                                     <Box sx={{ float: 'right' }}>
-                                    <Button 
+                                        <Button 
                                          aria-label='Xóa'
                                          style={{
                                             background:'#a9a9a9',
@@ -326,11 +329,8 @@ const Img = React.memo(props => {
                                         </Button>
                                         <Button
                                         variant='contained'
-                                        style={{
-                                          
-                                        }}
                                         component={Link}
-                                        href={`/pages/face_management/detail/add`}
+                                        href={`/pages/car_management/detail/add`}
                                         >
                                             <Icon icon="tabler:plus" />Thêm mới
                                         </Button>
@@ -338,6 +338,7 @@ const Img = React.memo(props => {
                                 </Grid>
                                 <Grid item>
                                     <CustomTextField
+
                                         value={keyword}
                                         onChange={(e) => setKeyword(e.target.value)}
                                         placeholder='Search…'
@@ -379,13 +380,14 @@ const Img = React.memo(props => {
                                 <TableRow>
                                     <TableCell>
                                     <Checkbox
+
                                       onChange={handleSelectAllChange}
                                       checked={selectAll}
                                      />
                                     </TableCell>
                                     <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                                    <TableCell sx={{ padding: '16px' }}>Ảnh đối tượng</TableCell>
-                                    <TableCell sx={{ padding: '16px' }}>Tên Đối tượng</TableCell>
+                                    <TableCell sx={{ padding: '16px' }}>Ảnh xe</TableCell>
+                                    <TableCell sx={{ padding: '16px' }}>Biển số xe</TableCell>
                                     <TableCell sx={{ padding: '16px' }}>Lần cuối xuất hiện</TableCell>
                                     <TableCell sx={{ padding: '16px',textAlign:'center' }}>Chi tiết</TableCell>
                                     <TableCell sx={{ padding: '16px' }}>Xóa</TableCell>
@@ -414,7 +416,7 @@ const Img = React.memo(props => {
                                                 <Button
                                                     size='small'
                                                     component={Link}
-                                                    href={`/pages/face_management/detail/${user.id}`}
+                                                    href={`/pages/car_management/detail/${user.id}`}
                                                     sx={{ color: 'blue', left: '45px' }}
                                                 >
                                                     Xem chi tiết
@@ -444,11 +446,9 @@ const Img = React.memo(props => {
                     </Card>
                 </Grid>
             </Grid>
-            )}
+                )}
         </>
     );
-    
 }
 
-
-export default FaceManagement
+export default Car_management
