@@ -11,11 +11,8 @@ import authConfig from 'src/configs/auth'
 import axios from 'axios'
 import TCP from './TCP-IP'
 import DDNs from './DDNS'
-import Networks from './Networks'
-import Passwords from './PassWord'
-import Video from './VideoCameraa'
-import Image from './ImageCamera'
-import Cloud from './CloudCamera'
+import Port from './Port'
+import NTP from './NTP'
 
 import {
   Autocomplete,
@@ -53,7 +50,7 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
 }))
 import Swal from 'sweetalert2'
 
-const Edit = ({ open, onClose, onSelect, camera }) => {
+const Network = ({ open, onClose, onSelect, camera }) => {
   const [selectedRole, setSelectedRole] = useState(null)
   const [groupName, setGroupName] = useState([])
   const [defaultGroup, setDefaultGroup] = useState(null)
@@ -61,16 +58,11 @@ const Edit = ({ open, onClose, onSelect, camera }) => {
   const [cameras, setCamera] = useState([])
   const [nic, setNic] = useState([])
   const [value, setValue] = useState('1')
-  const [value1, setValue1] = useState('1')
 
   const handleChange = (event, newValue) => {
     setValue(newValue)
   }
-
-  const handleChange1 = (event, newValue) => {
-    setValue1(newValue)
-  }
-  console.log(camera, 'camera eidy')
+  console.log(camera, 'camera')
 
   const handleCancel = () => {
     onClose()
@@ -106,46 +98,34 @@ const Edit = ({ open, onClose, onSelect, camera }) => {
   }, [camera]) // Thêm openPopupNetwork vào dependency array để useEffect được gọi khi openPopupNetwork thay đổi
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Chỉnh sửa</DialogTitle>
-      <DialogContent>
-        <TabContext value={value}>
-          <Grid>
+    <TabContext value={value}>
+      <Grid>
+        {' '}
+        <TabList onChange={handleChange} aria-label='customized tabs example'>
+          <Tab value='1' label='TCP/IP' />
+          <Tab value='2' label='DDNS' />
+          <Tab value='3' label='PORT' />
+          {/* <Tab value='4' label='NTP' /> */}
+        </TabList>
+      </Grid>
+      <TabPanel value='1'>
+        {' '}
+        <TCP camera={cameras} nic={nic} />
+      </TabPanel>
+      <TabPanel value='2'>
+        {' '}
+        <DDNs camera={cameras} />
+      </TabPanel>
+      <TabPanel value='3'>
+        {' '}
+        <Port nvrs={cameras} />
+      </TabPanel>
+      {/* <TabPanel value='4'>
             {' '}
-            <TabList onChange={handleChange} aria-label='customized tabs example'>
-              <Tab value='1' label='Mật khẩu' />
-              <Tab value='2' label='Mạng' />
-              <Tab value='3' label='Video' />
-              <Tab value='4' label='Hình ảnh' />
-              <Tab value='5' label='Bộ nhớ' />
-            </TabList>
-          </Grid>
-          <TabPanel value='1'>
-            <Passwords />
-          </TabPanel>
-          <TabPanel value='2'>
-            <Networks />
-          </TabPanel>
-          <TabPanel value='3'>
-            {' '}
-            <Video nvrs={cameras} />
-          </TabPanel>
-          <TabPanel value='4'>
-            {' '}
-            <Image nvrs={cameras} />
-          </TabPanel>
-          <TabPanel value='5'>
-            {' '}
-            <Cloud nvrs={cameras} />
-          </TabPanel>
-        </TabContext>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCancel}>Cancel</Button>
-        <Button>OK</Button>
-      </DialogActions>
-    </Dialog>
+            <NTP nvrs={cameras} />
+          </TabPanel> */}
+    </TabContext>
   )
 }
 
-export default Edit
+export default Network

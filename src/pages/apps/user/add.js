@@ -54,10 +54,10 @@ const Add = () => {
   const [rows, setRows] = useState([])
   const [rows1, setRows1] = useState([])
   const [createAccount, setCreateAccount] = useState(true)
-  const [timeEndMorning, setTimeEndMorning] = useState('')
-  const [timeStartAfternoon, setTimeStartAfternoon] = useState('')
-  const [timeEndAfternoon, setTimeEndAfternoon] = useState('')
-  const [dateTime, setDateTime] = useState('')
+  const [timeEndMorning, setTimeEndMorning] = useState(new Date())
+  const [timeStartAfternoon, setTimeStartAfternoon] = useState(new Date())
+  const [timeEndAfternoon, setTimeEndAfternoon] = useState(new Date())
+  const [dateTime, setDateTime] = useState(new Date())
   const [fullNameValue, setFullNameValue] = useState('')
   const [account, setAccount] = useState('')
   const [email, setEmail] = useState('')
@@ -166,8 +166,8 @@ const Add = () => {
 
       return
     }
-    if (!fullNameValue) {
-      Swal.fire('Lỗi!', 'Tên không được để trống', 'error')
+    if (!fullNameValue || fullNameValue.length <= 3) {
+      Swal.fire('Lỗi!', 'Tên không được để trống và độ dài phải >3', 'error')
 
       return
     }
@@ -196,12 +196,16 @@ const Add = () => {
 
       return
     }
-    if (!userGroups) {
-      Swal.fire('Lỗi!', 'Nhóm người dùng không được để trống', 'error')
+    if (!account) {
+      Swal.fire('Lỗi!', 'Tên tài khoản không được để trống', 'error')
 
       return
     }
+    if (userGroups.length === 0) {
+      Swal.fire('Lỗi!', 'Nhóm người dùng không được để trống.', 'error')
 
+      return
+    }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
       Swal.fire('Lỗi!', 'Địa chỉ email không hợp lệ.', 'error')
