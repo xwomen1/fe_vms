@@ -9,10 +9,13 @@ import { styled } from '@mui/material/styles'
 import MuiTabList from '@mui/lab/TabList'
 import authConfig from 'src/configs/auth'
 import axios from 'axios'
-import Camera from './Camera'
-import Channel from './Channel'
-import Port from './Port'
-import NTP from './NTP'
+import TCP from './TCP-IP'
+import DDNs from './DDNS'
+import Networks from './Networks'
+import Passwords from './PassWord'
+import Video from './VideoCameraa'
+import Image from './ImageCamera'
+import Cloud from './CloudCamera'
 
 import {
   Autocomplete,
@@ -50,43 +53,91 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
 }))
 import Swal from 'sweetalert2'
 
-const RolePopup = ({ open, onClose, onSelect, nvr }) => {
+const Edit = ({ open, onClose, onSelect, camera }) => {
   const [selectedRole, setSelectedRole] = useState(null)
   const [groupName, setGroupName] = useState([])
   const [defaultGroup, setDefaultGroup] = useState(null)
   const [selectedGroupId, setSelectedGroupId] = useState(null) // Thêm trạng thái để lưu trữ id của nhóm được chọn
-  const [nvrs, setNvrs] = useState([])
-  const [groupCode, setGroupCode] = useState([])
+  const [cameras, setCamera] = useState([])
+  const [nic, setNic] = useState([])
   const [value, setValue] = useState('1')
+  const [value1, setValue1] = useState('1')
 
   const handleChange = (event, newValue) => {
     setValue(newValue)
   }
 
+  const handleChange1 = (event, newValue) => {
+    setValue1(newValue)
+  }
+  console.log(camera, 'camera eidy')
+
   const handleCancel = () => {
     onClose()
   }
+  useEffect(() => {
+    const fetchGroupData = async () => {
+      try {
+        if (camera != null) {
+          // Kiểm tra xem popup Network đã mở chưa
+          const token = localStorage.getItem(authConfig.storageTokenKeyName)
+          console.log('token', token)
+
+          const config = {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+
+          const response = await axios.get(
+            `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/{idCamera}?idCamera=${camera}`,
+            config
+          )
+
+          setCamera(response.data.data)
+          setNic(response.data.data.nicType.name)
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+
+    fetchGroupData()
+  }, [camera]) // Thêm openPopupNetwork vào dependency array để useEffect được gọi khi openPopupNetwork thay đổi
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Cấu hình luu tru</DialogTitle>
+      <DialogTitle>Chỉnh sửa</DialogTitle>
       <DialogContent>
         <TabContext value={value}>
           <Grid>
             {' '}
             <TabList onChange={handleChange} aria-label='customized tabs example'>
-              <Tab value='1' label='Lich ghi' />
-              <Tab value='2' label='Chat luong ghi' />
-            
+              <Tab value='1' label='Mật khẩu' />
+              <Tab value='2' label='Mạng' />
+              <Tab value='3' label='Video' />
+              <Tab value='4' label='Hình ảnh' />
+              <Tab value='5' label='Bộ nhớ' />
             </TabList>
           </Grid>
           <TabPanel value='1'>
-            <Camera  />
+            <Passwords />
           </TabPanel>
           <TabPanel value='2'>
-            <Channel  />
+            <Networks />
           </TabPanel>
-         
+          <TabPanel value='3'>
+            {' '}
+            <Video nvrs={cameras} />
+          </TabPanel>
+          <TabPanel value='4'>
+            {' '}
+            <Image nvrs={cameras} />
+          </TabPanel>
+          <TabPanel value='5'>
+            {' '}
+            <Cloud nvrs={cameras} />
+          </TabPanel>
         </TabContext>
       </DialogContent>
       <DialogActions>
@@ -97,4 +148,4 @@ const RolePopup = ({ open, onClose, onSelect, nvr }) => {
   )
 }
 
-export default RolePopup
+export default Edit

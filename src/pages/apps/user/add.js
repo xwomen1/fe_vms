@@ -54,10 +54,10 @@ const Add = () => {
   const [rows, setRows] = useState([])
   const [rows1, setRows1] = useState([])
   const [createAccount, setCreateAccount] = useState(true)
-  const [timeEndMorning, setTimeEndMorning] = useState('')
-  const [timeStartAfternoon, setTimeStartAfternoon] = useState('')
-  const [timeEndAfternoon, setTimeEndAfternoon] = useState('')
-  const [dateTime, setDateTime] = useState('')
+  const [timeEndMorning, setTimeEndMorning] = useState(new Date())
+  const [timeStartAfternoon, setTimeStartAfternoon] = useState(new Date())
+  const [timeEndAfternoon, setTimeEndAfternoon] = useState(new Date())
+  const [dateTime, setDateTime] = useState(new Date())
   const [fullNameValue, setFullNameValue] = useState('')
   const [account, setAccount] = useState('')
   const [email, setEmail] = useState('')
@@ -166,8 +166,43 @@ const Add = () => {
 
       return
     }
-    if (!fullNameValue || !email || !phoneNumber || !identityNumber || !userCode || !syncCode || !userGroups) {
-      Swal.fire('Lỗi!', 'Vui lòng điền đầy đủ thông tin.', 'error')
+    if (!fullNameValue || fullNameValue.length <= 3) {
+      Swal.fire('Lỗi!', 'Tên không được để trống và độ dài phải >3', 'error')
+
+      return
+    }
+    if (!email) {
+      Swal.fire('Lỗi!', 'Email không được để trống', 'error')
+
+      return
+    }
+    if (!phoneNumber) {
+      Swal.fire('Lỗi!', 'Số điện thoại không được để trống', 'error')
+
+      return
+    }
+    if (!identityNumber) {
+      Swal.fire('Lỗi!', 'Số giấy tờ không được để trống', 'error')
+
+      return
+    }
+    if (!userCode) {
+      Swal.fire('Lỗi!', 'Mã người dùng không được để trống', 'error')
+
+      return
+    }
+    if (!syncCode) {
+      Swal.fire('Lỗi!', 'Mã đồng bộ không được để trống', 'error')
+
+      return
+    }
+    if (!account) {
+      Swal.fire('Lỗi!', 'Tên tài khoản không được để trống', 'error')
+
+      return
+    }
+    if (userGroups.length === 0) {
+      Swal.fire('Lỗi!', 'Nhóm người dùng không được để trống.', 'error')
 
       return
     }

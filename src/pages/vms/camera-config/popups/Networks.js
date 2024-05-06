@@ -98,42 +98,33 @@ const Network = ({ open, onClose, onSelect, camera }) => {
   }, [camera]) // Thêm openPopupNetwork vào dependency array để useEffect được gọi khi openPopupNetwork thay đổi
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Cấu hình mạng</DialogTitle>
-      <DialogContent>
-        <TabContext value={value}>
-          <Grid>
-            {' '}
-            <TabList onChange={handleChange} aria-label='customized tabs example'>
-              <Tab value='1' label='TCP/IP' />
-              <Tab value='2' label='DDNS' />
-              <Tab value='3' label='PORT' />
-              {/* <Tab value='4' label='NTP' /> */}
-            </TabList>
-          </Grid>
-          <TabPanel value='1'>
-            {' '}
-            <TCP camera={cameras} nic={nic} />
-          </TabPanel>
-          <TabPanel value='2'>
-            {' '}
-            <DDNs camera={cameras} />
-          </TabPanel>
-          <TabPanel value='3'>
-            {' '}
-            <Port nvrs={cameras} />
-          </TabPanel>
-          {/* <TabPanel value='4'>
+    <TabContext value={value}>
+      <Grid>
+        {' '}
+        <TabList onChange={handleChange} aria-label='customized tabs example'>
+          <Tab value='1' label='TCP/IP' />
+          <Tab value='2' label='DDNS' />
+          <Tab value='3' label='PORT' />
+          {/* <Tab value='4' label='NTP' /> */}
+        </TabList>
+      </Grid>
+      <TabPanel value='1'>
+        {' '}
+        <TCP camera={cameras} nic={nic} />
+      </TabPanel>
+      <TabPanel value='2'>
+        {' '}
+        <DDNs camera={cameras} />
+      </TabPanel>
+      <TabPanel value='3'>
+        {' '}
+        <Port nvrs={cameras} />
+      </TabPanel>
+      {/* <TabPanel value='4'>
             {' '}
             <NTP nvrs={cameras} />
           </TabPanel> */}
-        </TabContext>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCancel}>Cancel</Button>
-        <Button>OK</Button>
-      </DialogActions>
-    </Dialog>
+    </TabContext>
   )
 }
 

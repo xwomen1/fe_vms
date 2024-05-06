@@ -4,95 +4,94 @@
  *
  */
 
-import React, { useEffect, useState } from 'react';
-import { Button } from 'devextreme-react/button';
-import Cropper from 'react-cropper';
-import { makeStyles, withStyles } from '@material-ui/core/styles';
-import Slider from '@material-ui/core/Slider';
-import styled from 'styled-components';
+import React, { useEffect, useState } from 'react'
+import { Button } from 'devextreme-react/button'
+
+//dùng thư viện khác
+import Cropper from 'react-cropper'
+import { makeStyles, withStyles } from '@material-ui/core/styles'
+import Slider from '@material-ui/core/Slider'
+
+//b
+import styled from 'styled-components'
 
 function ImageCropper({ onClose, fileAvatar, setFileAvatar, setAvatarImage }) {
-
-  const classes = useStyles();
-  const [image, setImage] = useState(null);
-  const [cropper, setCropper] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [ratio, setRatio] = useState(0.9);
-  const { innerWidth } = window;
+  const classes = useStyles()
+  const [image, setImage] = useState(null)
+  const [cropper, setCropper] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [ratio, setRatio] = useState(0.9)
+  const { innerWidth } = window
 
   useEffect(() => {
     if (fileAvatar !== null) {
-      const reader = new FileReader();
+      const reader = new FileReader()
       reader.onload = () => {
-        setImage(reader.result);
-      };
-      reader.readAsDataURL(fileAvatar);
+        setImage(reader.result)
+      }
+      reader.readAsDataURL(fileAvatar)
     }
 
     if (innerWidth <= 960) {
-      setRatio(0.9);
+      setRatio(0.9)
     } else if (innerWidth > 960 && innerWidth <= 1920) {
-      setRatio(0.7);
+      setRatio(0.7)
     } else if (innerWidth <= 2560) {
-      setRatio(0.4);
+      setRatio(0.4)
     } else {
-      setRatio(0.1);
+      setRatio(0.1)
     }
-  }, []);
+  }, [])
 
   const getCanvasBlob = canvas => {
-
     return new Promise(resolve => {
       canvas.toBlob(
         blob => {
-          resolve(blob);
+          resolve(blob)
         },
         'image/jpeg',
-        ratio,
-      );
-    });
-  };
+        ratio
+      )
+    })
+  }
 
   const onCrop = () => {
-    setLoading(true);
+    setLoading(true)
     if (typeof cropper !== 'undefined') {
+      const canvas = cropper.getCroppedCanvas()
 
-      const canvas = cropper.getCroppedCanvas();
-
-      const canvasBlob = getCanvasBlob(canvas);
+      const canvasBlob = getCanvasBlob(canvas)
 
       canvasBlob.then(
         blob => {
-
           const file = new File([blob], fileAvatar.name, {
-            type: 'image/jpeg',
-          });
-          setAvatarImage(canvas.toDataURL());
-          setFileAvatar(file);
-          setLoading(false);
-          onClose();
+            type: 'image/jpeg'
+          })
+          setAvatarImage(canvas.toDataURL())
+          setFileAvatar(file)
+          setLoading(false)
+          onClose()
         },
         () => {
-          setLoading(false);
-        },
-      );
+          setLoading(false)
+        }
+      )
     }
-  };
+  }
 
   const handleSliderChange = (event, newValue) => {
-
-    const scaleVal = 1 + newValue / 100;
-    cropper.scale(scaleVal, scaleVal);
-  };
+    const scaleVal = 1 + newValue / 100
+    cropper.scale(scaleVal, scaleVal)
+  }
 
   return (
     <Modal>
       {loading}
       <div className={classes.imageContainer}>
         <span
-          className="close"
+          className='close'
           onClick={() => {
-            onClose();
+            onClose()
           }}
         >
           &times;
@@ -100,7 +99,7 @@ function ImageCropper({ onClose, fileAvatar, setFileAvatar, setAvatarImage }) {
         <Cropper
           style={{ height: '100%', width: '100%' }}
           initialAspectRatio={1}
-          preview=".img-preview"
+          preview='.img-preview'
           src={image}
           viewMode={1}
           guides
@@ -111,22 +110,18 @@ function ImageCropper({ onClose, fileAvatar, setFileAvatar, setAvatarImage }) {
           autoCropArea={0.5}
           checkOrientation={false}
           onInitialized={instance => {
-            setCropper(instance);
+            setCropper(instance)
           }}
         />
         <div className={classes.vertical}>
-          <CustomSlider
-            orientation="vertical"
-            defaultValue={0}
-            onChange={handleSliderChange}
-          />
+          <CustomSlider orientation='vertical' defaultValue={0} onChange={handleSliderChange} />
         </div>
         <Button
-          id="btnSaveAndContinue"
-          text="Đặt làm ảnh đại diện"
-          type="success"
+          id='btnSaveAndContinue'
+          text='Đặt làm ảnh đại diện'
+          type='success'
           onClick={() => {
-            onCrop();
+            onCrop()
           }}
           style={{
             height: '40px',
@@ -137,12 +132,12 @@ function ImageCropper({ onClose, fileAvatar, setFileAvatar, setAvatarImage }) {
             marginTop: '-70px',
             position: 'absolute',
             border: '1px solid #00695C',
-            color: '#00695C',
+            color: '#00695C'
           }}
         />
       </div>
     </Modal>
-  );
+  )
 }
 
 const Modal = styled.div`
@@ -499,7 +494,7 @@ const Modal = styled.div`
   .cropper-disabled .cropper-point {
     cursor: not-allowed;
   }
-`;
+`
 
 const useStyles = makeStyles({
   vertical: {
@@ -508,28 +503,28 @@ const useStyles = makeStyles({
     position: 'relative',
     float: 'right',
     marginTop: '-65%',
-    marginRight: '20px',
+    marginRight: '20px'
   },
   imageContainer: {
     width: '668px',
     height: '668px',
     margin: 'auto',
     overflow: 'hidden',
-    position: 'relative',
+    position: 'relative'
   },
   white: {
     color: '#fff',
-    '& p': { margin: '7px 0px' },
-  },
-});
+    '& p': { margin: '7px 0px' }
+  }
+})
 
 const CustomSlider = withStyles({
   root: {
     color: '#C4C4C4',
     height: 8,
     '&$vertical': {
-      width: 8,
-    },
+      width: 8
+    }
   },
   thumb: {
     height: 24,
@@ -537,34 +532,34 @@ const CustomSlider = withStyles({
     backgroundColor: '#fff',
     border: '2px solid currentColor',
     marginTop: -8,
-    marginLeft: -12,
+    marginLeft: -12
   },
   active: {},
   valueLabel: {
-    left: 'calc(-50% + 4px)',
+    left: 'calc(-50% + 4px)'
   },
   track: {
     height: 8,
-    borderRadius: 4,
+    borderRadius: 4
   },
   rail: {
     height: 8,
-    borderRadius: 4,
+    borderRadius: 4
   },
   vertical: {
     '& $rail': {
-      width: 8,
+      width: 8
     },
     '& $track': {
-      width: 8,
+      width: 8
     },
     '& $thumb': {
       marginLeft: -8,
-      marginBottom: -11,
-    },
-  },
-})(Slider);
+      marginBottom: -11
+    }
+  }
+})(Slider)
 
-ImageCropper.propTypes = {};
+ImageCropper.propTypes = {}
 
-export default ImageCropper;
+export default ImageCropper

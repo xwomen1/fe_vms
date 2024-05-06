@@ -3,8 +3,6 @@ import Card from '@mui/material/Card'
 import Menu from '@mui/material/Menu'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
-import TreeView from '@mui/lab/TreeView'
-import TreeItem from '@mui/lab/TreeItem'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
@@ -15,15 +13,12 @@ import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
 import { Button, FormControl, IconButton, InputLabel, Paper, Select } from '@mui/material'
 import Swal from 'sweetalert2'
-import { fetchData } from 'src/store/apps/user'
-import { useRouter } from 'next/router'
 import axios from 'axios'
-import TableHeader from 'src/views/apps/vms/camera-config/TableHeader'
 import CustomTextField from 'src/@core/components/mui/text-field'
-import Link from 'next/link'
 import RolePopup from './popups/ChangePassword'
 import Passwords from './popups/PassWord'
 import { Radio, RadioGroup, FormControlLabel } from '@mui/material'
+import toast from 'react-hot-toast'
 
 import Network from './popups/Network'
 import Video from './popups/video'
@@ -32,7 +27,7 @@ import Checkbox from '@mui/material/Checkbox'
 import Cloud from './popups/Cloud'
 import ConnectCamera from './popups/ConnectCamera'
 import VideoConnectCamera from './popups/VideoConnectCamera'
-import { Password } from '@mui/icons-material'
+import PopupScan from './popups/Add'
 
 const Add = ({ apiData }) => {
   const [value, setValue] = useState('')
@@ -46,11 +41,7 @@ const Add = ({ apiData }) => {
   const [openPopupCloud, setOpenPopupCloud] = useState(false)
   const [openPopupConnectCamera, setOpenPopupConnectCamera] = useState(false)
   const [openPopupVideoConnectCamera, setOpenPopupVideoConnectCamera] = useState(false)
-
-  const [selectedNvrId, setSelectedNvrId] = useState(null)
-  const [addUserOpen, setAddUserOpen] = useState(false)
   const [assettype, setAssetType] = useState([])
-  const [camera, setCamera] = useState([1])
 
   const [total, setTotal] = useState([1])
   const [page, setPage] = useState(1)
@@ -60,6 +51,46 @@ const Add = ({ apiData }) => {
   const pageSizeOptions = [25, 50, 100]
   const [anchorEl, setAnchorEl] = useState(null)
   const [selectedValue, setSelectedValue] = useState('')
+  const [ipAddress, setIpAddress] = useState('')
+  const [port, setPort] = useState('')
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [response, setResponse] = useState('')
+  const [openPopupResponse, setOpenPopupResponse] = useState(false)
+
+  const handleScan = async () => {
+    setOpenPopupResponse(true)
+
+    try {
+      const payload = {
+        ipAddress,
+        port,
+        username,
+        password
+      }
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.post(
+        'https://sbs.basesystem.one/ivis/vms/api/v0/device/onvif/scandevicestaticip',
+        payload,
+        config
+      )
+
+      setResponse(response.data)
+      toast.success('Thành công')
+
+      setOpenPopupResponse(true)
+    } catch (error) {
+      console.error('Error scanning device:', error)
+      Swal.fire('Đã xảy ra lỗi', error.response.statusText, 'error')
+    }
+  }
 
   const handleRadioChange = event => {
     setSelectedValue(event.target.value)
@@ -81,16 +112,8 @@ const Add = ({ apiData }) => {
     }
   }
 
-  const handleAddRoleClick = () => {
-    setOpenPopup(true)
-  }
-
-  const handleAddRolesClick = () => {
-    setOpenPopup(true)
-  }
-
   const handleClosePopup = () => {
-    setOpenPopup(false) // Đóng Popup khi cần thiết
+    setOpenPopup(false)
   }
 
   const handleAddPClick = () => {
@@ -98,39 +121,23 @@ const Add = ({ apiData }) => {
   }
 
   const handleClosePPopup = () => {
-    setOpenPopupP(false) // Đóng Popup khi cần thiết
-  }
-
-  const handleAddNetworkClick = () => {
-    setOpenPopupNetwork(true)
+    setOpenPopupP(false)
   }
 
   const handleCloseNetWorkPopup = () => {
-    setOpenPopupNetwork(false) // Đóng Popup khi cần thiết
-  }
-
-  const handleAddVideoClick = () => {
-    setOpenPopupVideo(true)
+    setOpenPopupNetwork(false)
   }
 
   const handleCloseVideoPopup = () => {
-    setOpenPopupVideo(false) // Đóng Popup khi cần thiết
-  }
-
-  const handleAddImageClick = () => {
-    setOpenPopupImage(true)
+    setOpenPopupVideo(false)
   }
 
   const handleCloseImagePopup = () => {
-    setOpenPopupImage(false) // Đóng Popup khi cần thiết
-  }
-
-  const handleAddCloudClick = () => {
-    setOpenPopupCloud(true)
+    setOpenPopupImage(false)
   }
 
   const handleCloseCloudPopup = () => {
-    setOpenPopupCloud(false) // Đóng Popup khi cần thiết
+    setOpenPopupCloud(false)
   }
 
   const handleAddConnectCameraClick = () => {
@@ -138,7 +145,7 @@ const Add = ({ apiData }) => {
   }
 
   const handleCloseConnectCameraPopup = () => {
-    setOpenPopupConnectCamera(false) // Đóng Popup khi cần thiết
+    setOpenPopupConnectCamera(false)
   }
 
   const handleAddVideoConnectClick = () => {
@@ -146,7 +153,7 @@ const Add = ({ apiData }) => {
   }
 
   const handleCloseVideoConnectPopup = () => {
-    setOpenPopupVideoConnectCamera(false) // Đóng Popup khi cần thiết
+    setOpenPopupVideoConnectCamera(false)
   }
 
   const handleOpenMenu = event => {
@@ -188,7 +195,6 @@ const Add = ({ apiData }) => {
         }
         const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/cameras', config)
         setStatus1(response.data.data.isOfflineSetting)
-        setCamera(response.data.data[0].id)
         setAssetType(response.data.data)
         setTotal(response.data.data.page)
         console.log(response.data.data[0].id)
@@ -228,28 +234,52 @@ const Add = ({ apiData }) => {
                 style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
               >
                 <Grid item xs={2}>
-                  <CustomTextField label='Địa chỉ IP' fullWidth />
+                  <CustomTextField
+                    value={ipAddress}
+                    onChange={e => setIpAddress(e.target.value)}
+                    label='Địa chỉ IP'
+                    fullWidth
+                  />
                 </Grid>
                 <Grid item xs={0.2}></Grid>
                 <Grid item xs={2}>
-                  <CustomTextField label='Cổng' fullWidth />
+                  <CustomTextField value={port} onChange={e => setPort(e.target.value)} label='Cổng' fullWidth />
                 </Grid>
                 <Grid item xs={0.2}></Grid>
                 <Grid item xs={2}>
-                  <CustomTextField label='Đăng nhập' fullWidth />
+                  <CustomTextField
+                    value={username}
+                    onChange={e => setUsername(e.target.value)}
+                    label='Đăng nhập'
+                    fullWidth
+                  />
                 </Grid>
                 <Grid item xs={0.2}></Grid>
                 <Grid item xs={2}>
-                  <CustomTextField label='Mật khẩu' type='password' fullWidth />
+                  <CustomTextField
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    label='Mật khẩu'
+                    type='password'
+                    fullWidth
+                  />
                 </Grid>
                 <Grid item xs={0.2}></Grid>
 
                 <Grid item xs={3} style={{ marginTop: '2%' }}>
                   <Button>Cancel</Button>
-                  <Button variant='contained'>Quét</Button>
+                  <Button onClick={handleScan} variant='contained'>
+                    Quét
+                  </Button>
                 </Grid>
               </Grid>
             )}
+            {openPopupResponse && (
+              <>
+                <PopupScan open={openPopupResponse} response={response} onClose={() => setOpenPopupResponse(false)} />{' '}
+              </>
+            )}
+
             {selectedValue === 'daiIp' && (
               <Grid
                 container
