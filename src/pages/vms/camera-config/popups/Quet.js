@@ -132,15 +132,4 @@ const ScanDevice = ({ apiData, response }) => {
   )
 }
 
-export const getStaticProps = async () => {
-  const res = await axios.get('/cards/statistics')
-  const apiData = res.data
-
-  return {
-    props: {
-      apiData
-    }
-  }
-}
-
 export default ScanDevice

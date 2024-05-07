@@ -1,15 +1,10 @@
-import { useEffect, useState } from 'react'
-import { Grid, IconButton } from '@mui/material'
-import Icon from 'src/@core/components/icon'
-import Link from 'next/link'
+import { useState } from 'react'
+import { Grid } from '@mui/material'
 import Tab from '@mui/material/Tab'
 import TabPanel from '@mui/lab/TabPanel'
 import TabContext from '@mui/lab/TabContext'
 import { styled } from '@mui/material/styles'
 import MuiTabList from '@mui/lab/TabList'
-import authConfig from 'src/configs/auth'
-import axios from 'axios'
-import TCP from './TCP-IP'
 import Device from './Device'
 import Networks from './Networks'
 import Passwords from './PassWord'
@@ -17,16 +12,7 @@ import Video from './VideoCameraa'
 import Image from './ImageCamera'
 import Cloud from './CloudCamera'
 
-import {
-  Autocomplete,
-  TextField,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Checkbox
-} from '@mui/material'
+import { Dialog, DialogTitle, DialogContent } from '@mui/material'
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   borderBottom: '0 !important',
@@ -51,7 +37,6 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
     }
   }
 }))
-import Swal from 'sweetalert2'
 
 const Edit = ({ open, onClose, camera }) => {
   const [cameras, setCamera] = useState([])

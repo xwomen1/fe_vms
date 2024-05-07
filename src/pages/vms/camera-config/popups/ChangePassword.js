@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react'
-import { Autocomplete, TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, Grid } from '@mui/material'
+import React, { useState } from 'react'
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Grid } from '@mui/material'
 import axios from 'axios'
 import authConfig from 'src/configs/auth'
 import Swal from 'sweetalert2'
 import CustomTextField from 'src/@core/components/mui/text-field'
-import { minWidth } from '@mui/system'
 
 const RolePopup = ({ open, onClose, onSelect, nvr }) => {
   const [password, setPassword] = useState('')
@@ -59,20 +58,21 @@ const RolePopup = ({ open, onClose, onSelect, nvr }) => {
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Đổi mật khẩu</DialogTitle>
       <DialogContent>
-      <Grid container spacing={2} style={{minWidth: 500}}>
-        <Grid container item  style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
-<Grid item xs = {12}>
-<CustomTextField label='Mật khẩu' type='password' onChange={handlePasswordChange}  fullWidth/>
-
-      </Grid>
-      <Grid item xs={12}>
-      <CustomTextField label='Xác nhận mật khẩu' type='password' onChange={handleConfirmPasswordChange} fullWidth />
-     
-      </Grid>
-    
-      </Grid>
-    </Grid>
-    
+        <Grid container spacing={2} style={{ minWidth: 500 }}>
+          <Grid container item style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
+            <Grid item xs={12}>
+              <CustomTextField label='Mật khẩu' type='password' onChange={handlePasswordChange} fullWidth />
+            </Grid>
+            <Grid item xs={12}>
+              <CustomTextField
+                label='Xác nhận mật khẩu'
+                type='password'
+                onChange={handleConfirmPasswordChange}
+                fullWidth
+              />
+            </Grid>
+          </Grid>
+        </Grid>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleCancel}>Cancel</Button>

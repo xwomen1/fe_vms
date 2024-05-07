@@ -1,12 +1,10 @@
 import { useRouter } from 'next/router'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState } from 'react'
 import axios from 'axios'
 import authConfig from 'src/configs/auth'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import { Grid, Checkbox, Autocomplete } from '@mui/material'
-
-import Paper from '@mui/material/Paper'
 
 const DDNS = cameras => {
   const [DDNSOption, setDDNS] = useState([])
@@ -49,12 +47,8 @@ const DDNS = cameras => {
   }
 
   const handleComboboxFocus = () => {
-    // if (DDNSOption.length === 0) {
     fetchNicTypes()
-
-    // }
   }
-  console.log('param', cameras?.camera.ddnsType)
   const formatDDNS = ddns => <Checkbox checked={ddns} disabled />
 
   return (

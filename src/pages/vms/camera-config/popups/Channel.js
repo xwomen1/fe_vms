@@ -1,63 +1,15 @@
-import { useState, useEffect, useCallback } from 'react'
 import Card from '@mui/material/Card'
-import Menu from '@mui/material/Menu'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
-import TreeView from '@mui/lab/TreeView'
-import TreeItem from '@mui/lab/TreeItem'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
-import authConfig from 'src/configs/auth'
 import Table from '@mui/material/Table'
-import Pagination from '@mui/material/Pagination'
-import Icon from 'src/@core/components/icon'
-import { FormControl, IconButton, InputLabel, Select } from '@mui/material'
-import Swal from 'sweetalert2'
-import { fetchData } from 'src/store/apps/user'
-import { useRouter } from 'next/router'
+import { FormControl, InputLabel, Select } from '@mui/material'
 import axios from 'axios'
-import TableHeader from 'src/views/apps/asset/TableHeader'
-import CustomTextField from 'src/@core/components/mui/text-field'
-import Link from 'next/link'
 
 const UserList = ({ apiData }) => {
-  const [value, setValue] = useState('')
-
-  const [addUserOpen, setAddUserOpen] = useState(false)
-  const [assettype, setAssetType] = useState([])
-
-  const [total, setTotal] = useState([1])
-  const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(25)
-  const pageSizeOptions = [25, 50, 100]
-  const [anchorEl, setAnchorEl] = useState(null)
-
-  const handlePageChange = newPage => {
-    setPage(newPage)
-  }
-
-  function showAlertConfirm(options, intl) {
-    const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
-      imageWidth: 213,
-      showCancelButton: true,
-      showCloseButton: true,
-      showConfirmButton: true,
-      focusCancel: true,
-      reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
-      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
-      customClass: {
-        content: 'content-class',
-        confirmButton: 'swal-btn-confirm'
-      }
-    }
-
-    return Swal.fire({ ...defaultProps, ...options })
-  }
-
   const createData = (name, ch1, ch2) => {
     return { name, ch1, ch2 }
   }
@@ -133,26 +85,6 @@ const UserList = ({ apiData }) => {
       </FormControl>
     )
   ]
-
-  const handleOpenMenu = event => {
-    setAnchorEl(event.currentTarget)
-  }
-
-  const handleCloseMenu = () => {
-    setAnchorEl(null)
-  }
-
-  const handleSelectPageSize = size => {
-    setPageSize(size)
-    setPage(1)
-    handleCloseMenu()
-  }
-
-  const handleFilter = useCallback(val => {
-    setValue(val)
-  }, [])
-
-  console.log(total, 'totalpage')
 
   return (
     <Grid container spacing={2}>

@@ -21,7 +21,7 @@ import Edit from './popups/Edit'
 
 import Network from './popups/Network'
 import Video from './popups/video'
-import Image from './popups/Image'
+import Images from './popups/Image'
 import Checkbox from '@mui/material/Checkbox'
 import Cloud from './popups/Cloud'
 
@@ -36,9 +36,7 @@ const Camera = ({ apiData }) => {
   const [openPopupImage, setOpenPopupImage] = useState(false)
   const [openPopupCloud, setOpenPopupCloud] = useState(false)
   const [selectedNvrId, setSelectedNvrId] = useState(null)
-  const [addUserOpen, setAddUserOpen] = useState(false)
   const [assettype, setAssetType] = useState([])
-  const [camera, setCamera] = useState([1])
 
   const [total, setTotal] = useState([1])
   const [page, setPage] = useState(1)
@@ -195,7 +193,6 @@ const Camera = ({ apiData }) => {
         }
         const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/cameras', config)
         setStatus1(response.data.data.isOfflineSetting)
-        setCamera(response.data.data[0].id)
         setAssetType(response.data.data)
         setTotal(response.data.data.page)
       } catch (error) {
@@ -308,7 +305,7 @@ const Camera = ({ apiData }) => {
         </Card>
         {openPopupNetwork && (
           <>
-            {/* <RolePopup open={openPopup} onClose={handleClosePopup} nvr={selectedIds} /> */}
+            {' '}
             <Network open={openPopupNetwork} onClose={handleCloseNetWorkPopup} camera={selectedIds} />
           </>
         )}
@@ -324,7 +321,7 @@ const Camera = ({ apiData }) => {
         )}{' '}
         {openPopupImage && (
           <>
-            <Image open={openPopupImage} onClose={handleCloseImagePopup} camera={selectedIds} />
+            <Images open={openPopupImage} onClose={handleCloseImagePopup} camera={selectedIds} />
           </>
         )}{' '}
         {openPopupCloud && (

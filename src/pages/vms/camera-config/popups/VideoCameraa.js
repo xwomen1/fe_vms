@@ -1,74 +1,8 @@
-import { useEffect, useState } from 'react'
-import { FormControl, Grid, IconButton, InputLabel, MenuItem, Paper, Select } from '@mui/material'
-import Icon from 'src/@core/components/icon'
-import Link from 'next/link'
-import Tab from '@mui/material/Tab'
-import TabPanel from '@mui/lab/TabPanel'
-import TabContext from '@mui/lab/TabContext'
-import { styled } from '@mui/material/styles'
-import MuiTabList from '@mui/lab/TabList'
-import authConfig from 'src/configs/auth'
-import axios from 'axios'
-import TCP from './TCP-IP'
-import DDNs from './DDNS'
-import Port from './Port'
-import NTP from './NTP'
+import { FormControl, Grid, InputLabel, MenuItem, Paper, Select } from '@mui/material'
 
-import {
-  Autocomplete,
-  TextField,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Checkbox
-} from '@mui/material'
 import CustomTextField from 'src/@core/components/mui/text-field'
 
-const RolePopup = ({ open, onClose, onSelect, nvr }) => {
-  const [selectedRole, setSelectedRole] = useState(null)
-  const [groupName, setGroupName] = useState([])
-  const [defaultGroup, setDefaultGroup] = useState(null)
-  const [selectedGroupId, setSelectedGroupId] = useState(null) // Thêm trạng thái để lưu trữ id của nhóm được chọn
-  const [nvrs, setNvrs] = useState([])
-  const [groupCode, setGroupCode] = useState([])
-  const [value, setValue] = useState('1')
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue)
-  }
-
-  const handleCancel = () => {
-    onClose()
-  }
-
-  // useEffect(() => {
-  //   const fetchGroupData = async () => {
-  //     try {
-  //       const token = localStorage.getItem(authConfig.storageTokenKeyName)
-  //       console.log('token', token)
-
-  //       const config = {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`
-  //         }
-  //       }
-
-  //       const response = await axios.get(
-  //         `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/{idCamera}?idCamera=${nvr}`,
-  //         config
-  //       )
-
-  //       setNvrs(response.data.data)
-  //     } catch (error) {
-  //       console.error('Error fetching data:', error)
-  //     }
-  //   }
-
-  //   fetchGroupData()
-  // }, [])
-
+const VideoCamera = ({}) => {
   return (
     <div style={{ width: '100%' }}>
       <Grid container spacing={3}>
@@ -175,4 +109,4 @@ const RolePopup = ({ open, onClose, onSelect, nvr }) => {
   )
 }
 
-export default RolePopup
+export default VideoCamera

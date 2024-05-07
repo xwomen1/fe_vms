@@ -18,22 +18,6 @@ const PassWord = ({ onClose, camera }) => {
     setConfirmPassword(event.target.value)
   }
 
-  const handleSubmit = () => {
-    // Kiểm tra mật khẩu và xác nhận mật khẩu
-    if (password !== confirmPassword) {
-      Swal.fire('Lỗi!', 'Mật khẩu và xác nhận mật khẩu không khớp nhau.', 'error')
-
-      return
-    }
-
-    // Gọi hàm saveChanges từ prop
-    saveChanges(password)
-  }
-
-  const handleCancel = () => {
-    onClose()
-  }
-
   const saveChange = async () => {
     setLoading(true)
     onClose()
