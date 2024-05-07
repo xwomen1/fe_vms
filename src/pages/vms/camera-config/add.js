@@ -34,6 +34,7 @@ const Add = ({ apiData }) => {
   const [selectedIds, setSelectedIds] = useState([])
   const [openPopup, setOpenPopup] = useState(false)
   const [openPopupP, setOpenPopupP] = useState(false)
+  const [selectNVR, setSelectedNVR] = useState('')
 
   const [openPopupNetwork, setOpenPopupNetwork] = useState(false)
   const [openPopupVideo, setOpenPopupVideo] = useState(false)
@@ -42,6 +43,7 @@ const Add = ({ apiData }) => {
   const [openPopupConnectCamera, setOpenPopupConnectCamera] = useState(false)
   const [openPopupVideoConnectCamera, setOpenPopupVideoConnectCamera] = useState(false)
   const [assettype, setAssetType] = useState([])
+  const [nvrs, setNVR] = useState([])
 
   const [total, setTotal] = useState([1])
   const [page, setPage] = useState(1)
@@ -57,6 +59,40 @@ const Add = ({ apiData }) => {
   const [password, setPassword] = useState('')
   const [response, setResponse] = useState('')
   const [openPopupResponse, setOpenPopupResponse] = useState(false)
+
+  const fetchNicTypes = async () => {
+    try {
+      // setLoading(true)
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/nvrs', config)
+
+      const nicTypes = response.data.data.map(item => ({
+        label: item.name,
+        value: item.value
+      }))
+      setNVR(nicTypes)
+
+      // Set selectedNicType here based on your business logic
+      if (nicTypes.length > 0) {
+        setSelectedNVR(nicTypes[0].value) // Set it to the first value in the array, or adjust as needed
+      }
+    } catch (error) {
+      console.error('Error fetching NIC types:', error)
+    } finally {
+      // setLoading(false)
+    }
+  }
+
+  const handleComboboxFocus = () => {
+    fetchNicTypes()
+  }
 
   const handleScan = async () => {
     setOpenPopupResponse(true)
@@ -164,6 +200,10 @@ const Add = ({ apiData }) => {
     setAnchorEl(null)
   }
 
+  const handleDDNSChange = (event, newValue) => {
+    setSelectedNVR(newValue)
+  }
+
   const handleSelectPageSize = size => {
     setPageSize(size)
     setPage(1)
@@ -234,7 +274,16 @@ const Add = ({ apiData }) => {
                 style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
               >
                 <Grid item xs={1.8}>
-                  <Autocomplete renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />} />
+                  <Autocomplete
+                    value={selectNVR}
+                    onChange={handleDDNSChange}
+                    options={nvrs}
+                    getOptionLabel={option => option.label}
+                    renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
+                    onFocus={handleComboboxFocus}
+
+                    // loading={loading}
+                  />{' '}
                 </Grid>
                 <Grid item xs={0.1}></Grid>
 

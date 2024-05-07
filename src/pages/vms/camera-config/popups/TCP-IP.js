@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios'
 import authConfig from 'src/configs/auth'
 import CustomTextField from 'src/@core/components/mui/text-field'
@@ -9,12 +9,24 @@ import Autocomplete from '@mui/material/Autocomplete'
 
 const TCP = (cameras, nic) => {
   const [nicTypeOptions, setNicTypeOptions] = useState([])
-  const [selectedNicType, setSelectedNicType] = useState(cameras.camera.nicType?.name || '')
+  const defaultValue = cameras.camera?.nicType?.name || ''
+
+  const [selectedNicType, setSelectedNicType] = useState({
+    label: cameras.camera.nicType?.name || '',
+    value: cameras.camera.nicType?.name || ''
+  })
+
+  const [loading, setLoading] = useState(false)
 
   const handleNicTypeChange = (event, newValue) => {
-    setSelectedNicType(newValue)
+    setSelectedNicType(newValue || defaultValue)
   }
-  const [loading, setLoading] = useState(false)
+  useEffect(() => {
+    setSelectedNicType({
+      label: defaultValue,
+      value: defaultValue
+    })
+  }, [defaultValue])
 
   const fetchNicTypes = async () => {
     try {
@@ -50,9 +62,10 @@ const TCP = (cameras, nic) => {
   }
 
   const handleComboboxFocus = () => {
-    if (nicTypeOptions.length === 0) {
-      fetchNicTypes()
-    }
+    // if (nicTypeOptions.length === 0) {
+    fetchNicTypes()
+
+    // }
   }
 
   const formatDDNS = ddns => <Checkbox checked={ddns} disabled />
@@ -63,7 +76,7 @@ const TCP = (cameras, nic) => {
         <Grid container item style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
           <Grid item xs={5.8}>
             <Autocomplete
-              defaultValue={cameras.camera?.dhcp || ''}
+              value={selectedNicType}
               onChange={handleNicTypeChange}
               options={nicTypeOptions}
               getOptionLabel={option => option.label}
