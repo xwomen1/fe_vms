@@ -1,3 +1,5 @@
+import React, { useEffect, useState, useRef } from 'react'
+
 import { Grid } from '@mui/material'
 
 // import TableStickyHeader from './table'
@@ -6,9 +8,10 @@ import TabPanel from '@mui/lab/TabPanel'
 import { styled } from '@mui/material/styles'
 import MuiTabList from '@mui/lab/TabList'
 import TabContext from '@mui/lab/TabContext'
-import { useState } from 'react'
 import ViewCamera from 'src/@core/components/camera'
 import Settings from 'src/@core/components/camera/settings'
+import { getApi } from 'src/@core/utils/requestUltils'
+import { CAMERA_API } from 'src/@core/components/api-url'
 const TabList = styled(MuiTabList)(({ theme }) => ({
   borderBottom: '0 !important',
   '&, & .MuiTabs-scroller': {
@@ -36,127 +39,75 @@ const DivStyle = styled('div')(({ theme }) => ({
   margin: '-1.2rem -1.5rem'
 }))
 
-const MocData = [
-  {
-    id: 1,
-    name: 'Camera 1',
-    status: 'Connected',
-    ip: '',
-    location: 'Main Entrance',
-    type: 'Dome',
-    model: 'Hikvision',
-    resolution: '1080p',
-    fps: '30',
-    bitrate: '5000'
-  },
-  {
-    id: 2,
-    name: 'Camera 2',
-    status: 'Connected',
-    ip: '',
-    location: 'Main Entrance',
-    type: 'Dome',
-    model: 'Hikvision',
-    resolution: '1080p',
-    fps: '30',
-    bitrate: '5000'
-  },
-  {
-    id: 3,
-    name: 'Camera 3',
-    status: 'Connected',
-    ip: '',
-    location: 'Main Entrance',
-    type: 'Dome',
-    model: 'Hikvision',
-    resolution: '1080p',
-    fps: '30',
-    bitrate: '5000'
-  },
-  {
-    id: 4,
-    name: 'Camera 4',
-    status: 'Connected',
-    ip: '',
-    location: 'Main Entrance',
-    type: 'Dome',
-    model: 'Hikvision',
-    resolution: '1080p',
-    fps: '30',
-    bitrate: '5000'
-  },
-  {
-    id: 5,
-    name: 'Camera 5',
-    status: 'Connected',
-    ip: '',
-    location: 'Main Entrance',
-    type: 'Dome',
-    model: 'Hikvision',
-    resolution: '1080p',
-    fps: '30',
-    bitrate: '5000'
-  },
-  {
-    id: 6,
-    name: 'Camera 6',
-    status: 'Connected',
-    ip: '',
-    location: 'Main Entrance',
-    type: 'Dome',
-    model: 'Hikvision',
-    resolution: '1080p',
-    fps: '30',
-    bitrate: '5000'
-  },
-  {
-    id: 7,
-    name: 'Camera 7',
-    status: 'Connected',
-    ip: '',
-    location: 'Main Entrance',
-    type: 'Dome',
-    model: 'Hikvision',
-    resolution: '1080p',
-    fps: '30',
-    bitrate: '5000'
-  },
-  {
-    id: 8,
-    name: 'Camera 8',
-    status: 'Connected',
-    ip: '',
-    location: 'Main Entrance',
-    type: 'Dome',
-    model: 'Hikvision',
-    resolution: '1080p',
-    fps: '30',
-    bitrate: '5000'
-  },
-  {
-    id: 9,
-    name: 'Camera 9',
-    status: 'Connected',
-    ip: '',
-    location: 'Main Entrance',
-    type: 'Dome',
-    model: 'Hikvision',
-    resolution: '1080p',
-    fps: '30',
-    bitrate: '5000'
-  }
-]
+const valueFilterInit = {
+  page: 1,
+  limit: 25,
+  deviceTypes: 'NVR'
+}
 
 const Caller = () => {
   const [sizeScreen, setSizeScreen] = useState(3)
+  const [reload, setReload] = useState(0)
+  const [valueFilter, setValueFilter] = useState(valueFilterInit)
+  const [cameraGroup, setCameraGroup] = useState([])
+  const fetchCameraGroup = async () => {
+    try {
+      const res = await getApi(
+        `${CAMERA_API.CAMERA_GROUP}?deviceTypes=${valueFilter.deviceTypes}&limit=${valueFilter.limit}&page=${valueFilter.page}`
+      )
+      let listCamera = []
+      res.data.map(item => {
+        if (item.cameras) {
+          item.cameras.map(camera => {
+            if (listCamera.length < sizeScreen ** 2) {
+              listCamera.push({
+                ...camera,
+                channel: 'Sub'
+              })
+            }
+          })
+        }
+      })
+      console.log(listCamera)
+      setCameraGroup(listCamera)
+    } catch (error) {
+      console.error('Error fetching data: ', error)
+    }
+  }
+
+  useEffect(() => {
+    fetchCameraGroup()
+  }, [reload])
+
+  const handSetChanel = (id, channel) => {
+    let newCamera = cameraGroup.map(item => {
+      if (item.id === id) {
+        return {
+          ...item,
+          channel: channel
+        }
+      }
+      return item
+    })
+    setCameraGroup(newCamera)
+  }
   return (
     <DivStyle>
       <Grid container spacing={0}>
-        {MocData.map((camera, index) => (
-          <Grid item xs={Math.floor(12 / sizeScreen)} key={index}>
-            <ViewCamera id={camera.id} channel={camera.name} status={camera.status} sizeScreen={sizeScreen} />
-          </Grid>
-        ))}
+        {cameraGroup.length > 0 &&
+          cameraGroup.map((camera, index) => (
+            <Grid item xs={Math.floor(12 / sizeScreen)} key={index}>
+              <ViewCamera
+                name={camera?.deviceName}
+                id={camera.id}
+                // id='4fa9a51c-e904-4ab0-acad-169ed4c9aeda'
+                channel={camera.channel}
+                status={camera.status}
+                sizeScreen={sizeScreen}
+                handSetChanel={handSetChanel}
+              />
+            </Grid>
+          ))}
       </Grid>
       <Settings sizeScreen={sizeScreen} setSizeScreen={size => setSizeScreen(size)} />
     </DivStyle>
