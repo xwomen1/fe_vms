@@ -50,7 +50,7 @@ function ModalImage({ onClose, imageUrl }) {
           style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 9999, background:'#fff' }}
           onClick={onClose}
         >
-          <Icon icon='tabler:letter-x'/>
+          <Icon icon='tabler:x' fontSize='2rem' />
         </IconButton>
         <Grid item xs={12} style={{ height: '100%' }}>
           <TransformWrapper defaultScale={1} defaultPositionX={0} defaultPositionY={0}>

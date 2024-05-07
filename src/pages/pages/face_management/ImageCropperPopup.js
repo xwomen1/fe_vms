@@ -1,18 +1,13 @@
-/**
- *
- * ModalImage
- *
- */
-
 import React, { useEffect, useState } from 'react'
-import { Button } from 'devextreme-react/button'
-
-//dùng thư viện khác
+import {
+  Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Tab, TableContainer, Paper,
+  Table, TableHead, TableRow, TableCell, TableBody, Pagination, Menu, MenuItem, Dialog, DialogContent,
+  DialogActions,
+  Typography,
+  Slider,
+} from "@mui/material"
 import Cropper from 'react-cropper'
-import { makeStyles, withStyles } from '@material-ui/core/styles'
-import Slider from '@material-ui/core/Slider'
-
-//b
+import { makeStyles} from '@material-ui/core/styles'
 import styled from 'styled-components'
 
 function ImageCropper({ onClose, fileAvatar, setFileAvatar, setAvatarImage }) {
@@ -114,17 +109,17 @@ function ImageCropper({ onClose, fileAvatar, setFileAvatar, setAvatarImage }) {
           }}
         />
         <div className={classes.vertical}>
-          <CustomSlider orientation='vertical' defaultValue={0} onChange={handleSliderChange} />
+          <Slider  color='primary' orientation='vertical' defaultValue={0} onChange={handleSliderChange} />
         </div>
         <Button
           id='btnSaveAndContinue'
-          text='Đặt làm ảnh đại diện'
           type='success'
           onClick={() => {
             onCrop()
           }}
           style={{
             height: '40px',
+            width:'28%',
             right: '30px',
             background: '#FFFFFF',
             boxShadow: '0px 4px 10px rgba(16, 156, 241, 0.24)',
@@ -134,7 +129,9 @@ function ImageCropper({ onClose, fileAvatar, setFileAvatar, setAvatarImage }) {
             border: '1px solid #00695C',
             color: '#00695C'
           }}
-        />
+        >
+          Đặt làm ảnh đại diện
+          </Button>
       </div>
     </Modal>
   )
@@ -517,48 +514,6 @@ const useStyles = makeStyles({
     '& p': { margin: '7px 0px' }
   }
 })
-
-const CustomSlider = withStyles({
-  root: {
-    color: '#C4C4C4',
-    height: 8,
-    '&$vertical': {
-      width: 8
-    }
-  },
-  thumb: {
-    height: 24,
-    width: 24,
-    backgroundColor: '#fff',
-    border: '2px solid currentColor',
-    marginTop: -8,
-    marginLeft: -12
-  },
-  active: {},
-  valueLabel: {
-    left: 'calc(-50% + 4px)'
-  },
-  track: {
-    height: 8,
-    borderRadius: 4
-  },
-  rail: {
-    height: 8,
-    borderRadius: 4
-  },
-  vertical: {
-    '& $rail': {
-      width: 8
-    },
-    '& $track': {
-      width: 8
-    },
-    '& $thumb': {
-      marginLeft: -8,
-      marginBottom: -11
-    }
-  }
-})(Slider)
 
 ImageCropper.propTypes = {}
 
