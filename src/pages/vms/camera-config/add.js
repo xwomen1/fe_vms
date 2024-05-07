@@ -11,7 +11,7 @@ import authConfig from 'src/configs/auth'
 import Table from '@mui/material/Table'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
-import { Button, FormControl, IconButton, InputLabel, Paper, Select } from '@mui/material'
+import { Autocomplete, Button, FormControl, IconButton, InputLabel, Paper, Select } from '@mui/material'
 import Swal from 'sweetalert2'
 import axios from 'axios'
 import CustomTextField from 'src/@core/components/mui/text-field'
@@ -233,7 +233,12 @@ const Add = ({ apiData }) => {
                 component={Paper}
                 style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
               >
-                <Grid item xs={2}>
+                <Grid item xs={1.8}>
+                  <Autocomplete renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />} />
+                </Grid>
+                <Grid item xs={0.1}></Grid>
+
+                <Grid item xs={1.8}>
                   <CustomTextField
                     value={ipAddress}
                     onChange={e => setIpAddress(e.target.value)}
@@ -241,12 +246,12 @@ const Add = ({ apiData }) => {
                     fullWidth
                   />
                 </Grid>
-                <Grid item xs={0.2}></Grid>
-                <Grid item xs={2}>
+                <Grid item xs={0.1}></Grid>
+                <Grid item xs={1.8}>
                   <CustomTextField value={port} onChange={e => setPort(e.target.value)} label='Cổng' fullWidth />
                 </Grid>
-                <Grid item xs={0.2}></Grid>
-                <Grid item xs={2}>
+                <Grid item xs={0.1}></Grid>
+                <Grid item xs={1.8}>
                   <CustomTextField
                     value={username}
                     onChange={e => setUsername(e.target.value)}
@@ -254,8 +259,8 @@ const Add = ({ apiData }) => {
                     fullWidth
                   />
                 </Grid>
-                <Grid item xs={0.2}></Grid>
-                <Grid item xs={2}>
+                <Grid item xs={0.1}></Grid>
+                <Grid item xs={1.8}>
                   <CustomTextField
                     value={password}
                     onChange={e => setPassword(e.target.value)}
@@ -266,7 +271,7 @@ const Add = ({ apiData }) => {
                 </Grid>
                 <Grid item xs={0.2}></Grid>
 
-                <Grid item xs={3} style={{ marginTop: '2%' }}>
+                <Grid item xs={2} style={{ marginTop: '2%' }}>
                   <Button>Cancel</Button>
                   <Button onClick={handleScan} variant='contained'>
                     Quét
@@ -287,6 +292,11 @@ const Add = ({ apiData }) => {
                 component={Paper}
                 style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
               >
+                <Grid item xs={1.8}>
+                  <Autocomplete renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />} />
+                </Grid>
+                <Grid item xs={0.1}></Grid>
+
                 <Grid item xs={2}>
                   <CustomTextField label='Địa chỉ IP bắt đầu' fullWidth />
                 </Grid>
@@ -311,7 +321,6 @@ const Add = ({ apiData }) => {
                 <Grid item xs={2}>
                   <CustomTextField label='Cổng kết thúc' fullWidth />
                 </Grid>
-                <Grid item xs={2}></Grid>
                 <Grid item xs={2}>
                   <CustomTextField label='Đăng nhập' fullWidth />
                 </Grid>
@@ -334,9 +343,11 @@ const Add = ({ apiData }) => {
                 component={Paper}
                 style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
               >
-                <Grid item xs={0.4}></Grid>
+                <Grid item xs={1.8}>
+                  <Autocomplete renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />} />
+                </Grid>
+                <Grid item xs={0.1}></Grid>
 
-                <Grid item xs={0.4}></Grid>
                 <Grid item xs={2}>
                   <CustomTextField label='Đăng nhập' fullWidth />
                 </Grid>
@@ -369,8 +380,11 @@ const Add = ({ apiData }) => {
                   </FormControl>
                 </Grid>
                 <Grid item xs={0.4}></Grid>
+                <Grid item xs={1.8}>
+                  <Autocomplete renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />} />
+                </Grid>
+                <Grid item xs={0.1}></Grid>
 
-                <Grid item xs={0.4}></Grid>
                 <Grid item xs={2}>
                   <CustomTextField label='Đăng nhập' fullWidth />
                 </Grid>
@@ -380,7 +394,7 @@ const Add = ({ apiData }) => {
                 </Grid>
                 <Grid item xs={0.2}></Grid>
 
-                <Grid item xs={4} style={{ marginTop: '2%' }}>
+                <Grid item xs={3} style={{ marginTop: '2%' }}>
                   <Button>Cancel</Button>
                   <Button variant='contained'>Quét</Button>
                 </Grid>

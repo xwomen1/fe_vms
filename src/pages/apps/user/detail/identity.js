@@ -490,18 +490,14 @@ const UserDetails = () => {
 
   const handleCancel = () => {
     fetchUserData()
+
     setReadOnly(true)
     setEditing(false)
     setShowPlusColumn(!showPlusColumn)
-
-    router.reload()
-
-    setUser({
-      ...user,
-      fullName: '',
-      email: ''
-    })
   }
+  useEffect(() => {
+    fetchUserData()
+  }, [])
 
   return (
     <div>

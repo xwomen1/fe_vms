@@ -3,8 +3,6 @@ import Card from '@mui/material/Card'
 import Menu from '@mui/material/Menu'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
-import TreeView from '@mui/lab/TreeView'
-import TreeItem from '@mui/lab/TreeItem'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
@@ -16,23 +14,16 @@ import Icon from 'src/@core/components/icon'
 import { IconButton } from '@mui/material'
 import Swal from 'sweetalert2'
 import { fetchData } from 'src/store/apps/user'
-import { useRouter } from 'next/router'
 import axios from 'axios'
 import TableHeader from 'src/views/apps/vms/camera-config/TableHeader'
-import CustomTextField from 'src/@core/components/mui/text-field'
-import Link from 'next/link'
 import RolePopup from './popups/ChangePassword'
-import Passwords from './popups/Edit'
+import Edit from './popups/Edit'
 
 import Network from './popups/Network'
 import Video from './popups/video'
 import Image from './popups/Image'
 import Checkbox from '@mui/material/Checkbox'
 import Cloud from './popups/Cloud'
-import ConnectCamera from './popups/ConnectCamera'
-import VideoConnectCamera from './popups/VideoConnectCamera'
-
-// import { Password } from '@mui/icons-material'
 
 const Camera = ({ apiData }) => {
   const [value, setValue] = useState('')
@@ -44,9 +35,6 @@ const Camera = ({ apiData }) => {
   const [openPopupVideo, setOpenPopupVideo] = useState(false)
   const [openPopupImage, setOpenPopupImage] = useState(false)
   const [openPopupCloud, setOpenPopupCloud] = useState(false)
-  const [openPopupConnectCamera, setOpenPopupConnectCamera] = useState(false)
-  const [openPopupVideoConnectCamera, setOpenPopupVideoConnectCamera] = useState(false)
-
   const [selectedNvrId, setSelectedNvrId] = useState(null)
   const [addUserOpen, setAddUserOpen] = useState(false)
   const [assettype, setAssetType] = useState([])
@@ -80,20 +68,17 @@ const Camera = ({ apiData }) => {
     setOpenPopup(true)
   }
 
-  const handleAddRolesClick = () => {
-    setOpenPopup(true)
-  }
-
   const handleClosePopup = () => {
-    setOpenPopup(false) // Đóng Popup khi cần thiết
+    setOpenPopup(false)
   }
 
-  const handleAddPClick = () => {
+  const handleAddPClick = cameraId => {
     setOpenPopupP(true)
+    setSelectedNvrId(cameraId)
   }
 
   const handleClosePPopup = () => {
-    setOpenPopupP(false) // Đóng Popup khi cần thiết
+    setOpenPopupP(false)
   }
 
   const handleAddNetworkClick = () => {
@@ -101,7 +86,7 @@ const Camera = ({ apiData }) => {
   }
 
   const handleCloseNetWorkPopup = () => {
-    setOpenPopupNetwork(false) // Đóng Popup khi cần thiết
+    setOpenPopupNetwork(false)
   }
 
   const handleAddVideoClick = () => {
@@ -109,7 +94,7 @@ const Camera = ({ apiData }) => {
   }
 
   const handleCloseVideoPopup = () => {
-    setOpenPopupVideo(false) // Đóng Popup khi cần thiết
+    setOpenPopupVideo(false)
   }
 
   const handleAddImageClick = () => {
@@ -117,7 +102,7 @@ const Camera = ({ apiData }) => {
   }
 
   const handleCloseImagePopup = () => {
-    setOpenPopupImage(false) // Đóng Popup khi cần thiết
+    setOpenPopupImage(false)
   }
 
   const handleAddCloudClick = () => {
@@ -125,24 +110,9 @@ const Camera = ({ apiData }) => {
   }
 
   const handleCloseCloudPopup = () => {
-    setOpenPopupCloud(false) // Đóng Popup khi cần thiết
+    setOpenPopupCloud(false)
   }
 
-  const handleAddConnectCameraClick = () => {
-    setOpenPopupConnectCamera(true)
-  }
-
-  const handleCloseConnectCameraPopup = () => {
-    setOpenPopupConnectCamera(false) // Đóng Popup khi cần thiết
-  }
-
-  const handleAddVideoConnectClick = () => {
-    setOpenPopupVideoConnectCamera(true)
-  }
-
-  const handleCloseVideoConnectPopup = () => {
-    setOpenPopupVideoConnectCamera(false) // Đóng Popup khi cần thiết
-  }
   function showAlertConfirm(options, intl) {
     const defaultProps = {
       title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
@@ -176,13 +146,6 @@ const Camera = ({ apiData }) => {
     setPage(1)
     handleCloseMenu()
   }
-
-  const passwords = useCallback(val => {
-    setValue(val)
-  }, [])
-
-  console.log(total, 'totalpage')
-
   const statusText = status1 ? 'Đang hoạt động' : 'Không hoạt động'
 
   const handleDelete = idDelete => {
@@ -215,8 +178,6 @@ const Camera = ({ apiData }) => {
       }
     })
   }
-
-  const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen)
   useEffect(() => {
     const fetchFilteredOrAllUsers = async () => {
       try {
@@ -237,7 +198,6 @@ const Camera = ({ apiData }) => {
         setCamera(response.data.data[0].id)
         setAssetType(response.data.data)
         setTotal(response.data.data.page)
-        console.log(response.data.data[0].id)
       } catch (error) {
         console.error('Error fetching users:', error)
       }
@@ -312,7 +272,7 @@ const Camera = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{statusText}</TableCell>
 
                       <TableCell sx={{ padding: '16px' }}>
-                        <IconButton size='small' onClick={handleAddPClick}>
+                        <IconButton size='small' onClick={() => handleAddPClick(assetType.id)}>
                           <Icon icon='tabler:edit' />
                         </IconButton>
                         <IconButton onClick={() => handleDelete(assetType.id)}>
@@ -354,54 +314,32 @@ const Camera = ({ apiData }) => {
         )}
         {openPopup && (
           <>
-            <RolePopup open={openPopup} onClose={handleClosePopup} nvr={selectedIds} />
+            <RolePopup open={openPopup} onClose={handleClosePopup} camera={selectedIds} />
           </>
         )}
         {openPopupVideo && (
           <>
-            <Video open={openPopupVideo} onClose={handleCloseVideoPopup} nvr={selectedIds} />
+            <Video open={openPopupVideo} onClose={handleCloseVideoPopup} camera={selectedIds} />
           </>
         )}{' '}
         {openPopupImage && (
           <>
-            <Image open={openPopupImage} onClose={handleCloseImagePopup} nvr={selectedIds} />
+            <Image open={openPopupImage} onClose={handleCloseImagePopup} camera={selectedIds} />
           </>
         )}{' '}
         {openPopupCloud && (
           <>
-            <Cloud open={openPopupCloud} onClose={handleCloseCloudPopup} nvr={selectedIds} />
+            <Cloud open={openPopupCloud} onClose={handleCloseCloudPopup} camera={selectedIds} />
           </>
         )}
-        {/* {selectedIds.length < 2 && selectedIds.length >= 0 && (
-    <>
-      <RolePopup open={openPopup} onClose={handleClosePopup} camera={selectedIds} />
-      <Network open={openPopupNetwork} onClose={handleCloseNetWorkPopup} camera={selectedIds} />
-      <Video open={openPopupVideo} onClose={handleCloseVideoPopup} camera={selectedIds} />
-      <Image open={openPopupImage} onClose={handleCloseImagePopup} camera={selectedIds} />
-      <Cloud open={openPopupCloud} onClose={handleCloseCloudPopup} camera={selectedIds} />
-    </>
-  )} */}
-        <Passwords open={openPopupP} onClose={handleClosePPopup} camera={selectedIds} />
-        <ConnectCamera open={openPopupConnectCamera} onClose={handleCloseConnectCameraPopup} camera={selectedIds} />
-        <VideoConnectCamera
-          open={openPopupVideoConnectCamera}
-          onClose={handleCloseVideoConnectPopup}
-          camera={selectedIds}
-        />
+        {openPopupP && (
+          <>
+            <Edit open={openPopupP} onClose={handleClosePPopup} camera={selectedNvrId} />
+          </>
+        )}
       </Grid>
     </Grid>
   )
-}
-
-export const getStaticProps = async () => {
-  const res = await axios.get('/cards/statistics')
-  const apiData = res.data
-
-  return {
-    props: {
-      apiData
-    }
-  }
 }
 
 export default Camera

@@ -11,7 +11,6 @@ import {
   FormControlLabel,
   Checkbox,
   Switch,
-  TextField,
   Typography,
   FormControl,
   InputLabel,
@@ -19,11 +18,9 @@ import {
   MenuItem
 } from '@mui/material'
 import Icon from 'src/@core/components/icon'
-import Autocomplete from '@mui/material/Autocomplete'
 import Box from '@mui/material/Box'
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import TableContainer from '@mui/material/TableContainer'
-import Paper from '@mui/material/Paper'
 import Table from '@mui/material/Table'
 import TableRow from '@mui/material/TableRow'
 import TableHead from '@mui/material/TableHead'
@@ -73,6 +70,7 @@ const UserDetails = () => {
   const [piId, setPiId] = useState(null)
   const [ava1, setAva1] = useState(null)
   const [ava2, setAva2] = useState(null)
+  const [data, setData] = useState(null)
 
   const handleAddRoleClickPolicy = () => {
     setOpenPopupPolicy(true)
@@ -248,21 +246,6 @@ const UserDetails = () => {
     return [hour, minute]
   }
 
-  // Sử dụng hàm
-  // console.log(timeArray, 'timearray')
-  // const convertStringToTimeArray = timeString => {
-  //   if (typeof timeString === 'string') {
-  //     const [hourStr, minuteStr] = timeString.split(':').map(str => parseInt(str, 10))
-
-  //     if (!isNaN(hourStr) && !isNaN(minuteStr)) {
-  //       return [hourStr, minuteStr]
-  //     }
-  //   }
-
-  //   console.error('Invalid timeString:', timeString)
-  //   return null
-  // }
-
   useEffect(() => {
     const fetchGroupData = async () => {
       try {
@@ -296,6 +279,8 @@ const UserDetails = () => {
         }
       }
       const response = await axios.get(`https://dev-ivi.basesystem.one/smc/iam/api/v0/users/${userId}`, config)
+      setData(response.data.data) // store the fetched data in the state
+
       setGroup(response.data.data.userGroups)
       setPolicies(response.data.data.policies)
       setPiId(response.data.data.piId)
@@ -415,6 +400,7 @@ const UserDetails = () => {
           }
         }
         const response = await axios.get(`https://dev-ivi.basesystem.one/smc/iam/api/v0/users/${userId}`, config)
+        setData(response.data.data) // store the fetched data in the state
         setUser(response.data.data)
         setGroup(response.data.data.userGroups)
         setPolicies(response.data.data.policies)
@@ -483,17 +469,14 @@ const UserDetails = () => {
 
   const handleCancel = () => {
     fetchUserData()
+
     setReadOnly(true)
     setEditing(false)
     setShowPlusColumn(!showPlusColumn)
-    router.reload()
-
-    setUser({
-      ...user,
-      fullName: '',
-      email: ''
-    })
   }
+  useEffect(() => {
+    fetchUserData()
+  }, [])
   console.log('param', params)
 
   return (

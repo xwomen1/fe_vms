@@ -1,4 +1,4 @@
-import { Grid } from '@mui/material'
+import { Grid, Paper } from '@mui/material'
 
 import TableStickyHeader from './table'
 import Tab from '@mui/material/Tab'
@@ -41,24 +41,22 @@ const Caller = () => {
   }
 
   return (
-    <Grid>
+    <Grid component={Paper} style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
       <TabContext value={value}>
-          <Grid>
-            {' '}
-            <TabList onChange={handleChange} aria-label='customized tabs example'>
-              <Tab value='1' label='Cấu hình Camera' />
-              <Tab value='2' label='Thêm Camera' />
-            
-            </TabList>
-          </Grid>
-          <TabPanel value='1'>
+        <Grid>
+          {' '}
+          <TabList onChange={handleChange} aria-label='customized tabs example'>
+            <Tab value='1' label='Cấu hình Camera' />
+            <Tab value='2' label='Thêm Camera' />
+          </TabList>
+        </Grid>
+        <TabPanel value='1'>
           <TableStickyHeader />
-          </TabPanel>
-          <TabPanel value='2'>
-            <Add/>
-          </TabPanel>
-         
-        </TabContext>
+        </TabPanel>
+        <TabPanel value='2'>
+          <Add />
+        </TabPanel>
+      </TabContext>
     </Grid>
   )
 }
