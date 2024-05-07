@@ -1,21 +1,31 @@
 import { useRouter } from 'next/router'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios'
 import authConfig from 'src/configs/auth'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import { Grid, Checkbox, Autocomplete } from '@mui/material'
 
-import Paper from '@mui/material/Paper'
-
 const DDNS = cameras => {
   const [DDNSOption, setDDNS] = useState([])
+  const defaultValue = cameras.camera?.ddnsType?.name || ''
+
+  const [DDNS, setSelectedDDNSType] = useState({
+    label: cameras.camera?.ddnsType?.name || '',
+    value: cameras.camera?.ddnsType?.name || ''
+  })
 
   const handleDDNSChange = (event, newValue) => {
-    setSelectedNicType(newValue)
+    setSelectedDDNSType(newValue || defaultValue)
   }
+  useEffect(() => {
+    setSelectedDDNSType({
+      label: defaultValue,
+      value: defaultValue
+    })
+  }, [defaultValue])
 
-  const fetchNicTypes = async () => {
+  const fetchDDNS = async () => {
     try {
       // setLoading(true)
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -37,7 +47,6 @@ const DDNS = cameras => {
       }))
       setDDNS(nicTypes)
 
-      // Set selectedNicType here based on your business logic
       if (nicTypes.length > 0) {
         setSelectedNicType(nicTypes[0].value) // Set it to the first value in the array, or adjust as needed
       }
@@ -49,12 +58,8 @@ const DDNS = cameras => {
   }
 
   const handleComboboxFocus = () => {
-    // if (DDNSOption.length === 0) {
-    fetchNicTypes()
-
-    // }
+    fetchDDNS()
   }
-  console.log('param', cameras?.camera.ddnsType)
   const formatDDNS = ddns => <Checkbox checked={ddns} disabled />
 
   return (
@@ -68,7 +73,7 @@ const DDNS = cameras => {
           <Grid item xs={5.8}></Grid>
           <Grid item xs={5.8}>
             <Autocomplete
-              value={cameras.camera?.ddnsType?.name || ''}
+              value={DDNS}
               onChange={handleDDNSChange}
               options={DDNSOption}
               getOptionLabel={option => option.label}

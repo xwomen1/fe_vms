@@ -1,29 +1,14 @@
-import { useEffect, useState } from 'react'
-import { Grid, IconButton } from '@mui/material'
-import Icon from 'src/@core/components/icon'
-import Link from 'next/link'
+import { useState } from 'react'
+import { Grid } from '@mui/material'
 import Tab from '@mui/material/Tab'
 import TabPanel from '@mui/lab/TabPanel'
 import TabContext from '@mui/lab/TabContext'
 import { styled } from '@mui/material/styles'
 import MuiTabList from '@mui/lab/TabList'
-import authConfig from 'src/configs/auth'
-import axios from 'axios'
 import Camera from './Camera'
 import Channel from './Channel'
-import Port from './Port'
-import NTP from './NTP'
 
-import {
-  Autocomplete,
-  TextField,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Checkbox
-} from '@mui/material'
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Checkbox } from '@mui/material'
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   borderBottom: '0 !important',
@@ -48,15 +33,8 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
     }
   }
 }))
-import Swal from 'sweetalert2'
 
-const RolePopup = ({ open, onClose, onSelect, nvr }) => {
-  const [selectedRole, setSelectedRole] = useState(null)
-  const [groupName, setGroupName] = useState([])
-  const [defaultGroup, setDefaultGroup] = useState(null)
-  const [selectedGroupId, setSelectedGroupId] = useState(null) // Thêm trạng thái để lưu trữ id của nhóm được chọn
-  const [nvrs, setNvrs] = useState([])
-  const [groupCode, setGroupCode] = useState([])
+const RolePopup = ({ open, onClose }) => {
   const [value, setValue] = useState('1')
 
   const handleChange = (event, newValue) => {

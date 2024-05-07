@@ -1,32 +1,18 @@
-import { useEffect, useState } from 'react'
-import { Grid, IconButton } from '@mui/material'
-import Icon from 'src/@core/components/icon'
-import Link from 'next/link'
+import { useState } from 'react'
+import { Grid } from '@mui/material'
 import Tab from '@mui/material/Tab'
 import TabPanel from '@mui/lab/TabPanel'
 import TabContext from '@mui/lab/TabContext'
 import { styled } from '@mui/material/styles'
 import MuiTabList from '@mui/lab/TabList'
-import authConfig from 'src/configs/auth'
-import axios from 'axios'
-import TCP from './TCP-IP'
-import DDNs from './DDNS'
+import Device from './Device'
 import Networks from './Networks'
 import Passwords from './PassWord'
 import Video from './VideoCameraa'
 import Image from './ImageCamera'
 import Cloud from './CloudCamera'
 
-import {
-  Autocomplete,
-  TextField,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Checkbox
-} from '@mui/material'
+import { Dialog, DialogTitle, DialogContent } from '@mui/material'
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   borderBottom: '0 !important',
@@ -51,59 +37,20 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
     }
   }
 }))
-import Swal from 'sweetalert2'
 
-const Edit = ({ open, onClose, onSelect, camera }) => {
-  const [selectedRole, setSelectedRole] = useState(null)
-  const [groupName, setGroupName] = useState([])
-  const [defaultGroup, setDefaultGroup] = useState(null)
-  const [selectedGroupId, setSelectedGroupId] = useState(null) // Thêm trạng thái để lưu trữ id của nhóm được chọn
+const Edit = ({ open, onClose, camera }) => {
   const [cameras, setCamera] = useState([])
-  const [nic, setNic] = useState([])
-  const [value, setValue] = useState('1')
-  const [value1, setValue1] = useState('1')
+  const [value, setValue] = useState('0')
 
   const handleChange = (event, newValue) => {
     setValue(newValue)
   }
 
-  const handleChange1 = (event, newValue) => {
-    setValue1(newValue)
-  }
   console.log(camera, 'camera eidy')
 
   const handleCancel = () => {
     onClose()
   }
-  useEffect(() => {
-    const fetchGroupData = async () => {
-      try {
-        if (camera != null) {
-          // Kiểm tra xem popup Network đã mở chưa
-          const token = localStorage.getItem(authConfig.storageTokenKeyName)
-          console.log('token', token)
-
-          const config = {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-
-          const response = await axios.get(
-            `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/{idCamera}?idCamera=${camera}`,
-            config
-          )
-
-          setCamera(response.data.data)
-          setNic(response.data.data.nicType.name)
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
-    }
-
-    fetchGroupData()
-  }, [camera]) // Thêm openPopupNetwork vào dependency array để useEffect được gọi khi openPopupNetwork thay đổi
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -113,6 +60,7 @@ const Edit = ({ open, onClose, onSelect, camera }) => {
           <Grid>
             {' '}
             <TabList onChange={handleChange} aria-label='customized tabs example'>
+              <Tab value='0' label='Thiết bị' />
               <Tab value='1' label='Mật khẩu' />
               <Tab value='2' label='Mạng' />
               <Tab value='3' label='Video' />
@@ -120,11 +68,14 @@ const Edit = ({ open, onClose, onSelect, camera }) => {
               <Tab value='5' label='Bộ nhớ' />
             </TabList>
           </Grid>
+          <TabPanel value='0'>
+            <Device onClose={handleCancel} camera={camera} />
+          </TabPanel>
           <TabPanel value='1'>
-            <Passwords />
+            <Passwords onClose={handleCancel} camera={camera} />
           </TabPanel>
           <TabPanel value='2'>
-            <Networks />
+            <Networks camera={camera} />
           </TabPanel>
           <TabPanel value='3'>
             {' '}
@@ -140,10 +91,6 @@ const Edit = ({ open, onClose, onSelect, camera }) => {
           </TabPanel>
         </TabContext>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCancel}>Cancel</Button>
-        <Button>OK</Button>
-      </DialogActions>
     </Dialog>
   )
 }

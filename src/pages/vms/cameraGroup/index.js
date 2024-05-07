@@ -10,8 +10,12 @@ import MuiTabList from '@mui/lab/TabList'
 import TabContext from '@mui/lab/TabContext'
 import ViewCamera from 'src/@core/components/camera'
 import Settings from 'src/@core/components/camera/settings'
+<<<<<<< HEAD
 import { getApi } from 'src/@core/utils/requestUltils'
 import { CAMERA_API } from 'src/@core/components/api-url'
+=======
+
+>>>>>>> main
 const TabList = styled(MuiTabList)(({ theme }) => ({
   borderBottom: '0 !important',
   '&, & .MuiTabs-scroller': {
@@ -35,6 +39,7 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
     }
   }
 }))
+
 const DivStyle = styled('div')(({ theme }) => ({
   margin: '-1.2rem -1.5rem'
 }))

@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Grid, IconButton } from '@mui/material'
-import Icon from 'src/@core/components/icon'
-import Link from 'next/link'
+import { Grid } from '@mui/material'
 import Tab from '@mui/material/Tab'
 import TabPanel from '@mui/lab/TabPanel'
 import TabContext from '@mui/lab/TabContext'
@@ -12,18 +10,6 @@ import axios from 'axios'
 import TCP from './TCP-IP'
 import DDNs from './DDNS'
 import Port from './Port'
-import NTP from './NTP'
-
-import {
-  Autocomplete,
-  TextField,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Checkbox
-} from '@mui/material'
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   borderBottom: '0 !important',
@@ -48,13 +34,8 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
     }
   }
 }))
-import Swal from 'sweetalert2'
 
 const Network = ({ open, onClose, onSelect, camera }) => {
-  const [selectedRole, setSelectedRole] = useState(null)
-  const [groupName, setGroupName] = useState([])
-  const [defaultGroup, setDefaultGroup] = useState(null)
-  const [selectedGroupId, setSelectedGroupId] = useState(null) // Thêm trạng thái để lưu trữ id của nhóm được chọn
   const [cameras, setCamera] = useState([])
   const [nic, setNic] = useState([])
   const [value, setValue] = useState('1')
@@ -64,14 +45,10 @@ const Network = ({ open, onClose, onSelect, camera }) => {
   }
   console.log(camera, 'camera')
 
-  const handleCancel = () => {
-    onClose()
-  }
   useEffect(() => {
     const fetchGroupData = async () => {
       try {
         if (camera != null) {
-          // Kiểm tra xem popup Network đã mở chưa
           const token = localStorage.getItem(authConfig.storageTokenKeyName)
           console.log('token', token)
 
@@ -95,7 +72,7 @@ const Network = ({ open, onClose, onSelect, camera }) => {
     }
 
     fetchGroupData()
-  }, [camera]) // Thêm openPopupNetwork vào dependency array để useEffect được gọi khi openPopupNetwork thay đổi
+  }, [camera])
 
   return (
     <TabContext value={value}>
@@ -105,7 +82,6 @@ const Network = ({ open, onClose, onSelect, camera }) => {
           <Tab value='1' label='TCP/IP' />
           <Tab value='2' label='DDNS' />
           <Tab value='3' label='PORT' />
-          {/* <Tab value='4' label='NTP' /> */}
         </TabList>
       </Grid>
       <TabPanel value='1'>
@@ -120,10 +96,6 @@ const Network = ({ open, onClose, onSelect, camera }) => {
         {' '}
         <Port nvrs={cameras} />
       </TabPanel>
-      {/* <TabPanel value='4'>
-            {' '}
-            <NTP nvrs={cameras} />
-          </TabPanel> */}
     </TabContext>
   )
 }

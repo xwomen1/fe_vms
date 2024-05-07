@@ -1,47 +1,17 @@
-import { useEffect, useState } from 'react'
-import { FormControl, Grid, IconButton, InputLabel, MenuItem, Paper, Select } from '@mui/material'
-import Icon from 'src/@core/components/icon'
-import Link from 'next/link'
-import Tab from '@mui/material/Tab'
-import TabPanel from '@mui/lab/TabPanel'
-import TabContext from '@mui/lab/TabContext'
-import { styled } from '@mui/material/styles'
-import MuiTabList from '@mui/lab/TabList'
+import { useState } from 'react'
+import { Grid, Paper } from '@mui/material'
+
 import authConfig from 'src/configs/auth'
 import axios from 'axios'
-import TCP from './TCP-IP'
-import DDNs from './DDNS'
-import Port from './Port'
-import NTP from './NTP'
 
-import {
-  Autocomplete,
-  TextField,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Checkbox
-} from '@mui/material'
+import { Autocomplete, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material'
 import CustomTextField from 'src/@core/components/mui/text-field'
 
-const RolePopup = ({ open, onClose, onSelect, nvr }) => {
-  const [selectedRole, setSelectedRole] = useState(null)
-  const [groupName, setGroupName] = useState([])
-  const [defaultGroup, setDefaultGroup] = useState(null)
-  const [selectedGroupId, setSelectedGroupId] = useState(null) // Thêm trạng thái để lưu trữ id của nhóm được chọn
-  const [nvrs, setNvrs] = useState([])
-  const [groupCode, setGroupCode] = useState([])
-  const [value, setValue] = useState('1')
+const RolePopup = ({ open, onClose }) => {
   const [DDNSOption, setDDNS] = useState([])
 
   const handleDDNSChange = (event, newValue) => {
     setSelectedNicType(newValue)
-  }
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue)
   }
 
   const handleCancel = () => {
@@ -50,7 +20,6 @@ const RolePopup = ({ open, onClose, onSelect, nvr }) => {
 
   const fetchCameraTypes = async () => {
     try {
-      // setLoading(true)
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
       const config = {
@@ -70,22 +39,17 @@ const RolePopup = ({ open, onClose, onSelect, nvr }) => {
       }))
       setDDNS(nicTypes)
 
-      // Set selectedNicType here based on your business logic
       if (nicTypes.length > 0) {
-        setSelectedNicType(nicTypes[0].value) // Set it to the first value in the array, or adjust as needed
+        setSelectedNicType(nicTypes[0].value)
       }
     } catch (error) {
       console.error('Error fetching NIC types:', error)
     } finally {
-      // setLoading(false)
     }
   }
 
   const handleCamera = () => {
-    // if (DDNSOption.length === 0) {
     fetchCameraTypes()
-
-    // }
   }
 
   return (
@@ -102,8 +66,6 @@ const RolePopup = ({ open, onClose, onSelect, nvr }) => {
                   getOptionLabel={option => option.label}
                   renderInput={params => <CustomTextField {...params} label='Camera' fullWidth />}
                   onFocus={handleCamera}
-
-                  // loading={loading}
                 />
               </Grid>
               <Grid item xs={0.2}></Grid>

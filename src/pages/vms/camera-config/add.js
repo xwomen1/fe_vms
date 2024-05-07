@@ -11,7 +11,7 @@ import authConfig from 'src/configs/auth'
 import Table from '@mui/material/Table'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
-import { Button, FormControl, IconButton, InputLabel, Paper, Select } from '@mui/material'
+import { Autocomplete, Button, FormControl, IconButton, InputLabel, Paper, Select } from '@mui/material'
 import Swal from 'sweetalert2'
 import axios from 'axios'
 import CustomTextField from 'src/@core/components/mui/text-field'
@@ -34,6 +34,8 @@ const Add = ({ apiData }) => {
   const [selectedIds, setSelectedIds] = useState([])
   const [openPopup, setOpenPopup] = useState(false)
   const [openPopupP, setOpenPopupP] = useState(false)
+  const [selectNVR, setSelectedNVR] = useState('')
+  const defaultValue = ''
 
   const [openPopupNetwork, setOpenPopupNetwork] = useState(false)
   const [openPopupVideo, setOpenPopupVideo] = useState(false)
@@ -42,6 +44,7 @@ const Add = ({ apiData }) => {
   const [openPopupConnectCamera, setOpenPopupConnectCamera] = useState(false)
   const [openPopupVideoConnectCamera, setOpenPopupVideoConnectCamera] = useState(false)
   const [assettype, setAssetType] = useState([])
+  const [nvrs, setNVR] = useState([])
 
   const [total, setTotal] = useState([1])
   const [page, setPage] = useState(1)
@@ -57,6 +60,40 @@ const Add = ({ apiData }) => {
   const [password, setPassword] = useState('')
   const [response, setResponse] = useState('')
   const [openPopupResponse, setOpenPopupResponse] = useState(false)
+
+  const fetchNicTypes = async () => {
+    try {
+      // setLoading(true)
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/nvrs', config)
+
+      const nicTypes = response.data.data.map(item => ({
+        label: item.name,
+        value: item.value
+      }))
+      setNVR(nicTypes)
+
+      // Set selectedNicType here based on your business logic
+      if (nicTypes.length > 0) {
+        setSelectedNVR(nicTypes[0].value) // Set it to the first value in the array, or adjust as needed
+      }
+    } catch (error) {
+      console.error('Error fetching NIC types:', error)
+    } finally {
+      // setLoading(false)
+    }
+  }
+
+  const handleComboboxFocus = () => {
+    fetchNicTypes()
+  }
 
   const handleScan = async () => {
     setOpenPopupResponse(true)
@@ -101,16 +138,16 @@ const Add = ({ apiData }) => {
     setPage(newPage)
   }
 
-  const handleCheckboxChange = id => {
-    const isSelected = selectedIds.includes(id)
-    if (isSelected) {
-      setSelectedIds(selectedIds.filter(selectedId => selectedId !== id))
-      setSelectedNvrId(null)
-    } else {
-      setSelectedIds([...selectedIds, id])
-      setSelectedNvrId(id)
-    }
-  }
+  // const handleCheckboxChange = id => {
+  //   const isSelected = selectedIds.includes(id)
+  //   if (isSelected) {
+  //     setSelectedIds(selectedIds.filter(selectedId => selectedId !== id))
+  //     setSelectedNvrId(null)
+  //   } else {
+  //     setSelectedIds([...selectedIds, id])
+  //     setSelectedNvrId(id)
+  //   }
+  // }
 
   const handleClosePopup = () => {
     setOpenPopup(false)
@@ -163,6 +200,16 @@ const Add = ({ apiData }) => {
   const handleCloseMenu = () => {
     setAnchorEl(null)
   }
+
+  const handleDDNSChange = (event, newValue) => {
+    setSelectedNVR(newValue || defaultValue)
+  }
+  useEffect(() => {
+    setSelectedNVR({
+      label: defaultValue,
+      value: defaultValue
+    })
+  }, [defaultValue])
 
   const handleSelectPageSize = size => {
     setPageSize(size)
@@ -233,7 +280,21 @@ const Add = ({ apiData }) => {
                 component={Paper}
                 style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
               >
-                <Grid item xs={2}>
+                <Grid item xs={1.8}>
+                  <Autocomplete
+                    value={selectNVR}
+                    onChange={handleDDNSChange}
+                    options={nvrs}
+                    getOptionLabel={option => option.label}
+                    renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
+                    onFocus={handleComboboxFocus}
+
+                    // loading={loading}
+                  />{' '}
+                </Grid>
+                <Grid item xs={0.1}></Grid>
+
+                <Grid item xs={1.8}>
                   <CustomTextField
                     value={ipAddress}
                     onChange={e => setIpAddress(e.target.value)}
@@ -241,12 +302,12 @@ const Add = ({ apiData }) => {
                     fullWidth
                   />
                 </Grid>
-                <Grid item xs={0.2}></Grid>
-                <Grid item xs={2}>
+                <Grid item xs={0.1}></Grid>
+                <Grid item xs={1.8}>
                   <CustomTextField value={port} onChange={e => setPort(e.target.value)} label='Cổng' fullWidth />
                 </Grid>
-                <Grid item xs={0.2}></Grid>
-                <Grid item xs={2}>
+                <Grid item xs={0.1}></Grid>
+                <Grid item xs={1.8}>
                   <CustomTextField
                     value={username}
                     onChange={e => setUsername(e.target.value)}
@@ -254,8 +315,8 @@ const Add = ({ apiData }) => {
                     fullWidth
                   />
                 </Grid>
-                <Grid item xs={0.2}></Grid>
-                <Grid item xs={2}>
+                <Grid item xs={0.1}></Grid>
+                <Grid item xs={1.8}>
                   <CustomTextField
                     value={password}
                     onChange={e => setPassword(e.target.value)}
@@ -266,7 +327,7 @@ const Add = ({ apiData }) => {
                 </Grid>
                 <Grid item xs={0.2}></Grid>
 
-                <Grid item xs={3} style={{ marginTop: '2%' }}>
+                <Grid item xs={2} style={{ marginTop: '2%' }}>
                   <Button>Cancel</Button>
                   <Button onClick={handleScan} variant='contained'>
                     Quét
@@ -287,6 +348,11 @@ const Add = ({ apiData }) => {
                 component={Paper}
                 style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
               >
+                <Grid item xs={1.8}>
+                  <Autocomplete renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />} />
+                </Grid>
+                <Grid item xs={0.1}></Grid>
+
                 <Grid item xs={2}>
                   <CustomTextField label='Địa chỉ IP bắt đầu' fullWidth />
                 </Grid>
@@ -311,7 +377,6 @@ const Add = ({ apiData }) => {
                 <Grid item xs={2}>
                   <CustomTextField label='Cổng kết thúc' fullWidth />
                 </Grid>
-                <Grid item xs={2}></Grid>
                 <Grid item xs={2}>
                   <CustomTextField label='Đăng nhập' fullWidth />
                 </Grid>
@@ -334,9 +399,11 @@ const Add = ({ apiData }) => {
                 component={Paper}
                 style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
               >
-                <Grid item xs={0.4}></Grid>
+                <Grid item xs={1.8}>
+                  <Autocomplete renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />} />
+                </Grid>
+                <Grid item xs={0.1}></Grid>
 
-                <Grid item xs={0.4}></Grid>
                 <Grid item xs={2}>
                   <CustomTextField label='Đăng nhập' fullWidth />
                 </Grid>
@@ -369,8 +436,11 @@ const Add = ({ apiData }) => {
                   </FormControl>
                 </Grid>
                 <Grid item xs={0.4}></Grid>
+                <Grid item xs={1.8}>
+                  <Autocomplete renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />} />
+                </Grid>
+                <Grid item xs={0.1}></Grid>
 
-                <Grid item xs={0.4}></Grid>
                 <Grid item xs={2}>
                   <CustomTextField label='Đăng nhập' fullWidth />
                 </Grid>
@@ -380,7 +450,7 @@ const Add = ({ apiData }) => {
                 </Grid>
                 <Grid item xs={0.2}></Grid>
 
-                <Grid item xs={4} style={{ marginTop: '2%' }}>
+                <Grid item xs={3} style={{ marginTop: '2%' }}>
                   <Button>Cancel</Button>
                   <Button variant='contained'>Quét</Button>
                 </Grid>
@@ -424,7 +494,8 @@ const Add = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>
                         <Checkbox
                           checked={selectedIds.includes(assetType.id)}
-                          onChange={() => handleCheckboxChange(assetType.id)}
+
+                          // onChange={() => handleCheckboxChange(assetType.id)}
                         />
                       </TableCell>
                       <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
@@ -478,23 +549,6 @@ const Add = ({ apiData }) => {
             </Grid>
           </Grid>
         </Card>
-        {selectedIds.length > 0 && (
-          <>
-            <RolePopup open={openPopup} onClose={handleClosePopup} camera={selectedIds} />
-            <Network open={openPopupNetwork} onClose={handleCloseNetWorkPopup} camera={selectedIds} />
-            <Video open={openPopupVideo} onClose={handleCloseVideoPopup} camera={selectedIds} />
-            <Image open={openPopupImage} onClose={handleCloseImagePopup} camera={selectedIds} />
-            <Cloud open={openPopupCloud} onClose={handleCloseCloudPopup} camera={selectedIds} />
-          </>
-        )}
-        <Passwords open={openPopupP} onClose={handleClosePPopup} camera={selectedIds} />
-
-        <ConnectCamera open={openPopupConnectCamera} onClose={handleCloseConnectCameraPopup} camera={selectedIds} />
-        <VideoConnectCamera
-          open={openPopupVideoConnectCamera}
-          onClose={handleCloseVideoConnectPopup}
-          camera={selectedIds}
-        />
       </Grid>
     </Grid>
   )
