@@ -11,7 +11,7 @@ export const METHODS = {
 
 async function getToken() {
   if (typeof window === 'undefined') return ''
-  const token = window.localStorage.getItem('accessToken')
+  const token = window.localStorage.getItem('access_token')
 
   return token && token.length ? `Bearer ${token}` : ''
 }
@@ -37,13 +37,11 @@ axios.interceptors.response.use(
   response => (response?.data?.data ? response?.data : response),
   error => {
     if (error.response?.status === 401 && !window?.location?.pathname?.includes('login')) {
-      window?.localStorage?.clear()
-      window?.location?.reload()
-
+      // window?.localStorage?.clear()
+      // window?.location?.reload()
       // const pathNameLogin =
       //   window?.location?.protocol + '//' + window?.location?.host + '/login'
       // window.location.replace(pathNameLogin)
-
     }
 
     return Promise.reject(error)
@@ -104,7 +102,6 @@ export function postApi(url, payload = {}, other) {
     //   'Access-Control-Allow-Origin': '*'
     // },
     // withCredentials: true ,
-
   })
 }
 
