@@ -9,6 +9,7 @@ import TabContext from '@mui/lab/TabContext'
 import { useState } from 'react'
 import ViewCamera from 'src/@core/components/camera'
 import Settings from 'src/@core/components/camera/settings'
+
 const TabList = styled(MuiTabList)(({ theme }) => ({
   borderBottom: '0 !important',
   '&, & .MuiTabs-scroller': {
@@ -32,6 +33,7 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
     }
   }
 }))
+
 const DivStyle = styled('div')(({ theme }) => ({
   margin: '-1.2rem -1.5rem'
 }))
@@ -149,6 +151,7 @@ const MocData = [
 
 const Caller = () => {
   const [sizeScreen, setSizeScreen] = useState(3)
+
   return (
     <DivStyle>
       <Grid container spacing={0}>
