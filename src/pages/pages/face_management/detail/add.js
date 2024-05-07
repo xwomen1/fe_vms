@@ -319,7 +319,6 @@ const AddFaceManagement = () => {
                                 style={{
                                     fontSize: '18px',
                                     lineHeight: '22px',
-                                    color: 'rgba(0, 0, 0, 0.6)',
                                     margin: '0px',
                                 }}
                                 >
@@ -354,7 +353,6 @@ const AddFaceManagement = () => {
                                 defaultValue=""
                                 mode="text"
                                 style={{
-                                    background: '#FFFFFF',
                                     border: '1px solid rgba(0, 0, 0, 0.12)',
                                     borderRadius: '4px',
                                     marginTop: '10px',
@@ -452,7 +450,6 @@ const AddFaceManagement = () => {
                                         style={{
                                         fontSize: '16px',
                                         lineHeight: '19px',
-                                        color: 'rgba(37, 37, 37, 0.6)',
                                         }}
                                     >
                                         {`Kéo thả ảnh`}
@@ -461,7 +458,6 @@ const AddFaceManagement = () => {
                                         style={{
                                         fontSize: '16px',
                                         lineHeight: '19px',
-                                        color: 'rgba(37, 37, 37, 0.84)',
                                         }}
                                     >
                                         {`Hoặc`}
@@ -571,7 +567,6 @@ const useStyles = makeStyles(() => ({
     },
     container: {
         padding: '30px 50px 0px 50px',
-        background: '#FFFFFF',
         boxShadow: '0px 6px 18px rgba(0, 0, 0, 0.06)',
         borderRadius: '10px',
     },

@@ -321,7 +321,6 @@ const AddFaceManagement = () => {
                                 style={{
                                     fontSize: '18px',
                                     lineHeight: '22px',
-                                    color: 'rgba(0, 0, 0, 0.6)',
                                     margin: '0px',
                                 }}
                                 >
