@@ -35,6 +35,7 @@ const Add = ({ apiData }) => {
   const [openPopup, setOpenPopup] = useState(false)
   const [openPopupP, setOpenPopupP] = useState(false)
   const [selectNVR, setSelectedNVR] = useState('')
+  const defaultValue = ''
 
   const [openPopupNetwork, setOpenPopupNetwork] = useState(false)
   const [openPopupVideo, setOpenPopupVideo] = useState(false)
@@ -137,16 +138,16 @@ const Add = ({ apiData }) => {
     setPage(newPage)
   }
 
-  const handleCheckboxChange = id => {
-    const isSelected = selectedIds.includes(id)
-    if (isSelected) {
-      setSelectedIds(selectedIds.filter(selectedId => selectedId !== id))
-      setSelectedNvrId(null)
-    } else {
-      setSelectedIds([...selectedIds, id])
-      setSelectedNvrId(id)
-    }
-  }
+  // const handleCheckboxChange = id => {
+  //   const isSelected = selectedIds.includes(id)
+  //   if (isSelected) {
+  //     setSelectedIds(selectedIds.filter(selectedId => selectedId !== id))
+  //     setSelectedNvrId(null)
+  //   } else {
+  //     setSelectedIds([...selectedIds, id])
+  //     setSelectedNvrId(id)
+  //   }
+  // }
 
   const handleClosePopup = () => {
     setOpenPopup(false)
@@ -201,8 +202,14 @@ const Add = ({ apiData }) => {
   }
 
   const handleDDNSChange = (event, newValue) => {
-    setSelectedNVR(newValue)
+    setSelectedNVR(newValue || defaultValue)
   }
+  useEffect(() => {
+    setSelectedNVR({
+      label: defaultValue,
+      value: defaultValue
+    })
+  }, [defaultValue])
 
   const handleSelectPageSize = size => {
     setPageSize(size)
@@ -487,7 +494,8 @@ const Add = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>
                         <Checkbox
                           checked={selectedIds.includes(assetType.id)}
-                          onChange={() => handleCheckboxChange(assetType.id)}
+
+                          // onChange={() => handleCheckboxChange(assetType.id)}
                         />
                       </TableCell>
                       <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
@@ -541,23 +549,6 @@ const Add = ({ apiData }) => {
             </Grid>
           </Grid>
         </Card>
-        {selectedIds.length > 0 && (
-          <>
-            <RolePopup open={openPopup} onClose={handleClosePopup} camera={selectedIds} />
-            <Network open={openPopupNetwork} onClose={handleCloseNetWorkPopup} camera={selectedIds} />
-            <Video open={openPopupVideo} onClose={handleCloseVideoPopup} camera={selectedIds} />
-            <Image open={openPopupImage} onClose={handleCloseImagePopup} camera={selectedIds} />
-            <Cloud open={openPopupCloud} onClose={handleCloseCloudPopup} camera={selectedIds} />
-          </>
-        )}
-        <Passwords open={openPopupP} onClose={handleClosePPopup} camera={selectedIds} />
-
-        <ConnectCamera open={openPopupConnectCamera} onClose={handleCloseConnectCameraPopup} camera={selectedIds} />
-        <VideoConnectCamera
-          open={openPopupVideoConnectCamera}
-          onClose={handleCloseVideoConnectPopup}
-          camera={selectedIds}
-        />
       </Grid>
     </Grid>
   )
