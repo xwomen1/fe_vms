@@ -5,9 +5,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import authConfig from 'src/configs/auth';
 import toast from 'react-hot-toast';
 import Swal from 'sweetalert2'
+import Icon from 'src/@core/components/icon'
 import CustomTextField from "src/@core/components/mui/text-field";
 import FileUploader from 'devextreme-react/file-uploader';
-import Icon from 'src/@core/components/icon'
 import ModalImage from '../ModalImage';
 import Link from 'next/link'
 import {
@@ -17,14 +17,14 @@ import {
     Typography,
     TextField,
     Input,
-    TextareaAutosize
 } from "@mui/material";
+import Fullscreen from '@material-ui/icons/Fullscreen';
 
-const EditFaceManagement = () => {
+const UpDateCar = () => {
 
     const classes = useStyles();
     const router = useRouter();
-    const id = router.query.EditDetailBlacklist;
+    const id = router.query.UpDateCar;
     const [loading, setLoading] = useState(false);
     const [avatarImage, setAvatarImage] = useState(null);
     const [listFileId, setListFileId] = useState([]);
@@ -32,12 +32,14 @@ const EditFaceManagement = () => {
     const listFileUrl = [];
     const [listFileUpload, setListFileUpload] = useState([]);
     const [fileAvatarImg, setFileAvatarImg] = useState(null);
+    const [showCropper, setShowCopper] = useState(false);
     const [fileAvatarId, setFileAvatarId] = useState(null);
     const [name, setName] = useState(null);
     const [note, setNote] = useState(null);
     const fileUploader1 = useRef(null);
     const fileUploader2 = useRef(null);
     const [showLoading, setShowLoading] = useState(false);
+    const [isDoubleClick, setIsDoubleClick] = useState(false);
     const ALLOWED_FILE_EXTENSIONS = ['.jpg', '.jpeg', '.gif', '.png'];
     const [modalImage, setModalImage] = useState(null);
     const [img0, setImg0] = useState(null);
@@ -45,7 +47,6 @@ const EditFaceManagement = () => {
     const [img2, setImg2] = useState(null);
     const [img3, setImg3] = useState(null);
     const [img4, setImg4] = useState(null);
-
 
     const buildUrlWithToken = url => {
         const token = localStorage.getItem(authConfig.storageTokenKeyName);
@@ -66,6 +67,7 @@ const EditFaceManagement = () => {
         const listImg = listFileId.map((id) => buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${id}`));
         setListImage(listImg);
     }, [listFileId]);
+
 
     const onDragDropImage = async (e) => {
         if (e.value.length > 0) {
@@ -146,7 +148,7 @@ const EditFaceManagement = () => {
             };
 
             if (id) { 
-                const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${id}`, config);
+                const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates/${id}`, config);
                 const imgs = [...response.data.data.imgs];
                 setFileAvatarId(response.data.data.mainImageId);
                 setListFileUpload(imgs.map((img) => buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${img.id}`)));
@@ -188,8 +190,7 @@ const EditFaceManagement = () => {
                 };
 
                 if (id) { 
-
-                    const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${id}`, config);
+                    const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates/${id}`, config);
                     const imgs = [...response.data.data.imgs];
                     setFileAvatarId(response.data.data.mainImageId);
                     setListFileUpload(imgs.map((img) => buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${img.id}`)));
@@ -237,7 +238,7 @@ const EditFaceManagement = () => {
                     urlImage: listFileUrl[id],
                 })),
             }
-            await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${id}`,params,config)
+            await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates/${id}`,params,config)
             Swal.fire('Sửa thành công', '', 'success')
             fetchFilteredOrAllUserss();
         } catch (error) {
@@ -254,7 +255,7 @@ const EditFaceManagement = () => {
                 <div>Loading...</div>
            ):(
             <>
-            <Grid container spacing={6.5}>
+            <Grid container spacing={6.5} >
                 <Grid item xs={12}>
                     <Card>
                         <CardHeader
@@ -269,7 +270,7 @@ const EditFaceManagement = () => {
                                             color:'#000000',
                                             right:'20px'}}
                                             component={Link}
-                                            href={`/pages/face_management/list`}
+                                            href={`/pages/car_management/list`}
                                             sx={{ color: 'blue' }}
                                              >
                                             Hủy
@@ -292,6 +293,7 @@ const EditFaceManagement = () => {
                             }}
                         />
                         <Grid item xs={12}>
+                        <TableContainer>
                         {modalImage && (
                                 <ModalImage
                                     imageUrl={modalImage}
@@ -440,6 +442,7 @@ const EditFaceManagement = () => {
                                                         style={{
                                                             fontSize: '16px',
                                                             lineHeight: '19px',
+                                                        
                                                         }}
                                                     >
                                                         {`Kéo thả ảnh`}
@@ -448,6 +451,7 @@ const EditFaceManagement = () => {
                                                         style={{
                                                             fontSize: '16px',
                                                             lineHeight: '19px',
+                                                            
                                                         }}
                                                     >
                                                         {`Hoặc`}
@@ -532,18 +536,18 @@ const EditFaceManagement = () => {
                                                             setListImage(listFileUploadTmp);
                                                         }}
                                                         color='primary'
-                                                        >
-                                                            -
-                                                        </IconButton>
-                                                        <IconButton
-                                                            className="full"
-                                                            color='primary'
-                                                            onClick={() => {
-                                                                setModalImage(image);
-                                                            }}
-                                                        >
-                                                            <Icon icon='tabler:maximize' />
-                                                        </IconButton>
+                                                    >
+                                                        -
+                                                    </IconButton>
+                                                    <IconButton
+                                                        className="full"
+                                                        color='primary'
+                                                        onClick={() => {
+                                                            setModalImage(image);
+                                                        }}
+                                                    >
+                                                        <Icon icon='tabler:maximize' />
+                                                    </IconButton>
                                                 </div>
                                             ))}
 
@@ -551,6 +555,7 @@ const EditFaceManagement = () => {
                                     )}
                                 </div>
                             </div>  
+                        </TableContainer>
                         </Grid>
                     </Card>
                 </Grid>
@@ -711,4 +716,4 @@ const useStyles = makeStyles(() => ({
     },
 }));
 
-export default EditFaceManagement;
+export default UpDateCar;
