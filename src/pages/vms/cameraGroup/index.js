@@ -52,6 +52,7 @@ const Caller = () => {
   const [reload, setReload] = useState(0)
   const [valueFilter, setValueFilter] = useState(valueFilterInit)
   const [cameraGroup, setCameraGroup] = useState([])
+  
   const fetchCameraGroup = async () => {
     try {
       const res = await getApi(
@@ -84,15 +85,18 @@ const Caller = () => {
   const handSetChanel = (id, channel) => {
     let newCamera = cameraGroup.map(item => {
       if (item.id === id) {
+
         return {
           ...item,
           channel: channel
         }
       }
+
       return item
     })
     setCameraGroup(newCamera)
   }
+
   return (
     <DivStyle>
       <Grid container spacing={0}>
@@ -102,6 +106,7 @@ const Caller = () => {
               <ViewCamera
                 name={camera?.deviceName}
                 id={camera.id}
+
                 // id='4fa9a51c-e904-4ab0-acad-169ed4c9aeda'
                 channel={camera.channel}
                 status={camera.status}

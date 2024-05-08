@@ -1,21 +1,13 @@
-import { useState, useEffect, forwardRef,useCallback } from 'react'
+import { useState, useEffect} from 'react'
 import {
-  Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Tab, TableContainer, Paper,
-  Table, TableHead, TableRow, TableCell,Fade,styled, TableBody, Pagination, Menu, MenuItem, Dialog, DialogContent,
-  DialogActions,
-  Typography,
-  TextField,
-  Input,
-  TextareaAutosize
+  Box, Button, Card, CardContent, CardHeader, Grid, IconButton, 
+  Table, TableHead, TableRow, TableCell,Fade,styled, TableBody, 
 } from "@mui/material";
 import authConfig from 'src/configs/auth'
 import Icon from 'src/@core/components/icon'
 import Swal from 'sweetalert2'
 import { useRouter } from 'next/router'
 import axios from 'axios'
-import TableHeader from 'src/views/apps/asset/TableHeader'
-import CustomTextField from 'src/@core/components/mui/text-field'
-import Link from 'next/link'
 
 const AddCamera = ({nvr, onClose }) => {
 
@@ -28,7 +20,7 @@ const AddCamera = ({nvr, onClose }) => {
     console.log(nvr,'nvr');
 
  
- useEffect(() => {
+    useEffect(() => {
     const fetchGroupData = async () => {
 
         try {
@@ -75,9 +67,36 @@ const AddCamera = ({nvr, onClose }) => {
     fetchGroupDataNVR();
 }, [nvr]);
 
-const handleDelete = (cameraId) => {
-    Swal.fire('Deleted!', 'Camera has been deleted.', 'success');
-};
+const handleDelete = async (id) => {
+
+    setLoading(true);
+    try {
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+        
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+
+        const nvrResponse = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${nvr}`, config);
+        const nvrCameras = nvrResponse.data.data.cameras;
+
+        const updatedCameras = nvrCameras.filter(camera => camera.id !== id);
+
+
+        await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${nvr}`, { cameras: updatedCameras }, config);
+
+        Swal.fire('Xóa camera thành công', '', 'success');
+    } catch (error) {
+
+        Swal.fire('Đã xảy ra lỗi', error.message, 'error');
+        console.error('Error deleting camera:', error);
+    } finally {
+        onClose();
+        setLoading(false);
+    }
+}
 
 const handleUpdate = async (id, name) => {
     setLoading(true);
@@ -90,10 +109,8 @@ const handleUpdate = async (id, name) => {
                 Authorization: `Bearer ${token}`
             }
         }
-        
-        const params = {
 
-            // ...(nvrCameraList && Array.isArray(nvrCameraList) ? nvrCameraList : []),
+        const params = {
             cameras: [
                 {
                     id: id,
@@ -108,28 +125,6 @@ const handleUpdate = async (id, name) => {
         console.error('Error adding member to group:', error)
     }
 }
-
-
-
-  function showAlertConfirm(options, intl) {
-    const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
-      imageWidth: 213,
-      showCancelButton: true,
-      showCloseButton: true,
-      showConfirmButton: true,
-      focusCancel: true,
-      reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
-      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
-      customClass: {
-        content: 'content-class',
-        confirmButton: 'swal-btn-confirm'
-      }
-    }
-
-    return Swal.fire({ ...defaultProps, ...options })
-  }
   
   return (
     
@@ -168,7 +163,7 @@ const handleUpdate = async (id, name) => {
                                                         nvrCameraList.some(nvrCamera => nvrCamera.id === camera.id) ? (
                                                             <IconButton
                                                             
-                                                                // onClick={() => handleDelete(camera.id)}
+                                                                onClick={() => handleDelete(camera.id)}
                                                             >
                                                                 <Icon icon='tabler:minus' />
                                                             </IconButton>
@@ -182,7 +177,7 @@ const handleUpdate = async (id, name) => {
                                                     ) : (
                                                         <IconButton
 
-                                                            // onClick={() => handleAdd(camera.id)}
+                                                                onClick={() => handleUpdate(camera.id, camera.name)}
                                                         >
                                                             <Icon icon='tabler:plus' />
                                                         </IconButton>
