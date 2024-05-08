@@ -28,7 +28,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
   const remoteVideoRef = useRef(null)
   const [heightDiv, setHeightDiv] = useState(100)
   useEffect(() => {
-    const heightCaculator = Math.floor((window.innerHeight - 90) / sizeScreen)
+    const heightCaculator = Math.floor((window.innerHeight - 90) / sizeScreen.split('x')[1])
     setHeightDiv(heightCaculator)
     window.addEventListener('resize', () => {
       setHeightDiv(heightCaculator)
@@ -55,9 +55,13 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
     pc.ontrack = event => {
       setLoading(false)
       const stream = event.streams[0]
-      if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {
-        setRemoteStream(stream)
-        remoteVideoRef.current.srcObject = stream
+      try {
+        if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {
+          setRemoteStream(stream)
+          remoteVideoRef.current.srcObject = stream
+        }
+      } catch (err) {
+        console.log(err)
       }
     }
   }

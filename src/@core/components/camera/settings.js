@@ -15,6 +15,12 @@ import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import MuiDrawer from '@mui/material/Drawer'
+import { Container, Draggable } from 'react-smooth-dnd'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListItemIcon from '@mui/material/ListItemIcon'
+import ListItemText from '@mui/material/ListItemText'
+import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -67,7 +73,15 @@ const ColorBox = styled(Box)(({ theme }) => ({
   }
 }))
 
-const Customizer = ({ sizeScreen, setSizeScreen }) => {
+const Customizer = ({
+  cameraGroup,
+  cameraHiden,
+  setNumberShow,
+  setCameraGroup,
+  setCameraHiden,
+  sizeScreen,
+  setSizeScreen
+}) => {
   // ** State
   const [open, setOpen] = useState(false)
 
@@ -92,6 +106,20 @@ const Customizer = ({ sizeScreen, setSizeScreen }) => {
 
   const handleChange = (field, value) => {
     saveSettings({ ...settings, [field]: value })
+  }
+
+  const onDrop = ({ removedIndex, addedIndex }) => {
+    let newCameraGroup = []
+    for (let i = 0; i < cameraGroup.length; i++) {
+      if (i === addedIndex) {
+        newCameraGroup.push(cameraGroup[removedIndex])
+      } else if (i === removedIndex) {
+        newCameraGroup.push(cameraGroup[addedIndex])
+      } else {
+        newCameraGroup.push(cameraGroup[i])
+      }
+    }
+    setCameraGroup(newCameraGroup)
   }
 
   return (
@@ -125,27 +153,95 @@ const Customizer = ({ sizeScreen, setSizeScreen }) => {
             <Icon icon='tabler:x' fontSize={20} />
           </IconButton>
         </Box>
+
+        {/* <Icon fontSize='1.625rem' icon='tabler:layout-grid-add' /> */}
         <PerfectScrollbar options={{ wheelPropagation: false }}>
-          <CustomizerSpacing className='customizer-body'>
+          <CustomizerSpacing sx={{ py: 1 }} className='customizer-body'>
             {/* Skin */}
             <Box sx={{ mb: 5 }}>
               <Typography>Trang</Typography>
               <RadioGroup
                 value={sizeScreen}
+                row
                 sx={{ '& .MuiFormControlLabel-label': { color: 'text.secondary' } }}
                 onChange={e => setSizeScreen(e.target.value)}
               >
-                <FormControlLabel value='1' label='1x1' control={<Radio />} />
-                <FormControlLabel value='2' label='2x2' control={<Radio />} />
-                <FormControlLabel value='3' label='3x3' control={<Radio />} />
-                <FormControlLabel value='4' label='4x4' control={<Radio />} />
-                <FormControlLabel value='6' label='6x6' control={<Radio />} />
+                <FormControlLabel value='1x1' label='1x1' control={<Radio />} />
+                <FormControlLabel value='2x2' label='2x2' control={<Radio />} />
+                <FormControlLabel value='3x3' label='3x3' control={<Radio />} />
+                <FormControlLabel value='3x2' label='3x2' control={<Radio />} />
+                <FormControlLabel value='4x3' label='4x3' control={<Radio />} />
+                <FormControlLabel value='4x4' label='4x4' control={<Radio />} />
+                <FormControlLabel value='6x4' label='6x4' control={<Radio />} />
+                <FormControlLabel value='12x8' label='12x8' control={<Radio />} />
               </RadioGroup>
             </Box>
           </CustomizerSpacing>
 
           <Divider sx={{ m: '0 !important' }} />
+          <CustomizerSpacing sx={{ py: 1 }} className='customizer-body'>
+            <Box sx={{ mb: 5 }}>
+              <Typography>{cameraGroup.length} Camera hiển thị</Typography>
+              <List>
+                <Container dragHandleSelector='.drag-handle' lockAxis='y' onDrop={onDrop}>
+                  {cameraGroup.length > 0 &&
+                    cameraGroup.map((camera, id) => (
+                      <Draggable key={id}>
+                        <ListItem>
+                          <ListItemIcon>
+                            <ListItemIcon className='drag-handle'>
+                              <Icon icon='eva:menu-2-outline' />
+                            </ListItemIcon>
+                          </ListItemIcon>
+                          <ListItemText primary={camera.deviceName} />
+                          <ListItemSecondaryAction>
+                            <Icon
+                              onClick={() => {
+                                let newCameraGroup = cameraGroup.filter(item => item.id !== camera.id)
+                                let newCameraHiden = [...cameraHiden, camera]
+                                setCameraGroup(newCameraGroup)
+                                setCameraHiden(newCameraHiden)
+                                setNumberShow(cameraGroup.length - 1)
+                              }}
+                              icon='eva:close-outline'
+                            />
+                          </ListItemSecondaryAction>
+                        </ListItem>
+                      </Draggable>
+                    ))}
+                </Container>
+              </List>
+            </Box>
+          </CustomizerSpacing>
 
+          <CustomizerSpacing sx={{ py: 1 }} className='customizer-body'>
+            <Box sx={{ mb: 5 }}>
+              <Typography>{cameraHiden.length} Camera chưa hiển thị</Typography>
+              <List>
+                {cameraHiden.length > 0 &&
+                  cameraHiden.map((camera, id) => (
+                    <ListItem key={camera + id}>
+                      <ListItemText primary={camera.deviceName} />
+                      <ListItemSecondaryAction>
+                        <ListItemIcon className='drag-handle1'>
+                          <Icon
+                            onClick={() => {
+                              let newCameraHiden = cameraHiden.filter(item => item.id !== camera.id)
+                              let newCameraGroup = [...cameraGroup, camera]
+                              setCameraGroup(newCameraGroup)
+                              setCameraHiden(newCameraHiden)
+                              setNumberShow(cameraGroup.length + 1)
+                            }}
+                            icon='eva:plus-outline'
+                          />
+                        </ListItemIcon>
+                      </ListItemSecondaryAction>
+                    </ListItem>
+                  ))}
+              </List>
+            </Box>
+          </CustomizerSpacing>
+          <Divider sx={{ m: '0 !important' }} />
           <CustomizerSpacing className='customizer-body'>
             {/* Menu Layout */}
             <Box sx={{ mb: layout === 'horizontal' && appBar === 'hidden' ? {} : 5 }}>

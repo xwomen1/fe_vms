@@ -43,27 +43,35 @@ const DivStyle = styled('div')(({ theme }) => ({
 
 const valueFilterInit = {
   page: 1,
-  limit: 25,
+  limit: 50,
   deviceTypes: 'NVR'
 }
 
 const Caller = () => {
-  const [sizeScreen, setSizeScreen] = useState(3)
+  const [sizeScreen, setSizeScreen] = useState('3x3')
   const [reload, setReload] = useState(0)
+  const [numberShow, setNumberShow] = useState(9)
   const [valueFilter, setValueFilter] = useState(valueFilterInit)
   const [cameraGroup, setCameraGroup] = useState([])
-  
+  const [cameraHiden, setCameraHiden] = useState([])
+
   const fetchCameraGroup = async () => {
     try {
       const res = await getApi(
         `${CAMERA_API.CAMERA_GROUP}?deviceTypes=${valueFilter.deviceTypes}&limit=${valueFilter.limit}&page=${valueFilter.page}`
       )
       let listCamera = []
+      let listCameraHiden = []
       res.data.map(item => {
         if (item.cameras) {
           item.cameras.map(camera => {
-            if (listCamera.length < sizeScreen ** 2) {
+            if (listCamera.length < numberShow) {
               listCamera.push({
+                ...camera,
+                channel: 'Sub'
+              })
+            } else {
+              listCameraHiden.push({
                 ...camera,
                 channel: 'Sub'
               })
@@ -71,8 +79,8 @@ const Caller = () => {
           })
         }
       })
-      console.log(listCamera)
       setCameraGroup(listCamera)
+      setCameraHiden(listCameraHiden)
     } catch (error) {
       console.error('Error fetching data: ', error)
     }
@@ -85,7 +93,6 @@ const Caller = () => {
   const handSetChanel = (id, channel) => {
     let newCamera = cameraGroup.map(item => {
       if (item.id === id) {
-
         return {
           ...item,
           channel: channel
@@ -102,11 +109,10 @@ const Caller = () => {
       <Grid container spacing={0}>
         {cameraGroup.length > 0 &&
           cameraGroup.map((camera, index) => (
-            <Grid item xs={Math.floor(12 / sizeScreen)} key={index}>
+            <Grid item xs={Math.floor(12 / sizeScreen.split('x')[0])} key={index}>
               <ViewCamera
                 name={camera?.deviceName}
                 id={camera.id}
-
                 // id='4fa9a51c-e904-4ab0-acad-169ed4c9aeda'
                 channel={camera.channel}
                 status={camera.status}
@@ -116,7 +122,15 @@ const Caller = () => {
             </Grid>
           ))}
       </Grid>
-      <Settings sizeScreen={sizeScreen} setSizeScreen={size => setSizeScreen(size)} />
+      <Settings
+        cameraGroup={cameraGroup}
+        cameraHiden={cameraHiden}
+        setNumberShow={number => setNumberShow(number)}
+        setCameraGroup={camera => setCameraGroup(camera)}
+        setCameraHiden={camera => setCameraHiden(camera)}
+        sizeScreen={sizeScreen}
+        setSizeScreen={size => setSizeScreen(size)}
+      />
     </DivStyle>
   )
 }
