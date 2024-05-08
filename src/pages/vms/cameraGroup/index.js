@@ -113,7 +113,6 @@ const Caller = () => {
               <ViewCamera
                 name={camera?.deviceName}
                 id={camera.id}
-                // id='4fa9a51c-e904-4ab0-acad-169ed4c9aeda'
                 channel={camera.channel}
                 status={camera.status}
                 sizeScreen={sizeScreen}
