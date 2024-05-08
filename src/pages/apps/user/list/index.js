@@ -118,7 +118,7 @@ const UserList = ({ apiData }) => {
           }
         }
         const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search', config)
-        const dataWithChildren = addChildrenField(response.data.data)
+        const dataWithChildren = addChildrenField(response.data)
         const rootGroups = findRootGroups(dataWithChildren)
         setGroups(rootGroups)
       } catch (error) {
@@ -233,8 +233,8 @@ const UserList = ({ apiData }) => {
           url = 'https://dev-ivi.basesystem.one/smc/iam/api/v0/users/search'
         }
         const response = await axios.get(url, config)
-        setUserData(response.data.data.rows)
-        setTotal(response.data.data.totalPage)
+        setUserData(response.data.rows)
+        setTotal(response.data.totalPage)
       } catch (error) {
         console.error('Error fetching users:', error)
       }

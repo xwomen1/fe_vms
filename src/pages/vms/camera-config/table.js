@@ -192,9 +192,9 @@ const Camera = ({ apiData }) => {
           }
         }
         const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/cameras', config)
-        setStatus1(response.data.data.isOfflineSetting)
-        setAssetType(response.data.data)
-        setTotal(response.data.data.page)
+        setStatus1(response.data.isOfflineSetting)
+        setAssetType(response.data)
+        setTotal(response.data.page)
       } catch (error) {
         console.error('Error fetching users:', error)
       }

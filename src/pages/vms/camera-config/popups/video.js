@@ -33,7 +33,7 @@ const RolePopup = ({ open, onClose }) => {
         config
       )
 
-      const nicTypes = response.data.data.map(item => ({
+      const nicTypes = response.data.map(item => ({
         label: item.name,
         value: item.value
       }))

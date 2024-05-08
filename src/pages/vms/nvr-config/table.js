@@ -234,11 +234,11 @@ const UserList = ({ apiData }) => {
           }
         }
         const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/nvrs', config)
-        setStatus1(response.data.data.isOfflineSetting)
-        setNvr(response.data.data[0].id)
-        setAssetType(response.data.data)
-        setTotal(response.data.data.page)
-        console.log(response.data.data[0].id)
+        setStatus1(response.data.isOfflineSetting)
+        setNvr(response.data[0].id)
+        setAssetType(response.data)
+        setTotal(response.data.page)
+        console.log(response.data[0].id)
       } catch (error) {
         console.error('Error fetching users:', error)
       }

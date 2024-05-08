@@ -121,7 +121,7 @@ const FaceManagement=() => {
 
           const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/blacklist?sort=%2Bcreated_at&page=1', config)
 
-            const data = response.data.data.map(item => ({
+            const data = response.data.map(item => ({
                 mainImageId: item.mainImageId,
                 name: item.name,
                 time: item.time,
@@ -186,9 +186,9 @@ const FaceManagement=() => {
             };
 
             const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/blacklist?sort=%2Bcreated_at&page=1', config)
-            if (response.data.data && response.data.data.length > 0) {
-                setUserData(response.data.data);
-                const imageFaces = response.data.data[0].mainImageUrl;
+            if (response.data && response.data.length > 0) {
+                setUserData(response.data);
+                const imageFaces = response.data[0].mainImageUrl;
                 setListImage(imageFaces);
             } else {
                 setUserData([]);

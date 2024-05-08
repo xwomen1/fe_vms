@@ -78,9 +78,9 @@ function ReportMonth({ history }) {
             }
             const response = await axios.post(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/event/search/user`, {}, config)
 
-            if (response.data.data.rows.length > 0) {
+            if (response.data.rows.length > 0) {
                 // Cập nhật dữ liệu mới vào mảng tạm thời
-                setDataResource(prevData => [...prevData, ...response.data.data.rows])
+                setDataResource(prevData => [...prevData, ...response.data.rows])
 
                 // Tăng trang
                 incrementPage()
@@ -110,7 +110,7 @@ function ReportMonth({ history }) {
                     }
                 }
                 const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search', config)
-                const dataWithChildren = addChildrenField(response.data.data)
+                const dataWithChildren = addChildrenField(response.data)
                 const rootGroups = findRootGroups(dataWithChildren)
                 setGroups(rootGroups)
             } catch (error) {

@@ -36,7 +36,7 @@ const AddCamera = ({nvr, onClose }) => {
                 'https://sbs.basesystem.one/ivis/vms/api/v0/cameras?sort=%2Bcreated_at&page=1',
                 config
             );
-            setCamera(response.data.data);
+            setCamera(response.data);
         } catch (error) {
             console.error('Error fetching camera data:', error);
         }
@@ -57,7 +57,7 @@ const AddCamera = ({nvr, onClose }) => {
                 `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${nvr}`,
                 config
             );
-            setNVRCameraList(response.data.data.cameras);
+            setNVRCameraList(response.data.cameras);
         } catch (error) {
             console.error('Error fetching NVR data:', error);
         }

@@ -42,7 +42,7 @@ const RolePopup = ({ open, onClose, onSelect, userId }) => {
         config
       )
 
-      return response.data.data.groupId
+      return response.data.groupId
     } catch (error) {
       throw error
     }
@@ -63,8 +63,8 @@ const RolePopup = ({ open, onClose, onSelect, userId }) => {
         config
       )
 
-      if (response.data.data.length > 0) {
-        return response.data.data[0].groupId
+      if (response.data.length > 0) {
+        return response.data[0].groupId
       } else {
         return null // Trả về null nếu không tìm thấy groupId
       }
@@ -137,8 +137,8 @@ const RolePopup = ({ open, onClose, onSelect, userId }) => {
           config
         )
 
-        setGroupOptions(response.data.data)
-        console.log(response.data.data, 'go')
+        setGroupOptions(response.data)
+        console.log(response.data, 'go')
       } catch (error) {
         console.error('Error fetching data:', error)
       }

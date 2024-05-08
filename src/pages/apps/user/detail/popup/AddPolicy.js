@@ -64,7 +64,7 @@ const RolePopup = ({ open, onClose, onSelect, userId, piId }) => {
         }
         const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/policies/search', config)
 
-        setGroupOptions(response.data.data.rows)
+        setGroupOptions(response.data.rows)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
