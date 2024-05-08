@@ -54,10 +54,14 @@ const Add = ({ apiData }) => {
   const pageSizeOptions = [25, 50, 100]
   const [anchorEl, setAnchorEl] = useState(null)
   const [selectedValue, setSelectedValue] = useState('')
-  const [ipAddress, setIpAddress] = useState('')
-  const [port, setPort] = useState('')
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const [startHost, setStartHost] = useState('')
+  const [endHost, setEndHost] = useState('')
+
+  const [url, setUrl] = useState('')
+
+  const [host, setHost] = useState('')
+  const [userName, setUsername] = useState('')
+  const [passWord, setPassWord] = useState('')
   const [response, setResponse] = useState('')
   const [openPopupResponse, setOpenPopupResponse] = useState(false)
 
@@ -96,14 +100,14 @@ const Add = ({ apiData }) => {
   }
 
   const handleScan = async () => {
-    setOpenPopupResponse(true)
+    // setOpenPopupResponse(true)
 
     try {
       const payload = {
-        ipAddress,
-        port,
-        username,
-        password
+        url,
+        host,
+        userName,
+        passWord
       }
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -125,7 +129,7 @@ const Add = ({ apiData }) => {
       setOpenPopupResponse(true)
     } catch (error) {
       console.error('Error scanning device:', error)
-      Swal.fire('Đã xảy ra lỗi', error.response.statusText, 'error')
+      Swal.fire('Đã xảy ra lỗi', error, 'error')
     }
   }
 
@@ -202,7 +206,7 @@ const Add = ({ apiData }) => {
   }
 
   const handleDDNSChange = (event, newValue) => {
-    setSelectedNVR(newValue || defaultValue)
+    setSelectedNVR(newValue)
   }
   useEffect(() => {
     setSelectedNVR({
@@ -295,21 +299,16 @@ const Add = ({ apiData }) => {
                 <Grid item xs={0.1}></Grid>
 
                 <Grid item xs={1.8}>
-                  <CustomTextField
-                    value={ipAddress}
-                    onChange={e => setIpAddress(e.target.value)}
-                    label='Địa chỉ IP'
-                    fullWidth
-                  />
+                  <CustomTextField value={url} onChange={e => setUrl(e.target.value)} label='Địa chỉ IP' fullWidth />
                 </Grid>
                 <Grid item xs={0.1}></Grid>
                 <Grid item xs={1.8}>
-                  <CustomTextField value={port} onChange={e => setPort(e.target.value)} label='Cổng' fullWidth />
+                  <CustomTextField value={host} onChange={e => setHost(e.target.value)} label='Cổng' fullWidth />
                 </Grid>
                 <Grid item xs={0.1}></Grid>
                 <Grid item xs={1.8}>
                   <CustomTextField
-                    value={username}
+                    value={userName}
                     onChange={e => setUsername(e.target.value)}
                     label='Đăng nhập'
                     fullWidth
@@ -318,8 +317,8 @@ const Add = ({ apiData }) => {
                 <Grid item xs={0.1}></Grid>
                 <Grid item xs={1.8}>
                   <CustomTextField
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
+                    value={passWord}
+                    onChange={e => setPassWord(e.target.value)}
                     label='Mật khẩu'
                     type='password'
                     fullWidth
@@ -337,7 +336,15 @@ const Add = ({ apiData }) => {
             )}
             {openPopupResponse && (
               <>
-                <PopupScan open={openPopupResponse} response={response} onClose={() => setOpenPopupResponse(false)} />{' '}
+                <PopupScan
+                  open={openPopupResponse}
+                  url={url}
+                  port={host}
+                  userName={userName}
+                  passWord={passWord}
+                  response={response}
+                  onClose={() => setOpenPopupResponse(false)}
+                />{' '}
               </>
             )}
 
@@ -349,7 +356,16 @@ const Add = ({ apiData }) => {
                 style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
               >
                 <Grid item xs={1.8}>
-                  <Autocomplete renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />} />
+                  <Autocomplete
+                    value={selectNVR}
+                    onChange={handleDDNSChange}
+                    options={nvrs}
+                    getOptionLabel={option => option.label}
+                    renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
+                    onFocus={handleComboboxFocus}
+
+                    // loading={loading}
+                  />{' '}
                 </Grid>
                 <Grid item xs={0.1}></Grid>
 
@@ -400,7 +416,16 @@ const Add = ({ apiData }) => {
                 style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
               >
                 <Grid item xs={1.8}>
-                  <Autocomplete renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />} />
+                  <Autocomplete
+                    value={selectNVR}
+                    onChange={handleDDNSChange}
+                    options={nvrs}
+                    getOptionLabel={option => option.label}
+                    renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
+                    onFocus={handleComboboxFocus}
+
+                    // loading={loading}
+                  />{' '}
                 </Grid>
                 <Grid item xs={0.1}></Grid>
 
@@ -437,7 +462,16 @@ const Add = ({ apiData }) => {
                 </Grid>
                 <Grid item xs={0.4}></Grid>
                 <Grid item xs={1.8}>
-                  <Autocomplete renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />} />
+                  <Autocomplete
+                    value={selectNVR}
+                    onChange={handleDDNSChange}
+                    options={nvrs}
+                    getOptionLabel={option => option.label}
+                    renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
+                    onFocus={handleComboboxFocus}
+
+                    // loading={loading}
+                  />{' '}
                 </Grid>
                 <Grid item xs={0.1}></Grid>
 

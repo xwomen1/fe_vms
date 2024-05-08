@@ -40,6 +40,8 @@ const UserDetails = () => {
   const [timeValidity, setTimeValidity] = useState('Custom')
   const [user, setUser] = useState(null)
   const [readOnly, setReadOnly] = useState(true)
+  const [readOnlys, setReadOnlys] = useState(true)
+
   const [params, setParams] = useState({})
   const [editing, setEditing] = useState(false)
   const [groupOptions, setGroupOptions] = useState([])
@@ -50,6 +52,7 @@ const UserDetails = () => {
   const [availableAt, setAvailableAt] = useState('')
   const [expiredAt, setExpiredAt] = useState('')
   const [note, setNote] = useState('')
+  const [username, setUserName] = useState('')
 
   const [timeEndMorning, setTimeEndMorning] = useState('')
   const [timeStartAfternoon, setTimeStartAfternoon] = useState('')
@@ -133,6 +136,10 @@ const UserDetails = () => {
 
   const handleNoteChange = event => {
     setNote(event.target.value)
+  }
+
+  const handleUserNameChange = event => {
+    setUserName(event.target.value)
   }
 
   const handleIdentityNumberChange = event => {
@@ -779,8 +786,9 @@ const UserDetails = () => {
                   <CustomTextField
                     label='Tài khoản'
                     defaultValue={user?.userAccount.username}
+                    onChange={handleUserNameChange}
                     id='form-props-read-only-input'
-                    InputProps={{ readOnly: readOnly }}
+                    InputProps={{ readOnly: readOnlys }}
                     fullWidth
                   />
                 </Grid>
@@ -789,7 +797,7 @@ const UserDetails = () => {
                     label='Loại tài khoản'
                     defaultValue={user?.userAccount.identityProviderType}
                     id='form-props-read-only-input'
-                    InputProps={{ readOnly: readOnly }}
+                    InputProps={{ readOnly: readOnlys }}
                     fullWidth
                   />
                 </Grid>
