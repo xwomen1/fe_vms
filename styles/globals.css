@@ -107,3 +107,8 @@ code[class*='language-'] {
   background: #6e6e6e;
   color: #fff;
 }
+
+.caption-subject {
+  color: #fff;
+  margin-left: 5px;
+}

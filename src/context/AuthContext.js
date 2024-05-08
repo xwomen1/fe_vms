@@ -3,6 +3,7 @@ import axios from 'axios'
 import { useRouter } from 'next/router'
 import authConfig from 'src/configs/auth'
 import { USER_API } from 'src/@core/components/api-url'
+import { postApi } from 'src/@core/utils/requestUltils'
 
 const defaultProvider = {
   user: null,
@@ -16,6 +17,7 @@ const defaultProvider = {
 const AuthContext = createContext(defaultProvider)
 
 const AuthProvider = ({ children }) => {
+  
   const [user, setUser] = useState(defaultProvider.user)
   const [expire, setExpire] = useState('')
   const [loading, setLoading] = useState(defaultProvider.loading)
@@ -113,7 +115,7 @@ const AuthProvider = ({ children }) => {
         },
         data: { refreshToken }
       }
-      const response = await axios.post(USER_API.REFREST, { refreshToken }, params)
+      const response = await postApi(USER_API.REFREST, { refreshToken })
       const newAccessToken = response.data.access_token
       setExpire(response.data.expires_in)
 
@@ -124,15 +126,14 @@ const AuthProvider = ({ children }) => {
   }
 
   const handleLogin = (params, errorCallback) => {
-    axios
-      .post(USER_API.LOGIN, params)
+    postApi(USER_API.LOGIN, params)
       .then(async response => {
         const tokenReturn = response.data.access_token
         const refreshToken = response.data.refresh_token
+        console.log('tokenreturn', tokenReturn)
         localStorage.setItem(authConfig.storageTokenKeyName, tokenReturn)
         localStorage.setItem(authConfig.onTokenExpiration, refreshToken)
 
-        console.log('tokenreturn', tokenReturn)
         const returnUrl = router.query.returnUrl
         setExpire(response.data.expires_in)
         console.log(response.data.expires_in)
