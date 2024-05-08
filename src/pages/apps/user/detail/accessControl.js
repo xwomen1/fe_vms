@@ -65,7 +65,7 @@ const UserDetails = () => {
         config
       )
 
-      const userGroups = response.data.data.groupMappings.map(groupMapping => groupMapping.userGroup)
+      const userGroups = response.data.groupMappings.map(groupMapping => groupMapping.userGroup)
 
       if (Array.isArray(userGroups)) {
         // Nếu userGroups là một mảng, bạn có thể sử dụng nó trực tiếp
@@ -135,7 +135,7 @@ const UserDetails = () => {
           config
         )
 
-        const userGroups = response.data.data.groupMappings.map(groupMapping => groupMapping.userGroup)
+        const userGroups = response.data.groupMappings.map(groupMapping => groupMapping.userGroup)
 
         if (Array.isArray(userGroups)) {
           // Nếu userGroups là một mảng, bạn có thể sử dụng nó trực tiếp
@@ -237,7 +237,7 @@ const UserDetails = () => {
         config
       )
       Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
-      router.push(`/apps/user/detail/${response.data.data.userId}`)
+      router.push(`/apps/user/detail/${response.data.userId}`)
     } catch (error) {
       console.error('Error updating user details:', error)
       Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi cập nhật dữ liệu.', 'error')
@@ -261,7 +261,7 @@ const UserDetails = () => {
           }
         }
         const response = await axios.get('https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups', config)
-        setGroupOptions(response.data.data.rows)
+        setGroupOptions(response.data.rows)
       } catch (error) {
         console.error('Error fetching data:', error)
       }

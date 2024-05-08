@@ -149,19 +149,19 @@ const UpDateCar = () => {
 
             if (id) { 
                 const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates/${id}`, config);
-                const imgs = [...response.data.data.imgs];
-                setFileAvatarId(response.data.data.mainImageId);
+                const imgs = [...response.data.imgs];
+                setFileAvatarId(response.data.mainImageId);
                 setListFileUpload(imgs.map((img) => buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${img.id}`)));
                 setListFileId(imgs.map((img) => img.id));
                 setListImage(imgs.map((img) =>  buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${img.id}`)));
-                setAvatarImage(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${response.data.data.mainImageId}`));
+                setAvatarImage(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${response.data.mainImageId}`));
                 setImg0(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[0]?.id}`));
                 setImg1(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[1]?.id}`));
                 setImg2(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[2]?.id}`));
                 setImg3(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[3]?.id}`));
                 setImg4(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[4]?.id}`));
-                setName(response.data.data.name);
-                setNote(response.data.data.note);
+                setName(response.data.name);
+                setNote(response.data.note);
             }
         } catch (error) {
 
@@ -191,19 +191,19 @@ const UpDateCar = () => {
 
                 if (id) { 
                     const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates/${id}`, config);
-                    const imgs = [...response.data.data.imgs];
-                    setFileAvatarId(response.data.data.mainImageId);
+                    const imgs = [...response.data.imgs];
+                    setFileAvatarId(response.data.mainImageId);
                     setListFileUpload(imgs.map((img) => buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${img.id}`)));
                     setListFileId(imgs.map((img) => img.id));
                     setListImage(imgs.map((img) =>  buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${img.id}`)));
-                    setAvatarImage(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${response.data.data.mainImageId}`));
+                    setAvatarImage(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${response.data.mainImageId}`));
                     setImg0(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[0]?.id}`));
                     setImg1(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[1]?.id}`));
                     setImg2(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[2]?.id}`));
                     setImg3(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[3]?.id}`));
                     setImg4(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[4]?.id}`));
-                    setName(response.data.data.name);
-                    setNote(response.data.data.note);
+                    setName(response.data.name);
+                    setNote(response.data.note);
                 }
             } catch (error) {
 

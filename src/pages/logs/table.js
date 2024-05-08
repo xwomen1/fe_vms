@@ -127,8 +127,8 @@ const Logs = ({ apiData }) => {
         }
         const response = await axios.get('https://sbs.basesystem.one/ivis/api/v0/logs/api', config)
 
-        setAssetType(response.data.data.rows)
-        setTotal(response.data.data.totalPage)
+        setAssetType(response.data.rows)
+        setTotal(response.data.totalPage)
       } catch (error) {
         console.error('Error fetching users:', error)
       }

@@ -102,9 +102,9 @@ const AssetTypeDetail = () => {
           `http://192.168.11.106:8089/smc/smart-parking/api/v0/asset/type/find/${id}`,
           config
         )
-        setAssetType(response.data.data)
-        setName(response.data.data.name)
-        setCode(response.data.data.code)
+        setAssetType(response.data)
+        setName(response.data.name)
+        setCode(response.data.code)
       } catch (error) {
         console.error('Error fetching user details:', error)
       }

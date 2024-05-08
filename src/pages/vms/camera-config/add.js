@@ -78,7 +78,7 @@ const Add = ({ apiData }) => {
 
       const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/nvrs', config)
 
-      const nicTypes = response.data.data.map(item => ({
+      const nicTypes = response.data.map(item => ({
         label: item.name,
         value: item.value
       }))
@@ -245,10 +245,10 @@ const Add = ({ apiData }) => {
           }
         }
         const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/cameras', config)
-        setStatus1(response.data.data.isOfflineSetting)
-        setAssetType(response.data.data)
-        setTotal(response.data.data.page)
-        console.log(response.data.data[0].id)
+        setStatus1(response.data.isOfflineSetting)
+        setAssetType(response.data)
+        setTotal(response.data.page)
+        console.log(response.data[0].id)
       } catch (error) {
         console.error('Error fetching users:', error)
       }

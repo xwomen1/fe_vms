@@ -266,7 +266,7 @@ const UserDetails = () => {
         }
         const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search', config)
 
-        setGroupOptions(response.data.data)
+        setGroupOptions(response.data)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -286,29 +286,29 @@ const UserDetails = () => {
         }
       }
       const response = await axios.get(`https://dev-ivi.basesystem.one/smc/iam/api/v0/users/${userId}`, config)
-      setData(response.data.data) // store the fetched data in the state
+      setData(response.data) // store the fetched data in the state
 
-      setGroup(response.data.data.userGroups)
-      setPolicies(response.data.data.policies)
-      setPiId(response.data.data.piId)
-      setFullNameValue(response.data.data.fullName)
-      setEmail(response.data.data.email)
-      setPhoneNumber(response.data.data.phoneNumber)
-      setIdentityNumber(response.data.data.identityNumber)
-      setUserCode(response.data.data.userCode)
-      setSyncCode(response.data.data.syncCode)
-      setStatus1(response.data.data.userStatus)
-      setAvailableAt(response.data.data.availableAt)
-      setExpiredAt(response.data.data.expiredAt)
-      setUser(response.data.data)
-      setNote(response.data.data.note)
-      setStatus(response.data.data.userAccount.accStatus)
+      setGroup(response.data.userGroups)
+      setPolicies(response.data.policies)
+      setPiId(response.data.piId)
+      setFullNameValue(response.data.fullName)
+      setEmail(response.data.email)
+      setPhoneNumber(response.data.phoneNumber)
+      setIdentityNumber(response.data.identityNumber)
+      setUserCode(response.data.userCode)
+      setSyncCode(response.data.syncCode)
+      setStatus1(response.data.userStatus)
+      setAvailableAt(response.data.availableAt)
+      setExpiredAt(response.data.expiredAt)
+      setUser(response.data)
+      setNote(response.data.note)
+      setStatus(response.data.userAccount.accStatus)
 
-      if (response.data.data.userGroups && response.data.data.userGroups.length > 0) {
-        setDefaultGroup(response.data.data.userGroups[0])
+      if (response.data.userGroups && response.data.userGroups.length > 0) {
+        setDefaultGroup(response.data.userGroups[0])
       }
-      if (response.data.data.userAccount && response.data.data.userAccount.length > 0) {
-        setStatus(response.data.data.userAccount.accStatus)
+      if (response.data.userAccount && response.data.userAccount.length > 0) {
+        setStatus(response.data.userAccount.accStatus)
       }
     } catch (error) {
       console.error('Error fetching user details:', error)
@@ -407,26 +407,26 @@ const UserDetails = () => {
           }
         }
         const response = await axios.get(`https://dev-ivi.basesystem.one/smc/iam/api/v0/users/${userId}`, config)
-        setData(response.data.data) // store the fetched data in the state
-        setUser(response.data.data)
-        setGroup(response.data.data.userGroups)
-        setPolicies(response.data.data.policies)
-        setPiId(response.data.data.piId)
-        setFullNameValue(response.data.data.fullName)
-        setEmail(response.data.data.email)
-        setPhoneNumber(response.data.data.phoneNumber)
-        setIdentityNumber(response.data.data.identityNumber)
-        setUserCode(response.data.data.userCode)
-        setSyncCode(response.data.data.syncCode)
-        setStatus1(response.data.data.userStatus)
-        setAvailableAt(response.data.data.availableAt)
-        setExpiredAt(response.data.data.expiredAt)
-        setLeaderOfUnit(response.data.data.userGroups[0].isLeader)
-        setNote(response.data.data.note)
-        setStatus(response.data.data.userAccount.accStatus)
+        setData(response.data) // store the fetched data in the state
+        setUser(response.data)
+        setGroup(response.data.userGroups)
+        setPolicies(response.data.policies)
+        setPiId(response.data.piId)
+        setFullNameValue(response.data.fullName)
+        setEmail(response.data.email)
+        setPhoneNumber(response.data.phoneNumber)
+        setIdentityNumber(response.data.identityNumber)
+        setUserCode(response.data.userCode)
+        setSyncCode(response.data.syncCode)
+        setStatus1(response.data.userStatus)
+        setAvailableAt(response.data.availableAt)
+        setExpiredAt(response.data.expiredAt)
+        setLeaderOfUnit(response.data.userGroups[0].isLeader)
+        setNote(response.data.note)
+        setStatus(response.data.userAccount.accStatus)
 
-        if (response.data.data.timeStartMorning) {
-          const [hour, minute] = response.data.data.timeStartMorning
+        if (response.data.timeStartMorning) {
+          const [hour, minute] = response.data.timeStartMorning
           const timeString = `${hour}:${minute.toString().padStart(2, '0')}`
           const defaultTime = new Date()
           defaultTime.setHours(hour)
@@ -435,24 +435,24 @@ const UserDetails = () => {
         }
         console.log(timeEndMorning) // Kết quả mong muốn
 
-        if (response.data.data.timeEndMorning) {
-          const [hour, minute] = response.data.data.timeEndMorning
+        if (response.data.timeEndMorning) {
+          const [hour, minute] = response.data.timeEndMorning
           const timeString = `${hour}:${minute.toString().padStart(2, '0')}`
           const defaultTime = new Date()
           defaultTime.setHours(hour)
           defaultTime.setMinutes(minute)
           setTimeEndMorning(defaultTime)
         }
-        if (response.data.data.timeStartAfternoon) {
-          const [hour, minute] = response.data.data.timeStartAfternoon
+        if (response.data.timeStartAfternoon) {
+          const [hour, minute] = response.data.timeStartAfternoon
           const timeString = `${hour}:${minute.toString().padStart(2, '0')}`
           const defaultTime = new Date()
           defaultTime.setHours(hour)
           defaultTime.setMinutes(minute)
           setTimeStartAfternoon(defaultTime)
         }
-        if (response.data.data.timeEndAfternoon) {
-          const [hour, minute] = response.data.data.timeEndAfternoon
+        if (response.data.timeEndAfternoon) {
+          const [hour, minute] = response.data.timeEndAfternoon
           const timeString = `${hour}:${minute.toString().padStart(2, '0')}`
           const defaultTime = new Date()
           defaultTime.setHours(hour)
@@ -460,10 +460,10 @@ const UserDetails = () => {
           setTimeEndAfternoon(defaultTime)
         }
 
-        // setDateTime(convertTimeArrayToString(response.data.data.timeEndMorning))
-        console.log(convertTimeArrayToString(response.data.data.timeEndMorning))
-        if (response.data.data.userGroups && response.data.data.userGroups.length > 0) {
-          setDefaultGroup(response.data.data.userGroups[0])
+        // setDateTime(convertTimeArrayToString(response.data.timeEndMorning))
+        console.log(convertTimeArrayToString(response.data.timeEndMorning))
+        if (response.data.userGroups && response.data.userGroups.length > 0) {
+          setDefaultGroup(response.data.userGroups[0])
         }
       } catch (error) {
         console.error('Error fetching user details:', error)

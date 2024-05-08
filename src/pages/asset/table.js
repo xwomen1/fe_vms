@@ -127,8 +127,8 @@ const UserList = ({ apiData }) => {
         }
         const response = await axios.get('http://192.168.11.106:8089/smc/smart-parking/api/v0/asset/type/', config)
 
-        setAssetType(response.data.data.rows)
-        setTotal(response.data.data.totalPage)
+        setAssetType(response.data.rows)
+        setTotal(response.data.totalPage)
       } catch (error) {
         console.error('Error fetching users:', error)
       }

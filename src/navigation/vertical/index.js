@@ -38,21 +38,22 @@ const navigation = () => {
           title: 'Báo cáo tháng',
           icon: 'tabler:id'
         },
-        {
-          path: '/pages/access-rights/list',
-          title: 'Quyền truy cập',
-          icon: 'tabler:shield'
-        },
-        {
-          path: '/pages/access-rights/list',
-          title: 'Thống kê',
-          icon: 'tabler:statistics/time?tab=%2Fstatistics%2Ftime'
-        },
-        {
-          path: '/pages/access-rights/list',
-          title: 'Hẹn lịch',
-          icon: 'tabler:guest-registrations'
-        }
+        
+        // {
+        //   path: '/pages/access-rights/list',
+        //   title: 'Quyền truy cập',
+        //   icon: 'tabler:shield'
+        // },
+        // {
+        //   path: '/pages/access-rights/list',
+        //   title: 'Thống kê',
+        //   icon: 'tabler:statistics/time?tab=%2Fstatistics%2Ftime'
+        // },
+        // {
+        //   path: '/pages/access-rights/list',
+        //   title: 'Hẹn lịch',
+        //   icon: 'tabler:guest-registrations'
+        // }
       ]
     },
     {

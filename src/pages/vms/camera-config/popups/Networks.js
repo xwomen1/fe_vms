@@ -63,8 +63,8 @@ const Network = ({ open, onClose, onSelect, camera }) => {
             config
           )
 
-          setCamera(response.data.data)
-          setNic(response.data.data.nicType.name)
+          setCamera(response.data)
+          setNic(response.data.nicType.name)
         }
       } catch (error) {
         console.error('Error fetching data:', error)
