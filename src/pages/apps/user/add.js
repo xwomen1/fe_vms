@@ -71,7 +71,7 @@ const Add = () => {
   const [confirmPassword, setConfirmPassword] = useState('')
 
   const handleAddRow = () => {
-    const newRow = { groupName: '', groupCode: '', groupId: '' } // Thêm groupId vào đây
+    const newRow = { name: '', code: '', groupId: '' } // Thêm groupId vào đây
     setRows([...rows, newRow])
   }
 
@@ -299,7 +299,11 @@ const Add = () => {
             Authorization: `Bearer ${token}`
           }
         }
-        const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search', config)
+
+        const response = await axios.get(
+          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions?limit=25&page=1&parentID=f963e9d4-3d6b-45df-884d-15f93452f2a2',
+          config
+        )
 
         setGroupOptions(response.data)
       } catch (error) {
@@ -543,19 +547,19 @@ const Add = () => {
                         <TableCell>
                           <Autocomplete
                             options={groupOptions}
-                            getOptionLabel={option => option.groupName}
+                            getOptionLabel={option => option.name}
                             value={row.name}
                             onChange={(event, newValue) => {
                               const updatedRows = [...rows]
                               updatedRows[index].name = newValue.name
-                              updatedRows[index].groupCode = newValue.groupCode
+                              updatedRows[index].code = newValue.code
                               updatedRows[index].groupId = newValue.groupId
                               setRows(updatedRows)
                             }}
                             renderInput={params => <TextField {...params} label='Đơn vị' />}
                           />
                         </TableCell>
-                        <TableCell>{row.groupCode}</TableCell>
+                        <TableCell>{row.code}</TableCell>
                         <TableCell align='right'>{formatIsLeader(row.isLeader)}</TableCell>
                         <TableCell align='center'>
                           {index > 0 && (
