@@ -1565,15 +1565,15 @@
   dependencies:
     glob "7.1.7"
 
-"@next/swc-win32-x64-msvc@13.5.6":
+"@next/swc-darwin-x64@13.5.6":
   version "13.5.6"
-  resolved "https://registry.npmjs.org/@next/swc-win32-x64-msvc/-/swc-win32-x64-msvc-13.5.6.tgz"
-  integrity sha512-Cqfe1YmOS7k+5mGu92nl5ULkzpKuxJrP3+4AEuPmrpFZ3BHxTY3TnHmU1On3bFmFFs6FbTcdF58CCUProGpIGQ==
+  resolved "https://registry.npmjs.org/@next/swc-darwin-x64/-/swc-darwin-x64-13.5.6.tgz"
+  integrity sha512-6cgBfxg98oOCSr4BckWjLLgiVwlL3vlLj8hXg2b+nDgm4bC/qVXXLfpLB9FHdoDu4057hzywbxKvmYGmi7yUzA==
 
-"@next/swc-win32-x64-msvc@14.1.4":
+"@next/swc-darwin-x64@14.1.4":
   version "14.1.4"
-  resolved "https://registry.npmjs.org/@next/swc-win32-x64-msvc/-/swc-win32-x64-msvc-14.1.4.tgz"
-  integrity sha512-4Rto21sPfw555sZ/XNLqfxDUNeLhNYGO2dlPqsnuCg8N8a2a9u1ltqBOPQ4vj1Gf7eJC0W2hHG2eYUHuiXgY2w==
+  resolved "https://registry.npmjs.org/@next/swc-darwin-x64/-/swc-darwin-x64-14.1.4.tgz"
+  integrity sha512-b0Xo1ELj3u7IkZWAKcJPJEhBop117U78l70nfoQGo4xUSvv0PJSTaV4U9xQBLvZlnjsYkc8RwQN1HoH/oQmLlQ==
 
 "@nicolo-ribaudo/eslint-scope-5-internals@5.1.1-v1":
   version "5.1.1-v1"

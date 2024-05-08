@@ -43,7 +43,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
     return [...Array(length)].map(pickRandom).join('')
   }
   const SOCKET_LIVE_VIEW = process.env.NEXT_PUBLIC_SOCKET_CCTT
-  
+
   const createWsConnection = () => {
     const ws = new WebSocket(`${SOCKET_LIVE_VIEW}/ivis/vms/api/v0/ws/signaling/${randomId(10)}`)
 
@@ -161,7 +161,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
   }, [rtcPeerConnection])
 
   return (
-    <div className='portlet portlet-video live' style={{ width: '100%', height: heightDiv }}>
+    <div className='portlet portlet-video live' style={{ width: '100%' }}>
       <div className='portlet-title'>
         <div className='caption'>
           <span className='label label-sm bg-red'>LIVE</span>
@@ -185,7 +185,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
         </div>
       </div>
       <video
-        style={{ width: '100%', height: heightDiv }}
+        style={{ width: '100%', height: heightDiv - 26 }}
         ref={remoteVideoRef}
         playsInline
         autoPlay
