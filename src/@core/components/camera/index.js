@@ -4,7 +4,6 @@ import Button from '@mui/material/Button'
 import Link from 'next/link'
 import IconButton from '@mui/material/IconButton'
 import Icon from 'src/@core/components/icon'
-import { Diversity2Outlined } from '@mui/icons-material'
 
 const config = {
   bundlePolicy: 'max-bundle',
