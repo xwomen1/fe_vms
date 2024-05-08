@@ -3,7 +3,8 @@ import _ from 'lodash'
 import Button from '@mui/material/Button'
 import Link from 'next/link'
 import IconButton from '@mui/material/IconButton'
-import Icon from '@mui/material/Icon'
+import Icon from 'src/@core/components/icon'
+import { Diversity2Outlined } from '@mui/icons-material'
 
 const config = {
   bundlePolicy: 'max-bundle',
@@ -27,6 +28,8 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
   const [loading, setLoading] = useState(false)
   const remoteVideoRef = useRef(null)
   const [heightDiv, setHeightDiv] = useState(100)
+  const [status, setStatus] = useState('')
+  const [reload, setReload] = useState(0)
   useEffect(() => {
     const heightCaculator = Math.floor((window.innerHeight - 90) / sizeScreen.split('x')[1])
     setHeightDiv(heightCaculator)
@@ -71,6 +74,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
       createWsConnection()
     }
   }, [id, channel])
+
   useEffect(() => {
     createWsConnection()
 
@@ -82,7 +86,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
         rtcPeerConnection.close()
       }
     }
-  }, [])
+  }, [reload])
 
   // send message to WebSocket server
   const sendMessage = message => {
@@ -130,6 +134,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
         break
     }
     setText(message?.content)
+    console.log('message', message)
   }
 
   // set up WebSocket event listeners
@@ -160,6 +165,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
     if (rtcPeerConnection) {
       rtcPeerConnection.addEventListener('connectionstatechange', () => {
         console.log('RTCPeerConnection state:', rtcPeerConnection.connectionState)
+        setStatus(rtcPeerConnection.connectionState)
       })
     }
   }, [rtcPeerConnection])
@@ -168,7 +174,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
     <div className='portlet portlet-video live' style={{ width: '100%' }}>
       <div className='portlet-title'>
         <div className='caption'>
-          <span className='label label-sm bg-red'>LIVE</span>
+          <span className='label label-sm bg-red'> {status ? status.toUpperCase() : 'LIVE'}</span>
           <span className='caption-subject font-dark sbold uppercase'>{name}</span>
         </div>
         <div className='media-top-controls'>
@@ -180,7 +186,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
               SD
             </Button>
             <Button
-              className={`hd_btn btn btn-default btn-xs ${channel === 'Sub' ? 'active' : ''}`}
+              className={`hd_btn btn btn-default btn-xs ${channel === 'Main' ? 'active' : ''}`}
               onClick={() => handSetChanel(id, 'Main')}
             >
               HD
@@ -188,13 +194,29 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
           </div>
         </div>
       </div>
-      <video
-        style={{ width: '100%', height: heightDiv - 26 }}
-        ref={remoteVideoRef}
-        playsInline
-        autoPlay
-        srcObject={remoteStream}
-      />
+      <div>
+        <video
+          style={{ width: '100%', height: heightDiv - 26 }}
+          ref={remoteVideoRef}
+          playsInline
+          autoPlay
+          srcObject={remoteStream}
+        />
+        {(status === 'failed' || status == 'disconnected') && (
+          <IconButton
+            sx={{
+              left: '30%',
+              top: '50%',
+              position: 'absolute',
+              color: '#efefef',
+              transform: 'translateY(-50%)'
+            }}
+            onClick={() => setReload(reload + 1)}
+          >
+            <Icon icon='tabler:reload' fontSize={30} />
+          </IconButton>
+        )}
+      </div>
     </div>
   )
 }

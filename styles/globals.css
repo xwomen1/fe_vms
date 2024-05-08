@@ -98,6 +98,10 @@ code[class*='language-'] {
   font-weight: 600;
   border: none;
 }
+.btn-default {
+  color: #333333;
+  background-color: white;
+}
 
 .media-top-controls:hover {
   opacity: 1;
@@ -111,4 +115,10 @@ code[class*='language-'] {
 .caption-subject {
   color: #fff;
   margin-left: 5px;
+}
+
+.portlet-body {
+  position: absolute;
+  top: 50%;
+  left: 50%;
 }
