@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import authConfig from 'src/configs/auth'
 import { USER_API } from 'src/@core/components/api-url'
 import { postApi } from 'src/@core/utils/requestUltils'
+
 const defaultProvider = {
   user: null,
   loading: true,
@@ -16,6 +17,7 @@ const defaultProvider = {
 const AuthContext = createContext(defaultProvider)
 
 const AuthProvider = ({ children }) => {
+  
   const [user, setUser] = useState(defaultProvider.user)
   const [expire, setExpire] = useState('')
   const [loading, setLoading] = useState(defaultProvider.loading)

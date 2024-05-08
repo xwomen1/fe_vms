@@ -43,6 +43,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
     return [...Array(length)].map(pickRandom).join('')
   }
   const SOCKET_LIVE_VIEW = process.env.NEXT_PUBLIC_SOCKET_CCTT
+  
   const createWsConnection = () => {
     const ws = new WebSocket(`${SOCKET_LIVE_VIEW}/ivis/vms/api/v0/ws/signaling/${randomId(10)}`)
 

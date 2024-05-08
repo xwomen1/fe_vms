@@ -22,4 +22,5 @@ const POLICY_API = {
 const CAMERA_API = {
   CAMERA_GROUP: `${API_CAMERA}/camera-groups`
 }
+
 export { USER_API, GROUP_API, POLICY_API, CAMERA_API }
