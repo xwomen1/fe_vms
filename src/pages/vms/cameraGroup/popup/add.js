@@ -55,9 +55,11 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
           const cameraPromises = cameraIds.map(async cameraId => {
             try {
               const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${cameraId}`, config)
+
               return response.data
             } catch (error) {
               console.error(`Error fetching camera ${cameraId}:`, error)
+
               return null
             }
           })
@@ -78,6 +80,7 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
     const newRow = { name: '', location: '', ipAddress: '', id: '' }
     setRows([...rows, newRow])
   }
+
   const handleDeleteRow = index => {
     const updatedRows = [...rows]
     updatedRows.splice(index, 1)
@@ -137,6 +140,7 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
     }
     if (!validateInputs()) {
       console.log('Dữ liệu không hợp lệ')
+
       return
     }
 
@@ -162,6 +166,7 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
       console.error('Lỗi khi tạo nhóm mới:', error)
     }
   }
+
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth='x1' style={{ maxWidth: '80%', margin: 'auto' }}>
       <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Sửa nhóm camera</DialogTitle>

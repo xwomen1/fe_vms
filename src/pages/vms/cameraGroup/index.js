@@ -68,6 +68,7 @@ const CameraGroup = ({ apiData }) => {
   const handleCloseDelete = () => {
     setOpenPopupDetail(false)
   }
+
   const handleCloseDetail = () => {
     setOpenPopupDetail(false)
   }
@@ -87,6 +88,7 @@ const CameraGroup = ({ apiData }) => {
   }
 
   console.log(total, 'totalpage')
+
   const fetchFilteredOrAllCameraGroup = async () => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -116,6 +118,7 @@ const CameraGroup = ({ apiData }) => {
   const handleFilter = useCallback(val => {
     setValue(val)
   }, [])
+
   return (
     <Grid container spacing={6.5}>
       <Grid item xs={12}>

@@ -77,9 +77,11 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
           const cameraPromises = cameraIds.map(async cameraId => {
             try {
               const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${cameraId}`, config)
+
               return response.data
             } catch (error) {
               console.error(`Error fetching camera ${cameraId}:`, error)
+
               return null
             }
           })
@@ -97,10 +99,12 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
   }, [cameraGroup])
 
   console.log(rows)
+
   const updateCameraGroup = async () => {
     onClose()
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -133,6 +137,7 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
     setRows([...rows, newRow])
   }
   const formatIsLeader = isLeader => <Checkbox checked={isLeader} disabled />
+
   const handleDeleteRow = index => {
     const updatedRows = [...rows]
     updatedRows.splice(index, 1)
