@@ -110,7 +110,7 @@ const CameraGroup = ({ apiData }) => {
       console.error('Error fetching users:', error)
     }
   }
-  
+
   useEffect(() => {
     fetchFilteredOrAllCameraGroup()
   }, [page, pageSize, total, value])
