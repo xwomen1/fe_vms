@@ -63,6 +63,7 @@ const TCP = (cameras, nic) => {
   const [multicast, setMulticast] = useState(cameras.camera.multicast)
   const [nicTypeOptions, setNicTypeOptions] = useState([])
   const defaultValue = cameras.camera?.nicType?.name || ''
+  
   const [selectedNicType, setSelectedNicType] = useState({ 
     label: cameras.camera.nicType?.name || '', 
     value: cameras.camera.nicType?.name || '' })
