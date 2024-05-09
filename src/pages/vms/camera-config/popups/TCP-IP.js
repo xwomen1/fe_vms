@@ -112,11 +112,7 @@ const TCP = (cameras, nic) => {
             <CustomTextField label='Preferred DNS Server' value={cameras.camera.prefDNS} fullWidth />
           </Grid>
           <Grid item xs={5.8}>
-            <CustomTextField
-              label='Alternate DNS Server'
-              value={cameras.camera.alterDNS}
-              fullWidth
-            />
+            <CustomTextField label='Alternate DNS Server' value={cameras.camera.alterDNS} fullWidth />
           </Grid>
         </Grid>
         <Grid item xs={0.4}></Grid>

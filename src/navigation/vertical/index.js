@@ -63,7 +63,7 @@ const navigation = () => {
       children: [
         {
           title: 'Xem trực tiếp',
-          path: '/vms/cameraGroup'
+          path: '/vms/live-view'
         },
         {
           title: 'Xem trực tiếp 2',
@@ -75,7 +75,7 @@ const navigation = () => {
         },
         {
           title: 'Nhóm camera',
-          path: '/vms/cameraGroup'
+          path: '/vms/camera-group'
         },
         {
           title: 'Sự kiện AI',

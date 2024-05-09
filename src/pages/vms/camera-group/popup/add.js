@@ -33,33 +33,11 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
   const [groupOptions, setGroupOptions] = useState([])
   const [rows, setRows] = useState([])
   const [name, setName] = useState([])
-  const [description, setDescription] = useState([])
+  const [description, setDescription] = useState('')
   const [camera, setCamera] = useState([])
   const [cameras, setCameras] = useState([])
   const [cameraGroup, setCameraGroup] = useState([])
   console.log('id', id)
-
-  useEffect(() => {
-    const fetchFiltered = async () => {
-      try {
-        const token = localStorage.getItem(authConfig.storageTokenKeyName)
-
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-        const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/camera-groups/${id}`, config)
-        setCameraGroup(response.data)
-        setGroupName(response.data.name)
-        setDescription(response.data.description)
-        console.log(response.data.cameras[0].id)
-      } catch (error) {
-        console.error('Error fetching users:', error)
-      }
-    }
-    fetchFiltered()
-  }, [])
 
   useEffect(() => {
     const fetchFilterCameras = async () => {
@@ -78,7 +56,7 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
             try {
               const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${cameraId}`, config)
 
-              return response.data
+              return response.data.data
             } catch (error) {
               console.error(`Error fetching camera ${cameraId}:`, error)
 
@@ -98,45 +76,10 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
     fetchFilterCameras()
   }, [cameraGroup])
 
-  console.log(rows)
-
-  const updateCameraGroup = async () => {
-    onClose()
-    try {
-      const token = localStorage.getItem(authConfig.storageTokenKeyName)
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      }
-
-      const payload = {
-        cameras: rows.map(row => ({ deviceName: row.name, id: row.id })),
-        description: description,
-        name: groupName
-      }
-
-      const response = await axios.put(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/camera-groups/${id}`,
-        payload,
-        config
-      )
-      Swal.fire('Sửa thành công', '', 'success')
-      onSuccess()
-
-      console.log('Camera group updated successfully')
-    } catch (error) {
-      console.error('Error updating camera group:', error)
-    }
-  }
-
   const handleAddRow = () => {
     const newRow = { name: '', location: '', ipAddress: '', id: '' }
     setRows([...rows, newRow])
   }
-  const formatIsLeader = isLeader => <Checkbox checked={isLeader} disabled />
 
   const handleDeleteRow = index => {
     const updatedRows = [...rows]
@@ -176,8 +119,8 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
           }
         }
         const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/cameras', config)
-
-        setGroupOptions(response.data)
+        setGroupOptions(response.data.data)
+        router.reload()
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -185,6 +128,44 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
 
     fetchGroupData()
   }, [])
+
+  const handleAdd = async () => {
+    const token = localStorage.getItem(authConfig.storageTokenKeyName)
+    console.log('token', token)
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+    if (!validateInputs()) {
+      console.log('Dữ liệu không hợp lệ')
+
+      return
+    }
+
+    try {
+      const newGroupData = {
+        name: groupName,
+        description: description,
+        cameras: rows.map(row => ({
+          deviceName: row.name,
+          id: row.id
+        }))
+      }
+
+      const response = await axios.post(
+        'https://sbs.basesystem.one/ivis/vms/api/v0/camera-groups',
+        newGroupData,
+        config
+      )
+      onClose()
+      Swal.fire('Thêm thành công', '', 'success')
+      onSuccess()
+    } catch (error) {
+      console.error('Lỗi khi tạo nhóm mới:', error)
+    }
+  }
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth='x1' style={{ maxWidth: '80%', margin: 'auto' }}>
@@ -217,7 +198,6 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    {/* <TableCell style={{ fontSize: '12px', textTransform:'none' }}>STT</TableCell> */}
                     <TableCell style={{ fontSize: '12px', textTransform: 'none' }}>Tên camera</TableCell>
                     <TableCell style={{ fontSize: '12px', textTransform: 'none' }}>Vị trí</TableCell>
                     <TableCell style={{ fontSize: '12px', textTransform: 'none' }}>IP Cam</TableCell>
@@ -271,7 +251,7 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
         <Button
           onClick={() => {
             if (validateInputs()) {
-              updateCameraGroup()
+              handleAdd()
               console.log('Tên nhóm:', groupName)
               console.log('Mô tả:', description)
             } else {
@@ -279,7 +259,7 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
             }
           }}
         >
-          Cập nhật
+          Thêm
         </Button>
       </DialogActions>
     </Dialog>
