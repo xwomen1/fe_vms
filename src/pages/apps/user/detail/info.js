@@ -490,6 +490,10 @@ const UserDetails = () => {
     }
   }
 
+  const filteredGroupOptions = groupOptions.filter(
+    option => !groups || !groups.some(group => group.groupName === option.name)
+  )
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -852,9 +856,9 @@ const UserDetails = () => {
                           <TableRow key={index}>
                             <TableCell>
                               <Autocomplete
-                                options={groupOptions}
+                                options={filteredGroupOptions}
                                 getOptionLabel={option => option.name}
-                                value={group.groupName}
+                                value={groupOptions.find(option => option.name === group.groupName) || null}
                                 onChange={(event, newValue) => {
                                   const updatedRows = [...groups]
                                   updatedRows[index].groupName = newValue.name
