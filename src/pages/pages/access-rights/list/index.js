@@ -11,7 +11,7 @@ import CustomTextField from "src/@core/components/mui/text-field"
 import authConfig from 'src/configs/auth'
 import axios from 'axios'
 import toast from 'react-hot-toast'
-import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx'
 import Filter from '../popups/filter'
 import Add from '../popups/add'
 import View from '../popups/view'
@@ -321,8 +321,8 @@ const AccessRight = () => {
                         'Tên lịch': row.nameCalendar,
                         'Phòng ban': row.groupName,
                         'Ngày trong tuần': calendarDay.dayOfWeek,
-                        'Giờ bắt đầu': calendarDay.timePeriods[0].startTimeInMinute,
-                        'Giờ kết thúc': calendarDay.timePeriods[0].endTimeInMinute,
+                        'Giờ bắt đầu': calendarDay.timePeriods[0]?.startTimeInMinute,
+                        'Giờ kết thúc': calendarDay.timePeriods[0]?.endTimeInMinute,
                         'Cửa vào': row.doorInName,
                         'Cửa ra': row.doorOutName,
                         'Ngày bắt đầu': row.startDate,

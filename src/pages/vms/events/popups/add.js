@@ -126,7 +126,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
     const fetchCameraList = async () => {
         try {
             const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras?sort=%2Bcreated_at`, config)
-            setCameraList(res.data.data);
+            setCameraList(res.data)
         } catch (error) {
             console.error('Error fetching data: ', error)
         }
@@ -135,7 +135,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
     const fetchLocationList = async () => {
         try {
             const res = await axios.get(`${API_REGIONS}/?parentId=7cac40af-6b9e-47e6-9aba-8d458722d5a4`, config)
-            setLocationList(res.data.data);
+            setLocationList(res.data)
         } catch (error) {
             console.error('Error fetching data: ', error)
         }

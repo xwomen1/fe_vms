@@ -12,6 +12,7 @@ import 'react-perfect-scrollbar/dist/css/styles.css'
 import Daily from '../mocdata/daily'
 import toast from 'react-hot-toast'
 import { format } from 'date-fns'
+import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Fade ref={ref} {...props} />
@@ -120,7 +121,7 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
         try {
             const res = await axios.get(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/doors
             `, config)
-            setDoorList(res.data.data.rows);
+            setDoorList(res.data.rows);
         } catch (error) {
             console.error('Error fetching data: ', error)
         }
@@ -129,7 +130,7 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
     const fetchDepartment = async () => {
         try {
             const res = await axios.get(`${API_REGIONS}/?parentId=342e46d6-abbb-4941-909e-3309e7487304`, config)
-            setGroupName(res.data.data);
+            setGroupName(res.data);
         } catch (error) {
             console.error('Error fetching data: ', error)
         }
@@ -406,23 +407,31 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
                                 />
                             </Grid>
                             <Grid item xs={3}>
-                                <DatePicker
-                                    selected={start}
-                                    id='basic-input'
-                                    onChange={date => setStart(date)}
-                                    placeholderText='Ngày bắt đầu'
-                                    customInput={<CustomInput label='Ngày bắt đầu' />}
-                                />
+                                <DatePickerWrapper>
+                                    <div>
+                                        <DatePicker
+                                            selected={start}
+                                            id='basic-input'
+                                            onChange={date => setStart(date)}
+                                            placeholderText='Ngày bắt đầu'
+                                            customInput={<CustomInput label='Ngày bắt đầu' />}
+                                        />
+                                    </div>
+                                </DatePickerWrapper>
                             </Grid>
                             <Grid item xs={3}>
-                                <DatePicker
-                                    selected={end}
-                                    id='basic-input'
-                                    onChange={date => setEnd(date)}
-                                    placeholderText='Ngày kết thúc'
-                                    customInput={<CustomInput label='Ngày kết thúc' />}
-                                    minDate={start}
-                                />
+                                <DatePickerWrapper>
+                                    <div>
+                                        <DatePicker
+                                            selected={end}
+                                            id='basic-input'
+                                            onChange={date => setEnd(date)}
+                                            placeholderText='Ngày kết thúc'
+                                            customInput={<CustomInput label='Ngày kết thúc' />}
+                                            minDate={start}
+                                        />
+                                    </div>
+                                </DatePickerWrapper>
                             </Grid>
                             <Grid item xs={2}>
                                 <FormControlLabel
