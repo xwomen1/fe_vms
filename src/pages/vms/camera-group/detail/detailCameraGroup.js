@@ -50,10 +50,10 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
           }
         }
         const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/camera-groups/${id}`, config)
-        setCameraGroup(response.data.data)
-        setGroupName(response.data.data.name)
-        setDescription(response.data.data.description)
-        console.log(response.data.data.cameras[0].id)
+        setCameraGroup(response.data)
+        setGroupName(response.data.name)
+        setDescription(response.data.description)
+        console.log(response.data.cameras[0].id)
       } catch (error) {
         console.error('Error fetching users:', error)
       }
@@ -78,7 +78,7 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
             try {
               const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${cameraId}`, config)
 
-              return response.data.data
+              return response.data
             } catch (error) {
               console.error(`Error fetching camera ${cameraId}:`, error)
 
@@ -177,7 +177,7 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
         }
         const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/cameras', config)
 
-        setGroupOptions(response.data.data)
+        setGroupOptions(response.data)
       } catch (error) {
         console.error('Error fetching data:', error)
       }

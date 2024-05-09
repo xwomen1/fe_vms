@@ -104,8 +104,8 @@ const CameraGroup = ({ apiData }) => {
         }
       }
       const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/camera-groups', config)
-      setCamera(response.data.data)
-      console.log(response.data.data[0].id)
+      setCamera(response.data)
+      console.log(response.data[0].id)
     } catch (error) {
       console.error('Error fetching users:', error)
     }
