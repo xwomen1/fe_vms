@@ -59,7 +59,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
         try {
             const res = await axios.get(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/doors
             `, config)
-            setDoorList(res.data.data.rows);
+            setDoorList(res.data.rows);
         } catch (error) {
             console.error('Error fetching data: ', error)
         }
@@ -69,8 +69,8 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
         setLoading(true)
         try {
             const res = await axios.get(`${API_REGIONS}/?parentId=342e46d6-abbb-4941-909e-3309e7487304`, config)
-            const group = res.data.data
-            groupName.push(...res.data.data)
+            const group = res.data
+            groupName.push(...res.data)
             group.map((item, index) => {
                 if (item.isParent == true) {
                     fetchDepartmentChildren(item.id)
@@ -85,7 +85,6 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
         try {
             const res = await axios.get(`${API_REGIONS}?parentId=${idParent}`, config)
             const groupChildren = []
-            groupChildren.push(...res.data.data)
             groupName.push(...groupChildren)
         } catch (error) {
             console.error('Error fetching data: ', error)
