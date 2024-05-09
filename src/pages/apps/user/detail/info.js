@@ -282,7 +282,7 @@ const UserDetails = () => {
         }
         const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search', config)
 
-        setGroupOptions(response.data)
+        // setGroupOptions(response.data)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -305,7 +305,8 @@ const UserDetails = () => {
       setData(response.data) // store the fetched data in the state
 
       setGroup(response.data.userGroups)
-      setRows(response.data.userGroups)
+
+      // setRows(response.data.userGroups)
 
       setPolicies(response.data.policies)
       setPiId(response.data.piId)
@@ -383,36 +384,10 @@ const UserDetails = () => {
     })
   }
 
-  const handleDeleteRow = (userId, groupId) => {
-    showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
-    }).then(({ value }) => {
-      if (value) {
-        const token = localStorage.getItem(authConfig.storageTokenKeyName)
-        if (!token) {
-          return
-        }
-
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-
-        let urlDelete = `https://dev-ivi.basesystem.one/smc/iam/api/v0/user-groups/${userId}/remove?groupId=${groupId}`
-        axios
-          .delete(urlDelete, config)
-          .then(() => {
-            Swal.fire('Xóa thành công', '', 'success')
-
-            // Tùy chỉnh việc cập nhật dữ liệu sau khi xóa
-            fetchUserData()
-          })
-          .catch(err => {
-            Swal.fire('Đã xảy ra lỗi', err.message, 'error')
-          })
-      }
-    })
+  const handleDeleteRow = index => {
+    const updatedRows = [...groups]
+    updatedRows.splice(index, 1)
+    setGroup(updatedRows)
   }
   useEffect(() => {
     const fetchGroupData = async () => {
@@ -878,12 +853,15 @@ const UserDetails = () => {
                             <TableCell>
                               <Autocomplete
                                 options={groupOptions}
-                                getOptionLabel={option => option.groupName}
+                                getOptionLabel={option => option.name}
                                 value={group.groupName}
                                 onChange={(event, newValue) => {
                                   const updatedRows = [...groups]
-                                  updatedRows[index].groupName = newValue.groupName
-                                  updatedRows[index].groupCode = newValue.groupCode
+                                  updatedRows[index].groupName = newValue.name
+                                  updatedRows[index].groupCode = newValue.code
+                                  {
+                                    console.log(group.groupName, 'groupname')
+                                  }
 
                                   // updatedRows[index].id = newValue.id
                                   setGroup(updatedRows)
@@ -891,7 +869,7 @@ const UserDetails = () => {
                                 renderInput={params => <CustomTextField {...params} label='Đơn vị' />}
                               />
                             </TableCell>
-                            {console.log(group.groupName, 'group')}
+                            {console.log(groups, 'group')}
                             <TableCell>{group.groupCode}</TableCell>
                             <TableCell align='right'>
                               {/* Render formatted content in isLeader column */}
@@ -899,7 +877,7 @@ const UserDetails = () => {
                             </TableCell>
                             {showPlusColumn && (
                               <TableCell align='center'>
-                                <IconButton onClick={() => handleDeleteRow(userId, group.groupId)}>
+                                <IconButton onClick={() => handleDeleteRow(index)}>
                                   <Icon icon='bi:trash' />
                                 </IconButton>
                               </TableCell>
