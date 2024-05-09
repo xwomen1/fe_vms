@@ -41,12 +41,7 @@ const multicastOption = [
   { label: 'DISABLE', value: 'option2' }
 ]
 
-const nicTypeOptions = [
-  { label: 'Auto', value: 'option1' },
-  { label: 'Manual', value: 'option2' }
-]
-
-const UserDetails = cameras => {
+const TCP = (cameras, nic) => {
   const router = useRouter()
   const { id } = router.query
   const [timeValidity, setTimeValidity] = useState('Custom')
@@ -74,47 +69,75 @@ const UserDetails = cameras => {
   const [phoneNumber, setPhoneNumber] = useState('')
   const [identityNumber, setIdentityNumber] = useState('')
   const [userCode, setUserCode] = useState('')
-  const [syncCode, setSyncCode] = useState('')
+  const [camera, setCamera] = useState('')
   const [ava1, setAva1] = useState(null)
   const [ava2, setAva2] = useState(null)
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [selectedNicType, setSelectedNicType] = useState(cameras.camera?.nicType?.name)
   const [multicast, setMulticast] = useState(cameras.camera.multicast)
+  const [nicTypeOptions, setNicTypeOptions] = useState([])
+  const defaultValue = cameras.camera?.nicType?.name || ''
+  const [selectedNicType, setSelectedNicType] = useState({ 
+    label: cameras.camera.nicType?.name || '', 
+    value: cameras.camera.nicType?.name || '' })
+  console.log(defaultValue)
+  console.log(selectedNicType)
 
   const handleMulticastChange = (event, newValue) => {
     setMulticast(newValue)
   }
 
   const handleNicTypeChange = (event, newValue) => {
-    setSelectedNicType(newValue)
+    setSelectedNicType(newValue || defaultValue);
+  }
+  const [loading, setLoading] = useState(false)
+
+  const fetchNicTypes = async () => {
+    try {
+      setLoading(true)
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.get(
+        'https://sbs.basesystem.one/ivis/vms/api/v0/cameras/options/combox?cameraType=network_nic_type',
+        config
+      )
+
+      const nicTypes = response.data.data.map(item => ({
+        label: item.name,
+        value: item.value
+      }))
+      setNicTypeOptions(nicTypes)
+
+      // Set selectedNicType here based on your business logic
+      if (nicTypes.length > 0) {
+        setSelectedNicType(nicTypes[0].value) // Set it to the first value in the array, or adjust as needed
+      }
+    } catch (error) {
+      console.error('Error fetching NIC types:', error)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  // useEffect(() => {
-  //   const fetchGroupData = async () => {
-  //     try {
-  //       const token = localStorage.getItem(authConfig.storageTokenKeyName)
-  //       console.log('token', token)
+  useEffect(() => {
+    setSelectedNicType({
+      label: defaultValue,
+      value: defaultValue
+    });
+  }, [defaultValue]);  
 
-  //       const config = {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`
-  //         }
-  //       }
+  const handleComboboxFocus = () => {
+    if (nicTypeOptions.length === 0) {
+      fetchNicTypes()
+    }
+  }
 
-  //       const response = await axios.get(
-  //         `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/{idCamera}?idCamera=${cameras.camera}`,
-  //         config
-  //       )
-
-  //       setNvrs(response.data.data)
-  //     } catch (error) {
-  //       console.error('Error fetching data:', error)
-  //     }
-  //   }
-
-  //   fetchGroupData()
-  // }, [])
   console.log(cameras)
 
   const handleAddRow = () => {
@@ -140,7 +163,7 @@ const UserDetails = cameras => {
     setExpiredAt(date)
     setAva2(isoToEpoch(date))
   }
-  console.log('New start date:', isoToEpoch(availableAt))
+  console.log('New start date:', camera)
   function isoToEpoch(isoDateString) {
     var milliseconds = Date.parse(isoDateString)
 
@@ -186,6 +209,8 @@ const UserDetails = cameras => {
   }
 
   const formatDDNS = ddns => <Checkbox checked={ddns} disabled />
+  console.log('Camera object:', cameras.camera)
+  console.log('NIC Type:', cameras.camera.nicType)
 
   return (
     <div style={{ width: '100%' }}>
@@ -195,10 +220,14 @@ const UserDetails = cameras => {
             <Autocomplete
               value={selectedNicType}
               onChange={handleNicTypeChange}
-              options={nicTypeOptions.map(option => option.label)}
+              options={nicTypeOptions}
+              getOptionLabel={option => option.label}
               renderInput={params => <CustomTextField {...params} label='Loại NIC' fullWidth />}
+              onFocus={handleComboboxFocus}
+              loading={loading}
             />
           </Grid>
+          {console.log(cameras.camera.nicType?.name)}
 
           <Grid item xs={0.4}></Grid>
 
@@ -216,7 +245,7 @@ const UserDetails = cameras => {
           </Grid>
           <Grid item xs={5.8}>
             <Autocomplete
-              value={selectedNicType}
+              value={multicast}
               onChange={handleMulticastChange}
               options={multicastOption.map(option => option.label)}
               renderInput={params => <CustomTextField {...params} label='Multicast Discovery' fullWidth />}
@@ -226,7 +255,7 @@ const UserDetails = cameras => {
 
           <Grid item xs={5.8}>
             <CustomTextField
-              label='Preferred DNS Server              '
+              label='Preferred DNS Server'
               value={cameras.camera.prefDNS}
               onChange={handleFullNameChange}
               fullWidth
@@ -234,8 +263,7 @@ const UserDetails = cameras => {
           </Grid>
           <Grid item xs={5.8}>
             <CustomTextField
-              label='Alternate DNS Server
-              '
+              label='Alternate DNS Server'
               value={cameras.camera.alterDNS}
               onChange={handleEmailChange}
               fullWidth
@@ -249,4 +277,4 @@ const UserDetails = cameras => {
   )
 }
 
-export default UserDetails
+export default TCP 
