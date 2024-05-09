@@ -78,7 +78,7 @@ const TCPIP = nvrs => {
   const [ava2, setAva2] = useState(null)
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [selectedNicType, setSelectedNicType] = useState(nvrs.nvrs.ddnsType.name)
+  const [selectedNicType, setSelectedNicType] = useState(nvrs?.nvrs?.ddnsType?.name)
 
   const handleNicTypeChange = (event, newValue) => {
     setSelectedNicType(newValue)

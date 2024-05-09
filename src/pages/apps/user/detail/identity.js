@@ -200,7 +200,7 @@ const UserDetails = () => {
       }
     }
     const res = await axios.get(`https://dev-ivi.basesystem.one/smc/iam/api/v0/users/${userId}`, config)
-    setUserCode(res.data.data.accessCode)
+    setUserCode(res.data.accessCode)
 
     if (res && res.data) {
       accessCodeUser.current = res.data.accessCode
@@ -250,9 +250,9 @@ const UserDetails = () => {
         config
       )
 
-      setStatus1(response.data.data.isEnableFace)
-      setFingerIdentifyUpdatedAt(response.data.data.fingerIdentifyUpdatedAt)
-      setUser(response.data.data)
+      setStatus1(response.data.isEnableFace)
+      setFingerIdentifyUpdatedAt(response.data.fingerIdentifyUpdatedAt)
+      setUser(response.data)
     } catch (error) {
       console.error('Error fetching user details:', error)
     }
@@ -476,9 +476,9 @@ const UserDetails = () => {
           `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-access/${userId}/authentications`,
           config
         )
-        setUser(response.data.data)
-        setStatus1(response.data.data.isEnableFace)
-        setFingerIdentifyUpdatedAt(response.data.data.fingerIdentifyUpdatedAt)
+        setUser(response.data)
+        setStatus1(response.data.isEnableFace)
+        setFingerIdentifyUpdatedAt(response.data.fingerIdentifyUpdatedAt)
       } catch (error) {
         console.error('Error fetching user details:', error)
       }
@@ -490,18 +490,14 @@ const UserDetails = () => {
 
   const handleCancel = () => {
     fetchUserData()
+
     setReadOnly(true)
     setEditing(false)
     setShowPlusColumn(!showPlusColumn)
-
-    router.reload()
-
-    setUser({
-      ...user,
-      fullName: '',
-      email: ''
-    })
   }
+  useEffect(() => {
+    fetchUserData()
+  }, [])
 
   return (
     <div>

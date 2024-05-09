@@ -11,8 +11,8 @@ import {Fragment, useState, useEffect,useRef } from 'react';
 import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import authConfig from 'src/configs/auth';
-import Fullscreen from '@material-ui/icons/Fullscreen';
 import Swal from 'sweetalert2';
+import Icon from 'src/@core/components/icon'
 import FileUploader from 'devextreme-react/file-uploader';
 import ModalImage from '../ModalImage';
 import ImageCropper from '../ImageCropperPopup';
@@ -26,10 +26,12 @@ const AddFaceManagement = () => {
     const [modalImage, setModalImage] = useState(null);
     const [listFileId, setListFileId] = useState([]);
     const listFileUrl = [];
+    const [isNameEntered, setIsNameEntered] = useState(false);
     const [listImage, setListImage] = useState([]);
     const [fileAvatarId, setFileAvatarId] = useState(null);
     const [listFileUpload, setListFileUpload] = useState([]);
     const [name, setName] = useState(null);
+    const [note, setNote] = useState(null);
     const [showCropper, setShowCopper] = useState(false);
     const fileUploader1 = useRef(null);
     const fileUploader2 = useRef(null);
@@ -37,6 +39,12 @@ const AddFaceManagement = () => {
     const [fileAvatarImg, setFileAvatarImg] = useState(null);
     const ALLOWED_FILE_EXTENSIONS = ['.jpg', '.jpeg', '.gif', '.png'];
     const [isDoubleClick, setIsDoubleClick] = useState(false);
+
+    const handleInputChange = (e) => {
+        const value = e.target.value;
+        setName(value);
+        setIsNameEntered(!!value); 
+    };
 
       useEffect(() => {
         if (!showCropper) {
@@ -83,12 +91,12 @@ const AddFaceManagement = () => {
     const renderImage = listFileUpload.length > 0 && listImage.length > 0 && (
         <div className={classes.cardImageContainer}>
           {listImage.length < 5 && (
-            <div style={{border: '1.5px dashed rgba(0, 0, 0, 0.48)'}}>
             <div className="add-btn card-img" id="dropzone-external-2">
-              <div style={{ alignSelf: 'center', margin: 'auto' }}>
-                <img src="data:image/svg+xml,%3Csvg width='32' height='34' viewBox='0 0 32 34' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M17.9 15.1665H31.7441V18.6665H17.9V33.729H14.1191V18.6665H0.556641V15.1665H14.1191V0.604004H17.9V15.1665Z' fill='black' fill-opacity='0.6'/%3E%3C/svg%3E" alt="" />
-              </div>
+            <div style={{ alignSelf: 'center', margin: 'auto',marginLeft:'100px' }}>
+                   <Icon icon='tabler:plus' />
+               </div>
               <FileUploader
+                style={{opacity:'0'}}
                 id="file-uploader-2"
                 dialogTrigger="#dropzone-external-2"
                 dropZone="#dropzone-external-2"
@@ -101,7 +109,6 @@ const AddFaceManagement = () => {
                 }}
                 ref={fileUploader2}
               />
-            </div>
             </div>
           )}
           {listImage.map((image, index) => (
@@ -125,16 +132,18 @@ const AddFaceManagement = () => {
                   listFileUploadTmp.splice(listImage.indexOf(image), 1);
                   setListFileUpload(listFileUploadTmp);
                 }}
+                color='primary'
               >
                 -
               </IconButton>
               <IconButton
+                color='primary'
                 className="full"
                 onClick={() => {
                   setModalImage(image);
                 }}
               >
-                <Fullscreen />
+                <Icon icon='tabler:maximize' />
               </IconButton>
             </div>
           ))}
@@ -161,11 +170,7 @@ const AddFaceManagement = () => {
 
                 const files = listFileUpload.concat(e.value);
 
-                console.log(files, 'files');
-
                 const formData = new FormData();
-
-                console.log(formData, 'formData');
 
                 for (const file of files) {
                     formData.append('files', file);
@@ -184,14 +189,11 @@ const AddFaceManagement = () => {
 
                     const res = await axios.post(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/upload/multi`, formData, config);
                     setListFileUpload(files);
-                    console.log(res.data, 'res');
     
                     const fileIds = res.data.data.map((x) => x.id);
-                    console.log(fileIds, 'fileIds');
     
                     const arr = [...listFileId, ...fileIds];
-                    console.log(arr, 'arr');
-    
+
                     setListFileId([...arr].slice(0, 5));
                 } catch (error) {
 
@@ -230,6 +232,7 @@ const AddFaceManagement = () => {
                     id: id,
                     urlImage: listFileUrl[id],
           })),
+                note:note,
             }
             await axios.post(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist`,params,config)
             Swal.fire('Thêm đối tượng thành công', '', 'success')
@@ -265,8 +268,10 @@ const AddFaceManagement = () => {
                                             Hủy
                                             </Button>
                                             <Button
+                                             disabled={!isNameEntered}
                                             onClick={handleAddBlacklist}
-                                             style={{background:'#3B2828',color:'#FFFFFF'}}>
+                                            variant='contained'
+                                            >
                                             Thêm mới
                                             </Button>
                                         </Box>
@@ -314,7 +319,6 @@ const AddFaceManagement = () => {
                                 style={{
                                     fontSize: '18px',
                                     lineHeight: '22px',
-                                    color: 'rgba(0, 0, 0, 0.6)',
                                     margin: '0px',
                                 }}
                                 >
@@ -349,7 +353,6 @@ const AddFaceManagement = () => {
                                 defaultValue=""
                                 mode="text"
                                 style={{
-                                    background: '#FFFFFF',
                                     border: '1px solid rgba(0, 0, 0, 0.12)',
                                     borderRadius: '4px',
                                     marginTop: '10px',
@@ -357,18 +360,54 @@ const AddFaceManagement = () => {
                                 onInput={(e) => {
                                     setName(e.target.value);
                                 }}
+                                onChange={handleInputChange}
                                 />
                             </div>
-                            <div style={{ color: 'red', float: 'left', position: 'absolute', bottom: '70%  ', left: '50%', fontSize: 20 }}>
+                            <div
+                                    style={{
+                                        marginLeft:'300px',
+                                        width:'65%',
+                                        marginTop:'-260px'
+                                    }}
+                                >
+                                     <p
+                                            style={{
+                                                fontSize: '18px',
+                                                lineHeight: '22px',
+                                                margin: '0px',
+                                            }}
+                                        >
+                                        Ghi chú
+                                        </p>
+
+                                    <TextField
+                                    rows={4}
+                                    multiline
+                                    variant='standard'
+                                    style={{
+                                        border: '1px solid rgba(0, 0, 0, 0.12)',
+                                        borderRadius: '10px',
+                                        width:'100%'
+                                    }}
+                                    defaultValue=''
+                                    placeholder='  Nhập ghi chú ...!'
+                                    onInput={(e) => {
+                                        setNote(e.target.value);
+                                    }}
+                                    id='textarea-standard-static'
+                                    />
+                                </div>
+
+                            <div style={{ color: 'red', float: 'left', position: 'absolute', bottom: '50% ', left: '50%', fontSize: 20 }}>
                                 {`Nhấn đúp chuột vào ảnh để tạo Avatar`}
                             </div>
-                            <div style={{ color: 'red', float: 'left', position: 'absolute', bottom: '66%  ', left: '50%', fontSize: 20 }}>
+                            <div style={{ color: 'red', float: 'left', position: 'absolute', bottom: '45% ', left: '50%', fontSize: 20 }}>
                                 {`Tên đối tượng bắt buộc phải nhập`}
                             </div>
 
                             </div>
                             {listFileUpload.length === 0 && (
-                            <p style={{ margin: '35px 0px 0px 0px' }}>
+                            <p style={{ margin: '35px 0px 0px 0px' ,marginTop:'250px',marginLeft:'10px'}}>
 
                                 <div></div>
 
@@ -376,7 +415,7 @@ const AddFaceManagement = () => {
                             </p>
                             )}
                             {listFileUpload.length > 0 && (
-                            <p style={{ margin: '35px 0px 0px 0px' }}>
+                            <p style={{ margin: '35px 0px 0px 0px',marginTop:'250px',marginLeft:'10px' }}>
                                 {`Ảnh của đối tượng ${listFileUpload.length}/5)`}
                             </p>
                             )}
@@ -411,7 +450,6 @@ const AddFaceManagement = () => {
                                         style={{
                                         fontSize: '16px',
                                         lineHeight: '19px',
-                                        color: 'rgba(37, 37, 37, 0.6)',
                                         }}
                                     >
                                         {`Kéo thả ảnh`}
@@ -420,7 +458,6 @@ const AddFaceManagement = () => {
                                         style={{
                                         fontSize: '16px',
                                         lineHeight: '19px',
-                                        color: 'rgba(37, 37, 37, 0.84)',
                                         }}
                                     >
                                         {`Hoặc`}
@@ -530,7 +567,6 @@ const useStyles = makeStyles(() => ({
     },
     container: {
         padding: '30px 50px 0px 50px',
-        background: '#FFFFFF',
         boxShadow: '0px 6px 18px rgba(0, 0, 0, 0.06)',
         borderRadius: '10px',
     },
@@ -575,9 +611,6 @@ const useStyles = makeStyles(() => ({
         flexFlow: 'wrap',
         '& .add-btn': {
             border: '1.5px dashed rgba(0, 0, 0, 0.48)',
-            color: 'transparent',
-            opacity: 0,
-            PointerEvent: 'none',
         },
         '& .card-img': {
             position: 'relative',
@@ -600,7 +633,6 @@ const useStyles = makeStyles(() => ({
             top: '10px',
             width:'25px',
             right: '5px',
-            color: '#000',
             backgroundColor: '#fff',
             '& .MuiIconButton-label': {
                 width: '24px',
@@ -618,7 +650,6 @@ const useStyles = makeStyles(() => ({
             bottom: '5px',
             width:'25px',
             height:'25px',
-            color: '#000',
             backgroundColor: '#fff',
             '& .MuiIconButton-label': {
                 width: '24px',

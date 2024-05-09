@@ -83,7 +83,7 @@ const RolePopup = ({ open, onClose, onSelect, nvr }) => {
           config
         )
 
-        setNvrs(response.data.data)
+        setNvrs(response.data)
       } catch (error) {
         console.error('Error fetching data:', error)
       }

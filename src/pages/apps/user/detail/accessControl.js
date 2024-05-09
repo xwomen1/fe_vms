@@ -50,17 +50,75 @@ const UserDetails = () => {
     setRows([...rows, newRow])
   }
 
+  const fetchUserData = async () => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.get(
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-access/${userId}/detail-groups`,
+        config
+      )
+
+      const userGroups = response.data.groupMappings.map(groupMapping => groupMapping.userGroup)
+
+      if (Array.isArray(userGroups)) {
+        // Nếu userGroups là một mảng, bạn có thể sử dụng nó trực tiếp
+        setRows(
+          userGroups.map(group => ({
+            groupName: group.name,
+            groupCode: group.code,
+            id: group.id,
+            description: '' // Placeholder, sẽ được cập nhật trong bước tiếp theo
+          }))
+        )
+      } else {
+        // Nếu userGroups là một đối tượng, bạn cần xử lý nó một cách thích hợp
+        // Dưới đây là một cách để chuyển đổi đối tượng thành một mảng để sử dụng
+        const groupsArray = Object.values(userGroups)
+        setRows(
+          groupsArray.map(group => ({
+            groupName: group.name,
+            groupCode: group.code,
+            id: group.id,
+            description: '' // Placeholder, sẽ được cập nhật trong bước tiếp theo
+          }))
+        )
+      }
+
+      // Lặp qua từng user group để gọi API và lấy mô tả, sau đó cập nhật vào state
+      for (const group of userGroups) {
+        const description = await getListAccessGroupNamesByUserGroupId(group.id)
+        setRows(prevRows => {
+          const updatedRows = [...prevRows]
+          const rowIndex = updatedRows.findIndex(row => row.id === group.id)
+          if (rowIndex !== -1) {
+            updatedRows[rowIndex].description = description
+          }
+
+          return updatedRows
+        })
+      }
+    } catch (error) {
+      console.error('Error fetching user details:', error)
+    }
+  }
+
   const handleCancel = () => {
+    fetchUserData()
+
     setReadOnly(true)
     setEditing(false)
     setShowPlusColumn(!showPlusColumn)
-    router.reload()
-    setUser({
-      ...user,
-      fullName: '',
-      email: ''
-    })
   }
+  useEffect(() => {
+    fetchUserData()
+  }, [])
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -77,7 +135,7 @@ const UserDetails = () => {
           config
         )
 
-        const userGroups = response.data.data.groupMappings.map(groupMapping => groupMapping.userGroup)
+        const userGroups = response.data.groupMappings.map(groupMapping => groupMapping.userGroup)
 
         if (Array.isArray(userGroups)) {
           // Nếu userGroups là một mảng, bạn có thể sử dụng nó trực tiếp
@@ -140,8 +198,8 @@ const UserDetails = () => {
       config
     )
 
-    if (res && res.data.data.accessGroupList) {
-      return res.data.data.accessGroupList.map(item => item.name).join(', ')
+    if (res && res.data.accessGroupList) {
+      return res.data.accessGroupList.map(item => item.name).join(', ')
     }
 
     return ''
@@ -179,7 +237,7 @@ const UserDetails = () => {
         config
       )
       Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
-      router.push(`/apps/user/detail/${response.data.data.userId}`)
+      router.push(`/apps/user/detail/${response.data.userId}`)
     } catch (error) {
       console.error('Error updating user details:', error)
       Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi cập nhật dữ liệu.', 'error')
@@ -203,7 +261,7 @@ const UserDetails = () => {
           }
         }
         const response = await axios.get('https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups', config)
-        setGroupOptions(response.data.data.rows)
+        setGroupOptions(response.data.rows)
       } catch (error) {
         console.error('Error fetching data:', error)
       }

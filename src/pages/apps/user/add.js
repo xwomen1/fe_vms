@@ -54,10 +54,10 @@ const Add = () => {
   const [rows, setRows] = useState([])
   const [rows1, setRows1] = useState([])
   const [createAccount, setCreateAccount] = useState(true)
-  const [timeEndMorning, setTimeEndMorning] = useState('')
-  const [timeStartAfternoon, setTimeStartAfternoon] = useState('')
-  const [timeEndAfternoon, setTimeEndAfternoon] = useState('')
-  const [dateTime, setDateTime] = useState('')
+  const [timeEndMorning, setTimeEndMorning] = useState(new Date())
+  const [timeStartAfternoon, setTimeStartAfternoon] = useState(new Date())
+  const [timeEndAfternoon, setTimeEndAfternoon] = useState(new Date())
+  const [dateTime, setDateTime] = useState(new Date())
   const [fullNameValue, setFullNameValue] = useState('')
   const [account, setAccount] = useState('')
   const [email, setEmail] = useState('')
@@ -71,7 +71,7 @@ const Add = () => {
   const [confirmPassword, setConfirmPassword] = useState('')
 
   const handleAddRow = () => {
-    const newRow = { groupName: '', groupCode: '', groupId: '' } // Thêm groupId vào đây
+    const newRow = { groupName: '', code: '', id: '' } // Thêm groupId vào đây
     setRows([...rows, newRow])
   }
 
@@ -150,11 +150,11 @@ const Add = () => {
     setTimeValidity(event.target.value)
   }
 
-  const userGroups = rows.map(row => ({
-    groupId: row.groupId,
-    policyName: true,
-    isLeader: false
-  }))
+  // const userGroups = rows.map(row => ({
+  //   groupId: row.id,
+  //   policyName: true,
+  //   isLeader: false
+  // }))
 
   const userPolicy = rows1.map(row => ({
     policyId: row.policyId
@@ -166,8 +166,43 @@ const Add = () => {
 
       return
     }
-    if (!fullNameValue || !email || !phoneNumber || !identityNumber || !userCode || !syncCode || !userGroups) {
-      Swal.fire('Lỗi!', 'Vui lòng điền đầy đủ thông tin.', 'error')
+    if (!fullNameValue || fullNameValue.length <= 3) {
+      Swal.fire('Lỗi!', 'Tên không được để trống và độ dài phải >3', 'error')
+
+      return
+    }
+    if (!email) {
+      Swal.fire('Lỗi!', 'Email không được để trống', 'error')
+
+      return
+    }
+    if (!phoneNumber) {
+      Swal.fire('Lỗi!', 'Số điện thoại không được để trống', 'error')
+
+      return
+    }
+    if (!identityNumber) {
+      Swal.fire('Lỗi!', 'Số giấy tờ không được để trống', 'error')
+
+      return
+    }
+    if (!userCode) {
+      Swal.fire('Lỗi!', 'Mã người dùng không được để trống', 'error')
+
+      return
+    }
+    if (!syncCode) {
+      Swal.fire('Lỗi!', 'Mã đồng bộ không được để trống', 'error')
+
+      return
+    }
+    if (!account) {
+      Swal.fire('Lỗi!', 'Tên tài khoản không được để trống', 'error')
+
+      return
+    }
+    if (userGroups.length === 0) {
+      Swal.fire('Lỗi!', 'Nhóm người dùng không được để trống.', 'error')
 
       return
     }
@@ -195,6 +230,13 @@ const Add = () => {
     }
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
+      const processedGroups = await userGroups(rows) // Call the userGroups function passing rows
+      if (processedGroups.length === 0) {
+        Swal.fire('Lỗi!', 'Nhóm người dùng không được để trống.', 'error')
+
+        return
+      }
+      console.log()
 
       const config = {
         headers: {
@@ -221,7 +263,7 @@ const Add = () => {
           availableAt: ava1,
           expiredAt: ava2,
           note: note,
-          userGroups: userGroups,
+          userGroups: processedGroups,
           policies: userPolicy,
           userAccount: {
             accStatus: 'ACTIVE',
@@ -232,10 +274,85 @@ const Add = () => {
         config
       )
       Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
-      router.push(`/apps/user/detail/${response.data.data.userId}`)
+      router.push(`/apps/user/detail/${response.data.userId}`)
     } catch (error) {
       console.error('Error updating user details:', error)
       Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi cập nhật dữ liệu.', 'error')
+    }
+  }
+
+  const searchGroupId = async (groupName, groupCode) => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.get(
+        `https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search?keyword=${groupName}`,
+        config
+      )
+
+      if (response.data.length > 0) {
+        return response.data[0].groupId // Trả về groupId nếu tìm thấy
+      } else {
+        // Nếu không tìm thấy, tạo nhóm mới và trả về groupId của nhóm mới đó
+        const newGroupId = await createNewGroup(groupName, groupCode)
+
+        return newGroupId
+      }
+    } catch (error) {
+      throw error
+    }
+  }
+
+  const createNewGroup = async (groupName, groupCode) => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.post(
+        'https://dev-ivi.basesystem.one/smc/iam/api/v0/groups',
+        {
+          groupName: groupName,
+          groupCode: groupCode,
+          isPnLVGR: false
+        },
+        config
+      )
+
+      return response.data.groupId
+    } catch (error) {
+      throw error
+    }
+  }
+
+  const userGroups = async rows => {
+    try {
+      const processedGroups = []
+      for (const row of rows) {
+        const groupId = await searchGroupId(row.name, row.code)
+
+        const userGroup = {
+          groupId: groupId,
+          policyName: true,
+          isLeader: false
+        }
+        processedGroups.push(userGroup)
+        console.log(userGroup)
+      }
+
+      return processedGroups
+    } catch (error) {
+      throw error
     }
   }
 
@@ -264,9 +381,13 @@ const Add = () => {
             Authorization: `Bearer ${token}`
           }
         }
-        const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search', config)
 
-        setGroupOptions(response.data.data)
+        const response = await axios.get(
+          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions?limit=25&page=1&parentID=f963e9d4-3d6b-45df-884d-15f93452f2a2',
+          config
+        )
+
+        setGroupOptions(response.data)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -287,7 +408,7 @@ const Add = () => {
         }
         const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/policies/search', config)
 
-        setPolicy(response.data.data.rows)
+        setPolicy(response.data.rows)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -494,7 +615,7 @@ const Add = () => {
                     <TableRow>
                       <TableCell>Đơn vị</TableCell>
                       <TableCell>Mã đơn vị</TableCell>
-                      <TableCell align='right'>Là lãnh đạo đơn vị</TableCell>
+                      <TableCell align='right'>Đơn vị</TableCell>
                       <TableCell align='center'>
                         <IconButton size='small' onClick={handleAddRow} sx={{ marginLeft: '10px' }}>
                           <Icon icon='bi:plus' />
@@ -508,19 +629,21 @@ const Add = () => {
                         <TableCell>
                           <Autocomplete
                             options={groupOptions}
-                            getOptionLabel={option => option.groupName}
+                            getOptionLabel={option => option.name}
                             value={row.name}
                             onChange={(event, newValue) => {
                               const updatedRows = [...rows]
                               updatedRows[index].name = newValue.name
-                              updatedRows[index].groupCode = newValue.groupCode
-                              updatedRows[index].groupId = newValue.groupId
+                              updatedRows[index].code = newValue.code
+
+                              // updatedRows[index].id = newValue.id
                               setRows(updatedRows)
                             }}
-                            renderInput={params => <TextField {...params} label='Đơn vị' />}
+                            renderInput={params => <CustomTextField {...params} label='Đơn vị' />}
                           />
                         </TableCell>
-                        <TableCell>{row.groupCode}</TableCell>
+                        {console.log(rows)}
+                        <TableCell>{row.code}</TableCell>
                         <TableCell align='right'>{formatIsLeader(row.isLeader)}</TableCell>
                         <TableCell align='center'>
                           {index > 0 && (
@@ -610,7 +733,7 @@ const Add = () => {
                                 updatedRows[index].policyName = newValue.policyName
                                 updatedRows[index].description = newValue.description
                                 updatedRows[index].policyId = newValue.policyId
-                                setRows(updatedRows)
+                                setRows1(updatedRows)
                               }}
                               renderInput={params => <TextField {...params} label='Đơn vị' />}
                             />

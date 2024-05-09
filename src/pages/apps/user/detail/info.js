@@ -11,19 +11,17 @@ import {
   FormControlLabel,
   Checkbox,
   Switch,
-  TextField,
   Typography,
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  Autocomplete
 } from '@mui/material'
 import Icon from 'src/@core/components/icon'
-import Autocomplete from '@mui/material/Autocomplete'
 import Box from '@mui/material/Box'
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import TableContainer from '@mui/material/TableContainer'
-import Paper from '@mui/material/Paper'
 import Table from '@mui/material/Table'
 import TableRow from '@mui/material/TableRow'
 import TableHead from '@mui/material/TableHead'
@@ -43,6 +41,9 @@ const UserDetails = () => {
   const [timeValidity, setTimeValidity] = useState('Custom')
   const [user, setUser] = useState(null)
   const [readOnly, setReadOnly] = useState(true)
+  const [readOnlys, setReadOnlys] = useState(true)
+  const [rows, setRows] = useState([])
+
   const [params, setParams] = useState({})
   const [editing, setEditing] = useState(false)
   const [groupOptions, setGroupOptions] = useState([])
@@ -53,6 +54,7 @@ const UserDetails = () => {
   const [availableAt, setAvailableAt] = useState('')
   const [expiredAt, setExpiredAt] = useState('')
   const [note, setNote] = useState('')
+  const [username, setUserName] = useState('')
 
   const [timeEndMorning, setTimeEndMorning] = useState('')
   const [timeStartAfternoon, setTimeStartAfternoon] = useState('')
@@ -68,11 +70,12 @@ const UserDetails = () => {
   const [userCode, setUserCode] = useState('')
   const [syncCode, setSyncCode] = useState('')
 
-  const [group, setGroup] = useState(null)
+  const [groups, setGroup] = useState(null)
   const [policies, setPolicies] = useState(null)
   const [piId, setPiId] = useState(null)
   const [ava1, setAva1] = useState(null)
   const [ava2, setAva2] = useState(null)
+  const [data, setData] = useState(null)
 
   const handleAddRoleClickPolicy = () => {
     setOpenPopupPolicy(true)
@@ -137,6 +140,10 @@ const UserDetails = () => {
     setNote(event.target.value)
   }
 
+  const handleUserNameChange = event => {
+    setUserName(event.target.value)
+  }
+
   const handleIdentityNumberChange = event => {
     setIdentityNumber(event.target.value)
   }
@@ -155,6 +162,11 @@ const UserDetails = () => {
 
   const handleAddRoleClick = () => {
     setOpenPopup(true)
+  }
+
+  const handleAddRow = () => {
+    const newRow = { groupName: '', groupCode: '', id: '' } // Thêm groupId vào đây
+    setGroup([...groups, newRow])
   }
 
   const handleClosePopup = () => {
@@ -185,12 +197,19 @@ const UserDetails = () => {
     setDefaultGroup(newValue)
     console.log(newValue)
   }
+  console.log(groups)
 
   const saveChanges = async () => {
     setReadOnly(true)
     setEditing(false)
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
+      const processedGroups = await userGroups(groups) // Call the userGroups function passing rows
+      if (processedGroups.length === 0) {
+        Swal.fire('Lỗi!', 'Nhóm người dùng không được để trống.', 'error')
+
+        return
+      }
 
       const config = {
         headers: {
@@ -209,6 +228,8 @@ const UserDetails = () => {
           userCode: userCode,
           syncCode: syncCode,
           userStatus: status1,
+          userGroups: processedGroups,
+
           timeEndAfternoon: convertStringToTimeArray(timeEndAfternoon),
           timeStartAfternoon: convertStringToTimeArray(timeStartAfternoon),
           timeStartMorning: convertStringToTimeArray(dateTime),
@@ -248,21 +269,6 @@ const UserDetails = () => {
     return [hour, minute]
   }
 
-  // Sử dụng hàm
-  // console.log(timeArray, 'timearray')
-  // const convertStringToTimeArray = timeString => {
-  //   if (typeof timeString === 'string') {
-  //     const [hourStr, minuteStr] = timeString.split(':').map(str => parseInt(str, 10))
-
-  //     if (!isNaN(hourStr) && !isNaN(minuteStr)) {
-  //       return [hourStr, minuteStr]
-  //     }
-  //   }
-
-  //   console.error('Invalid timeString:', timeString)
-  //   return null
-  // }
-
   useEffect(() => {
     const fetchGroupData = async () => {
       try {
@@ -276,7 +282,7 @@ const UserDetails = () => {
         }
         const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search', config)
 
-        setGroupOptions(response.data.data)
+        // setGroupOptions(response.data)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -296,27 +302,32 @@ const UserDetails = () => {
         }
       }
       const response = await axios.get(`https://dev-ivi.basesystem.one/smc/iam/api/v0/users/${userId}`, config)
-      setGroup(response.data.data.userGroups)
-      setPolicies(response.data.data.policies)
-      setPiId(response.data.data.piId)
-      setFullNameValue(response.data.data.fullName)
-      setEmail(response.data.data.email)
-      setPhoneNumber(response.data.data.phoneNumber)
-      setIdentityNumber(response.data.data.identityNumber)
-      setUserCode(response.data.data.userCode)
-      setSyncCode(response.data.data.syncCode)
-      setStatus1(response.data.data.userStatus)
-      setAvailableAt(response.data.data.availableAt)
-      setExpiredAt(response.data.data.expiredAt)
-      setUser(response.data.data)
-      setNote(response.data.data.note)
-      setStatus(response.data.data.userAccount.accStatus)
+      setData(response.data) // store the fetched data in the state
 
-      if (response.data.data.userGroups && response.data.data.userGroups.length > 0) {
-        setDefaultGroup(response.data.data.userGroups[0])
+      setGroup(response.data.userGroups)
+
+      // setRows(response.data.userGroups)
+
+      setPolicies(response.data.policies)
+      setPiId(response.data.piId)
+      setFullNameValue(response.data.fullName)
+      setEmail(response.data.email)
+      setPhoneNumber(response.data.phoneNumber)
+      setIdentityNumber(response.data.identityNumber)
+      setUserCode(response.data.userCode)
+      setSyncCode(response.data.syncCode)
+      setStatus1(response.data.userStatus)
+      setAvailableAt(response.data.availableAt)
+      setExpiredAt(response.data.expiredAt)
+      setUser(response.data)
+      setNote(response.data.note)
+      setStatus(response.data.userAccount.accStatus)
+
+      if (response.data.userGroups && response.data.userGroups.length > 0) {
+        setDefaultGroup(response.data.userGroups[0])
       }
-      if (response.data.data.userAccount && response.data.data.userAccount.length > 0) {
-        setStatus(response.data.data.userAccount.accStatus)
+      if (response.data.userAccount && response.data.userAccount.length > 0) {
+        setStatus(response.data.userAccount.accStatus)
       }
     } catch (error) {
       console.error('Error fetching user details:', error)
@@ -373,15 +384,16 @@ const UserDetails = () => {
     })
   }
 
-  const handleDeleteRow = (userId, groupId) => {
-    showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
-    }).then(({ value }) => {
-      if (value) {
+  const handleDeleteRow = index => {
+    const updatedRows = [...groups]
+    updatedRows.splice(index, 1)
+    setGroup(updatedRows)
+  }
+  useEffect(() => {
+    const fetchGroupData = async () => {
+      try {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
-        if (!token) {
-          return
-        }
+        console.log('token', token)
 
         const config = {
           headers: {
@@ -389,21 +401,95 @@ const UserDetails = () => {
           }
         }
 
-        let urlDelete = `https://dev-ivi.basesystem.one/smc/iam/api/v0/user-groups/${userId}/remove?groupId=${groupId}`
-        axios
-          .delete(urlDelete, config)
-          .then(() => {
-            Swal.fire('Xóa thành công', '', 'success')
+        const response = await axios.get(
+          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions?limit=25&page=1&parentID=f963e9d4-3d6b-45df-884d-15f93452f2a2',
+          config
+        )
 
-            // Tùy chỉnh việc cập nhật dữ liệu sau khi xóa
-            fetchUserData()
-          })
-          .catch(err => {
-            Swal.fire('Đã xảy ra lỗi', err.message, 'error')
-          })
+        setGroupOptions(response.data)
+      } catch (error) {
+        console.error('Error fetching data:', error)
       }
-    })
+    }
+
+    fetchGroupData()
+  }, [])
+
+  const searchGroupId = async (groupName, groupCode) => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.get(
+        `https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search?keyword=${groupName}`,
+        config
+      )
+
+      if (response.data.length > 0) {
+        return response.data[0].groupId // Trả về groupId nếu tìm thấy
+      } else {
+        // Nếu không tìm thấy, tạo nhóm mới và trả về groupId của nhóm mới đó
+        const newGroupId = await createNewGroup(groupName, groupCode)
+
+        return newGroupId
+      }
+    } catch (error) {
+      throw error
+    }
   }
+
+  const createNewGroup = async (groupName, groupCode) => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.post(
+        'https://dev-ivi.basesystem.one/smc/iam/api/v0/groups',
+        {
+          groupName: groupName,
+          groupCode: groupCode,
+          isPnLVGR: false
+        },
+        config
+      )
+
+      return response.data.groupId
+    } catch (error) {
+      throw error
+    }
+  }
+
+  const userGroups = async rows => {
+    try {
+      const processedGroups = []
+      for (const row of rows) {
+        const groupId = await searchGroupId(row.groupName, row.groupCode)
+
+        const userGroup = {
+          groupId: groupId,
+          policyName: true,
+          isLeader: false
+        }
+        processedGroups.push(userGroup)
+        console.log(userGroup)
+      }
+
+      return processedGroups
+    } catch (error) {
+      throw error
+    }
+  }
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -415,25 +501,26 @@ const UserDetails = () => {
           }
         }
         const response = await axios.get(`https://dev-ivi.basesystem.one/smc/iam/api/v0/users/${userId}`, config)
-        setUser(response.data.data)
-        setGroup(response.data.data.userGroups)
-        setPolicies(response.data.data.policies)
-        setPiId(response.data.data.piId)
-        setFullNameValue(response.data.data.fullName)
-        setEmail(response.data.data.email)
-        setPhoneNumber(response.data.data.phoneNumber)
-        setIdentityNumber(response.data.data.identityNumber)
-        setUserCode(response.data.data.userCode)
-        setSyncCode(response.data.data.syncCode)
-        setStatus1(response.data.data.userStatus)
-        setAvailableAt(response.data.data.availableAt)
-        setExpiredAt(response.data.data.expiredAt)
-        setLeaderOfUnit(response.data.data.userGroups[0].isLeader)
-        setNote(response.data.data.note)
-        setStatus(response.data.data.userAccount.accStatus)
+        setData(response.data) // store the fetched data in the state
+        setUser(response.data)
+        setGroup(response.data.userGroups)
+        setPolicies(response.data.policies)
+        setPiId(response.data.piId)
+        setFullNameValue(response.data.fullName)
+        setEmail(response.data.email)
+        setPhoneNumber(response.data.phoneNumber)
+        setIdentityNumber(response.data.identityNumber)
+        setUserCode(response.data.userCode)
+        setSyncCode(response.data.syncCode)
+        setStatus1(response.data.userStatus)
+        setAvailableAt(response.data.availableAt)
+        setExpiredAt(response.data.expiredAt)
+        setLeaderOfUnit(response.data.userGroups[0].isLeader)
+        setNote(response.data.note)
+        setStatus(response.data.userAccount.accStatus)
 
-        if (response.data.data.timeStartMorning) {
-          const [hour, minute] = response.data.data.timeStartMorning
+        if (response.data.timeStartMorning) {
+          const [hour, minute] = response.data.timeStartMorning
           const timeString = `${hour}:${minute.toString().padStart(2, '0')}`
           const defaultTime = new Date()
           defaultTime.setHours(hour)
@@ -442,24 +529,24 @@ const UserDetails = () => {
         }
         console.log(timeEndMorning) // Kết quả mong muốn
 
-        if (response.data.data.timeEndMorning) {
-          const [hour, minute] = response.data.data.timeEndMorning
+        if (response.data.timeEndMorning) {
+          const [hour, minute] = response.data.timeEndMorning
           const timeString = `${hour}:${minute.toString().padStart(2, '0')}`
           const defaultTime = new Date()
           defaultTime.setHours(hour)
           defaultTime.setMinutes(minute)
           setTimeEndMorning(defaultTime)
         }
-        if (response.data.data.timeStartAfternoon) {
-          const [hour, minute] = response.data.data.timeStartAfternoon
+        if (response.data.timeStartAfternoon) {
+          const [hour, minute] = response.data.timeStartAfternoon
           const timeString = `${hour}:${minute.toString().padStart(2, '0')}`
           const defaultTime = new Date()
           defaultTime.setHours(hour)
           defaultTime.setMinutes(minute)
           setTimeStartAfternoon(defaultTime)
         }
-        if (response.data.data.timeEndAfternoon) {
-          const [hour, minute] = response.data.data.timeEndAfternoon
+        if (response.data.timeEndAfternoon) {
+          const [hour, minute] = response.data.timeEndAfternoon
           const timeString = `${hour}:${minute.toString().padStart(2, '0')}`
           const defaultTime = new Date()
           defaultTime.setHours(hour)
@@ -467,10 +554,10 @@ const UserDetails = () => {
           setTimeEndAfternoon(defaultTime)
         }
 
-        // setDateTime(convertTimeArrayToString(response.data.data.timeEndMorning))
-        console.log(convertTimeArrayToString(response.data.data.timeEndMorning))
-        if (response.data.data.userGroups && response.data.data.userGroups.length > 0) {
-          setDefaultGroup(response.data.data.userGroups[0])
+        // setDateTime(convertTimeArrayToString(response.data.timeEndMorning))
+        console.log(convertTimeArrayToString(response.data.timeEndMorning))
+        if (response.data.userGroups && response.data.userGroups.length > 0) {
+          setDefaultGroup(response.data.userGroups[0])
         }
       } catch (error) {
         console.error('Error fetching user details:', error)
@@ -483,17 +570,14 @@ const UserDetails = () => {
 
   const handleCancel = () => {
     fetchUserData()
+
     setReadOnly(true)
     setEditing(false)
     setShowPlusColumn(!showPlusColumn)
-    router.reload()
-
-    setUser({
-      ...user,
-      fullName: '',
-      email: ''
-    })
   }
+  useEffect(() => {
+    fetchUserData()
+  }, [])
   console.log('param', params)
 
   return (
@@ -750,24 +834,42 @@ const UserDetails = () => {
                           <TableCell align='right'>Là lãnh đạo đơn vị</TableCell>
                           {showPlusColumn && (
                             <TableCell align='center'>
-                              <IconButton onClick={handleAddRoleClick} size='small' sx={{ marginLeft: '10px' }}>
+                              <IconButton onClick={handleAddRow} size='small' sx={{ marginLeft: '10px' }}>
                                 <Icon icon='bi:plus' />
                               </IconButton>
-                              <RolePopup
+                              {/* <RolePopup
                                 open={openPopup}
                                 onClose={handleClosePopup}
                                 onSelect={handleRoleSelect}
                                 userId={userId}
-                              />
+                              /> */}
                             </TableCell>
                           )}
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {group.map((group, index) => (
+                        {groups.map((group, index) => (
                           <TableRow key={index}>
-                            <TableCell>{group.groupName}</TableCell>
+                            <TableCell>
+                              <Autocomplete
+                                options={groupOptions}
+                                getOptionLabel={option => option.name}
+                                value={group.groupName}
+                                onChange={(event, newValue) => {
+                                  const updatedRows = [...groups]
+                                  updatedRows[index].groupName = newValue.name
+                                  updatedRows[index].groupCode = newValue.code
+                                  {
+                                    console.log(group.groupName, 'groupname')
+                                  }
 
+                                  // updatedRows[index].id = newValue.id
+                                  setGroup(updatedRows)
+                                }}
+                                renderInput={params => <CustomTextField {...params} label='Đơn vị' />}
+                              />
+                            </TableCell>
+                            {console.log(groups, 'group')}
                             <TableCell>{group.groupCode}</TableCell>
                             <TableCell align='right'>
                               {/* Render formatted content in isLeader column */}
@@ -775,7 +877,7 @@ const UserDetails = () => {
                             </TableCell>
                             {showPlusColumn && (
                               <TableCell align='center'>
-                                <IconButton onClick={() => handleDeleteRow(userId, group.groupId)}>
+                                <IconButton onClick={() => handleDeleteRow(index)}>
                                   <Icon icon='bi:trash' />
                                 </IconButton>
                               </TableCell>
@@ -796,8 +898,9 @@ const UserDetails = () => {
                   <CustomTextField
                     label='Tài khoản'
                     defaultValue={user?.userAccount.username}
+                    onChange={handleUserNameChange}
                     id='form-props-read-only-input'
-                    InputProps={{ readOnly: readOnly }}
+                    InputProps={{ readOnly: readOnlys }}
                     fullWidth
                   />
                 </Grid>
@@ -806,7 +909,7 @@ const UserDetails = () => {
                     label='Loại tài khoản'
                     defaultValue={user?.userAccount.identityProviderType}
                     id='form-props-read-only-input'
-                    InputProps={{ readOnly: readOnly }}
+                    InputProps={{ readOnly: readOnlys }}
                     fullWidth
                   />
                 </Grid>

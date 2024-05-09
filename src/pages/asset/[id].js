@@ -204,7 +204,7 @@ const UserDetails = () => {
         config
       )
       Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
-      router.push(`/apps/user/detail/${response.data.data.userId}`)
+      router.push(`/apps/user/detail/${response.data.userId}`)
     } catch (error) {
       console.error('Error updating user details:', error)
       Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi cập nhật dữ liệu.', 'error')
@@ -238,7 +238,7 @@ const UserDetails = () => {
         }
         const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search', config)
 
-        setGroupOptions(response.data.data)
+        setGroupOptions(response.data)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -259,7 +259,7 @@ const UserDetails = () => {
         }
         const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/policies/search', config)
 
-        setPolicy(response.data.data.rows)
+        setPolicy(response.data.rows)
       } catch (error) {
         console.error('Error fetching data:', error)
       }

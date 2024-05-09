@@ -36,6 +36,9 @@ import { Password } from '@mui/icons-material'
 const UserList = ({ apiData }) => {
   const [value, setValue] = useState('')
   const [selectedIds, setSelectedIds] = useState([])
+  const [idNVR, setId] = useState([])
+  const [nameNVR, setNameNvr] = useState(null)
+  const [IPNVR, setIPNVR] = useState(null)
   const [openPopup, setOpenPopup] = useState(false)
   const [openPopupP, setOpenPopupP] = useState(false)
 
@@ -231,11 +234,11 @@ const UserList = ({ apiData }) => {
           }
         }
         const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/nvrs', config)
-        setStatus1(response.data.data.isOfflineSetting)
-        setNvr(response.data.data[0].id)
-        setAssetType(response.data.data)
-        setTotal(response.data.data.page)
-        console.log(response.data.data[0].id)
+        setStatus1(response.data.isOfflineSetting)
+        setNvr(response.data[0].id)
+        setAssetType(response.data)
+        setTotal(response.data.page)
+        console.log(response.data[0].id)
       } catch (error) {
         console.error('Error fetching users:', error)
       }
@@ -243,6 +246,8 @@ const UserList = ({ apiData }) => {
     fetchFilteredOrAllUsers()
   }, [page, pageSize, total, value])
 
+  console.log(nameNVR,'idNVR');
+  
   return (
     <Grid container spacing={6.5}>
       <Grid item xs={12}>
@@ -317,7 +322,12 @@ const UserList = ({ apiData }) => {
                           <IconButton size='small' onClick={handleAddVideoConnectClick}>
                             <Icon icon='tabler:camera' />
                           </IconButton>
-                          <IconButton size='small' onClick={handleAddConnectCameraClick}>
+                          <IconButton size='small' onClick={() =>{
+                            setIPNVR(assetType.ipAddress)
+                            setNameNvr(assetType.name)
+                            setId(assetType.id)
+                            handleAddConnectCameraClick(assetType.id)
+                            }}>
                             <Icon icon='tabler:link' />
                           </IconButton>
                           <IconButton size='small' sx={{ color: 'text.secondary' }}>
@@ -371,7 +381,7 @@ const UserList = ({ apiData }) => {
         )}  */}
         <Passwords open={openPopupP} onClose={handleClosePPopup} nvr={selectedIds} />
 
-        <ConnectCamera open={openPopupConnectCamera} onClose={handleCloseConnectCameraPopup} nvr={selectedIds} />
+        <ConnectCamera open={openPopupConnectCamera} onClose={handleCloseConnectCameraPopup} nvr={idNVR} name ={nameNVR} ip={IPNVR}/>
         <VideoConnectCamera
           open={openPopupVideoConnectCamera}
           onClose={handleCloseVideoConnectPopup}

@@ -24,7 +24,11 @@ const navigation = () => {
           title: 'Quản lý khuôn mặt',
           icon: 'tabler:users'
         },
-
+        {
+          path: '/pages/car_management/list',
+          title: 'Quản lý Biển số',
+          icon: 'tabler:id-badge-2'
+        },
         {
           title: 'Chấm công',
           path: '/timekeeping'
@@ -34,21 +38,22 @@ const navigation = () => {
           title: 'Báo cáo tháng',
           icon: 'tabler:id'
         },
-        {
-          path: '/pages/access-rights/list',
-          title: 'Quyền truy cập',
-          icon: 'tabler:shield'
-        },
-        {
-          path: '/pages/access-rights/list',
-          title: 'Thống kê',
-          icon: 'tabler:statistics/time?tab=%2Fstatistics%2Ftime'
-        },
-        {
-          path: '/pages/access-rights/list',
-          title: 'Hẹn lịch',
-          icon: 'tabler:guest-registrations'
-        }
+        
+        // {
+        //   path: '/pages/access-rights/list',
+        //   title: 'Quyền truy cập',
+        //   icon: 'tabler:shield'
+        // },
+        // {
+        //   path: '/pages/access-rights/list',
+        //   title: 'Thống kê',
+        //   icon: 'tabler:statistics/time?tab=%2Fstatistics%2Ftime'
+        // },
+        // {
+        //   path: '/pages/access-rights/list',
+        //   title: 'Hẹn lịch',
+        //   icon: 'tabler:guest-registrations'
+        // }
       ]
     },
     {
@@ -58,15 +63,15 @@ const navigation = () => {
       children: [
         {
           title: 'Xem trực tiếp',
-          path: 'vms/cameraGroup'
+          path: '/vms/cameraGroup'
         },
         {
           title: 'Xem trực tiếp 2',
-          path: 'vms/live-view-p2p-private'
+          path: '/vms/live-view-p2p-private'
         },
         {
           title: 'Xem lại',
-          path: 'vms/playback-camera'
+          path: '/vms/playback-camera'
         },
         {
           title: 'Nhóm camera',
@@ -78,11 +83,11 @@ const navigation = () => {
         },
         {
           title: 'Sự cố hệ thống',
-          path: 'vms/problems'
+          path: '/vms/problems'
         },
         {
           title: 'Danh sách đen',
-          path: 'vms/black-list'
+          path: '/vms/black-list'
         },
         {
           title: 'Cấu hình camera',
@@ -94,15 +99,15 @@ const navigation = () => {
         },
         {
           title: 'Quản lý lưu trữ',
-          path: 'vms/stores'
+          path: '/vms/stores'
         },
         {
           title: 'Thư viện media',
-          path: 'vms/library'
+          path: '/vms/library'
         },
         {
           title: 'Bản đồ số',
-          path: 'vms/map'
+          path: '/vms/map'
         }
       ]
     },

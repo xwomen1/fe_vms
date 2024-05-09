@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react'
-import { Autocomplete, TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, Grid } from '@mui/material'
+import React, { useState } from 'react'
+import CustomTextField from 'src/@core/components/mui/text-field'
+import { Button, Grid } from '@mui/material'
 import axios from 'axios'
 import authConfig from 'src/configs/auth'
 import Swal from 'sweetalert2'
-import CustomTextField from 'src/@core/components/mui/text-field'
-import { minWidth } from '@mui/system'
 
-const RolePopup = ({ open, onClose, onSelect, nvr }) => {
+const PassWord = ({ onClose, camera }) => {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const handlePasswordChange = event => {
     setPassword(event.target.value)
@@ -18,14 +18,12 @@ const RolePopup = ({ open, onClose, onSelect, nvr }) => {
     setConfirmPassword(event.target.value)
   }
 
-  const handleCancel = () => {
+  const saveChange = async () => {
+    setLoading(true)
     onClose()
-  }
-
-  const saveChanges = async () => {
     if (password !== confirmPassword) {
       Swal.fire('Lỗi!', 'Mật khẩu và xác nhận mật khẩu không khớp nhau.', 'error')
-      onClose()
+      setLoading(false)
 
       return
     }
@@ -40,46 +38,43 @@ const RolePopup = ({ open, onClose, onSelect, nvr }) => {
       }
 
       const response = await axios.put(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/config/changepassword?idCamera=${nvr}`,
+        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/changepassword?idCamera=${camera}`,
         {
           password: password
         },
         config
       )
       Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
-      onClose()
+      setLoading(false)
     } catch (error) {
       console.error('Error updating user details:', error)
       Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi cập nhật dữ liệu.', 'error')
-      onClose()
+      setLoading(false)
     }
   }
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Đổi mật khẩu</DialogTitle>
-      <DialogContent>
-      <Grid container spacing={2} style={{minWidth: 500}}>
-        <Grid container item  style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
-<Grid item xs = {12}>
-<CustomTextField label='Mật khẩu' type='password' onChange={handlePasswordChange}  fullWidth/>
-
+    <div style={{ width: '100%' }}>
+      <Grid container spacing={2} style={{ minWidth: 500 }}>
+        <Grid container item style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
+          <Grid item xs={12}>
+            <CustomTextField label='Mật khẩu' type='password' onChange={handlePasswordChange} fullWidth />
+          </Grid>
+          <Grid item xs={12}>
+            <CustomTextField
+              label='Xác nhận mật khẩu'
+              type='password'
+              onChange={handleConfirmPasswordChange}
+              fullWidth
+            />
+          </Grid>
+        </Grid>
       </Grid>
-      <Grid item xs={12}>
-      <CustomTextField label='Xác nhận mật khẩu' type='password' onChange={handleConfirmPasswordChange} fullWidth />
-     
-      </Grid>
-    
-      </Grid>
-    </Grid>
-    
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCancel}>Cancel</Button>
-        <Button onClick={saveChanges}>OK</Button>
-      </DialogActions>
-    </Dialog>
+      <br />
+      <Button onClick={onClose}>Cancel</Button>
+      <Button onClick={saveChange}>OK</Button>
+    </div>
   )
 }
 
-export default RolePopup
+export default PassWord

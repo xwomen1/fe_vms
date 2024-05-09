@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Grid, IconButton } from '@mui/material'
-import Icon from 'src/@core/components/icon'
-import Link from 'next/link'
+import { Grid } from '@mui/material'
 import Tab from '@mui/material/Tab'
 import TabPanel from '@mui/lab/TabPanel'
 import TabContext from '@mui/lab/TabContext'
@@ -12,18 +10,8 @@ import axios from 'axios'
 import TCP from './TCP-IP'
 import DDNs from './DDNS'
 import Port from './Port'
-import NTP from './NTP'
 
-import {
-  Autocomplete,
-  TextField,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Checkbox
-} from '@mui/material'
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Checkbox } from '@mui/material'
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   borderBottom: '0 !important',
@@ -48,15 +36,10 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
     }
   }
 }))
-import Swal from 'sweetalert2'
 
-const Network = ({ open, onClose, onSelect, camera }) => {
-  const [selectedRole, setSelectedRole] = useState(null)
-  const [groupName, setGroupName] = useState([])
-  const [defaultGroup, setDefaultGroup] = useState(null)
-  const [selectedGroupId, setSelectedGroupId] = useState(null) // Thêm trạng thái để lưu trữ id của nhóm được chọn
+const Network = ({ open, onClose, camera }) => {
   const [cameras, setCamera] = useState([])
-  const [groupCode, setGroupCode] = useState([])
+  const [nic, setNic] = useState([])
   const [value, setValue] = useState('1')
 
   const handleChange = (event, newValue) => {
@@ -86,7 +69,8 @@ const Network = ({ open, onClose, onSelect, camera }) => {
             config
           )
 
-          setCamera(response.data.data)
+          setCamera(response.data)
+          setNic(response.data.nicType.name)
         }
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -94,7 +78,7 @@ const Network = ({ open, onClose, onSelect, camera }) => {
     }
 
     fetchGroupData()
-  }, [camera]) // Thêm openPopupNetwork vào dependency array để useEffect được gọi khi openPopupNetwork thay đổi
+  }, [camera])
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -112,7 +96,7 @@ const Network = ({ open, onClose, onSelect, camera }) => {
           </Grid>
           <TabPanel value='1'>
             {' '}
-            <TCP camera={cameras} />
+            <TCP camera={cameras} nic={nic} />
           </TabPanel>
           <TabPanel value='2'>
             {' '}

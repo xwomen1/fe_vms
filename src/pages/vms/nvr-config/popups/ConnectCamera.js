@@ -35,6 +35,9 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
   '& .MuiTabs-indicator': {
     display: 'none'
   },
+  '& .MuiTabs-container': {
+    display: 'none'
+  },
   '& .Mui-selected': {
     boxShadow: theme.shadows[2],
     backgroundColor: theme.palette.primary.main,
@@ -49,14 +52,9 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
   }
 }))
 import Swal from 'sweetalert2'
+import { width } from '@mui/system'
 
-const RolePopup = ({ open, onClose, onSelect, nvr }) => {
-  const [selectedRole, setSelectedRole] = useState(null)
-  const [groupName, setGroupName] = useState([])
-  const [defaultGroup, setDefaultGroup] = useState(null)
-  const [selectedGroupId, setSelectedGroupId] = useState(null) // Thêm trạng thái để lưu trữ id của nhóm được chọn
-  const [nvrs, setNvrs] = useState([])
-  const [groupCode, setGroupCode] = useState([])
+const RolePopup = ({ open, onClose, onSelect, nvr ,name,ip}) => {
   const [value, setValue] = useState('1')
 
   const handleChange = (event, newValue) => {
@@ -68,29 +66,24 @@ const RolePopup = ({ open, onClose, onSelect, nvr }) => {
   }
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Cấu hình luu tru</DialogTitle>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+      <DialogTitle>{`${name}-${ip}`}</DialogTitle>
       <DialogContent>
         <TabContext value={value}>
-          <Grid>
-            {' '}
-            <TabList onChange={handleChange} aria-label='customized tabs example'>
-              <Tab value='1' label='Quet' />
-              <Tab value='2' label='Nhap' />
-            
-            </TabList>
-          </Grid>
+          <TabList onChange={handleChange} aria-label='customized tabs example'>
+            <Tab value='1' label='Quét' />
+            <Tab value='2' label='Nhập' />
+          </TabList>
           <TabPanel value='1'>
-            <Quet  />
+            <Quet nvr={nvr} onClose={onClose} />
           </TabPanel>
           <TabPanel value='2'>
             <Nhap  />
           </TabPanel>
-         
         </TabContext>
       </DialogContent>
       <DialogActions>
-        <Button>OK</Button>
+        <Button onClick={onClose}>OK</Button>
       </DialogActions>
     </Dialog>
   )

@@ -1,16 +1,11 @@
-/**
- *
- * ModalImage
- *
- */
-
 import React, { useEffect, useState } from 'react';
 import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 import { Popup } from 'devextreme-react';
-import Grid from '@material-ui/core/Grid';
-import { IconButton, Tooltip } from '@material-ui/core';
+import {
+  Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Tab, TableContainer, Paper,
+  Table, TableHead, TableRow, TableCell, TableBody, Pagination, Menu, MenuItem, Dialog, DialogContent,
+} from "@mui/material";
 import Icon from 'src/@core/components/icon'
-import MyLocationIcon from '@material-ui/icons/MyLocation';
 import MaskGroup from './list/Imge/NoAvatar.svg';
 
 function ModalImage({ onClose, imageUrl }) {
@@ -51,10 +46,11 @@ function ModalImage({ onClose, imageUrl }) {
         style={{ width: '100%', height: '100%' }}
       >
           <IconButton
-          style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 9999 }}
+          color='primary'
+          style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 9999, background:'#fff' }}
           onClick={onClose}
         >
-          <Icon icon='tabler:circle-letter-x'/>
+          <Icon icon='tabler:x' fontSize='2rem' />
         </IconButton>
         <Grid item xs={12} style={{ height: '100%' }}>
           <TransformWrapper defaultScale={1} defaultPositionX={0} defaultPositionY={0}>
@@ -62,31 +58,19 @@ function ModalImage({ onClose, imageUrl }) {
               <React.Fragment>
                 <Grid item container justifyContent='center' alignItems='center'>
                   <Grid item>
-                    <Tooltip title='Tải xuống'>
-                      <IconButton onClick={() => onDownloadBtnClick()}>
+
+                      <IconButton style={{ background:'#fff',width:'40px',height:'40px'}} color='primary' onClick={() => onDownloadBtnClick()}>
                       <Icon icon='tabler:download' />
                       </IconButton>
-                    </Tooltip>
-                    <Tooltip title='Phóng to'>
-                      <IconButton onClick={() => zoomIn()}>
-                        <Icon icon='tabler:camera-minus' />
+                      <IconButton style={{ background:'#fff',width:'40px',height:'40px'}}  color='primary' onClick={() => zoomIn()}>
+                        <Icon icon='tabler:zoom-in' />
                       </IconButton>
-                    </Tooltip>
-                    <Tooltip title='Thu nhỏ'>
-                      <IconButton onClick={() => zoomOut()}>
-                        <Icon icon='tabler:camera-plus' />
+                      <IconButton style={{ background:'#fff',width:'40px',height:'40px'}} color='primary' onClick={() => zoomOut()}>
+                        <Icon icon='tabler:zoom-out' />
                       </IconButton>
-                    </Tooltip>
-                    <Tooltip title='Trung tâm'>
-                      <IconButton onClick={() => centerView()}>
-                        <MyLocationIcon fontSize='small' />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title='Quay về mặc định'>
-                      <IconButton onClick={() => resetTransform()}>
+                      <IconButton style={{ background:'#fff',width:'40px',height:'40px'}} color='primary' onClick={() => resetTransform()}>
                       <Icon icon='tabler:rotate' />
                       </IconButton>
-                    </Tooltip>
                   </Grid>
                 </Grid>
                 <TransformComponent

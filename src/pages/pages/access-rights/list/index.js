@@ -189,7 +189,7 @@ const AccessRight = () => {
 
             const response = await axios.get(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/calendar/configuration/`, config)
 
-            setDataList(response.data.data.rows)
+            setDataList(response.data.rows)
         } catch (error) {
             console.error('Error fetching data:', error)
             toast.error(error)
@@ -247,8 +247,8 @@ const AccessRight = () => {
 
             const response = await axios.get(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/calendar/configuration/`, config)
 
-            setDataList1(response.data.data.rows)
-            setTotal(response.data.data.totalPage)
+            setDataList1(response.data.rows)
+            setTotal(response.data.totalPage)
         } catch (error) {
             console.error('Error fetching data:', error)
             toast.error(error)
