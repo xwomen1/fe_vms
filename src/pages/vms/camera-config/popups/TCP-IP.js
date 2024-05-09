@@ -182,13 +182,6 @@ const TCP = (cameras, nic) => {
     setEmail(event.target.value)
   }
 
-  const handleComboboxFocus = () => {
-    // if (nicTypeOptions.length === 0) {
-    fetchNicTypes()
-
-    // }
-  }
-
   const formatDDNS = ddns => <Checkbox checked={ddns} disabled />
   console.log('Camera object:', cameras.camera)
   console.log('NIC Type:', cameras.camera.nicType)
