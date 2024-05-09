@@ -137,6 +137,7 @@ const EventMap = () => {
         if (event.target.checked) {
             const newSelected = rows.map((n) => n.time)
             setSelected(newSelected)
+
             return
         }
         setSelected([])
@@ -168,6 +169,7 @@ const EventMap = () => {
                 'Sự kiện': row.event,
                 'Camera': row.camera
             })
+
             return acc
         }, [])
 
