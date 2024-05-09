@@ -24,7 +24,11 @@ const CameraGroup = ({ apiData }) => {
   const [openPopup, setOpenPopup] = useState(false)
   const [openPopupAdd, setOpenPopupAdd] = useState(false)
 
+<<<<<<< HEAD
   const [openPopupId, setOpenPopupId] = useState(null)
+=======
+  const [openPopupId, setOpenPopupId] = useState(null);
+>>>>>>> 7cc0805 (group camera)
 
   const [openPopupDetail, setOpenPopupDetail] = useState(false)
 
@@ -43,6 +47,7 @@ const CameraGroup = ({ apiData }) => {
     setPage(newPage)
   }
 
+<<<<<<< HEAD
   const handleOpenPopup = id => {
     setOpenPopupId(id)
     setOpenPopup(true)
@@ -52,6 +57,18 @@ const CameraGroup = ({ apiData }) => {
     setOpenPopupAdd(true)
   }
 
+=======
+
+  const handleOpenPopup = (id) => {
+    setOpenPopupId(id);
+    setOpenPopup(true)
+  }
+
+  const handleOpenPopupAdd = () => {
+    setOpenPopupAdd(true)
+  }
+  
+>>>>>>> 7cc0805 (group camera)
   const handleClose = () => {
     setOpenPopup(false)
   }
@@ -60,6 +77,7 @@ const CameraGroup = ({ apiData }) => {
     setOpenPopupAdd(false)
   }
 
+<<<<<<< HEAD
   const handleOpenPopupDetail = id => {
     setOpenPopupId(id)
     setOpenPopupDetail(true)
@@ -70,6 +88,17 @@ const CameraGroup = ({ apiData }) => {
   }
 
   const handleCloseDetail = () => {
+=======
+  const handleOpenPopupDetail = (id) => {
+    setOpenPopupId(id);
+    setOpenPopupDetail(true)
+  }
+  
+  const handleCloseDelete = () => {
+    setOpenPopupDetail(false)
+  }
+  const handleCloseDetail= () => {
+>>>>>>> 7cc0805 (group camera)
     setOpenPopupDetail(false)
   }
 
@@ -87,6 +116,7 @@ const CameraGroup = ({ apiData }) => {
     handleCloseMenu()
   }
 
+<<<<<<< HEAD
   console.log(total, 'totalpage')
 
   const fetchFilteredOrAllCameraGroup = async () => {
@@ -110,7 +140,7 @@ const CameraGroup = ({ apiData }) => {
       console.error('Error fetching users:', error)
     }
   }
-  
+
   useEffect(() => {
     fetchFilteredOrAllCameraGroup()
   }, [page, pageSize, total, value])
@@ -118,7 +148,40 @@ const CameraGroup = ({ apiData }) => {
   const handleFilter = useCallback(val => {
     setValue(val)
   }, [])
+=======
 
+
+  console.log(total, 'totalpage')
+  const fetchFilteredOrAllCameraGroup = async () => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        params: {
+          limit: pageSize,
+          page: page,
+          keyword: value
+        }
+      }
+      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/camera-groups', config)
+      setCamera(response.data.data)
+      console.log(response.data.data[0].id)
+    } catch (error) {
+      console.error('Error fetching users:', error)
+    }
+  }
+  
+  useEffect(() => {
+    fetchFilteredOrAllCameraGroup();
+  }, [page, pageSize, total, value]);
+>>>>>>> 7cc0805 (group camera)
+
+  const handleFilter = useCallback(val => {
+    setValue(val)
+  }, [])
   return (
     <Grid container spacing={6.5}>
       <Grid item xs={12}>
@@ -127,6 +190,7 @@ const CameraGroup = ({ apiData }) => {
           <Grid container spacing={2}>
             <Grid item xs={0.1}></Grid>
 
+<<<<<<< HEAD
             <Grid container item xs={12} alignItems='center'>
               <Grid container spacing={2}>
                 <Grid item xs={7} style={{ color: 'orange', marginLeft: '2%' }}>
@@ -146,10 +210,33 @@ const CameraGroup = ({ apiData }) => {
                   />
                 </Grid>
               </Grid>
+=======
+            <Grid container item xs={12} alignItems="center">
+              <Grid container spacing={2}>
+                  <Grid item xs = {7} style={{color:'orange', marginLeft: '2%'}}><h3>Danh sách nhóm Camera</h3></Grid>
+                  <Grid item xs ={2} style={{marginTop:'1%', marginLeft:'4%', fontSize:'14px'}}> 
+                  <IconButton onClick={() => handleOpenPopupAdd()}>
+                        <Icon icon='tabler:plus' />
+                  </IconButton>
+                  Thêm nhóm
+                  </Grid>
+                  <Grid item xs = {2} style={{marginTop:'1%'}}>                  
+                    <CustomTextField
+                      value={value}
+                      placeholder='Search Group'
+                      onChange={e => handleFilter(e.target.value)}
+                  />
+                  </Grid>
+                  </Grid>
+>>>>>>> 7cc0805 (group camera)
 
               <Table>
                 <TableHead>
                   <TableRow>
+<<<<<<< HEAD
+=======
+                  
+>>>>>>> 7cc0805 (group camera)
                     <TableCell sx={{ padding: '13px' }}>STT</TableCell>
                     <TableCell sx={{ padding: '13px' }}>Tên nhóm</TableCell>
                     <TableCell sx={{ padding: '13px' }}>Mô tả</TableCell>
@@ -159,6 +246,7 @@ const CameraGroup = ({ apiData }) => {
                 </TableHead>
                 <TableBody>
                   {console.log(cameras)}
+<<<<<<< HEAD
                   {cameras &&
                     cameras.map((camera, index) => (
                       <TableRow key={camera.id}>
@@ -180,6 +268,28 @@ const CameraGroup = ({ apiData }) => {
                         </TableCell>
                       </TableRow>
                     ))}
+=======
+                  {cameras && cameras.map((camera, index) => (
+                    <TableRow key={camera.id}>
+                      <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{camera.name}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{camera.description}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{camera.cameras ? camera.cameras.length : 0}</TableCell>
+
+                      <TableCell sx={{ padding: '16px' }}>
+                        <Grid container spacing={2}>
+                        <IconButton onClick={() => handleOpenPopupDetail(camera.id)}>
+                            <Icon icon='tabler:edit' />
+                          </IconButton>
+                          <IconButton onClick={() => handleOpenPopup(camera.id)}>
+                            {console.log(camera.id)}
+                          <Icon icon='tabler:trash' />
+                          </IconButton>
+                        </Grid>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+>>>>>>> 7cc0805 (group camera)
                 </TableBody>
               </Table>
               <br></br>
@@ -208,6 +318,7 @@ const CameraGroup = ({ apiData }) => {
       </Grid>
 
       {console.log(openPopupId)}
+<<<<<<< HEAD
       {openPopup && (
         <DeletePopup
           open={openPopup}
@@ -229,6 +340,25 @@ const CameraGroup = ({ apiData }) => {
       {openPopupAdd && (
         <CameraGroupAdd open={openPopupAdd} onClose={handleCloseAdd} onSuccess={fetchFilteredOrAllCameraGroup} />
       )}
+=======
+      {
+        openPopup && (
+          <DeletePopup open={openPopup} onClose={handleClose} id={openPopupId} onSuccess={fetchFilteredOrAllCameraGroup} />
+        )
+      }
+
+      {
+        openPopupDetail && (
+          <DetailPopup open={openPopupDetail} onClose={handleCloseDetail} id ={openPopupId} onSuccess={fetchFilteredOrAllCameraGroup}/>
+        )
+      }
+
+      {
+        openPopupAdd && (
+          <CameraGroupAdd open={openPopupAdd} onClose={handleCloseAdd} onSuccess={fetchFilteredOrAllCameraGroup}/>
+        )
+      }
+>>>>>>> 7cc0805 (group camera)
     </Grid>
   )
 }
