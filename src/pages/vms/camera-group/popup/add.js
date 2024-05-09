@@ -56,7 +56,7 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
             try {
               const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${cameraId}`, config)
 
-              return response.data.data
+              return response.data
             } catch (error) {
               console.error(`Error fetching camera ${cameraId}:`, error)
 
@@ -119,7 +119,7 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
           }
         }
         const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/cameras', config)
-        setGroupOptions(response.data.data)
+        setGroupOptions(response.data)
         router.reload()
       } catch (error) {
         console.error('Error fetching data:', error)
