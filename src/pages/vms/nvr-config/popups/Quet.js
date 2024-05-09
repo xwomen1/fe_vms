@@ -80,7 +80,7 @@ const handleDelete = async (id) => {
         }
 
         const nvrResponse = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${nvr}`, config);
-        const nvrCameras = nvrResponse.data.data.cameras;
+        const nvrCameras = nvrResponse.data.cameras;
 
         const updatedCameras = nvrCameras.filter(camera => camera.id !== id);
 
@@ -111,7 +111,9 @@ const handleUpdate = async (id, name) => {
         }
 
         const params = {
+
             cameras: [
+                ...(nvrCameraList && Array.isArray(nvrCameraList) ? nvrCameraList : []),
                 {
                     id: id,
                     name: name,
@@ -123,6 +125,10 @@ const handleUpdate = async (id, name) => {
     } catch (error) {
         Swal.fire('Đã xảy ra lỗi', error.message, 'error')
         console.error('Error adding member to group:', error)
+        onClose();
+    }finally {
+        onClose();
+        setLoading(false);
     }
 }
   
