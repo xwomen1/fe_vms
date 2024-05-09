@@ -1,137 +1,241 @@
-import React, { useEffect, useState, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import Card from '@mui/material/Card'
+import Menu from '@mui/material/Menu'
+import Grid from '@mui/material/Grid'
+import MenuItem from '@mui/material/MenuItem'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
+import authConfig from 'src/configs/auth'
+import Table from '@mui/material/Table'
+import Pagination from '@mui/material/Pagination'
+import Icon from 'src/@core/components/icon'
+import { IconButton } from '@mui/material'
+import axios from 'axios'
+import CustomTextField from 'src/@core/components/mui/text-field'
+import DeletePopup from './popup/delete'
+import DetailPopup from './detail/detailCameraGroup'
+import CameraGroupAdd from './popup/add'
 
-import { Grid } from '@mui/material'
+const CameraGroup = ({ apiData }) => {
+  const [value, setValue] = useState('')
 
-// import TableStickyHeader from './table'
-import Tab from '@mui/material/Tab'
-import TabPanel from '@mui/lab/TabPanel'
-import { styled } from '@mui/material/styles'
-import MuiTabList from '@mui/lab/TabList'
-import TabContext from '@mui/lab/TabContext'
-import ViewCamera from 'src/@core/components/camera'
-import Settings from 'src/@core/components/camera/settings'
-import { getApi } from 'src/@core/utils/requestUltils'
-import { CAMERA_API } from 'src/@core/components/api-url'
+  const [openPopup, setOpenPopup] = useState(false)
+  const [openPopupAdd, setOpenPopupAdd] = useState(false)
 
-const TabList = styled(MuiTabList)(({ theme }) => ({
-  borderBottom: '0 !important',
-  '&, & .MuiTabs-scroller': {
-    boxSizing: 'content-box',
-    padding: theme.spacing(1.25, 1.25, 2),
-    margin: `${theme.spacing(-1.25, -1.25, -2)} !important`
-  },
-  '& .MuiTabs-indicator': {
-    display: 'none'
-  },
-  '& .Mui-selected': {
-    boxShadow: theme.shadows[2],
-    backgroundColor: theme.palette.primary.main,
-    color: `${theme.palette.common.white} !important`
-  },
-  '& .MuiTab-root': {
-    lineHeight: 1,
-    borderRadius: theme.shape.borderRadius,
-    '&:hover': {
-      color: theme.palette.primary.main
-    }
+  const [openPopupId, setOpenPopupId] = useState(null);
+
+  const [openPopupDetail, setOpenPopupDetail] = useState(false)
+
+  const [addUserOpen, setAddUserOpen] = useState(false)
+  const [cameras, setCamera] = useState([])
+
+  const [total, setTotal] = useState([1])
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(25)
+  const [status1, setStatus1] = useState(25)
+
+  const pageSizeOptions = [25, 50, 100]
+  const [anchorEl, setAnchorEl] = useState(null)
+
+  const handlePageChange = newPage => {
+    setPage(newPage)
   }
-}))
 
-const DivStyle = styled('div')(({ theme }) => ({
-  margin: '-1.2rem -1.5rem'
-}))
 
-const valueFilterInit = {
-  page: 1,
-  limit: 50,
-  deviceTypes: 'NVR'
-}
+  const handleOpenPopup = (id) => {
+    setOpenPopupId(id);
+    setOpenPopup(true)
+  }
 
-const Caller = () => {
-  const [sizeScreen, setSizeScreen] = useState('3x3')
-  const [reload, setReload] = useState(0)
-  const [numberShow, setNumberShow] = useState(9)
-  const [valueFilter, setValueFilter] = useState(valueFilterInit)
-  const [cameraGroup, setCameraGroup] = useState([])
-  const [cameraHiden, setCameraHiden] = useState([])
+  const handleOpenPopupAdd = () => {
+    setOpenPopupAdd(true)
+  }
+  
+  const handleClose = () => {
+    setOpenPopup(false)
+  }
 
-  const fetchCameraGroup = async () => {
+  const handleCloseAdd = () => {
+    setOpenPopupAdd(false)
+  }
+
+  const handleOpenPopupDetail = (id) => {
+    setOpenPopupId(id);
+    setOpenPopupDetail(true)
+  }
+  
+  const handleCloseDelete = () => {
+    setOpenPopupDetail(false)
+  }
+  const handleCloseDetail= () => {
+    setOpenPopupDetail(false)
+  }
+
+  const handleOpenMenu = event => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null)
+  }
+
+  const handleSelectPageSize = size => {
+    setPageSize(size)
+    setPage(1)
+    handleCloseMenu()
+  }
+
+
+
+  console.log(total, 'totalpage')
+  const fetchFilteredOrAllCameraGroup = async () => {
     try {
-      const res = await getApi(
-        `${CAMERA_API.CAMERA_GROUP}?deviceTypes=${valueFilter.deviceTypes}&limit=${valueFilter.limit}&page=${valueFilter.page}`
-      )
-      let listCamera = []
-      let listCameraHiden = []
-      res.data.map(item => {
-        if (item.cameras) {
-          item.cameras.map(camera => {
-            if (listCamera.length < numberShow) {
-              listCamera.push({
-                ...camera,
-                channel: 'Sub'
-              })
-            } else {
-              listCameraHiden.push({
-                ...camera,
-                channel: 'Sub'
-              })
-            }
-          })
-        }
-      })
-      setCameraGroup(listCamera)
-      setCameraHiden(listCameraHiden)
-    } catch (error) {
-      console.error('Error fetching data: ', error)
-    }
-  }
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
-  useEffect(() => {
-    fetchCameraGroup()
-  }, [reload])
-
-  const handSetChanel = (id, channel) => {
-    let newCamera = cameraGroup.map(item => {
-      if (item.id === id) {
-        return {
-          ...item,
-          channel: channel
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        params: {
+          limit: pageSize,
+          page: page,
+          keyword: value
         }
       }
-
-      return item
-    })
-    setCameraGroup(newCamera)
+      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/camera-groups', config)
+      setCamera(response.data.data)
+      console.log(response.data.data[0].id)
+    } catch (error) {
+      console.error('Error fetching users:', error)
+    }
   }
+  
+  useEffect(() => {
+    fetchFilteredOrAllCameraGroup();
+  }, [page, pageSize, total, value]);
 
+  const handleFilter = useCallback(val => {
+    setValue(val)
+  }, [])
   return (
-    <DivStyle>
-      <Grid container spacing={0}>
-        {cameraGroup.length > 0 &&
-          cameraGroup.map((camera, index) => (
-            <Grid item xs={Math.floor(12 / sizeScreen.split('x')[0])} key={index}>
-              <ViewCamera
-                name={camera?.deviceName}
-                id={camera.id}
-                channel={camera.channel}
-                status={camera.status}
-                sizeScreen={sizeScreen}
-                handSetChanel={handSetChanel}
-              />
+    <Grid container spacing={6.5}>
+      <Grid item xs={12}>
+        <Card>
+          <div></div>
+          <Grid container spacing={2}>
+            <Grid item xs={0.1}></Grid>
+
+            <Grid container item xs={12} alignItems="center">
+              <Grid container spacing={2}>
+                  <Grid item xs = {7} style={{color:'orange', marginLeft: '2%'}}><h3>Danh sách nhóm Camera</h3></Grid>
+                  <Grid item xs ={2} style={{marginTop:'1%', marginLeft:'4%', fontSize:'14px'}}> 
+                  <IconButton onClick={() => handleOpenPopupAdd()}>
+                        <Icon icon='tabler:plus' />
+                  </IconButton>
+                  Thêm nhóm
+                  </Grid>
+                  <Grid item xs = {2} style={{marginTop:'1%'}}>                  
+                    <CustomTextField
+                      value={value}
+                      placeholder='Search Group'
+                      onChange={e => handleFilter(e.target.value)}
+                  />
+                  </Grid>
+                  </Grid>
+
+              <Table>
+                <TableHead>
+                  <TableRow>
+                  
+                    <TableCell sx={{ padding: '13px' }}>STT</TableCell>
+                    <TableCell sx={{ padding: '13px' }}>Tên nhóm</TableCell>
+                    <TableCell sx={{ padding: '13px' }}>Mô tả</TableCell>
+                    <TableCell sx={{ padding: '13px' }}>Số lượng camera</TableCell>
+                    <TableCell sx={{ padding: '13px' }}>Thao tác</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {console.log(cameras)}
+                  {cameras && cameras.map((camera, index) => (
+                    <TableRow key={camera.id}>
+                      <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{camera.name}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{camera.description}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{camera.cameras ? camera.cameras.length : 0}</TableCell>
+
+                      <TableCell sx={{ padding: '16px' }}>
+                        <Grid container spacing={2}>
+                        <IconButton onClick={() => handleOpenPopupDetail(camera.id)}>
+                            <Icon icon='tabler:edit' />
+                          </IconButton>
+                          <IconButton onClick={() => handleOpenPopup(camera.id)}>
+                            {console.log(camera.id)}
+                          <Icon icon='tabler:trash' />
+                          </IconButton>
+                        </Grid>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              <br></br>
+              <Grid container spacing={2} style={{ padding: 10 }}>
+                <Grid item xs={3}></Grid>
+                <Grid item xs={1.5} style={{ padding: 0 }}>
+                  <IconButton onClick={handleOpenMenu}>
+                    <Icon icon='tabler:selector' />
+                    <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
+                  </IconButton>
+                  <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+                    {pageSizeOptions.map(size => (
+                      <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
+                        {size}
+                      </MenuItem>
+                    ))}
+                  </Menu>
+                </Grid>
+                <Grid item xs={6}>
+                  <Pagination count={total} color='primary' onChange={(event, page) => handlePageChange(page)} />
+                </Grid>
+              </Grid>
             </Grid>
-          ))}
+          </Grid>
+        </Card>
       </Grid>
-      <Settings
-        cameraGroup={cameraGroup}
-        cameraHiden={cameraHiden}
-        setNumberShow={number => setNumberShow(number)}
-        setCameraGroup={camera => setCameraGroup(camera)}
-        setCameraHiden={camera => setCameraHiden(camera)}
-        sizeScreen={sizeScreen}
-        setSizeScreen={size => setSizeScreen(size)}
-      />
-    </DivStyle>
+
+      {console.log(openPopupId)}
+      {
+        openPopup && (
+          <DeletePopup open={openPopup} onClose={handleClose} id={openPopupId} onSuccess={fetchFilteredOrAllCameraGroup} />
+        )
+      }
+
+      {
+        openPopupDetail && (
+          <DetailPopup open={openPopupDetail} onClose={handleCloseDetail} id ={openPopupId} onSuccess={fetchFilteredOrAllCameraGroup}/>
+        )
+      }
+
+      {
+        openPopupAdd && (
+          <CameraGroupAdd open={openPopupAdd} onClose={handleCloseAdd} onSuccess={fetchFilteredOrAllCameraGroup}/>
+        )
+      }
+    </Grid>
   )
 }
 
-export default Caller
+export const getStaticProps = async () => {
+  const res = await axios.get('/cards/statistics')
+  const apiData = res.data
+
+  return {
+    props: {
+      apiData
+    }
+  }
+}
+
+export default CameraGroup

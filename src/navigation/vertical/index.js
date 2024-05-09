@@ -75,7 +75,7 @@ const navigation = () => {
         },
         {
           title: 'Nhóm camera',
-          path: '/cameraGroup'
+          path: '/vms/cameraGroup'
         },
         {
           title: 'Sự kiện AI',

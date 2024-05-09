@@ -69,6 +69,8 @@ const TCP = (cameras, nic) => {
   }
 
   const formatDDNS = ddns => <Checkbox checked={ddns} disabled />
+  console.log('Camera object:', cameras.camera)
+  console.log('NIC Type:', cameras.camera.nicType)
 
   return (
     <div style={{ width: '100%' }}>
@@ -111,8 +113,7 @@ const TCP = (cameras, nic) => {
           </Grid>
           <Grid item xs={5.8}>
             <CustomTextField
-              label='Alternate DNS Server
-              '
+              label='Alternate DNS Server'
               value={cameras.camera.alterDNS}
               fullWidth
             />
