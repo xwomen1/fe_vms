@@ -28,6 +28,7 @@ import Cloud from './popups/Cloud'
 import ConnectCamera from './popups/ConnectCamera'
 import VideoConnectCamera from './popups/VideoConnectCamera'
 import PopupScan from './popups/Add'
+import CircularProgress from '@mui/material/CircularProgress'
 
 const Add = ({ apiData }) => {
   const [value, setValue] = useState('')
@@ -64,6 +65,7 @@ const Add = ({ apiData }) => {
   const [passWord, setPassWord] = useState('')
   const [response, setResponse] = useState('')
   const [openPopupResponse, setOpenPopupResponse] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const fetchNicTypes = async () => {
     try {
@@ -101,7 +103,7 @@ const Add = ({ apiData }) => {
 
   const handleScan = async () => {
     // setOpenPopupResponse(true)
-
+    setLoading(true)
     try {
       const payload = {
         url,
@@ -124,11 +126,14 @@ const Add = ({ apiData }) => {
       )
 
       setResponse(response.data)
-      toast.success('Thành công')
+      setLoading(false)
 
+      toast.success('Thành công')
       setOpenPopupResponse(true)
     } catch (error) {
       console.error('Error scanning device:', error)
+      setLoading(false)
+
       Swal.fire('Đã xảy ra lỗi', error, 'error')
     }
   }
@@ -332,6 +337,7 @@ const Add = ({ apiData }) => {
                     Quét
                   </Button>
                 </Grid>
+                {loading && <CircularProgress />}
               </Grid>
             )}
             {openPopupResponse && (

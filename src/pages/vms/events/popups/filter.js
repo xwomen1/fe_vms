@@ -58,7 +58,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
         try {
             const res = await axios.get(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=7cac40af-6b9e-47e6-9aba-8d458722d5a4
             `, config)
-            setLocations(res.data.data);
+            setLocations(res.data);
         } catch (error) {
             console.error('Error fetching data: ', error)
         }
@@ -67,7 +67,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
     const fetchCameras = async () => {
         try {
             const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras`, config)
-            setCameras(res.data.data);
+            setCameras(res.data);
         } catch (error) {
             console.error('Error fetching data: ', error)
         }
