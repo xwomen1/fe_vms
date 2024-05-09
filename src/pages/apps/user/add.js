@@ -615,7 +615,7 @@ const Add = () => {
                     <TableRow>
                       <TableCell>Đơn vị</TableCell>
                       <TableCell>Mã đơn vị</TableCell>
-                      <TableCell align='right'>Là lãnh đạo đơn vị</TableCell>
+                      <TableCell align='right'>Đơn vị</TableCell>
                       <TableCell align='center'>
                         <IconButton size='small' onClick={handleAddRow} sx={{ marginLeft: '10px' }}>
                           <Icon icon='bi:plus' />
@@ -639,7 +639,7 @@ const Add = () => {
                               // updatedRows[index].id = newValue.id
                               setRows(updatedRows)
                             }}
-                            renderInput={params => <TextField {...params} label='Đơn vị' />}
+                            renderInput={params => <CustomTextField {...params} label='Đơn vị' />}
                           />
                         </TableCell>
                         {console.log(rows)}

@@ -200,7 +200,7 @@ const UserDetails = () => {
       }
     }
     const res = await axios.get(`https://dev-ivi.basesystem.one/smc/iam/api/v0/users/${userId}`, config)
-    setUserCode(res.data.data.accessCode)
+    setUserCode(res.data.accessCode)
 
     if (res && res.data) {
       accessCodeUser.current = res.data.accessCode
