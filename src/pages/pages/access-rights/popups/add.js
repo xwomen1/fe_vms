@@ -128,13 +128,33 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
     }
 
     const fetchDepartment = async () => {
+        setLoading(true)
         try {
             const res = await axios.get(`${API_REGIONS}/?parentId=342e46d6-abbb-4941-909e-3309e7487304`, config)
-            setGroupName(res.data);
+            const group = res.data
+            groupName.push(...res.data)
+            group.map((item, index) => {
+                if (item.isParent == true) {
+                    fetchDepartmentChildren(item.id)
+                }
+            })
         } catch (error) {
             console.error('Error fetching data: ', error)
         }
     }
+
+    const fetchDepartmentChildren = async (idParent) => {
+        try {
+            const res = await axios.get(`${API_REGIONS}?parentId=${idParent}`, config)
+            const groupChildren = [...res.data]
+            groupName.push(...groupChildren)
+        } catch (error) {
+            console.error('Error fetching data: ', error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
 
     useEffect(() => {
         fetchDoorList()

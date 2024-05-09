@@ -197,7 +197,7 @@ const View = ({ show, onClose, id, setReload, filter }) => {
         setLoading(true)
         try {
             const res = await axios.get(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/calendar/configuration/`, config)
-            const setData = res.data.data.rows.filter(x => x.id == id)
+            const setData = res.data.rows.filter(x => x.id == id)
             setDetail(setData[0])
         } catch (error) {
             console.error('Error fetching data: ', error)
