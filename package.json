@@ -28,6 +28,7 @@
     "@fullcalendar/list": "6.1.6",
     "@fullcalendar/react": "6.1.6",
     "@fullcalendar/timegrid": "6.1.6",
+    "@goongmaps/goong-map-react": "^1.1.2",
     "@hookform/resolvers": "3.1.0",
     "@iconify/react": "4.1.0",
     "@material-ui/core": "^4.12.4",

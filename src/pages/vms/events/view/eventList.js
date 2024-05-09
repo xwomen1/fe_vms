@@ -256,9 +256,9 @@ const EventList = () => {
         setLoading(true)
         try {
             const res = await axios.get(`https://sbs.basesystem.one/ivis/cmsgo/api/v0/aievents`, params)
-            setDeviceList(res.data.data)
-            setCount(res.data.data.count)
-            setTotal(res.data.data.totalPage)
+            setDeviceList(res.data)
+            setCount(res.data.count)
+            setTotal(res.data.totalPage)
         } catch (error) {
             console.error('Error fetching data:', error)
             toast.error(error)
@@ -358,7 +358,7 @@ const EventList = () => {
             axios.delete(`https://sbs.basesystem.one/ivis/cmsgo/api/v0/aievents/delete/${idDelete}`, config)
                 .then(() => {
                     toast.success('Xóa thành công')
-                    setViewId(null)
+                    setIdDelete(null)
                     setReload(reload + 1)
                 })
                 .catch(error => {
@@ -395,7 +395,7 @@ const EventList = () => {
                             <Grid item>
                                 <CustomTextField
                                     value={keyword}
-                                    placeholder='Search…'
+                                    placeholder='Tìm kiếm sự kiện '
                                     InputProps={{
                                         startAdornment: (
                                             <Box sx={{ mr: 2, display: 'flex' }}>

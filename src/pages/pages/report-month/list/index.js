@@ -18,6 +18,7 @@ import { format, isWithinInterval, parse } from "date-fns"
 import TreeView from "@mui/lab/TreeView"
 import { useForm } from 'react-hook-form'
 import useUrlState from "../useUrlState"
+import DatePickerWrapper from "src/@core/styles/libs/react-datepicker"
 
 const initValueFilter = {
     limit: 100,
@@ -230,12 +231,6 @@ function ReportMonth({ history }) {
         }
     }, [start, end])
 
-    const tableStyle = {
-        borderCollapse: 'collapse',
-        width: '100%',
-        overflowX: 'auto',
-    }
-
     const exportToExcel = () => {
         // Tạo một workbook mới
         const workbook = XLSX.utils.book_new()
@@ -369,23 +364,31 @@ function ReportMonth({ history }) {
                         />
                     </Grid>
                     <Grid item xs={12} sm={3}>
-                        <DatePicker
-                            selected={start}
-                            id='basic-input'
-                            onChange={date => setStart(date)}
-                            placeholderText='Click to select a date'
-                            customInput={<CustomInput label='Ngày bắt đầu' />}
-                        />
+                        <DatePickerWrapper>
+                            <div>
+                                <DatePicker
+                                    selected={start}
+                                    id='basic-input'
+                                    onChange={date => setStart(date)}
+                                    placeholderText='Click to select a date'
+                                    customInput={<CustomInput label='Ngày bắt đầu' />}
+                                />
+                            </div>
+                        </DatePickerWrapper>
                     </Grid>
                     <Grid item xs={12} sm={3}>
-                        <DatePicker
-                            selected={end}
-                            id='basic-input'
-                            onChange={date => setEnd(date)}
-                            placeholderText='Click to select a date'
-                            customInput={<CustomInput label='Ngày kết thúc' />}
-                            minDate={start}
-                        />
+                        <DatePickerWrapper>
+                            <div>
+                                <DatePicker
+                                    selected={end}
+                                    id='basic-input'
+                                    onChange={date => setEnd(date)}
+                                    placeholderText='Click to select a date'
+                                    customInput={<CustomInput label='Ngày kết thúc' />}
+                                    minDate={start}
+                                />
+                            </div>
+                        </DatePickerWrapper>
                     </Grid>
                     <Grid item xs={12} sm={2}>
                         <Button
