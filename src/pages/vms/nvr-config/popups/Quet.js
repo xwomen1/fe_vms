@@ -123,7 +123,7 @@ const handleUpdate = async (id, name) => {
         await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/camera/${nvr}`, params, config)
         Swal.fire('Thêm thành công', '', 'success')
     } catch (error) {
-        Swal.fire('Đã xảy ra lỗi', error.message, 'error')
+        Swal.fire('Thiết bị chưa phản hồi', error.message, 'error')
         console.error('Error adding member to group:', error)
         onClose();
     }finally {
