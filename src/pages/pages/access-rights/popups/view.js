@@ -187,8 +187,6 @@ const View = ({ show, onClose, id, setReload, filter }) => {
         }
     }, [detail])
 
-
-
     const setDetailFormValue = () => {
         reset(detail);
     }
@@ -211,10 +209,11 @@ const View = ({ show, onClose, id, setReload, filter }) => {
         setIsCheckboxChecked(event.target.checked)
     }
 
-
     const ViewContent = () => {
 
         const transformCalendarDays = (calendarDays) => {
+            console.log('calendarDays', calendarDays)
+
             return calendarDays.map((day) => {
                 const { dayOfWeek, timePeriods } = day;
                 const value = dataDailyDefault.find((item) => item.dayOfWeek === dayOfWeek)?.value || 1;
