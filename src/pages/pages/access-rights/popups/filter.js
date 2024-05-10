@@ -84,7 +84,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
     const fetchDepartmentChildren = async (idParent) => {
         try {
             const res = await axios.get(`${API_REGIONS}?parentId=${idParent}`, config)
-            const groupChildren = []
+            const groupChildren = [...res.data]
             groupName.push(...groupChildren)
         } catch (error) {
             console.error('Error fetching data: ', error)
