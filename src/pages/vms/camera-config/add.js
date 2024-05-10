@@ -102,7 +102,7 @@ const Add = ({ apiData }) => {
   }
 
   const handleScan = async () => {
-    // setOpenPopupResponse(true)
+    setOpenPopupResponse(true)
     setLoading(true)
     try {
       const payload = {
@@ -129,14 +129,19 @@ const Add = ({ apiData }) => {
       setLoading(false)
 
       toast.success('Thành công')
-      setOpenPopupResponse(true)
+
+      // setOpenPopupResponse(true)
     } catch (error) {
-      console.error('Error scanning device:', error)
+      console.error('Error scanning device:', error.response.statusText)
+
+      setOpenPopupResponse(false)
+
       setLoading(false)
 
-      Swal.fire('Đã xảy ra lỗi', error, 'error')
+      Swal.fire('Đã xảy ra lỗi', error.response.statusText, 'error')
     }
   }
+  console.log(response)
 
   const handleRadioChange = event => {
     setSelectedValue(event.target.value)
@@ -349,6 +354,7 @@ const Add = ({ apiData }) => {
                   userName={userName}
                   passWord={passWord}
                   response={response}
+                  loadings={loading}
                   onClose={() => setOpenPopupResponse(false)}
                 />{' '}
               </>

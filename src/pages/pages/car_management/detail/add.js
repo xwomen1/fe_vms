@@ -192,7 +192,7 @@ const AddFaceManagement = () => {
                     const res = await axios.post(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/upload/multi`, formData, config);
                     setListFileUpload(files);
     
-                    const fileIds = res.data.data.map((x) => x.id);
+                    const fileIds = res.data.map((x) => x.id);
     
                     const arr = [...listFileId, ...fileIds];
 

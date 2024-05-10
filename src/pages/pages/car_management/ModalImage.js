@@ -14,7 +14,6 @@ import {
   Typography,
   TextField,
   Input,
-  TextareaAutosize
 } from "@mui/material";
 import Icon from 'src/@core/components/icon'
 import MaskGroup from './Imge/NoAvatar.svg';

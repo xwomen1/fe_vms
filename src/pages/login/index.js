@@ -92,7 +92,6 @@ const schema = yup.object().shape({
 //   username: 'admin@vuexy.com'
 // }
 
-
 const LoginPage = () => {
   const [rememberMe, setRememberMe] = useState(true)
   const [showPassword, setShowPassword] = useState(false)
@@ -103,15 +102,14 @@ const LoginPage = () => {
   const bgColors = useBgColor()
   const { settings } = useSettings()
   const hidden = useMediaQuery(theme.breakpoints.down('md'))
-  
+
   const ColoredCheckbox = styled(Checkbox)(({ theme }) => ({
     color: '#FF9C73',
     '&.Mui-checked': {
-      color: '#FF9C73',
-    },
-  }));
-  
-  
+      color: '#FF9C73'
+    }
+  }))
+
   // ** Vars
   const { skin } = settings
 
@@ -138,7 +136,7 @@ const LoginPage = () => {
   const imageSource = skin === 'bordered' ? 'auth-v2-login-illustration-bordered' : 'auth-v2-login-illustration'
 
   return (
-    <Box className='content-right'sx={{backgroundColor:'white'}} >
+    <Box className='content-right' sx={{ backgroundColor: 'white' }}>
       {!hidden ? (
         <Box
           sx={{
@@ -148,12 +146,12 @@ const LoginPage = () => {
             alignItems: 'center',
             borderRadius: '20px',
             justifyContent: 'center',
-            
+
             // backgroundColor: 'customColors.bodyBg',
             margin: theme => theme.spacing(8, 0, 8, 8)
           }}
         >
-          <LoginIllustration alt='login-illustration' src={`/images/a.jpg`} style={{width:'70%'}} />
+          <LoginIllustration alt='login-illustration' src={`/images/a.jpg`} style={{ width: '70%' }} />
         </Box>
       ) : null}
       <RightWrapper>
@@ -167,7 +165,7 @@ const LoginPage = () => {
           }}
         >
           <Box sx={{ width: '100%', maxWidth: 400 }}>
-            <svg width={34} viewBox='0 0 32 22' fill='none' xmlns='http://www.w3.org/2000/svg' >
+            <svg width={34} viewBox='0 0 32 22' fill='none' xmlns='http://www.w3.org/2000/svg'>
               <path
                 fillRule='evenodd'
                 clipRule='evenodd'
@@ -191,7 +189,7 @@ const LoginPage = () => {
               <path
                 fillRule='evenodd'
                 clipRule='evenodd'
-    fill='#FF9C73'
+                fill='#FF9C73'
                 d='M7.77295 16.3566L23.6563 0H32V6.88383C32 6.88383 31.8262 9.17836 30.6591 10.4057L19.7824 22H13.6938L7.77295 16.3566Z'
               />
             </svg>
@@ -199,9 +197,8 @@ const LoginPage = () => {
               <Typography variant='h3' sx={{ mb: 1.5 }}>
                 {`Welcome to Camnet! 👋🏻`}
               </Typography>
-            
             </Box>
-           
+
             <form noValidate autoComplete='off' onSubmit={handleSubmit(onSubmit)}>
               <Box sx={{ mb: 4 }}>
                 <Controller
@@ -216,8 +213,6 @@ const LoginPage = () => {
                       value={value}
                       onBlur={onBlur}
                       onChange={onChange}
-                      
-                      // placeholder=''
                       error={Boolean(errors.username)}
                       {...(errors.username && { helperText: errors.username.message })}
                     />
@@ -265,10 +260,8 @@ const LoginPage = () => {
                   alignItems: 'center',
                   justifyContent: 'space-between'
                 }}
-              >
-            
-              </Box>
-              <Button fullWidth type='submit' variant='contained' sx={{ mb: 4, backgroundColor:'#FF9C73' }}>
+              ></Box>
+              <Button fullWidth type='submit' variant='contained' sx={{ mb: 4, backgroundColor: '#FF9C73' }}>
                 Login
               </Button>
             </form>
