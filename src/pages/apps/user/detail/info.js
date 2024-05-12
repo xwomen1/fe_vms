@@ -15,7 +15,8 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  Autocomplete
 } from '@mui/material'
 import Icon from 'src/@core/components/icon'
 import Box from '@mui/material/Box'
@@ -41,6 +42,7 @@ const UserDetails = () => {
   const [user, setUser] = useState(null)
   const [readOnly, setReadOnly] = useState(true)
   const [readOnlys, setReadOnlys] = useState(true)
+  const [rows, setRows] = useState([])
 
   const [params, setParams] = useState({})
   const [editing, setEditing] = useState(false)
@@ -68,7 +70,7 @@ const UserDetails = () => {
   const [userCode, setUserCode] = useState('')
   const [syncCode, setSyncCode] = useState('')
 
-  const [group, setGroup] = useState(null)
+  const [groups, setGroup] = useState(null)
   const [policies, setPolicies] = useState(null)
   const [piId, setPiId] = useState(null)
   const [ava1, setAva1] = useState(null)
@@ -162,6 +164,11 @@ const UserDetails = () => {
     setOpenPopup(true)
   }
 
+  const handleAddRow = () => {
+    const newRow = { groupName: '', groupCode: '', id: '' } // Thêm groupId vào đây
+    setGroup([...groups, newRow])
+  }
+
   const handleClosePopup = () => {
     setOpenPopup(false) // Đóng Popup khi cần thiết
   }
@@ -190,12 +197,19 @@ const UserDetails = () => {
     setDefaultGroup(newValue)
     console.log(newValue)
   }
+  console.log(groups)
 
   const saveChanges = async () => {
     setReadOnly(true)
     setEditing(false)
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
+      const processedGroups = await userGroups(groups) // Call the userGroups function passing rows
+      if (processedGroups.length === 0) {
+        Swal.fire('Lỗi!', 'Nhóm người dùng không được để trống.', 'error')
+
+        return
+      }
 
       const config = {
         headers: {
@@ -214,6 +228,8 @@ const UserDetails = () => {
           userCode: userCode,
           syncCode: syncCode,
           userStatus: status1,
+          userGroups: processedGroups,
+
           timeEndAfternoon: convertStringToTimeArray(timeEndAfternoon),
           timeStartAfternoon: convertStringToTimeArray(timeStartAfternoon),
           timeStartMorning: convertStringToTimeArray(dateTime),
@@ -266,7 +282,7 @@ const UserDetails = () => {
         }
         const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search', config)
 
-        setGroupOptions(response.data)
+        // setGroupOptions(response.data)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -289,6 +305,9 @@ const UserDetails = () => {
       setData(response.data) // store the fetched data in the state
 
       setGroup(response.data.userGroups)
+
+      // setRows(response.data.userGroups)
+
       setPolicies(response.data.policies)
       setPiId(response.data.piId)
       setFullNameValue(response.data.fullName)
@@ -365,15 +384,16 @@ const UserDetails = () => {
     })
   }
 
-  const handleDeleteRow = (userId, groupId) => {
-    showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
-    }).then(({ value }) => {
-      if (value) {
+  const handleDeleteRow = index => {
+    const updatedRows = [...groups]
+    updatedRows.splice(index, 1)
+    setGroup(updatedRows)
+  }
+  useEffect(() => {
+    const fetchGroupData = async () => {
+      try {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
-        if (!token) {
-          return
-        }
+        console.log('token', token)
 
         const config = {
           headers: {
@@ -381,21 +401,99 @@ const UserDetails = () => {
           }
         }
 
-        let urlDelete = `https://dev-ivi.basesystem.one/smc/iam/api/v0/user-groups/${userId}/remove?groupId=${groupId}`
-        axios
-          .delete(urlDelete, config)
-          .then(() => {
-            Swal.fire('Xóa thành công', '', 'success')
+        const response = await axios.get(
+          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions?limit=25&page=1&parentID=f963e9d4-3d6b-45df-884d-15f93452f2a2',
+          config
+        )
 
-            // Tùy chỉnh việc cập nhật dữ liệu sau khi xóa
-            fetchUserData()
-          })
-          .catch(err => {
-            Swal.fire('Đã xảy ra lỗi', err.message, 'error')
-          })
+        setGroupOptions(response.data)
+      } catch (error) {
+        console.error('Error fetching data:', error)
       }
-    })
+    }
+
+    fetchGroupData()
+  }, [])
+
+  const searchGroupId = async (groupName, groupCode) => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.get(
+        `https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search?keyword=${groupName}`,
+        config
+      )
+
+      if (response.data.length > 0) {
+        return response.data[0].groupId // Trả về groupId nếu tìm thấy
+      } else {
+        // Nếu không tìm thấy, tạo nhóm mới và trả về groupId của nhóm mới đó
+        const newGroupId = await createNewGroup(groupName, groupCode)
+
+        return newGroupId
+      }
+    } catch (error) {
+      throw error
+    }
   }
+
+  const createNewGroup = async (groupName, groupCode) => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.post(
+        'https://dev-ivi.basesystem.one/smc/iam/api/v0/groups',
+        {
+          groupName: groupName,
+          groupCode: groupCode,
+          isPnLVGR: false
+        },
+        config
+      )
+
+      return response.data.groupId
+    } catch (error) {
+      throw error
+    }
+  }
+
+  const userGroups = async rows => {
+    try {
+      const processedGroups = []
+      for (const row of rows) {
+        const groupId = await searchGroupId(row.groupName, row.groupCode)
+
+        const userGroup = {
+          groupId: groupId,
+          policyName: true,
+          isLeader: false
+        }
+        processedGroups.push(userGroup)
+        console.log(userGroup)
+      }
+
+      return processedGroups
+    } catch (error) {
+      throw error
+    }
+  }
+
+  const filteredGroupOptions = groupOptions.filter(
+    option => !groups || !groups.some(group => group.groupName === option.name)
+  )
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -740,24 +838,42 @@ const UserDetails = () => {
                           <TableCell align='right'>Là lãnh đạo đơn vị</TableCell>
                           {showPlusColumn && (
                             <TableCell align='center'>
-                              <IconButton onClick={handleAddRoleClick} size='small' sx={{ marginLeft: '10px' }}>
+                              <IconButton onClick={handleAddRow} size='small' sx={{ marginLeft: '10px' }}>
                                 <Icon icon='bi:plus' />
                               </IconButton>
-                              <RolePopup
+                              {/* <RolePopup
                                 open={openPopup}
                                 onClose={handleClosePopup}
                                 onSelect={handleRoleSelect}
                                 userId={userId}
-                              />
+                              /> */}
                             </TableCell>
                           )}
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {group.map((group, index) => (
+                        {groups.map((group, index) => (
                           <TableRow key={index}>
-                            <TableCell>{group.groupName}</TableCell>
+                            <TableCell>
+                              <Autocomplete
+                                options={filteredGroupOptions}
+                                getOptionLabel={option => option.name}
+                                value={groupOptions.find(option => option.name === group.groupName) || null}
+                                onChange={(event, newValue) => {
+                                  const updatedRows = [...groups]
+                                  updatedRows[index].groupName = newValue.name
+                                  updatedRows[index].groupCode = newValue.code
+                                  {
+                                    console.log(group.groupName, 'groupname')
+                                  }
 
+                                  // updatedRows[index].id = newValue.id
+                                  setGroup(updatedRows)
+                                }}
+                                renderInput={params => <CustomTextField {...params} label='Đơn vị' />}
+                              />
+                            </TableCell>
+                            {console.log(groups, 'group')}
                             <TableCell>{group.groupCode}</TableCell>
                             <TableCell align='right'>
                               {/* Render formatted content in isLeader column */}
@@ -765,7 +881,7 @@ const UserDetails = () => {
                             </TableCell>
                             {showPlusColumn && (
                               <TableCell align='center'>
-                                <IconButton onClick={() => handleDeleteRow(userId, group.groupId)}>
+                                <IconButton onClick={() => handleDeleteRow(index)}>
                                   <Icon icon='bi:trash' />
                                 </IconButton>
                               </TableCell>

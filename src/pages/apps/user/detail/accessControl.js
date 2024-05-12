@@ -198,8 +198,8 @@ const UserDetails = () => {
       config
     )
 
-    if (res && res.data.data.accessGroupList) {
-      return res.data.data.accessGroupList.map(item => item.name).join(', ')
+    if (res && res.data.accessGroupList) {
+      return res.data.accessGroupList.map(item => item.name).join(', ')
     }
 
     return ''

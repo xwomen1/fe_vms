@@ -20,16 +20,20 @@ import TableCell from '@mui/material/TableCell'
 import Icon from 'src/@core/components/icon'
 import TableBody from '@mui/material/TableBody'
 import Swal from 'sweetalert2'
+import CircularProgress from '@mui/material/CircularProgress'
 
-const Add = ({ open, response, onClose, url, port, userName, passWord }) => {
+const Add = ({ open, response, onClose, url, port, userName, passWord, loadings }) => {
   const [selectedIds, setSelectedIds] = useState([])
+
+  const [loading, setLoading] = useState(false)
+
   console.log('url' + url, ' port' + port, 'username' + userName, 'password' + passWord)
 
   const handleCreateCamera = async camera => {
-    onClose()
     console.log('camera name', camera.name)
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
+      setLoading(true)
 
       const config = {
         headers: {
@@ -55,9 +59,15 @@ const Add = ({ open, response, onClose, url, port, userName, passWord }) => {
         },
         config
       )
+      setLoading(false)
+      onClose()
+
       Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
     } catch (error) {
       console.error('Error updating user details:', error)
+      setLoading(false)
+      onClose()
+
       Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi cập nhật dữ liệu.', 'error')
     }
   }
@@ -116,8 +126,9 @@ const Add = ({ open, response, onClose, url, port, userName, passWord }) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {response.data && response.data.length > 0 ? (
-                    response.data.map((camera, index) => (
+                  {console.log(response)}
+                  {response && response.length > 0 ? (
+                    response.map((camera, index) => (
                       <TableRow key={index}>
                         <TableCell sx={{ padding: '16px' }}>{index + 1}</TableCell>
                         <TableCell sx={{ padding: '16px' }}>{camera.name}</TableCell>
@@ -135,6 +146,7 @@ const Add = ({ open, response, onClose, url, port, userName, passWord }) => {
                           </IconButton>
                           <IconButton onClick={() => handleCreateCamera(camera)}>
                             <Icon icon='tabler:plus' />
+                            {loading && <CircularProgress />}
                           </IconButton>
                         </TableCell>
                       </TableRow>

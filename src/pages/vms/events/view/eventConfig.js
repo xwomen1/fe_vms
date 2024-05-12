@@ -1,48 +1,16 @@
-import { useEffect, useRef, useState } from 'react'
-import axios from 'axios'
-import { TreeItem, TreeView } from '@mui/lab'
+import { use, useEffect, useRef, useState } from "react"
+import axios from "axios"
+import { TreeItem, TreeView } from "@mui/lab"
 import Icon from 'src/@core/components/icon'
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Box,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
-  CardMedia,
-  Checkbox,
-  DialogActions,
-  Divider,
-  FormControlLabel,
-  Grid,
-  IconButton,
-  MenuItem,
-  Slider,
-  Tooltip,
-  Typography,
-  styled
-} from '@mui/material'
+import { Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Slider, Tooltip, Typography, styled } from "@mui/material"
 import authConfig from 'src/configs/auth'
-import ViewCamera from './viewCamera'
-import {
-  AddBox,
-  CameraAlt,
-  FastForward,
-  FastRewind,
-  IndeterminateCheckBox,
-  Pause,
-  PlayArrow,
-  SkipNext,
-  SkipPrevious
-} from '@mui/icons-material'
-import { format } from 'date-fns'
-import CustomTextField from 'src/@core/components/mui/text-field'
-import Schedule from '../popups/schedule'
-import CustomAutocomplete from 'src/@core/components/mui/autocomplete'
-import toast from 'react-hot-toast'
+import ViewCamera from "./viewCamera"
+import { AddBox, CameraAlt, FastForward, FastRewind, IndeterminateCheckBox, Pause, PlayArrow, SkipNext, SkipPrevious } from "@mui/icons-material"
+import { format } from "date-fns"
+import CustomTextField from "src/@core/components/mui/text-field"
+import Schedule from "../popups/schedule"
+import CustomAutocomplete from "src/@core/components/mui/autocomplete"
+import toast from "react-hot-toast"
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   '&:hover > .MuiTreeItem-content:not(.Mui-selected)': {
@@ -149,6 +117,7 @@ const EventConfig = () => {
   const [alertAIList, setAlertAIList] = useState([])
   const [alertList, setAlertList] = useState([])
   const [cameraAIPropertyId, setCameraAIPropertyId] = useState(null)
+  const [calendar, setCalendar] = useState(null)
 
   const [direction, setDirection] = useState({
     value: '1',
@@ -465,39 +434,10 @@ const EventConfig = () => {
   const handleSetSchedule = async data => {
     setLoading(true)
 
-    let calendar = {
-      mondayschedule: [],
-      tuesdayschedule: [],
-      wednesdayschedule: [],
-      thursdayschedule: [],
-      fridayschedule: [],
-      saturdayschedule: [],
-      sundayschedule: []
-    }
-
-    calendar = data?.calendarDays?.reduce((acc, item) => {
-      switch (item.StringValue) {
-        case 'MONDAY':
-          return { ...acc, mondayschedule: item?.times }
-        case 'TUESDAY':
-          return { ...acc, tuesdayschedule: item?.times }
-        case 'WEDNESDAY':
-          return { ...acc, wednesdayschedule: item?.times }
-        case 'THURSDAY':
-          return { ...acc, thursdayschedule: item?.times }
-        case 'FRIDAY':
-          return { ...acc, fridayschedule: item?.times }
-        case 'SATURDAY':
-          return { ...acc, saturdayschedule: item?.times }
-        case 'SUNDAY':
-          return { ...acc, sundayschedule: item?.times }
-        default:
-          return acc
-      }
-    }, calendar)
+    console.log('data', data?.data?.calendarDays);
 
     const changedAlerts = alertList.map(alert => {
-      return alert.aitype === eventSelect ? { ...alert, cameraschedules: calendar } : alert
+      return alert.aitype === eventSelect ? { ...alert, calendarDays: data?.calendarDays } : alert
     })
 
     await updateAlertList(changedAlerts)
@@ -575,6 +515,7 @@ const EventConfig = () => {
                 setLineSelect(arr)
               }
             }
+            setCalendar(alert?.calendarDays)
           }}
           sx={{
             marginBottom: 5,
@@ -615,14 +556,14 @@ const EventConfig = () => {
     <StyledTreeItem key={group.id} nodeId={group.id} labelText={group.name} labelIcon='tabler:folder'>
       {group.cameras && group.cameras.length > 0
         ? group.cameras.map(camera => (
-            <StyledTreeItem
-              key={camera.id}
-              nodeId={camera.id}
-              labelText={camera.deviceName}
-              labelIcon='tabler:camera'
-              onClick={() => handleItemClick(camera.id, camera.deviceName)}
-            />
-          ))
+          <StyledTreeItem
+            key={camera.id}
+            nodeId={camera.id}
+            labelText={camera.deviceName}
+            labelIcon='tabler:camera'
+            onClick={() => handleItemClick(camera.id, camera.deviceName)}
+          />
+        ))
         : null}
     </StyledTreeItem>
   )
@@ -830,7 +771,7 @@ const EventConfig = () => {
                     borderRadius: 2
                   }}
                 >
-                  {idCameraSelect != null && <ViewCamera id={idCameraSelect} channel={'Sub'} />}
+                  {/* {idCameraSelect != null && <ViewCamera id={idCameraSelect} channel={'Sub'} />} */}
                   <canvas
                     ref={canvasRef}
                     width='640'
@@ -941,7 +882,7 @@ const EventConfig = () => {
       </Grid>
 
       {isOpenSchedule && (
-        <Schedule onClose={() => setIsOpenSchedule(false)} show={isOpenSchedule} callback={handleSetSchedule} />
+        <Schedule onClose={() => setIsOpenSchedule(false)} show={isOpenSchedule} callback={handleSetSchedule} data={calendar} />
       )}
     </>
   )

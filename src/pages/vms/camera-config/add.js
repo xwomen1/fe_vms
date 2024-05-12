@@ -28,6 +28,7 @@ import Cloud from './popups/Cloud'
 import ConnectCamera from './popups/ConnectCamera'
 import VideoConnectCamera from './popups/VideoConnectCamera'
 import PopupScan from './popups/Add'
+import CircularProgress from '@mui/material/CircularProgress'
 
 const Add = ({ apiData }) => {
   const [value, setValue] = useState('')
@@ -64,6 +65,7 @@ const Add = ({ apiData }) => {
   const [passWord, setPassWord] = useState('')
   const [response, setResponse] = useState('')
   const [openPopupResponse, setOpenPopupResponse] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const fetchNicTypes = async () => {
     try {
@@ -100,8 +102,8 @@ const Add = ({ apiData }) => {
   }
 
   const handleScan = async () => {
-    // setOpenPopupResponse(true)
-
+    setOpenPopupResponse(true)
+    setLoading(true)
     try {
       const payload = {
         url,
@@ -124,14 +126,22 @@ const Add = ({ apiData }) => {
       )
 
       setResponse(response.data)
+      setLoading(false)
+
       toast.success('Thành công')
 
-      setOpenPopupResponse(true)
+      // setOpenPopupResponse(true)
     } catch (error) {
-      console.error('Error scanning device:', error)
-      Swal.fire('Đã xảy ra lỗi', error, 'error')
+      console.error('Error scanning device:', error.response.statusText)
+
+      setOpenPopupResponse(false)
+
+      setLoading(false)
+
+      Swal.fire('Đã xảy ra lỗi', error.response.statusText, 'error')
     }
   }
+  console.log(response)
 
   const handleRadioChange = event => {
     setSelectedValue(event.target.value)
@@ -332,6 +342,7 @@ const Add = ({ apiData }) => {
                     Quét
                   </Button>
                 </Grid>
+                {loading && <CircularProgress />}
               </Grid>
             )}
             {openPopupResponse && (
@@ -343,6 +354,7 @@ const Add = ({ apiData }) => {
                   userName={userName}
                   passWord={passWord}
                   response={response}
+                  loadings={loading}
                   onClose={() => setOpenPopupResponse(false)}
                 />{' '}
               </>

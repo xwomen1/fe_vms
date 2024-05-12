@@ -389,7 +389,7 @@ const Img = React.memo(props => {
                                     <TableCell sx={{ padding: '16px' }}>Ảnh xe</TableCell>
                                     <TableCell sx={{ padding: '16px' }}>Biển số xe</TableCell>
                                     <TableCell sx={{ padding: '16px' }}>Lần cuối xuất hiện</TableCell>
-                                    <TableCell sx={{ padding: '16px',textAlign:'center' }}>Chi tiết</TableCell>
+                                    <TableCell sx={{ padding: '16px'}}>Chi tiết</TableCell>
                                     <TableCell sx={{ padding: '16px' }}>Xóa</TableCell>
                                 </TableRow>
                            </TableHead>
@@ -417,7 +417,7 @@ const Img = React.memo(props => {
                                                     size='small'
                                                     component={Link}
                                                     href={`/pages/car_management/detail/${user.id}`}
-                                                    sx={{ color: 'blue', left: '45px' }}
+                                                    sx={{ color: 'blue', right: '10px' }}
                                                 >
                                                     Xem chi tiết
                                                 </Button>

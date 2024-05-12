@@ -200,7 +200,7 @@ const UserDetails = () => {
       }
     }
     const res = await axios.get(`https://dev-ivi.basesystem.one/smc/iam/api/v0/users/${userId}`, config)
-    setUserCode(res.data.data.accessCode)
+    setUserCode(res.data.accessCode)
 
     if (res && res.data) {
       accessCodeUser.current = res.data.accessCode
@@ -625,7 +625,7 @@ const UserDetails = () => {
                         alt='Fingerprint'
                         style={{ width: '15%', height: '100%', marginLeft: '20%' }}
                       />
-                      <p style={{ color: 'black', marginLeft: '20%' }}> Chưa có định danh cho vân tay người này</p>
+                      <p style={{ color: 'black', marginLeft: '20%' }}> Người dùng chưa được định danh vân tay</p>
                     </Grid>
                   )}
                   <Grid item xs={4}></Grid>
@@ -746,6 +746,14 @@ const UserDetails = () => {
                   <Grid item xs={12}>
                     <h2 style={{ color: 'black', marginLeft: '1%' }}> Hình ảnh khuôn mặt</h2>
                   </Grid>
+                  <Grid item xs={12} style={{ alignContent: 'center' }}>
+                    <img
+                      src='/images/image.png'
+                      alt='Fingerprint'
+                      style={{ width: '15%', height: '100%', marginLeft: '20%' }}
+                    />
+                    <p style={{ color: 'black', marginLeft: '20%' }}> Người dùng chưa được định danh khuôn mặt</p>
+                  </Grid>
 
                   <Grid item xs={12}>
                     <h2 style={{ color: 'black', marginLeft: '1%' }}> Thông tin định danh vân tay</h2>
@@ -776,7 +784,7 @@ const UserDetails = () => {
                       alt='Fingerprint'
                       style={{ width: '15%', height: '100%', marginLeft: '20%' }}
                     />
-                    <p style={{ color: 'black', marginLeft: '20%' }}> Chưa có định danh cho vân tay người này</p>
+                    <p style={{ color: 'black', marginLeft: '20%' }}> Người dùng chưa được định danh vân tay</p>
                   </Grid>
                   <Grid item xs={4}></Grid>
                 </Grid>
