@@ -1,5 +1,5 @@
 import CustomTextField from 'src/@core/components/mui/text-field'
-import { Grid } from '@mui/material'
+import { Button, DialogActions, Grid } from '@mui/material'
 
 const UserDetails = nvrs => {
   return (
@@ -20,6 +20,24 @@ const UserDetails = nvrs => {
           <Grid item xs={5.8}>
             <CustomTextField label='Server Port' value={nvrs.nvrs.server} fullWidth />
           </Grid>
+        </Grid>
+
+        <Grid item xs={12}>
+          <DialogActions
+            sx={{
+              justifyContent: 'center',
+              px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
+              pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
+            }}
+          >
+            <Button type='submit' variant='contained'>
+              Lưu
+            </Button>
+            <Button variant='tonal'>Mặc định</Button>
+            <Button variant='tonal' color='secondary'>
+              Hủy
+            </Button>
+          </DialogActions>
         </Grid>
       </Grid>
       <br />

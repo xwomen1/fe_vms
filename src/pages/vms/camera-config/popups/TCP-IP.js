@@ -1,83 +1,66 @@
-import { useRouter } from 'next/router'
-
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import authConfig from 'src/configs/auth'
 import CustomTextField from 'src/@core/components/mui/text-field'
-import { Grid, Checkbox, Switch } from '@mui/material'
+import { Grid, Checkbox, Switch, DialogActions, Button, CircularProgress } from '@mui/material'
 import Autocomplete from '@mui/material/Autocomplete'
-import Box from '@mui/material/Box'
-import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
-import TableContainer from '@mui/material/TableContainer'
-import Paper from '@mui/material/Paper'
-import Table from '@mui/material/Table'
-import TableRow from '@mui/material/TableRow'
-import TableHead from '@mui/material/TableHead'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import DatePicker from 'react-datepicker'
-import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
-
 import Swal from 'sweetalert2'
-import Link from 'next/link'
-import Alert from '@mui/material/Alert'
 
-const multicastOption = [
-  { label: 'ENABLE', value: 'option1' },
-  { label: 'DISABLE', value: 'option2' }
-]
-
-const TCP = (cameras, nic) => {
-  const router = useRouter()
-  const { id } = router.query
-  const [timeValidity, setTimeValidity] = useState('Custom')
-  const [user, setUser] = useState(null)
-  const [readOnly, setReadOnly] = useState(true)
-  const [params, setParams] = useState({})
-  const [editing, setEditing] = useState(false)
-  const [groupOptions, setGroupOptions] = useState([])
-  const [policy, setPolicy] = useState([])
-  const [status, setStatus] = useState('ACTIVE')
+const TCP = ({ cameras, onClose, mtu }) => {
   const [status1, setStatus1] = useState('ACTIVE')
-  const [availableAt, setAvailableAt] = useState('')
-  const [expiredAt, setExpiredAt] = useState('')
-  const [note, setNote] = useState('')
-  const [rows, setRows] = useState([])
-  const [rows1, setRows1] = useState([])
-  const [createAccount, setCreateAccount] = useState(true)
-  const [timeEndMorning, setTimeEndMorning] = useState('')
-  const [timeStartAfternoon, setTimeStartAfternoon] = useState('')
-  const [timeEndAfternoon, setTimeEndAfternoon] = useState('')
-  const [dateTime, setDateTime] = useState('')
-  const [fullNameValue, setFullNameValue] = useState('')
-  const [account, setAccount] = useState('')
-  const [email, setEmail] = useState('')
-  const [phoneNumber, setPhoneNumber] = useState('')
-  const [identityNumber, setIdentityNumber] = useState('')
-  const [userCode, setUserCode] = useState('')
-  const [camera, setCamera] = useState('')
-  const [ava1, setAva1] = useState(null)
-  const [ava2, setAva2] = useState(null)
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [multicast, setMulticast] = useState(cameras.camera.multicast)
+  const [multicast, setMulticast] = useState(cameras?.multicast)
+  const [dhcp, setDHCP] = useState(cameras?.dhcp)
+  const [mtus, setMTU] = useState(cameras?.mtu || 'null')
+  const [mutiAddress, setMultiAddress] = useState(cameras?.MulticastAddress)
+  const [ddnsServer, setDDNSServer] = useState(cameras?.prefDNS)
+  const [alter, setAlter] = useState(cameras?.alterDNS)
+
   const [nicTypeOptions, setNicTypeOptions] = useState([])
-  const defaultValue = cameras.camera?.nicType?.name || ''
+  const [nic, setNic] = useState([])
 
-  const [selectedNicType, setSelectedNicType] = useState({ 
-    label: cameras.camera.nicType?.name || '', 
-    value: cameras.camera.nicType?.name || '' })
-  console.log(defaultValue)
-  console.log(selectedNicType)
+  const defaultValue = cameras?.nicType?.name || ''
 
-  const handleMulticastChange = (event, newValue) => {
-    setMulticast(newValue)
+  const [selectedNicType, setSelectedNicType] = useState({
+    label: cameras?.nicType?.name || '',
+    value: cameras?.nicType?.name || ''
+  })
+
+  const handleMTUChange = event => {
+    setMTU(event.target.value)
   }
+
+  const handleDDNSServerChange = event => {
+    setDDNSServer(event.target.value)
+  }
+
+  const handleAltChange = event => {
+    setAlter(event.target.value)
+  }
+  console.log(cameras)
 
   const handleNicTypeChange = (event, newValue) => {
-    setSelectedNicType(newValue || defaultValue);
+    setSelectedNicType(newValue || defaultValue)
   }
+
   const [loading, setLoading] = useState(false)
+  useEffect(() => {
+    if (cameras) {
+      setMulticast(cameras.multicast)
+      setDHCP(cameras.dhcp)
+      setMTU(cameras.mtu)
+      setMultiAddress(cameras.MulticastAddress)
+      setDDNSServer(cameras.prefDNS)
+      setAlter(cameras.alterDNS)
+    }
+  }, [cameras])
+
+  const handleStatusChange = () => {
+    setDHCP(dhcp === true ? false : true)
+  }
+
+  const handleCheckboxChange = () => {
+    setMulticast(multicast === true ? false : true)
+  }
 
   const fetchNicTypes = async () => {
     try {
@@ -94,16 +77,19 @@ const TCP = (cameras, nic) => {
         'https://sbs.basesystem.one/ivis/vms/api/v0/cameras/options/combox?cameraType=network_nic_type',
         config
       )
+      setNic(response.data)
 
       const nicTypes = response.data.map(item => ({
+        id: item.id,
+        channel: item.channel,
+        name: item.name,
         label: item.name,
         value: item.value
       }))
       setNicTypeOptions(nicTypes)
-
-      // Set selectedNicType here based on your business logic
+      console.log(nicTypes)
       if (nicTypes.length > 0) {
-        setSelectedNicType(nicTypes[0].value) // Set it to the first value in the array, or adjust as needed
+        setSelectedNicType(nicTypes[0].value)
       }
     } catch (error) {
       console.error('Error fetching NIC types:', error)
@@ -116,8 +102,8 @@ const TCP = (cameras, nic) => {
     setSelectedNicType({
       label: defaultValue,
       value: defaultValue
-    });
-  }, [defaultValue]);  
+    })
+  }, [defaultValue])
 
   const handleComboboxFocus = () => {
     if (nicTypeOptions.length === 0) {
@@ -125,93 +111,78 @@ const TCP = (cameras, nic) => {
     }
   }
 
-  console.log(cameras)
+  const handleSaveClick = async () => {
+    handleSave() // Gọi hàm handleSave truyền từ props
+  }
+  console.log(mtus)
 
-  const handleAddRow = () => {
-    const newRow = { groupName: '', groupCode: '', groupId: '' } // Thêm groupId vào đây
-    setRows([...rows, newRow])
+  const handleSave = async () => {
+    try {
+      setLoading(true)
+
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const data = {
+        multicast: multicast || cameras.multicast,
+        dhcp: dhcp,
+        mtu: mtus || cameras?.mtu,
+        multicastAddress: mutiAddress || cameras.multicastAddress,
+        prefDNS: ddnsServer || cameras.prefDNS,
+        alterDNS: alter || cameras.alterDNS,
+        nic: {
+          id: selectedNicType.id || cameras.nicType.id,
+          name: selectedNicType.name || cameras.nicType.name,
+          channel: selectedNicType.channel
+        }
+      }
+
+      await axios.put(
+        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/{idNetWorkConfig}?idNetWorkConfig=${cameras.id}&NetWorkConfigType=tcpip`,
+        data,
+        config
+      )
+      setLoading(false)
+      Swal.fire('Lưu thành công!', '', 'success')
+
+      onClose()
+    } catch (error) {
+      console.error(error)
+      setLoading(false)
+      onClose()
+
+      Swal.fire('Đã xảy ra lỗi', error.response?.data?.message, 'error')
+    } finally {
+      setLoading(false)
+      onClose()
+    }
   }
 
-  const handleAddRow1 = () => {
-    const newRow1 = { policyName: '', description: '' }
-    setRows1([...rows1, newRow1])
-  }
-
-  const handleCreateAccountChange = event => {
-    setCreateAccount(event.target.checked)
-  }
-
-  const handleStartDateChange = date => {
-    setAvailableAt(date)
-    setAva1(isoToEpoch(date))
-  }
-
-  const handleEndDateChange = date => {
-    setExpiredAt(date)
-    setAva2(isoToEpoch(date))
-  }
-  console.log('New start date:', camera)
-  function isoToEpoch(isoDateString) {
-    var milliseconds = Date.parse(isoDateString)
-
-    var epochSeconds = Math.round(milliseconds)
-
-    return epochSeconds
-  }
-
-  const handleFullNameChange = event => {
-    setFullNameValue(event.target.value)
-  }
-
-  const handleAccountChange = event => {
-    setAccount(event.target.value)
-  }
-
-  const handlePasswordChange = event => {
-    setPassword(event.target.value)
-  }
-
-  const handleConfirmPasswordChange = event => {
-    setConfirmPassword(event.target.value)
-  }
-
-  const handleStatusChange = () => {
-    setStatus1(status1 === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE')
-  }
-
-  const handleEmailChange = event => {
-    setEmail(event.target.value)
-  }
-
-  const formatDDNS = ddns => <Checkbox checked={ddns} disabled />
-  console.log('Camera object:', cameras.camera)
-  console.log('NIC Type:', cameras.camera.nicType)
+  const formatDDNS = multicast => <Checkbox checked={multicast} onChange={handleCheckboxChange} />
 
   return (
     <div style={{ width: '100%' }}>
+      {loading && <CircularProgress />}
+
       <Grid container spacing={3}>
         <Grid container item style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
           <Grid item xs={5.8}>
-            <Autocomplete
-              value={selectedNicType}
-              onChange={handleNicTypeChange}
-              options={nicTypeOptions}
-              getOptionLabel={option => option.label}
-              renderInput={params => <CustomTextField {...params} label='Loại NIC' fullWidth />}
-              onFocus={handleComboboxFocus}
-              loading={loading}
-            />
+            {formatDDNS(multicast)} Enable Multicast Discovery
           </Grid>
-          {console.log(cameras.camera.nicType?.name)}
 
           <Grid item xs={0.4}></Grid>
 
           <Grid item xs={5.8}>
-            <Switch checked={cameras.camera?.dhcp} color='primary' />
+            <Switch checked={dhcp} onChange={handleStatusChange} color='primary' />
             DHCP
           </Grid>
           <Grid item xs={5.8}>
-            <CustomTextField label='MTU' value={cameras.camera.mtu} fullWidth />
+            <CustomTextField label='MTU' value={mtus} onChange={handleMTUChange} fullWidth />
           </Grid>
           <Grid item xs={0.4}></Grid>
 
@@ -220,10 +191,12 @@ const TCP = (cameras, nic) => {
           </Grid>
           <Grid item xs={5.8}>
             <Autocomplete
-              value={multicast}
-              onChange={handleMulticastChange}
-              options={multicastOption.map(option => option.label)}
-              renderInput={params => <CustomTextField {...params} label='Multicast Discovery' fullWidth />}
+              value={selectedNicType}
+              onChange={handleNicTypeChange}
+              options={nicTypeOptions}
+              getOptionLabel={option => option.label}
+              renderInput={params => <CustomTextField {...params} label='Loại NIC' fullWidth />}
+              onFocus={handleComboboxFocus}
             />{' '}
           </Grid>
           <Grid item xs={0.4}></Grid>
@@ -231,24 +204,34 @@ const TCP = (cameras, nic) => {
           <Grid item xs={5.8}>
             <CustomTextField
               label='Preferred DNS Server'
-              value={cameras.camera.prefDNS}
-              onChange={handleFullNameChange}
+              value={ddnsServer}
+              onChange={handleDDNSServerChange}
               fullWidth
             />
           </Grid>
           <Grid item xs={5.8}>
-            <CustomTextField
-              label='Alternate DNS Server'
-              value={cameras.camera.alterDNS}
-              fullWidth
-            />
+            <CustomTextField label='Alternate DNS Server' value={alter} onChange={handleAltChange} fullWidth />
           </Grid>
         </Grid>
         <Grid item xs={0.4}></Grid>
+      </Grid>
+      <Grid item xs={12}>
+        <DialogActions
+          sx={{
+            justifyContent: 'center',
+            px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
+            pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
+          }}
+        >
+          <Button type='submit' variant='contained' onClick={handleSaveClick}>
+            Lưu
+          </Button>
+          <Button onClick={onClose}>Đóng</Button>
+        </DialogActions>
       </Grid>
       <br />
     </div>
   )
 }
 
-export default TCP 
+export default TCP

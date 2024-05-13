@@ -47,6 +47,8 @@ const UserDetails = () => {
   const [params, setParams] = useState({})
   const [editing, setEditing] = useState(false)
   const [groupOptions, setGroupOptions] = useState([])
+  const [policyOption, setPolicyOption] = useState([])
+
   const [defaultGroup, setDefaultGroup] = useState(null)
   const [leaderOfUnit, setLeaderOfUnit] = useState('')
   const [status, setStatus] = useState('')
@@ -59,7 +61,7 @@ const UserDetails = () => {
   const [timeEndMorning, setTimeEndMorning] = useState('')
   const [timeStartAfternoon, setTimeStartAfternoon] = useState('')
   const [timeEndAfternoon, setTimeEndAfternoon] = useState('')
-  const [showPlusColumn, setShowPlusColumn] = useState(false)
+  const [showPlusColumn, setShowPlusColumn] = useState(true)
 
   const [dateTime, setDateTime] = useState('')
   const [startDate, setStartDate] = useState(new Date())
@@ -71,7 +73,7 @@ const UserDetails = () => {
   const [syncCode, setSyncCode] = useState('')
 
   const [groups, setGroup] = useState(null)
-  const [policies, setPolicies] = useState(null)
+  const [policies, setPolicies] = useState([])
   const [piId, setPiId] = useState(null)
   const [ava1, setAva1] = useState(null)
   const [ava2, setAva2] = useState(null)
@@ -79,6 +81,11 @@ const UserDetails = () => {
 
   const handleAddRoleClickPolicy = () => {
     setOpenPopupPolicy(true)
+  }
+
+  const handleAddRow1 = () => {
+    const newRow = { policyName: '', description: '', policyId: '', policyCode: '' } // Thêm groupId vào đây
+    setPolicies([...policies, newRow])
   }
 
   const handleStartDateChange = date => {
@@ -269,7 +276,7 @@ const UserDetails = () => {
           syncCode: syncCode,
           userStatus: status1,
           userGroups: processedGroups,
-
+          policies: policyList,
           timeEndAfternoon: convertStringToTimeArray(timeEndAfternoon),
           timeStartAfternoon: convertStringToTimeArray(timeStartAfternoon),
           timeStartMorning: convertStringToTimeArray(dateTime),
@@ -332,6 +339,17 @@ const UserDetails = () => {
     fetchGroupData()
   }, [])
   const formatIsLeader = isLeader => <Checkbox checked={isLeader} disabled />
+
+  const policyList = policies.map(row => ({
+    policyId: row.policyId,
+    description: row.description,
+    policyCode: row.policyCode,
+    policyName: row.policyName,
+    status: 'ACTIVE'
+
+    // policyName: true,
+    // isLeader: false
+  }))
 
   const fetchUserData = async () => {
     try {
@@ -455,6 +473,28 @@ const UserDetails = () => {
 
     fetchGroupData()
   }, [])
+  useEffect(() => {
+    const fetchGroupData = async () => {
+      try {
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+        console.log('token', token)
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+
+        const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/policies/search', config)
+
+        setPolicyOption(response.data.rows)
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+
+    fetchGroupData()
+  }, [])
 
   const searchGroupId = async (groupName, groupCode) => {
     try {
@@ -534,6 +574,11 @@ const UserDetails = () => {
   const filteredGroupOptions = groupOptions.filter(
     option => !groups || !groups.some(group => group.groupName === option.name)
   )
+
+  const filteredPolicyOptions = policyOption.filter(
+    option => !policies || !policies.some(policies => policies.policyName === option.policyName)
+  )
+  console.log(policyOption)
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -618,7 +663,8 @@ const UserDetails = () => {
 
     setReadOnly(true)
     setEditing(false)
-    setShowPlusColumn(!showPlusColumn)
+
+    // setShowPlusColumn(!showPlusColumn)
   }
   useEffect(() => {
     fetchUserData()
@@ -650,23 +696,11 @@ const UserDetails = () => {
               </Grid>
               <Grid container spacing={2}>
                 <Grid item xs={4}>
-                  <CustomTextField
-                    label='Tên'
-                    value={fullNameValue}
-                    InputProps={{ readOnly: readOnly }}
-                    onChange={handleFullNameChange}
-                    fullWidth
-                  />
+                  <CustomTextField label='Tên' value={fullNameValue} onChange={handleFullNameChange} fullWidth />
                 </Grid>
                 {console.log(user.userAccount.accStatus)}
                 <Grid item xs={4}>
-                  <CustomTextField
-                    label='Email'
-                    value={email}
-                    onChange={handleEmailChange}
-                    InputProps={{ readOnly: readOnly }}
-                    fullWidth
-                  />
+                  <CustomTextField label='Email' value={email} onChange={handleEmailChange} fullWidth />
                 </Grid>
                 <Grid item xs={3.8}>
                   {' '}
@@ -675,7 +709,6 @@ const UserDetails = () => {
                     label='Số điện thoại'
                     value={phoneNumber}
                     onChange={handlePhoneNumberChange}
-                    InputProps={{ readOnly: readOnly }}
                     fullWidth // Thêm thuộc tính fullWidth vào đây
                   />
                 </Grid>
@@ -684,7 +717,6 @@ const UserDetails = () => {
                     label='Số giấy tờ'
                     value={identityNumber}
                     onChange={handleIdentityNumberChange}
-                    InputProps={{ readOnly: readOnly }}
                     fullWidth
                   />
                 </Grid>
@@ -693,7 +725,6 @@ const UserDetails = () => {
                     label='Mã người dùng'
                     defaultValue={userCode}
                     onChange={handleUserCodeChange}
-                    InputProps={{ readOnly: readOnly }}
                     fullWidth
                   />
                 </Grid>
@@ -702,7 +733,6 @@ const UserDetails = () => {
                     label='Mã đồng bộ'
                     defaultValue={syncCode}
                     onChange={handleSyncCodeChange}
-                    InputProps={{ readOnly: readOnly }}
                     fullWidth
                   />
                 </Grid>
@@ -714,7 +744,6 @@ const UserDetails = () => {
                     onChange={handleStatusChange}
                     color='primary'
                     label='Trạng thái'
-                    disabled={readOnly}
                   />
                 </Grid>
 
@@ -731,7 +760,6 @@ const UserDetails = () => {
                           selected={dateTime}
                           timeIntervals={15}
                           showTimeSelectOnly
-                          disabled={readOnly}
                           dateFormat='h:mm '
                           id='time-only-picker'
                           onChange={date => handleTimeChange(date)}
@@ -750,7 +778,6 @@ const UserDetails = () => {
                           selected={timeEndMorning}
                           timeIntervals={15}
                           showTimeSelectOnly
-                          disabled={readOnly}
                           dateFormat='h:mm '
                           id='time-only-picker'
                           onChange={date => handleTimeEndMorningChange(date)}
@@ -772,7 +799,6 @@ const UserDetails = () => {
                           selected={timeStartAfternoon}
                           timeIntervals={15}
                           showTimeSelectOnly
-                          disabled={readOnly}
                           dateFormat='h:mm '
                           id='time-only-picker'
                           onChange={date => handleTimeStartAfetrnoonChange(date)}
@@ -791,7 +817,6 @@ const UserDetails = () => {
                           selected={timeEndAfternoon}
                           timeIntervals={15}
                           showTimeSelectOnly
-                          disabled={readOnly}
                           dateFormat='h:mm '
                           id='time-only-picker'
                           onChange={date => handleTimeEndAfternoonChange(date)}
@@ -809,7 +834,6 @@ const UserDetails = () => {
                       labelId='time-validity-label'
                       id='time-validity-select'
                       value={timeValidity}
-                      disabled={readOnly}
                       onChange={handleTimeValidityChange}
                     >
                       <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
@@ -829,7 +853,6 @@ const UserDetails = () => {
                             timeIntervals={15}
                             timeCaption='Time'
                             dateFormat='MMMM d, yyyy '
-                            disabled={readOnly}
                             customInput={<CustomInput label='Ngày bắt đầu' />}
                           />
                         </Grid>
@@ -842,7 +865,6 @@ const UserDetails = () => {
                             showTimeSelect
                             timeIntervals={15}
                             timeCaption='Time'
-                            disabled={readOnly}
                             dateFormat='MMMM d, yyyy '
                             customInput={<CustomInput label='Ngày kết thúc' />}
                           />
@@ -860,7 +882,6 @@ const UserDetails = () => {
                     onChange={handleNoteChange}
                     id='textarea-outlined-static'
                     fullWidth
-                    InputProps={{ readOnly: readOnly }}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -989,7 +1010,6 @@ const UserDetails = () => {
                             })
                         }}
                         color='primary'
-                        disabled={readOnly}
                       />
                     }
                     label='Trạng thái'
@@ -1005,29 +1025,43 @@ const UserDetails = () => {
                       <TableHead>
                         <TableRow>
                           <TableCell>Tên vai trò</TableCell>
+                          <TableCell>Mã vai trò</TableCell>
                           <TableCell>Mô tả</TableCell>
-                          {showPlusColumn && (
-                            <TableCell align='center'>
-                              <IconButton onClick={handleAddRoleClickPolicy} size='small' sx={{ marginLeft: '10px' }}>
-                                <Icon icon='bi:plus' />
-                              </IconButton>
-                              <PolicyPopup
-                                open={openPopupPolicy}
-                                onClose={handleClosePopupPolicy}
-                                onSelect={handleRoleSelectPolicy}
-                                userId={userId}
-                                piId={piId}
-                              />
-                            </TableCell>
-                          )}
+                          {/* {showPlusColumn && ( */}
+                          <TableCell align='center'>
+                            <IconButton onClick={handleAddRow1} size='small' sx={{ marginLeft: '10px' }}>
+                              <Icon icon='bi:plus' />
+                            </IconButton>
+                          </TableCell>
+                          {/* )} */}
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {policies.map((policies, index) => (
+                        {policies.map((policy, index) => (
                           <TableRow key={index}>
-                            <TableCell>{policies.policyName}</TableCell>
+                            <TableCell>
+                              {' '}
+                              <Autocomplete
+                                options={filteredPolicyOptions}
+                                getOptionLabel={option => option.policyName}
+                                value={policyOption.find(option => option.policyName === policy.policyName) || null}
+                                onChange={(event, newValue) => {
+                                  const updatedRows = [...policies]
+                                  updatedRows[index].policyName = newValue.policyName
+                                  updatedRows[index].policyCode = newValue.policyCode
+                                  updatedRows[index].description = newValue.description
+                                  updatedRows[index].policyId = newValue.policyId
 
-                            <TableCell>{policies.description}</TableCell>
+                                  // updatedRows[index].id = newValue.id
+                                  setPolicies(updatedRows)
+                                }}
+                                renderInput={params => <CustomTextField {...params} label='Đơn vị' />}
+                              />
+                            </TableCell>
+                            <TableCell>{policy.policyCode}</TableCell>
+
+                            <TableCell>{policy.description}</TableCell>
+
                             {showPlusColumn && (
                               <TableCell align='center'>
                                 <IconButton onClick={() => handleDeleteRowPolicy(piId, policies.policyId)}>

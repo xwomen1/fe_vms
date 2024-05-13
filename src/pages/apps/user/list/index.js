@@ -174,7 +174,7 @@ const UserList = ({ apiData }) => {
   }, [])
 
   const handleFilterGroup = event => {
-    setSearchGroup(event.target.value)
+    setValueGroup(event)
   }
 
   console.log(total, 'totalpage')
@@ -292,7 +292,7 @@ const UserList = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{user.fullName}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{user.email}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{user.phoneNumber}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user.mainGroupName}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{user.userGroup[0]?.groupName}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>
                         <Grid container spacing={2}>
                           <IconButton
