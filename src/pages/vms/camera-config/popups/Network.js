@@ -132,10 +132,10 @@ const Network = ({ open, onClose, camera }) => {
             <TCP cameras={cameras} mtu={mtu} cameraId={cameraId} onClose={onClose} />
           </TabPanel>
           <TabPanel value='2'>
-            <DDNs camera={cameras} />
+            <DDNs cameras={cameras} onClose={onClose} />
           </TabPanel>
           <TabPanel value='3'>
-            <Port nvrs={cameras} />
+            <Port cameras={cameras} onClose={onClose} />
           </TabPanel>
         </TabContext>
       </DialogContent>

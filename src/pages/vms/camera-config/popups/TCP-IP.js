@@ -97,6 +97,7 @@ const TCP = ({ cameras, onClose, mtu }) => {
       setLoading(false)
     }
   }
+  console.log(selectedNicType)
 
   useEffect(() => {
     setSelectedNicType({
@@ -156,7 +157,8 @@ const TCP = ({ cameras, onClose, mtu }) => {
       setLoading(false)
       onClose()
 
-      Swal.fire('Đã xảy ra lỗi', error.response?.data?.message, 'error')
+      Swal.fire('Đã xảy ra lỗi', error.message, error.response?.data?.message)
+      console.log(error.response?.data?.message)
     } finally {
       setLoading(false)
       onClose()
