@@ -4,6 +4,7 @@ import Button from '@mui/material/Button'
 import Link from 'next/link'
 import IconButton from '@mui/material/IconButton'
 import Icon from 'src/@core/components/icon'
+import { connect } from 'react-redux'
 
 const config = {
   bundlePolicy: 'max-bundle',
@@ -48,7 +49,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
 
   const createWsConnection = () => {
     const ws = new WebSocket(`${SOCKET_LIVE_VIEW}/ivis/vms/api/v0/ws/signaling/${randomId(10)}`)
-
+    console.log('createWsConnection', ws)
     setWebsocket(ws)
     const pc = new RTCPeerConnection(config)
     setRtcPeerConnection(pc)
@@ -66,26 +67,41 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
         console.log(err)
       }
     }
+    pc.oniceconnectionstatechange = event => {
+      console.log('ICE connection state change:', pc.iceConnectionState)
+      if (pc.iceConnectionState === 'closed' || pc.iceConnectionState === 'failed') {
+        // Handle connection closed or failed
+      }
+    }
+
+    // Close the RTCPeerConnection
+    // pc.close()
+  }
+
+  const connectWebSocket = () => {
+    createWsConnection()
+
+    if (websocket) {
+      websocket.close()
+      setWebsocket(null) // Clear websocket reference
+    }
+    if (rtcPeerConnection) {
+      rtcPeerConnection.close()
+      setRtcPeerConnection(null) // Clear rtcPeerConnection reference
+    }
   }
   useEffect(() => {
     if (websocket && channel) {
-      websocket.close()
-      createWsConnection()
+      if (rtcPeerConnection) {
+        rtcPeerConnection.close()
+        setRtcPeerConnection(null) // Clear rtcPeerConnection reference
+      }
     }
   }, [id, channel])
 
   useEffect(() => {
-    createWsConnection()
-
-    return () => {
-      if (websocket) {
-        websocket.close()
-      }
-      if (rtcPeerConnection) {
-        rtcPeerConnection.close()
-      }
-    }
-  }, [reload])
+    connectWebSocket()
+  }, [])
 
   // send message to WebSocket server
   const sendMessage = message => {
@@ -133,7 +149,6 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
         break
     }
     setText(message?.content)
-    console.log('message', message)
   }
 
   // set up WebSocket event listeners
@@ -194,13 +209,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
         </div>
       </div>
       <div>
-        <video
-          style={{ width: '100%', height: heightDiv - 26 }}
-          ref={remoteVideoRef}
-          playsInline
-          autoPlay
-          srcObject={remoteStream}
-        />
+        <video style={{ width: '100%', height: heightDiv - 26 }} ref={remoteVideoRef} playsInline autoPlay />
         {(status === 'failed' || status == 'disconnected') && (
           <IconButton
             sx={{
@@ -210,7 +219,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
               color: '#efefef',
               transform: 'translateY(-50%)'
             }}
-            onClick={() => setReload(reload + 1)}
+            onClick={() => connectWebSocket()}
           >
             <Icon icon='tabler:reload' fontSize={30} />
           </IconButton>

@@ -109,7 +109,7 @@ const Caller = () => {
       <Grid container spacing={0}>
         {cameraGroup.length > 0 &&
           cameraGroup.map((camera, index) => (
-            <Grid item xs={Math.floor(12 / sizeScreen.split('x')[0])} key={index}>
+            <Grid item xs={Math.floor(12 / sizeScreen.split('x')[0])} key={camera.id + index}>
               <ViewCamera
                 name={camera?.deviceName}
                 id={camera.id}
