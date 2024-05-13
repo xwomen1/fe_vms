@@ -242,7 +242,7 @@ const UserDetails = () => {
       return
     }
 
-    const phoneRegex = /^(84|0[3|5|7|8|9])+([0-9]{8})\b$/;
+    const phoneRegex = /^\d+$/;
     if (!phoneRegex.test(phoneNumber)) {
       Swal.fire('Lỗi!', 'Số điện thoại không hợp lệ.', 'error')
 
@@ -268,7 +268,7 @@ const UserDetails = () => {
         {
           ...params,
           userId: userId,
-          fullName: fullNameValue,
+          fullName: fullNameValue ,
           email: email,
           phoneNumber: phoneNumber,
           identityNumber: identityNumber,
@@ -276,7 +276,7 @@ const UserDetails = () => {
           syncCode: syncCode,
           userStatus: status1,
           userGroups: processedGroups,
-          policies: policyList,
+          policyIds: policyList,
           timeEndAfternoon: convertStringToTimeArray(timeEndAfternoon),
           timeStartAfternoon: convertStringToTimeArray(timeStartAfternoon),
           timeStartMorning: convertStringToTimeArray(dateTime),
@@ -340,16 +340,7 @@ const UserDetails = () => {
   }, [])
   const formatIsLeader = isLeader => <Checkbox checked={isLeader} disabled />
 
-  const policyList = policies.map(row => ({
-    policyId: row.policyId,
-    description: row.description,
-    policyCode: row.policyCode,
-    policyName: row.policyName,
-    status: 'ACTIVE'
-
-    // policyName: true,
-    // isLeader: false
-  }))
+  const policyList = policies.map(row => row.policyId)
 
   const fetchUserData = async () => {
     try {
