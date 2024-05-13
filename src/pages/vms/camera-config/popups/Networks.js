@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Grid } from '@mui/material'
+import { Button, DialogActions, Grid } from '@mui/material'
 import Tab from '@mui/material/Tab'
 import TabPanel from '@mui/lab/TabPanel'
 import TabContext from '@mui/lab/TabContext'
@@ -45,6 +45,9 @@ const Network = ({ open, onClose, onSelect, camera }) => {
   }
   console.log(camera, 'camera')
 
+  const handleCancel = () => {
+    onClose()
+  }
   useEffect(() => {
     const fetchGroupData = async () => {
       try {
@@ -75,28 +78,26 @@ const Network = ({ open, onClose, onSelect, camera }) => {
   }, [camera])
 
   return (
-    <TabContext value={value}>
-      <Grid>
-        {' '}
-        <TabList onChange={handleChange} aria-label='customized tabs example'>
-          <Tab value='1' label='TCP/IP' />
-          <Tab value='2' label='DDNS' />
-          <Tab value='3' label='PORT' />
-        </TabList>
-      </Grid>
-      <TabPanel value='1'>
-        {' '}
-        <TCP camera={cameras} nic={nic} />
-      </TabPanel>
-      <TabPanel value='2'>
-        {' '}
-        <DDNs camera={cameras} />
-      </TabPanel>
-      <TabPanel value='3'>
-        {' '}
-        <Port nvrs={cameras} />
-      </TabPanel>
-    </TabContext>
+    <Grid container direction='column'>
+      <TabContext value={value}>
+        <Grid item>
+          <TabList onChange={handleChange} aria-label='customized tabs example'>
+            <Tab value='1' label='TCP/IP' />
+            <Tab value='2' label='DDNS' />
+            <Tab value='3' label='PORT' />
+          </TabList>
+        </Grid>
+        <TabPanel value='1'>
+          <TCP camera={cameras} nic={nic} idCamera={camera} onClose={handleCancel} />
+        </TabPanel>
+        <TabPanel value='2'>
+          <DDNs camera={cameras} />
+        </TabPanel>
+        <TabPanel value='3'>
+          <Port nvrs={cameras} />
+        </TabPanel>
+      </TabContext>
+    </Grid>
   )
 }
 

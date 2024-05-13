@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import authConfig from 'src/configs/auth'
 import CustomTextField from 'src/@core/components/mui/text-field'
-import { Grid, Checkbox, Autocomplete } from '@mui/material'
+import { Grid, Checkbox, Autocomplete, DialogActions, Button } from '@mui/material'
 
 const DDNS = cameras => {
   const [DDNSOption, setDDNS] = useState([])
@@ -104,6 +104,23 @@ const DDNS = cameras => {
           <Grid item xs={5.8}>
             <CustomTextField label='Domain' value={cameras?.camera.domain} fullWidth />
           </Grid>
+        </Grid>
+        <Grid item xs={12}>
+          <DialogActions
+            sx={{
+              justifyContent: 'center',
+              px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
+              pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
+            }}
+          >
+            <Button type='submit' variant='contained'>
+              Lưu
+            </Button>
+            <Button variant='tonal'>Mặc định</Button>
+            <Button variant='tonal' color='secondary'>
+              Hủy
+            </Button>
+          </DialogActions>
         </Grid>
       </Grid>
       <br />
