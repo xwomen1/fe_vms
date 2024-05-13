@@ -11,6 +11,7 @@ import {Fragment, useState, useEffect,useRef } from 'react';
 import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import authConfig from 'src/configs/auth';
+import CircularProgress from '@mui/material/CircularProgress'
 import Swal from 'sweetalert2';
 import Icon from 'src/@core/components/icon'
 import FileUploader from 'devextreme-react/file-uploader';
@@ -213,17 +214,15 @@ const AddFaceManagement = () => {
     };
 
     const handleAddBlacklist = async () =>{
-        setLoading(false);
+        setLoading(true);
         setShowLoading(true);
         try {
-
-            const token = localStorage.getItem(authConfig.storageTokenKeyName)
-
+            const token = localStorage.getItem(authConfig.storageTokenKeyName);
             const config = {
                 headers: {
-                Authorization: `Bearer ${token}`
+                    Authorization: `Bearer ${token}`
                 }
-            }
+            };
             
             const params ={
                 name: name,
@@ -231,25 +230,40 @@ const AddFaceManagement = () => {
                 imgs: listFileId.map((id, index) => ({
                     id: id,
                     urlImage: listFileUrl[id],
-          })),
-                note:note,
-            }
-            await axios.post(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist`,params,config)
-            Swal.fire('Thêm đối tượng thành công', '', 'success')
-            window.location.href = '/pages/face_management/list';
+                })),
+                note: note,
+            };
+    
+            const response = await axios.post(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist`, params, config);
+            const newId = response.data.id;
+            Swal.fire('Thêm đối tượng thành công', '', 'success');
+            window.location.href = `/pages/face_management/detail/${newId}`; 
         } catch (error) {
-            Swal.fire('Đã xảy ra lỗi', error.message, 'error')
-
-            console.error('Error adding member to group:', error)
+            if (error.response && error.response.data && error.response.data.message === 'ERR BLACKLIST EXISTED') {
+                Swal.fire('Đối tượng đã tồn tại', '', 'error');
+            } else if (error.response && error.response.data && error.response.data.message === 'fail to search all cards, rsp: 404 , code: 404') {
+                Swal.fire('Avatar chưa được đặt', '', 'error');
+            }else if (error.response && error.response.data && error.response.data.message === 'ERR NUMBER LANDMARK NOT ENOUGHT') {
+                Swal.fire('Không xác nhận được khuôn mặt', '', 'error');
+            }
+             else {
+                Swal.fire('Đã xảy ra lỗi', error.message, 'error');
+            }
+            console.error('Error adding member to group:', error);
+        } finally {
+            setLoading(false);
         }
-
-   }
+    }
+    
 
     return(
+        
         <>
-         <Grid container spacing={6.5}>
+        <div className={classes.loadingContainer}>
+        {loading && <CircularProgress className={classes.circularProgress} />}
+         <Grid container spacing={6.5} style={{zIndex:'0'}}>
             <Grid item xs={12}>
-                <Card>
+            <Card>
                 <CardHeader
                             title='Thêm mới đối tượng'
                             titleTypographyProps={{ sx: { mb: [2, 0] } }}
@@ -274,6 +288,7 @@ const AddFaceManagement = () => {
                                             >
                                             Thêm mới
                                             </Button>
+
                                         </Box>
                                     </Grid>
 
@@ -401,11 +416,12 @@ const AddFaceManagement = () => {
                             <div style={{ color: 'red', float: 'left', position: 'absolute', bottom: '50% ', left: '50%', fontSize: 20 }}>
                                 {`Nhấn đúp chuột vào ảnh để tạo Avatar`}
                             </div>
+
                             <div style={{ color: 'red', float: 'left', position: 'absolute', bottom: '45% ', left: '50%', fontSize: 20 }}>
                                 {`Tên đối tượng bắt buộc phải nhập`}
                             </div>
-
                             </div>
+          
                             {listFileUpload.length === 0 && (
                             <p style={{ margin: '35px 0px 0px 0px' ,marginTop:'250px',marginLeft:'10px'}}>
 
@@ -443,6 +459,7 @@ const AddFaceManagement = () => {
                                         textAlign: 'center',
                                     }}
                                     >
+                                        
                                     <div>
                                         <img alt="" src={`data:image/svg+xml;utf8,${encodeURIComponent(svgPath)}`}  />
                                     </div>
@@ -462,22 +479,21 @@ const AddFaceManagement = () => {
                                     >
                                         {`Hoặc`}
                                     </p>
-                                    <button
+                                    <Button
                                         style={{
-                                        background: '#00554A',
                                         boxShadow: '0px 4px 10px rgba(16, 156, 241, 0.24)',
                                         borderRadius: '8px',
-                                        width: '104px',
-                                        height: '40px',
-
-                                        border: 'none',
-                                        color: '#fff',
+                                        width: '200px',
+                                        height: '50px',
                                         }}
+                                        variant='contained'
+                                        color='primary'
                                     >
                                         {`Tải ảnh lên`}
-                                    </button>
+                                    </Button>
                                     </div>
                                 </div>
+                                
                                 <FileUploader
                                     style={{opacity:'0'}}
                                     id="file-uploader"
@@ -499,6 +515,7 @@ const AddFaceManagement = () => {
                 </Card>
             </Grid>
          </Grid>
+           </div>
         </>
     )
 }
@@ -546,7 +563,20 @@ const MaskGroup = `<svg width="21" height="23" viewBox="0 0 193 173" fill="none"
 </svg>
 `
 
+  
 const useStyles = makeStyles(() => ({
+    loadingContainer: {
+        position: 'relative',
+        minHeight: '100px', // Đặt độ cao tùy ý
+        zIndex: 0,
+      },
+      circularProgress: {
+        position: 'absolute',
+        top: '40%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        zIndex: 99999, // Đặt z-index cao hơn so với Grid container
+      },
     cancelBtn: {
         width: '116px',
         height: '40px',
