@@ -296,6 +296,7 @@ const UpDateCar = () => {
 
    }
 console.log(avatarImage,'avatarImage');
+
     return (
         <>
             {showLoading || loading ? (
