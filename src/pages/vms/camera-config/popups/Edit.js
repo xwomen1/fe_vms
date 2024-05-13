@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Grid } from '@mui/material'
+import { Grid, IconButton } from '@mui/material'
 import Tab from '@mui/material/Tab'
 import TabPanel from '@mui/lab/TabPanel'
 import TabContext from '@mui/lab/TabContext'
@@ -11,8 +11,24 @@ import Passwords from './PassWord'
 import Video from './VideoCameraa'
 import Image from './ImageCamera'
 import Cloud from './CloudCamera'
+import Icon from 'src/@core/components/icon'
 
 import { Dialog, DialogTitle, DialogContent } from '@mui/material'
+
+const CustomCloseButton = styled(IconButton)(({ theme }) => ({
+  top: 0,
+  right: 0,
+  color: 'grey.500',
+  position: 'absolute',
+  boxShadow: theme.shadows[2],
+  transform: 'translate(10px, -10px)',
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: `${theme.palette.background.paper} !important`,
+  transition: 'transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out',
+  '&:hover': {
+    transform: 'translate(7px, -5px)'
+  }
+}))
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   borderBottom: '0 !important',
@@ -53,7 +69,10 @@ const Edit = ({ open, onClose, camera }) => {
   }
 
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth='x1' style={{ maxWidth: '80%', margin: 'auto' }}>
+      <CustomCloseButton onClick={onClose}>
+        <Icon icon='tabler:x' fontSize='1.25rem' />
+      </CustomCloseButton>
       <DialogTitle>Chỉnh sửa</DialogTitle>
       <DialogContent>
         <TabContext value={value}>

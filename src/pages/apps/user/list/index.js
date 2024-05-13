@@ -11,6 +11,7 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import authConfig from 'src/configs/auth'
 import Table from '@mui/material/Table'
+import Paper  from '@mui/material/Paper'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
 import { IconButton } from '@mui/material'
@@ -151,6 +152,7 @@ const UserList = ({ apiData }) => {
           onChange={handleGroupCheckboxChange}
         />
       }
+      style={{ marginTop: '5%' }}
     >
       {group.children && group.children.map(childGroup => renderGroup(childGroup))}
     </TreeItem>
@@ -172,7 +174,7 @@ const UserList = ({ apiData }) => {
   }, [])
 
   const handleFilterGroup = event => {
-    setSearchGroup(event.target.value)
+    setValueGroup(event)
   }
 
   console.log(total, 'totalpage')
@@ -243,13 +245,13 @@ const UserList = ({ apiData }) => {
   }, [selectedGroups, page, pageSize, total, value])
 
   return (
-    <Grid container spacing={6.5}>
+<Grid container spacing={6.5} style={{ minWidth: '1000px' }}>
       <Grid item xs={12}>
         <Card>
           <TableHeader value={value} handleFilter={handleFilter} toggle={toggleAddUserDrawer} />
           {console.log(userData)}
           <Grid container spacing={2}>
-            <Grid item xs={0.1}></Grid>
+            {/* <Grid item xs={0.1}></Grid> */}
             <Grid item xs={2}>
               <div>
                 <CustomTextField
@@ -267,9 +269,9 @@ const UserList = ({ apiData }) => {
                 </TreeView>
               </div>
             </Grid>
-            <Grid item xs={9.9}>
+            <Grid item xs={10}>
               <div></div>
-
+              <Paper elevation={3}>
               <Table>
                 <TableHead>
                   <TableRow>
@@ -290,7 +292,7 @@ const UserList = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{user.fullName}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{user.email}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{user.phoneNumber}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user.mainGroupName}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{user.userGroup[0]?.groupName}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>
                         <Grid container spacing={2}>
                           <IconButton
@@ -310,6 +312,8 @@ const UserList = ({ apiData }) => {
                   ))}
                 </TableBody>
               </Table>
+              </Paper>
+
               <br></br>
               <Grid container spacing={2} style={{ padding: 10 }}>
                 <Grid item xs={3}></Grid>

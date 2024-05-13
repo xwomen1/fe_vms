@@ -18,10 +18,14 @@ import useDebounce from './useDebounce'
 import Slider from '@mui/material/Slider'
 import Box from '@mui/material/Box'
 import { Stack } from '@mui/material'
+
 // ** Third Party Imports
+
 import DatePicker from 'react-datepicker'
+
 // ** Styled Component
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
+
 // ** Custom Component Imports
 import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
 import { formatTimeShow, formatDate } from 'src/@core/utils/format'
@@ -63,14 +67,17 @@ const valueFilterInit = {
 const Caller = () => {
   function formatTime(timeInSeconds) {
     const result = new Date(timeInSeconds * 1000).toTimeString().substr(0, 8)
+
     return result
   }
 
   const msToTime = duration => {
+
     const seconds = Math.floor((duration / 1000) % 60)
     const minutes = Math.floor((duration / (1000 * 60)) % 60)
     const hours = Math.floor((duration / (1000 * 60 * 60)) % 24)
     const count = seconds + minutes * 60 + hours * 3600
+
     return count
   }
 
@@ -85,7 +92,9 @@ const Caller = () => {
   const [sizeScreen, setSizeScreen] = useState('3x2')
   const [reload, setReload] = useState(0)
   const [numberShow, setNumberShow] = useState(6)
+
   const [valueFilter, setValueFilter] = useState(valueFilterInit)
+
   const [cameraGroup, setCameraGroup] = useState([])
   const [cameraHiden, setCameraHiden] = useState([])
   const [play, setPlay] = useState(true)
@@ -94,6 +103,7 @@ const Caller = () => {
 
   const onClickPlay = v => {
     setPlay(v)
+
     // if (videoId) {
     //   if (!v) {
     //     videoId.pause();
@@ -148,6 +158,7 @@ const Caller = () => {
   const handSetChanel = (id, channel) => {
     let newCamera = cameraGroup.map(item => {
       if (item.id === id) {
+
         return {
           ...item,
           channel: channel
@@ -159,11 +170,16 @@ const Caller = () => {
     setCameraGroup(newCamera)
   }
   function timeDisplay(time) {
-    if (time < 10) return '0' + time
+    if (time < 10)
+
+       return '0' + time
+
     return time
   }
   function valuetext(value) {
+
     const timeCurrent = new Date(timeFilter.start_time + value)
+
     return `${
       timeCurrent.getFullYear() +
       '/' +
@@ -176,6 +192,7 @@ const Caller = () => {
       timeDisplay(timeCurrent.getMinutes())
     }`
   }
+
   const handleIconClick = () => {
     if (datePickerRef.current) {
       datePickerRef.current.setOpen(true)
@@ -193,6 +210,8 @@ const Caller = () => {
         label: timeCurrent.getHours() + ':' + timeCurrent.getMinutes()
       })
     }
+
+
     return marks
   }
 
@@ -223,6 +242,7 @@ const Caller = () => {
                 <Box className='w-100' sx={{ px: 2 }}>
                   <Slider
                     defaultValue={1}
+                    
                     // getAriaValueText={'1'}
                     shiftStep={0.25}
                     step={0.25}

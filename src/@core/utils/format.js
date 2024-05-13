@@ -95,6 +95,7 @@ function timeTwoDigits(value) {
 
 export const formatDateTimeShow = data => {
   const time = new Date(data)
+
   return `${time.getFullYear()}/${timeTwoDigits(time.getMonth() + 1)}/${time
     .getDate()
     .toString()
@@ -106,6 +107,7 @@ export const formatDateTimeShow = data => {
 
 export const formatTimeShow = data => {
   const time = new Date(data)
+  
   return `${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}:${time
     .getSeconds()
     .toString()

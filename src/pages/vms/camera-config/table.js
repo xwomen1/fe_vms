@@ -75,9 +75,36 @@ const Camera = ({ apiData }) => {
     setSelectedNvrId(cameraId)
   }
 
+  const fetchFilteredOrAllUsers = async () => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        params: {
+          limit: pageSize,
+          page: page,
+          keyword: value
+        }
+      }
+      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/cameras', config)
+      setStatus1(response.data.isOfflineSetting)
+      setAssetType(response.data)
+      setTotal(response.data.page)
+    } catch (error) {
+      console.error('Error fetching users:', error)
+    }
+  }
+
   const handleClosePPopup = () => {
     setOpenPopupP(false)
+    fetchFilteredOrAllUsers()
   }
+  useEffect(() => {
+    fetchFilteredOrAllUsers()
+  }, [])
 
   const handleAddNetworkClick = () => {
     setOpenPopupNetwork(true)
