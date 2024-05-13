@@ -218,6 +218,7 @@ const AddFaceManagement = () => {
         setShowLoading(true);
         try {
             const token = localStorage.getItem(authConfig.storageTokenKeyName);
+            
             const config = {
                 headers: {
                     Authorization: `Bearer ${token}`
