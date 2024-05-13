@@ -209,11 +209,51 @@ const UserDetails = () => {
   const saveChanges = async () => {
     setReadOnly(true)
     setEditing(false)
+    if (!fullNameValue || fullNameValue.length <= 3) {
+      Swal.fire('Lỗi!', 'Tên không được để trống và độ dài phải >3', 'error')
+
+      return
+    }
+    if (!email) {
+      Swal.fire('Lỗi!', 'Email không được để trống', 'error')
+
+      return
+    }
+    if (!phoneNumber) {
+      Swal.fire('Lỗi!', 'Số điện thoại không được để trống ', 'error')
+
+      return
+    }
+    if (!identityNumber) {
+      Swal.fire('Lỗi!', 'Số giấy tờ không được để trống', 'error')
+
+      return
+    }
+   
+    if (userGroups.length === 0) {
+      Swal.fire('Lỗi!', 'Đơn vị người dùng không được để trống.', 'error')
+
+      return
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      Swal.fire('Lỗi!', 'Địa chỉ email không hợp lệ.', 'error')
+
+      return
+    }
+
+    const phoneRegex = /^\d+$/;
+    if (!phoneRegex.test(phoneNumber)) {
+      Swal.fire('Lỗi!', 'Số điện thoại không hợp lệ.', 'error')
+
+      return
+    }
+
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
       const processedGroups = await userGroups(groups) // Call the userGroups function passing rows
       if (processedGroups.length === 0) {
-        Swal.fire('Lỗi!', 'Nhóm người dùng không được để trống.', 'error')
+        Swal.fire('Lỗi!', 'Đơn vị người dùng không được để trống.', 'error')
 
         return
       }
@@ -228,7 +268,7 @@ const UserDetails = () => {
         {
           ...params,
           userId: userId,
-          fullName: fullNameValue,
+          fullName: fullNameValue ,
           email: email,
           phoneNumber: phoneNumber,
           identityNumber: identityNumber,
@@ -236,7 +276,7 @@ const UserDetails = () => {
           syncCode: syncCode,
           userStatus: status1,
           userGroups: processedGroups,
-          policies: policyList,
+          policyIds: policyList,
           timeEndAfternoon: convertStringToTimeArray(timeEndAfternoon),
           timeStartAfternoon: convertStringToTimeArray(timeStartAfternoon),
           timeStartMorning: convertStringToTimeArray(dateTime),
@@ -250,8 +290,9 @@ const UserDetails = () => {
       Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
     } catch (error) {
       console.error('Error updating user details:', error)
-      Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi cập nhật dữ liệu.', 'error')
+      Swal.fire('Lỗi!', error.response.data.message, 'error')
     }
+    fetchUserData() 
   }
 
   const convertTimeArrayToString = timeArray => {
@@ -299,16 +340,7 @@ const UserDetails = () => {
   }, [])
   const formatIsLeader = isLeader => <Checkbox checked={isLeader} disabled />
 
-  const policyList = policies.map(row => ({
-    policyId: row.policyId,
-    description: row.description,
-    policyCode: row.policyCode,
-    policyName: row.policyName,
-    status: 'ACTIVE'
-
-    // policyName: true,
-    // isLeader: false
-  }))
+  const policyList = policies.map(row => row.policyId)
 
   const fetchUserData = async () => {
     try {
@@ -642,15 +674,15 @@ const UserDetails = () => {
               <Grid container spacing={2}>
                 <div style={{ width: '80%' }}></div>
                 {/* {editing ? ( */}
-                <>
-                  <Button variant='contained' onClick={saveChanges} sx={{ marginRight: '10px' }}>
-                    Lưu
-                  </Button>
-                  <Button variant='contained' onClick={handleCancel}>
-                    Huỷ
-                  </Button>
-                </>
-                {/* ) */}
+                  <>
+                    <Button variant='contained' onClick={saveChanges} sx={{ marginRight: '10px' }}>
+                      Lưu
+                    </Button>
+                    <Button variant='contained' onClick={handleCancel}>
+                      Huỷ
+                    </Button>
+                  </>
+                
                 {/* )} */}
               </Grid>
               <Grid container spacing={2}>
