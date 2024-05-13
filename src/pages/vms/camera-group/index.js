@@ -11,7 +11,7 @@ import authConfig from 'src/configs/auth'
 import Table from '@mui/material/Table'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
-import { IconButton } from '@mui/material'
+import { Button, IconButton } from '@mui/material'
 import axios from 'axios'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import DeletePopup from './popup/delete'
@@ -133,10 +133,12 @@ const CameraGroup = ({ apiData }) => {
                   <h3>Danh sách nhóm Camera</h3>
                 </Grid>
                 <Grid item xs={2} style={{ marginTop: '1%', marginLeft: '4%', fontSize: '14px' }}>
-                  <IconButton onClick={() => handleOpenPopupAdd()}>
+                  <Button 
+                  variant='contained'
+                  onClick={() => handleOpenPopupAdd()}>
                     <Icon icon='tabler:plus' />
-                  </IconButton>
-                  Thêm nhóm
+                    Thêm nhóm
+                  </Button>
                 </Grid>
                 <Grid item xs={2} style={{ marginTop: '1%' }}>
                   <CustomTextField
@@ -159,7 +161,7 @@ const CameraGroup = ({ apiData }) => {
                 </TableHead>
                 <TableBody>
                   {console.log(cameras)}
-                  {cameras &&
+                  {cameras.length >0 &&
                     cameras.map((camera, index) => (
                       <TableRow key={camera.id}>
                         <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>

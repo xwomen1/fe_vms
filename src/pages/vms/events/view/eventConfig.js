@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { use, useEffect, useRef, useState } from "react"
 import axios from "axios"
 import { TreeItem, TreeView } from "@mui/lab"
 import Icon from 'src/@core/components/icon'
@@ -117,6 +117,7 @@ const EventConfig = () => {
   const [alertAIList, setAlertAIList] = useState([])
   const [alertList, setAlertList] = useState([])
   const [cameraAIPropertyId, setCameraAIPropertyId] = useState(null)
+  const [calendar, setCalendar] = useState(null)
 
   const [direction, setDirection] = useState({
     value: '1',
@@ -433,39 +434,10 @@ const EventConfig = () => {
   const handleSetSchedule = async data => {
     setLoading(true)
 
-    let calendar = {
-      mondayschedule: [],
-      tuesdayschedule: [],
-      wednesdayschedule: [],
-      thursdayschedule: [],
-      fridayschedule: [],
-      saturdayschedule: [],
-      sundayschedule: []
-    }
-
-    calendar = data?.calendarDays?.reduce((acc, item) => {
-      switch (item.StringValue) {
-        case 'MONDAY':
-          return { ...acc, mondayschedule: item?.times }
-        case 'TUESDAY':
-          return { ...acc, tuesdayschedule: item?.times }
-        case 'WEDNESDAY':
-          return { ...acc, wednesdayschedule: item?.times }
-        case 'THURSDAY':
-          return { ...acc, thursdayschedule: item?.times }
-        case 'FRIDAY':
-          return { ...acc, fridayschedule: item?.times }
-        case 'SATURDAY':
-          return { ...acc, saturdayschedule: item?.times }
-        case 'SUNDAY':
-          return { ...acc, sundayschedule: item?.times }
-        default:
-          return acc
-      }
-    }, calendar)
+    console.log('data', data?.data?.calendarDays);
 
     const changedAlerts = alertList.map(alert => {
-      return alert.aitype === eventSelect ? { ...alert, cameraschedules: calendar } : alert
+      return alert.aitype === eventSelect ? { ...alert, calendarDays: data?.calendarDays } : alert
     })
 
     await updateAlertList(changedAlerts)
@@ -543,6 +515,7 @@ const EventConfig = () => {
                 setLineSelect(arr)
               }
             }
+            setCalendar(alert?.calendarDays)
           }}
           sx={{
             marginBottom: 5,
@@ -798,7 +771,7 @@ const EventConfig = () => {
                     borderRadius: 2
                   }}
                 >
-                  {idCameraSelect != null && <ViewCamera id={idCameraSelect} channel={'Sub'} />}
+                  {/* {idCameraSelect != null && <ViewCamera id={idCameraSelect} channel={'Sub'} />} */}
                   <canvas
                     ref={canvasRef}
                     width='640'
@@ -909,7 +882,7 @@ const EventConfig = () => {
       </Grid>
 
       {isOpenSchedule && (
-        <Schedule onClose={() => setIsOpenSchedule(false)} show={isOpenSchedule} callback={handleSetSchedule} />
+        <Schedule onClose={() => setIsOpenSchedule(false)} show={isOpenSchedule} callback={handleSetSchedule} data={calendar} />
       )}
     </>
   )

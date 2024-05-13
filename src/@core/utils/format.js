@@ -88,3 +88,28 @@ export const formatCVC = (value, cardNumber, Payment) => {
 
   return clearValue.slice(0, maxLength)
 }
+
+function timeTwoDigits(value) {
+  return value.toString().padStart(2, '0')
+}
+
+export const formatDateTimeShow = data => {
+  const time = new Date(data)
+
+  return `${time.getFullYear()}/${timeTwoDigits(time.getMonth() + 1)}/${time
+    .getDate()
+    .toString()
+    .padStart(2, '0')} ${time.getHours().toString().padStart(2, '0')}:${time
+    .getMinutes()
+    .toString()
+    .padStart(2, '0')}:${time.getSeconds().toString().padStart(2, '0')}`
+}
+
+export const formatTimeShow = data => {
+  const time = new Date(data)
+  
+  return `${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}:${time
+    .getSeconds()
+    .toString()
+    .padStart(2, '0')}`
+}

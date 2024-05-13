@@ -4,13 +4,16 @@ import {
   Table, TableHead, TableRow, TableCell,Fade,styled, TableBody, 
 } from "@mui/material";
 import authConfig from 'src/configs/auth'
+import { makeStyles } from '@material-ui/core/styles';
 import Icon from 'src/@core/components/icon'
 import Swal from 'sweetalert2'
 import { useRouter } from 'next/router'
+import CircularProgress from '@mui/material/CircularProgress'
 import axios from 'axios'
 
 const AddCamera = ({nvr, onClose }) => {
 
+    const classes = useStyles();
     const [loading, setLoading] = useState(false);
     const router = useRouter()
     const { id } = router.query;
@@ -133,7 +136,8 @@ const handleUpdate = async (id, name) => {
 }
   
   return (
-    
+    <div className={classes.loadingContainer}>
+    {loading && <CircularProgress className={classes.circularProgress} />}
     <Grid container spacing={1}>
      <Card >
      <Grid item xs={12}>
@@ -204,7 +208,23 @@ const handleUpdate = async (id, name) => {
                     </Grid>
       </Card>
     </Grid>
+    </div>
   );
 }
 
+const useStyles = makeStyles(() => ({
+    loadingContainer: {
+        position: 'relative',
+        minHeight: '100px', // Đặt độ cao tùy ý
+        zIndex: 0,
+      },
+      circularProgress: {
+        position: 'absolute',
+        top: '40%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        zIndex: 99999, // Đặt z-index cao hơn so với Grid container
+      },
+    }));
+    
 export default AddCamera

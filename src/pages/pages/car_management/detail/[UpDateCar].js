@@ -1,10 +1,11 @@
 import { useRouter } from 'next/router';
-import {Fragment, useState, useEffect,useRef } from 'react';
+import React, {Fragment, useState, useEffect,useRef } from 'react';
 import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import authConfig from 'src/configs/auth';
 import toast from 'react-hot-toast';
 import Swal from 'sweetalert2'
+import { CircularProgress } from '@material-ui/core'
 import Icon from 'src/@core/components/icon'
 import CustomTextField from "src/@core/components/mui/text-field";
 import FileUploader from 'devextreme-react/file-uploader';
@@ -37,6 +38,7 @@ const UpDateCar = () => {
     const [name, setName] = useState(null);
     const [note, setNote] = useState(null);
     const fileUploader1 = useRef(null);
+
     const fileUploader2 = useRef(null);
     const [showLoading, setShowLoading] = useState(false);
     const [isDoubleClick, setIsDoubleClick] = useState(false);
@@ -68,6 +70,38 @@ const UpDateCar = () => {
         setListImage(listImg);
     }, [listFileId]);
 
+    const Img = React.memo(props => {
+        const [loaded, setLoaded] = useState(false)
+    
+        const { src } = props
+    
+        return (
+          <>
+            <div
+              style={
+                loaded
+                  ? { display: 'none' }
+                  : {
+                      width: '100%',
+                      height: '100%',
+                      display: 'grid',
+                      backgroundColor: '#C4C4C4',
+                      placeItems: 'center'
+                    }
+              }
+            >
+              <CircularProgress size={20} />
+            </div>
+            <img
+              {...props}
+              src={src}
+              alt='Ảnh'
+              onLoad={() => setLoaded(true)}
+              style={loaded ? { width: '100%', height: '100%' } : { display: 'none' }}
+            />
+          </>
+        )
+      })
 
     const onDragDropImage = async (e) => {
         if (e.value.length > 0) {
@@ -149,12 +183,19 @@ const UpDateCar = () => {
 
             if (id) { 
                 const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates/${id}`, config);
-                const imgs = [...response.data.imgs];
+                const imgs = response.data.imgs ? [...response.data.imgs] : []; // Kiểm tra nếu response.data.imgs tồn tại
                 setFileAvatarId(response.data.mainImageId);
                 setListFileUpload(imgs.map((img) => buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${img.id}`)));
                 setListFileId(imgs.map((img) => img.id));
                 setListImage(imgs.map((img) =>  buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${img.id}`)));
-                setAvatarImage(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${response.data.mainImageId}`));
+                if (response.data.mainImageId.length>0) {
+                    console.log('đúng');
+                    setAvatarImage(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${response.data.mainImageId}`));
+                }else{
+                    setAvatarImage(null);
+                    console.log('sai');
+                }
+    
                 setImg0(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[0]?.id}`));
                 setImg1(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[1]?.id}`));
                 setImg2(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[2]?.id}`));
@@ -191,12 +232,18 @@ const UpDateCar = () => {
 
                 if (id) { 
                     const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates/${id}`, config);
-                    const imgs = [...response.data.imgs];
+                    const imgs = response.data.imgs ? [...response.data.imgs] : []; // Kiểm tra nếu response.data.imgs tồn tại
                     setFileAvatarId(response.data.mainImageId);
                     setListFileUpload(imgs.map((img) => buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${img.id}`)));
                     setListFileId(imgs.map((img) => img.id));
                     setListImage(imgs.map((img) =>  buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${img.id}`)));
-                    setAvatarImage(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${response.data.mainImageId}`));
+                    if (response.data.mainImageId.length>0) {
+                        console.log('đúng');
+                        setAvatarImage(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${response.data.mainImageId}`));
+                    }else{
+                        setAvatarImage(null);
+                        console.log('sai');
+                    }
                     setImg0(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[0]?.id}`));
                     setImg1(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[1]?.id}`));
                     setImg2(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[2]?.id}`));
@@ -248,6 +295,7 @@ const UpDateCar = () => {
         }
 
    }
+console.log(avatarImage,'avatarImage');
 
     return (
         <>
@@ -329,7 +377,8 @@ const UpDateCar = () => {
                                                 height: '192px',
                                             }}
                                         >
-                                            <img
+                                        {avatarImage ? (
+                                                <img
                                                 alt=""
                                                 src={avatarImage}
                                                 style={{
@@ -338,7 +387,18 @@ const UpDateCar = () => {
                                                     width: `${avatarImage ? '100%' : ''}`,
                                                     height: `${avatarImage ? '100%' : ''}`,
                                                 }}
-                                            />
+                                                />
+                                          ) : (
+                                              <Img 
+                                              style={{
+                                                objectFit: 'contain',
+                                                width: '100%' ,
+                                                height: '100%',
+                                            }}
+                                              src={`data:image/svg+xml;utf8,${encodeURIComponent(MaskGroup)}`}
+                                              alt="Placeholder Image" />
+                                          )}
+                                           
                                         </div>
                                         <div 
                                             style={{
@@ -456,19 +516,16 @@ const UpDateCar = () => {
                                                     >
                                                         {`Hoặc`}
                                                     </p>
-                                                    <button
+                                                    <Button
                                                         style={{
-                                                            background: '#00554A',
-                                                            boxShadow: '0px 4px 10px rgba(16, 156, 241, 0.24)',
-                                                            borderRadius: '8px',
-                                                            width: '104px',
-                                                            height: '40px',
-                                                            border: 'none',
-                                                            color: '#fff',
+                                                            width: '200px',
+                                                            height: '50px',
                                                         }}
+                                                        variant='contained'
+                                                        color='primary'
                                                     >
                                                         {`Tải ảnh lên`}
-                                                    </button>
+                                                    </Button>
                                                 </div>
                                             </div>
                                             <FileUploader
@@ -567,6 +624,19 @@ const UpDateCar = () => {
         </>
     );
 };
+
+const MaskGroup = `<svg width="21" height="23" viewBox="0 0 193 173" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0)">
+<path d="M176.833 147.216C154.238 134.408 126.747 128.909 123.96 120.697C121.173 112.485 120.571 104.423 123.132 98.3208C125.692 92.2183 128.705 92.9717 130.211 86.1911C130.211 86.1911 133.977 86.9445 136.99 82.4242C140.003 77.9038 140.756 70.3698 140.756 66.6029C140.756 62.8359 135.484 60.5757 135.484 60.5757C135.484 60.5757 140.756 46.2612 137.743 31.9467C134.73 17.6322 124.939 -0.449244 92.553 1.05755V1.28356C66.1168 2.71501 57.6813 18.9883 54.8945 32.1727C51.8819 46.4872 57.1541 60.8017 57.1541 60.8017C57.1541 60.8017 51.8819 63.0619 51.8819 66.8289C51.8819 70.5959 52.635 78.1298 55.6477 82.6502C58.6604 87.1705 62.4262 86.4171 62.4262 86.4171C63.9326 93.1977 66.9453 92.4443 69.506 98.5468C72.0668 104.649 71.4643 112.786 68.6775 120.923C65.8908 129.059 38.4001 134.634 15.8051 147.442C-6.79001 160.25 -4.5305 173.058 -4.5305 173.058L197.319 172.907C197.168 172.831 199.428 160.024 176.833 147.216Z" fill="#797979"/>
+</g>
+<defs>
+<clipPath id="clip0">
+<rect width="202" height="172" fill="white" transform="translate(-4.75635 0.982422)"/>
+</clipPath>
+</defs>
+</svg>
+`
+
 
 const svgPath = `<svg width="85" height="84" viewBox="0 0 85 84" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g opacity="0.4" clip-path="url(#clip0)">
