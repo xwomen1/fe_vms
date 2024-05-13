@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useState } from 'react';
+import React, {Fragment, useEffect, useState ,useCallback} from 'react';
 import {
     Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Tab, TableContainer, Paper,
     Table, TableHead, TableRow, TableCell, TableBody, Pagination, Menu, MenuItem, Dialog, DialogContent,
@@ -18,13 +18,20 @@ import Link from 'next/link'
 
 const FaceManagement=() => {
 
-    const [keyword, setKeyword] = useState('');
+    const [value, setValue] = useState('')
     const [selectedIds, setSelectedIds] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
     const [userData, setUserData] = useState([]);
     const [loading, setLoading] = useState(false)
     const [listImage, setListImage] = useState([]);
     const [isDeleteDisabled, setIsDeleteDisabled] = useState(true);
+
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [pageSize, setPageSize] = useState(25);
+    const [total, setTotal] = useState([1])
+    const [page, setPage] = useState(1)
+
+    const pageSizeOptions = [25, 50, 100];
 
     const initValueFilter = {
         keyword: '',
@@ -33,6 +40,24 @@ const FaceManagement=() => {
     }
 
     const [valueFilter, setValueFilter] = useState(initValueFilter)
+
+    const handleOpenMenu = event => {
+      setAnchorEl(event.currentTarget)
+    }
+
+    const handleCloseMenu = () => {
+      setAnchorEl(null)
+    }
+
+    const handleSelectPageSize = size => {
+      setPageSize(size)
+      setPage(1)
+      handleCloseMenu()
+    }
+    
+    const handleFilter = useCallback(val => {
+      setValue(val)
+    }, [])
 
     useEffect(() => {
 
@@ -168,7 +193,6 @@ const FaceManagement=() => {
     return Swal.fire({ ...defaultProps, ...options })
   }
 
-  useEffect(() => {
     const fetchFilteredOrAllUsers = async () => {
         setLoading(true);
         try {
@@ -179,7 +203,7 @@ const FaceManagement=() => {
                     Authorization: `Bearer ${token}`
                 },
                 params: {
-                    keyword: keyword,
+                    keyword: value,
                     page: valueFilter.page,
                     limit: valueFilter.limit,
                 }
@@ -203,9 +227,10 @@ const FaceManagement=() => {
         }
     };
 
-    fetchFilteredOrAllUsers();
-}, [keyword]);
 
+useEffect(() => {
+  fetchFilteredOrAllUsers()
+}, [page, pageSize, total,value])
 
 const handleDelete = idDelete => {
     showAlertConfirm({
@@ -285,10 +310,6 @@ const Img = React.memo(props => {
 
     return(
         <>
-
-        {loading ? (
-                <div>Loading...</div>
-            ) : (
                 <Grid container spacing={6.5}>
                 <Grid item xs={12}>
                     <Card>
@@ -338,8 +359,8 @@ const Img = React.memo(props => {
                                 </Grid>
                                 <Grid item>
                                     <CustomTextField
-                                        value={keyword}
-                                        onChange={(e) => setKeyword(e.target.value)}
+                                        value={value}
+                                        onChange={e => handleFilter(e.target.value)}
                                         placeholder='Search…'
                                         InputProps={{
                                             startAdornment: (
@@ -392,6 +413,7 @@ const Img = React.memo(props => {
                                 </TableRow>
                            </TableHead>
                            <TableBody>
+                                 {loading && <CircularProgress />}
                                 {Array.isArray(userData) && userData.length > 0 ? (
                                     userData.map((user, index) => (
                                         <TableRow key={user.id}>
@@ -440,11 +462,31 @@ const Img = React.memo(props => {
                                 )}
                             </TableBody>
                         </Table>
+                        <br></br>
+                                <Grid container spacing={2} style={{ padding: 10 }}>
+                                  <Grid item xs={3}></Grid>
+                                  <Grid item xs={1.5} style={{ padding: 0,marginLeft:'12%' }}>
+                                    <IconButton onClick={handleOpenMenu}>
+                                      <Icon icon='tabler:selector' />
+                                      <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
+                                    </IconButton>
+                                    <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+                                      {pageSizeOptions.map(size => (
+                                        <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
+                                          {size}
+                                        </MenuItem>
+                                      ))}
+                                    </Menu>
+                                  </Grid>
+                                  <Grid item xs={6}>
+                                    <Pagination count={total} color='primary' onChange={(event, page) => handlePageChange(page)} />
+                                  </Grid>
+                                </Grid>
                     </Grid>
                     </Card>
                 </Grid>
             </Grid>
-            )}
+            
         </>
     );
     
