@@ -115,7 +115,6 @@ const TCP = ({ cameras, onClose, mtu }) => {
   const handleSaveClick = async () => {
     handleSave() // Gọi hàm handleSave truyền từ props
   }
-  console.log(mtus)
 
   const handleSave = async () => {
     try {

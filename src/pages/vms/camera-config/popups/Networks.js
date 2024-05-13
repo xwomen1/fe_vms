@@ -88,13 +88,13 @@ const Network = ({ open, onClose, onSelect, camera }) => {
           </TabList>
         </Grid>
         <TabPanel value='1'>
-          <TCP camera={cameras} nic={nic} idCamera={camera} onClose={handleCancel} />
+          <TCP cameras={cameras} onClose={onClose} />
         </TabPanel>
         <TabPanel value='2'>
-          <DDNs camera={cameras} />
+          <DDNs cameras={cameras} onClose={onClose} />
         </TabPanel>
         <TabPanel value='3'>
-          <Port nvrs={cameras} />
+          <Port cameras={cameras} onClose={onClose} />
         </TabPanel>
       </TabContext>
     </Grid>
