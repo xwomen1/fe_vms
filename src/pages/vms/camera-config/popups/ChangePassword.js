@@ -1,11 +1,13 @@
-import React, { useState } from 'react'
+import React, { forwardRef, useEffect, useState } from 'react'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import {
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  Fade,
   Grid,
   IconButton,
   InputAdornment
@@ -15,12 +17,38 @@ import authConfig from 'src/configs/auth'
 import Swal from 'sweetalert2'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import VisibilityIcon from '@mui/icons-material/Visibility'
+import { makeStyles } from '@material-ui/core/styles'
+import Icon from 'src/@core/components/icon'
+import { styled } from '@mui/material/styles'
+
+const CustomCloseButton = styled(IconButton)(({ theme }) => ({
+  top: 0,
+  right: 0,
+  color: 'grey.500',
+  position: 'absolute',
+  boxShadow: theme.shadows[2],
+  transform: 'translate(10px, -10px)',
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: `${theme.palette.background.paper} !important`,
+  transition: 'transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out',
+  '&:hover': {
+    transform: 'translate(7px, -5px)'
+  }
+}))
+
+const Transition = forwardRef(function Transition(props, ref) {
+  return <Fade ref={ref} {...props} />
+})
 
 const PassWord = ({ onClose, camera }) => {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false) //Thêm state cho việc hiển thị mật khẩu
   const [loading, setLoading] = useState(false)
+  const [ipAddress, setIpAddress] = useState('')
+  const [httpPort, setHttpPort] = useState('')
+  const [username, setUserName] = useState('')
+  const classes = useStyles()
 
   const handlePasswordChange = event => {
     setPassword(event.target.value)
@@ -34,6 +62,33 @@ const PassWord = ({ onClose, camera }) => {
     //Hàm xử lý hiển thị mật khẩu
     setShowPassword(!showPassword)
   }
+  useEffect(() => {
+    const fetchGroupData = async () => {
+      try {
+        if (camera != null) {
+          // Kiểm tra xem popup Network đã mở chưa
+          const token = localStorage.getItem(authConfig.storageTokenKeyName)
+          console.log('token', token)
+
+          const config = {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+
+          const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${camera}`, config)
+          setIpAddress(response.data.ipAddress)
+          setHttpPort(response.data.httpPort)
+          setUserName(response.data.username)
+          console.log(response.data)
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+
+    fetchGroupData()
+  }, [camera])
 
   const saveChange = async () => {
     setLoading(true)
@@ -57,7 +112,10 @@ const PassWord = ({ onClose, camera }) => {
       const response = await axios.put(
         `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/changepassword?idCamera=${camera}`,
         {
-          password: password
+          password: password,
+          username: username,
+          httpPort: httpPort,
+          ipAddress: ipAddress
         },
         config
       )
@@ -65,62 +123,92 @@ const PassWord = ({ onClose, camera }) => {
       setLoading(false)
     } catch (error) {
       console.error('Error updating user details:', error)
-      Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi cập nhật dữ liệu.', 'error')
+      Swal.fire(error.message, error.response?.data?.message)
       setLoading(false)
     }
   }
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Đổi mật khẩu</DialogTitle>
-      <DialogContent>
-        <Grid container spacing={2} style={{ minWidth: 500 }}>
-          <Grid container item style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
-            <Grid item xs={12}>
-              <CustomTextField
-                label='Mật khẩu'
-                type={showPassword ? 'text' : 'password'}
-                onChange={handlePasswordChange}
-                fullWidth
-                InputProps={{
-                  //Thêm InputProps để thêm IconButton
-                  endAdornment: (
-                    <InputAdornment position='end'>
-                      <IconButton onClick={toggleShowPassword} edge='end'>
-                        {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                      </IconButton>
-                    </InputAdornment>
-                  )
-                }}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <CustomTextField
-                label='Xác nhận mật khẩu'
-                type={showPassword ? 'text' : 'password'}
-                onChange={handleConfirmPasswordChange}
-                fullWidth
-                InputProps={{
-                  //Thêm InputProps để thêm IconButton
-                  endAdornment: (
-                    <InputAdornment position='end'>
-                      <IconButton onClick={toggleShowPassword} edge='end'>
-                        {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                      </IconButton>
-                    </InputAdornment>
-                  )
-                }}
-              />
+    <div style={{ width: '100%' }} className={classes.loadingContainer}>
+      {loading && <CircularProgress className={classes.circularProgress} />}
+
+      <Dialog
+        open={open}
+        onClose={onClose}
+        fullWidth
+        maxWidth='md'
+        scroll='body'
+        TransitionComponent={Transition}
+        sx={{ '& .MuiDialog-paper': { overflow: 'visible' } }}
+      >
+        <DialogTitle>Đổi mật khẩu</DialogTitle>
+        <CustomCloseButton onClick={onClose}>
+          <Icon icon='tabler:x' fontSize='1.25rem' />
+        </CustomCloseButton>
+        <DialogContent>
+          <Grid container spacing={2} style={{ minWidth: 500 }}>
+            <Grid container item style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
+              <Grid item xs={12}>
+                <CustomTextField
+                  label='Mật khẩu'
+                  type={showPassword ? 'text' : 'password'}
+                  onChange={handlePasswordChange}
+                  fullWidth
+                  InputProps={{
+                    //Thêm InputProps để thêm IconButton
+                    endAdornment: (
+                      <InputAdornment position='end'>
+                        <IconButton onClick={toggleShowPassword} edge='end'>
+                          {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                        </IconButton>
+                      </InputAdornment>
+                    )
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <CustomTextField
+                  label='Xác nhận mật khẩu'
+                  type={showPassword ? 'text' : 'password'}
+                  onChange={handleConfirmPasswordChange}
+                  fullWidth
+                  InputProps={{
+                    //Thêm InputProps để thêm IconButton
+                    endAdornment: (
+                      <InputAdornment position='end'>
+                        <IconButton onClick={toggleShowPassword} edge='end'>
+                          {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                        </IconButton>
+                      </InputAdornment>
+                    )
+                  }}
+                />
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={saveChange}>OK</Button>
-      </DialogActions>
-    </Dialog>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onClose}>Cancel</Button>
+          <Button onClick={saveChange}>OK</Button>
+        </DialogActions>
+      </Dialog>
+    </div>
   )
 }
+
+const useStyles = makeStyles(() => ({
+  loadingContainer: {
+    position: 'relative',
+    minHeight: '100px',
+    zIndex: 0
+  },
+  circularProgress: {
+    position: 'absolute',
+    top: '40%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    zIndex: 99999
+  }
+}))
 
 export default PassWord

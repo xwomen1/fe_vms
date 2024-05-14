@@ -2,7 +2,7 @@ import { use, useEffect, useRef, useState } from "react"
 import axios from "axios"
 import { TreeItem, TreeView } from "@mui/lab"
 import Icon from 'src/@core/components/icon'
-import { Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Slider, Tooltip, Typography, styled } from "@mui/material"
+import { Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Slider, Tooltip, Typography, styled, CircularProgress } from "@mui/material"
 import authConfig from 'src/configs/auth'
 import ViewCamera from "./viewCamera"
 import { AddBox, CameraAlt, FastForward, FastRewind, IndeterminateCheckBox, Pause, PlayArrow, SkipNext, SkipPrevious } from "@mui/icons-material"
@@ -37,15 +37,18 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
 
 const StyledTreeItem = props => {
   // ** Props
-  const { labelText, labelIcon, labelInfo, ...other } = props
+  const { labelText, labelIcon, labelInfo, matchedEvent, ...other } = props
+
+  const colorText = matchedEvent?.statusValue?.name ? '#28C76F' : ''
 
   return (
     <StyledTreeItemRoot
       {...other}
       label={
-        <Box sx={{ py: 1, display: 'flex', alignItems: 'center', '& svg': { mr: 1 } }}>
-          <Icon icon={labelIcon} color='inherit' />
-          <Typography variant='body2' sx={{ flexGrow: 1, fontWeight: 'inherit' }}>
+        <Box
+          sx={{ py: 1, display: 'flex', alignItems: 'center', '& svg': { mr: 1 } }}>
+          <Icon icon={labelIcon} color={colorText} />
+          <Typography variant='body2' sx={{ flexGrow: 1, fontWeight: 500 }} color={colorText}>
             {labelText}
           </Typography>
           {labelInfo ? (
@@ -130,11 +133,15 @@ const EventConfig = () => {
   const [lineSelect, setLineSelect] = useState(lineExample)
   const [isDraw, setIsDraw] = useState('')
   const [isDrawLine, setIsDrawLine] = useState(false)
-
+  const clientId = 'be571c00-41cf-4878-a1de-b782625da62a'
   const [startDate, setStartDate] = useState(new Date(new Date() - 100 * 60 * 1000))
 
   const webcamRef = useRef(null)
   const canvasRef = useRef()
+
+  const [eventsData, setEventData] = useState([])
+  const [websocket, setWebsocket] = useState(null)
+  const [rtcPeerConnection, setRtcPeerConnection] = useState(null)
 
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -143,6 +150,91 @@ const EventConfig = () => {
       Authorization: `Bearer ${token}`
     }
   }
+
+  const configWs = {
+    bundlePolicy: 'max-bundle',
+    iceServers: [
+      {
+        urls: 'stun:dev-ivis-camera-api.basesystem.one:3478',
+      },
+      {
+        urls: 'turn:dev-ivis-camera-api.basesystem.one:3478',
+        username: 'demo',
+        credential: 'demo',
+      },
+    ]
+  }
+
+  // create WebSocket connection
+  const createWsConnection = () => {
+    const ws = new WebSocket(`wss://sbs.basesystem.one/ivis/vms/api/v0/websocket/topic/cameraStatus/${clientId}`)
+
+    setWebsocket(ws)
+
+    //create RTCPeerConnection 
+    const pc = new RTCPeerConnection(configWs)
+    setRtcPeerConnection(pc)
+
+    //listen for remote tracks and add them to remote stream
+
+    pc.ontrack = (event) => {
+      const stream = event.streams[0]
+      if (
+        !remoteVideoRef.current?.srcObject ||
+        remoteVideoRef.current?.srcObject.id !== stream.id
+      ) {
+        setRemoteStream(stream);
+        remoteVideoRef.current.srcObject = stream
+      }
+    }
+
+    // close Websocket and RTCPeerConnection on component unmount
+
+    return () => {
+      if (websocket) {
+        websocket.close()
+      }
+      if (rtcPeerConnection) {
+        rtcPeerConnection.close()
+      }
+    }
+  }
+
+  const handleMessage = async (event) => {
+    const message = JSON.parse(event.data)
+    const newMessage = JSON.parse(message?.data)
+    setEventData(newMessage)
+  }
+
+  const handleClose = async (event) => {
+    if (websocket) {
+      websocket.close()
+    }
+  }
+
+  useEffect(() => {
+    const cleanup = createWsConnection()
+
+    return cleanup
+  }, [])
+
+  useEffect(() => {
+    if (websocket) {
+      websocket.addEventListener('open', (event) => { })
+
+      websocket.addEventListener('message', handleMessage)
+
+      websocket.addEventListener('error', (error) => {
+        console.error('WebSocket error: ', error)
+      })
+
+      websocket.addEventListener('close', handleClose)
+    }
+  }, [websocket])
+
+  useEffect(() => {
+    setReload(reload + 1)
+  }, [eventsData])
 
   useEffect(() => {
     fetchCameraGroup()
@@ -401,13 +493,13 @@ const EventConfig = () => {
   }
   const marks = createSilder(startDate)
 
+  const handleSearch = e => {
+    setKeyword(e.target.value)
+  }
+
   const handleItemClick = (cameraId, cameraName) => {
     setIdCameraSelect(cameraId)
     setNameCameraSelect(cameraName)
-  }
-
-  const handleSearch = e => {
-    setKeyword(e.target.value)
   }
 
   const updateAlertList = async changedAlerts => {
@@ -424,7 +516,7 @@ const EventConfig = () => {
       setReload(reload + 1)
       toast.success('Thao tác thành công')
     } catch (error) {
-      console.log('Error fetching data: ', error)
+      console.error('Error fetching data: ', error)
       toast.error(error)
     } finally {
       setLoading(false)
@@ -433,8 +525,6 @@ const EventConfig = () => {
 
   const handleSetSchedule = async data => {
     setLoading(true)
-
-    console.log('data', data?.data?.calendarDays);
 
     const changedAlerts = alertList.map(alert => {
       return alert.aitype === eventSelect ? { ...alert, calendarDays: data?.calendarDays } : alert
@@ -552,21 +642,30 @@ const EventConfig = () => {
     ))
   }
 
-  const renderTree = group => (
-    <StyledTreeItem key={group.id} nodeId={group.id} labelText={group.name} labelIcon='tabler:folder'>
-      {group.cameras && group.cameras.length > 0
-        ? group.cameras.map(camera => (
-          <StyledTreeItem
-            key={camera.id}
-            nodeId={camera.id}
-            labelText={camera.deviceName}
-            labelIcon='tabler:camera'
-            onClick={() => handleItemClick(camera.id, camera.deviceName)}
-          />
-        ))
-        : null}
-    </StyledTreeItem>
-  )
+  const renderTree = group => {
+    return (
+      <StyledTreeItem key={group.id} nodeId={group.id} labelText={group.name} labelIcon='tabler:folder'>
+        {group.cameras && group.cameras.length > 0
+          ? group.cameras.map(camera => {
+            const matchedEvent = eventsData.find(event => event.id === camera.id)
+            const labelText = matchedEvent ? `${camera.deviceName} (${matchedEvent.statusValue.name})` : camera.deviceName;
+
+            return (
+              <StyledTreeItem
+                key={camera.id}
+                nodeId={camera.id}
+                labelText={camera.deviceName}
+                matchedEvent={matchedEvent ? matchedEvent : ''}
+                labelIcon='tabler:camera'
+                onClick={() => handleItemClick(camera.id, camera.deviceName)}
+              />
+            );
+          })
+          : null}
+      </StyledTreeItem>
+    );
+  }
+
 
   return (
     <>
@@ -771,7 +870,7 @@ const EventConfig = () => {
                     borderRadius: 2
                   }}
                 >
-                  {/* {idCameraSelect != null && <ViewCamera id={idCameraSelect} channel={'Sub'} />} */}
+                  {idCameraSelect != null && <ViewCamera key={idCameraSelect} id={idCameraSelect} channel={'Sub'} />}
                   <canvas
                     ref={canvasRef}
                     width='640'

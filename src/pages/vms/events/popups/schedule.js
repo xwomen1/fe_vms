@@ -136,25 +136,6 @@ const Schedule = ({ show, onClose, valueFilter, callback, direction, data }) => 
 
   const onSubmit = (values) => {
 
-    // if (values.calendarDays && Array.isArray(values.calendarDays)) {
-    //   const validCalendarDays = values.calendarDays
-    //     .filter((day) => day.dayOfWeek && day.timePeriods && Array.isArray(day.timePeriods))
-    //     .map((day) => {
-    //       return {
-    //         dayOfWeek: day.dayOfWeek,
-    //         timePeriods: day.timePeriods.map((timePeriod) => {
-    //           return {
-    //             endTimeInMinute: timePeriod.endTimeInMinute,
-    //             startTimeInMinute: timePeriod.startTimeInMinute,
-    //           };
-    //         }),
-    //       };
-    //     });
-    //   values.calendarDays = validCalendarDays;
-    // } else {
-    //   values.calendarDays = [];
-    // }
-
     callback(values)
     onClose()
   }
