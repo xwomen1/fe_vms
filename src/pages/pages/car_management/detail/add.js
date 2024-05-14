@@ -13,6 +13,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import authConfig from 'src/configs/auth';
 import Swal from 'sweetalert2';
 import FileUploader from 'devextreme-react/file-uploader';
+import CircularProgress from '@mui/material/CircularProgress'
 import ModalImage from '../ModalImage';
 import Icon from 'src/@core/components/icon'
 import ImageCropper from '../ImageCropperPopup';
@@ -214,42 +215,45 @@ const AddFaceManagement = () => {
         }
     };
 
-    const handleAddBlacklist = async () =>{
-        setLoading(false);
+    const handleAddBlacklist = async () => {
+        setLoading(true);
         setShowLoading(true);
         try {
-
-            const token = localStorage.getItem(authConfig.storageTokenKeyName)
-
+            const token = localStorage.getItem(authConfig.storageTokenKeyName);
+            
             const config = {
                 headers: {
-                Authorization: `Bearer ${token}`
+                    Authorization: `Bearer ${token}`
                 }
-            }
-            
-            const params ={
+            };
+    
+            const params = {
                 name: name,
                 mainImageId: fileAvatarId,
                 imgs: listFileId.map((id, index) => ({
                     id: id,
                     urlImage: listFileUrl[id],
-          })),
-                note:note,
-            }
-            await axios.post(`https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates`,params,config)
+                })),
+                note: note,
+            };
+            const response = await axios.post(`https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates`, params, config);
+            const newId = response.data.id; 
             Swal.fire('Thêm đối tượng thành công', '', 'success')
-            window.location.href = '/pages/car_management/list';
+            window.location.href = `/pages/car_management/detail/${newId}`;
         } catch (error) {
-            Swal.fire('Đã xảy ra lỗi', error.message, 'error')
+            Swal.fire('Đã xảy ra lỗi', error.message, 'error');
+            console.error('Error adding member to group:', error);
+        } finally {
 
-            console.error('Error adding member to group:', error)
+            setLoading(false);
         }
-
-   }
+    };
 
     return(
         <>
-         <Grid container spacing={6.5}>
+        <div className={classes.loadingContainer}>
+        {loading && <CircularProgress className={classes.circularProgress} />}
+         <Grid container spacing={6.5} style={{zIndex:'0'}}>
             <Grid item xs={12}>
                 <Card>
                 <CardHeader
@@ -463,19 +467,17 @@ const AddFaceManagement = () => {
                                     >
                                         {`Hoặc`}
                                     </p>
-                                    <button
+                                    <Button
                                         style={{
-                                        background: '#00554A',
-                                        boxShadow: '0px 4px 10px rgba(16, 156, 241, 0.24)',
-                                        borderRadius: '8px',
-                                        width: '104px',
-                                        height: '40px',
+                                        width: '200px',
+                                        height: '50px',
                                         border: 'none',
-                                        color: '#fff',
                                         }}
+                                        color="primary"
+                                        variant='contained'
                                     >
                                         {`Tải ảnh lên`}
-                                    </button>
+                                    </Button>
                                     </div>
                                 </div>
                                 <FileUploader
@@ -499,6 +501,7 @@ const AddFaceManagement = () => {
                 </Card>
             </Grid>
          </Grid>
+         </div>
         </>
     )
 }
@@ -547,6 +550,18 @@ const MaskGroup = `<svg width="21" height="23" viewBox="0 0 193 173" fill="none"
 `
 
 const useStyles = makeStyles(() => ({
+    loadingContainer: {
+        position: 'relative',
+        minHeight: '100px', // Đặt độ cao tùy ý
+        zIndex: 0,
+      },
+      circularProgress: {
+        position: 'absolute',
+        top: '40%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        zIndex: 99999, // Đặt z-index cao hơn so với Grid container
+      },
     cancelBtn: {
         width: '116px',
         height: '40px',

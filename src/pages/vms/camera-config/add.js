@@ -29,6 +29,7 @@ import ConnectCamera from './popups/ConnectCamera'
 import VideoConnectCamera from './popups/VideoConnectCamera'
 import PopupScan from './popups/Add'
 import CircularProgress from '@mui/material/CircularProgress'
+import Edit from './popups/Edit'
 
 const Add = ({ apiData }) => {
   const [value, setValue] = useState('')
@@ -66,6 +67,7 @@ const Add = ({ apiData }) => {
   const [response, setResponse] = useState('')
   const [openPopupResponse, setOpenPopupResponse] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [selectedNvrId, setSelectedNvrId] = useState(null)
 
   const fetchNicTypes = async () => {
     try {
@@ -167,8 +169,40 @@ const Add = ({ apiData }) => {
     setOpenPopup(false)
   }
 
-  const handleAddPClick = () => {
+  const handleDelete = idDelete => {
+    showAlertConfirm({
+      text: 'Bạn có chắc chắn muốn xóa?'
+    }).then(({ value }) => {
+      if (value) {
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+        if (!token) {
+          return
+        }
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+        let urlDelete = `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${idDelete}`
+        axios
+          .delete(urlDelete, config)
+          .then(() => {
+            Swal.fire('Xóa thành công', '', 'success')
+            const updatedData = assettype.filter(assettype => assettype.id !== idDelete)
+            setAssetType(updatedData)
+            fetchData()
+          })
+          .catch(err => {
+            Swal.fire('Đã xảy ra lỗi', err.message, 'error')
+          })
+      }
+    })
+  }
+
+  const handleAddPClick = cameraId => {
     setOpenPopupP(true)
+    setSelectedNvrId(cameraId)
   }
 
   const handleClosePPopup = () => {
@@ -553,20 +587,12 @@ const Add = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{statusText}</TableCell>
 
                       <TableCell sx={{ padding: '16px' }}>
-                        <Grid container spacing={2}>
-                          <IconButton size='small' onClick={handleAddPClick}>
-                            <Icon icon='tabler:key' />
-                          </IconButton>
-                          <IconButton size='small' onClick={handleAddVideoConnectClick}>
-                            <Icon icon='tabler:camera' />
-                          </IconButton>
-                          <IconButton size='small' onClick={handleAddConnectCameraClick}>
-                            <Icon icon='tabler:link' />
-                          </IconButton>
-                          <IconButton size='small' sx={{ color: 'text.secondary' }}>
-                            <Icon icon='tabler:reload' />
-                          </IconButton>
-                        </Grid>
+                        <IconButton size='small' onClick={() => handleAddPClick(assetType.id)}>
+                          <Icon icon='tabler:edit' />
+                        </IconButton>
+                        <IconButton onClick={() => handleDelete(assetType.id)}>
+                          <Icon icon='tabler:trash' />
+                        </IconButton>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -596,6 +622,11 @@ const Add = ({ apiData }) => {
           </Grid>
         </Card>
       </Grid>
+      {openPopupP && (
+        <>
+          <Edit open={openPopupP} onClose={handleClosePPopup} camera={selectedNvrId} />
+        </>
+      )}
     </Grid>
   )
 }

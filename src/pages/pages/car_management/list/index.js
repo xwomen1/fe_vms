@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useState } from 'react';
+import React, {Fragment, useEffect, useState,useCallback } from 'react';
 import {
     Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Tab, TableContainer, Paper,
     Table, TableHead, TableRow, TableCell, TableBody, Pagination, Menu, MenuItem, Dialog, DialogContent,
@@ -22,9 +22,16 @@ const Car_management = () => {
     const [selectedIds, setSelectedIds] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
     const [userData, setUserData] = useState([]);
+    const [value, setValue] = useState('')
     const [loading, setLoading] = useState(false)
     const [listImage, setListImage] = useState([]);
     const [isDeleteDisabled, setIsDeleteDisabled] = useState(true);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [pageSize, setPageSize] = useState(25);
+    const [total, setTotal] = useState([1])
+    const [page, setPage] = useState(1)
+
+    const pageSizeOptions = [25, 50, 100];
 
     const initValueFilter = {
         keyword: '',
@@ -33,6 +40,24 @@ const Car_management = () => {
     }
 
     const [valueFilter, setValueFilter] = useState(initValueFilter)
+
+    const handleOpenMenu = event => {
+      setAnchorEl(event.currentTarget)
+    }
+
+    const handleCloseMenu = () => {
+      setAnchorEl(null)
+    }
+
+    const handleSelectPageSize = size => {
+      setPageSize(size)
+      setPage(1)
+      handleCloseMenu()
+    }
+
+    const handleFilter = useCallback(val => {
+      setValue(val)
+    }, [])
 
     useEffect(() => {
 
@@ -168,9 +193,8 @@ const Car_management = () => {
     return Swal.fire({ ...defaultProps, ...options })
   }
 
-  useEffect(() => {
+
     const fetchFilteredOrAllUsers = async () => {
-        setLoading(true);
         try {
             const token = localStorage.getItem(authConfig.storageTokenKeyName);
             
@@ -179,9 +203,9 @@ const Car_management = () => {
                     Authorization: `Bearer ${token}`
                 },
                 params: {
-                    keyword: keyword,
-                    page: valueFilter.page,
-                    limit: valueFilter.limit,
+                    keyword: value,
+                    page: page,
+                    limit: pageSize,
                 }
             };
 
@@ -207,8 +231,9 @@ const Car_management = () => {
         }
     };
 
-    fetchFilteredOrAllUsers();
-}, [keyword]);
+useEffect(() => {
+  fetchFilteredOrAllUsers()
+}, [page, pageSize, total, value])
 
 const handleDelete = idDelete => {
     showAlertConfirm({
@@ -332,15 +357,17 @@ const Img = React.memo(props => {
                                         component={Link}
                                         href={`/pages/car_management/detail/add`}
                                         >
-                                            <Icon icon="tabler:plus" />Thêm mới
+                                            <Icon icon="tabler:plus" />
+                                            Thêm mới
+
                                         </Button>
                                     </Box>
                                 </Grid>
                                 <Grid item>
                                     <CustomTextField
 
-                                        value={keyword}
-                                        onChange={(e) => setKeyword(e.target.value)}
+                                        value={value}
+                                        onChange={e => handleFilter(e.target.value)}
                                         placeholder='Search…'
                                         InputProps={{
                                             startAdornment: (
@@ -405,11 +432,15 @@ const Img = React.memo(props => {
                                             </TableCell>
                                             <TableCell>{index + 1}</TableCell>
                                             <TableCell>
-                                                <Img
-                                                    src={buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${user.mainImageId}`)}
-                                                    style={{ maxWidth: '91px', height: '56px', minWidth: '56px' }}
-                                                />
-                                            </TableCell>
+                                          {user && user.mainImageId.length > 0 ? (
+                                              <Img
+                                                  src={buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${user.mainImageId}`)}
+                                                  style={{ maxWidth: '91px', height: '56px', minWidth: '56px' }}
+                                              />
+                                          ) : (
+                                              <Img src={`data:image/svg+xml;utf8,${encodeURIComponent(MaskGroup)}`} alt="Placeholder Image" />
+                                          )}
+                                      </TableCell>
                                             <TableCell>{user.name}</TableCell>
                                             <TableCell>{user.lastAppearance}</TableCell>
                                             <TableCell>
@@ -440,8 +471,30 @@ const Img = React.memo(props => {
                                         </TableCell>
                                     </TableRow>
                                 )}
+                                
                             </TableBody>
+                            
                         </Table>
+                        <br></br>
+                                <Grid container spacing={2} style={{ padding: 10 }}>
+                                  <Grid item xs={3}></Grid>
+                                  <Grid item xs={1.5} style={{ padding: 0,marginLeft:'12%' }}>
+                                    <IconButton onClick={handleOpenMenu}>
+                                      <Icon icon='tabler:selector' />
+                                      <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
+                                    </IconButton>
+                                    <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+                                      {pageSizeOptions.map(size => (
+                                        <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
+                                          {size}
+                                        </MenuItem>
+                                      ))}
+                                    </Menu>
+                                  </Grid>
+                                  <Grid item xs={6}>
+                                    <Pagination count={total} color='primary' onChange={(event, page) => handlePageChange(page)} />
+                                  </Grid>
+                                </Grid>
                     </Grid>
                     </Card>
                 </Grid>
@@ -450,5 +503,17 @@ const Img = React.memo(props => {
         </>
     );
 }
+
+const MaskGroup = `<svg width="21" height="23" viewBox="0 0 193 173" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0)">
+<path d="M176.833 147.216C154.238 134.408 126.747 128.909 123.96 120.697C121.173 112.485 120.571 104.423 123.132 98.3208C125.692 92.2183 128.705 92.9717 130.211 86.1911C130.211 86.1911 133.977 86.9445 136.99 82.4242C140.003 77.9038 140.756 70.3698 140.756 66.6029C140.756 62.8359 135.484 60.5757 135.484 60.5757C135.484 60.5757 140.756 46.2612 137.743 31.9467C134.73 17.6322 124.939 -0.449244 92.553 1.05755V1.28356C66.1168 2.71501 57.6813 18.9883 54.8945 32.1727C51.8819 46.4872 57.1541 60.8017 57.1541 60.8017C57.1541 60.8017 51.8819 63.0619 51.8819 66.8289C51.8819 70.5959 52.635 78.1298 55.6477 82.6502C58.6604 87.1705 62.4262 86.4171 62.4262 86.4171C63.9326 93.1977 66.9453 92.4443 69.506 98.5468C72.0668 104.649 71.4643 112.786 68.6775 120.923C65.8908 129.059 38.4001 134.634 15.8051 147.442C-6.79001 160.25 -4.5305 173.058 -4.5305 173.058L197.319 172.907C197.168 172.831 199.428 160.024 176.833 147.216Z" fill="#797979"/>
+</g>
+<defs>
+<clipPath id="clip0">
+<rect width="202" height="172" fill="white" transform="translate(-4.75635 0.982422)"/>
+</clipPath>
+</defs>
+</svg>
+`
 
 export default Car_management

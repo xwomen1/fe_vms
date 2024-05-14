@@ -33,44 +33,45 @@ const dataDailyDefault = [
   },
   {
     label: 'Thứ 2',
-    StringValue: 'MONDAY',
+    dayOfWeek: 'MONDAY',
     value: 2,
   },
   {
     label: 'Thứ 3',
-    StringValue: 'TUESDAY',
+    dayOfWeek: 'TUESDAY',
     value: 3,
   },
   {
     label: 'Thứ 4',
-    StringValue: 'WEDNESDAY',
+    dayOfWeek: 'WEDNESDAY',
     value: 4,
   },
   {
     label: 'Thứ 5',
-    StringValue: 'THURSDAY',
+    dayOfWeek: 'THURSDAY',
     value: 5,
   },
   {
     label: 'Thứ 6',
-    StringValue: 'FRIDAY',
+    dayOfWeek: 'FRIDAY',
     value: 6,
   },
   {
     label: 'Thứ 7',
-    StringValue: 'SATURDAY',
+    dayOfWeek: 'SATURDAY',
     value: 7,
   },
   {
     label: 'CN',
-    StringValue: 'SUNDAY',
+    dayOfWeek: 'SUNDAY',
     value: 8,
   },
 ]
 
-const Schedule = ({ show, onClose, valueFilter, callback, direction }) => {
+const Schedule = ({ show, onClose, valueFilter, callback, direction, data }) => {
   const [loading, setLoading] = useState(false)
   const [dataDaily, setDataDaily] = useState([])
+  const [detail, setDetail] = useState(null)
   const [dataDailyState, setDataDailyState] = useState(dataDailyDefault)
 
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -85,9 +86,47 @@ const Schedule = ({ show, onClose, valueFilter, callback, direction }) => {
 
   const {
     control,
+    reset,
     handleSubmit,
     formState: { errors }
   } = useForm({})
+
+  useEffect(() => {
+    setDetail(data)
+  }, [data])
+
+  useEffect(() => {
+    if (detail) {
+      setDetailFormValue()
+    }
+  }, [detail])
+
+  const setDetailFormValue = () => {
+    reset(detail)
+  }
+
+  const transformCalendarDays = (calendarDays) => {
+
+    return calendarDays.map((day) => {
+      const { dayOfWeek, timePeriods } = day
+      const value = dataDailyDefault.find((item) => item.dayOfWeek === dayOfWeek)?.value || 1
+
+      return {
+        label: value === 1 ? '' : value === 8 ? 'CN' : `Thứ ${value}`,
+        dayOfWeek,
+        value,
+        timePeriods,
+      }
+    })
+  }
+
+  useEffect(() => {
+    if (detail) {
+      const transformedData = transformCalendarDays(detail)
+      setDataDailyState(transformedData)
+      setDataDaily(transformedData)
+    }
+  }, [detail])
 
   const onReset = (values) => {
     var detail = {}
@@ -96,8 +135,27 @@ const Schedule = ({ show, onClose, valueFilter, callback, direction }) => {
   }
 
   const onSubmit = (values) => {
-    var detail = { ...values }
-    callback(detail)
+
+    // if (values.calendarDays && Array.isArray(values.calendarDays)) {
+    //   const validCalendarDays = values.calendarDays
+    //     .filter((day) => day.dayOfWeek && day.timePeriods && Array.isArray(day.timePeriods))
+    //     .map((day) => {
+    //       return {
+    //         dayOfWeek: day.dayOfWeek,
+    //         timePeriods: day.timePeriods.map((timePeriod) => {
+    //           return {
+    //             endTimeInMinute: timePeriod.endTimeInMinute,
+    //             startTimeInMinute: timePeriod.startTimeInMinute,
+    //           };
+    //         }),
+    //       };
+    //     });
+    //   values.calendarDays = validCalendarDays;
+    // } else {
+    //   values.calendarDays = [];
+    // }
+
+    callback(values)
     onClose()
   }
 
@@ -133,39 +191,39 @@ const Schedule = ({ show, onClose, valueFilter, callback, direction }) => {
                   name='calendarDays'
                   control={control}
                   render={({ field: { value, onChange } }) => (
-                    <Daily
-                      callbackOfDaily={(v) => {
-                        onChange(v)
-                        setDataDaily(v)
-                        setDataDailyState(v)
-                      }}
-                      dataDailyProps={dataDailyState}
-                      error={Boolean(errors.calendarDays)}
-                      aria-describedby='validation-basic-last-name'
-                      {...(errors.calendarDays && { helperText: 'Trường này bắt buộc' })}
-                    />
+                    <div>
+                      <Daily
+                        callbackOfDaily={(v) => {
+                          onChange(v)
+                          setDataDaily(v)
+                          setDataDailyState(v)
+                        }}
+                        dataDailyProps={dataDailyState}
+                        error={Boolean(errors.calendarDays)}
+                        aria-describedby='validation-basic-last-name'
+                        {...(errors.calendarDays && { helperText: 'Trường này bắt buộc' })}
+                      />
+                    </div>
                   )}
                 />
-              </Grid>
-              <Grid item xs={12}>
-                <DialogActions
-                  sx={{
-                    justifyContent: 'right',
-                    px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
-                    pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
-                  }}
-                >
-                  <Button variant='tonal' color='secondary' onClick={onClose}>
-                    Hủy
-                  </Button>
-                  <Button type='submit' variant='contained' onClick={handleSubmit(onSubmit)}>
-                    Thêm
-                  </Button>
-                </DialogActions>
               </Grid>
             </Grid>
           </form>
         </DialogContent>
+        <DialogActions
+          sx={{
+            justifyContent: 'right',
+            px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
+            pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
+          }}
+        >
+          <Button variant='tonal' color='secondary' onClick={onClose}>
+            Hủy
+          </Button>
+          <Button type='submit' variant='contained' onClick={handleSubmit(onSubmit)}>
+            Thêm
+          </Button>
+        </DialogActions>
       </Dialog>
     </Card>
   )

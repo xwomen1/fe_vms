@@ -451,19 +451,18 @@ const EditFaceManagement = () => {
                                                     >
                                                         {`Hoặc`}
                                                     </p>
-                                                    <button
-                                                        style={{
-                                                            background: '#00554A',
-                                                            boxShadow: '0px 4px 10px rgba(16, 156, 241, 0.24)',
-                                                            borderRadius: '8px',
-                                                            width: '104px',
-                                                            height: '40px',
-                                                            border: 'none',
-                                                            color: '#fff',
+                                                    <Button
+                                                    style={{
+                                                        boxShadow: '0px 4px 10px rgba(16, 156, 241, 0.24)',
+                                                        borderRadius: '8px',
+                                                        width: '200px',
+                                                        height: '50px',
                                                         }}
+                                                        variant='contained'
+                                                        color='primary'
                                                     >
                                                         {`Tải ảnh lên`}
-                                                    </button>
+                                                    </Button>
                                                 </div>
                                             </div>
                                             <FileUploader
@@ -485,7 +484,10 @@ const EditFaceManagement = () => {
                                             {listImage.length < 5 && (
                                                 <div className="add-btn card-img" id="dropzone-external-2">
                                                     <div style={{ alignSelf: 'center', margin: 'auto',marginLeft:'100px' }}>
-                                                    <Icon icon='tabler:plus' />
+                                                    <Icon 
+                                                    color='primary' 
+                                                    icon='tabler:plus' 
+                                                    />
                                                     </div>
                                                     <FileUploader
                                                         style={{opacity:'0'}}

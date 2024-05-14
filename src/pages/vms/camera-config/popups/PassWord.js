@@ -1,13 +1,16 @@
 import React, { useState } from 'react'
 import CustomTextField from 'src/@core/components/mui/text-field'
-import { Button, Grid } from '@mui/material'
+import { Button, Grid, IconButton, InputAdornment } from '@mui/material' //Thêm InputAdornment
 import axios from 'axios'
 import authConfig from 'src/configs/auth'
 import Swal from 'sweetalert2'
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
+import VisibilityIcon from '@mui/icons-material/Visibility'
 
 const PassWord = ({ onClose, camera }) => {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false) //Thêm state cho việc hiển thị mật khẩu
   const [loading, setLoading] = useState(false)
 
   const handlePasswordChange = event => {
@@ -16,6 +19,11 @@ const PassWord = ({ onClose, camera }) => {
 
   const handleConfirmPasswordChange = event => {
     setConfirmPassword(event.target.value)
+  }
+
+  const toggleShowPassword = () => {
+    //Hàm xử lý hiển thị mật khẩu
+    setShowPassword(!showPassword)
   }
 
   const saveChange = async () => {
@@ -58,14 +66,39 @@ const PassWord = ({ onClose, camera }) => {
       <Grid container spacing={2} style={{ minWidth: 500 }}>
         <Grid container item style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
           <Grid item xs={12}>
-            <CustomTextField label='Mật khẩu' type='password' onChange={handlePasswordChange} fullWidth />
+            <CustomTextField
+              label='Mật khẩu'
+              type={showPassword ? 'text' : 'password'}
+              onChange={handlePasswordChange}
+              fullWidth
+              InputProps={{
+                //Thêm InputProps để thêm IconButton
+                endAdornment: (
+                  <InputAdornment position='end'>
+                    <IconButton onClick={toggleShowPassword} edge='end'>
+                      {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
+            />
           </Grid>
           <Grid item xs={12}>
             <CustomTextField
               label='Xác nhận mật khẩu'
-              type='password'
+              type={showPassword ? 'text' : 'password'}
               onChange={handleConfirmPasswordChange}
               fullWidth
+              InputProps={{
+                //Thêm InputProps để thêm IconButton
+                endAdornment: (
+                  <InputAdornment position='end'>
+                    <IconButton onClick={toggleShowPassword} edge='end'>
+                      {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
             />
           </Grid>
         </Grid>

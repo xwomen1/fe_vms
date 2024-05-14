@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react'
-import { Grid } from '@mui/material'
+import { forwardRef, useEffect, useState } from 'react'
+import { Card, Fade, Grid, IconButton, Typography } from '@mui/material'
+import Icon from 'src/@core/components/icon'
+
 import Tab from '@mui/material/Tab'
 import TabPanel from '@mui/lab/TabPanel'
 import TabContext from '@mui/lab/TabContext'
@@ -12,6 +14,26 @@ import DDNs from './DDNS'
 import Port from './Port'
 
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Checkbox } from '@mui/material'
+import { Box } from 'devextreme-react'
+
+const Transition = forwardRef(function Transition(props, ref) {
+  return <Fade ref={ref} {...props} />
+})
+
+const CustomCloseButton = styled(IconButton)(({ theme }) => ({
+  top: 0,
+  right: 0,
+  color: 'grey.500',
+  position: 'absolute',
+  boxShadow: theme.shadows[2],
+  transform: 'translate(10px, -10px)',
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: `${theme.palette.background.paper} !important`,
+  transition: 'transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out',
+  '&:hover': {
+    transform: 'translate(7px, -5px)'
+  }
+}))
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   borderBottom: '0 !important',
@@ -39,8 +61,9 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
 
 const Network = ({ open, onClose, camera }) => {
   const [cameras, setCamera] = useState([])
-  const [nic, setNic] = useState([])
+  const [mtu, setMTU] = useState([])
   const [value, setValue] = useState('1')
+  const [cameraId, setCameraId] = useState('1')
 
   const handleChange = (event, newValue) => {
     setValue(newValue)
@@ -70,7 +93,9 @@ const Network = ({ open, onClose, camera }) => {
           )
 
           setCamera(response.data)
-          setNic(response.data.nicType.name)
+          setCameraId(response.data.id)
+          setMTU(response.data.mtu)
+          console.log(response.data)
         }
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -81,41 +106,39 @@ const Network = ({ open, onClose, camera }) => {
   }, [camera])
 
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog
+      fullWidth
+      maxWidth='md'
+      scroll='body'
+      open={open}
+      TransitionComponent={Transition}
+      sx={{ '& .MuiDialog-paper': { overflow: 'visible' } }}
+    >
+      {' '}
       <DialogTitle>Cấu hình mạng</DialogTitle>
       <DialogContent>
+        <CustomCloseButton onClick={onClose}>
+          <Icon icon='tabler:x' fontSize='1.25rem' />
+        </CustomCloseButton>
         <TabContext value={value}>
-          <Grid>
-            {' '}
+          <Grid item>
             <TabList onChange={handleChange} aria-label='customized tabs example'>
               <Tab value='1' label='TCP/IP' />
               <Tab value='2' label='DDNS' />
               <Tab value='3' label='PORT' />
-              {/* <Tab value='4' label='NTP' /> */}
             </TabList>
           </Grid>
           <TabPanel value='1'>
-            {' '}
-            <TCP camera={cameras} nic={nic} />
+            <TCP cameras={cameras} mtu={mtu} cameraId={cameraId} onClose={onClose} />
           </TabPanel>
           <TabPanel value='2'>
-            {' '}
-            <DDNs camera={cameras} />
+            <DDNs cameras={cameras} onClose={onClose} />
           </TabPanel>
           <TabPanel value='3'>
-            {' '}
-            <Port nvrs={cameras} />
+            <Port cameras={cameras} onClose={onClose} />
           </TabPanel>
-          {/* <TabPanel value='4'>
-            {' '}
-            <NTP nvrs={cameras} />
-          </TabPanel> */}
         </TabContext>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCancel}>Cancel</Button>
-        <Button>OK</Button>
-      </DialogActions>
     </Dialog>
   )
 }
