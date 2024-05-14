@@ -6,9 +6,13 @@ import {
   Checkbox,
   CircularProgress,
   DialogActions,
+  FormControl,
   Grid,
   IconButton,
+  InputLabel,
+  MenuItem,
   Paper,
+  Select,
   Table,
   TableBody,
   TableCell,
@@ -32,13 +36,20 @@ const Device = ({ onClose, camera }) => {
   const [rows, setRows] = useState([])
   const [channel, setChannel] = useState([])
   const [cameraGroup, setCameraGroup] = useState([])
+  const [regions, setRegions] = useState([])
+
   const [cameras, setCamera] = useState(null)
 
   const [cameraGroupSelect, setCameraGroupSelect] = useState({
     label: cameras?.cameraGroup?.name || '',
     value: cameras?.cameraGroup?.name || ''
   })
-  const [isOfflineSetting, setisOfflineSetting] = useState([])
+
+  const [regionsSelect, setRegionsSelect] = useState({
+    label: cameras?.regions?.name || '',
+    value: cameras?.regions?.name || ''
+  })
+  const [isOfflineSetting, setisOfflineSetting] = useState(false)
   const [lat, setLat] = useState(null)
   const [lng, setLng] = useState(null)
   const [cameraName, setCameraName] = useState(null)
@@ -93,8 +104,8 @@ const Device = ({ onClose, camera }) => {
     setIpAddress(event.target.value)
   }
 
-  const handleCheckboxChange = event => {
-    setisOfflineSetting(event.target.value)
+  const handleCheckboxChange = () => {
+    setisOfflineSetting(isOfflineSetting === true ? false : true)
   }
 
   const handleAddRow = () => {
@@ -128,6 +139,7 @@ const Device = ({ onClose, camera }) => {
           console.log(response.data)
           setLat(response.data.lat)
           setLng(response.data.long)
+          setisOfflineSetting(response.data.isOfflineSetting)
         }
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -161,7 +173,8 @@ const Device = ({ onClose, camera }) => {
         http: http,
         onvif: onvif,
         lat: lat.toString(),
-        long: lng.toString()
+        long: lng.toString(),
+        isOfflineSetting: isOfflineSetting
       }
 
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${camera}`, data, config)
@@ -187,7 +200,24 @@ const Device = ({ onClose, camera }) => {
       fetchNicTypes()
     }
   }
+
+  const handleComboboxFocusRegions = () => {
+    if (regions.length === 0) {
+      fetchRegions()
+    }
+  }
   const formatDDNS = ddns => <Checkbox checked={ddns} onChange={handleCheckboxChange} />
+
+  const channelOptions = [
+    { channel: 'ONVIF' },
+    { channel: 'IVI' },
+    { channel: 'HIKVISION' },
+    { channel: 'DAHUA' },
+    { channel: 'AXIS' },
+    { channel: 'BOSCH' },
+    { channel: 'HANWHA' },
+    { channel: 'PANASONIC' }
+  ]
 
   const fetchNicTypes = async () => {
     try {
@@ -220,8 +250,46 @@ const Device = ({ onClose, camera }) => {
     }
   }
 
+  const fetchRegions = async () => {
+    try {
+      setLoading(true)
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.get(
+        'https://sbs.basesystem.one/ivis/infrares/api/v0/regions?limit=25&page=1&parentID=abbe3f3c-963b-4d23-a766-42a8261607c3',
+        config
+      )
+
+      const nicTypes = response.data.map(item => ({
+        id: item.id,
+        name: item.name,
+        label: item.name,
+        value: item.value
+      }))
+      setRegions(nicTypes)
+      console.log(nicTypes)
+      if (nicTypes.length > 0) {
+        setRegionsSelect(nicTypes[0].value)
+      }
+    } catch (error) {
+      console.error('Error fetching NIC types:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleCameraGroupChange = (event, newValue) => {
     setCameraGroupSelect(newValue)
+  }
+
+  const handleRegionsChange = (event, newValue) => {
+    setRegionsSelect(newValue)
   }
 
   return (
@@ -283,24 +351,21 @@ const Device = ({ onClose, camera }) => {
           <Grid item xs={0.1}></Grid>
           <Grid item xs={3.9}>
             <Autocomplete
-              renderInput={params => (
-                <CustomTextField
-                  {...params}
-                  options={channel}
-                  getOptionLabel={option => option.channel}
-                  label='Giao thức'
-                  fullWidth
-                  onFocus={handleComboboxFocus}
-                />
-              )}
-              loading={loading}
-            />{' '}
+              options={channelOptions}
+              getOptionLabel={option => option.channel}
+              renderInput={params => <CustomTextField {...params} label='Giao thức' fullWidth />}
+            />
           </Grid>
+
           <Grid item xs={0.1}></Grid>
           <Grid item xs={4}>
             <Autocomplete
+              value={regionsSelect}
+              onChange={handleRegionsChange}
+              options={regions}
+              getOptionLabel={option => option.label}
               renderInput={params => <CustomTextField {...params} label='Vùng' fullWidth />}
-              loading={loading}
+              onFocus={handleComboboxFocusRegions}
             />{' '}
           </Grid>
           <Grid item xs={3.9}>
@@ -318,7 +383,7 @@ const Device = ({ onClose, camera }) => {
           </Grid>
           <Grid item xs={0.1}></Grid>
           <Grid item xs={4}>
-            {formatDDNS(true)} thiết bị đang ngoại tuyến
+            {formatDDNS(isOfflineSetting)} thiết bị đang ngoại tuyến
           </Grid>
         </Grid>
         <Grid item xs={12}>
