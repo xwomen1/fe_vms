@@ -38,7 +38,7 @@ const navigation = () => {
           title: 'Báo cáo tháng',
           icon: 'tabler:id'
         },
-        
+
         // {
         //   path: '/pages/access-rights/list',
         //   title: 'Quyền truy cập',
@@ -80,6 +80,10 @@ const navigation = () => {
         {
           title: 'Sự kiện AI',
           path: '/vms/events'
+        },
+        {
+          title: 'Cấu hình AI',
+          path: '/vms/ai-config'
         },
         {
           title: 'Sự cố hệ thống',
