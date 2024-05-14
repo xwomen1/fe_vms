@@ -68,6 +68,7 @@ const Add = ({ apiData }) => {
   const [openPopupResponse, setOpenPopupResponse] = useState(false)
   const [loading, setLoading] = useState(false)
   const [selectedNvrId, setSelectedNvrId] = useState(null)
+  const [idBox, setIdBox] = useState(null)
 
   const fetchNicTypes = async () => {
     try {
@@ -84,13 +85,15 @@ const Add = ({ apiData }) => {
 
       const nicTypes = response.data.map(item => ({
         label: item.name,
-        value: item.value
+        value: item.value,
+        id: item.id
       }))
       setNVR(nicTypes)
 
       // Set selectedNicType here based on your business logic
       if (nicTypes.length > 0) {
-        setSelectedNVR(nicTypes[0].value) // Set it to the first value in the array, or adjust as needed
+        setSelectedNVR(nicTypes[0].value)
+        setIdBox(nicTypes[0].id)
       }
     } catch (error) {
       console.error('Error fetching NIC types:', error)
@@ -111,7 +114,8 @@ const Add = ({ apiData }) => {
         url,
         host,
         userName,
-        passWord
+        passWord,
+        idBox: selectNVR.id
       }
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -202,6 +206,7 @@ const Add = ({ apiData }) => {
 
   const handleAddPClick = cameraId => {
     setOpenPopupP(true)
+    setIdBox(cameraId)
     setSelectedNvrId(cameraId)
   }
 
@@ -251,6 +256,7 @@ const Add = ({ apiData }) => {
 
   const handleDDNSChange = (event, newValue) => {
     setSelectedNVR(newValue)
+    setIdBox(newValue.value)
   }
   useEffect(() => {
     setSelectedNVR({
