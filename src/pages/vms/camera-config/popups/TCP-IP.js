@@ -135,7 +135,7 @@ const TCP = ({ cameras, onClose, mtu }) => {
         multicastAddress: mutiAddress || cameras.multicastAddress,
         prefDNS: ddnsServer || cameras.prefDNS,
         alterDNS: alter || cameras.alterDNS,
-        nic: {
+        nicType: {
           id: selectedNicType.id || cameras.nicType.id,
           name: selectedNicType.name || cameras.nicType.name,
           channel: selectedNicType.channel
@@ -143,7 +143,7 @@ const TCP = ({ cameras, onClose, mtu }) => {
       }
 
       await axios.put(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/{idNetWorkConfig}?idNetWorkConfig=${cameras.id}&NetWorkConfigType=tcpip`,
+        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/{idNetWorkConfig}?idNetWorkConfig=${cameras.id}`,
         data,
         config
       )
@@ -156,7 +156,7 @@ const TCP = ({ cameras, onClose, mtu }) => {
       setLoading(false)
       onClose()
 
-      Swal.fire('Đã xảy ra lỗi', error.message, error.response?.data?.message)
+      Swal.fire(error.message, error.response?.data?.message)
       console.log(error.response?.data?.message)
     } finally {
       setLoading(false)
