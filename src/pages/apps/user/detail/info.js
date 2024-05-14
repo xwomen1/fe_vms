@@ -16,7 +16,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Autocomplete
+  Autocomplete,
+  Paper
 } from '@mui/material'
 import Icon from 'src/@core/components/icon'
 import Box from '@mui/material/Box'
@@ -229,7 +230,7 @@ const UserDetails = () => {
 
       return
     }
-   
+
     if (userGroups.length === 0) {
       Swal.fire('Lỗi!', 'Đơn vị người dùng không được để trống.', 'error')
 
@@ -242,7 +243,7 @@ const UserDetails = () => {
       return
     }
 
-    const phoneRegex = /^\d+$/;
+    const phoneRegex = /^\d+$/
     if (!phoneRegex.test(phoneNumber)) {
       Swal.fire('Lỗi!', 'Số điện thoại không hợp lệ.', 'error')
 
@@ -268,7 +269,7 @@ const UserDetails = () => {
         {
           ...params,
           userId: userId,
-          fullName: fullNameValue ,
+          fullName: fullNameValue,
           email: email,
           phoneNumber: phoneNumber,
           identityNumber: identityNumber,
@@ -292,7 +293,7 @@ const UserDetails = () => {
       console.error('Error updating user details:', error)
       Swal.fire('Lỗi!', error.response.data.message, 'error')
     }
-    fetchUserData() 
+    fetchUserData()
   }
 
   const convertTimeArrayToString = timeArray => {
@@ -438,6 +439,12 @@ const UserDetails = () => {
     const updatedRows = [...groups]
     updatedRows.splice(index, 1)
     setGroup(updatedRows)
+  }
+
+  const handleDeleteRow1 = index => {
+    const updatedRows = [...policies]
+    updatedRows.splice(index, 1)
+    setPolicies(updatedRows)
   }
   useEffect(() => {
     const fetchGroupData = async () => {
@@ -666,23 +673,23 @@ const UserDetails = () => {
     <div>
       {user ? (
         <div>
-          <Grid container spacing={3}>
+          <Grid container spacing={3} component={Paper}>
             <Grid style={{ borderRadius: '0.05%', marginLeft: 10 }}>
               <Grid container spacing={2}>
-                <h3 style={{ color: 'black', marginLeft: '1%' }}> Thông tin người dùng</h3>
+                <h2 style={{ color: 'black', marginLeft: '1%' }}> Thông tin người dùng</h2>
               </Grid>
               <Grid container spacing={2}>
                 <div style={{ width: '80%' }}></div>
                 {/* {editing ? ( */}
-                  <>
-                    <Button variant='contained' onClick={saveChanges} sx={{ marginRight: '10px' }}>
-                      Lưu
-                    </Button>
-                    <Button variant='contained' onClick={handleCancel}>
-                      Huỷ
-                    </Button>
-                  </>
-                
+                <>
+                  <Button variant='contained' onClick={handleCancel} sx={{ marginRight: '10px' }}>
+                    Huỷ
+                  </Button>
+                  <Button variant='contained' onClick={saveChanges}>
+                    Lưu
+                  </Button>
+                </>
+
                 {/* )} */}
               </Grid>
               <Grid container spacing={2}>
@@ -1055,7 +1062,7 @@ const UserDetails = () => {
 
                             {showPlusColumn && (
                               <TableCell align='center'>
-                                <IconButton onClick={() => handleDeleteRowPolicy(piId, policies.policyId)}>
+                                <IconButton onClick={() => handleDeleteRow1(index)}>
                                   <Icon icon='bi:trash' />
                                 </IconButton>
                               </TableCell>
