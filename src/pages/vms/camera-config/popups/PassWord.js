@@ -1,17 +1,32 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import CustomTextField from 'src/@core/components/mui/text-field'
-import { Button, Grid, IconButton, InputAdornment } from '@mui/material' //Thêm InputAdornment
+import {
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  IconButton,
+  InputAdornment
+} from '@mui/material' //Thêm InputAdornment
 import axios from 'axios'
 import authConfig from 'src/configs/auth'
 import Swal from 'sweetalert2'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import VisibilityIcon from '@mui/icons-material/Visibility'
+import { makeStyles } from '@material-ui/core/styles'
 
 const PassWord = ({ onClose, camera }) => {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false) //Thêm state cho việc hiển thị mật khẩu
   const [loading, setLoading] = useState(false)
+  const [ipAddress, setIpAddress] = useState('')
+  const [httpPort, setHttpPort] = useState('')
+  const [username, setUserName] = useState('')
+  const classes = useStyles()
 
   const handlePasswordChange = event => {
     setPassword(event.target.value)
@@ -25,6 +40,33 @@ const PassWord = ({ onClose, camera }) => {
     //Hàm xử lý hiển thị mật khẩu
     setShowPassword(!showPassword)
   }
+  useEffect(() => {
+    const fetchGroupData = async () => {
+      try {
+        if (camera != null) {
+          // Kiểm tra xem popup Network đã mở chưa
+          const token = localStorage.getItem(authConfig.storageTokenKeyName)
+          console.log('token', token)
+
+          const config = {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+
+          const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${camera}`, config)
+          setIpAddress(response.data.ipAddress)
+          setHttpPort(response.data.httpPort)
+          setUserName(response.data.username)
+          console.log(response.data)
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+
+    fetchGroupData()
+  }, [camera])
 
   const saveChange = async () => {
     setLoading(true)
@@ -48,7 +90,10 @@ const PassWord = ({ onClose, camera }) => {
       const response = await axios.put(
         `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/changepassword?idCamera=${camera}`,
         {
-          password: password
+          password: password,
+          username: username,
+          httpPort: httpPort,
+          ipAddress: ipAddress
         },
         config
       )
@@ -56,14 +101,16 @@ const PassWord = ({ onClose, camera }) => {
       setLoading(false)
     } catch (error) {
       console.error('Error updating user details:', error)
-      Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi cập nhật dữ liệu.', 'error')
+      Swal.fire(error.message, error.response?.data?.message)
       setLoading(false)
     }
   }
 
   return (
-    <div style={{ width: '100%' }}>
-      <Grid container spacing={2} style={{ minWidth: 500 }}>
+    <div style={{ width: '100%' }} className={classes.loadingContainer}>
+      <Grid container spacing={2} style={{ minWidth: 500 }} className={classes.loadingContainer}>
+        {loading && <CircularProgress className={classes.circularProgress} />}
+
         <Grid container item style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
           <Grid item xs={12}>
             <CustomTextField
@@ -103,11 +150,27 @@ const PassWord = ({ onClose, camera }) => {
           </Grid>
         </Grid>
       </Grid>
-      <br />
-      <Button onClick={onClose}>Cancel</Button>
-      <Button onClick={saveChange}>OK</Button>
+      <DialogActions>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={saveChange}>OK</Button>
+      </DialogActions>
     </div>
   )
 }
+
+const useStyles = makeStyles(() => ({
+  loadingContainer: {
+    position: 'relative',
+    minHeight: '100px',
+    zIndex: 0
+  },
+  circularProgress: {
+    position: 'absolute',
+    top: '40%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    zIndex: 99999
+  }
+}))
 
 export default PassWord
