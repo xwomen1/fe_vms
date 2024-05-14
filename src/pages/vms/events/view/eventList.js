@@ -442,7 +442,7 @@ const EventList = () => {
                                     deviceList?.rows.slice(0, pageSize).map((row, index) => {
                                         return (
                                             <TableRow hover tabIndex={-1} key={index}>
-                                                <TableCell>{(page - 1) * pageSize + index + 1}</TableCell>
+                                                <TableCell>{index + 1}</TableCell>
                                                 {columns.map(column => {
                                                     const value = row[column.field]
 
