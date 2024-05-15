@@ -21,37 +21,33 @@ const OrganizationalStructure = () => {
   const [childData, setChildData] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
   const [openPopupId, setOpenPopupId] = useState(null);
-  const [openPopupDetail, setOpenPopupDetail] = useState(false)
+  const [openPopupDetail, setOpenPopupDetail] = useState(false);
   const [openPopupAdd, setOpenPopupAdd] = useState(false);
-  const [showPlusIcon, setShowPlusIcon] = useState(false);
+  const [selectedNode, setSelectedNode] = useState(null);
 
-  const handleOpenPopup = id => {
+  const handleSelectNode = (nodeId) => {
+    if (nodeId !== selectedNode) {
+      setSelectedNode(nodeId);
+    }
+  };
+
+  const handleOpenPopup = (id) => {
     setOpenPopupId(id);
     setOpenPopup(true);
   };
 
-
-  const handleOpenPopupDetail = id => {
-    setOpenPopupId(id)
-    setOpenPopupDetail(true)
-  }
-
-  const handleCloseDetail = () => {
-    setOpenPopupDetail(false)
-  }
-
-  const handleClose = () => {
-    setOpenPopup(false);
+  const handleOpenPopupDetail = (id) => {
+    setOpenPopupId(id);
+    setOpenPopupDetail(true);
   };
 
-  const handleCloseAdd = () => {
-    setOpenPopupAdd(false);
-  };
+  const handleCloseDetail = () => setOpenPopupDetail(false);
 
-  const handleOpenAdd = () => {
-    setOpenPopupAdd(true);
-  };
+  const handleClose = () => setOpenPopup(false);
 
+  const handleCloseAdd = () => setOpenPopupAdd(false);
+
+  const handleOpenAdd = () => setOpenPopupAdd(true);
 
   const fetchFilter = async () => {
     try {
@@ -59,18 +55,16 @@ const OrganizationalStructure = () => {
 
       const config = {
         headers: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         params: {
           limit: 10,
           page: 1,
-          keyword: ''
-        }
+          keyword: '',
+        },
       };
       const response = await axios.get('https://sbs.basesystem.one/ivis/infrares/api/v0/regions/adults', config);
       setInfra(response.data);
-
-      // Fetch child data for the first tab after infra data is loaded
       if (response.data.length > 0) {
         fetchChildData(response.data[0].id);
         fetchTreeData(response.data[0].id);
@@ -85,7 +79,6 @@ const OrganizationalStructure = () => {
     setSelectedTab(0);
     await fetchChildData(infra[0]?.id);
   };
-  
 
   const fetchChildData = async (parentId) => {
     try {
@@ -93,15 +86,11 @@ const OrganizationalStructure = () => {
 
       const response = await axios.get(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`, {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-
       setChildData(response.data);
-      setTreeData((prevTreeData) => ({
-        ...prevTreeData,
-        [parentId]: response.data
-      }));
+      setTreeData((prevTreeData) => ({...prevTreeData, [parentId]: response.data }));
     } catch (error) {
       console.error('Error fetching children:', error);
     }
@@ -119,69 +108,53 @@ const OrganizationalStructure = () => {
   };
 
   const fetchChildrenById = async (parentId) => {
-    try {
+   try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName);
 
       const response = await axios.get(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`, {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-
-      return response.data;
+      
+return response.data;
     } catch (error) {
       console.error('Error fetching children:', error);
-
-      return [];
+      
+return [];
     }
   };
 
   const handleFetchChildren = async (nodeId) => {
-    const isExpanded = expandedNodes.includes(nodeId);
-    if (isExpanded) {
-      setExpandedNodes(expandedNodes.filter(id => id !== nodeId));
-    } else {
-      const childrenData = await fetchChildrenById(nodeId);
-      setTreeData((prevTreeData) => ({
-        ...prevTreeData,
-        [nodeId]: childrenData
-      }));
-      setExpandedNodes([...expandedNodes, nodeId]);
-    }
-    setShowPlusIcon(true);
+    const childrenData = await fetchChildrenById(nodeId);
+    setTreeData((prevTreeData) => ({...prevTreeData, [nodeId]: childrenData }));
+    setExpandedNodes([...expandedNodes, nodeId]);
   };
 
-  const renderTreeItems = (nodes) => {
-    return nodes.map((node) => {
-      const hasChildren = treeData[node.id] && treeData[node.id].length > 0;
-  
-      return (
-        <TreeItem
-          key={node.id}
-          nodeId={node.id}
-          label={node.name}
-          sx={{ marginLeft: '3%', marginTop: '4%' }}
-          icon={
-            node.isParent ? (
-              <IconButton style={{ padding: '0px' }} onClick={() => handleFetchChildren(node.id)}>
-                <Icon icon={expandedNodes.includes(node.id) ? 'bi:chevron-down' : 'tabler:chevron-right'} />
-              </IconButton>
-            ) : null
-          }
-          labelIcon={
-            hasChildren && showPlusIcon ? (
-              <IconButton style={{ padding: '0px' }} onClick={() => handleFetchChildren(node.id)}>
-                <Icon icon="bi:plus" />
-              </IconButton>
-            ) : null
-          }
-        >
-          {hasChildren && renderTreeItems(treeData[node.id])}
-        </TreeItem>
-      );
-    });
-  };
-  
+  const renderTreeItems = (nodes) => nodes.map((node) => (
+    <TreeItem
+      key={node.id}
+      nodeId={node.id}
+      label={
+        <Box display="flex" alignItems="center">
+          <Typography>{node.name}</Typography>
+          <IconButton size="small" onClick={() => handleAddChild(node.id)}>
+            <Icon icon="bi:plus" />
+          </IconButton>
+        </Box>
+      }
+      sx={{ marginLeft: '3%', marginTop: '4%' }}
+      icon={
+        node.isParent? (
+          <IconButton size="small" onClick={() => handleFetchChildren(node.id)}>
+            <Icon icon={expandedNodes.includes(node.id)? 'bi:chevron-down' : 'tabler:chevron-right'} />
+          </IconButton>
+        ) : null
+      }
+    >
+      {treeData[node.id] && renderTreeItems(treeData[node.id])}
+    </TreeItem>
+  ));
 
   const currentTabInfra = infra[selectedTab] || {};
   const rootNodes = treeData[currentTabInfra.id] || [];
@@ -197,12 +170,12 @@ const OrganizationalStructure = () => {
           </Tabs>
           <Box display="flex" alignItems="center">
             <Typography variant="body2" style={{ marginRight: '16px' }}>
-              <Button variant='contained' onClick={() => handleOpenAdd()}>
+              <Button variant="contained" onClick={handleOpenAdd}>
                 Thêm
               </Button>
             </Typography>
             <Typography variant="body2">
-              <Button variant='contained' onClick={() => handleOpenPopup(infra[selectedTab]?.id)}>
+              <Button variant="contained" onClick={() => handleOpenPopup(infra[selectedTab]?.id)}>
                 Xóa
               </Button>
             </Typography>
@@ -224,26 +197,26 @@ const OrganizationalStructure = () => {
           </Grid>
           <Grid item xs={9.5} style={{ display: 'flex', flexDirection: 'column' }}>
             <Paper elevation={3} style={{ padding: '16px', marginBottom: '16px' }}>
-            <Box onClick={() => handleOpenPopupDetail(currentTabInfra.id)}>
-              <CustomTextField
-                label='Tên'
-                type='text'
-                value={currentTabInfra.name}
-                fullWidth
-                style={{ marginBottom: '16px' }}
-              />
-            </Box>
+              <Box onClick={() => handleOpenPopupDetail(currentTabInfra.id)}>
+                <CustomTextField
+                  label="Tên"
+                  type="text"
+                  value={currentTabInfra.name}
+                  fullWidth
+                  style={{ marginBottom: '16px' }}
+                />
+              </Box>
 
               <CustomTextField
-                label='Mã'
-                type='text'
-                value={currentTabInfra.name}
+                label="Mã"
+                type="text"
+                value={currentTabInfra.type}
                 fullWidth
                 style={{ marginBottom: '16px' }}
               />
               <CustomTextField
-                label='Ghi chú'
-                type='text'
+                label="Ghi chú"
+                type="text"
                 value={currentTabInfra.detail}
                 fullWidth
               />
@@ -260,21 +233,22 @@ const OrganizationalStructure = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {childData.length > 0 && childData.map((child, index) => (
-                      <TableRow key={child.id}>
-                        <TableCell>{index + 1}</TableCell>
-                        <TableCell>{child.name}</TableCell>
-                        <TableCell>{child.name}</TableCell>
-                        <TableCell sx={{ padding: '16px' }}>
-                          <IconButton size='small'>
-                            <Icon icon='tabler:edit'  onClick={() => handleOpenPopupDetail(child.id)}  />
-                          </IconButton>
-                          <IconButton onClick={() => handleOpenPopup(child.id)}>
-                            <Icon icon='tabler:trash' />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {childData.length> 0 &&
+                      childData.map((child, index) => (
+                        <TableRow key={child.id}>
+                          <TableCell>{index + 1}</TableCell>
+                          <TableCell>{child.name}</TableCell>
+                          <TableCell>{child.type}</TableCell>
+                          <TableCell sx={{ padding: '16px' }}>
+                            <IconButton size="small">
+                              <Icon icon="tabler:edit" onClick={() => handleOpenPopupDetail(child.id)} />
+                            </IconButton>
+                            <IconButton onClick={() => handleOpenPopup(child.id)}>
+                              <Icon icon="tabler:trash" />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      ))}
                   </TableBody>
                 </Table>
               </TableContainer>
@@ -290,14 +264,13 @@ const OrganizationalStructure = () => {
           onSuccess={handleSuccess}
         />
       )}
-
       {openPopupAdd && (
-       <AddPopup
-        open={openPopupAdd}
-        onClose={handleCloseAdd}
-        onSuccess={handleSuccess}
-          />
-        )}
+        <AddPopup
+          open={openPopupAdd}
+          onClose={handleCloseAdd}
+          onSuccess={handleSuccess}
+        />
+      )}
       {openPopupDetail && (
         <DetailPopup
           open={openPopupDetail}
