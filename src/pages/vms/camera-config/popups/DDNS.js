@@ -6,6 +6,7 @@ import authConfig from 'src/configs/auth'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import { Grid, Checkbox, Autocomplete, DialogActions, Button, CircularProgress } from '@mui/material'
 import Swal from 'sweetalert2'
+import { makeStyles } from '@material-ui/core/styles'
 
 const DDNS = ({ cameras, onClose }) => {
   const [DDNSOption, setDDNS] = useState([])
@@ -16,6 +17,7 @@ const DDNS = ({ cameras, onClose }) => {
   const [userName, setUserName] = useState(cameras?.userName)
   const [password, setPassword] = useState(cameras?.password)
   const [confirm, setConfirm] = useState(cameras?.confirm)
+  const classes = useStyles()
 
   const defaultValue = cameras?.ddnsType?.name || ''
   const [loading, setLoading] = useState(false)
@@ -128,7 +130,7 @@ const DDNS = ({ cameras, onClose }) => {
       }
 
       await axios.put(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/{idNetWorkConfig}?idNetWorkConfig=${cameras.id}`,
+        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/{idNetWorkConfig}?idNetWorkConfig=${cameras.id}&NetWorkConfigType=ddns`,
         data,
         config
       )
@@ -160,8 +162,8 @@ const DDNS = ({ cameras, onClose }) => {
   const formatDDNS = ddns => <Checkbox checked={ddns} onChange={handleCheckboxChange} />
 
   return (
-    <div style={{ width: '100%' }}>
-      {loading && <CircularProgress />}
+    <div style={{ width: '100%' }} className={classes.loadingContainer}>
+      {loading && <CircularProgress className={classes.circularProgress} />}
 
       <Grid container spacing={3}>
         <Grid container item style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
@@ -231,5 +233,20 @@ const DDNS = ({ cameras, onClose }) => {
     </div>
   )
 }
+
+const useStyles = makeStyles(() => ({
+  loadingContainer: {
+    position: 'relative',
+    minHeight: '100px', // Đặt độ cao tùy ý
+    zIndex: 0
+  },
+  circularProgress: {
+    position: 'absolute',
+    top: '40%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    zIndex: 99999 // Đặt z-index cao hơn so với Grid container
+  }
+}))
 
 export default DDNS

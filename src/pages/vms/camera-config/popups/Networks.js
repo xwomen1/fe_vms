@@ -10,6 +10,7 @@ import axios from 'axios'
 import TCP from './TCP-IP'
 import DDNs from './DDNS'
 import Port from './Port'
+import { Paper } from '@material-ui/core'
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   borderBottom: '0 !important',
@@ -78,7 +79,7 @@ const Network = ({ open, onClose, onSelect, camera }) => {
   }, [camera])
 
   return (
-    <Grid container direction='column'>
+    <Grid container direction='column' component={Paper}>
       <TabContext value={value}>
         <Grid item>
           <TabList onChange={handleChange} aria-label='customized tabs example'>

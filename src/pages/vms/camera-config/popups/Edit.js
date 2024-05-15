@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Grid, IconButton } from '@mui/material'
+import { forwardRef, useState } from 'react'
+import { Fade, Grid, IconButton } from '@mui/material'
 import Tab from '@mui/material/Tab'
 import TabPanel from '@mui/lab/TabPanel'
 import TabContext from '@mui/lab/TabContext'
@@ -9,11 +9,15 @@ import Device from './Device'
 import Networks from './Networks'
 import Passwords from './PassWord'
 import Video from './VideoCameraa'
-import Image from './ImageCamera'
+import Images from './ImageCamera'
 import Cloud from './CloudCamera'
 import Icon from 'src/@core/components/icon'
 
 import { Dialog, DialogTitle, DialogContent } from '@mui/material'
+
+const Transition = forwardRef(function Transition(props, ref) {
+  return <Fade ref={ref} {...props} />
+})
 
 const CustomCloseButton = styled(IconButton)(({ theme }) => ({
   top: 0,
@@ -48,10 +52,17 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
   '& .MuiTab-root': {
     lineHeight: 1,
     borderRadius: theme.shape.borderRadius,
+    height: 48, // Set a fixed height for the tabs
     '&:hover': {
       color: theme.palette.primary.main
-    }
+    },
+    flex: 1 // Ensure tabs take equal space
   }
+}))
+
+const StyledTabPanel = styled(TabPanel)(({ theme }) => ({
+  height: 700, // Fixed height for the tab content
+  overflow: 'auto' // Enable scrolling if content exceeds the height
 }))
 
 const Edit = ({ open, onClose, camera }) => {
@@ -69,7 +80,15 @@ const Edit = ({ open, onClose, camera }) => {
   }
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth='x1' style={{ maxWidth: '80%', margin: 'auto' }}>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth='md'
+      scroll='body'
+      TransitionComponent={Transition}
+      sx={{ '& .MuiDialog-paper': { overflow: 'visible' } }}
+    >
       <CustomCloseButton onClick={onClose}>
         <Icon icon='tabler:x' fontSize='1.25rem' />
       </CustomCloseButton>
@@ -77,7 +96,6 @@ const Edit = ({ open, onClose, camera }) => {
       <DialogContent>
         <TabContext value={value}>
           <Grid>
-            {' '}
             <TabList onChange={handleChange} aria-label='customized tabs example'>
               <Tab value='0' label='Thiết bị' />
               <Tab value='1' label='Mật khẩu' />
@@ -87,27 +105,24 @@ const Edit = ({ open, onClose, camera }) => {
               <Tab value='5' label='Bộ nhớ' />
             </TabList>
           </Grid>
-          <TabPanel value='0'>
+          <StyledTabPanel value='0'>
             <Device onClose={handleCancel} camera={camera} />
-          </TabPanel>
-          <TabPanel value='1'>
+          </StyledTabPanel>
+          <StyledTabPanel value='1'>
             <Passwords onClose={handleCancel} camera={camera} />
-          </TabPanel>
-          <TabPanel value='2'>
+          </StyledTabPanel>
+          <StyledTabPanel value='2'>
             <Networks camera={camera} />
-          </TabPanel>
-          <TabPanel value='3'>
-            {' '}
+          </StyledTabPanel>
+          <StyledTabPanel value='3'>
             <Video nvrs={cameras} />
-          </TabPanel>
-          <TabPanel value='4'>
-            {' '}
-            <Image nvrs={cameras} />
-          </TabPanel>
-          <TabPanel value='5'>
-            {' '}
+          </StyledTabPanel>
+          <StyledTabPanel value='4'>
+            <Images nvrs={cameras} />
+          </StyledTabPanel>
+          <StyledTabPanel value='5'>
             <Cloud nvrs={cameras} />
-          </TabPanel>
+          </StyledTabPanel>
         </TabContext>
       </DialogContent>
     </Dialog>

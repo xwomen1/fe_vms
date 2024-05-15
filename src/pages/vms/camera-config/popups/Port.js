@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Swal from 'sweetalert2'
 import axios from 'axios'
 import authConfig from 'src/configs/auth'
+import { makeStyles } from '@material-ui/core/styles'
 
 const UserDetails = ({ cameras, onClose }) => {
   console.log(cameras)
@@ -12,6 +13,7 @@ const UserDetails = ({ cameras, onClose }) => {
   const [https, setHttps] = useState(cameras?.https)
   const [server, setServer] = useState(cameras?.server)
   const [loading, setLoading] = useState(false)
+  const classes = useStyles()
 
   const handleHttpChange = event => {
     setHttp(event.target.value)
@@ -53,10 +55,11 @@ const UserDetails = ({ cameras, onClose }) => {
       }
 
       await axios.put(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/{idNetWorkConfig}?idNetWorkConfig=${cameras.id}`,
+        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/{idNetWorkConfig}?idNetWorkConfig=${cameras.id}&NetWorkConfigType=port`,
         data,
         config
       )
+      console.log(cameras)
       setLoading(false)
       Swal.fire('Lưu thành công!', '', 'success')
 
@@ -75,8 +78,8 @@ const UserDetails = ({ cameras, onClose }) => {
   }
 
   return (
-    <div style={{ width: '100%' }}>
-      {loading && <CircularProgress />}
+    <div style={{ width: '100%' }} className={classes.loadingContainer}>
+      {loading && <CircularProgress className={classes.circularProgress} />}
 
       <Grid container spacing={3}>
         <Grid container item style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
@@ -115,5 +118,20 @@ const UserDetails = ({ cameras, onClose }) => {
     </div>
   )
 }
+
+const useStyles = makeStyles(() => ({
+  loadingContainer: {
+    position: 'relative',
+    minHeight: '100px', // Đặt độ cao tùy ý
+    zIndex: 0
+  },
+  circularProgress: {
+    position: 'absolute',
+    top: '40%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    zIndex: 99999 // Đặt z-index cao hơn so với Grid container
+  }
+}))
 
 export default UserDetails
