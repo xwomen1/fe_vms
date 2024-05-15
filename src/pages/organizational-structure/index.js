@@ -10,6 +10,8 @@ import { Button, IconButton, Typography, Box, Paper, Table, TableBody, TableCell
 import authConfig from 'src/configs/auth';
 import CustomTextField from 'src/@core/components/mui/text-field';
 import DeletePopup from './popup/delete';
+import DetailPopup from './detail/detailInfra'
+import AddPopup from './popup/add'
 
 const OrganizationalStructure = () => {
   const [infra, setInfra] = useState([]);
@@ -19,15 +21,37 @@ const OrganizationalStructure = () => {
   const [childData, setChildData] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
   const [openPopupId, setOpenPopupId] = useState(null);
+  const [openPopupDetail, setOpenPopupDetail] = useState(false)
+  const [openPopupAdd, setOpenPopupAdd] = useState(false);
+  const [showPlusIcon, setShowPlusIcon] = useState(false);
 
   const handleOpenPopup = id => {
     setOpenPopupId(id);
     setOpenPopup(true);
   };
 
+
+  const handleOpenPopupDetail = id => {
+    setOpenPopupId(id)
+    setOpenPopupDetail(true)
+  }
+
+  const handleCloseDetail = () => {
+    setOpenPopupDetail(false)
+  }
+
   const handleClose = () => {
     setOpenPopup(false);
   };
+
+  const handleCloseAdd = () => {
+    setOpenPopupAdd(false);
+  };
+
+  const handleOpenAdd = () => {
+    setOpenPopupAdd(true);
+  };
+
 
   const fetchFilter = async () => {
     try {
@@ -57,8 +81,11 @@ const OrganizationalStructure = () => {
   };
 
   const handleSuccess = async () => {
-    await fetchChildData(infra[selectedTab]?.id);
+    await fetchFilter();
+    setSelectedTab(0);
+    await fetchChildData(infra[0]?.id);
   };
+  
 
   const fetchChildData = async (parentId) => {
     try {
@@ -121,12 +148,13 @@ const OrganizationalStructure = () => {
       }));
       setExpandedNodes([...expandedNodes, nodeId]);
     }
+    setShowPlusIcon(true);
   };
 
   const renderTreeItems = (nodes) => {
     return nodes.map((node) => {
       const hasChildren = treeData[node.id] && treeData[node.id].length > 0;
-
+  
       return (
         <TreeItem
           key={node.id}
@@ -140,12 +168,20 @@ const OrganizationalStructure = () => {
               </IconButton>
             ) : null
           }
+          labelIcon={
+            hasChildren && showPlusIcon ? (
+              <IconButton style={{ padding: '0px' }} onClick={() => handleFetchChildren(node.id)}>
+                <Icon icon="bi:plus" />
+              </IconButton>
+            ) : null
+          }
         >
           {hasChildren && renderTreeItems(treeData[node.id])}
         </TreeItem>
       );
     });
   };
+  
 
   const currentTabInfra = infra[selectedTab] || {};
   const rootNodes = treeData[currentTabInfra.id] || [];
@@ -161,12 +197,12 @@ const OrganizationalStructure = () => {
           </Tabs>
           <Box display="flex" alignItems="center">
             <Typography variant="body2" style={{ marginRight: '16px' }}>
-              <Button variant='contained'>
-                Thêm mới
+              <Button variant='contained' onClick={() => handleOpenAdd()}>
+                Thêm
               </Button>
             </Typography>
             <Typography variant="body2">
-              <Button variant='contained'>
+              <Button variant='contained' onClick={() => handleOpenPopup(infra[selectedTab]?.id)}>
                 Xóa
               </Button>
             </Typography>
@@ -188,6 +224,7 @@ const OrganizationalStructure = () => {
           </Grid>
           <Grid item xs={9.5} style={{ display: 'flex', flexDirection: 'column' }}>
             <Paper elevation={3} style={{ padding: '16px', marginBottom: '16px' }}>
+            <Box onClick={() => handleOpenPopupDetail(currentTabInfra.id)}>
               <CustomTextField
                 label='Tên'
                 type='text'
@@ -195,6 +232,8 @@ const OrganizationalStructure = () => {
                 fullWidth
                 style={{ marginBottom: '16px' }}
               />
+            </Box>
+
               <CustomTextField
                 label='Mã'
                 type='text'
@@ -228,7 +267,7 @@ const OrganizationalStructure = () => {
                         <TableCell>{child.name}</TableCell>
                         <TableCell sx={{ padding: '16px' }}>
                           <IconButton size='small'>
-                            <Icon icon='tabler:edit' />
+                            <Icon icon='tabler:edit'  onClick={() => handleOpenPopupDetail(child.id)}  />
                           </IconButton>
                           <IconButton onClick={() => handleOpenPopup(child.id)}>
                             <Icon icon='tabler:trash' />
@@ -247,6 +286,22 @@ const OrganizationalStructure = () => {
         <DeletePopup
           open={openPopup}
           onClose={handleClose}
+          id={openPopupId}
+          onSuccess={handleSuccess}
+        />
+      )}
+
+      {openPopupAdd && (
+       <AddPopup
+        open={openPopupAdd}
+        onClose={handleCloseAdd}
+        onSuccess={handleSuccess}
+          />
+        )}
+      {openPopupDetail && (
+        <DetailPopup
+          open={openPopupDetail}
+          onClose={handleCloseDetail}
           id={openPopupId}
           onSuccess={handleSuccess}
         />
