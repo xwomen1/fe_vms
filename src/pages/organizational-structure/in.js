@@ -24,7 +24,6 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 import DeletePopup from './popup/delete'
 import DetailPopup from './detail/detailInfra'
 import AddPopup from './popup/add'
-import PopUpAdd from './popup/AddChild'
 
 const OrganizationalStructure = () => {
   const [infra, setInfra] = useState([])
@@ -175,14 +174,7 @@ const OrganizationalStructure = () => {
         <TreeItem
           key={node.id}
           nodeId={node.id}
-          label={
-            <Box display='flex' alignItems='center'>
-              <Typography>{node.name}</Typography>
-              <IconButton size='small' onClick={() => handleAddPClick(node.id)}>
-                <Icon icon='bi:plus' />
-              </IconButton>
-            </Box>
-          }
+          label={node.name}
           sx={{ marginLeft: '3%', marginTop: '4%' }}
           icon={
             node.isParent ? (
