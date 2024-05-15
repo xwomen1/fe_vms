@@ -22,8 +22,8 @@ export const ViewCamera = ({ id, channel }) => {
     const [rtcPeerConnection, setRtcPeerConnection] = useState(null)
     const [remoteStream, setRemoteStream] = useState(null)
     const [loading, setLoading] = useState(false)
-    const [text, setText] = useState(null) // Added text state
-    const [currentChannel, setCurrentChannel] = useState(null) // Added currentChannel state
+    const [text, setText] = useState(null) // Thêm trạng thái text
+    const [currentChannel, setCurrentChannel] = useState(null) // Thêm trạng thái currentChannel
     const remoteVideoRef = useRef(null)
 
     const randomId = (length) => [...Array(length)].map(() => '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'[Math.floor(Math.random() * 62)]).join('')
@@ -40,7 +40,9 @@ export const ViewCamera = ({ id, channel }) => {
             const stream = event.streams[0]
             if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {
                 setRemoteStream(stream)
-                remoteVideoRef.current.srcObject = stream
+                if (remoteVideoRef.current) {
+                    remoteVideoRef.current.srcObject = stream
+                }
             }
         }
     }
@@ -103,7 +105,7 @@ export const ViewCamera = ({ id, channel }) => {
 
     return (
         <div style={{ width: '100%', height: '100%' }}>
-            <video style={{ width: '100%', height: '100%' }} ref={remoteVideoRef} playsInline autoPlay srcObject={remoteStream} />
+            <video style={{ width: '100%', height: '100%' }} ref={remoteVideoRef} playsInline autoPlay />
             {loading && <h4 style={{ textAlign: 'center', marginTop: '-2rem' }}>{text} ...</h4>}
         </div>
     )
