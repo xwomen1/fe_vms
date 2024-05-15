@@ -61,8 +61,7 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
 }))
 
 const StyledTabPanel = styled(TabPanel)(({ theme }) => ({
-  height: 1000, // Fixed height for the tab content
-  width: 1000,
+  height: 700, // Fixed height for the tab content
   overflow: 'auto' // Enable scrolling if content exceeds the height
 }))
 

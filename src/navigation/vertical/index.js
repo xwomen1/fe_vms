@@ -234,7 +234,7 @@ const navigation = () => {
         {
           title: 'Cơ cấu tổ chức',
           icon: 'tabler:users',
-          path: 'broadcast/local'
+          path: '/organizational-structure'
         },
         {
           title: 'Vai Trò',
