@@ -48,7 +48,7 @@ const StyledTreeItem = props => {
         <Box
           sx={{ py: 1, display: 'flex', alignItems: 'center', '& svg': { mr: 1 } }}>
           <Icon icon={labelIcon} color={colorText} />
-          <Typography variant='body2' sx={{ flexGrow: 1, fontWeight: 500 }} color={colorText}>
+          <Typography variant='body2' sx={{ flexGrow: 1, fontWeight: 500 }}>
             {labelText}
           </Typography>
           {labelInfo ? (

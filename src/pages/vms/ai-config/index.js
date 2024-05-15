@@ -3,6 +3,8 @@ import MuiTabList from '@mui/lab/TabList'
 import { TabContext, TabPanel } from "@mui/lab"
 import { Grid, Tab, styled } from "@mui/material"
 import AIConfig from "./view/aiConfig"
+import EventConfig from "./view/eventConfig"
+import EventOverview from "./view/eventOverview"
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
     borderBottom: '0 !important',
@@ -42,21 +44,20 @@ const Events = () => {
                     <Grid item xs={12}>
                         {' '}
                         <TabList onChange={handleChange} aria-label='customized tabs example'>
-                            <Tab value='1' label='Tab 1' key={1} />
-                            <Tab value='2' label='Tab 2' key={2} />
-                            <Tab value='3' label='Tab 3' key={3} />
-                            <Tab value='4' label='Tab 4' key={4} />
+                            <Tab value='1' label='Tổng quan' key={1} />
+                            <Tab value='2' label='Cấu hình' key={2} />
+                            <Tab value='3' label='Khoanh vùng AI' key={3} />
                         </TabList>
                     </Grid>
                     <Grid item xs={12}>
                         <TabPanel value='1'>
+                            <EventOverview />
                         </TabPanel>
                         <TabPanel value='2'>
                             <AIConfig />
                         </TabPanel>
                         <TabPanel value='3'>
-                        </TabPanel>
-                        <TabPanel value='4'>
+                            <EventConfig />
                         </TabPanel>
                     </Grid>
                 </TabContext>
