@@ -37,8 +37,6 @@ const OrganizationalStructure = () => {
   const [openPopupDetail, setOpenPopupDetail] = useState(false)
   const [openPopupAdd, setOpenPopupAdd] = useState(false)
   const [showPlusIcon, setShowPlusIcon] = useState(false)
-  const [openPopupAddChild, setOpenPopupAddChild] = useState(false)
-  const [selectId, setSelectIds] = useState(null)
 
   const handleOpenPopup = id => {
     setOpenPopupId(id)
@@ -91,17 +89,6 @@ const OrganizationalStructure = () => {
     } catch (error) {
       console.error('Error fetching users:', error)
     }
-  }
-
-  const handleAddPClick = id => {
-    setOpenPopupAddChild(true)
-    setSelectIds(id)
-    console.log(id, 'nodeid')
-  }
-
-  const handleClosePPopup = () => {
-    setOpenPopupAddChild(false)
-    fetchChildrenById()
   }
 
   const handleSuccess = async () => {
@@ -324,11 +311,6 @@ const OrganizationalStructure = () => {
       {openPopupAdd && <AddPopup open={openPopupAdd} onClose={handleCloseAdd} onSuccess={handleSuccess} />}
       {openPopupDetail && (
         <DetailPopup open={openPopupDetail} onClose={handleCloseDetail} id={openPopupId} onSuccess={handleSuccess} />
-      )}
-      {openPopupAddChild && (
-        <>
-          <PopUpAdd open={openPopupAddChild} onClose={handleClosePPopup} id={selectId} onSuccess={handleSuccess} />
-        </>
       )}
     </Grid>
   )

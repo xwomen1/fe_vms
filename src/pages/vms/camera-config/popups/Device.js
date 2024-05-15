@@ -39,7 +39,7 @@ const Device = ({ onClose, camera }) => {
   const [regions, setRegions] = useState([])
 
   const [cameras, setCamera] = useState(null)
-  const [selectedProtocol, setSelectedProtocol] = useState(cameras?.protocol?.name)
+  const [selectedProtocol, setSelectedProtocol] = useState(null)
 
   const [protocols, setProtocols] = useState([
     { label: 'ONVIF', value: 'ONVIF', id: 'ONVIF', name: 'ONVIF' },
@@ -58,10 +58,7 @@ const Device = ({ onClose, camera }) => {
     value: cameras?.type?.name || ''
   })
 
-  const [regionsSelect, setRegionsSelect] = useState({
-    label: cameras?.regions?.name || '',
-    value: cameras?.regions?.name || ''
-  })
+  const [regionsSelect, setRegionsSelect] = useState('')
   const [isOfflineSetting, setisOfflineSetting] = useState(false)
   const [lat, setLat] = useState(null)
   const [lng, setLng] = useState(null)
@@ -147,7 +144,7 @@ const Device = ({ onClose, camera }) => {
   }
 
   const handleAddRow = () => {
-    const newRow = { groupName: '', groupCode: '', groupId: '' } // Thêm groupId vào đây
+    const newRow = { nameChannel: '', proxied: '', channelUrl: '', streamType: '' } // Thêm groupId vào đây
     setRows([...rows, newRow])
   }
 
@@ -182,11 +179,13 @@ const Device = ({ onClose, camera }) => {
             label: response.data.type.name || '',
             value: response.data.type.name || ''
           })
-          setProtocols(response.data.protocol.name)
-          setProtocols({
+          setSelectedProtocol({
             label: response.data.protocol.name || '',
-            value: response.data.protocol.name || '',
-            name: response.data.protocol.name || ''
+            value: response.data.protocol.name || ''
+          })
+          setRegionsSelect({
+            label: response.data.location || '',
+            value: response.data.location || ''
           })
         }
       } catch (error) {
@@ -230,7 +229,7 @@ const Device = ({ onClose, camera }) => {
         lat: lat.toString(),
         long: lng.toString(),
         isOfflineSetting: isOfflineSetting,
-        channel: {
+        streams: {
           name: nameChannel,
           proxied: proxied,
           channelUrl: channelUrl,
@@ -243,7 +242,8 @@ const Device = ({ onClose, camera }) => {
         protocol: {
           id: selectedProtocol.id || cameras.protocol.id,
           name: selectedProtocol.name || cameras.protocol.name
-        }
+        },
+        location: regionsSelect.name
       }
 
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${camera}`, data, config)

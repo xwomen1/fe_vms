@@ -41,7 +41,7 @@ const Caller = () => {
   }
 
   return (
-    <Grid>
+    <Grid style={{ minWidth: '1000px' }}>
       <TabContext value={value}>
         <Grid>
           {' '}
