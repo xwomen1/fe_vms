@@ -17,7 +17,7 @@ const defaultProvider = {
 const AuthContext = createContext(defaultProvider)
 
 const AuthProvider = ({ children }) => {
-  
+
   const [user, setUser] = useState(defaultProvider.user)
   const [expire, setExpire] = useState('')
   const [loading, setLoading] = useState(defaultProvider.loading)
@@ -105,8 +105,6 @@ const AuthProvider = ({ children }) => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
-      console.log('token', token)
-
       // ** Đặt header Authorization bằng token
 
       const params = {
@@ -130,13 +128,11 @@ const AuthProvider = ({ children }) => {
       .then(async response => {
         const tokenReturn = response.data.access_token
         const refreshToken = response.data.refresh_token
-        console.log('tokenreturn', tokenReturn)
         localStorage.setItem(authConfig.storageTokenKeyName, tokenReturn)
         localStorage.setItem(authConfig.onTokenExpiration, refreshToken)
 
         const returnUrl = router.query.returnUrl
         setExpire(response.data.expires_in)
-        console.log(response.data.expires_in)
 
         const apiUser = {
           username: params.username,
@@ -147,7 +143,6 @@ const AuthProvider = ({ children }) => {
         setLoading(false)
 
         const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
-        console.log('URL', redirectURL)
         router.replace(redirectURL)
       })
       .catch(err => {
