@@ -116,16 +116,16 @@ const Edit = ({ open, onClose, camera }) => {
             <Passwords onClose={handleCancel} camera={camera} />
           </StyledTabPanel>
           <StyledTabPanel value='2'>
-            <Networks camera={camera} />
+            <Networks camera={camera} onClose={handleCancel} />
           </StyledTabPanel>
           <StyledTabPanel value='3'>
-            <Video nvrs={cameras} />
+            <Video nvrs={cameras} onClose={handleCancel} />
           </StyledTabPanel>
           <StyledTabPanel value='4'>
-            <Images nvrs={cameras} />
+            <Images nvrs={cameras} onClose={handleCancel} />
           </StyledTabPanel>
           <StyledTabPanel value='5'>
-            <Cloud nvrs={cameras} />
+            <Cloud nvrs={cameras} onClose={handleCancel} />
           </StyledTabPanel>
         </TabContext>
       </DialogContent>

@@ -11,7 +11,7 @@ const TCP = ({ cameras, onClose, mtu }) => {
   const [status1, setStatus1] = useState('ACTIVE')
   const [multicast, setMulticast] = useState(cameras?.multicast)
   const [dhcp, setDHCP] = useState(cameras?.dhcp)
-  const [mtus, setMTU] = useState(cameras?.mtu || 'null')
+  const [mtus, setMTU] = useState(parseInt(cameras?.mtu) || 0)
   const [mutiAddress, setMultiAddress] = useState(cameras?.MulticastAddress)
   const [ddnsServer, setDDNSServer] = useState(cameras?.prefDNS)
   const [alter, setAlter] = useState(cameras?.alterDNS)
@@ -28,7 +28,7 @@ const TCP = ({ cameras, onClose, mtu }) => {
   })
 
   const handleMTUChange = event => {
-    setMTU(event.target.value)
+    setMTU(parseInt(event.target.value) || 0)
   }
 
   const handleDDNSServerChange = event => {

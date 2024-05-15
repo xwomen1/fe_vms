@@ -6,29 +6,29 @@ import axios from 'axios'
 import authConfig from 'src/configs/auth'
 import { makeStyles } from '@material-ui/core/styles'
 
-const UserDetails = ({ nvr, onClose }) => {
+const Port = ({ nvr, onClose }) => {
   console.log(nvr)
-  const [http, setHttp] = useState(nvr?.http)
-  const [rtsp, SetRtsp] = useState(nvr?.rtsp)
-  const [https, setHttps] = useState(nvr?.https)
-  const [server, setServer] = useState(nvr?.server)
+  const [http, setHttp] = useState(parseInt(nvr?.http) || 0)
+  const [rtsp, setRtsp] = useState(parseInt(nvr?.rtsp) || 0)
+  const [https, setHttps] = useState(parseInt(nvr?.https) || 0)
+  const [server, setServer] = useState(parseInt(nvr?.server) || 0)
   const [loading, setLoading] = useState(false)
   const classes = useStyles()
 
   const handleHttpChange = event => {
-    setHttp(event.target.value)
+    setHttp(parseInt(event.target.value) || 0)
   }
 
   const handleRtspChange = event => {
-    SetRtsp(event.target.value)
+    setRtsp(parseInt(event.target.value) || 0)
   }
 
   const handleHttpsChange = event => {
-    setHttps(event.target.value)
+    setHttps(parseInt(event.target.value) || 0)
   }
 
-  const handleServerhange = event => {
-    setServer(event.target.value)
+  const handleServerChange = event => {
+    setServer(parseInt(event.target.value) || 0)
   }
 
   const handleSaveClick = async () => {
@@ -94,7 +94,7 @@ const UserDetails = ({ nvr, onClose }) => {
           </Grid>
           <Grid item xs={0.4}></Grid>
           <Grid item xs={5.8}>
-            <CustomTextField label='Server Port' value={server} onChange={handleServerhange} fullWidth />
+            <CustomTextField label='Server Port' value={server} onChange={handleServerChange} fullWidth />
           </Grid>
         </Grid>
 
@@ -134,4 +134,4 @@ const useStyles = makeStyles(() => ({
   }
 }))
 
-export default UserDetails
+export default Port
