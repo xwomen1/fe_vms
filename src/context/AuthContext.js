@@ -17,7 +17,6 @@ const defaultProvider = {
 const AuthContext = createContext(defaultProvider)
 
 const AuthProvider = ({ children }) => {
-  
   const [user, setUser] = useState(defaultProvider.user)
   const [expire, setExpire] = useState('')
   const [loading, setLoading] = useState(defaultProvider.loading)
@@ -45,53 +44,69 @@ const AuthProvider = ({ children }) => {
     setUser(null)
     window.localStorage.removeItem('userData')
     window.localStorage.removeItem(authConfig.storageTokenKeyName)
+    window.localStorage.removeItem(authConfig.onTokenExpiration)
     router.push('/login')
   }, [router])
+
+  const refreshAccessToken = async refreshToken => {
+    try {
+      const response = await postApi(USER_API.REFREST, { refreshToken })
+      const newAccessToken = response.data.access_token
+      console.log('Token refreshed:', newAccessToken) // Logging refreshed token
+
+      localStorage.setItem(authConfig.storageTokenKeyName, newAccessToken)
+      setExpire(response.data.expires_in)
+      scheduleTokenRefresh(newAccessToken) // Schedule next refresh
+
+      return newAccessToken
+    } catch (error) {
+      console.error('Error refreshing token:', error) // Logging error
+      throw new Error('Error refreshing token')
+    }
+  }
+
+  const scheduleTokenRefresh = token => {
+    const tokenData = parseToken(token)
+    const expirationTime = tokenData.exp * 1000
+    const currentTime = Date.now()
+    const timeUntilExpiration = expirationTime - currentTime
+    const refreshTime = timeUntilExpiration - 60 * 1000 // Refresh 1 minute before expiration
+
+    if (refreshTime > 0) {
+      setTimeout(async () => {
+        const storedRefreshToken = localStorage.getItem(authConfig.onTokenExpiration)
+        try {
+          await refreshAccessToken(storedRefreshToken)
+        } catch (error) {
+          console.error('Error refreshing token:', error)
+          handleLogout()
+        }
+      }, refreshTime)
+    } else {
+      handleLogout() // Token has already expired
+    }
+  }
 
   useEffect(() => {
     const initAuth = async () => {
       const storedUserData = window.localStorage.getItem('userData')
       const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-      const refresh_token = localStorage.getItem(authConfig.onTokenExpiration)
+      const storedRefreshToken = window.localStorage.getItem(authConfig.onTokenExpiration)
 
       if (storedUserData && storedToken) {
         const userData = JSON.parse(storedUserData)
         setUser(userData)
-
         const tokenExpired = checkTokenExpiration(storedToken)
         if (tokenExpired) {
           try {
-            setLoading(true)
-            const tokenData = parseToken(storedToken)
-            const expirationTime = tokenData.exp * 1000
-            const currentTime = Date.now()
-            const timeUntilExpiration = expirationTime - currentTime
-            const refreshTime = timeUntilExpiration - 5 * 1000
-            if (refreshTime > 0) {
-              setTimeout(async () => {
-                try {
-                  const refreshedToken = await refreshAccessToken(refresh_token)
-                  localStorage.setItem(authConfig.storageTokenKeyName, refreshedToken)
-                  setLoading(false)
-                } catch (error) {
-                  console.error('Error refreshing token:', error)
-                  handleLogout()
-                }
-              }, refreshTime)
-            } else {
-              // Token has already expired, refresh immediately
-              const refreshedToken = await refreshAccessToken(refresh_token)
-              localStorage.setItem(authConfig.storageTokenKeyName, refreshedToken)
-              setLoading(false)
-            }
+            await refreshAccessToken(storedRefreshToken)
           } catch (error) {
             console.error('Error refreshing token:', error)
             handleLogout()
-
-            return
           }
+        } else {
+          scheduleTokenRefresh(storedToken)
         }
-
         setLoading(false)
       } else {
         setLoading(false)
@@ -101,42 +116,19 @@ const AuthProvider = ({ children }) => {
     initAuth()
   }, [checkTokenExpiration, handleLogout])
 
-  const refreshAccessToken = async refreshToken => {
-    try {
-      const token = localStorage.getItem(authConfig.storageTokenKeyName)
-
-      console.log('token', token)
-
-      // ** Đặt header Authorization bằng token
-
-      const params = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        data: { refreshToken }
-      }
-      const response = await postApi(USER_API.REFREST, { refreshToken })
-      const newAccessToken = response.data.access_token
-      setExpire(response.data.expires_in)
-
-      return newAccessToken
-    } catch (error) {
-      throw new Error('Error refreshing token')
-    }
-  }
-
   const handleLogin = (params, errorCallback) => {
     postApi(USER_API.LOGIN, params)
       .then(async response => {
+        console.log('Login successful:', response.data) // Logging response
+
         const tokenReturn = response.data.access_token
         const refreshToken = response.data.refresh_token
-        console.log('tokenreturn', tokenReturn)
+
         localStorage.setItem(authConfig.storageTokenKeyName, tokenReturn)
         localStorage.setItem(authConfig.onTokenExpiration, refreshToken)
 
         const returnUrl = router.query.returnUrl
         setExpire(response.data.expires_in)
-        console.log(response.data.expires_in)
 
         const apiUser = {
           username: params.username,
@@ -147,10 +139,12 @@ const AuthProvider = ({ children }) => {
         setLoading(false)
 
         const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
-        console.log('URL', redirectURL)
         router.replace(redirectURL)
+
+        scheduleTokenRefresh(tokenReturn)
       })
       .catch(err => {
+        console.error('Login failed:', err) // Logging error
         if (errorCallback) errorCallback(err)
       })
   }

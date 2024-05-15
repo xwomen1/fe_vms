@@ -1,5 +1,5 @@
 import { forwardRef, useState } from 'react'
-import { Fade, Grid, IconButton, Dialog, DialogTitle, DialogContent } from '@mui/material'
+import { Fade, Grid, IconButton } from '@mui/material'
 import Tab from '@mui/material/Tab'
 import TabPanel from '@mui/lab/TabPanel'
 import TabContext from '@mui/lab/TabContext'
@@ -12,6 +12,8 @@ import Video from './VideoCameraa'
 import Images from './ImageCamera'
 import Cloud from './CloudCamera'
 import Icon from 'src/@core/components/icon'
+
+import { Dialog, DialogTitle, DialogContent } from '@mui/material'
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Fade ref={ref} {...props} />
@@ -59,18 +61,19 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
 }))
 
 const StyledTabPanel = styled(TabPanel)(({ theme }) => ({
-  height: 1000, // Fixed height for the tab content
-  width: '100%', // Adjust to 100% of the dialog's width
+  height: 700, // Fixed height for the tab content
   overflow: 'auto' // Enable scrolling if content exceeds the height
 }))
 
-const Edit = ({ open, onClose, camera }) => {
+const Edit = ({ open, onClose, nvr }) => {
   const [cameras, setCamera] = useState([])
   const [value, setValue] = useState('0')
 
   const handleChange = (event, newValue) => {
     setValue(newValue)
   }
+
+  console.log(nvr, 'cameraid')
 
   const handleCancel = () => {
     onClose()
@@ -81,17 +84,10 @@ const Edit = ({ open, onClose, camera }) => {
       open={open}
       onClose={onClose}
       fullWidth
-      maxWidth='lg' // Change to 'lg' or use custom styling
+      maxWidth='md'
       scroll='body'
       TransitionComponent={Transition}
-      sx={{
-        '& .MuiDialog-paper': {
-          overflow: 'visible',
-          maxWidth: '1200px', // Custom width
-          width: '100%', // Ensure it takes full width
-          padding: '20px' // Additional padding if needed
-        }
-      }}
+      sx={{ '& .MuiDialog-paper': { overflow: 'visible' } }}
     >
       <CustomCloseButton onClick={onClose}>
         <Icon icon='tabler:x' fontSize='1.25rem' />
@@ -110,22 +106,22 @@ const Edit = ({ open, onClose, camera }) => {
             </TabList>
           </Grid>
           <StyledTabPanel value='0'>
-            <Device onClose={handleCancel} camera={camera} />
+            <Device onClose={handleCancel} nvr={nvr} />
           </StyledTabPanel>
           <StyledTabPanel value='1'>
-            <Passwords onClose={handleCancel} camera={camera} />
+            <Passwords onClose={handleCancel} nvr={nvr} />
           </StyledTabPanel>
           <StyledTabPanel value='2'>
-            <Networks camera={camera} onClose={handleCancel} />
+            <Networks nvr={nvr} onClose={handleCancel} />
           </StyledTabPanel>
           <StyledTabPanel value='3'>
-            <Video nvrs={cameras} onClose={handleCancel} />
+            <Video nvr={nvr} onClose={handleCancel} />
           </StyledTabPanel>
           <StyledTabPanel value='4'>
-            <Images nvrs={cameras} onClose={handleCancel} />
+            <Images nvr={cameras} onClose={handleCancel} />
           </StyledTabPanel>
           <StyledTabPanel value='5'>
-            <Cloud nvrs={cameras} onClose={handleCancel} />
+            <Cloud nvr={cameras} onClose={handleCancel} />
           </StyledTabPanel>
         </TabContext>
       </DialogContent>

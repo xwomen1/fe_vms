@@ -151,8 +151,10 @@ const PassWord = ({ onClose, camera }) => {
         </Grid>
       </Grid>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={saveChange}>OK</Button>
+        <Button onClick={onClose}>Đóng</Button>
+        <Button onClick={saveChange} variant='contained'>
+          Lưu
+        </Button>
       </DialogActions>
     </div>
   )

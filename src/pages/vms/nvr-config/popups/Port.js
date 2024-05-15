@@ -1,164 +1,117 @@
-import { useRouter } from 'next/router'
-
-import { useState, useEffect, useMemo } from 'react'
+import CustomTextField from 'src/@core/components/mui/text-field'
+import { Button, CircularProgress, DialogActions, Grid } from '@mui/material'
+import { useState } from 'react'
+import Swal from 'sweetalert2'
 import axios from 'axios'
 import authConfig from 'src/configs/auth'
-import CustomTextField from 'src/@core/components/mui/text-field'
-import {
-  Grid,
-  IconButton,
-  Button,
-  FormControlLabel,
-  Checkbox,
-  Switch,
-  TextField,
-  Typography,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem
-} from '@mui/material'
-import Icon from 'src/@core/components/icon'
-import Autocomplete from '@mui/material/Autocomplete'
-import Box from '@mui/material/Box'
-import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
-import TableContainer from '@mui/material/TableContainer'
-import Paper from '@mui/material/Paper'
-import Table from '@mui/material/Table'
-import TableRow from '@mui/material/TableRow'
-import TableHead from '@mui/material/TableHead'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import DatePicker from 'react-datepicker'
-import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
+import { makeStyles } from '@material-ui/core/styles'
 
-import Swal from 'sweetalert2'
-import Link from 'next/link'
-import Alert from '@mui/material/Alert'
+const Port = ({ nvr, onClose }) => {
+  console.log(nvr)
+  const [http, setHttp] = useState(parseInt(nvr?.http) || 0)
+  const [rtsp, setRtsp] = useState(parseInt(nvr?.rtsp) || 0)
+  const [https, setHttps] = useState(parseInt(nvr?.https) || 0)
+  const [server, setServer] = useState(parseInt(nvr?.server) || 0)
+  const [loading, setLoading] = useState(false)
+  const classes = useStyles()
 
-const UserDetails = nvrs => {
-  const router = useRouter()
-  const { id } = router.query
-  const [timeValidity, setTimeValidity] = useState('Custom')
-  const [user, setUser] = useState(null)
-  const [readOnly, setReadOnly] = useState(true)
-  const [params, setParams] = useState({})
-  const [editing, setEditing] = useState(false)
-  const [groupOptions, setGroupOptions] = useState([])
-  const [policy, setPolicy] = useState([])
-  const [status, setStatus] = useState('ACTIVE')
-  const [status1, setStatus1] = useState('ACTIVE')
-  const [availableAt, setAvailableAt] = useState('')
-  const [expiredAt, setExpiredAt] = useState('')
-  const [note, setNote] = useState('')
-  const [rows, setRows] = useState([])
-  const [rows1, setRows1] = useState([])
-  const [createAccount, setCreateAccount] = useState(true)
-  const [timeEndMorning, setTimeEndMorning] = useState('')
-  const [timeStartAfternoon, setTimeStartAfternoon] = useState('')
-  const [timeEndAfternoon, setTimeEndAfternoon] = useState('')
-  const [dateTime, setDateTime] = useState('')
-  const [fullNameValue, setFullNameValue] = useState('')
-  const [account, setAccount] = useState('')
-  const [email, setEmail] = useState('')
-  const [phoneNumber, setPhoneNumber] = useState('')
-  const [identityNumber, setIdentityNumber] = useState('')
-  const [userCode, setUserCode] = useState('')
-  const [syncCode, setSyncCode] = useState('')
-  const [ava1, setAva1] = useState(null)
-  const [ava2, setAva2] = useState(null)
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-
-  const handleAddRow = () => {
-    const newRow = { groupName: '', groupCode: '', groupId: '' } // Thêm groupId vào đây
-    setRows([...rows, newRow])
+  const handleHttpChange = event => {
+    setHttp(parseInt(event.target.value) || 0)
   }
 
-  const handleAddRow1 = () => {
-    const newRow1 = { policyName: '', description: '' }
-    setRows1([...rows1, newRow1])
+  const handleRtspChange = event => {
+    setRtsp(parseInt(event.target.value) || 0)
   }
 
-  const handleCreateAccountChange = event => {
-    setCreateAccount(event.target.checked)
+  const handleHttpsChange = event => {
+    setHttps(parseInt(event.target.value) || 0)
   }
 
-  const handleStartDateChange = date => {
-    setAvailableAt(date)
-    setAva1(isoToEpoch(date))
+  const handleServerChange = event => {
+    setServer(parseInt(event.target.value) || 0)
   }
 
-  const handleEndDateChange = date => {
-    setExpiredAt(date)
-    setAva2(isoToEpoch(date))
-  }
-  console.log('New start date:', isoToEpoch(availableAt))
-  function isoToEpoch(isoDateString) {
-    var milliseconds = Date.parse(isoDateString)
-
-    var epochSeconds = Math.round(milliseconds)
-
-    return epochSeconds
+  const handleSaveClick = async () => {
+    handleSave() // Gọi hàm handleSave truyền từ props
   }
 
-  const handleFullNameChange = event => {
-    setFullNameValue(event.target.value)
-  }
+  const handleSave = async () => {
+    try {
+      setLoading(true)
 
-  const handleAccountChange = event => {
-    setAccount(event.target.value)
-  }
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
-  const handlePasswordChange = event => {
-    setPassword(event.target.value)
-  }
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
 
-  const handleConfirmPasswordChange = event => {
-    setConfirmPassword(event.target.value)
-  }
+      const data = {
+        http: http || nvr?.http,
+        rtsp: rtsp || nvr?.rtsp,
+        https: https || nvr?.https,
+        server: server || nvr?.server
+      }
 
-  const handleStatusChange = () => {
-    setStatus1(status1 === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE')
-  }
+      await axios.put(
+        `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/config/networkconfig/{idNetWorkConfig}?idNetWorkConfig=${nvr.id}&NetWorkConfigType=port`,
+        data,
+        config
+      )
+      console.log(nvr)
+      setLoading(false)
+      Swal.fire('Lưu thành công!', '', 'success')
 
-  const handleEmailChange = event => {
-    setEmail(event.target.value)
-  }
+      onClose()
+    } catch (error) {
+      console.error(error)
+      setLoading(false)
+      onClose()
 
-  const handlePhoneNumberChange = event => {
-    setPhoneNumber(event.target.value)
+      Swal.fire('Đã xảy ra lỗi', error.message, error.response?.data?.message)
+    } finally {
+      setLoading(false)
+      onClose()
+    }
   }
-
-  const handleNoteChange = event => {
-    setNote(event.target.value)
-  }
-
-  const handleIdentityNumberChange = event => {
-    setIdentityNumber(event.target.value)
-  }
-
-  console.log('param', nvrs.nvrs.ddnsType)
-  const formatDDNS = ddns => <Checkbox checked={ddns} disabled />
 
   return (
-    <div style={{ width: '100%' }}>
+    <div style={{ width: '100%' }} className={classes.loadingContainer}>
+      {loading && <CircularProgress className={classes.circularProgress} />}
+
       <Grid container spacing={3}>
-        <Grid container item component={Paper} style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
+        <Grid container item style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
           <Grid item xs={5.8}>
-            <CustomTextField label='HTTP Port' value={nvrs.nvrs.http} onChange={handleFullNameChange} fullWidth />
+            <CustomTextField label='HTTP Port' value={http} onChange={handleHttpChange} fullWidth />
           </Grid>
           <Grid item xs={0.4}></Grid>
           <Grid item xs={5.8}>
-            <CustomTextField label='RTSP Port' value={nvrs.nvrs.rtsp} onChange={handleEmailChange} fullWidth />
+            <CustomTextField label='RTSP Port' value={rtsp} onChange={handleRtspChange} fullWidth />
           </Grid>
           <Grid item xs={5.8}>
-            <CustomTextField label='HTTPS Port' value={nvrs.nvrs.https} onChange={handleFullNameChange} fullWidth />
+            <CustomTextField label='HTTPS Port' value={https} onChange={handleHttpsChange} fullWidth />
           </Grid>
           <Grid item xs={0.4}></Grid>
           <Grid item xs={5.8}>
-            <CustomTextField label='Server Port' value={nvrs.nvrs.server} onChange={handleEmailChange} fullWidth />
+            <CustomTextField label='Server Port' value={server} onChange={handleServerChange} fullWidth />
           </Grid>
+        </Grid>
+
+        <Grid item xs={12}>
+          <DialogActions
+            sx={{
+              justifyContent: 'center',
+              px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
+              pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
+            }}
+          >
+            <Button onClick={onClose}>Đóng</Button>
+
+            <Button type='submit' variant='contained' onClick={handleSaveClick}>
+              Lưu
+            </Button>
+          </DialogActions>
         </Grid>
       </Grid>
       <br />
@@ -166,4 +119,19 @@ const UserDetails = nvrs => {
   )
 }
 
-export default UserDetails
+const useStyles = makeStyles(() => ({
+  loadingContainer: {
+    position: 'relative',
+    minHeight: '100px', // Đặt độ cao tùy ý
+    zIndex: 0
+  },
+  circularProgress: {
+    position: 'absolute',
+    top: '40%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    zIndex: 99999 // Đặt z-index cao hơn so với Grid container
+  }
+}))
+
+export default Port

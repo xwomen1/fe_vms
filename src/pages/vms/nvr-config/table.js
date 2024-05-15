@@ -21,17 +21,18 @@ import axios from 'axios'
 import TableHeader from 'src/views/apps/vms/nvr-config/TableHeader'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import Link from 'next/link'
-import RolePopup from './popups/ChangePassword'
+import ChangePassWords from './popups/ChangePassword'
 import Passwords from './popups/PassWord'
 
 import Network from './popups/Network'
 import Video from './popups/video'
-import Image from './popups/Image'
+import Images from './popups/Image'
 import Checkbox from '@mui/material/Checkbox'
 import Cloud from './popups/Cloud'
 import ConnectCamera from './popups/ConnectCamera'
 import VideoConnectCamera from './popups/VideoConnectCamera'
 import { Password } from '@mui/icons-material'
+import Edit from './popups/Edit'
 
 const UserList = ({ apiData }) => {
   const [value, setValue] = useState('')
@@ -89,8 +90,9 @@ const UserList = ({ apiData }) => {
     setOpenPopup(false) // Đóng Popup khi cần thiết
   }
 
-  const handleAddPClick = () => {
+  const handleAddPClick = selectedNvrId => {
     setOpenPopupP(true)
+    setSelectedNvrId(selectedNvrId)
   }
 
   const handleClosePPopup = () => {
@@ -246,8 +248,8 @@ const UserList = ({ apiData }) => {
     fetchFilteredOrAllUsers()
   }, [page, pageSize, total, value])
 
-  console.log(nameNVR,'idNVR');
-  
+  console.log(nameNVR, 'idNVR')
+
   return (
     <Grid container spacing={6.5}>
       <Grid item xs={12}>
@@ -315,25 +317,23 @@ const UserList = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{statusText}</TableCell>
 
                       <TableCell sx={{ padding: '16px' }}>
-                        <Grid container spacing={2}>
-                          <IconButton size='small' onClick={handleAddPClick}>
-                            <Icon icon='tabler:key' />
-                          </IconButton>
-                          <IconButton size='small' onClick={handleAddVideoConnectClick}>
-                            <Icon icon='tabler:camera' />
-                          </IconButton>
-                          <IconButton size='small' onClick={() =>{
+                        <IconButton size='small' onClick={() => handleAddPClick(assetType.id)}>
+                          <Icon icon='tabler:edit' />
+                        </IconButton>
+                        <IconButton
+                          size='small'
+                          onClick={() => {
                             setIPNVR(assetType.ipAddress)
                             setNameNvr(assetType.name)
                             setId(assetType.id)
                             handleAddConnectCameraClick(assetType.id)
-                            }}>
-                            <Icon icon='tabler:link' />
-                          </IconButton>
-                          <IconButton size='small' sx={{ color: 'text.secondary' }}>
-                            <Icon icon='tabler:reload' />
-                          </IconButton>
-                        </Grid>
+                          }}
+                        >
+                          <Icon icon='tabler:link' />
+                        </IconButton>
+                        <IconButton onClick={() => handleDelete(assetType.id)}>
+                          <Icon icon='tabler:trash' />
+                        </IconButton>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -364,13 +364,13 @@ const UserList = ({ apiData }) => {
         </Card>
         {openPopupNetwork && (
           <>
-            {/* <RolePopup open={openPopup} onClose={handleClosePopup} nvr={selectedIds} /> */}
+            {/* <ChangePassWords open={openPopup} onClose={handleClosePopup} nvr={selectedIds} /> */}
             <Network open={openPopupNetwork} onClose={handleCloseNetWorkPopup} nvr={selectedIds} />
           </>
         )}
         {/* {selectedIds.length > 0 && (
           <>
-            <RolePopup open={openPopup} onClose={handleClosePopup} nvr={selectedIds} />
+            <ChangePassWords open={openPopup} onClose={handleClosePopup} nvr={selectedIds} />
             <Network open={openPopupNetwork} onClose={handleCloseNetWorkPopup} nvr={selectedIds} />
             <Video open={openPopupVideo} onClose={handleCloseVideoPopup} nvr={selectedIds} />
             <Image open={openPopupImage} onClose={handleCloseImagePopup} nvr={selectedIds} />
@@ -379,9 +379,39 @@ const UserList = ({ apiData }) => {
           </>
 
         )}  */}
-        <Passwords open={openPopupP} onClose={handleClosePPopup} nvr={selectedIds} />
-
-        <ConnectCamera open={openPopupConnectCamera} onClose={handleCloseConnectCameraPopup} nvr={idNVR} name ={nameNVR} ip={IPNVR}/>
+        {openPopup && (
+          <>
+            <ChangePassWords open={openPopup} onClose={handleClosePopup} nvr={selectedIds} />
+          </>
+        )}
+        {openPopupVideo && (
+          <>
+            <Video open={openPopupVideo} onClose={handleCloseVideoPopup} camera={selectedIds} />
+          </>
+        )}{' '}
+        {openPopupImage && (
+          <>
+            <Images open={openPopupImage} onClose={handleCloseImagePopup} camera={selectedIds} />
+          </>
+        )}{' '}
+        {openPopupCloud && (
+          <>
+            <Cloud open={openPopupCloud} onClose={handleCloseCloudPopup} camera={selectedIds} />
+          </>
+        )}
+        {openPopupP && (
+          <>
+            <Edit open={openPopupP} onClose={handleClosePPopup} nvr={selectedNvrId} />
+          </>
+        )}
+        {/* <Passwords open={openPopupP} onClose={handleClosePPopup} nvr={selectedIds} /> */}
+        <ConnectCamera
+          open={openPopupConnectCamera}
+          onClose={handleCloseConnectCameraPopup}
+          nvr={idNVR}
+          name={nameNVR}
+          ip={IPNVR}
+        />
         <VideoConnectCamera
           open={openPopupVideoConnectCamera}
           onClose={handleCloseVideoConnectPopup}

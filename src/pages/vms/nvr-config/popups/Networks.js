@@ -102,49 +102,33 @@ const Network = ({ open, onClose, onSelect, nvr }) => {
   }, [])
 
   return (
-    <Dialog
-      fullWidth
-      maxWidth='md'
-      scroll='body'
-      open={open}
-      TransitionComponent={Transition}
-      sx={{ '& .MuiDialog-paper': { overflow: 'visible' } }}
-    >
-      {' '}
-      <DialogTitle>Cấu hình mạng</DialogTitle>
-      <DialogContent>
-        <CustomCloseButton onClick={onClose}>
-          <Icon icon='tabler:x' fontSize='1.25rem' />
-        </CustomCloseButton>
-        <TabContext value={value}>
-          <Grid>
-            {' '}
-            <TabList onChange={handleChange} aria-label='customized tabs example'>
-              <Tab value='1' label='TCP/IP' />
-              <Tab value='2' label='DDNS' />
-              <Tab value='3' label='PORT' />
-              {/* <Tab value='4' label='NTP' /> */}
-            </TabList>
-          </Grid>
-          <TabPanel value='1'>
-            {' '}
-            <TCP nvr={nvrs} onClose={onClose} />
-          </TabPanel>
-          <TabPanel value='2'>
-            {' '}
-            <DDNs nvr={nvrs} onClose={onClose} />
-          </TabPanel>
-          <TabPanel value='3'>
-            {' '}
-            <Port nvr={nvrs} onClose={onClose} />
-          </TabPanel>
-          {/* <TabPanel value='4'>
+    <TabContext value={value}>
+      <Grid>
+        {' '}
+        <TabList onChange={handleChange} aria-label='customized tabs example'>
+          <Tab value='1' label='TCP/IP' />
+          <Tab value='2' label='DDNS' />
+          <Tab value='3' label='PORT' />
+          {/* <Tab value='4' label='NTP' /> */}
+        </TabList>
+      </Grid>
+      <TabPanel value='1'>
+        {' '}
+        <TCP nvr={nvrs} onClose={onClose} />
+      </TabPanel>
+      <TabPanel value='2'>
+        {' '}
+        <DDNs nvr={nvrs} onClose={onClose} />
+      </TabPanel>
+      <TabPanel value='3'>
+        {' '}
+        <Port nvr={nvrs} onClose={onClose} />
+      </TabPanel>
+      {/* <TabPanel value='4'>
             {' '}
             <NTP nvr={nvrs} onClose={onClose} />
           </TabPanel> */}
-        </TabContext>
-      </DialogContent>
-    </Dialog>
+    </TabContext>
   )
 }
 

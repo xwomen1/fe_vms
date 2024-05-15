@@ -1,205 +1,205 @@
-import { useRouter } from 'next/router'
-
-import { useState, useEffect, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios'
 import authConfig from 'src/configs/auth'
 import CustomTextField from 'src/@core/components/mui/text-field'
-import {
-  Grid,
-  IconButton,
-  Button,
-  FormControlLabel,
-  Checkbox,
-  Switch,
-  TextField,
-  Typography,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem
-} from '@mui/material'
-import Icon from 'src/@core/components/icon'
+import { Grid, Checkbox, DialogActions, Button, CircularProgress } from '@mui/material'
 import Autocomplete from '@mui/material/Autocomplete'
-import Box from '@mui/material/Box'
-import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
-import TableContainer from '@mui/material/TableContainer'
-import Paper from '@mui/material/Paper'
-import Table from '@mui/material/Table'
-import TableRow from '@mui/material/TableRow'
-import TableHead from '@mui/material/TableHead'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import DatePicker from 'react-datepicker'
-import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
-
 import Swal from 'sweetalert2'
-import Link from 'next/link'
+import { makeStyles } from '@material-ui/core/styles'
 
-import Alert from '@mui/material/Alert'
+const TCP = ({ onClose, nvr }) => {
+  const classes = useStyles()
+  const defaultValue = nvr?.nicType?.name || ''
 
-const nicTypeOptions = [
-  { label: 'Auto', value: 'option1' },
-  { label: '10M Half-Dup', value: 'option2' },
-  { label: '10M Full-Dup', value: 'option3' },
-  { label: '100M Half-Dup', value: 'option4' },
-  { label: '100M Full-Dup', value: 'option5' }
-]
+  const [autoDNS, setAutoDNS] = useState(nvr?.autoDNS || false)
+  const [multicast, setMulticast] = useState(nvr?.multicast || false)
+  const [prefDNS, setPrefDNS] = useState(nvr?.prefDNS || '')
+  const [alterDNS, setAlterDNS] = useState(nvr?.alterDNS || '')
+  const [dhcp, setDHCP] = useState(nvr?.dhcp || false)
+  const [mtus, setMTU] = useState(nvr?.mtu || 'null')
+  const [multiAddress, setMultiAddress] = useState(nvr?.MulticastAddress || '')
+  const [ddnsServer, setDDNSServer] = useState(nvr?.prefDNS || '')
+  const [alter, setAlter] = useState(nvr?.alterDNS || '')
+  const [macAddress, setMacAddress] = useState(nvr?.macAddress || '')
+  const [ipv4, setIpv4] = useState(nvr?.ipv4SubnetMask || '')
+  const [ipv6, setIpv6] = useState(nvr?.ipv6DefaultGateway || '')
+  const [subnetPrefixLength, setSubnetPrefixLength] = useState(nvr?.subnetPrefixLength || '')
+  const [ipv4DefaultGateway, setIpv4Default] = useState(nvr?.ipv4DefaultGateway || '')
+  const [nicTypeOptions, setNicTypeOptions] = useState([])
 
-const TCPIP = nvrs => {
-  const router = useRouter()
-  const { id } = router.query
-  const [timeValidity, setTimeValidity] = useState('Custom')
-  const [user, setUser] = useState(null)
-  const [readOnly, setReadOnly] = useState(true)
-  const [params, setParams] = useState({})
-  const [editing, setEditing] = useState(false)
-  const [groupOptions, setGroupOptions] = useState([])
-  const [policy, setPolicy] = useState([])
-  const [status, setStatus] = useState('ACTIVE')
-  const [status1, setStatus1] = useState('ACTIVE')
-  const [availableAt, setAvailableAt] = useState('')
-  const [expiredAt, setExpiredAt] = useState('')
-  const [note, setNote] = useState('')
-  const [rows, setRows] = useState([])
-  const [rows1, setRows1] = useState([])
-  const [createAccount, setCreateAccount] = useState(true)
-  const [timeEndMorning, setTimeEndMorning] = useState('')
-  const [timeStartAfternoon, setTimeStartAfternoon] = useState('')
-  const [timeEndAfternoon, setTimeEndAfternoon] = useState('')
-  const [dateTime, setDateTime] = useState('')
-  const [fullNameValue, setFullNameValue] = useState('')
-  const [account, setAccount] = useState('')
-  const [email, setEmail] = useState('')
-  const [phoneNumber, setPhoneNumber] = useState('')
-  const [identityNumber, setIdentityNumber] = useState('')
-  const [userCode, setUserCode] = useState('')
-  const [syncCode, setSyncCode] = useState('')
-  const [ava1, setAva1] = useState(null)
-  const [ava2, setAva2] = useState(null)
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [selectedNicType, setSelectedNicType] = useState(nvrs?.nvrs?.ddnsType?.name)
+  const [selectedNicType, setSelectedNicType] = useState({
+    label: nvr?.nicType?.name || '',
+    value: nvr?.nicType?.name || ''
+  })
+
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (nvr) {
+      setAutoDNS(nvr.autoDNS || false)
+      setMulticast(nvr.multicast || false)
+      setDHCP(nvr.dhcp || false)
+      setMTU(nvr.mtu || 'null')
+      setMultiAddress(nvr.MulticastAddress || '')
+      setDDNSServer(nvr.prefDNS || '')
+      setAlter(nvr.alterDNS || '')
+      setMacAddress(nvr.macAddress || '')
+      setIpv4(nvr.ipv4SubnetMask || '')
+      setIpv4Default(nvr.ipv4DefaultGateway || '')
+      setSubnetPrefixLength(nvr.subnetPrefixLength || '')
+      setIpv6(nvr.ipv6DefaultGateway || '')
+      setPrefDNS(nvr.prefDNS || '')
+      setAlterDNS(nvr.alterDNS || '')
+    }
+  }, [nvr])
+  useEffect(() => {
+    setSelectedNicType({
+      label: defaultValue,
+      value: defaultValue
+    })
+  }, [defaultValue])
+
+  const fetchNicTypes = async () => {
+    try {
+      setLoading(true)
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.get(
+        'https://sbs.basesystem.one/ivis/vms/api/v0/cameras/options/combox?cameraType=network_nic_type',
+        config
+      )
+
+      const nicTypes = response.data.map(item => ({
+        id: item.id,
+        channel: item.channel,
+        name: item.name,
+        label: item.name,
+        value: item.value
+      }))
+      setNicTypeOptions(nicTypes)
+      console.log(nicTypes)
+      if (nicTypes.length > 0) {
+        setSelectedNicType(nicTypes[0].value)
+      }
+    } catch (error) {
+      console.error('Error fetching NIC types:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleNicTypeChange = (event, newValue) => {
-    setSelectedNicType(newValue)
+    setSelectedNicType(newValue || defaultValue)
   }
 
-  const handleAddRow = () => {
-    const newRow = { groupName: '', groupCode: '', groupId: '' } // Thêm groupId vào đây
-    setRows([...rows, newRow])
+  const handleComboboxFocus = () => {
+    fetchNicTypes()
+    console.log('Fetching NIC types...') // Add this line
   }
 
-  const handleAddRow1 = () => {
-    const newRow1 = { policyName: '', description: '' }
-    setRows1([...rows1, newRow1])
+  const handleCheckboxChange = () => {
+    setAutoDNS(!autoDNS)
   }
 
-  const handleCreateAccountChange = event => {
-    setCreateAccount(event.target.checked)
+  const handleSaveClick = async () => {
+    try {
+      setLoading(true)
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const data = {
+        macAddress: macAddress || nvr.macAddress,
+        dhcp: dhcp,
+        mtu: mtus || nvr?.mtu,
+        ipv4SubnetMask: ipv4 || nvr?.ipv4SubnetMask,
+        ipv4DefaultGateway: ipv4DefaultGateway || nvr?.ipv4DefaultGateway,
+        subnetPrefixLength: subnetPrefixLength || nvr?.subnetPrefixLength,
+        ipv6DefaultGateway: ipv6 || nvr?.ipv6DefaultGateway,
+        prefDNS: prefDNS || nvr?.prefDNS,
+        alterDNS: alterDNS || nvr?.alterDNS,
+        autoDNS: autoDNS,
+        nicType: {
+          id: selectedNicType.id || nvr.nicType.id,
+          name: selectedNicType.name || nvr.nicType.name,
+          channel: selectedNicType.channel
+        }
+      }
+      await axios.put(
+        `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/config/networkconfig/{idNetWorkConfig}?idNetWorkConfig=${nvr.id}&NetWorkConfigType=tcpip`,
+        data,
+        config
+      )
+      Swal.fire('Lưu thành công!', '', 'success')
+      onClose()
+    } catch (error) {
+      console.error(error)
+      onClose()
+
+      Swal.fire('Lưu thất bại', error.message, 'error')
+    } finally {
+      setLoading(false)
+    }
   }
-
-  const handleStartDateChange = date => {
-    setAvailableAt(date)
-    setAva1(isoToEpoch(date))
-  }
-
-  const handleEndDateChange = date => {
-    setExpiredAt(date)
-    setAva2(isoToEpoch(date))
-  }
-  console.log('New start date:', isoToEpoch(availableAt))
-  function isoToEpoch(isoDateString) {
-    var milliseconds = Date.parse(isoDateString)
-
-    var epochSeconds = Math.round(milliseconds)
-
-    return epochSeconds
-  }
-
-  const handleFullNameChange = event => {
-    setFullNameValue(event.target.value)
-  }
-
-  const handleAccountChange = event => {
-    setAccount(event.target.value)
-  }
-
-  const handlePasswordChange = event => {
-    setPassword(event.target.value)
-  }
-
-  const handleConfirmPasswordChange = event => {
-    setConfirmPassword(event.target.value)
-  }
-
-  const handleStatusChange = () => {
-    setStatus1(status1 === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE')
-  }
-
-  const handleEmailChange = event => {
-    setEmail(event.target.value)
-  }
-
-  const handlePhoneNumberChange = event => {
-    setPhoneNumber(event.target.value)
-  }
-
-  const handleNoteChange = event => {
-    setNote(event.target.value)
-  }
-
-  const handleIdentityNumberChange = event => {
-    setIdentityNumber(event.target.value)
-  }
-
-  console.log('param', nvrs.nvrs.ddnsType)
-  const formatDDNS = ddns => <Checkbox checked={ddns} disabled />
 
   return (
-    <div style={{ width: '100%' }}>
+    <div style={{ width: '100%' }} className={classes.loadingContainer}>
+      {loading && <CircularProgress className={classes.circularProgress} />}
       <Grid container spacing={3}>
-        <Grid container item component={Paper} style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
+        <Grid container item style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
           <Grid item xs={5.8}>
             <Autocomplete
               value={selectedNicType}
               onChange={handleNicTypeChange}
-              options={nicTypeOptions.map(option => option.label)}
-              renderInput={params => <TextField {...params} label='Loại NIC' fullWidth />}
-            />
+              options={nicTypeOptions}
+              getOptionLabel={option => option.label}
+              renderInput={params => <CustomTextField {...params} label='Loại NIC' fullWidth />}
+              onFocus={handleComboboxFocus}
+            />{' '}
           </Grid>
           <Grid item xs={0.4}></Grid>
-          <Grid item xs={5.8}>
-            <CustomTextField label='MAC Address' value={nvrs.nvrs.macAddress} onChange={handleEmailChange} fullWidth />
-          </Grid>
-          <Grid item xs={5.8}>
-            {formatDDNS(nvrs.nvrs.dhcp)} DHCP
-          </Grid>
-          <Grid item xs={0.4}></Grid>
-          <Grid item xs={5.8}>
-            <CustomTextField label='MTU' value={nvrs.nvrs.mtu} onChange={handleEmailChange} fullWidth />
-          </Grid>
           <Grid item xs={5.8}>
             <CustomTextField
-              label='IPv4 Subnet Mask'
-              value={nvrs.nvrs.ipv4SubnetMask}
-              onChange={handleFullNameChange}
+              label='MAC Address'
+              value={macAddress}
+              onChange={e => setMacAddress(e.target.value)}
               fullWidth
             />
+          </Grid>
+          <Grid item xs={5.8}>
+            <Checkbox checked={dhcp} onChange={() => setDHCP(!dhcp)} /> DHCP
+          </Grid>
+          <Grid item xs={0.4}></Grid>
+          <Grid item xs={5.8}>
+            <CustomTextField label='MTU' value={mtus} onChange={e => setMTU(e.target.value)} fullWidth />
+          </Grid>
+          <Grid item xs={5.8}>
+            <CustomTextField label='IPv4 Subnet Mask' value={ipv4} onChange={e => setIpv4(e.target.value)} fullWidth />
           </Grid>
           <Grid item xs={0.4}></Grid>
           <Grid item xs={5.8}>
             <CustomTextField
               label='IPv4 Default Gateway'
-              value={nvrs.nvrs.ipv4DefaultGateway}
-              onChange={handleEmailChange}
+              value={ipv4DefaultGateway}
+              onChange={e => setIpv4Default(e.target.value)}
               fullWidth
             />
           </Grid>
           <Grid item xs={5.8}>
             <CustomTextField
               label='Subnet Prefix Length'
-              value={nvrs.nvrs.subnetPrefixLength}
-              onChange={handleFullNameChange}
+              value={subnetPrefixLength}
+              onChange={e => setSubnetPrefixLength(e.target.value)}
               fullWidth
             />
           </Grid>
@@ -207,8 +207,8 @@ const TCPIP = nvrs => {
           <Grid item xs={5.8}>
             <CustomTextField
               label='IPv6 Default Gateway'
-              value={nvrs.nvrs.ipv6DefaultGateway}
-              onChange={handleEmailChange}
+              value={ipv6}
+              onChange={e => setIpv6(e.target.value)}
               fullWidth
             />
           </Grid>
@@ -216,34 +216,62 @@ const TCPIP = nvrs => {
         <Grid item xs={12} style={{ fontWeight: 500, backgroundColor: 'lightgray' }}>
           DNS Server
         </Grid>
-        <Grid container item component={Paper} style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
+        <Grid container item style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
           <Grid item xs={5.8}>
-            {formatDDNS(nvrs.nvrs.dhcp)} Auto DNS
+            <Checkbox checked={autoDNS} onChange={handleCheckboxChange} /> Auto DNS
           </Grid>
           <Grid item xs={0.4}></Grid>
           <Grid item xs={5.8}></Grid>
           <Grid item xs={5.8}>
             <CustomTextField
               label='Preferred DNS Server'
-              value={nvrs.nvrs.autoDNS}
-              onChange={handleFullNameChange}
+              value={prefDNS}
+              onChange={e => setPrefDNS(e.target.value)}
               fullWidth
             />
           </Grid>
           <Grid item xs={0.4}></Grid>
           <Grid item xs={5.8}>
             <CustomTextField
-              label='Alternnate DNS Server'
-              value={nvrs.nvrs.alterDNS}
-              onChange={handleEmailChange}
+              label='Alternate DNS Server'
+              value={alterDNS}
+              onChange={e => setAlterDNS(e.target.value)}
               fullWidth
             />
           </Grid>
         </Grid>
       </Grid>
-      <br />
+      <Grid item xs={12}>
+        <DialogActions
+          sx={{
+            justifyContent: 'center',
+            px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
+            pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
+          }}
+        >
+          <Button onClick={onClose}>Đóng</Button>
+          <Button type='submit' variant='contained' onClick={handleSaveClick}>
+            Lưu
+          </Button>
+        </DialogActions>
+      </Grid>
     </div>
   )
 }
 
-export default TCPIP
+const useStyles = makeStyles(() => ({
+  loadingContainer: {
+    position: 'relative',
+    minHeight: '100px',
+    zIndex: 0
+  },
+  circularProgress: {
+    position: 'absolute',
+    top: '40%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    zIndex: 99999
+  }
+}))
+
+export default TCP
