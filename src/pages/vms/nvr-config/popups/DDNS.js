@@ -1,189 +1,346 @@
-import { useRouter } from 'next/router'
-
-import { useState, useEffect, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios'
 import authConfig from 'src/configs/auth'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import {
   Grid,
-  IconButton,
-  Button,
-  FormControlLabel,
   Checkbox,
   Switch,
-  TextField,
-  Typography,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem
+  DialogActions,
+  Button,
+  CircularProgress,
+  InputAdornment,
+  IconButton
 } from '@mui/material'
-import Icon from 'src/@core/components/icon'
 import Autocomplete from '@mui/material/Autocomplete'
-import Box from '@mui/material/Box'
-import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
-import TableContainer from '@mui/material/TableContainer'
-import Paper from '@mui/material/Paper'
-import Table from '@mui/material/Table'
-import TableRow from '@mui/material/TableRow'
-import TableHead from '@mui/material/TableHead'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import DatePicker from 'react-datepicker'
-import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
-
 import Swal from 'sweetalert2'
-import Link from 'next/link'
-import Alert from '@mui/material/Alert'
+import { makeStyles } from '@material-ui/core/styles'
+import { set } from 'nprogress'
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
+import VisibilityIcon from '@mui/icons-material/Visibility'
 
-const UserDetails = nvrs => {
-  const router = useRouter()
-  const { id } = router.query
-  const [timeValidity, setTimeValidity] = useState('Custom')
-  const [user, setUser] = useState(null)
-  const [readOnly, setReadOnly] = useState(true)
-  const [params, setParams] = useState({})
-  const [editing, setEditing] = useState(false)
-  const [groupOptions, setGroupOptions] = useState([])
-  const [policy, setPolicy] = useState([])
-  const [status, setStatus] = useState('ACTIVE')
-  const [status1, setStatus1] = useState('ACTIVE')
-  const [availableAt, setAvailableAt] = useState('')
-  const [expiredAt, setExpiredAt] = useState('')
-  const [note, setNote] = useState('')
-  const [rows, setRows] = useState([])
-  const [rows1, setRows1] = useState([])
-  const [createAccount, setCreateAccount] = useState(true)
-  const [timeEndMorning, setTimeEndMorning] = useState('')
-  const [timeStartAfternoon, setTimeStartAfternoon] = useState('')
-  const [timeEndAfternoon, setTimeEndAfternoon] = useState('')
-  const [dateTime, setDateTime] = useState('')
-  const [fullNameValue, setFullNameValue] = useState('')
-  const [account, setAccount] = useState('')
-  const [email, setEmail] = useState('')
-  const [phoneNumber, setPhoneNumber] = useState('')
-  const [identityNumber, setIdentityNumber] = useState('')
-  const [userCode, setUserCode] = useState('')
-  const [syncCode, setSyncCode] = useState('')
-  const [ava1, setAva1] = useState(null)
-  const [ava2, setAva2] = useState(null)
-  const [password, setPassword] = useState('')
+const TCP = ({ onClose, mtu, nvr }) => {
+  const [autoDNS, setAutoDNS] = useState(nvr?.autoDNS)
+  const [multicast, setMulticast] = useState(nvr?.multicast)
+  const [userName, setUserName] = useState(nvr?.userName)
+
+  const [password, setPassword] = useState(nvr?.password)
+  const [port, setPort] = useState(nvr?.port)
+
+  const [dhcp, setDHCP] = useState(nvr?.dhcp)
+  const [mtus, setMTU] = useState(nvr?.mtu || 'null')
+  const [serverAddressNTP, setserverAddressNTP] = useState(nvr?.serverAddressNTP)
+  const [ddnsServer, setDDNSServer] = useState(nvr?.ddns)
+  const [domain, setDomain] = useState(nvr?.domain)
+  const [macAddress, setMacAddress] = useState(nvr?.macAddress)
+  const [ipv4, setIpv4] = useState(nvr?.ipv4SubnetMask)
+  const [ipv6, setIpv6] = useState(nvr?.ipv6DefaultGateway)
   const [confirmPassword, setConfirmPassword] = useState('')
 
-  const handleAddRow = () => {
-    const newRow = { groupName: '', groupCode: '', groupId: '' } // Thêm groupId vào đây
-    setRows([...rows, newRow])
+  const [subnetPrefixLength, setsubnetPrefixLength] = useState(nvr?.subnetPrefixLength)
+
+  const [ipv4DefaultGateway, setIpv4Default] = useState(nvr?.ipv4DefaultGateway)
+  const [showPassword, setShowPassword] = useState(false)
+
+  const classes = useStyles()
+
+  const [ddnsTypeOptions, setddnsTypeOptions] = useState([])
+
+  const defaultValue = nvr?.ddnsType?.name || ''
+
+  const [selectedDDNSType, setselectedDDNSType] = useState({
+    label: nvr?.ddnsType?.name || '',
+    value: nvr?.ddnsType?.name || ''
+  })
+
+  const handleUserNameChange = event => {
+    setUserName(event.target.value)
+  }
+  console.log(nvr)
+
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword)
   }
 
-  const handleAddRow1 = () => {
-    const newRow1 = { policyName: '', description: '' }
-    setRows1([...rows1, newRow1])
+  useEffect(() => {
+    if (nvr) {
+      setDDNSServer(nvr.ddns)
+      setUserName(nvr.userName)
+      setselectedDDNSType({
+        label: nvr?.ddnsType?.name || '',
+        value: nvr?.ddnsType?.name || ''
+      })
+      setserverAddressNTP(nvr.serverAddressNTP)
+      setPassword(nvr?.password)
+      setPort(nvr?.port)
+      setDomain(nvr?.domain)
+    }
+  }, [nvr])
+
+  const fetchDDNSTypes = async () => {
+    try {
+      setLoading(true)
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.get(
+        'https://sbs.basesystem.one/ivis/vms/api/v0/cameras/options/combox?cameraType=network_ddns_type',
+        config
+      )
+
+      const ddnsTypes = response.data.map(item => ({
+        id: item.id,
+        channel: item.channel,
+        name: item.name,
+        label: item.name,
+        value: item.value
+      }))
+      setddnsTypeOptions(ddnsTypes)
+      console.log(ddnsTypes)
+      if (ddnsTypes.length > 0) {
+        setselectedDDNSType(ddnsTypes[0].value)
+      }
+    } catch (error) {
+      console.error('Error fetching DDNS types:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+  console.log(selectedDDNSType)
+
+  useEffect(() => {
+    setselectedDDNSType({
+      label: defaultValue,
+      value: defaultValue
+    })
+  }, [defaultValue])
+
+  const handleComboboxFocus = () => {
+    if (ddnsTypeOptions.length === 0) {
+      fetchDDNSTypes()
+    }
   }
 
-  const handleCreateAccountChange = event => {
-    setCreateAccount(event.target.checked)
+  const formatDDNS = autoDNS => <Checkbox checked={autoDNS} onChange={handleCheckboxChange} />
+
+  console.log(nvr)
+
+  const handleDDNSTypeChange = (event, newValue) => {
+    setselectedDDNSType(newValue || defaultValue)
   }
 
-  const handleStartDateChange = date => {
-    setAvailableAt(date)
-    setAva1(isoToEpoch(date))
+  const [loading, setLoading] = useState(false)
+
+  const handleStatusChange = () => {
+    setDHCP(dhcp === true ? false : true)
   }
 
-  const handleEndDateChange = date => {
-    setExpiredAt(date)
-    setAva2(isoToEpoch(date))
-  }
-  console.log('New start date:', isoToEpoch(availableAt))
-  function isoToEpoch(isoDateString) {
-    var milliseconds = Date.parse(isoDateString)
-
-    var epochSeconds = Math.round(milliseconds)
-
-    return epochSeconds
+  const handleCheckboxChange = () => {
+    setDDNSServer(ddnsServer === true ? false : true)
   }
 
-  const handleFullNameChange = event => {
-    setFullNameValue(event.target.value)
-  }
+  console.log(selectedDDNSType)
 
-  const handleAccountChange = event => {
-    setAccount(event.target.value)
+  const handleserverAddressNTPChange = event => {
+    setserverAddressNTP(event.target.value)
   }
 
   const handlePasswordChange = event => {
     setPassword(event.target.value)
   }
 
+  const handlePortChange = event => {
+    setPort(event.target.value)
+  }
+
+  const handleDomainChange = event => {
+    setDomain(event.target.value)
+  }
+
   const handleConfirmPasswordChange = event => {
     setConfirmPassword(event.target.value)
   }
 
-  const handleStatusChange = () => {
-    setStatus1(status1 === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE')
+  const handleSaveClick = async () => {
+    handleSave() // Gọi hàm handleSave truyền từ props
   }
 
-  const handleEmailChange = event => {
-    setEmail(event.target.value)
-  }
+  const handleSave = async () => {
+    try {
+      setLoading(true)
+      if (password !== confirmPassword) {
+        onClose()
+        Swal.fire('Lỗi!', 'Mật khẩu và xác nhận mật khẩu không khớp nhau.', 'error')
+        setLoading(false)
 
-  const handlePhoneNumberChange = event => {
-    setPhoneNumber(event.target.value)
-  }
+        return
+      }
 
-  const handleNoteChange = event => {
-    setNote(event.target.value)
-  }
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
-  const handleIdentityNumberChange = event => {
-    setIdentityNumber(event.target.value)
-  }
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
 
-  console.log('param', nvrs.nvrs.ddnsType)
-  const formatDDNS = ddns => <Checkbox checked={ddns} disabled />
+      const data = {
+        ddnsType: {
+          id: selectedDDNSType.id || nvr.ddnsType.id,
+          name: selectedDDNSType.name || nvr.ddnsType.name,
+          channel: selectedDDNSType.channel
+        },
+        userName: userName,
+        ddns: ddnsServer,
+        serverAddressNTP: serverAddressNTP,
+
+        password: password,
+        confirm: confirmPassword,
+        domain: domain
+      }
+
+      await axios.put(
+        `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/config/networkconfig/{idNetWorkConfig}?idNetWorkConfig=${nvr.id}&NetWorkConfigType=ddns`,
+        data,
+        config
+      )
+      setLoading(false)
+      onClose()
+
+      Swal.fire('Lưu thành công!', '', 'success')
+    } catch (error) {
+      console.error(error)
+      setLoading(false)
+      onClose()
+
+      Swal.fire(error.message, error.response?.data?.message)
+      console.log(error.response?.data?.message)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
-    <div style={{ width: '100%' }}>
+    <div style={{ width: '100%' }} className={classes.loadingContainer}>
+      {loading && <CircularProgress className={classes.circularProgress} />}{' '}
       <Grid container spacing={3}>
-        <Grid container item component={Paper} style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
+        <Grid container item style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
           <Grid item xs={5.8}>
-            {formatDDNS(nvrs.nvrs.ddns)} Enable DDNS
+            {formatDDNS(ddnsServer)} Enable DDNS
           </Grid>
+
           <Grid item xs={0.4}></Grid>
+
           <Grid item xs={5.8}></Grid>
           <Grid item xs={5.8}>
-            <CustomTextField label='DDNS Type' value={nvrs.nvrs.ddnsType} onChange={handleFullNameChange} fullWidth />
+            <Autocomplete
+              value={selectedDDNSType}
+              onChange={handleDDNSTypeChange}
+              options={ddnsTypeOptions}
+              getOptionLabel={option => option.label}
+              renderInput={params => <CustomTextField {...params} label='Loại DDNS' fullWidth />}
+              onFocus={handleComboboxFocus}
+            />{' '}
           </Grid>
+          {/* <Grid item xs={5.8}>
+            <CustomTextField label='DDNS Type' value={nvr?.ddnsType} fullWidth />
+          </Grid> */}
           <Grid item xs={0.4}></Grid>
           <Grid item xs={5.8}>
-            <CustomTextField label='User Name' value={nvrs.nvrs.userName} onChange={handleEmailChange} fullWidth />
+            <CustomTextField label='User Name' value={userName} onChange={handleUserNameChange} fullWidth />
           </Grid>
           <Grid item xs={5.8}>
             <CustomTextField
               label='Server Address'
-              value={nvrs.nvrs.serverAddressNTP}
-              onChange={handleFullNameChange}
+              value={serverAddressNTP}
+              onChange={handleserverAddressNTPChange}
               fullWidth
             />
           </Grid>
           <Grid item xs={0.4}></Grid>
           <Grid item xs={5.8}>
-            <CustomTextField label='Password' value={nvrs.nvrs.password} onChange={handleEmailChange} fullWidth />
+            <CustomTextField
+              label='Password'
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position='end'>
+                    <IconButton onClick={toggleShowPassword} edge='end'>
+                      {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
+              onChange={handlePasswordChange}
+              fullWidth
+            />
           </Grid>
           <Grid item xs={5.8}>
-            <CustomTextField label='Port' value={nvrs.nvrs.port} onChange={handleFullNameChange} fullWidth />
+            <CustomTextField label='Port' value={port} onChange={handlePortChange} fullWidth />
           </Grid>
           <Grid item xs={0.4}></Grid>
           <Grid item xs={5.8}>
-            <CustomTextField label='User Name' value={nvrs.nvrs.userName} onChange={handleEmailChange} fullWidth />
+            <CustomTextField
+              label='Confirm'
+              type={showPassword ? 'text' : 'password'}
+              value={confirmPassword}
+              onChange={handleConfirmPasswordChange}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position='end'>
+                    <IconButton onClick={toggleShowPassword} edge='end'>
+                      {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
+              fullWidth
+            />
           </Grid>
           <Grid item xs={5.8}>
-            <CustomTextField label='Domain' value={nvrs.nvrs.domain} onChange={handleFullNameChange} fullWidth />
+            <CustomTextField label='Domain' value={domain} onChange={handleDomainChange} fullWidth />
           </Grid>
         </Grid>
+      </Grid>
+      <Grid item xs={12}>
+        <DialogActions
+          sx={{
+            justifyContent: 'center',
+            px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
+            pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
+          }}
+        >
+          <Button onClick={onClose}>Đóng</Button>
+
+          <Button type='submit' variant='contained' onClick={handleSaveClick}>
+            Lưu
+          </Button>
+        </DialogActions>
       </Grid>
       <br />
     </div>
   )
 }
 
-export default UserDetails
+const useStyles = makeStyles(() => ({
+  loadingContainer: {
+    position: 'relative',
+    minHeight: '100px', // Đặt độ cao tùy ý
+    zIndex: 0
+  },
+  circularProgress: {
+    position: 'absolute',
+    top: '40%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    zIndex: 99999 // Đặt z-index cao hơn so với Grid container
+  }
+}))
+
+export default TCP

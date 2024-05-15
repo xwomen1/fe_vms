@@ -107,10 +107,11 @@ const UserDetails = ({ cameras, onClose }) => {
               pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
             }}
           >
+            <Button onClick={onClose}>Đóng</Button>
+
             <Button type='submit' variant='contained' onClick={handleSaveClick}>
               Lưu
             </Button>
-            <Button onClick={onClose}>Đóng</Button>
           </DialogActions>
         </Grid>
       </Grid>

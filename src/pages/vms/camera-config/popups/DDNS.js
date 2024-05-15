@@ -219,12 +219,10 @@ const DDNS = ({ cameras, onClose }) => {
               pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
             }}
           >
+            <Button onClick={onClose}>Đóng</Button>
+
             <Button type='submit' variant='contained' onClick={handleSaveClick}>
               Lưu
-            </Button>
-            <Button variant='tonal'>Mặc định</Button>
-            <Button variant='tonal' color='secondary' onClick={onClose}>
-              Hủy
             </Button>
           </DialogActions>
         </Grid>

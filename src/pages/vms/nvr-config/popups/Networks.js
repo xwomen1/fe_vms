@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react'
-import { Button, DialogActions, Grid } from '@mui/material'
+import { forwardRef, useEffect, useState } from 'react'
+import { Card, Fade, Grid, IconButton, Typography } from '@mui/material'
+import Icon from 'src/@core/components/icon'
+
 import Tab from '@mui/material/Tab'
 import TabPanel from '@mui/lab/TabPanel'
 import TabContext from '@mui/lab/TabContext'
@@ -10,7 +12,28 @@ import axios from 'axios'
 import TCP from './TCP-IP'
 import DDNs from './DDNS'
 import Port from './Port'
-import { Paper } from '@material-ui/core'
+import NTP from './NTP'
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Checkbox } from '@mui/material'
+import { Box } from 'devextreme-react'
+
+const Transition = forwardRef(function Transition(props, ref) {
+  return <Fade ref={ref} {...props} />
+})
+
+const CustomCloseButton = styled(IconButton)(({ theme }) => ({
+  top: 0,
+  right: 0,
+  color: 'grey.500',
+  position: 'absolute',
+  boxShadow: theme.shadows[2],
+  transform: 'translate(10px, -10px)',
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: `${theme.palette.background.paper} !important`,
+  transition: 'transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out',
+  '&:hover': {
+    transform: 'translate(7px, -5px)'
+  }
+}))
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   borderBottom: '0 !important',
@@ -36,15 +59,18 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
   }
 }))
 
-const Network = ({ open, onClose, onSelect, camera }) => {
-  const [cameras, setCamera] = useState([])
-  const [nic, setNic] = useState([])
+const Network = ({ open, onClose, onSelect, nvr }) => {
+  const [selectedRole, setSelectedRole] = useState(null)
+  const [groupName, setGroupName] = useState([])
+  const [defaultGroup, setDefaultGroup] = useState(null)
+  const [selectedGroupId, setSelectedGroupId] = useState(null) // Thêm trạng thái để lưu trữ id của nhóm được chọn
+  const [nvrs, setNvrs] = useState([])
+  const [groupCode, setGroupCode] = useState([])
   const [value, setValue] = useState('1')
 
   const handleChange = (event, newValue) => {
     setValue(newValue)
   }
-  console.log(camera, 'camera')
 
   const handleCancel = () => {
     onClose()
@@ -52,53 +78,57 @@ const Network = ({ open, onClose, onSelect, camera }) => {
   useEffect(() => {
     const fetchGroupData = async () => {
       try {
-        if (camera != null) {
-          const token = localStorage.getItem(authConfig.storageTokenKeyName)
-          console.log('token', token)
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+        console.log('token', token)
 
-          const config = {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
           }
-
-          const response = await axios.get(
-            `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/{idCamera}?idCamera=${camera}`,
-            config
-          )
-
-          setCamera(response.data)
-          setNic(response.data.nicType.name)
         }
+
+        const response = await axios.get(
+          `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/config/networkconfig/{idNVR}?idNVR=${nvr}`,
+          config
+        )
+
+        setNvrs(response.data)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
     }
 
     fetchGroupData()
-  }, [camera])
+  }, [])
 
   return (
-    <Grid container direction='column' component={Paper}>
-      <TabContext value={value}>
-        <Grid item>
-          <TabList onChange={handleChange} aria-label='customized tabs example'>
-            <Tab value='1' label='TCP/IP' />
-            <Tab value='2' label='DDNS' />
-            <Tab value='3' label='PORT' />
-          </TabList>
-        </Grid>
-        <TabPanel value='1'>
-          <TCP cameras={cameras} onClose={onClose} />
-        </TabPanel>
-        <TabPanel value='2'>
-          <DDNs cameras={cameras} onClose={onClose} />
-        </TabPanel>
-        <TabPanel value='3'>
-          <Port cameras={cameras} onClose={onClose} />
-        </TabPanel>
-      </TabContext>
-    </Grid>
+    <TabContext value={value}>
+      <Grid>
+        {' '}
+        <TabList onChange={handleChange} aria-label='customized tabs example'>
+          <Tab value='1' label='TCP/IP' />
+          <Tab value='2' label='DDNS' />
+          <Tab value='3' label='PORT' />
+          {/* <Tab value='4' label='NTP' /> */}
+        </TabList>
+      </Grid>
+      <TabPanel value='1'>
+        {' '}
+        <TCP nvr={nvrs} onClose={onClose} />
+      </TabPanel>
+      <TabPanel value='2'>
+        {' '}
+        <DDNs nvr={nvrs} onClose={onClose} />
+      </TabPanel>
+      <TabPanel value='3'>
+        {' '}
+        <Port nvr={nvrs} onClose={onClose} />
+      </TabPanel>
+      {/* <TabPanel value='4'>
+            {' '}
+            <NTP nvr={nvrs} onClose={onClose} />
+          </TabPanel> */}
+    </TabContext>
   )
 }
 
