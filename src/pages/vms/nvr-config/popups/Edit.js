@@ -65,7 +65,7 @@ const StyledTabPanel = styled(TabPanel)(({ theme }) => ({
   overflow: 'auto' // Enable scrolling if content exceeds the height
 }))
 
-const Edit = ({ open, onClose, camera }) => {
+const Edit = ({ open, onClose, nvr }) => {
   const [cameras, setCamera] = useState([])
   const [value, setValue] = useState('0')
 
@@ -73,7 +73,7 @@ const Edit = ({ open, onClose, camera }) => {
     setValue(newValue)
   }
 
-  console.log(camera, 'camera eidy')
+  console.log(nvr, 'cameraid')
 
   const handleCancel = () => {
     onClose()
@@ -106,22 +106,22 @@ const Edit = ({ open, onClose, camera }) => {
             </TabList>
           </Grid>
           <StyledTabPanel value='0'>
-            <Device onClose={handleCancel} camera={camera} />
+            <Device onClose={handleCancel} nvr={nvr} />
           </StyledTabPanel>
           <StyledTabPanel value='1'>
-            <Passwords onClose={handleCancel} camera={camera} />
+            <Passwords onClose={handleCancel} nvr={nvr} />
           </StyledTabPanel>
           <StyledTabPanel value='2'>
-            <Networks camera={camera} />
+            <Networks nvr={nvr} onClose={handleCancel} />
           </StyledTabPanel>
           <StyledTabPanel value='3'>
-            <Video nvrs={cameras} />
+            <Video nvr={nvr} onClose={handleCancel} />
           </StyledTabPanel>
           <StyledTabPanel value='4'>
-            <Images nvrs={cameras} />
+            <Images nvr={cameras} onClose={handleCancel} />
           </StyledTabPanel>
           <StyledTabPanel value='5'>
-            <Cloud nvrs={cameras} />
+            <Cloud nvr={cameras} onClose={handleCancel} />
           </StyledTabPanel>
         </TabContext>
       </DialogContent>

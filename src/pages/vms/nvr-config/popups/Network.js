@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
-import { Grid, IconButton } from '@mui/material'
+import { forwardRef, useEffect, useState } from 'react'
+import { Card, Fade, Grid, IconButton, Typography } from '@mui/material'
 import Icon from 'src/@core/components/icon'
-import Link from 'next/link'
+
 import Tab from '@mui/material/Tab'
 import TabPanel from '@mui/lab/TabPanel'
 import TabContext from '@mui/lab/TabContext'
@@ -13,17 +13,27 @@ import TCP from './TCP-IP'
 import DDNs from './DDNS'
 import Port from './Port'
 import NTP from './NTP'
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Checkbox } from '@mui/material'
+import { Box } from 'devextreme-react'
 
-import {
-  Autocomplete,
-  TextField,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Checkbox
-} from '@mui/material'
+const Transition = forwardRef(function Transition(props, ref) {
+  return <Fade ref={ref} {...props} />
+})
+
+const CustomCloseButton = styled(IconButton)(({ theme }) => ({
+  top: 0,
+  right: 0,
+  color: 'grey.500',
+  position: 'absolute',
+  boxShadow: theme.shadows[2],
+  transform: 'translate(10px, -10px)',
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: `${theme.palette.background.paper} !important`,
+  transition: 'transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out',
+  '&:hover': {
+    transform: 'translate(7px, -5px)'
+  }
+}))
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   borderBottom: '0 !important',
@@ -48,9 +58,8 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
     }
   }
 }))
-import Swal from 'sweetalert2'
 
-const RolePopup = ({ open, onClose, onSelect, nvr }) => {
+const Network = ({ open, onClose, onSelect, nvr }) => {
   const [selectedRole, setSelectedRole] = useState(null)
   const [groupName, setGroupName] = useState([])
   const [defaultGroup, setDefaultGroup] = useState(null)
@@ -93,43 +102,50 @@ const RolePopup = ({ open, onClose, onSelect, nvr }) => {
   }, [])
 
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog
+      fullWidth
+      maxWidth='md'
+      scroll='body'
+      open={open}
+      TransitionComponent={Transition}
+      sx={{ '& .MuiDialog-paper': { overflow: 'visible' } }}
+    >
+      {' '}
       <DialogTitle>Cấu hình mạng</DialogTitle>
       <DialogContent>
+        <CustomCloseButton onClick={onClose}>
+          <Icon icon='tabler:x' fontSize='1.25rem' />
+        </CustomCloseButton>
         <TabContext value={value}>
           <Grid>
             {' '}
             <TabList onChange={handleChange} aria-label='customized tabs example'>
               <Tab value='1' label='TCP/IP' />
-              <Tab value='2' label='DNS' />
+              <Tab value='2' label='DDNS' />
               <Tab value='3' label='PORT' />
-              <Tab value='4' label='NTP' />
+              {/* <Tab value='4' label='NTP' /> */}
             </TabList>
           </Grid>
           <TabPanel value='1'>
             {' '}
-            <TCP nvrs={nvrs} />
+            <TCP nvr={nvrs} onClose={onClose} />
           </TabPanel>
           <TabPanel value='2'>
             {' '}
-            <DDNs nvrs={nvrs} />
+            <DDNs nvr={nvrs} onClose={onClose} />
           </TabPanel>
           <TabPanel value='3'>
             {' '}
-            <Port nvrs={nvrs} />
+            <Port nvr={nvrs} onClose={onClose} />
           </TabPanel>
-          <TabPanel value='4'>
+          {/* <TabPanel value='4'>
             {' '}
-            <NTP nvrs={nvrs} />
-          </TabPanel>
+            <NTP nvr={nvrs} onClose={onClose} />
+          </TabPanel> */}
         </TabContext>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCancel}>Cancel</Button>
-        <Button>OK</Button>
-      </DialogActions>
     </Dialog>
   )
 }
 
-export default RolePopup
+export default Network

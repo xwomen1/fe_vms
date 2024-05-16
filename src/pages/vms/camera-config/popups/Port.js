@@ -8,27 +8,27 @@ import { makeStyles } from '@material-ui/core/styles'
 
 const UserDetails = ({ cameras, onClose }) => {
   console.log(cameras)
-  const [http, setHttp] = useState(cameras?.http)
-  const [rtsp, SetRtsp] = useState(cameras?.rtsp)
-  const [https, setHttps] = useState(cameras?.https)
-  const [server, setServer] = useState(cameras?.server)
+  const [http, setHttp] = useState(parseInt(cameras?.http) || 0)
+  const [rtsp, setRtsp] = useState(parseInt(cameras?.rtsp) || 0)
+  const [https, setHttps] = useState(parseInt(cameras?.https) || 0)
+  const [server, setServer] = useState(parseInt(cameras?.server) || 0)
   const [loading, setLoading] = useState(false)
   const classes = useStyles()
 
   const handleHttpChange = event => {
-    setHttp(event.target.value)
+    setHttp(parseInt(event.target.value) || 0)
   }
 
   const handleRtspChange = event => {
-    SetRtsp(event.target.value)
+    setRtsp(parseInt(event.target.value) || 0)
   }
 
   const handleHttpsChange = event => {
-    setHttps(event.target.value)
+    setHttps(parseInt(event.target.value) || 0)
   }
 
-  const handleServerhange = event => {
-    setServer(event.target.value)
+  const handleServerChange = event => {
+    setServer(parseInt(event.target.value) || 0)
   }
 
   const handleSaveClick = async () => {
@@ -73,7 +73,6 @@ const UserDetails = ({ cameras, onClose }) => {
       console.log(error.response?.data?.message)
     } finally {
       setLoading(false)
-      onClose()
     }
   }
 
@@ -95,7 +94,7 @@ const UserDetails = ({ cameras, onClose }) => {
           </Grid>
           <Grid item xs={0.4}></Grid>
           <Grid item xs={5.8}>
-            <CustomTextField label='Server Port' value={server} onChange={handleServerhange} fullWidth />
+            <CustomTextField label='Server Port' value={server} onChange={handleServerChange} fullWidth />
           </Grid>
         </Grid>
 
@@ -107,10 +106,11 @@ const UserDetails = ({ cameras, onClose }) => {
               pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
             }}
           >
+            <Button onClick={onClose}>Đóng</Button>
+
             <Button type='submit' variant='contained' onClick={handleSaveClick}>
               Lưu
             </Button>
-            <Button onClick={onClose}>Đóng</Button>
           </DialogActions>
         </Grid>
       </Grid>

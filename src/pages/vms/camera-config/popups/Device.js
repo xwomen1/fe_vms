@@ -39,21 +39,36 @@ const Device = ({ onClose, camera }) => {
   const [regions, setRegions] = useState([])
 
   const [cameras, setCamera] = useState(null)
+  const [selectedProtocol, setSelectedProtocol] = useState(null)
+
+  const [protocols, setProtocols] = useState([
+    { label: 'ONVIF', value: 'ONVIF', id: 'ONVIF', name: 'ONVIF' },
+    { label: 'IVI', value: 'IVI', id: 'IVI', name: 'IVI' },
+    { label: 'HIKVISION', value: 'HIKVISION', id: 'HIKVISION', name: 'HIKVISION' },
+    { label: 'DAHUA', label: 'DAHUA', id: 'DAHUA', name: 'DAHUA' },
+    { label: 'AXIS', value: 'AXIS', id: 'AXIS', name: 'AXIS' },
+    { label: 'BOSCH', value: 'BOSCH', id: 'BOSCH', name: 'BOSCH' },
+    { label: 'HANWHA', value: 'HANWHA', id: 'HANWHA', name: 'HANWHA' },
+    { label: 'PANASONIC', value: 'PANASONIC', id: 'PANASONIC', name: 'PANASONIC' }
+  ])
+  const defaultValue = cameras?.type?.name || ''
 
   const [cameraGroupSelect, setCameraGroupSelect] = useState({
-    label: cameras?.cameraGroup?.name || '',
-    value: cameras?.cameraGroup?.name || ''
+    label: cameras?.type?.name || '',
+    value: cameras?.type?.name || ''
   })
 
-  const [regionsSelect, setRegionsSelect] = useState({
-    label: cameras?.regions?.name || '',
-    value: cameras?.regions?.name || ''
-  })
+  const [regionsSelect, setRegionsSelect] = useState('')
   const [isOfflineSetting, setisOfflineSetting] = useState(false)
   const [lat, setLat] = useState(null)
   const [lng, setLng] = useState(null)
   const [cameraName, setCameraName] = useState(null)
   const [userName, setUserName] = useState(null)
+  const [nameChannel, setNameChannel] = useState(null)
+  const [proxied, setProxied] = useState(null)
+  const [channelUrl, setChannelUrl] = useState(null)
+  const [streamType, setStreamType] = useState(null)
+
   const [ipAddress, setIpAddress] = useState(null)
   const [http, setHttp] = useState(null)
   const [onvif, setOnvif] = useState(null)
@@ -96,8 +111,28 @@ const Device = ({ onClose, camera }) => {
     setCameraName(event.target.value)
   }
 
+  const handleProtocolChange = (event, newValue) => {
+    setSelectedProtocol(newValue)
+  }
+
   const handleUserNameChange = event => {
     setUserName(event.target.value)
+  }
+
+  const handleChannelNameChange = event => {
+    setNameChannel(event.target.value)
+  }
+
+  const handleProxiedChange = event => {
+    setProxied(event.target.value)
+  }
+
+  const handleChannelUrlChange = event => {
+    setChannelUrl(event.target.value)
+  }
+
+  const handleStreamTypeChange = event => {
+    setStreamType(event.target.value)
   }
 
   const handleIpAddressChange = event => {
@@ -109,7 +144,7 @@ const Device = ({ onClose, camera }) => {
   }
 
   const handleAddRow = () => {
-    const newRow = { groupName: '', groupCode: '', groupId: '' } // Thêm groupId vào đây
+    const newRow = { nameChannel: '', proxied: '', channelUrl: '', streamType: '' } // Thêm groupId vào đây
     setRows([...rows, newRow])
   }
 
@@ -140,6 +175,18 @@ const Device = ({ onClose, camera }) => {
           setLat(response.data.lat)
           setLng(response.data.long)
           setisOfflineSetting(response.data.isOfflineSetting)
+          setCameraGroupSelect({
+            label: response.data.type.name || '',
+            value: response.data.type.name || ''
+          })
+          setSelectedProtocol({
+            label: response.data.protocol.name || '',
+            value: response.data.protocol.name || ''
+          })
+          setRegionsSelect({
+            label: response.data.location || '',
+            value: response.data.location || ''
+          })
         }
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -148,6 +195,12 @@ const Device = ({ onClose, camera }) => {
 
     fetchGroupData()
   }, [camera])
+  useEffect(() => {
+    setCameraGroupSelect({
+      label: defaultValue,
+      value: defaultValue
+    })
+  }, [defaultValue])
 
   const handleSaveClick = async () => {
     handleSave() // Gọi hàm handleSave truyền từ props
@@ -171,10 +224,26 @@ const Device = ({ onClose, camera }) => {
         password: password,
         ipAddress: ipAddress,
         http: http,
+        type: cameraGroupSelect,
         onvif: onvif,
         lat: lat.toString(),
         long: lng.toString(),
-        isOfflineSetting: isOfflineSetting
+        isOfflineSetting: isOfflineSetting,
+        streams: {
+          name: nameChannel,
+          proxied: proxied,
+          channelUrl: channelUrl,
+          streamType: streamType
+        },
+        type: {
+          id: cameraGroupSelect.id || cameras.type.id,
+          name: cameraGroupSelect.name || cameras.type.name
+        },
+        protocol: {
+          id: selectedProtocol.id || cameras.protocol.id,
+          name: selectedProtocol.name || cameras.protocol.name
+        },
+        location: regionsSelect.name
       }
 
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${camera}`, data, config)
@@ -195,12 +264,6 @@ const Device = ({ onClose, camera }) => {
     }
   }
 
-  const handleComboboxFocus = () => {
-    if (cameraGroup.length === 0) {
-      fetchNicTypes()
-    }
-  }
-
   const handleComboboxFocusRegions = () => {
     if (regions.length === 0) {
       fetchRegions()
@@ -209,15 +272,21 @@ const Device = ({ onClose, camera }) => {
   const formatDDNS = ddns => <Checkbox checked={ddns} onChange={handleCheckboxChange} />
 
   const channelOptions = [
-    { channel: 'ONVIF' },
-    { channel: 'IVI' },
-    { channel: 'HIKVISION' },
-    { channel: 'DAHUA' },
-    { channel: 'AXIS' },
-    { channel: 'BOSCH' },
-    { channel: 'HANWHA' },
-    { channel: 'PANASONIC' }
+    { label: 'ONVIF', value: 'ONVIF' },
+    { label: 'IVI', value: 'IVI' },
+    { label: 'HIKVISION', value: 'HIKVISION' },
+    { label: 'DAHUA', label: 'DAHUA' },
+    { label: 'AXIS', value: 'AXIS' },
+    { label: 'BOSCH', value: 'BOSCH' },
+    { label: 'HANWHA', value: 'HANWHA' },
+    { label: 'PANASONIC', value: 'PANASONIC' }
   ]
+
+  const handleDeleteRow = index => {
+    const updatedRows = [...rows]
+    updatedRows.splice(index, 1)
+    setRows(updatedRows)
+  }
 
   const fetchNicTypes = async () => {
     try {
@@ -232,22 +301,27 @@ const Device = ({ onClose, camera }) => {
 
       const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/camera-groups', config)
 
-      const nicTypes = response.data.map(item => ({
+      const cameraGroup = response.data.map(item => ({
         id: item.id,
         name: item.name,
         label: item.name,
         value: item.value
       }))
-      setCameraGroup(nicTypes)
-      console.log(nicTypes)
-      if (nicTypes.length > 0) {
-        setCameraGroupSelect(nicTypes[0].value)
+      setCameraGroup(cameraGroup)
+      console.log(cameraGroup)
+      if (cameraGroup.length > 0) {
+        setCameraGroupSelect(cameraGroup[0].value)
       }
     } catch (error) {
       console.error('Error fetching NIC types:', error)
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleComboboxFocus = () => {
+    fetchNicTypes()
+    console.log('Fetching NIC types...') // Add this line
   }
 
   const fetchRegions = async () => {
@@ -351,8 +425,10 @@ const Device = ({ onClose, camera }) => {
           <Grid item xs={0.1}></Grid>
           <Grid item xs={3.9}>
             <Autocomplete
-              options={channelOptions}
-              getOptionLabel={option => option.channel}
+              value={selectedProtocol}
+              onChange={handleProtocolChange}
+              options={protocols}
+              getOptionLabel={option => option.label}
               renderInput={params => <CustomTextField {...params} label='Giao thức' fullWidth />}
             />
           </Grid>
@@ -410,30 +486,25 @@ const Device = ({ onClose, camera }) => {
                 {rows.map((row, index) => (
                   <TableRow key={index}>
                     <TableCell>
-                      <Autocomplete
-                        options={channel}
-                        getOptionLabel={option => option.channel}
-                        value={row.name}
-                        onChange={(event, newValue) => {
-                          const updatedRows = [...rows]
-                          updatedRows[index].name = newValue.name
-                          updatedRows[index].groupCode = newValue.groupCode
-                          updatedRows[index].groupId = newValue.groupId
-                          setRows(updatedRows)
-                        }}
-                        renderInput={params => <CustomTextField {...params} label='Kênh' />}
-                      />
+                      <CustomTextField type='text' value={nameChannel} onChange={handleChannelNameChange} fullWidth />
                     </TableCell>
-                    <TableCell>{row.groupCode}</TableCell>
-                    <TableCell align='right'></TableCell>
-                    <TableCell align='right'></TableCell>
+                    <TableCell>
+                      {' '}
+                      <CustomTextField type='text' value={proxied} onChange={handleProxiedChange} fullWidth />
+                    </TableCell>
+                    <TableCell align='right'>
+                      {' '}
+                      <CustomTextField type='text' value={channelUrl} onChange={handleChannelUrlChange} fullWidth />
+                    </TableCell>
+                    <TableCell align='right'>
+                      {' '}
+                      <CustomTextField type='text' value={streamType} onChange={handleStreamTypeChange} fullWidth />
+                    </TableCell>
 
                     <TableCell align='center'>
-                      {index > 0 && (
-                        <IconButton size='small' onClick={() => handleDeleteRow(index)}>
-                          <Icon icon='bi:trash' />
-                        </IconButton>
-                      )}
+                      <IconButton size='small' onClick={() => handleDeleteRow(index)}>
+                        <Icon icon='bi:trash' />
+                      </IconButton>
                     </TableCell>
                   </TableRow>
                 ))}

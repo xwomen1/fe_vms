@@ -41,24 +41,22 @@ const Caller = () => {
   }
 
   return (
-    <Grid>
+    <Grid style={{ minWidth: '1000px' }}>
       <TabContext value={value}>
-          <Grid>
-            {' '}
-            <TabList onChange={handleChange} aria-label='customized tabs example'>
-              <Tab value='1' label='Cấu hình NVR' />
-              <Tab value='2' label='Thêm NVR' />
-            
-            </TabList>
-          </Grid>
-          <TabPanel value='1'>
+        <Grid>
+          {' '}
+          <TabList onChange={handleChange} aria-label='customized tabs example'>
+            <Tab value='1' label='Cấu hình NVR' />
+            <Tab value='2' label='Thêm NVR' />
+          </TabList>
+        </Grid>
+        <TabPanel value='1'>
           <TableStickyHeader />
-          </TabPanel>
-          <TabPanel value='2'>
-            <Add/>
-          </TabPanel>
-         
-        </TabContext>
+        </TabPanel>
+        <TabPanel value='2'>
+          <Add />
+        </TabPanel>
+      </TabContext>
     </Grid>
   )
 }
