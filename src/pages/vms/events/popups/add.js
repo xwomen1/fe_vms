@@ -298,7 +298,6 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
                                                                                 onChange(e)
                                                                                 if (item.name === 'camName') {
                                                                                     const cam = cameraList.find(cam => cam.name === e.target.value)
-                                                                                    console.log('cam', cam.id)
                                                                                     setCameraId(cam.id)
                                                                                 }
                                                                             }
