@@ -37,7 +37,7 @@ const navigation = () => {
           path: '/pages/report-month/list',
           title: 'Báo cáo tháng',
           icon: 'tabler:id'
-        },
+        }
 
         // {
         //   path: '/pages/access-rights/list',
@@ -65,10 +65,11 @@ const navigation = () => {
           title: 'Xem trực tiếp',
           path: '/vms/live-view'
         },
-        {
-          title: 'Xem trực tiếp 2',
-          path: '/vms/live-view-p2p-private'
-        },
+
+        // {
+        //   title: 'Xem trực tiếp 2',
+        //   path: '/vms/live-view-p2p-private'
+        // },
         {
           title: 'Xem lại',
           path: '/vms/playback-camera'
@@ -87,11 +88,7 @@ const navigation = () => {
         },
         {
           title: 'Sự cố hệ thống',
-          path: '/vms/problems'
-        },
-        {
-          title: 'Danh sách đen',
-          path: '/vms/black-list'
+          path: '/vms/error-system'
         },
         {
           title: 'Cấu hình camera',
@@ -100,19 +97,20 @@ const navigation = () => {
         {
           title: 'Cấu hình nvr',
           path: '/vms/nvr-config'
-        },
-        {
-          title: 'Quản lý lưu trữ',
-          path: '/vms/stores'
-        },
-        {
-          title: 'Thư viện media',
-          path: '/vms/library'
-        },
-        {
-          title: 'Bản đồ số',
-          path: '/vms/map'
         }
+
+        // {
+        //   title: 'Quản lý lưu trữ',
+        //   path: '/vms/stores'
+        // },
+        // {
+        //   title: 'Thư viện media',
+        //   path: '/vms/library'
+        // },
+        // {
+        //   title: 'Bản đồ số',
+        //   path: '/vms/map'
+        // }
       ]
     },
 
@@ -250,7 +248,7 @@ const navigation = () => {
       children: [
         {
           title: 'Quản lý thiết bị',
-          path: '/access-control/devices'
+          path: '/access-control-devices'
         },
         {
           title: 'Cảnh báo hệ thống',
