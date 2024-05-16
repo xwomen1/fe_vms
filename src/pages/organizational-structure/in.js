@@ -24,7 +24,6 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 import DeletePopup from './popup/delete'
 import DetailPopup from './detail/detailInfra'
 import AddPopup from './popup/add'
-import PopUpAdd from './popup/AddChild'
 
 const OrganizationalStructure = () => {
   const [infra, setInfra] = useState([])
@@ -37,8 +36,6 @@ const OrganizationalStructure = () => {
   const [openPopupDetail, setOpenPopupDetail] = useState(false)
   const [openPopupAdd, setOpenPopupAdd] = useState(false)
   const [showPlusIcon, setShowPlusIcon] = useState(false)
-  const [openPopupAddChild, setOpenPopupAddChild] = useState(false)
-  const [selectId, setSelectIds] = useState(null)
 
   const handleOpenPopup = id => {
     setOpenPopupId(id)
@@ -91,17 +88,6 @@ const OrganizationalStructure = () => {
     } catch (error) {
       console.error('Error fetching users:', error)
     }
-  }
-
-  const handleAddPClick = id => {
-    setOpenPopupAddChild(true)
-    setSelectIds(id)
-    console.log(id, 'nodeid')
-  }
-
-  const handleClosePPopup = () => {
-    setOpenPopupAddChild(false)
-    fetchChildrenById()
   }
 
   const handleSuccess = async () => {
@@ -188,14 +174,7 @@ const OrganizationalStructure = () => {
         <TreeItem
           key={node.id}
           nodeId={node.id}
-          label={
-            <Box display='flex' alignItems='center'>
-              <Typography>{node.name}</Typography>
-              <IconButton size='small' onClick={() => handleAddPClick(node.id)}>
-                <Icon icon='bi:plus' />
-              </IconButton>
-            </Box>
-          }
+          label={node.name}
           sx={{ marginLeft: '3%', marginTop: '4%' }}
           icon={
             node.isParent ? (
@@ -324,11 +303,6 @@ const OrganizationalStructure = () => {
       {openPopupAdd && <AddPopup open={openPopupAdd} onClose={handleCloseAdd} onSuccess={handleSuccess} />}
       {openPopupDetail && (
         <DetailPopup open={openPopupDetail} onClose={handleCloseDetail} id={openPopupId} onSuccess={handleSuccess} />
-      )}
-      {openPopupAddChild && (
-        <>
-          <PopUpAdd open={openPopupAddChild} onClose={handleClosePPopup} id={selectId} onSuccess={handleSuccess} />
-        </>
       )}
     </Grid>
   )

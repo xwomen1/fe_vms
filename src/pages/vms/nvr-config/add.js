@@ -32,7 +32,7 @@ import Checkbox from '@mui/material/Checkbox'
 import Cloud from './popups/Cloud'
 import ConnectCamera from './popups/ConnectCamera'
 import VideoConnectCamera from './popups/VideoConnectCamera'
-import { Password } from '@mui/icons-material'
+import Edit from './popups/Edit'
 
 const UserList = ({ apiData }) => {
   const [value, setValue] = useState('')
@@ -75,6 +75,9 @@ const UserList = ({ apiData }) => {
   const pageSizeOptions = [25, 50, 100]
   const [anchorEl, setAnchorEl] = useState(null)
   const [selectedValue, setSelectedValue] = useState('')
+  const [IPNVR, setIPNVR] = useState(null)
+  const [nameNVR, setNameNvr] = useState(null)
+  const [idNVR, setId] = useState([])
 
   const fetchNicTypes = async () => {
     try {
@@ -640,20 +643,23 @@ const UserList = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{statusText}</TableCell>
 
                       <TableCell sx={{ padding: '16px' }}>
-                        <Grid container spacing={2}>
-                          <IconButton size='small' onClick={handleAddPClick}>
-                            <Icon icon='tabler:key' />
-                          </IconButton>
-                          <IconButton size='small' onClick={handleAddVideoConnectClick}>
-                            <Icon icon='tabler:camera' />
-                          </IconButton>
-                          <IconButton size='small' onClick={handleAddConnectCameraClick}>
-                            <Icon icon='tabler:link' />
-                          </IconButton>
-                          <IconButton size='small' sx={{ color: 'text.secondary' }}>
-                            <Icon icon='tabler:reload' />
-                          </IconButton>
-                        </Grid>
+                        <IconButton size='small' onClick={() => handleAddPClick(assetType.id)}>
+                          <Icon icon='tabler:edit' />
+                        </IconButton>
+                        <IconButton
+                          size='small'
+                          onClick={() => {
+                            setIPNVR(assetType.ipAddress)
+                            setNameNvr(assetType.name)
+                            setId(assetType.id)
+                            handleAddConnectCameraClick(assetType.id)
+                          }}
+                        >
+                          <Icon icon='tabler:link' />
+                        </IconButton>
+                        <IconButton onClick={() => handleDelete(assetType.id)}>
+                          <Icon icon='tabler:trash' />
+                        </IconButton>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -691,8 +697,11 @@ const UserList = ({ apiData }) => {
             <Cloud open={openPopupCloud} onClose={handleCloseCloudPopup} nvr={selectedIds} />
           </>
         )}
-        <Passwords open={openPopupP} onClose={handleClosePPopup} nvr={selectedIds} />
-
+        {openPopupP && (
+          <>
+            <Edit open={openPopupP} onClose={handleClosePPopup} nvr={selectedNvrId} />
+          </>
+        )}
         <ConnectCamera open={openPopupConnectCamera} onClose={handleCloseConnectCameraPopup} nvr={selectedIds} />
         <VideoConnectCamera
           open={openPopupVideoConnectCamera}

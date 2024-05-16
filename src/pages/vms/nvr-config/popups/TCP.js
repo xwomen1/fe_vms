@@ -7,28 +7,28 @@ import Autocomplete from '@mui/material/Autocomplete'
 import Swal from 'sweetalert2'
 import { makeStyles } from '@material-ui/core/styles'
 
-const TCP = ({ cameras, onClose, mtu }) => {
+const TCP = ({ cameras, onClose, mtu, nvr }) => {
   const [status1, setStatus1] = useState('ACTIVE')
-  const [multicast, setMulticast] = useState(cameras?.multicast)
-  const [dhcp, setDHCP] = useState(cameras?.dhcp)
-  const [mtus, setMTU] = useState(parseInt(cameras?.mtu) || 0)
-  const [mutiAddress, setMultiAddress] = useState(cameras?.MulticastAddress)
-  const [ddnsServer, setDDNSServer] = useState(cameras?.prefDNS)
-  const [alter, setAlter] = useState(cameras?.alterDNS)
+  const [multicast, setMulticast] = useState(nvr?.multicast)
+  const [dhcp, setDHCP] = useState(nvr?.dhcp)
+  const [mtus, setMTU] = useState(nvr?.mtu || 'null')
+  const [mutiAddress, setMultiAddress] = useState(nvr?.MulticastAddress)
+  const [ddnsServer, setDDNSServer] = useState(nvr?.prefDNS)
+  const [alter, setAlter] = useState(nvr?.alterDNS)
   const classes = useStyles()
-
+  console.log(dhcp)
   const [nicTypeOptions, setNicTypeOptions] = useState([])
   const [nic, setNic] = useState([])
 
-  const defaultValue = cameras?.nicType?.name || ''
+  const defaultValue = nvr?.nicType?.name || ''
 
   const [selectedNicType, setSelectedNicType] = useState({
-    label: cameras?.nicType?.name || '',
-    value: cameras?.nicType?.name || ''
+    label: nvr?.nicType?.name || '',
+    value: nvr?.nicType?.name || ''
   })
 
   const handleMTUChange = event => {
-    setMTU(parseInt(event.target.value) || 0)
+    setMTU(event.target.value)
   }
 
   const handleDDNSServerChange = event => {
@@ -38,7 +38,7 @@ const TCP = ({ cameras, onClose, mtu }) => {
   const handleAltChange = event => {
     setAlter(event.target.value)
   }
-  console.log(cameras)
+  console.log(nvr)
 
   const handleNicTypeChange = (event, newValue) => {
     setSelectedNicType(newValue || defaultValue)
@@ -46,15 +46,15 @@ const TCP = ({ cameras, onClose, mtu }) => {
 
   const [loading, setLoading] = useState(false)
   useEffect(() => {
-    if (cameras) {
-      setMulticast(cameras.multicast)
-      setDHCP(cameras.dhcp)
-      setMTU(cameras.mtu)
-      setMultiAddress(cameras.MulticastAddress)
-      setDDNSServer(cameras.prefDNS)
-      setAlter(cameras.alterDNS)
+    if (nvr) {
+      setMulticast(nvr.multicast)
+      setDHCP(nvr.dhcp)
+      setMTU(nvr.mtu)
+      setMultiAddress(nvr.MulticastAddress)
+      setDDNSServer(nvr.prefDNS)
+      setAlter(nvr.alterDNS)
     }
-  }, [cameras])
+  }, [nvr])
 
   const handleStatusChange = () => {
     setDHCP(dhcp === true ? false : true)
@@ -76,7 +76,7 @@ const TCP = ({ cameras, onClose, mtu }) => {
       }
 
       const response = await axios.get(
-        'https://sbs.basesystem.one/ivis/vms/api/v0/cameras/options/combox?cameraType=network_nic_type',
+        'https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/options/combox?cameraType=network_nic_type',
         config
       )
       setNic(response.data)
@@ -131,21 +131,21 @@ const TCP = ({ cameras, onClose, mtu }) => {
       }
 
       const data = {
-        multicast: multicast || cameras.multicast,
+        multicast: multicast || nvr.multicast,
         dhcp: dhcp,
-        mtu: mtus || cameras?.mtu,
-        multicastAddress: mutiAddress || cameras.multicastAddress,
-        prefDNS: ddnsServer || cameras.prefDNS,
-        alterDNS: alter || cameras.alterDNS,
+        mtu: mtus || nvr?.mtu,
+        multicastAddress: mutiAddress || nvr.multicastAddress,
+        prefDNS: ddnsServer || nvr.prefDNS,
+        alterDNS: alter || nvr.alterDNS,
         nicType: {
-          id: selectedNicType.id || cameras.nicType.id,
-          name: selectedNicType.name || cameras.nicType.name,
+          id: selectedNicType.id || nvr.nicType.id,
+          name: selectedNicType.name || nvr.nicType.name,
           channel: selectedNicType.channel
         }
       }
 
       await axios.put(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/{idNetWorkConfig}?idNetWorkConfig=${cameras.id}&NetWorkConfigType=tcpip`,
+        `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/config/networkconfig/{idNetWorkConfig}?idNetWorkConfig=${nvr.id}&NetWorkConfigType=tcpip`,
         data,
         config
       )
@@ -174,7 +174,17 @@ const TCP = ({ cameras, onClose, mtu }) => {
       <Grid container spacing={3}>
         <Grid container item style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
           <Grid item xs={5.8}>
-            {formatDDNS(multicast)} Enable Multicast Discovery
+            <Autocomplete
+              value={selectedNicType}
+              onChange={handleNicTypeChange}
+              options={nicTypeOptions}
+              getOptionLabel={option => option.label}
+              renderInput={params => <CustomTextField {...params} label='Loại NIC' fullWidth />}
+              onFocus={handleComboboxFocus}
+            />{' '}
+          </Grid>
+          <Grid item xs={5.8}>
+            {formatDDNS(multicast)} DHCP
           </Grid>
 
           <Grid item xs={0.4}></Grid>
@@ -191,16 +201,7 @@ const TCP = ({ cameras, onClose, mtu }) => {
           <Grid item xs={5.8}>
             <CustomTextField label='Multicast Address' fullWidth />
           </Grid>
-          <Grid item xs={5.8}>
-            <Autocomplete
-              value={selectedNicType}
-              onChange={handleNicTypeChange}
-              options={nicTypeOptions}
-              getOptionLabel={option => option.label}
-              renderInput={params => <CustomTextField {...params} label='Loại NIC' fullWidth />}
-              onFocus={handleComboboxFocus}
-            />{' '}
-          </Grid>
+
           <Grid item xs={0.4}></Grid>
 
           <Grid item xs={5.8}>

@@ -29,7 +29,7 @@ import Swal from 'sweetalert2'
 import ReactMapGL, { Marker, Popup } from '@goongmaps/goong-map-react'
 import { MapPin } from 'tabler-icons-react'
 
-const Device = ({ onClose, camera }) => {
+const Device = ({ onClose, nvr }) => {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -113,11 +113,11 @@ const Device = ({ onClose, camera }) => {
     setRows([...rows, newRow])
   }
 
-  console.log(camera)
+  console.log(nvr)
   useEffect(() => {
     const fetchGroupData = async () => {
       try {
-        if (camera != null) {
+        if (nvr != null) {
           // Kiểm tra xem popup Network đã mở chưa
           const token = localStorage.getItem(authConfig.storageTokenKeyName)
           console.log('token', token)
@@ -128,7 +128,7 @@ const Device = ({ onClose, camera }) => {
             }
           }
 
-          const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${camera}`, config)
+          const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${nvr}`, config)
           setCamera(response.data)
           setCameraName(response.data.name)
           setUserName(response.data.username)
@@ -136,7 +136,7 @@ const Device = ({ onClose, camera }) => {
           setIpAddress(response.data.ipAddress)
           setHttp(response.data.httpPort)
           setOnvif(response.data.onvif)
-          console.log(response.data)
+          console.log(nvr)
           setLat(response.data.lat)
           setLng(response.data.long)
           setisOfflineSetting(response.data.isOfflineSetting)
@@ -147,7 +147,7 @@ const Device = ({ onClose, camera }) => {
     }
 
     fetchGroupData()
-  }, [camera])
+  }, [nvr])
 
   const handleSaveClick = async () => {
     handleSave() // Gọi hàm handleSave truyền từ props
@@ -172,12 +172,11 @@ const Device = ({ onClose, camera }) => {
         ipAddress: ipAddress,
         http: http,
         onvif: onvif,
-        lat: lat.toString(),
-        long: lng.toString(),
+
         isOfflineSetting: isOfflineSetting
       }
 
-      await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${camera}`, data, config)
+      await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${nvr}`, data, config)
       setLoading(false)
       Swal.fire('Lưu thành công!', '', 'success')
 
@@ -192,12 +191,6 @@ const Device = ({ onClose, camera }) => {
     } finally {
       setLoading(false)
       onClose()
-    }
-  }
-
-  const handleComboboxFocus = () => {
-    if (cameraGroup.length === 0) {
-      fetchNicTypes()
     }
   }
 
@@ -218,37 +211,6 @@ const Device = ({ onClose, camera }) => {
     { channel: 'HANWHA' },
     { channel: 'PANASONIC' }
   ]
-
-  const fetchNicTypes = async () => {
-    try {
-      setLoading(true)
-      const token = localStorage.getItem(authConfig.storageTokenKeyName)
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-
-      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/camera-groups', config)
-
-      const nicTypes = response.data.map(item => ({
-        id: item.id,
-        name: item.name,
-        label: item.name,
-        value: item.value
-      }))
-      setCameraGroup(nicTypes)
-      console.log(nicTypes)
-      if (nicTypes.length > 0) {
-        setCameraGroupSelect(nicTypes[0].value)
-      }
-    } catch (error) {
-      console.error('Error fetching NIC types:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const fetchRegions = async () => {
     try {
@@ -321,17 +283,7 @@ const Device = ({ onClose, camera }) => {
           <Grid item xs={4}>
             <CustomTextField label='Mật khẩu' type='text' value={password} onChange={handlePasswordChange} fullWidth />
           </Grid>
-          <Grid item xs={3.9}>
-            <Autocomplete
-              value={cameraGroupSelect}
-              onChange={handleCameraGroupChange}
-              options={cameraGroup}
-              getOptionLabel={option => option.label}
-              renderInput={params => <CustomTextField {...params} label='Nhóm Camera' fullWidth />}
-              onFocus={handleComboboxFocus}
-            />{' '}
-          </Grid>
-          <Grid item xs={0.1}></Grid>
+
           <Grid item xs={3.9}>
             <CustomTextField
               label='Địa chỉ IP'
@@ -342,13 +294,14 @@ const Device = ({ onClose, camera }) => {
             />
           </Grid>
           <Grid item xs={0.1}></Grid>
-          <Grid item xs={4}>
+          <Grid item xs={3.9}>
             <CustomTextField label='Cổng http' type='text' value={http} onChange={handleHttpChange} fullWidth />
           </Grid>
-          <Grid item xs={3.9}>
+          <Grid item xs={0.1}></Grid>
+
+          <Grid item xs={4}>
             <CustomTextField label='Cổng onvif ' type='text' value={onvif} onChange={handleOnvifChange} fullWidth />
           </Grid>
-          <Grid item xs={0.1}></Grid>
           <Grid item xs={3.9}>
             <Autocomplete
               options={channelOptions}
@@ -358,7 +311,7 @@ const Device = ({ onClose, camera }) => {
           </Grid>
 
           <Grid item xs={0.1}></Grid>
-          <Grid item xs={4}>
+          <Grid item xs={3.9}>
             <Autocomplete
               value={regionsSelect}
               onChange={handleRegionsChange}
@@ -368,99 +321,12 @@ const Device = ({ onClose, camera }) => {
               onFocus={handleComboboxFocusRegions}
             />{' '}
           </Grid>
-          <Grid item xs={3.9}>
-            <CustomTextField label='Latitude' type='text' value={lat || ''} onChange={handleLatitudeChange} fullWidth />
-          </Grid>
-          <Grid item xs={0.1}></Grid>
-          <Grid item xs={3.9}>
-            <CustomTextField
-              label='Longtitude'
-              type='text'
-              value={lng || ''}
-              onChange={handleLongitudeChange}
-              fullWidth
-            />
-          </Grid>
+
           <Grid item xs={0.1}></Grid>
           <Grid item xs={4}>
             {formatDDNS(isOfflineSetting)} thiết bị đang ngoại tuyến
           </Grid>
         </Grid>
-        <Grid item xs={12}>
-          <Typography variant='h5'>Kênh</Typography>
-        </Grid>
-        <Grid item xs={11.8} component={Paper}>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Tên Kênh</TableCell>
-                  <TableCell>Proxied</TableCell>
-                  <TableCell align='right'>Channel URL </TableCell>
-                  <TableCell align='right'>StreamType </TableCell>
-
-                  <TableCell align='center'>
-                    <IconButton size='small' onClick={handleAddRow}>
-                      <Icon icon='tabler:plus' />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row, index) => (
-                  <TableRow key={index}>
-                    <TableCell>
-                      <Autocomplete
-                        options={channel}
-                        getOptionLabel={option => option.channel}
-                        value={row.name}
-                        onChange={(event, newValue) => {
-                          const updatedRows = [...rows]
-                          updatedRows[index].name = newValue.name
-                          updatedRows[index].groupCode = newValue.groupCode
-                          updatedRows[index].groupId = newValue.groupId
-                          setRows(updatedRows)
-                        }}
-                        renderInput={params => <CustomTextField {...params} label='Kênh' />}
-                      />
-                    </TableCell>
-                    <TableCell>{row.groupCode}</TableCell>
-                    <TableCell align='right'></TableCell>
-                    <TableCell align='right'></TableCell>
-
-                    <TableCell align='center'>
-                      {index > 0 && (
-                        <IconButton size='small' onClick={() => handleDeleteRow(index)}>
-                          <Icon icon='bi:trash' />
-                        </IconButton>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Grid>{' '}
-        {viewport && (
-          <Grid item xs={12}>
-            <ReactMapGL
-              {...viewport}
-              width='100%'
-              height='30vh'
-              onViewportChange={setViewport}
-              goongApiAccessToken={GOONG_MAP_KEY}
-              onClick={handleMapClick} // Call handleMapClick function on map click
-            >
-              {lat && lng && (
-                <Marker latitude={parseFloat(lat)} longitude={parseFloat(lng)} offsetLeft={-20} offsetTop={-20}>
-                  <div>
-                    <MapPin size={48} strokeWidth={2} color={'#bf40ba'} />
-                  </div>
-                </Marker>
-              )}
-            </ReactMapGL>
-          </Grid>
-        )}
       </Grid>
       <br />
       <Grid item xs={12}>

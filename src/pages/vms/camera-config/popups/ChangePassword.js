@@ -11,7 +11,7 @@ import {
   Grid,
   IconButton,
   InputAdornment
-} from '@mui/material' //Thêm InputAdornment
+} from '@mui/material'
 import axios from 'axios'
 import authConfig from 'src/configs/auth'
 import Swal from 'sweetalert2'
@@ -41,9 +41,10 @@ const Transition = forwardRef(function Transition(props, ref) {
 })
 
 const PassWord = ({ onClose, camera }) => {
+  const [passwordOld, setPasswordOld] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false) //Thêm state cho việc hiển thị mật khẩu
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [ipAddress, setIpAddress] = useState('')
   const [httpPort, setHttpPort] = useState('')
@@ -54,33 +55,33 @@ const PassWord = ({ onClose, camera }) => {
     setPassword(event.target.value)
   }
 
+  const handlePasswordOldChange = event => {
+    setPasswordOld(event.target.value)
+  }
+
   const handleConfirmPasswordChange = event => {
     setConfirmPassword(event.target.value)
   }
 
   const toggleShowPassword = () => {
-    //Hàm xử lý hiển thị mật khẩu
     setShowPassword(!showPassword)
   }
+
   useEffect(() => {
     const fetchGroupData = async () => {
       try {
         if (camera != null) {
-          // Kiểm tra xem popup Network đã mở chưa
           const token = localStorage.getItem(authConfig.storageTokenKeyName)
-          console.log('token', token)
 
           const config = {
             headers: {
               Authorization: `Bearer ${token}`
             }
           }
-
           const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${camera}`, config)
           setIpAddress(response.data.ipAddress)
           setHttpPort(response.data.httpPort)
           setUserName(response.data.username)
-          console.log(response.data)
         }
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -92,7 +93,6 @@ const PassWord = ({ onClose, camera }) => {
 
   const saveChange = async () => {
     setLoading(true)
-    onClose()
     if (password !== confirmPassword) {
       Swal.fire('Lỗi!', 'Mật khẩu và xác nhận mật khẩu không khớp nhau.', 'error')
       setLoading(false)
@@ -108,8 +108,7 @@ const PassWord = ({ onClose, camera }) => {
           Authorization: `Bearer ${token}`
         }
       }
-
-      const response = await axios.put(
+      await axios.put(
         `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/changepassword?idCamera=${camera}`,
         {
           password: password,
@@ -120,91 +119,86 @@ const PassWord = ({ onClose, camera }) => {
         config
       )
       Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
-      setLoading(false)
     } catch (error) {
       console.error('Error updating user details:', error)
-      Swal.fire(error.message, error.response?.data?.message)
+      Swal.fire('Error!', error.response?.data?.message, 'error')
+    } finally {
       setLoading(false)
+      onClose()
     }
   }
 
   return (
-    <div style={{ width: '100%' }} className={classes.loadingContainer}>
+    <Dialog
+      open={Boolean(camera)}
+      onClose={onClose}
+      fullWidth
+      maxWidth='sm' // Changed to 'sm' for smaller width
+      scroll='body'
+      TransitionComponent={Transition}
+      sx={{ '& .MuiDialog-paper': { overflow: 'visible', minHeight: '10vh', position: 'relative' } }} // Reduced minHeight here
+    >
       {loading && <CircularProgress className={classes.circularProgress} />}
-
-      <Dialog
-        open={open}
-        onClose={onClose}
-        fullWidth
-        maxWidth='md'
-        scroll='body'
-        TransitionComponent={Transition}
-        sx={{ '& .MuiDialog-paper': { overflow: 'visible' } }}
-      >
-        <DialogTitle>Đổi mật khẩu</DialogTitle>
-        <CustomCloseButton onClick={onClose}>
-          <Icon icon='tabler:x' fontSize='1.25rem' />
-        </CustomCloseButton>
-        <DialogContent>
-          <Grid container spacing={2} style={{ minWidth: 500 }}>
-            <Grid container item style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
-              <Grid item xs={12}>
-                <CustomTextField
-                  label='Mật khẩu'
-                  type={showPassword ? 'text' : 'password'}
-                  onChange={handlePasswordChange}
-                  fullWidth
-                  InputProps={{
-                    //Thêm InputProps để thêm IconButton
-                    endAdornment: (
-                      <InputAdornment position='end'>
-                        <IconButton onClick={toggleShowPassword} edge='end'>
-                          {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                        </IconButton>
-                      </InputAdornment>
-                    )
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <CustomTextField
-                  label='Xác nhận mật khẩu'
-                  type={showPassword ? 'text' : 'password'}
-                  onChange={handleConfirmPasswordChange}
-                  fullWidth
-                  InputProps={{
-                    //Thêm InputProps để thêm IconButton
-                    endAdornment: (
-                      <InputAdornment position='end'>
-                        <IconButton onClick={toggleShowPassword} edge='end'>
-                          {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                        </IconButton>
-                      </InputAdornment>
-                    )
-                  }}
-                />
-              </Grid>
+      <DialogTitle>Đổi mật khẩu</DialogTitle>
+      <CustomCloseButton onClick={onClose}>
+        <Icon icon='tabler:x' fontSize='1.25rem' />
+      </CustomCloseButton>
+      <DialogContent sx={{ minHeight: '10vh' }}>
+        {' '}
+        {/* Reduced minHeight here */}
+        <Grid container spacing={2} style={{ minWidth: 400 }}>
+          <Grid container item style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
+            <Grid item xs={12}>
+              <CustomTextField
+                label='Mật khẩu'
+                type={showPassword ? 'text' : 'password'}
+                onChange={handlePasswordChange}
+                fullWidth
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position='end'>
+                      <IconButton onClick={toggleShowPassword} edge='end'>
+                        {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <CustomTextField
+                label='Xác nhận mật khẩu'
+                type={showPassword ? 'text' : 'password'}
+                onChange={handleConfirmPasswordChange}
+                fullWidth
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position='end'>
+                      <IconButton onClick={toggleShowPassword} edge='end'>
+                        {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+              />
             </Grid>
           </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose}>Cancel</Button>
-          <Button onClick={saveChange}>OK</Button>
-        </DialogActions>
-      </Dialog>
-    </div>
+        </Grid>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Đóng</Button>
+        <Button onClick={saveChange} variant='contained'>
+          Lưu
+        </Button>
+      </DialogActions>
+    </Dialog>
   )
 }
 
 const useStyles = makeStyles(() => ({
-  loadingContainer: {
-    position: 'relative',
-    minHeight: '100px',
-    zIndex: 0
-  },
   circularProgress: {
     position: 'absolute',
-    top: '40%',
+    top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
     zIndex: 99999

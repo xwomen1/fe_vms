@@ -90,8 +90,9 @@ const UserList = ({ apiData }) => {
     setOpenPopup(false) // Đóng Popup khi cần thiết
   }
 
-  const handleAddPClick = () => {
+  const handleAddPClick = selectedNvrId => {
     setOpenPopupP(true)
+    setSelectedNvrId(selectedNvrId)
   }
 
   const handleClosePPopup = () => {
@@ -400,7 +401,7 @@ const UserList = ({ apiData }) => {
         )}
         {openPopupP && (
           <>
-            <Edit open={openPopupP} onClose={handleClosePPopup} camera={selectedNvrId} />
+            <Edit open={openPopupP} onClose={handleClosePPopup} nvr={selectedNvrId} />
           </>
         )}
         {/* <Passwords open={openPopupP} onClose={handleClosePPopup} nvr={selectedIds} /> */}
