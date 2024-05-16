@@ -248,7 +248,7 @@ const navigation = () => {
       children: [
         {
           title: 'Quản lý thiết bị',
-          path: '/access-control-devices'
+          path: '/device-management'
         },
         {
           title: 'Cảnh báo hệ thống',

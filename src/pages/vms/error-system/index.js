@@ -1,76 +1,297 @@
-import { useState } from 'react'
-import MuiTabList from '@mui/lab/TabList'
-import { TabContext, TabPanel } from '@mui/lab'
-import { Grid, Tab, styled } from '@mui/material'
-import EventOverview from './view/eventOverview'
-import EventList from './view/eventList'
-import EventConfig from './view/eventConfig'
-import EventMap from './view/eventMap'
+import { useEffect, useState, useCallback } from 'react'
+import authConfig from 'src/configs/auth'
+import axios from 'axios'
+import toast from 'react-hot-toast'
+import Icon from 'src/@core/components/icon'
+import {
+  Box,
+  Button,
+  Card,
+  CardHeader,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  Grid,
+  IconButton,
+  Menu,
+  MenuItem,
+  Pagination,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography
+} from '@mui/material'
+import CustomTextField from 'src/@core/components/mui/text-field'
 
-const TabList = styled(MuiTabList)(({ theme }) => ({
-  borderBottom: '0 !important',
-  '&, & .MuiTabs-scroller': {
-    boxSizing: 'content-box',
-    padding: theme.spacing(1.25, 1.25, 2),
-    margin: `${theme.spacing(-1.25, -1.25, -2)} !important`
-  },
-  '& .MuiTabs-indicator': {
-    display: 'none'
-  },
-  '& .Mui-selected': {
-    boxShadow: theme.shadows[2],
-    backgroundColor: theme.palette.primary.main,
-    color: `${theme.palette.common.white} !important`
-  },
-  '& .MuiTab-root': {
-    lineHeight: 1,
-    borderRadius: theme.shape.borderRadius,
-    '&:hover': {
-      color: theme.palette.primary.main
+const initValueFilter = {
+  location: null,
+  cameraName: null,
+  startTime: null,
+  endTime: null,
+  keyword: '',
+  limit: 25,
+  page: 1
+}
+
+const EventList = () => {
+  const [anchorEl, setAnchorEl] = useState(null)
+  const [total, setTotal] = useState(1)
+  const [value, setValue] = useState('')
+  const [page, setPage] = useState(1)
+  const [devices, setDevices] = useState([])
+  const [pageSize, setPageSize] = useState(25)
+  const [loading, setLoading] = useState(false)
+  const pageSizeOptions = [25, 50, 100]
+  const [valueFilter, setValueFilter] = useState(initValueFilter)
+  const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+  const handleSetValueFilter = data => {
+    const newDto = {
+      ...valueFilter,
+      ...data,
+      page: 1
+    }
+
+    setValueFilter(newDto)
+    setIsOpenFilter(false)
+  }
+
+  const handlePageChange = newPage => {
+    setPage(newPage)
+  }
+
+  const handleOpenMenu = event => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null)
+  }
+
+  const handleSelectPageSize = size => {
+    setPageSize(size)
+    setPage(1)
+    handleCloseMenu()
+  }
+
+  const fetchDataList = async () => {
+    setLoading(true)
+
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        params: {
+          keyword: value,
+          page: valueFilter?.page,
+          limit: valueFilter.limit
+        }
+      }
+
+      const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/incidents/logs`, config)
+      console.log(response.data, 'https://sbs.basesystem.one/ivis/vms/api/v0/incidents/logs')
+      setDevices(response.data)
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      toast.error(error)
+    } finally {
+      setLoading(false)
     }
   }
-}))
 
-const ErrorSystem = () => {
-  const [value, setValue] = useState('1')
+  useEffect(() => {
+    fetchDataList()
+  }, [])
 
-  const handleChange = (event, newValue) => {
-    if (newValue === '7' && !isDetectCrowdEnabled) {
-      return
+  useEffect(() => {
+    fetchDataList()
+  }, [page, pageSize, total, value])
+
+  const handleFilter = useCallback(val => {
+    setValue(val)
+  }, [])
+
+  const columns = [
+    {
+      id: 1,
+      flex: 0.25,
+      minWidth: 50,
+      align: 'left',
+      field: 'eventName',
+      label: 'Tên sự cố'
+    },
+    {
+      id: 2,
+      flex: 0.15,
+      minWidth: 150,
+      align: 'left',
+      field: 'severity',
+      label: 'Mức độ'
+    },
+    {
+      id: 3,
+      flex: 0.15,
+      minWidth: 100,
+      align: 'left',
+      field: 'createdAt',
+      label: 'Thời gian'
+    },
+    {
+      id: 4,
+      flex: 0.15,
+      minWidth: 100,
+      align: 'left',
+      field: 'location',
+      label: 'Vị trí'
+    },
+    {
+      id: 5,
+      flex: 0.25,
+      minWidth: 50,
+      align: 'left',
+      field: 'status',
+      label: 'Trạng thái'
+    },
+    {
+      id: 6,
+      flex: 0.25,
+      minWidth: 50,
+      align: 'left',
+      field: 'source',
+      label: 'Nguồn'
     }
-    setValue(newValue)
-  }
+  ]
 
   return (
-    <div>
-      <Grid container spacing={0} style={{ marginTop: 10 }}>
-        <TabContext value={value}>
-          <Grid item xs={12}>
-            <TabList onChange={handleChange} aria-label='customized tabs example'>
-              <Tab value='1' label='Tổng Quan' key={1} />
-              <Tab value='2' label='Danh sách' key={2} />
-              <Tab value='3' label='Cấu hình' key={3} />
-              <Tab value='4' label='Bản đồ' key={4} />
-            </TabList>
+    <>
+      <Card>
+        <CardHeader
+          title='Danh sách sự cố'
+          titleTypographyProps={{ sx: { mb: [2, 0] } }}
+          sx={{
+            py: 4,
+            flexDirection: ['column', 'row'],
+            '& .MuiCardHeader-action': { m: 0 },
+            alignItems: ['flex-start', 'center']
+          }}
+          action={
+            <Grid container spacing={2}>
+              <Grid item>
+                <Box sx={{ float: 'right' }}>
+                  <Button
+                    aria-label='Bộ lọc'
+                    onClick={() => {
+                      setIsOpenFilter(true)
+                    }}
+                    variant='contained'
+                  >
+                    <Icon icon='tabler:filter' />
+                  </Button>
+                </Box>
+              </Grid>
+              <Grid item>
+                <CustomTextField
+                  value={value}
+                  onChange={e => handleFilter(e.target.value)}
+                  placeholder='Tìm kiếm sự kiện '
+                  InputProps={{
+                    startAdornment: (
+                      <Box sx={{ mr: 2, display: 'flex' }}>
+                        <Icon fontSize='1.25rem' icon='tabler:search' />
+                      </Box>
+                    ),
+                    endAdornment: (
+                      <IconButton size='small' title='Clear' aria-label='Clear' onClick={() => setKeyword('')}>
+                        <Icon fontSize='1.25rem' icon='tabler:x' />
+                      </IconButton>
+                    )
+                  }}
+                  sx={{
+                    width: {
+                      xs: 1,
+                      sm: 'auto'
+                    },
+                    '& .MuiInputBase-root > svg': {
+                      mr: 2
+                    }
+                  }}
+                />
+              </Grid>
+            </Grid>
+          }
+        />
+        <Grid container spacing={0}>
+          <TableContainer component={Paper} sx={{ maxHeight: 600 }}>
+            <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
+              <TableHead>
+                <TableRow>
+                  <TableCell>STT</TableCell>
+
+                  {columns.map(column => (
+                    <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
+                      {column.label}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {Array.isArray(devices) && devices.length > 0 ? (
+                  devices.map((row, index) => (
+                    <TableRow hover tabIndex={-1} key={index}>
+                      <TableCell>{index + 1}</TableCell>
+                      {columns.map(column => {
+                        const value = row[column.field]
+
+                        return (
+                          <TableCell key={column.id} align={column.align}>
+                            {column.renderCell ? column.renderCell(value) : value}
+                          </TableCell>
+                        )
+                      })}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={columns.length + 1}>Không có dữ liệu ...</TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Grid>
+        <br />
+        <Grid container spacing={2} style={{ padding: 10 }}>
+          <Grid item xs={3}></Grid>
+          <Grid item xs={1}>
+            <span style={{ fontSize: 15 }}> dòng/trang</span>
           </Grid>
-          <Grid item xs={12}>
-            <TabPanel value='1'>
-              <EventOverview />
-            </TabPanel>
-            <TabPanel value='2'>
-              <EventList />
-            </TabPanel>
-            <TabPanel value='3'>
-              <EventConfig />
-            </TabPanel>
-            <TabPanel value='4'>
-              <EventMap />
-            </TabPanel>
+          <Grid item xs={1} style={{ padding: 0 }}>
+            <Box>
+              <Button onClick={handleOpenMenu} endIcon={<Icon icon='tabler:selector' />}>
+                {pageSize}
+              </Button>
+              <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+                {pageSizeOptions.map(size => (
+                  <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
+                    {size}
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
           </Grid>
-        </TabContext>
-      </Grid>
-    </div>
+          <Grid item xs={6}>
+            <Pagination count={total} page={page} color='primary' onChange={(event, page) => handlePageChange(page)} />
+          </Grid>
+        </Grid>
+      </Card>
+    </>
   )
 }
 
-export default ErrorSystem
+export default EventList
