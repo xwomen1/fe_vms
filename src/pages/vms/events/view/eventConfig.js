@@ -491,6 +491,7 @@ const EventConfig = () => {
 
     return m
   }
+
   const marks = createSilder(startDate)
 
   const handleSearch = e => {

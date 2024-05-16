@@ -4,10 +4,9 @@ import { Controller, useForm } from 'react-hook-form'
 import { Box, Button, Card, Dialog, DialogActions, DialogContent, Fade, Grid, IconButton, Typography, styled } from '@mui/material'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import Icon from 'src/@core/components/icon'
-import 'react-datepicker/dist/react-datepicker.css'
-import 'react-perfect-scrollbar/dist/css/styles.css'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 import moment from 'moment'
+import { width } from '@mui/system'
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Fade ref={ref} {...props} />
@@ -94,10 +93,11 @@ const format_form = [
     },
 ]
 
-const View = ({ show, onClose, data, setReload }) => {
+const View = ({ data }) => {
     const [loading, setLoading] = useState(false)
     const [detail, setDetail] = useState(null)
-    const [form, setForm] = useState(format_form);
+    const [form, setForm] = useState(format_form)
+    const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
 
     const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -118,7 +118,7 @@ const View = ({ show, onClose, data, setReload }) => {
         formState: { errors },
     } = useForm({
         defaultValues: initValues
-    });
+    })
 
     useEffect(() => {
         setDetail(data)
@@ -132,154 +132,133 @@ const View = ({ show, onClose, data, setReload }) => {
     }, [detail])
 
     const setDetailFormValue = () => {
-        reset(detail);
+        reset(detail)
+    }
+
+    const handleImageLoad = (event) => {
+        const { naturalWidth, naturalHeight } = event.target
+        setDimensions({ width: naturalWidth, height: naturalHeight })
+    }
+
+    const getBoxStyles = () => {
+        if (dimensions.width < dimensions.height) {
+            return { width: '40vh' }
+        }
+        return {}
     }
 
     return (
-        <Card>
-            <Dialog
-                fullWidth
-                open={show}
-                maxWidth='lg'
-                scroll='body'
-                TransitionComponent={Transition}
-                sx={{ '& .MuiDialog-paper': { overflow: 'visible' } }}
-            >
-                <DialogContent
-                    sx={{
-                        pb: theme => `${theme.spacing(8)} !important`,
-                        px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
-                        pt: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
-                    }}
-                >
-                    <CustomCloseButton onClick={onClose}>
-                        <Icon icon='tabler:x' fontSize='1.25rem' />
-                    </CustomCloseButton>
-                    <Box sx={{ mb: 8, textAlign: 'left' }}>
-                        <Typography variant='h3' sx={{ mb: 3 }}>
-                            Chi tiết sự kiện
-                        </Typography>
-                    </Box>
-                    <form>
+        <Box>
+            <form>
+                <Grid container spacing={12}>
+                    <Grid item xs={12} sm={3}>
                         <Grid container spacing={2}>
-                            <Grid item xs={12} sm={3}>
-                                <Grid container spacing={2}>
-                                    {form.map((item, index) => {
-                                        if (item.type == 'ImageObject') {
-                                            return (
-                                                <Grid item xs={12} key={index}>
-                                                    <Controller
-                                                        name={item.name}
-                                                        control={control}
-                                                        rules={{ required: true }}
-                                                        render={({ field: { value, onChange } }) => (
-                                                            <Box>
-                                                                <Typography sx={{ mb: 1 }}>Ảnh đối tượng</Typography>
-                                                                <CustomAvatar
-                                                                    src={value}
-                                                                    variant='rounded'
-                                                                    alt={''}
-                                                                    sx={{ width: '100%', height: '100%', mb: 4 }}
-                                                                />
-                                                            </Box>
-                                                        )}
+                            {form.map((item, index) => {
+                                if (item.type == 'ImageObject') {
+                                    return (
+                                        <Grid item xs={12} key={index}>
+                                            <Controller
+                                                name={item.name}
+                                                control={control}
+                                                rules={{ required: true }}
+                                                render={({ field: { value, onChange } }) => (
+                                                    <Box>
+                                                        <Typography sx={{ mb: 1 }}>Ảnh đối tượng</Typography>
+                                                        <CustomAvatar
+                                                            src={value}
+                                                            variant='rounded'
+                                                            alt={''}
+                                                            sx={{ width: '100%', height: '100%', mb: 4 }}
+                                                        />
+                                                    </Box>
+                                                )}
+                                            />
+                                        </Grid>
+                                    )
+                                }
+                                if (item.type == 'TextField') {
+                                    return (
+                                        <Grid item xs={12} key={index}>
+                                            <Controller
+                                                name={item.name}
+                                                control={control}
+                                                rules={{ required: true }}
+                                                render={({ field: { value, onChange } }) => (
+                                                    <CustomTextField
+                                                        fullWidth
+                                                        disabled={true}
+                                                        value={item.name == 'timestamp' ? moment(new Date(value)).format('DD/MM/YYYY HH:mm:ss') : value}
+                                                        label={item.label}
+                                                        onChange={onChange}
+                                                        placeholder={item.placeholder}
+                                                        error={Boolean(errors[item.name])}
+                                                        aria-describedby='validation-basic-last-name'
+                                                        {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
                                                     />
-                                                </Grid>
-                                            )
-                                        }
-                                        if (item.type == 'TextField') {
-                                            return (
-                                                <Grid item xs={12} key={index}>
-                                                    <Controller
-                                                        name={item.name}
-                                                        control={control}
-                                                        rules={{ required: true }}
-                                                        render={({ field: { value, onChange } }) => (
-                                                            <CustomTextField
-                                                                fullWidth
-                                                                disabled={true}
-                                                                value={item.name == 'timestamp' ? moment(new Date(value)).format('DD/MM/YYYY HH:mm:ss') : value}
-                                                                label={item.label}
-                                                                onChange={onChange}
-                                                                placeholder={item.placeholder}
-                                                                error={Boolean(errors[item.name])}
-                                                                aria-describedby='validation-basic-last-name'
-                                                                {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
-                                                            />
-                                                        )}
+                                                )}
+                                            />
+                                        </Grid>
+                                    )
+                                }
+                                if (item.type == 'VAutocomplete') {
+                                    return (
+                                        <Grid item xs={12} key={index}>
+                                            <Controller
+                                                name={item.name}
+                                                control={control}
+                                                rules={{ required: true }}
+                                                render={({ field: { value, onChange } }) => (
+                                                    <CustomTextField
+                                                        fullWidth
+                                                        disabled={true}
+                                                        value={value}
+                                                        label={item.label}
+                                                        onChange={onChange}
+                                                        placeholder={item.placeholder}
+                                                        error={Boolean(errors[item.name])}
+                                                        aria-describedby='validation-basic-last-name'
+                                                        {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
                                                     />
-                                                </Grid>
-                                            )
-                                        }
-                                        if (item.type == 'VAutocomplete') {
-                                            return (
-                                                <Grid item xs={12} key={index}>
-                                                    <Controller
-                                                        name={item.name}
-                                                        control={control}
-                                                        rules={{ required: true }}
-                                                        render={({ field: { value, onChange } }) => (
-                                                            <CustomTextField
-                                                                fullWidth
-                                                                disabled={true}
-                                                                value={value}
-                                                                label={item.label}
-                                                                onChange={onChange}
-                                                                placeholder={item.placeholder}
-                                                                error={Boolean(errors[item.name])}
-                                                                aria-describedby='validation-basic-last-name'
-                                                                {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
-                                                            />
-                                                        )}
-                                                    />
-                                                </Grid>
-                                            )
-                                        }
-                                    })}
-                                </Grid>
-                            </Grid>
-                            <Grid item xs={12} sm={9}>
-                                <Grid container spacing={0}>
-                                    {form.map((item, index) => {
-                                        if (item.type == 'ImageResult') {
-                                            return (
-                                                <Grid item xs={12} key={index}>
-                                                    <Controller
-                                                        name={item.name}
-                                                        control={control}
-                                                        rules={{ required: true }}
-                                                        render={({ field: { value, onChange } }) => (
-                                                            <Box>
-                                                                <Typography sx={{ mb: 1 }}>Ảnh toàn cảnh</Typography>
-                                                                <CustomAvatar
-                                                                    src={value}
-                                                                    variant='rounded'
-                                                                    alt={''}
-                                                                    sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                                                />
-                                                            </Box>
-                                                        )}
-                                                    />
-                                                </Grid>
-                                            )
-                                        }
-                                    })}
-                                </Grid>
-                            </Grid>
+                                                )}
+                                            />
+                                        </Grid>
+                                    )
+                                }
+                            })}
                         </Grid>
-                    </form>
-                </DialogContent>
-                <DialogActions
-                    sx={{
-                        justifyContent: 'flex-end',
-                        px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
-                        pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
-                    }}
-                >
-                    <Button variant='contained' onClick={onClose}>Đóng</Button>
-                </DialogActions>
-            </Dialog>
-        </Card>
+                    </Grid>
+                    <Grid item xs={12} sm={9}>
+                        <Grid container spacing={0}>
+                            {form.map((item, index) => {
+                                if (item.type == 'ImageResult') {
+                                    return (
+                                        <Grid item xs={12} key={index}>
+                                            <Controller
+                                                name={item.name}
+                                                control={control}
+                                                rules={{ required: true }}
+                                                render={({ field: { value, onChange } }) => (
+                                                    <Box sx={getBoxStyles()}>
+                                                        <Typography sx={{ mb: 1 }}>Ảnh toàn cảnh</Typography>
+                                                        <CustomAvatar
+                                                            src={value}
+                                                            onLoad={handleImageLoad}
+                                                            variant='rounded'
+                                                            alt={''}
+                                                            sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                        />
+                                                    </Box>
+                                                )}
+                                            />
+                                        </Grid>
+                                    )
+                                }
+                            })}
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </form>
+        </Box>
     )
 }
 
