@@ -14,9 +14,9 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 
 const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
   const [name, setName] = useState('')
-  const [code, setCode] = useState('')
+  const [type, setType] = useState('')
   const [nameError, setNameError] = useState('')
-  const [codeError, setCodeError] = useState('')
+  const [typeError, setTypeError] = useState('')
 
   useEffect(() => {
     const fetchFiltered = async () => {
@@ -30,7 +30,7 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
         }
         const response = await axios.get(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${id}`, config)
         setName(response.data.name)
-        setCode(response.data.code)
+        setType(response.data.type)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -53,7 +53,7 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
 
       const payload = {
         name: name,
-        code: code
+        type: type
       }
 
       await axios.put(
@@ -79,11 +79,11 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
       setNameError('')
     }
 
-    if (code.trim() === '') {
-      setCodeError('Mã địa phương không được để trống')
+    if (type.trim() === '') {
+      setTypeError('Mã địa phương không được để trống')
       isValid = false
     } else {
-      setCodeError('')
+      setTypeError('')
     }
 
     return isValid
@@ -113,11 +113,11 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
           <Grid item xs={6}>
             <CustomTextField
               label='Mã địa phương'
-              value={code}
-              onChange={e => setCode(e.target.value)}
+              value={type}
+              onChange={e => setType(e.target.value)}
               fullWidth
-              error={Boolean(codeError)}
-              helperText={codeError}
+              error={Boolean(typeError)}
+              helperText={typeError}
             />
           </Grid>
         </Grid>
