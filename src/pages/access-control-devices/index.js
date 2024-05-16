@@ -30,6 +30,7 @@ import {
   TableRow,
   Typography
 } from '@mui/material'
+
 const AccessControlDevice = () => {
   const [loading, setLoading] = useState(false)
   const [treeData, setTreeData] = useState([]) // State để lưu trữ dữ liệu cây
@@ -61,6 +62,7 @@ const AccessControlDevice = () => {
           `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/device-groups/children-lv1?parentId=${parent.id}`,
           config
         )
+
         return { ...parent, children: response.data }
       })
 
@@ -88,8 +90,10 @@ const AccessControlDevice = () => {
           // Nếu không có parent, nghĩa là đây là thằng cha
           url = `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices?id=${node.id}`
         }
+
         // Gọi API
         const response = await axios.get(url, config)
+
         // Xử lý dữ liệu từ response nếu cần
         console.log(response.data)
       } catch (error) {
@@ -115,46 +119,27 @@ const AccessControlDevice = () => {
             <Grid container spacing={2}>
               <Grid item>
                 <Box sx={{ float: 'right' }}>
-                  <Button
-                    aria-label='Bộ lọc'
-                    // onClick={() => {
-                    //   setIsOpenFilter(true)
-                    // }}
-                    variant='contained'
-                  >
+                  <Button aria-label='Bộ lọc' variant='contained'>
                     <Icon icon='tabler:file-export' />
                   </Button>
                 </Box>
               </Grid>
               <Grid item>
                 <Box sx={{ float: 'right' }}>
-                  <Button
-                    aria-label='Bộ lọc'
-                    // onClick={() => {
-                    //   setIsOpenFilter(true)
-                    // }}
-                    variant='contained'
-                  >
+                  <Button aria-label='Bộ lọc' variant='contained'>
                     <Icon icon='tabler:filter' />
                   </Button>
                 </Box>
               </Grid>
               <Grid item>
                 <Box sx={{ float: 'right' }}>
-                  <Button
-                    aria-label='Bộ lọc'
-                    // onClick={() => {
-                    //   setIsOpenFilter(true)
-                    // }}
-                    variant='contained'
-                  >
+                  <Button aria-label='Bộ lọc' variant='contained'>
                     <Icon icon='tabler:trash' />
                   </Button>
                 </Box>
               </Grid>
               <Grid item>
                 <CustomTextField
-                  //   value={keyword}
                   placeholder='Tìm kiếm sự kiện '
                   InputProps={{
                     startAdornment: (
@@ -168,7 +153,6 @@ const AccessControlDevice = () => {
                       </IconButton>
                     )
                   }}
-                  //   onChange={e => handleSearch(e)}
                   sx={{
                     width: {
                       xs: 1,

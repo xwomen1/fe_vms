@@ -33,6 +33,7 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
 
 const ErrorSystem = () => {
   const [value, setValue] = useState('1')
+
   const handleChange = (event, newValue) => {
     if (newValue === '7' && !isDetectCrowdEnabled) {
       return

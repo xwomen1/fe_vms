@@ -69,6 +69,7 @@ const EventList = () => {
       }
     ]
   }
+
   const handlePageChange = newPage => {
     setPage(newPage)
   }
@@ -76,9 +77,11 @@ const EventList = () => {
   const handleOpenMenu = event => {
     setAnchorEl(event.currentTarget)
   }
+
   const handleCloseMenu = () => {
     setAnchorEl(null)
   }
+
   const handleSelectPageSize = size => {
     setPageSize(size)
     setPage(1)
@@ -164,7 +167,6 @@ const EventList = () => {
               </Grid>
               <Grid item>
                 <CustomTextField
-                  //   value={keyword}
                   placeholder='Tìm kiếm sự kiện '
                   InputProps={{
                     startAdornment: (

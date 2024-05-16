@@ -65,6 +65,7 @@ const navigation = () => {
           title: 'Xem trực tiếp',
           path: '/vms/live-view'
         },
+
         // {
         //   title: 'Xem trực tiếp 2',
         //   path: '/vms/live-view-p2p-private'
@@ -97,6 +98,7 @@ const navigation = () => {
           title: 'Cấu hình nvr',
           path: '/vms/nvr-config'
         }
+
         // {
         //   title: 'Quản lý lưu trữ',
         //   path: '/vms/stores'
