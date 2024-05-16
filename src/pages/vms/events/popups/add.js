@@ -96,7 +96,7 @@ const format_form = [
 
 const Add = ({ show, onClose, id, data, setReload, filter }) => {
     const [loading, setLoading] = useState(false)
-    const [time, setTime] = useState(null)
+    const [cameraId, setCameraId] = useState(null)
     const [cameraList, setCameraList] = useState([])
     const [locationList, setLocationList] = useState([])
     const API_REGIONS = `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/`
@@ -159,7 +159,12 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
     }, [])
 
     const onSubmit = (values) => {
-        handleUpdate(values)
+        const detail = {
+            ...values,
+            cameraId: cameraId
+        }
+
+        handleUpdate(detail)
     }
 
     const handleAdd = (values) => {
@@ -289,7 +294,14 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
                                                                         label={item.label}
                                                                         SelectProps={{
                                                                             value: value,
-                                                                            onChange: e => onChange(e)
+                                                                            onChange: e => {
+                                                                                onChange(e)
+                                                                                if (item.name === 'camName') {
+                                                                                    const cam = cameraList.find(cam => cam.name === e.target.value)
+                                                                                    console.log('cam', cam.id)
+                                                                                    setCameraId(cam.id)
+                                                                                }
+                                                                            }
                                                                         }}
                                                                         id='validation-basic-select'
                                                                         error={Boolean(errors[item.name])}

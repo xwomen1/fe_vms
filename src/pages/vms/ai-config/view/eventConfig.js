@@ -37,9 +37,7 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
 
 const StyledTreeItem = props => {
   // ** Props
-  const { labelText, labelIcon, labelInfo, matchedEvent, ...other } = props
-
-  const colorText = matchedEvent?.statusValue?.name ? '#28C76F' : ''
+  const { labelText, labelIcon, labelInfo, color, ...other } = props
 
   return (
     <StyledTreeItemRoot
@@ -47,7 +45,7 @@ const StyledTreeItem = props => {
       label={
         <Box
           sx={{ py: 1, display: 'flex', alignItems: 'center', '& svg': { mr: 1 } }}>
-          <Icon icon={labelIcon} color={colorText} />
+          <Icon icon={labelIcon} color={color} />
           <Typography variant='body2' sx={{ flexGrow: 1, fontWeight: 500 }}>
             {labelText}
           </Typography>
@@ -648,14 +646,14 @@ const EventConfig = () => {
         {group.cameras && group.cameras.length > 0
           ? group.cameras.map(camera => {
             const matchedEvent = eventsData.find(event => event.id === camera.id)
-            const labelText = matchedEvent ? `${camera.deviceName} (${matchedEvent.statusValue.name})` : camera.deviceName;
+            const status = matchedEvent?.status
 
             return (
               <StyledTreeItem
                 key={camera.id}
                 nodeId={camera.id}
+                color={status == true ? '#28c76f' : ''}
                 labelText={camera.deviceName}
-                matchedEvent={matchedEvent ? matchedEvent : ''}
                 labelIcon='tabler:camera'
                 onClick={() => handleItemClick(camera.id, camera.deviceName)}
               />
