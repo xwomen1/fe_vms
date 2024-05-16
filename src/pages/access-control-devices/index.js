@@ -6,6 +6,7 @@ import toast from 'react-hot-toast'
 import Icon from 'src/@core/components/icon'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import authConfig from 'src/configs/auth'
+import Link from 'next/link'
 import Checkbox from '@mui/material/Checkbox'
 import {
   Box,
@@ -34,6 +35,7 @@ import {
 const AccessControlDevice = () => {
   const [loading, setLoading] = useState(false)
   const [treeData, setTreeData] = useState([]) // State để lưu trữ dữ liệu cây
+  const [deviceData, setDeviceData] = useState([])
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
   const config = {
@@ -55,6 +57,8 @@ const AccessControlDevice = () => {
         config
       )
       const parentData = response.data
+      console.log(parentData[0].devices, 'parentData')
+      setDeviceData(parentData[0].devices)
 
       // Lấy dữ liệu thằng con tương ứng với mỗi thằng cha
       const promises = parentData.map(async parent => {
@@ -80,19 +84,21 @@ const AccessControlDevice = () => {
   }
 
   const handleNodeSelect = async (event, node) => {
-    if (node && node.id) {
+    if (node && node) {
       try {
         let url
         if (node.parent) {
           // Nếu có parent, nghĩa là đây là thằng con
-          url = `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices?id=${node.id}`
+          url = `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices?deviceGroupId=${node}`
         } else {
           // Nếu không có parent, nghĩa là đây là thằng cha
-          url = `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices?id=${node.id}`
+          url = `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices?deviceGroupId=${node}`
         }
 
         // Gọi API
         const response = await axios.get(url, config)
+
+        setDeviceData(response.data.results)
 
         // Xử lý dữ liệu từ response nếu cần
         console.log(response.data)
@@ -107,7 +113,7 @@ const AccessControlDevice = () => {
     <>
       <Card>
         <CardHeader
-          title='Thiết bị'
+          title='Quản lý thiết bị'
           titleTypographyProps={{ sx: { mb: [2, 0] } }}
           sx={{
             py: 4,
@@ -205,18 +211,29 @@ const AccessControlDevice = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  <TableRow>
-                    <TableCell>
-                      <Checkbox />
-                    </TableCell>
-                    <TableCell>Tên</TableCell>
-                    <TableCell>Vị trí</TableCell>
-                    <TableCell>Loại thiết bị</TableCell>
-                    <TableCell>Địa chỉ IP</TableCell>
-                    <TableCell>Trạng thái</TableCell>
-                    <TableCell>Phiên bản app</TableCell>
-                    <TableCell>PB phần cứng</TableCell>
-                  </TableRow>
+                  {deviceData.map(device => (
+                    <TableRow key={device.id}>
+                      <TableCell>
+                        <Checkbox />
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          size='small'
+                          component={Link}
+                          href={`/pages/car_management/detail/${device.id}`}
+                          sx={{ color: 'blue', right: '10px' }}
+                        >
+                          {device.name}
+                        </Button>
+                      </TableCell>
+                      <TableCell>{device.doorName}</TableCell>
+                      <TableCell>{device.deviceType}</TableCell>
+                      <TableCell>{device.ipAddress}</TableCell>
+                      <TableCell>{device.status}</TableCell>
+                      <TableCell>{device.firmware}</TableCell>
+                      <TableCell>{device.hardwareVersion}</TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </TableContainer>
