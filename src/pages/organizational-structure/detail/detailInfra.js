@@ -14,9 +14,12 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 
 const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
   const [name, setName] = useState('')
-  const [code, setCode] = useState('')
+  const [type, setType] = useState('')
+  const [detail, setDetail] = useState('')
   const [nameError, setNameError] = useState('')
-  const [codeError, setCodeError] = useState('')
+  const [typeError, setTypeError] = useState('')
+  const [detailError, setDetailError] = useState('')
+
 
   useEffect(() => {
     const fetchFiltered = async () => {
@@ -30,7 +33,8 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
         }
         const response = await axios.get(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${id}`, config)
         setName(response.data.name)
-        setCode(response.data.code)
+        setType(response.data.type)
+        setDetail(response.data.detail)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -53,7 +57,8 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
 
       const payload = {
         name: name,
-        code: code
+        type: type,
+        detail: detail
       }
 
       await axios.put(
@@ -78,12 +83,17 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
     } else {
       setNameError('')
     }
-
-    if (code.trim() === '') {
-      setCodeError('Mã địa phương không được để trống')
+    if (detail.trim() === '') {
+      setDetailError('Ghi chú địa phương không được để trống')
       isValid = false
     } else {
-      setCodeError('')
+      setDetailError('')
+    }
+    if (type.trim() === '') {
+      setTypeError('Mã địa phương không được để trống')
+      isValid = false
+    } else {
+      setTypeError('')
     }
 
     return isValid
@@ -113,11 +123,21 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
           <Grid item xs={6}>
             <CustomTextField
               label='Mã địa phương'
-              value={code}
-              onChange={e => setCode(e.target.value)}
+              value={type}
+              onChange={e => setType(e.target.value)}
               fullWidth
-              error={Boolean(codeError)}
-              helperText={codeError}
+              error={Boolean(typeError)}
+              helperText={typeError}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <CustomTextField
+              label='Ghi chú'
+              value={detail}
+              onChange={e => setDetail(e.target.value)}
+              fullWidth
+              error={Boolean(detailError)}
+              helperText={detailError}
             />
           </Grid>
         </Grid>
