@@ -119,20 +119,28 @@ const Device = ({ onClose, camera }) => {
     setUserName(event.target.value)
   }
 
-  const handleChannelNameChange = event => {
-    setNameChannel(event.target.value)
+  const handleChannelNameChange = (index, event) => {
+    const newRows = [...rows]
+    newRows[index].name = event.target.value
+    setRows(newRows)
   }
 
-  const handleProxiedChange = event => {
-    setProxied(event.target.value)
+  const handleChannelUrlChange = (index, event) => {
+    const newRows = [...rows]
+    newRows[index].url = event.target.value
+    setRows(newRows)
   }
 
-  const handleChannelUrlChange = event => {
-    setChannelUrl(event.target.value)
+  const handleProxiedChange = (index, event) => {
+    const newRows = [...rows]
+    newRows[index].isProxied = event.target.checked
+    setRows(newRows)
   }
 
-  const handleStreamTypeChange = event => {
-    setStreamType(event.target.value)
+  const handleStreamTypeChange = (index, event) => {
+    const newRows = [...rows]
+    newRows[index].type = event.target.value
+    setRows(newRows)
   }
 
   const handleIpAddressChange = event => {
@@ -144,7 +152,7 @@ const Device = ({ onClose, camera }) => {
   }
 
   const handleAddRow = () => {
-    const newRow = { nameChannel: '', proxied: '', channelUrl: '', streamType: '' } // Thêm groupId vào đây
+    const newRow = { name: '', isProxied: '', url: '', type: '' } // Thêm groupId vào đây
     setRows([...rows, newRow])
   }
 
@@ -170,6 +178,7 @@ const Device = ({ onClose, camera }) => {
           setPassword(response.data.password)
           setIpAddress(response.data.ipAddress)
           setHttp(response.data.httpPort)
+          setRows(response.data.streams)
           setOnvif(response.data.onvif)
           console.log(response.data)
           setLat(response.data.lat)
@@ -229,12 +238,7 @@ const Device = ({ onClose, camera }) => {
         lat: lat.toString(),
         long: lng.toString(),
         isOfflineSetting: isOfflineSetting,
-        streams: {
-          name: nameChannel,
-          proxied: proxied,
-          channelUrl: channelUrl,
-          streamType: streamType
-        },
+        streams: rows,
         type: {
           id: cameraGroupSelect.id || cameras.type.id,
           name: cameraGroupSelect.name || cameras.type.name
@@ -483,31 +487,45 @@ const Device = ({ onClose, camera }) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map((row, index) => (
-                  <TableRow key={index}>
-                    <TableCell>
-                      <CustomTextField type='text' value={nameChannel} onChange={handleChannelNameChange} fullWidth />
-                    </TableCell>
-                    <TableCell>
-                      {' '}
-                      <CustomTextField type='text' value={proxied} onChange={handleProxiedChange} fullWidth />
-                    </TableCell>
-                    <TableCell align='right'>
-                      {' '}
-                      <CustomTextField type='text' value={channelUrl} onChange={handleChannelUrlChange} fullWidth />
-                    </TableCell>
-                    <TableCell align='right'>
-                      {' '}
-                      <CustomTextField type='text' value={streamType} onChange={handleStreamTypeChange} fullWidth />
-                    </TableCell>
+                {rows &&
+                  rows.map((row, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <CustomTextField
+                          type='text'
+                          value={row.name}
+                          onChange={event => handleChannelNameChange(index, event)}
+                          fullWidth
+                        />{' '}
+                      </TableCell>
+                      <TableCell>
+                        {' '}
+                        <Checkbox checked={row.isProxied} onChange={event => handleProxiedChange(index, event)} />
+                      </TableCell>
+                      <TableCell align='right'>
+                        <CustomTextField
+                          type='text'
+                          value={row.url}
+                          onChange={event => handleChannelUrlChange(index, event)}
+                          fullWidth
+                        />
+                      </TableCell>
+                      <TableCell align='right'>
+                        <CustomTextField
+                          type='text'
+                          value={row.type}
+                          onChange={event => handleStreamTypeChange(index, event)}
+                          fullWidth
+                        />
+                      </TableCell>
 
-                    <TableCell align='center'>
-                      <IconButton size='small' onClick={() => handleDeleteRow(index)}>
-                        <Icon icon='bi:trash' />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                      <TableCell align='center'>
+                        <IconButton size='small' onClick={() => handleDeleteRow(index)}>
+                          <Icon icon='bi:trash' />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
               </TableBody>
             </Table>
           </TableContainer>

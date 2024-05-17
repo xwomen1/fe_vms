@@ -18,7 +18,6 @@ import axios from 'axios'
 import TableHeader from 'src/views/apps/vms/camera-config/TableHeader'
 import ChangePassWords from './popups/ChangePassword'
 import Edit from './popups/Edit'
-
 import Network from './popups/Network'
 import Video from './popups/video'
 import Images from './popups/Image'
@@ -27,24 +26,25 @@ import Cloud from './popups/Cloud'
 
 const Camera = ({ apiData }) => {
   const [value, setValue] = useState('')
+
+  const defaultCameraID = '0eb23593-a9b1-4278-9fb1-4d18f30ed6ff'
+
   const [selectedIds, setSelectedIds] = useState([])
   const [openPopup, setOpenPopup] = useState(false)
   const [openPopupP, setOpenPopupP] = useState(false)
-
   const [openPopupNetwork, setOpenPopupNetwork] = useState(false)
   const [openPopupVideo, setOpenPopupVideo] = useState(false)
   const [openPopupImage, setOpenPopupImage] = useState(false)
   const [openPopupCloud, setOpenPopupCloud] = useState(false)
   const [selectedNvrId, setSelectedNvrId] = useState(null)
   const [assettype, setAssetType] = useState([])
-
   const [total, setTotal] = useState([1])
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
   const [status1, setStatus1] = useState(25)
-
   const pageSizeOptions = [25, 50, 100]
   const [anchorEl, setAnchorEl] = useState(null)
+  const [prevCameraStatus, setPrevCameraStatus] = useState([])
 
   const handlePageChange = newPage => {
     setPage(newPage)
@@ -60,7 +60,6 @@ const Camera = ({ apiData }) => {
       setSelectedNvrId(id)
     }
   }
-  console.log(selectedIds)
 
   const handleAddRoleClick = () => {
     setOpenPopup(true)
@@ -74,6 +73,61 @@ const Camera = ({ apiData }) => {
     setOpenPopupP(true)
     setSelectedNvrId(cameraId)
   }
+  useEffect(() => {
+    const ws = new WebSocket(`wss://sbs.basesystem.one/ivis/vms/api/v0/websocket/topic/cameraStatus/${defaultCameraID}`)
+
+    ws.onmessage = event => {
+      const { dataType, data } = JSON.parse(event.data)
+      if (dataType === 'cameraStatus') {
+        const cameraStatusUpdates = JSON.parse(data)
+        updateCameraStatus(cameraStatusUpdates)
+      }
+    }
+
+    return () => {
+      ws.close()
+    }
+  }, [])
+
+  const updateCameraStatus = useCallback(
+    cameraStatusUpdates => {
+      const cameraStatusMap = new Map(
+        cameraStatusUpdates.map(status => [status.id, status.statusValue.name, status.ip])
+      )
+
+      // Lặp qua các mục trong Map sử dụng for...of
+      for (const entry of cameraStatusMap.entries()) {
+        const [id, status, ip] = entry
+
+        const entry1 = {
+          id: id,
+          status: status,
+          ip: ip
+        }
+
+        setAssetType(prevAssetType => {
+          const newAssetType = prevAssetType.map(camera => {
+            if (camera.id === entry1.id) {
+              if (camera.status.name !== entry1.status) {
+                console.log('AssetType with ID', entry1.id, 'has changed status.')
+                console.log('Previous status:', camera.status.name)
+                console.log('New status:', entry1.status)
+              }
+
+              return { ...camera, status: { name: entry1.status } }
+            }
+
+            return camera
+          })
+
+          // console.log('New Asset Type:', newAssetType) // Log updated asset type
+
+          return newAssetType
+        })
+      }
+    },
+    [assettype]
+  )
 
   const fetchFilteredOrAllUsers = async () => {
     try {
@@ -102,6 +156,7 @@ const Camera = ({ apiData }) => {
     setOpenPopupP(false)
     fetchFilteredOrAllUsers()
   }
+
   useEffect(() => {
     fetchFilteredOrAllUsers()
   }, [])
@@ -171,7 +226,6 @@ const Camera = ({ apiData }) => {
     setPage(1)
     handleCloseMenu()
   }
-  const statusText = status1 ? 'Đang hoạt động' : 'Không hoạt động'
 
   const handleDelete = idDelete => {
     showAlertConfirm({
@@ -203,31 +257,48 @@ const Camera = ({ apiData }) => {
       }
     })
   }
-  useEffect(() => {
-    const fetchFilteredOrAllUsers = async () => {
-      try {
-        const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          params: {
-            limit: pageSize,
-            page: page,
-            keyword: value
-          }
-        }
-        const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/cameras', config)
-        setStatus1(response.data.isOfflineSetting)
-        setAssetType(response.data)
-        setTotal(response.data.page)
-      } catch (error) {
-        console.error('Error fetching users:', error)
-      }
-    }
-    fetchFilteredOrAllUsers()
-  }, [page, pageSize, total, value])
+  // WebSocket connection
+  // Trong useEffect của bạn
+  // Trong useEffect của bạn
+  // useEffect(() => {
+  //   // WebSocket connection
+  //   const defaultCameraID = '0eb23593-a9b1-4278-9fb1-4d18f30ed6ff'
+  //   const ws = new WebSocket(`wss://sbs.basesystem.one/ivis/vms/api/v0/websocket/topic/cameraStatus/${defaultCameraID}`)
+
+  //   ws.onmessage = event => {
+  //     console.log('Received data from WebSocket:', event.data)
+  //     const { dataType, data } = JSON.parse(event.data)
+
+  //     if (dataType === 'cameraStatus') {
+  //       const cameraStatusUpdates = JSON.parse(data)
+  //       setAssetType(prevAssetType =>
+  //         prevAssetType.map(camera => {
+  //           const updatedStatus = cameraStatusUpdates.find(status => status.id === camera.id)
+  //           console.log(updatedStatus, 'updta')
+  //           if (updatedStatus) {
+  //             // Cập nhật trạng thái của camera
+  //             return {
+  //               ...camera,
+  //               status: {
+  //                 name: updatedStatus.statusValue.name
+  //               }
+  //             }
+  //           }
+  //           console.log(JSON.stringify(camera) + 'camm') // Log thông tin chi tiết về đối tượng camera
+
+  //           return camera
+  //         })
+  //       )
+  //     }
+  //   }
+
+  //   return () => {
+  //     ws.close()
+  //   }
+  // }, [])
+
+  const statusText = cameraStatus => (cameraStatus.name === 'Hoạt động' ? 'Đang hoạt động' : 'Không hoạt động')
 
   return (
     <Grid container spacing={6.5}>
@@ -244,7 +315,7 @@ const Camera = ({ apiData }) => {
               videos={handleAddVideoClick}
               cloud={handleAddCloudClick}
             />
-          )}{' '}
+          )}
           <Grid container spacing={2}>
             <Grid item xs={0.1}></Grid>
 
@@ -293,7 +364,7 @@ const Camera = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{assetType.ipAddress}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.macAddress}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.location}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{statusText}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{assetType.status.name}</TableCell>
 
                       <TableCell sx={{ padding: '16px' }}>
                         <IconButton size='small' onClick={() => handleAddPClick(assetType.id)}>
@@ -332,7 +403,6 @@ const Camera = ({ apiData }) => {
         </Card>
         {openPopupNetwork && (
           <>
-            {' '}
             <Network open={openPopupNetwork} onClose={handleCloseNetWorkPopup} camera={selectedIds} />
           </>
         )}
@@ -345,12 +415,12 @@ const Camera = ({ apiData }) => {
           <>
             <Video open={openPopupVideo} onClose={handleCloseVideoPopup} camera={selectedIds} />
           </>
-        )}{' '}
+        )}
         {openPopupImage && (
           <>
             <Images open={openPopupImage} onClose={handleCloseImagePopup} camera={selectedIds} />
           </>
-        )}{' '}
+        )}
         {openPopupCloud && (
           <>
             <Cloud open={openPopupCloud} onClose={handleCloseCloudPopup} camera={selectedIds} />

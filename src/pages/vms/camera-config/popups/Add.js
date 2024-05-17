@@ -22,15 +22,38 @@ import TableBody from '@mui/material/TableBody'
 import Swal from 'sweetalert2'
 import CircularProgress from '@mui/material/CircularProgress'
 
-const Add = ({ open, response, onClose, url, port, userName, passWord, loadings }) => {
+const Add = ({ open, response, onClose, url, port, userName, passWord, loadings, setReload }) => {
   const [selectedIds, setSelectedIds] = useState([])
-
   const [loading, setLoading] = useState(false)
+  console.log(response, 'res')
 
   console.log('url' + url, ' port' + port, 'username' + userName, 'password' + passWord)
 
+  const fetchGroupDatacamera = async () => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const responsecamera = await axios.get(
+        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras?sort=%2Bcreated_at&page=1`,
+        config
+      )
+      setSelectedIds(responsecamera.data)
+    } catch (error) {
+      console.error('Error fetching camera data:', error)
+    }
+  }
+
+  useEffect(() => {
+    fetchGroupDatacamera()
+  }, [])
+
   const handleCreateCamera = async camera => {
-    console.log('camera name', camera.name)
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
       setLoading(true)
@@ -72,42 +95,32 @@ const Add = ({ open, response, onClose, url, port, userName, passWord, loadings 
     }
   }
 
-  // const handleCreateCamera = async camera => {
-  //   try {
-  //     const response = await fetch('https://sbs.basesystem.one/ivis/vms/api/v0/camerass', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
+  const handleDelete = async id => {
+    setLoading(true)
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
-  //         // Assuming you need to authenticate with username and password
-  //         Authorization: `Basic ${btoa(`${username}:${password}`)}`
-  //       },
-  //       body: JSON.stringify({
-  //         ipAddress: camera.ipAddress,
-  //         port: camera.port
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
 
-  //         // Other parameters you need to send
-  //       })
-  //     })
+      await axios.delete(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${id}`, config)
 
-  //     if (response.ok) {
-  //       const newCamera = await response.json()
-
-  //       // Update UI with new camera, you can add it to your response data array or update state
-  //       // Example: response.data.push(newCamera);
-  //       // Or update state with new data
-  //     } else {
-  //       // Handle error if needed
-  //       console.error('Failed to create camera:', response.statusText)
-  //     }
-  //   } catch (error) {
-  //     console.error('Error creating camera:', error)
-  //   }
-  // }
+      Swal.fire('Xóa camera thành công', '', 'success')
+    } catch (error) {
+      Swal.fire('Đã xảy ra lỗi', error.message, 'error')
+      console.error('Error deleting camera:', error)
+    } finally {
+      onClose()
+      setLoading(false)
+    }
+  }
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth='x1' style={{ maxWidth: '80%', margin: 'auto' }}>
-      <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Quét Camera</DialogTitle>
+      <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Quét camera</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} alignItems='center'>
           <Grid item xs={12}>
@@ -116,8 +129,8 @@ const Add = ({ open, response, onClose, url, port, userName, passWord, loadings 
                 <TableHead>
                   <TableRow>
                     <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Tên Camera</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Loại</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Tên thiết bị</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Loại thiết bị</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Địa chỉ IP</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Địa chỉ Mac</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Vị trí</TableCell>
@@ -126,31 +139,36 @@ const Add = ({ open, response, onClose, url, port, userName, passWord, loadings 
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {console.log(response)}
                   {response && response.length > 0 ? (
-                    response.map((camera, index) => (
-                      <TableRow key={index}>
-                        <TableCell sx={{ padding: '16px' }}>{index + 1}</TableCell>
-                        <TableCell sx={{ padding: '16px' }}>{camera.name}</TableCell>
-                        <TableCell sx={{ padding: '16px' }}>{camera.type}</TableCell>
-                        <TableCell sx={{ padding: '16px' }}>{camera.url}</TableCell>
-                        <TableCell sx={{ padding: '16px' }}>{camera.macAddress}</TableCell>
-                        <TableCell sx={{ padding: '16px' }}>{camera.location}</TableCell>
-                        <TableCell sx={{ padding: '16px' }}>{camera.status}</TableCell>
-                        <TableCell sx={{ padding: '16px' }}>
-                          <IconButton size='small' onClick={() => handleAddPClick(camera.macAddress)}>
-                            <Icon icon='tabler:edit' />
-                          </IconButton>
-                          <IconButton size='small' onClick={() => handleAddPClick(camera.macAddress)}>
-                            <Icon icon='tabler:camera' />
-                          </IconButton>
-                          <IconButton onClick={() => handleCreateCamera(camera)}>
-                            <Icon icon='tabler:plus' />
-                            {loading && <CircularProgress />}
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    ))
+                    response.map((camera, index) => {
+                      const foundcamera = selectedIds.find(item => item.macAddress === camera.macAddress)
+
+                      return (
+                        <TableRow key={index}>
+                          <TableCell sx={{ padding: '16px' }}>{index + 1}</TableCell>
+                          <TableCell sx={{ padding: '16px' }}>{camera.name}</TableCell>
+                          <TableCell sx={{ padding: '16px' }}>{camera.type}</TableCell>
+                          <TableCell sx={{ padding: '16px' }}>{camera.url}</TableCell>
+                          <TableCell sx={{ padding: '16px' }}>{camera.macAddress}</TableCell>
+                          <TableCell sx={{ padding: '16px' }}>{camera.location}</TableCell>
+                          <TableCell sx={{ padding: '16px' }}>{camera.status}</TableCell>
+                          <TableCell sx={{ padding: '16px' }}>
+                            {foundcamera ? (
+                              <IconButton onClick={() => handleDelete(foundcamera.id)}>
+                                {' '}
+                                {/* Truyền id của camera */}
+                                <Icon icon='tabler:minus' />
+                              </IconButton>
+                            ) : (
+                              <IconButton onClick={() => handleCreateCamera(camera)}>
+                                <Icon icon='tabler:plus' />
+                              </IconButton>
+                            )}
+                            {loading && <CircularProgress style={{ marginLeft: '10%' }} />}
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })
                   ) : (
                     <TableRow>
                       <TableCell colSpan={9}>Không có dữ liệu</TableCell>
