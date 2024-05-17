@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Grid, IconButton, Paper } from '@mui/material'
+import { Button, Grid, IconButton, Paper } from '@mui/material'
 import Icon from 'src/@core/components/icon'
 import Link from 'next/link'
 import Tab from '@mui/material/Tab'
@@ -46,22 +46,23 @@ const UserDetails = () => {
 
   return (
     <div>
-      <Grid container spacing={3} style={{ marginTop: 10 }} component={Paper}>
+      <Grid container spacing={3} style={{ marginTop: 10 }}>
         <TabContext value={value}>
-          <Grid container spacing={2} item xs={3}>
+          <Grid container spacing={2} item xs={6}>
             <IconButton size='small' component={Link} href={`/apps/user/list`} sx={{ color: 'text.secondary' }}>
-              <Icon icon='tabler:chevron-left' />
+              <Button variant='contained' component={Link} href={`/apps/user/list`}>
+                <Icon icon='tabler:chevron-left' />
+                Quay lại
+              </Button>
             </IconButton>
-
-            <h2 style={{ color: 'black' }}>Chi tiết người dùng: </h2>
           </Grid>
           <Grid style={{ marginLeft: 200 }}>
             {' '}
             <TabList onChange={handleChange} aria-label='customized tabs example'>
               <Tab value='1' label='Thông tin cá nhân' />
               <Tab value='2' label='Thông tin định danh' />
-              <Tab value='3' label='Kiểm soát vào ra' />
-              <Tab value='4' label='Thông tin gửi xe' />
+              {/* <Tab value='3' label='Kiểm soát vào ra' />
+              <Tab value='4' label='Thông tin gửi xe' /> */}
             </TabList>
           </Grid>
           <TabPanel value='1'>
@@ -70,12 +71,12 @@ const UserDetails = () => {
           <TabPanel value='2'>
             <Identity />
           </TabPanel>
-          <TabPanel value='3'>
+          {/* <TabPanel value='3'>
             <AccessControl />
           </TabPanel>
           <TabPanel value='4'>
             <Parking />
-          </TabPanel>
+          </TabPanel> */}
         </TabContext>
       </Grid>
     </div>

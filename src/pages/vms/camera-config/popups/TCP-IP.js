@@ -5,15 +5,17 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 import { Grid, Checkbox, Switch, DialogActions, Button, CircularProgress } from '@mui/material'
 import Autocomplete from '@mui/material/Autocomplete'
 import Swal from 'sweetalert2'
+import { makeStyles } from '@material-ui/core/styles'
 
 const TCP = ({ cameras, onClose, mtu }) => {
   const [status1, setStatus1] = useState('ACTIVE')
   const [multicast, setMulticast] = useState(cameras?.multicast)
   const [dhcp, setDHCP] = useState(cameras?.dhcp)
-  const [mtus, setMTU] = useState(cameras?.mtu || 'null')
+  const [mtus, setMTU] = useState(parseInt(cameras?.mtu) || 0)
   const [mutiAddress, setMultiAddress] = useState(cameras?.MulticastAddress)
   const [ddnsServer, setDDNSServer] = useState(cameras?.prefDNS)
   const [alter, setAlter] = useState(cameras?.alterDNS)
+  const classes = useStyles()
 
   const [nicTypeOptions, setNicTypeOptions] = useState([])
   const [nic, setNic] = useState([])
@@ -26,7 +28,7 @@ const TCP = ({ cameras, onClose, mtu }) => {
   })
 
   const handleMTUChange = event => {
-    setMTU(event.target.value)
+    setMTU(parseInt(event.target.value) || 0)
   }
 
   const handleDDNSServerChange = event => {
@@ -135,7 +137,7 @@ const TCP = ({ cameras, onClose, mtu }) => {
         multicastAddress: mutiAddress || cameras.multicastAddress,
         prefDNS: ddnsServer || cameras.prefDNS,
         alterDNS: alter || cameras.alterDNS,
-        nic: {
+        nicType: {
           id: selectedNicType.id || cameras.nicType.id,
           name: selectedNicType.name || cameras.nicType.name,
           channel: selectedNicType.channel
@@ -156,19 +158,18 @@ const TCP = ({ cameras, onClose, mtu }) => {
       setLoading(false)
       onClose()
 
-      Swal.fire('Đã xảy ra lỗi', error.message, error.response?.data?.message)
+      Swal.fire(error.message, error.response?.data?.message)
       console.log(error.response?.data?.message)
     } finally {
       setLoading(false)
-      onClose()
     }
   }
 
   const formatDDNS = multicast => <Checkbox checked={multicast} onChange={handleCheckboxChange} />
 
   return (
-    <div style={{ width: '100%' }}>
-      {loading && <CircularProgress />}
+    <div style={{ width: '100%' }} className={classes.loadingContainer}>
+      {loading && <CircularProgress className={classes.circularProgress} />}
 
       <Grid container spacing={3}>
         <Grid container item style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
@@ -224,15 +225,31 @@ const TCP = ({ cameras, onClose, mtu }) => {
             pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
           }}
         >
+          <Button onClick={onClose}>Đóng</Button>
+
           <Button type='submit' variant='contained' onClick={handleSaveClick}>
             Lưu
           </Button>
-          <Button onClick={onClose}>Đóng</Button>
         </DialogActions>
       </Grid>
       <br />
     </div>
   )
 }
+
+const useStyles = makeStyles(() => ({
+  loadingContainer: {
+    position: 'relative',
+    minHeight: '100px', // Đặt độ cao tùy ý
+    zIndex: 0
+  },
+  circularProgress: {
+    position: 'absolute',
+    top: '40%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    zIndex: 99999 // Đặt z-index cao hơn so với Grid container
+  }
+}))
 
 export default TCP

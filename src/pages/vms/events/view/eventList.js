@@ -8,6 +8,7 @@ import CustomTextField from "src/@core/components/mui/text-field"
 import Filter from "../popups/filter"
 import View from "../popups/view"
 import Add from "../popups/add"
+import EventDetails from "../popups/eventDetails"
 
 const initValueFilter = {
     location: null,
@@ -442,7 +443,7 @@ const EventList = () => {
                                     deviceList?.rows.slice(0, pageSize).map((row, index) => {
                                         return (
                                             <TableRow hover tabIndex={-1} key={index}>
-                                                <TableCell>{(page - 1) * pageSize + index + 1}</TableCell>
+                                                <TableCell>{index + 1}</TableCell>
                                                 {columns.map(column => {
                                                     const value = row[column.field]
 
@@ -523,7 +524,7 @@ const EventList = () => {
             )}
 
             {isOpenView && (
-                <View show={isOpenView} onClose={() => setIsOpenView(false)} data={eventDetail} setReload={() => setReload(reload + 1)} />
+                <EventDetails show={isOpenView} onClose={() => setIsOpenView(false)} data={eventDetail} setReload={() => setReload(reload + 1)} />
             )}
 
             {isOpenEdit && (

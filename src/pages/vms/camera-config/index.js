@@ -41,7 +41,7 @@ const Caller = () => {
   }
 
   return (
-    <Grid component={Paper} style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
+    <Grid style={{ minWidth: '1000px' }}>
       <TabContext value={value}>
         <Grid>
           {' '}

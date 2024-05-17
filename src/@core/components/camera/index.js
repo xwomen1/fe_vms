@@ -30,6 +30,8 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
   const [heightDiv, setHeightDiv] = useState(100)
   const [status, setStatus] = useState('')
   const [reload, setReload] = useState(0)
+  const [videoDimensions, setVideoDimensions] = useState({ width: '100%', height: null })
+
   useEffect(() => {
     const heightCaculator = Math.floor((window.innerHeight - 90) / sizeScreen.split('x')[1])
     setHeightDiv(heightCaculator)
@@ -209,7 +211,16 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
         </div>
       </div>
       <div>
-        <video style={{ width: '100%', height: heightDiv - 26 }} ref={remoteVideoRef} playsInline autoPlay />
+        <video
+          style={{
+            width: '100%',
+            height: heightDiv - 26,
+            objectFit: 'fill'
+          }}
+          ref={remoteVideoRef}
+          playsInline
+          autoPlay
+        />
         {(status === 'failed' || status == 'disconnected') && (
           <IconButton
             sx={{

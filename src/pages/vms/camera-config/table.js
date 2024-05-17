@@ -16,7 +16,7 @@ import Swal from 'sweetalert2'
 import { fetchData } from 'src/store/apps/user'
 import axios from 'axios'
 import TableHeader from 'src/views/apps/vms/camera-config/TableHeader'
-import RolePopup from './popups/ChangePassword'
+import ChangePassWords from './popups/ChangePassword'
 import Edit from './popups/Edit'
 
 import Network from './popups/Network'
@@ -338,7 +338,7 @@ const Camera = ({ apiData }) => {
         )}
         {openPopup && (
           <>
-            <RolePopup open={openPopup} onClose={handleClosePopup} camera={selectedIds} />
+            <ChangePassWords open={openPopup} onClose={handleClosePopup} camera={selectedIds} />
           </>
         )}
         {openPopupVideo && (

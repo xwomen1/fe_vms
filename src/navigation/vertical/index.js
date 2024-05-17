@@ -37,8 +37,8 @@ const navigation = () => {
           path: '/pages/report-month/list',
           title: 'Báo cáo tháng',
           icon: 'tabler:id'
-        },
-        
+        }
+
         // {
         //   path: '/pages/access-rights/list',
         //   title: 'Quyền truy cập',
@@ -65,13 +65,18 @@ const navigation = () => {
           title: 'Xem trực tiếp',
           path: '/vms/live-view'
         },
-        {
-          title: 'Xem trực tiếp 2',
-          path: '/vms/live-view-p2p-private'
-        },
+
+        // {
+        //   title: 'Xem trực tiếp 2',
+        //   path: '/vms/live-view-p2p-private'
+        // },
         {
           title: 'Xem lại',
           path: '/vms/playback-camera'
+        },
+        {
+          title: 'Trích xuất clip',
+          path: '/vms/clip-extraction'
         },
         {
           title: 'Nhóm camera',
@@ -82,12 +87,12 @@ const navigation = () => {
           path: '/vms/events'
         },
         {
-          title: 'Sự cố hệ thống',
-          path: '/vms/problems'
+          title: 'Cấu hình AI',
+          path: '/vms/ai-config'
         },
         {
-          title: 'Danh sách đen',
-          path: '/vms/black-list'
+          title: 'Sự cố hệ thống',
+          path: '/vms/error-system'
         },
         {
           title: 'Cấu hình camera',
@@ -96,19 +101,20 @@ const navigation = () => {
         {
           title: 'Cấu hình nvr',
           path: '/vms/nvr-config'
-        },
-        {
-          title: 'Quản lý lưu trữ',
-          path: '/vms/stores'
-        },
-        {
-          title: 'Thư viện media',
-          path: '/vms/library'
-        },
-        {
-          title: 'Bản đồ số',
-          path: '/vms/map'
         }
+
+        // {
+        //   title: 'Quản lý lưu trữ',
+        //   path: '/vms/stores'
+        // },
+        // {
+        //   title: 'Thư viện media',
+        //   path: '/vms/library'
+        // },
+        // {
+        //   title: 'Bản đồ số',
+        //   path: '/vms/map'
+        // }
       ]
     },
 
@@ -230,7 +236,7 @@ const navigation = () => {
         {
           title: 'Cơ cấu tổ chức',
           icon: 'tabler:users',
-          path: 'broadcast/local'
+          path: '/organizational-structure'
         },
         {
           title: 'Vai Trò',
@@ -246,7 +252,7 @@ const navigation = () => {
       children: [
         {
           title: 'Quản lý thiết bị',
-          path: '/access-control/devices'
+          path: '/device-management'
         },
         {
           title: 'Cảnh báo hệ thống',
