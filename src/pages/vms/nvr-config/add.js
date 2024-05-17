@@ -143,6 +143,57 @@ const UserList = ({ apiData }) => {
     }
   }
 
+  function showAlertConfirm(options, intl) {
+    const defaultProps = {
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
+      imageWidth: 213,
+      showCancelButton: true,
+      showCloseButton: true,
+      showConfirmButton: true,
+      focusCancel: true,
+      reverseButtons: true,
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
+      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
+      customClass: {
+        content: 'content-class',
+        confirmButton: 'swal-btn-confirm'
+      }
+    }
+
+    return Swal.fire({ ...defaultProps, ...options })
+  }
+
+  const handleDelete = idDelete => {
+    showAlertConfirm({
+      text: 'Bạn có chắc chắn muốn xóa?'
+    }).then(({ value }) => {
+      if (value) {
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+        if (!token) {
+          return
+        }
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+        let urlDelete = `https://dev-ivi.basesystem.one/smc/smart-parking/api/v0/asset/type/delete/${idDelete}`
+        axios
+          .delete(urlDelete, config)
+          .then(() => {
+            Swal.fire('Xóa thành công', '', 'success')
+            const updatedData = assettype.filter(assettype => assettype.id !== idDelete)
+            setAssetType(updatedData)
+            fetchData()
+          })
+          .catch(err => {
+            Swal.fire('Đã xảy ra lỗi', err.message, 'error')
+          })
+      }
+    })
+  }
+
   const handleAddRoleClick = () => {
     setOpenPopup(true)
   }

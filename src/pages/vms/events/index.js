@@ -2,7 +2,8 @@ import { useState } from 'react'
 import MuiTabList from '@mui/lab/TabList'
 import { TabContext, TabPanel } from '@mui/lab'
 import { Grid, Tab, styled } from '@mui/material'
-import EventOverview from './view/eventOverview'
+import EventCar from './view/eventCar'
+import EventFace from './view/eventFace'
 import EventList from './view/eventList'
 import EventConfig from './view/eventConfig'
 import EventMap from './view/eventMap'
@@ -36,7 +37,7 @@ const Events = () => {
   const [isDetectCrowdEnabled, setIsDetectCrowdEnabled] = useState(false)
 
   const handleChange = (event, newValue) => {
-    if (newValue === '7' && !isDetectCrowdEnabled) {
+    if (newValue === '4' && !isDetectCrowdEnabled) {
       return
     }
     setValue(newValue)
@@ -48,26 +49,28 @@ const Events = () => {
         <TabContext value={value}>
           <Grid item xs={12}>
             <TabList onChange={handleChange} aria-label='customized tabs example'>
-              <Tab value='1' label='Tổng Quan' key={1} />
-              <Tab value='2' label='Danh sách' key={2} />
-              <Tab value='3' label='Cấu hình khoanh vùng' key={3} />
-              <Tab value='4' label='Bản đồ' key={4} />
-              <Tab value='5' label='Phát hiện khuôn mặt' key={5} />
-              <Tab value='6' label='Phát hiện biển số' key={6} />
-              <Tab value='7' label='Phát hiện đám đông' key={7} disabled={!isDetectCrowdEnabled} />
+              <Tab value='1' label='Danh sách' key={1} />
+              <Tab value='2' label='Phát hiện khuôn mặt' key={2} />
+              <Tab value='3' label='Phát hiện biển số' key={3} />
+              <Tab value='4' label='Phát hiện đám đông' key={4} disabled={!isDetectCrowdEnabled} />
+              <Tab value='5' label='Cấu hình khoanh vùng' key={5} />
+              <Tab value='6' label='Bản đồ' key={6} />
             </TabList>
           </Grid>
           <Grid item xs={12}>
             <TabPanel value='1'>
-              <EventOverview />
-            </TabPanel>
-            <TabPanel value='2'>
               <EventList />
             </TabPanel>
+            <TabPanel value='2'>
+              <EventFace />
+            </TabPanel>
             <TabPanel value='3'>
+              <EventCar />
+            </TabPanel>
+            <TabPanel value='5'>
               <EventConfig />
             </TabPanel>
-            <TabPanel value='4'>
+            <TabPanel value='6'>
               <EventMap />
             </TabPanel>
           </Grid>
