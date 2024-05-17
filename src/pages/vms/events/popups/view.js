@@ -142,8 +142,10 @@ const View = ({ data }) => {
 
     const getBoxStyles = () => {
         if (dimensions.width < dimensions.height) {
+
             return { width: '40vh' }
         }
+
         return {}
     }
 

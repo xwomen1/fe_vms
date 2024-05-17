@@ -198,8 +198,10 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
 
     const getBoxStyles = () => {
         if (dimensions.width < dimensions.height) {
+
             return { width: '40vh' }
         }
+
         return {}
     }
 
