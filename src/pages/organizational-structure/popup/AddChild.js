@@ -3,8 +3,6 @@ import { Autocomplete, TextField, Button, Dialog, DialogTitle, DialogContent, Di
 import axios from 'axios'
 import authConfig from 'src/configs/auth'
 import Swal from 'sweetalert2'
-import { router } from 'websocket'
-import { useRouter } from 'next/router'
 import CustomTextField from 'src/@core/components/mui/text-field'
 
 const InfraPopupAdd = ({ open, onClose, onSuccess, id }) => {
@@ -12,6 +10,9 @@ const InfraPopupAdd = ({ open, onClose, onSuccess, id }) => {
   const [name, setName] = useState('')
   const [note, setNote] = useState('')
   const [type, setType] = useState('')
+  const [nameError, setNameError] = useState('')
+  const [noteError, setNoteError] = useState('')
+  const [typeError, setTypeError] = useState('')
 
   const fetchDataAdults = async () => {
     try {
@@ -39,7 +40,7 @@ const InfraPopupAdd = ({ open, onClose, onSuccess, id }) => {
     }
   }
 
-  const handleAdd = async () => {
+  const Add = async () => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -67,6 +68,8 @@ const InfraPopupAdd = ({ open, onClose, onSuccess, id }) => {
         onSuccess()
       }
     } catch (error) {
+      onClose()
+
       console.error('Error adding infra:', error)
 
       Swal.fire('Error', 'Failed to add infra!', 'error')
@@ -76,6 +79,39 @@ const InfraPopupAdd = ({ open, onClose, onSuccess, id }) => {
   useEffect(() => {
     fetchDataAdults()
   }, [])
+
+  const validateInputs = () => {
+    let isValid = true
+
+    if (name.trim() === '') {
+      setNameError('Tên không được để trống')
+      isValid = false
+    } else {
+      setNameError('')
+    }
+
+    if (note.trim() === '') {
+      setNoteError('Ghi chú không được để trống')
+      isValid = false
+    } else {
+      setNoteError('')
+    }
+
+    if (type.trim() === '') {
+      setTypeError('Mã không được để trống')
+      isValid = false
+    } else {
+      setTypeError('')
+    }
+
+    return isValid
+  }
+
+  const handleAdd = () => {
+    if (validateInputs()) {
+      Add()
+    }
+  }
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
@@ -88,6 +124,8 @@ const InfraPopupAdd = ({ open, onClose, onSuccess, id }) => {
           style={{ marginBottom: '16px' }}
           value={name}
           onChange={e => setName(e.target.value)}
+          error={!!nameError}
+          helperText={nameError}
         />
         <CustomTextField
           label='Mã định danh'
@@ -96,6 +134,8 @@ const InfraPopupAdd = ({ open, onClose, onSuccess, id }) => {
           style={{ marginBottom: '16px' }}
           value={type}
           onChange={e => setType(e.target.value)}
+          error={!!typeError}
+          helperText={typeError}
         />
         <CustomTextField
           label='Ghi chú'
@@ -104,6 +144,8 @@ const InfraPopupAdd = ({ open, onClose, onSuccess, id }) => {
           style={{ marginBottom: '16px' }}
           value={note}
           onChange={e => setNote(e.target.value)}
+          error={!!noteError}
+          helperText={noteError}
         />
       </DialogContent>
       <DialogActions style={{ display: 'flex' }}>

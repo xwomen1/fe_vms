@@ -314,7 +314,9 @@ const UserList = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{assetType.ipAddress}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.macAddress}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.location}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{statusText}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>
+                        {assetType.status?.name ? assetType.status.name : statusText}
+                      </TableCell>
 
                       <TableCell sx={{ padding: '16px' }}>
                         <IconButton size='small' onClick={() => handleAddPClick(assetType.id)}>

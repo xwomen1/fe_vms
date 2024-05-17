@@ -96,13 +96,12 @@ const format_form = [
 
 const Add = ({ show, onClose, id, data, setReload, filter }) => {
     const [loading, setLoading] = useState(false)
-    const [cameraId, setCameraId] = useState(null)
+    const [time, setTime] = useState(null)
     const [cameraList, setCameraList] = useState([])
     const [locationList, setLocationList] = useState([])
     const API_REGIONS = `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/`
     const [detail, setDetail] = useState(null)
-    const [form, setForm] = useState(format_form)
-    const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
+    const [form, setForm] = useState(format_form);
 
     const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -122,7 +121,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
         formState: { errors },
     } = useForm({
         defaultValues: initValues
-    })
+    });
 
     const fetchCameraList = async () => {
         try {
@@ -149,7 +148,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
     }, [detail])
 
     const setDetailFormValue = () => {
-        reset(detail)
+        reset(detail);
     }
 
     useEffect(() => {
@@ -159,12 +158,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
     }, [])
 
     const onSubmit = (values) => {
-        const detail = {
-            ...values,
-            cameraId: cameraId
-        }
-
-        handleUpdate(detail)
+        handleUpdate(values)
     }
 
     const handleAdd = (values) => {
@@ -188,21 +182,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
             })
             .finally(() => {
                 setLoading(false)
-            })
-    }
-
-    const handleImageLoad = (event) => {
-        const { naturalWidth, naturalHeight } = event.target
-        setDimensions({ width: naturalWidth, height: naturalHeight })
-    }
-
-    const getBoxStyles = () => {
-        if (dimensions.width < dimensions.height) {
-
-            return { width: '40vh' }
-        }
-
-        return {}
+            });
     }
 
     return (
@@ -231,7 +211,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
                             </Typography>
                         </Box>
                         <form>
-                            <Grid container spacing={12}>
+                            <Grid container spacing={2}>
                                 <Grid item xs={12} sm={3}>
                                     <Grid container spacing={2}>
                                         {form.map((item, index) => {
@@ -296,13 +276,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
                                                                         label={item.label}
                                                                         SelectProps={{
                                                                             value: value,
-                                                                            onChange: e => {
-                                                                                onChange(e)
-                                                                                if (item.name === 'camName') {
-                                                                                    const cam = cameraList.find(cam => cam.name === e.target.value)
-                                                                                    setCameraId(cam.id)
-                                                                                }
-                                                                            }
+                                                                            onChange: e => onChange(e)
                                                                         }}
                                                                         id='validation-basic-select'
                                                                         error={Boolean(errors[item.name])}
@@ -340,11 +314,10 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
                                                             control={control}
                                                             rules={{ required: true }}
                                                             render={({ field: { value, onChange } }) => (
-                                                                <Box sx={getBoxStyles()}>
+                                                                <Box>
                                                                     <Typography sx={{ mb: 1 }}>Ảnh toàn cảnh</Typography>
                                                                     <CustomAvatar
                                                                         src={value}
-                                                                        onLoad={handleImageLoad}
                                                                         variant='rounded'
                                                                         alt={''}
                                                                         sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
