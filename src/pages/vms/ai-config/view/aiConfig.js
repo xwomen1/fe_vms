@@ -1,9 +1,8 @@
 import axios from "axios"
 import authConfig from 'src/configs/auth'
-import { Box, Button, Card, CardContent, CardHeader, FormControlLabel, Grid, IconButton, Menu, MenuItem, Pagination, Paper, Switch, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material"
+import { Box, Button, Card, CardHeader, Grid, Menu, MenuItem, Pagination, Paper, Switch, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material"
 import { useEffect, useState } from "react"
 import Icon from 'src/@core/components/icon'
-import { ca } from "date-fns/locale"
 import toast from "react-hot-toast"
 
 const AIConfig = () => {

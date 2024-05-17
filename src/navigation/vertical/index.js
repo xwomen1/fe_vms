@@ -75,6 +75,10 @@ const navigation = () => {
           path: '/vms/playback-camera'
         },
         {
+          title: 'Trích xuất clip',
+          path: '/vms/clip-extraction'
+        },
+        {
           title: 'Nhóm camera',
           path: '/vms/camera-group'
         },
