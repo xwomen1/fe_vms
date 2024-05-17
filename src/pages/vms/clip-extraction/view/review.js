@@ -1,378 +1,272 @@
-import React, { useEffect, useState, useRef } from 'react'
-
-import { Grid, Typography } from '@mui/material'
-
-// import TableStickyHeader from './table'
-import Tab from '@mui/material/Tab'
-import TabPanel from '@mui/lab/TabPanel'
-import { styled } from '@mui/material/styles'
-import MuiTabList from '@mui/lab/TabList'
-import TabContext from '@mui/lab/TabContext'
-import Settings from 'src/@core/components/camera/settings'
-import { getApi } from 'src/@core/utils/requestUltils'
-import { CAMERA_API } from 'src/@core/components/api-url'
-import IconButton from '@mui/material/IconButton'
+import { Box, Button, Card, Grid, IconButton } from "@mui/material"
+import { useEffect, useRef, useState } from "react"
 import Icon from 'src/@core/components/icon'
-import useDebounce from './useDebounce'
-import Slider from '@mui/material/Slider'
-import Box from '@mui/material/Box'
-import { Stack } from '@mui/material'
-
-// ** Third Party Imports
-
+import DatePickerWrapper from "src/@core/styles/libs/react-datepicker"
 import DatePicker from 'react-datepicker'
-
-// ** Styled Component
-import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
-
-// ** Custom Component Imports
 import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
-import { formatTimeShow, formatDate } from 'src/@core/utils/format'
 
-import { Card, CardContent } from "@mui/material"
-import ViewCamera from "src/@core/components/camera/playback"
-
-
-const valueFilterInit = {
-    page: 1,
-    limit: 50,
-    deviceTypes: 'NVR'
+const config = {
+    bundlePolicy: 'max-bundle',
+    iceServers: [
+        {
+            urls: 'stun:dev-ivis-camera-api.basesystem.one:3478'
+        },
+        {
+            urls: 'turn:dev-ivis-camera-api.basesystem.one:3478',
+            username: 'demo',
+            credential: 'demo'
+        }
+    ]
 }
 
-const Review = () => {
+const Review = ({ id, name, channel }) => {
     const [camera, setCamera] = useState()
-    function formatTime(timeInSeconds) {
-        const result = new Date(timeInSeconds * 1000).toTimeString().substr(0, 8)
-
-        return result
-    }
-
-    const msToTime = duration => {
-
-        const seconds = Math.floor((duration / 1000) % 60)
-        const minutes = Math.floor((duration / (1000 * 60)) % 60)
-        const hours = Math.floor((duration / (1000 * 60 * 60)) % 24)
-        const count = seconds + minutes * 60 + hours * 3600
-
-        return count
-    }
-
-    const [time, setTime] = useState(new Date())
+    const [channelCurrent, setChannelCurrent] = useState(channel)
+    const [websocket, setWebsocket] = useState(null)
+    const [text, setText] = useState(null)
+    const [rtcPeerConnection, setRtcPeerConnection] = useState(null)
+    const [remoteStream, setRemoteStream] = useState(null)
+    const [loading, setLoading] = useState(false)
+    const remoteVideoRef = useRef(null)
+    const [status, setStatus] = useState('')
+    const [reload, setReload] = useState(0)
+    const [selectTime, setSelectTime] = useState(null)
     const [dateTime, setDateTime] = useState(new Date())
 
-    const [timeFilter, setTimeFilter] = useState({
-        start_time: new Date() - 60 * 60 * 1000,
-        end_time: new Date()
-    })
-    const datePickerRef = useRef(null)
-    const [sizeScreen, setSizeScreen] = useState('3x2')
-    const [reload, setReload] = useState(0)
-    const [numberShow, setNumberShow] = useState(6)
+    const time = [
+        '00:00', '01:00', '02:00', '03:00', '04:00', '05:00',
+        '06:00', '07:00', '08:00', '09:00', '10:00', '11:00',
+        '12:00', '13:00', '14:00', '15:00', '16:00', '17:00',
+        '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'
+    ]
 
-    const [valueFilter, setValueFilter] = useState(valueFilterInit)
+    function randomId(length) {
+        const characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 
-    const [cameraHiden, setCameraHiden] = useState([])
-    const [play, setPlay] = useState(true)
-    const [valueRange, setValueRange] = useState(60 * 60 * 1000)
-    const debouncedSearch = useDebounce(valueRange, 700)
+        const pickRandom = () => characters.charAt(Math.floor(Math.random() * characters.length))
 
-    const onClickPlay = v => {
-        setPlay(v)
-
-        // if (videoId) {
-        //   if (!v) {
-        //     videoId.pause();
-        //     if (stopAndStartRecord) {
-        //       onClickCut('pause');
-        //     }
-        //   } else {
-        //     if (isScreen && isScreen === 'detail' && onChangeCurTimePlayback) {
-        //       const acb = timeFilter.start_time + parseInt(valueRange) - 6000;
-        //       onChangeCurTimePlayback(acb);
-        //     }
-        //     videoId.play();
-        //   }
-        // }
+        return [...Array(length)].map(pickRandom).join('')
     }
+    const SOCKET_LIVE_VIEW = process.env.NEXT_PUBLIC_SOCKET_CCTT
 
-    const handSetChanel = (id, channel) => {
-        let newCamera = {
-            id: id,
-            channel: channel
+    const createWsConnection = () => {
+        const ws = new WebSocket(`${SOCKET_LIVE_VIEW}/ivis/vms/api/v0/ws/signaling/${randomId(10)}`)
+
+        setWebsocket(ws)
+        const pc = new RTCPeerConnection(config)
+        setRtcPeerConnection(pc)
+
+        // listen for remote tracks and add them to remote stream
+        pc.ontrack = event => {
+            setLoading(false)
+            const stream = event.streams[0]
+            try {
+                if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {
+                    setRemoteStream(stream)
+                    remoteVideoRef.current.srcObject = stream
+                }
+            } catch (err) {
+                console.log(err)
+            }
         }
-        setCamera(newCamera)
     }
+    useEffect(() => {
+        if (websocket && channel) {
+            websocket.close()
+            createWsConnection()
+        }
+    }, [id, channel])
 
-    function timeDisplay(time) {
-        if (time < 10)
+    useEffect(() => {
+        createWsConnection()
 
-            return '0' + time
+        return () => {
+            if (websocket) {
+                websocket.close()
+            }
+            if (rtcPeerConnection) {
+                rtcPeerConnection.close()
+            }
+        }
+    }, [reload])
 
-        return time
-    }
-    function valuetext(value) {
-
-        const timeCurrent = new Date(timeFilter.start_time + value)
-
-        return `${timeCurrent.getFullYear() +
-            '/' +
-            timeDisplay(timeCurrent.getMonth() + 1) +
-            '/' +
-            timeCurrent.getDate() +
-            ' ' +
-            timeDisplay(timeCurrent.getHours()) +
-            ':' +
-            timeDisplay(timeCurrent.getMinutes())
-            }`
-    }
-
-    const handleIconClick = () => {
-        if (datePickerRef.current) {
-            datePickerRef.current.setOpen(true)
+    // send message to WebSocket server
+    const sendMessage = message => {
+        if (websocket && websocket.readyState === WebSocket.OPEN) {
+            websocket.send(JSON.stringify(message))
         }
     }
 
-    const renderMarks = () => {
-        const marks = []
-        const part = 10
-        for (let i = 0; i <= part; i++) {
-            let step = Math.floor(valueRange / part)
-            let timeCurrent = new Date(timeFilter.start_time + step * i)
-            marks.push({
-                value: step * i,
-                label: timeCurrent.getHours() + ':' + timeCurrent.getMinutes()
+    // handle WebSocket message
+    const handleMessage = async event => {
+        const message = JSON.parse(event.data)
+
+        // handle message based on its type
+        switch (message.type) {
+            // handle offer message
+            case 'offer':
+                rtcPeerConnection.setRemoteDescription(message).then(async () => {
+                    rtcPeerConnection.setLocalDescription(rtcPeerConnection.createAnswer())
+
+                    // Waiting for iceGathering completed
+                    await new Promise(resolve => {
+                        if (rtcPeerConnection.iceGatheringState === 'complete') {
+                            resolve()
+                        } else {
+                            rtcPeerConnection.addEventListener('icegatheringstatechange', () => {
+                                if (rtcPeerConnection.iceGatheringState === 'complete') {
+                                    resolve()
+                                }
+                            })
+                        }
+                    })
+
+                    sendMessage({
+                        id: id,
+                        type: 'answer',
+                        channel: channel,
+                        sdp: rtcPeerConnection?.localDescription.sdp
+                    })
+                })
+
+                break
+            case 'status':
+                break
+            default:
+                break
+        }
+        setText(message?.content)
+    }
+
+    // set up WebSocket event listeners
+    useEffect(() => {
+        if (websocket) {
+            setLoading(true)
+            websocket.addEventListener('open', () => {
+                // console.log('WebSocket connection established')
+                websocket.send(
+                    JSON.stringify({
+                        id: id,
+                        type: 'request'
+                    })
+                )
+            })
+            websocket.addEventListener('message', handleMessage)
+            websocket.addEventListener('close', () => {
+                // console.log('WebSocket connection closed')
+            })
+            websocket.addEventListener('error', error => {
+                console.error('WebSocket error:', error)
             })
         }
+    }, [websocket, channel])
 
+    // set up RTCPeerConnection event listeners
+    useEffect(() => {
+        if (rtcPeerConnection) {
+            rtcPeerConnection.addEventListener('connectionstatechange', () => {
+                console.log('RTCPeerConnection state:', rtcPeerConnection.connectionState)
+                setStatus(rtcPeerConnection.connectionState)
+            })
+        }
+    }, [rtcPeerConnection])
 
-        return marks
+    const handSetChanel = (channel) => {
+        setChannelCurrent(channel)
+    }
+
+    const handleSetSelectedTime = (event) => {
+        setSelectTime(event)
     }
 
     return (
-        <Card>
-            <CardContent>
-                <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                        <ViewCamera
-                            id={'01'}
-                            name={'Camera 01'}
-                            channel={'Sub'}
-                            sizeScreen={'1x1'}
-                            handSetChanel={handSetChanel}
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        {/* <div className='video-controls'>
-                            <div
-                                style={{
-                                    width: '100%'
-                                }}
-                            >
-
+        <Grid container spacing={2}>
+            <Grid item xs={9}>
+                <Card>
+                    <div className='portlet portlet-video live' style={{ width: '100%' }}>
+                        <div className='portlet-title'>
+                            <div className='caption'>
+                                <span className='label label-sm bg-red'> {status ? status.toUpperCase() : 'LIVE'}</span>
+                                <span className='caption-subject font-dark sbold uppercase'>{name}</span>
                             </div>
-                        </div> */}
-                        <div className='bottom-controls' style={{ background: '#000' }}>
-                            <div className='left-controls'>
-                                <Box className='w-100' sx={{ px: 2 }}>
-                                    <Slider
-                                        defaultValue={1}
-
-                                        // getAriaValueText={'1'}
-                                        shiftStep={0.25}
-                                        step={0.25}
-                                        marks
-                                        min={0.25}
-                                        max={4}
-                                        valueLabelDisplay='on'
-                                        color='secondary'
-                                        sx={{
-                                            '&. MuiSlider-track': {
-                                                backgroundColor: '#fff'
-                                            },
-                                            '& .MuiSlider-rail': {
-                                                opacity: 0.28,
-                                                backgroundColor: '#fff'
-                                            },
-                                            '& .MuiSlider-markLabel': {
-                                                color: '#fff'
-                                            }
-                                        }}
-                                    />
-                                </Box>
-                                <div className='w-100' style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                    {timeFilter && (
-                                        <IconButton
-                                            style={{ padding: 5, margin: '0 8px 0 8px' }}
-                                            onClick={() => {
-                                                // onChangeRange(1);
-                                            }}
-                                        >
-                                            <Icon icon='mage:previous' size='1.2em' color='#FFF' />
-                                        </IconButton>
-                                    )}
-
-                                    {timeFilter && (
-                                        <IconButton onClick={() => onClickPlay(!play)} style={{ padding: 5, margin: '0 8px 0 8px' }}>
-                                            {play ? (
-                                                <Icon icon='ph:play-light' size='1.2em' color='#FFF' />
-                                            ) : (
-                                                <Icon icon='ic:twotone-pause' size='1.2em' color='#FFF' />
-                                            )}
-                                        </IconButton>
-                                    )}
-                                    <IconButton style={{ padding: 5, margin: '0 8px 0 8px' }}>
-                                        <Icon icon='mage:next' size='1em' color='#FFF' />
-                                    </IconButton>
-                                </div>
-
-                                <div style={{ marginTop: 8 }} className='time'>
-                                    <time id='time-elapsed'>{`${formatTimeShow(timeFilter.start_time)}`}</time>
-                                    <span>{`/${formatTimeShow(timeFilter.end_time)}`}</span>
-                                </div>
-                            </div>
-                            <div className='slidecontainer-2'>
-                                <Box style={{ display: 'flex', alignItems: 'center' }}>
-                                    <IconButton
-                                        style={{ padding: 5 }}
-                                        onClick={() => {
-                                            setValueRange(valueRange * 2)
-                                            setTimeFilter({
-                                                ...timeFilter,
-                                                end_time: timeFilter.end_time + valueRange
-                                            })
-                                        }}
+                            <div className='media-top-controls'>
+                                <div className='btn-group'>
+                                    <Button
+                                        className={`sd_btn btn btn-default btn-xs ${channel === 'Sub' ? 'active' : ''}`}
+                                        onClick={() => handSetChanel('Sub')}
                                     >
-                                        <Icon icon='tabler:plus' size='1em' color='#FFF' />
-                                    </IconButton>
-                                    <IconButton
-                                        onClick={() => {
-                                            setValueRange(valueRange / 2)
-                                            setTimeFilter({
-                                                ...timeFilter,
-                                                end_time: timeFilter.end_time - valueRange
-                                            })
-                                        }}
-                                        style={{ padding: 5 }}
+                                        SD
+                                    </Button>
+                                    <Button
+                                        className={`hd_btn btn btn-default btn-xs ${channel === 'Main' ? 'active' : ''}`}
+                                        onClick={() => handSetChanel('Main')}
                                     >
-                                        <Icon icon='tabler:minus' size='1em' color='#FFF' />
-                                    </IconButton>
-                                    <Typography style={{ color: '#fff', fontWeight: 'bold' }}>
-                                        {`${Math.floor(valueRange / (60 * 60 * 1000))} giờ -  ${(valueRange - 60 * 60 * 1000 * Math.floor(valueRange / (60 * 60 * 1000))) / (60 * 1000)
-                                            } phút `}
-                                    </Typography>
-                                </Box>
-                                <Box className='w-100'>
-                                    <Slider
-                                        defaultValue={0}
-                                        color='secondary'
-                                        step={2000}
-                                        min={0}
-                                        max={valueRange}
-                                        valueLabelDisplay='auto'
-                                        getAriaValueText={valuetext}
-                                        valueLabelFormat={valuetext}
-                                        marks={renderMarks()}
-                                        aria-labelledby='custom-marks-slider'
-                                        sx={{
-                                            '& .MuiSlider-thumb': {
-                                                width: 8,
-                                                height: 8,
-                                                transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
-                                                '&::before': {
-                                                    boxShadow: '0 2px 12px 0 rgba(0,0,0,0.4)'
-                                                },
-                                                '&:hover, &.Mui-focusVisible': {
-                                                    boxShadow: `0px 0px 0px 8px ${'rgb(0 0 0 / 16%)'}`
-                                                },
-                                                '&.Mui-active': {
-                                                    width: 20,
-                                                    height: 20
-                                                }
-                                            },
-                                            '&. MuiSlider-track': {
-                                                backgroundColor: '#fff'
-                                            },
-                                            '& .MuiSlider-rail': {
-                                                opacity: 0.28,
-                                                backgroundColor: '#fff'
-                                            },
-                                            '& .MuiSlider-markLabel': {
-                                                color: '#fff'
-                                            }
-                                        }}
-                                    />
-                                </Box>
-                            </div>
-                            <div className='right-controls'>
-                                <Stack spacing={4} direction='row' sx={{ mb: 1, px: 1 }} alignItems='center'>
-                                    <Icon icon='formkit:volumedown' size='1rem' color='#fff' />
-
-                                    <Slider
-                                        aria-label='Volume'
-                                        defaultValue={30}
-                                        min={0}
-                                        max={100}
-                                        color='secondary'
-                                        sx={{
-                                            '& .MuiSlider-track': {
-                                                border: 'none'
-                                            },
-                                            '& .MuiSlider-thumb': {
-                                                width: 24,
-                                                height: 24,
-                                                backgroundColor: '#fff',
-                                                '&::before': {
-                                                    boxShadow: '0 4px 8px rgba(0,0,0,0.4)'
-                                                },
-                                                '&:hover, &.Mui-focusVisible, &.Mui-active': {
-                                                    boxShadow: 'none'
-                                                }
-                                            }
-                                        }}
-                                    />
-                                    <Icon icon='formkit:volumeup' size='1rem' color='#fff' />
-                                </Stack>
-                                <Box sx={{ mt: 1, ml: 4, display: 'flex', alignItems: 'center' }}>
-                                    <IconButton size='small' title='date' onClick={handleIconClick}>
-                                        <Icon color='#fff' fontSize='1.5rem' icon='fluent-mdl2:date-time-12' />
-                                    </IconButton>
-                                    <DatePickerWrapper sx={{ '& .react-datepicker-wrapper': { width: 'auto' } }}>
-                                        <DatePicker
-                                            ref={datePickerRef}
-                                            showTimeSelect
-                                            timeFormat='HH:mm'
-                                            timeIntervals={15}
-                                            selected={dateTime}
-                                            id='date-time-picker'
-                                            dateFormat='MM/dd/yyyy h:mm aa'
-                                            onChange={date => {
-                                                setDateTime(date)
-                                                setTimeFilter({
-                                                    ...timeFilter,
-                                                    start_time: new Date(date).getTime() - valueRange,
-                                                    end_time: new Date(date).getTime()
-                                                })
-                                            }}
-                                            popperPlacement='bottom-start'
-                                            customInput={
-                                                <CustomInput
-                                                    sx={{
-                                                        '& .MuiInputBase-input': {
-                                                            color: '#fff',
-                                                            fontWeight: 'bold'
-                                                        }
-                                                    }}
-                                                />
-                                            }
-                                        />
-                                    </DatePickerWrapper>
-                                </Box>
+                                        HD
+                                    </Button>
+                                </div>
                             </div>
                         </div>
+                        <div>
+                            <video
+                                style={{ width: '100%' }}
+                                ref={remoteVideoRef}
+                                playsInline
+                                autoPlay
+                                srcObject={remoteStream}
+                            />
+                            {(status === 'failed' || status == 'disconnected') && (
+                                <IconButton
+                                    sx={{
+                                        left: '30%',
+                                        top: '50%',
+                                        position: 'absolute',
+                                        color: '#efefef',
+                                        transform: 'translateY(-50%)'
+                                    }}
+                                    onClick={() => setReload(reload + 1)}
+                                >
+                                    <Icon icon='tabler:reload' fontSize={30} />
+                                </IconButton>
+                            )}
+                        </div>
+                    </div>
+                </Card>
+            </Grid>
+            <Grid item xs={3}>
+                <Card>
+                    <DatePickerWrapper>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                            <div>
+                                <DatePicker
+                                    showTimeSelect
+                                    timeFormat='HH:mm'
+                                    selected={dateTime}
+                                    id='date-time-picker'
+                                    dateFormat='MM/dd/yyyy h:mm aa'
+                                    onChange={date => setDateTime(date)}
+                                    customInput={<CustomInput label='' />}
+                                />
+                            </div>
+                        </Box>
+                    </DatePickerWrapper>
+                    <Grid container spacing={2} sx={{ padding: '5px' }}>
+                        {time.map((item, index) => {
+                            return (
+                                <Grid item xs={3}>
+                                    <Button
+                                        variant={item === selectTime ? 'contained' : ''}
+                                        color={item === selectTime ? 'primary' : 'secondary'}
+                                        onClick={() => handleSetSelectedTime(item)}
+                                    >
+                                        {item}
+                                    </Button>
+                                </Grid>
+                            )
+                        })}
                     </Grid>
-                </Grid>
-            </CardContent>
-        </Card>
+                </Card>
+            </Grid>
+        </Grid>
     )
 }
 

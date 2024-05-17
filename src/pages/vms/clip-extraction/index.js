@@ -126,10 +126,10 @@ const ClipExtraction = () => {
                         <TabPanel value='1' sx={{ paddingTop: '0' }}>
                             <LiveView key={camera.id} id={camera.id} name={camera.name} channel={camera.channel} />
                         </TabPanel>
-                        <TabPanel value='2'>
-                            <Review />
+                        <TabPanel value='2' sx={{ paddingTop: '0' }}>
+                            <Review key={camera.id} id={camera.id} name={camera.name} channel={camera.channel} />
                         </TabPanel>
-                        <TabPanel value='3'>
+                        <TabPanel value='3' sx={{ paddingTop: '0' }}>
                             <Storage />
                         </TabPanel>
                     </Grid>
