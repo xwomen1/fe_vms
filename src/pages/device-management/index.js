@@ -57,8 +57,6 @@ const AccessControlDevice = () => {
         config
       )
       const parentData = response.data
-      console.log(parentData[0].devices, 'parentData')
-      setDeviceData(parentData[0].devices)
 
       // Lấy dữ liệu thằng con tương ứng với mỗi thằng cha
       const promises = parentData.map(async parent => {
@@ -66,8 +64,15 @@ const AccessControlDevice = () => {
           `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/device-groups/children-lv1?parentId=${parent.id}`,
           config
         )
+        const children = response.data
 
-        return { ...parent, children: response.data }
+        // Lưu trữ ID của thằng cha trong mỗi thiết bị
+        const devicesWithParentId = parent.devices.map(device => ({
+          ...device,
+          parentId: parent.id
+        }))
+
+        return { ...parent, children, devices: devicesWithParentId }
       })
 
       // Đợi cho tất cả các promises hoàn thành
@@ -75,6 +80,7 @@ const AccessControlDevice = () => {
 
       // Cập nhật state treeData với dữ liệu thằng cha và thằng con
       setTreeData(childrenData)
+      setDeviceData(childrenData.flatMap(parent => parent.devices)) // Gộp tất cả thiết bị vào một mảng
     } catch (error) {
       console.error('Error fetching data:', error)
       toast.error(error.message)
@@ -83,22 +89,20 @@ const AccessControlDevice = () => {
     }
   }
 
-  const handleNodeSelect = async (event, node) => {
-    if (node && node) {
+  const handleNodeSelect = async (event, nodeId) => {
+    if (nodeId) {
       try {
-        let url
-        if (node.parent) {
-          // Nếu có parent, nghĩa là đây là thằng con
-          url = `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices?deviceGroupId=${node}`
-        } else {
-          // Nếu không có parent, nghĩa là đây là thằng cha
-          url = `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices?deviceGroupId=${node}`
-        }
+        const url = `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices?deviceGroupId=${nodeId}`
 
         // Gọi API
         const response = await axios.get(url, config)
 
-        setDeviceData(response.data.results)
+        // Lưu trữ dữ liệu thiết bị vào state
+        const devicesWithParentId = response.data.results.map(device => ({
+          ...device,
+          parentId: nodeId
+        }))
+        setDeviceData(devicesWithParentId)
 
         // Xử lý dữ liệu từ response nếu cần
         console.log(response.data)
@@ -220,7 +224,7 @@ const AccessControlDevice = () => {
                         <Button
                           size='small'
                           component={Link}
-                          href={`/device-management/Update/${device.id}`}
+                          href={`/device-management/Update/${device.parentId}`}
                           sx={{ color: 'blue', right: '10px' }}
                         >
                           {device.name}
