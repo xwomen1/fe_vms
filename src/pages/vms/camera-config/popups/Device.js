@@ -196,6 +196,7 @@ const Device = ({ onClose, camera }) => {
             label: response.data.location || '',
             value: response.data.location || ''
           })
+          console.log(response.data.regions, 'regions')
         }
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -327,6 +328,7 @@ const Device = ({ onClose, camera }) => {
     fetchNicTypes()
     console.log('Fetching NIC types...') // Add this line
   }
+  console.log(regions, 'vùng')
 
   const fetchRegions = async () => {
     try {
@@ -538,7 +540,7 @@ const Device = ({ onClose, camera }) => {
               height='30vh'
               onViewportChange={setViewport}
               goongApiAccessToken={GOONG_MAP_KEY}
-              onClick={handleMapClick} // Call handleMapClick function on map click
+              onClick={handleMapClick}
             >
               {lat && lng && (
                 <Marker latitude={parseFloat(lat)} longitude={parseFloat(lng)} offsetLeft={-20} offsetTop={-20}>
