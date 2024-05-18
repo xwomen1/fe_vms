@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 // ** Third Party Components
 import PerfectScrollbar from 'react-perfect-scrollbar'
@@ -15,18 +15,20 @@ import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import MuiDrawer from '@mui/material/Drawer'
-import { Container, Draggable } from 'react-smooth-dnd'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction'
-
+import { TreeItem, TreeView } from '@mui/lab'
+import Pagination from '@mui/material/Pagination'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
 // ** Hook Import
 import { useSettings } from 'src/@core/hooks/useSettings'
+import select from 'src/@core/theme/overrides/select'
+import { shouldForwardProp } from '@mui/system'
 
 const Toggler = styled(Box)(({ theme }) => ({
   right: 0,
@@ -61,33 +63,44 @@ const CustomizerSpacing = styled('div')(({ theme }) => ({
   padding: theme.spacing(5, 6)
 }))
 
-const ColorBox = styled(Box)(({ theme }) => ({
-  width: 45,
-  height: 45,
-  cursor: 'pointer',
-  margin: theme.spacing(2.5, 1.75, 1.75),
-  borderRadius: theme.shape.borderRadius,
-  transition: 'margin .25s ease-in-out, width .25s ease-in-out, height .25s ease-in-out, box-shadow .25s ease-in-out',
-  '&:hover': {
-    boxShadow: theme.shadows[4]
+const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
+  '&:hover > .MuiTreeItem-content:not(.Mui-selected)': {
+    backgroundColor: theme.palette.action.hover
+  },
+  '& .MuiTreeItem-content': {
+    paddingRight: theme.spacing(3),
+    borderTopRightRadius: theme.spacing(4),
+    borderBottomRightRadius: theme.spacing(4),
+    fontWeight: theme.typography.fontWeightMedium
+  },
+  '& .MuiTreeItem-label': {
+    fontWeight: 'inherit',
+    paddingRight: theme.spacing(3)
+  },
+  '& .MuiTreeItem-group': {
+    marginLeft: 0,
+    '& .MuiTreeItem-content': {
+      paddingLeft: theme.spacing(4),
+      fontWeight: theme.typography.fontWeightRegular
+    }
   }
 }))
 
-const Customizer = ({
-  cameraGroup,
-  cameraHiden,
-  setNumberShow,
-  setCameraGroup,
-  setCameraHiden,
-  sizeScreen,
-  setSizeScreen
-}) => {
+const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList, sizeScreen, setSizeScreen }) => {
   // ** State
   const [open, setOpen] = useState(false)
 
   // ** Hook
   const { settings, saveSettings } = useSettings()
-
+  const [expanded, setExpanded] = useState(['0'])
+  const [totalPage, setTotalPage] = useState(1)
+  useEffect(() => {
+    if (cameraList[selectIndex]?.cameras?.length > 0) {
+      setTotalPage(
+        Math.ceil(cameraList[selectIndex].cameras.length / (sizeScreen.split('x')[0] * sizeScreen.split('x')[1]))
+      )
+    }
+  }, [cameraList, sizeScreen])
   // ** Vars
   const {
     mode,
@@ -103,23 +116,33 @@ const Customizer = ({
     contentWidth,
     verticalNavToggleType
   } = settings
+  const StyledTreeItem = props => {
+    // ** Props
+    const { labelText, labelIcon, labelInfo, color, ...other } = props
 
-  const handleChange = (field, value) => {
-    saveSettings({ ...settings, [field]: value })
+    return (
+      <StyledTreeItemRoot
+        {...other}
+        label={
+          <Box sx={{ py: 1, display: 'flex', alignItems: 'center', '& svg': { mr: 1 } }}>
+            <Icon icon={labelIcon} color={color} />
+            <Typography variant='body2' sx={{ flexGrow: 1, fontWeight: 500 }}>
+              {labelText}
+            </Typography>
+            {labelInfo ? (
+              <Typography variant='caption' color='inherit'>
+                {labelInfo}
+              </Typography>
+            ) : null}
+          </Box>
+        }
+      />
+    )
   }
-
-  const onDrop = ({ removedIndex, addedIndex }) => {
-    let newCameraGroup = []
-    for (let i = 0; i < cameraGroup.length; i++) {
-      if (i === addedIndex) {
-        newCameraGroup.push(cameraGroup[removedIndex])
-      } else if (i === removedIndex) {
-        newCameraGroup.push(cameraGroup[addedIndex])
-      } else {
-        newCameraGroup.push(cameraGroup[i])
-      }
-    }
-    setCameraGroup(newCameraGroup)
+  const handleNodeToggle = (event, nodeIds) => {
+    onSetSelectIndex(nodeIds[0])
+    setExpanded([nodeIds[0]])
+    onSetPage(1)
   }
 
   return (
@@ -159,7 +182,7 @@ const Customizer = ({
           <CustomizerSpacing sx={{ py: 1 }} className='customizer-body'>
             {/* Skin */}
             <Box sx={{ mb: 5 }}>
-              <Typography>Trang</Typography>
+              <Typography>Lưới</Typography>
               <RadioGroup
                 value={sizeScreen}
                 row
@@ -181,64 +204,57 @@ const Customizer = ({
           <Divider sx={{ m: '0 !important' }} />
           <CustomizerSpacing sx={{ py: 1 }} className='customizer-body'>
             <Box sx={{ mb: 5 }}>
-              <Typography>{cameraGroup.length} Camera hiển thị</Typography>
-              <List>
-                <Container dragHandleSelector='.drag-handle' lockAxis='y' onDrop={onDrop}>
-                  {cameraGroup.length > 0 &&
-                    cameraGroup.map((camera, id) => (
-                      <Draggable key={id}>
-                        <ListItem>
-                          <ListItemIcon>
-                            <ListItemIcon className='drag-handle'>
-                              <Icon icon='eva:menu-2-outline' />
-                            </ListItemIcon>
-                          </ListItemIcon>
-                          <ListItemText primary={camera.deviceName} />
-                          <ListItemSecondaryAction>
-                            <Icon
-                              onClick={() => {
-                                let newCameraGroup = cameraGroup.filter(item => item.id !== camera.id)
-                                let newCameraHiden = [...cameraHiden, camera]
-                                setCameraGroup(newCameraGroup)
-                                setCameraHiden(newCameraHiden)
-                                setNumberShow(cameraGroup.length - 1)
-                              }}
-                              icon='eva:close-outline'
-                            />
-                          </ListItemSecondaryAction>
-                        </ListItem>
-                      </Draggable>
-                    ))}
-                </Container>
-              </List>
+              <Typography>Nhóm Camera hiển thị</Typography>
+              <TreeView
+                expanded={expanded}
+                onNodeToggle={handleNodeToggle}
+                defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
+                defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
+              >
+                {cameraList.length > 0 &&
+                  cameraList.map((group, index) => {
+                    return (
+                      <StyledTreeItem
+                        key={index}
+                        labelText={`(${group.cameras.length}) ${group.name} `}
+                        nodeId={index + ''}
+                        labelIcon='tabler:folder'
+                        disabled={group.cameras.length == 0}
+                      >
+                        {group.cameras && group.cameras.length > 0
+                          ? group.cameras.map((camera, idx) => {
+                              // const matchedEvent = eventsData.find(event => event.id === camera.id)
+                              // const status = matchedEvent?.status
+
+                              return (
+                                <StyledTreeItem
+                                  disabled={true}
+                                  key={camera?.id}
+                                  nodeId={camera?.id}
+                                  labelText={camera?.deviceName}
+                                  labelIcon='tabler:camera'
+                                  // onClick={() => handleItemClick(camera.id, camera.deviceName)}
+                                />
+                              )
+                            })
+                          : null}
+                      </StyledTreeItem>
+                    )
+                  })}
+              </TreeView>
             </Box>
           </CustomizerSpacing>
-
-          <CustomizerSpacing sx={{ py: 1 }} className='customizer-body'>
+          <Divider sx={{ m: '0 !important' }} />
+          <CustomizerSpacing>
             <Box sx={{ mb: 5 }}>
-              <Typography>{cameraHiden.length} Camera chưa hiển thị</Typography>
-              <List>
-                {cameraHiden.length > 0 &&
-                  cameraHiden.map((camera, id) => (
-                    <ListItem key={camera + id}>
-                      <ListItemText primary={camera.deviceName} />
-                      <ListItemSecondaryAction>
-                        <ListItemIcon className='drag-handle1'>
-                          <Icon
-                            onClick={() => {
-                              let newCameraHiden = cameraHiden.filter(item => item.id !== camera.id)
-                              let newCameraGroup = [...cameraGroup, camera]
-                              setCameraGroup(newCameraGroup)
-                              setCameraHiden(newCameraHiden)
-                              setNumberShow(cameraGroup.length + 1)
-                            }}
-                            icon='eva:plus-outline'
-                          />
-                        </ListItemIcon>
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                  ))}
-              </List>
+              <Typography>Trang </Typography>
+              <Pagination
+                count={totalPage}
+                page={page}
+                onChange={(event, page) => onSetPage(page)}
+                color='primary'
+                sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}
+              />
             </Box>
           </CustomizerSpacing>
           <Divider sx={{ m: '0 !important' }} />
