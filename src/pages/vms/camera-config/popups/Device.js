@@ -152,7 +152,7 @@ const Device = ({ onClose, camera }) => {
   }
 
   const handleAddRow = () => {
-    const newRow = { name: '', isProxied: '', url: '', type: '' } // Thêm groupId vào đây
+    const newRow = { name: '', isProxied: false, url: '', type: '' } // Ensure isProxied is a boolean
     setRows([...rows, newRow])
   }
 
@@ -178,7 +178,7 @@ const Device = ({ onClose, camera }) => {
           setPassword(response.data.password)
           setIpAddress(response.data.ipAddress)
           setHttp(response.data.httpPort)
-          setRows(response.data.streams)
+          setRows(cameraData.streams || [])
           setOnvif(response.data.onvif)
           console.log(response.data)
           setLat(response.data.lat)
