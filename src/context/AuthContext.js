@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import authConfig from 'src/configs/auth'
 import { USER_API } from 'src/@core/components/api-url'
 import { postApi } from 'src/@core/utils/requestUltils'
+import { useAuth } from 'src/hooks/useAuth'
 
 const defaultProvider = {
   user: null,
@@ -21,6 +22,9 @@ const AuthProvider = ({ children }) => {
   const [expire, setExpire] = useState('')
   const [loading, setLoading] = useState(defaultProvider.loading)
   const router = useRouter()
+  const auth = useAuth()
+  const [rememberMe, setRememberMe] = useState(true)
+  const [showPassword, setShowPassword] = useState(false)
 
   const checkTokenExpiration = useCallback(token => {
     if (!token) {
