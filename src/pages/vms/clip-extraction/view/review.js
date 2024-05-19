@@ -1,16 +1,7 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useState, useRef } from 'react'
 
 import { Grid, Typography } from '@mui/material'
 
-// import TableStickyHeader from './table'
-import Tab from '@mui/material/Tab'
-import TabPanel from '@mui/lab/TabPanel'
-import { styled } from '@mui/material/styles'
-import MuiTabList from '@mui/lab/TabList'
-import TabContext from '@mui/lab/TabContext'
-import Settings from 'src/@core/components/camera/settings'
-import { getApi } from 'src/@core/utils/requestUltils'
-import { CAMERA_API } from 'src/@core/components/api-url'
 import IconButton from '@mui/material/IconButton'
 import Icon from 'src/@core/components/icon'
 import useDebounce from './useDebounce'
@@ -66,13 +57,8 @@ const Review = ({ id, name, channel }) => {
         end_time: new Date()
     })
     const datePickerRef = useRef(null)
-    const [sizeScreen, setSizeScreen] = useState('3x2')
-    const [reload, setReload] = useState(0)
-    const [numberShow, setNumberShow] = useState(6)
 
-    const [valueFilter, setValueFilter] = useState(valueFilterInit)
 
-    const [cameraHiden, setCameraHiden] = useState([])
     const [play, setPlay] = useState(true)
     const [valueRange, setValueRange] = useState(60 * 60 * 1000)
     const debouncedSearch = useDebounce(valueRange, 700)
@@ -147,9 +133,15 @@ const Review = ({ id, name, channel }) => {
 
     return (
         <Card>
-            <CardContent>
-                <Grid container spacing={2}>
-                    <Grid item xs={12}>
+            <Grid container spacing={2}>
+                <Grid item xs={12}>
+                    {id === '' &&
+                        <div style={{ height: '70vh', background: '#000', display: 'flex', justifyContent: 'center' }}>
+                            <IconButton disabled>
+                                <Icon icon="tabler:player-play-filled" width='48' height='48' style={{ color: '#FF9F43' }} />
+                            </IconButton>
+                        </div>}
+                    {id !== '' && channel !== '' &&
                         <ViewCamera
                             id={id}
                             name={name}
@@ -157,209 +149,209 @@ const Review = ({ id, name, channel }) => {
                             sizeScreen={'1x1'}
                             handSetChanel={handSetChanel}
                         />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <div className='bottom-controls' style={{ background: '#000' }}>
-                            <div className='left-controls'>
-                                <Box className='w-100' sx={{ px: 2 }}>
-                                    <Slider
-                                        defaultValue={1}
+                    }
+                </Grid>
+                <Grid item xs={12}>
+                    <div className='bottom-controls' style={{ background: '#000' }}>
+                        <div className='left-controls'>
+                            <Box className='w-100' sx={{ px: 2 }}>
+                                <Slider
+                                    defaultValue={1}
 
-                                        // getAriaValueText={'1'}
-                                        shiftStep={0.25}
-                                        step={0.25}
-                                        marks
-                                        min={0.25}
-                                        max={4}
-                                        valueLabelDisplay='on'
-                                        color='secondary'
-                                        sx={{
-                                            '&. MuiSlider-track': {
-                                                backgroundColor: '#fff'
-                                            },
-                                            '& .MuiSlider-rail': {
-                                                opacity: 0.28,
-                                                backgroundColor: '#fff'
-                                            },
-                                            '& .MuiSlider-markLabel': {
-                                                color: '#fff'
-                                            }
-                                        }}
-                                    />
-                                </Box>
-                                <div className='w-100' style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                    {timeFilter && (
-                                        <IconButton
-                                            style={{ padding: 5, margin: '0 8px 0 8px' }}
-                                            onClick={() => {
-                                                // onChangeRange(1);
-                                            }}
-                                        >
-                                            <Icon icon='mage:previous' size='1.2em' color='#FFF' />
-                                        </IconButton>
-                                    )}
-
-                                    {timeFilter && (
-                                        <IconButton onClick={() => onClickPlay(!play)} style={{ padding: 5, margin: '0 8px 0 8px' }}>
-                                            {play ? (
-                                                <Icon icon='ph:play-light' size='1.2em' color='#FFF' />
-                                            ) : (
-                                                <Icon icon='ic:twotone-pause' size='1.2em' color='#FFF' />
-                                            )}
-                                        </IconButton>
-                                    )}
-                                    <IconButton style={{ padding: 5, margin: '0 8px 0 8px' }}>
-                                        <Icon icon='mage:next' size='1em' color='#FFF' />
-                                    </IconButton>
-                                </div>
-
-                                <div style={{ marginTop: 8 }} className='time'>
-                                    <time id='time-elapsed'>{`${formatTimeShow(timeFilter.start_time)}`}</time>
-                                    <span>{`/${formatTimeShow(timeFilter.end_time)}`}</span>
-                                </div>
-                            </div>
-                            <div className='slidecontainer-2'>
-                                <Box style={{ display: 'flex', alignItems: 'center' }}>
+                                    // getAriaValueText={'1'}
+                                    shiftStep={0.25}
+                                    step={0.25}
+                                    marks
+                                    min={0.25}
+                                    max={4}
+                                    valueLabelDisplay='on'
+                                    color='secondary'
+                                    sx={{
+                                        '&. MuiSlider-track': {
+                                            backgroundColor: '#fff'
+                                        },
+                                        '& .MuiSlider-rail': {
+                                            opacity: 0.28,
+                                            backgroundColor: '#fff'
+                                        },
+                                        '& .MuiSlider-markLabel': {
+                                            color: '#fff'
+                                        }
+                                    }}
+                                />
+                            </Box>
+                            <div className='w-100' style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                {timeFilter && (
                                     <IconButton
-                                        style={{ padding: 5 }}
+                                        style={{ padding: 5, margin: '0 8px 0 8px' }}
                                         onClick={() => {
-                                            setValueRange(valueRange * 2)
-                                            setTimeFilter({
-                                                ...timeFilter,
-                                                end_time: timeFilter.end_time + valueRange
-                                            })
+                                            // onChangeRange(1);
                                         }}
                                     >
-                                        <Icon icon='tabler:plus' size='1em' color='#FFF' />
+                                        <Icon icon='mage:previous' size='1.2em' color='#FFF' />
                                     </IconButton>
-                                    <IconButton
-                                        onClick={() => {
-                                            setValueRange(valueRange / 2)
-                                            setTimeFilter({
-                                                ...timeFilter,
-                                                end_time: timeFilter.end_time - valueRange
-                                            })
-                                        }}
-                                        style={{ padding: 5 }}
-                                    >
-                                        <Icon icon='tabler:minus' size='1em' color='#FFF' />
-                                    </IconButton>
-                                    <Typography style={{ color: '#fff', fontWeight: 'bold' }}>
-                                        {`${Math.floor(valueRange / (60 * 60 * 1000))} giờ -  ${(valueRange - 60 * 60 * 1000 * Math.floor(valueRange / (60 * 60 * 1000))) / (60 * 1000)
-                                            } phút `}
-                                    </Typography>
-                                </Box>
-                                <Box className='w-100'>
-                                    <Slider
-                                        defaultValue={0}
-                                        color='secondary'
-                                        step={2000}
-                                        min={0}
-                                        max={valueRange}
-                                        valueLabelDisplay='auto'
-                                        getAriaValueText={valuetext}
-                                        valueLabelFormat={valuetext}
-                                        marks={renderMarks()}
-                                        aria-labelledby='custom-marks-slider'
-                                        sx={{
-                                            '& .MuiSlider-thumb': {
-                                                width: 8,
-                                                height: 8,
-                                                transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
-                                                '&::before': {
-                                                    boxShadow: '0 2px 12px 0 rgba(0,0,0,0.4)'
-                                                },
-                                                '&:hover, &.Mui-focusVisible': {
-                                                    boxShadow: `0px 0px 0px 8px ${'rgb(0 0 0 / 16%)'}`
-                                                },
-                                                '&.Mui-active': {
-                                                    width: 20,
-                                                    height: 20
-                                                }
-                                            },
-                                            '&. MuiSlider-track': {
-                                                backgroundColor: '#fff'
-                                            },
-                                            '& .MuiSlider-rail': {
-                                                opacity: 0.28,
-                                                backgroundColor: '#fff'
-                                            },
-                                            '& .MuiSlider-markLabel': {
-                                                color: '#fff'
-                                            }
-                                        }}
-                                    />
-                                </Box>
-                            </div>
-                            <div className='right-controls'>
-                                <Stack spacing={4} direction='row' sx={{ mb: 1, px: 1 }} alignItems='center'>
-                                    <Icon icon='formkit:volumedown' size='1rem' color='#fff' />
+                                )}
 
-                                    <Slider
-                                        aria-label='Volume'
-                                        defaultValue={30}
-                                        min={0}
-                                        max={100}
-                                        color='secondary'
-                                        sx={{
-                                            '& .MuiSlider-track': {
-                                                border: 'none'
-                                            },
-                                            '& .MuiSlider-thumb': {
-                                                width: 24,
-                                                height: 24,
-                                                backgroundColor: '#fff',
-                                                '&::before': {
-                                                    boxShadow: '0 4px 8px rgba(0,0,0,0.4)'
-                                                },
-                                                '&:hover, &.Mui-focusVisible, &.Mui-active': {
-                                                    boxShadow: 'none'
-                                                }
-                                            }
-                                        }}
-                                    />
-                                    <Icon icon='formkit:volumeup' size='1rem' color='#fff' />
-                                </Stack>
-                                <Box sx={{ mt: 1, ml: 4, display: 'flex', alignItems: 'center' }}>
-                                    <IconButton size='small' title='date' onClick={handleIconClick}>
-                                        <Icon color='#fff' fontSize='1.5rem' icon='fluent-mdl2:date-time-12' />
+                                {timeFilter && (
+                                    <IconButton onClick={() => onClickPlay(!play)} style={{ padding: 5, margin: '0 8px 0 8px' }}>
+                                        {play ? (
+                                            <Icon icon='ph:play-light' size='1.2em' color='#FFF' />
+                                        ) : (
+                                            <Icon icon='ic:twotone-pause' size='1.2em' color='#FFF' />
+                                        )}
                                     </IconButton>
-                                    <DatePickerWrapper sx={{ '& .react-datepicker-wrapper': { width: 'auto' } }}>
-                                        <DatePicker
-                                            ref={datePickerRef}
-                                            showTimeSelect
-                                            timeFormat='HH:mm'
-                                            timeIntervals={15}
-                                            selected={dateTime}
-                                            id='date-time-picker'
-                                            dateFormat='MM/dd/yyyy h:mm aa'
-                                            onChange={date => {
-                                                setDateTime(date)
-                                                setTimeFilter({
-                                                    ...timeFilter,
-                                                    start_time: new Date(date).getTime() - valueRange,
-                                                    end_time: new Date(date).getTime()
-                                                })
-                                            }}
-                                            popperPlacement='bottom-start'
-                                            customInput={
-                                                <CustomInput
-                                                    sx={{
-                                                        '& .MuiInputBase-input': {
-                                                            color: '#fff',
-                                                            fontWeight: 'bold'
-                                                        }
-                                                    }}
-                                                />
-                                            }
-                                        />
-                                    </DatePickerWrapper>
-                                </Box>
+                                )}
+                                <IconButton style={{ padding: 5, margin: '0 8px 0 8px' }}>
+                                    <Icon icon='mage:next' size='1em' color='#FFF' />
+                                </IconButton>
+                            </div>
+
+                            <div style={{ marginTop: 8 }} className='time'>
+                                <time id='time-elapsed'>{`${formatTimeShow(timeFilter.start_time)}`}</time>
+                                <span>{`/${formatTimeShow(timeFilter.end_time)}`}</span>
                             </div>
                         </div>
-                    </Grid>
+                        <div className='slidecontainer-2'>
+                            <Box style={{ display: 'flex', alignItems: 'center' }}>
+                                <IconButton
+                                    style={{ padding: 5 }}
+                                    onClick={() => {
+                                        setValueRange(valueRange * 2)
+                                        setTimeFilter({
+                                            ...timeFilter,
+                                            end_time: timeFilter.end_time + valueRange
+                                        })
+                                    }}
+                                >
+                                    <Icon icon='tabler:plus' size='1em' color='#FFF' />
+                                </IconButton>
+                                <IconButton
+                                    onClick={() => {
+                                        setValueRange(valueRange / 2)
+                                        setTimeFilter({
+                                            ...timeFilter,
+                                            end_time: timeFilter.end_time - valueRange
+                                        })
+                                    }}
+                                    style={{ padding: 5 }}
+                                >
+                                    <Icon icon='tabler:minus' size='1em' color='#FFF' />
+                                </IconButton>
+                                <Typography style={{ color: '#fff', fontWeight: 'bold' }}>
+                                    {`${Math.floor(valueRange / (60 * 60 * 1000))} giờ -  ${(valueRange - 60 * 60 * 1000 * Math.floor(valueRange / (60 * 60 * 1000))) / (60 * 1000)
+                                        } phút `}
+                                </Typography>
+                            </Box>
+                            <Box className='w-100'>
+                                <Slider
+                                    defaultValue={0}
+                                    color='secondary'
+                                    step={2000}
+                                    min={0}
+                                    max={valueRange}
+                                    valueLabelDisplay='auto'
+                                    getAriaValueText={valuetext}
+                                    valueLabelFormat={valuetext}
+                                    marks={renderMarks()}
+                                    aria-labelledby='custom-marks-slider'
+                                    sx={{
+                                        '& .MuiSlider-thumb': {
+                                            width: 8,
+                                            height: 8,
+                                            transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
+                                            '&::before': {
+                                                boxShadow: '0 2px 12px 0 rgba(0,0,0,0.4)'
+                                            },
+                                            '&:hover, &.Mui-focusVisible': {
+                                                boxShadow: `0px 0px 0px 8px ${'rgb(0 0 0 / 16%)'}`
+                                            },
+                                            '&.Mui-active': {
+                                                width: 20,
+                                                height: 20
+                                            }
+                                        },
+                                        '&. MuiSlider-track': {
+                                            backgroundColor: '#fff'
+                                        },
+                                        '& .MuiSlider-rail': {
+                                            opacity: 0.28,
+                                            backgroundColor: '#fff'
+                                        },
+                                        '& .MuiSlider-markLabel': {
+                                            color: '#fff'
+                                        }
+                                    }}
+                                />
+                            </Box>
+                        </div>
+                        <div className='right-controls'>
+                            <Stack spacing={4} direction='row' sx={{ mb: 1, px: 1 }} alignItems='center'>
+                                <Icon icon='formkit:volumedown' size='1rem' color='#fff' />
+
+                                <Slider
+                                    aria-label='Volume'
+                                    defaultValue={30}
+                                    min={0}
+                                    max={100}
+                                    color='secondary'
+                                    sx={{
+                                        '& .MuiSlider-track': {
+                                            border: 'none'
+                                        },
+                                        '& .MuiSlider-thumb': {
+                                            width: 24,
+                                            height: 24,
+                                            backgroundColor: '#fff',
+                                            '&::before': {
+                                                boxShadow: '0 4px 8px rgba(0,0,0,0.4)'
+                                            },
+                                            '&:hover, &.Mui-focusVisible, &.Mui-active': {
+                                                boxShadow: 'none'
+                                            }
+                                        }
+                                    }}
+                                />
+                                <Icon icon='formkit:volumeup' size='1rem' color='#fff' />
+                            </Stack>
+                            <Box sx={{ mt: 1, ml: 4, display: 'flex', alignItems: 'center' }}>
+                                <IconButton size='small' title='date' onClick={handleIconClick}>
+                                    <Icon color='#fff' fontSize='1.5rem' icon='fluent-mdl2:date-time-12' />
+                                </IconButton>
+                                <DatePickerWrapper sx={{ '& .react-datepicker-wrapper': { width: 'auto' } }}>
+                                    <DatePicker
+                                        ref={datePickerRef}
+                                        showTimeSelect
+                                        timeFormat='HH:mm'
+                                        timeIntervals={15}
+                                        selected={dateTime}
+                                        id='date-time-picker'
+                                        dateFormat='MM/dd/yyyy h:mm aa'
+                                        onChange={date => {
+                                            setDateTime(date)
+                                            setTimeFilter({
+                                                ...timeFilter,
+                                                start_time: new Date(date).getTime() - valueRange,
+                                                end_time: new Date(date).getTime()
+                                            })
+                                        }}
+                                        popperPlacement='bottom-start'
+                                        customInput={
+                                            <CustomInput
+                                                sx={{
+                                                    '& .MuiInputBase-input': {
+                                                        color: '#fff',
+                                                        fontWeight: 'bold'
+                                                    }
+                                                }}
+                                            />
+                                        }
+                                    />
+                                </DatePickerWrapper>
+                            </Box>
+                        </div>
+                    </div>
                 </Grid>
-            </CardContent>
+            </Grid>
         </Card>
     )
 }

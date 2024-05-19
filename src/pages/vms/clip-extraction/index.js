@@ -1,7 +1,7 @@
 import axios from "axios"
 import authConfig from 'src/configs/auth'
 import { TabContext, TabPanel, TreeItem, TreeView } from "@mui/lab"
-import { Box, Card, CardContent, CardHeader, Grid, IconButton, MenuItem, MenuList, Tab, Typography, styled } from "@mui/material"
+import { Box, Card, CardContent, CardHeader, Grid, IconButton, Tab, Typography, styled } from "@mui/material"
 import MuiTabList from '@mui/lab/TabList'
 import { useEffect, useState } from "react"
 import LiveView from "./view/liveView"
@@ -183,10 +183,6 @@ const ClipExtraction = () => {
         }
     }, [websocket])
 
-    // useEffect(() => {
-    //     fetchCameraList()
-    // }, [])
-
     useEffect(() => {
         fetchCameraList()
     }, [keyword])
@@ -197,7 +193,12 @@ const ClipExtraction = () => {
                 `https://sbs.basesystem.one/ivis/vms/api/v0/camera-groups?deviceTypes=NVR&keyword=${keyword}&limit=25&page=1`,
                 config
             )
-            setCameraList(res?.data)
+            if (Array.isArray(res?.data)) {
+                setCameraList(res?.data)
+            } else {
+                setCameraList([])
+            }
+
         } catch (error) {
             console.error('Error fetching data: ', error)
         }
@@ -205,6 +206,7 @@ const ClipExtraction = () => {
 
     const handleChange = (event, newValue) => {
         setValue(newValue)
+        setCamera({ id: '', name: '', channel: '' })
     }
 
     const handleSearch = e => {
@@ -212,7 +214,7 @@ const ClipExtraction = () => {
     }
 
     const handleSetCamera = (camera) => {
-        setCamera({ id: camera.id, name: camera.name, channel: 'Sub' })
+        setCamera({ id: camera.id, name: camera.deviceName, channel: 'Sub' })
     }
 
     const renderTree = group => {
@@ -247,7 +249,7 @@ const ClipExtraction = () => {
                         <TabList onChange={handleChange} aria-label='customized tabs example'>
                             <Tab value='1' label='Trực tiếp' key={1} />
                             <Tab value='2' label='Xem lại' key={2} />
-                            <Tab value='3' label='Lưu trũ' key={3} />
+                            <Tab value='3' label='Lưu trữ' key={3} />
                         </TabList>
                     </Grid>
                     <Grid item xs={12} sm={4} lg={2}>
@@ -309,7 +311,7 @@ const ClipExtraction = () => {
                             <Review key={camera.id} id={camera.id} name={camera.name} channel={camera.channel} />
                         </TabPanel>
                         <TabPanel value='3' sx={{ paddingTop: '0' }}>
-                            <Storage />
+                            <Storage key={camera.id} id={camera.id} name={camera.name} channel={camera.channel} />
                         </TabPanel>
                     </Grid>
                 </TabContext>
