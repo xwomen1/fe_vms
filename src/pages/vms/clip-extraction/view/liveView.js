@@ -18,7 +18,7 @@ const config = {
 
 const LiveView = ({ id, name, channel }) => {
     const [camera, setCamera] = useState()
-    const [channelCurrent, setChannelCurrent] = useState(channel)
+    const [channelCurrent, setChannelCurrent] = useState(null)
     const [websocket, setWebsocket] = useState(null)
     const [text, setText] = useState(null)
     const [rtcPeerConnection, setRtcPeerConnection] = useState(null)
