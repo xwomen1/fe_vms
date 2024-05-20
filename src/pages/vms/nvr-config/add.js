@@ -90,10 +90,10 @@ const UserList = ({ apiData }) => {
         }
       }
 
-      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/nvrs', config)
+      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/device', config)
 
       const nicTypes = response.data.map(item => ({
-        label: item.name,
+        label: item.nameDevice,
         value: item.id
       }))
       setNVR(nicTypes)
@@ -409,6 +409,53 @@ const UserList = ({ apiData }) => {
       setLoading(false)
     }
   }
+
+  const handleScanOnvif = async () => {
+    setOpenPopupResponse(true)
+    setLoading(true)
+    try {
+      const payload = {
+        idBox: selectNVR?.value,
+        userName,
+        passWord
+      }
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.post(
+        'https://sbs.basesystem.one/ivis/vms/api/v0/device/onvif/scandevice',
+        payload,
+        config
+      )
+
+      setResponse(response.data)
+      setLoading(false)
+
+      toast.success('Thành công')
+
+      // setOpenPopupResponse(true)
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message === 'No response from the server device, timeout: scan_device'
+      ) {
+        Swal.fire('Thiết bị chưa phản hồi', '', 'error')
+      } else {
+        Swal.fire('Đã xảy ra lỗi', error.message, 'error')
+      }
+
+      setOpenPopupResponse(false)
+
+      setLoading(false)
+    }
+  }
+
   console.log(response)
 
   return (
@@ -617,32 +664,60 @@ const UserList = ({ apiData }) => {
                 component={Paper}
                 style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
               >
-                <Grid item xs={2}>
-                  <FormControl fullWidth>
-                    <InputLabel id='time-validity-label'>Chọn</InputLabel>
-                    <Select labelId='time-validity-label' id='time-validity-select'>
-                      <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
-                      <MenuItem value='Undefined'>Không xác định</MenuItem>
-                    </Select>
-                  </FormControl>
+                <Grid item xs={1.8}>
+                  <Autocomplete
+                    value={selectNVR}
+                    onChange={handleDDNSChange}
+                    options={nvrs}
+                    getOptionLabel={option => option.label}
+                    renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
+                    onFocus={handleComboboxFocus}
+
+                    // loading={loading}
+                  />{' '}
                 </Grid>
-                <Grid item xs={0.4}></Grid>
 
                 <Grid item xs={0.4}></Grid>
                 <Grid item xs={2}>
-                  <CustomTextField label='Đăng nhập' fullWidth />
+                  <CustomTextField
+                    value={userName}
+                    onChange={e => setUsername(e.target.value)}
+                    label='Đăng nhập'
+                    fullWidth
+                  />
                 </Grid>
                 <Grid item xs={0.4}></Grid>
                 <Grid item xs={2}>
-                  <CustomTextField label='Mật khẩu' type='password' fullWidth />
+                  <CustomTextField
+                    value={passWord}
+                    onChange={e => setPassWord(e.target.value)}
+                    label='Mật khẩu'
+                    type='password'
+                    fullWidth
+                  />
                 </Grid>
                 <Grid item xs={0.2}></Grid>
 
-                <Grid item xs={4} style={{ marginTop: '2%' }}>
+                <Grid item xs={4} style={{ marginTop: '1%' }}>
                   <Button>Cancel</Button>
-                  <Button variant='contained'>Quét</Button>
+                  <Button variant='contained' onClick={handleScanOnvif}>
+                    Quét
+                  </Button>
                 </Grid>
               </Grid>
+            )}
+            {openPopupResponse && (
+              <>
+                <PopupScan
+                  open={openPopupResponse}
+                  userName={userName}
+                  setReload={() => setReload(reload + 1)}
+                  passWord={passWord}
+                  response={response}
+                  loading={loading}
+                  onClose={() => setOpenPopupResponse(false)}
+                />{' '}
+              </>
             )}
           </div>
           <Grid container spacing={2}>
@@ -753,7 +828,13 @@ const UserList = ({ apiData }) => {
             <Edit open={openPopupP} onClose={handleClosePPopup} nvr={selectedNvrId} />
           </>
         )}
-        <ConnectCamera open={openPopupConnectCamera} onClose={handleCloseConnectCameraPopup} nvr={selectedIds} />
+        <ConnectCamera
+          open={openPopupConnectCamera}
+          onClose={handleCloseConnectCameraPopup}
+          nvr={idNVR}
+          name={nameNVR}
+          ip={IPNVR}
+        />
         <VideoConnectCamera
           open={openPopupVideoConnectCamera}
           onClose={handleCloseVideoConnectPopup}

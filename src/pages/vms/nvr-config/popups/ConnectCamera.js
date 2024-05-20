@@ -52,9 +52,8 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
   }
 }))
 import Swal from 'sweetalert2'
-import { width } from '@mui/system'
 
-const RolePopup = ({ open, onClose, onSelect, nvr ,name,ip}) => {
+const RolePopup = ({ open, onClose, onSelect, nvr, name, ip }) => {
   const [value, setValue] = useState('1')
 
   const handleChange = (event, newValue) => {
@@ -66,7 +65,7 @@ const RolePopup = ({ open, onClose, onSelect, nvr ,name,ip}) => {
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth='md' fullWidth>
       <DialogTitle>{`${name}-${ip}`}</DialogTitle>
       <DialogContent>
         <TabContext value={value}>
@@ -78,22 +77,21 @@ const RolePopup = ({ open, onClose, onSelect, nvr ,name,ip}) => {
             <Quet nvr={nvr} onClose={onClose} />
           </TabPanel>
           <TabPanel value='2'>
-            <Nhap  />
+            <Nhap />
           </TabPanel>
         </TabContext>
       </DialogContent>
       <DialogActions>
-      <Button 
-       variant='contained'
-       
-      // onClick={}
-      >
-        Quét
-      </Button>
         <Button
-         variant='contained'
-         onClick={onClose}
-         >OK</Button>
+          variant='contained'
+
+          // onClick={}
+        >
+          Quét
+        </Button>
+        <Button variant='contained' onClick={onClose}>
+          OK
+        </Button>
       </DialogActions>
     </Dialog>
   )

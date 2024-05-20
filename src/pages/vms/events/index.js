@@ -50,11 +50,10 @@ const Events = () => {
           <Grid item xs={12}>
             <TabList onChange={handleChange} aria-label='customized tabs example'>
               <Tab value='1' label='Danh sách' key={1} />
-              <Tab value='2' label='Phát hiện khuôn mặt' key={2} />
-              <Tab value='3' label='Phát hiện biển số' key={3} />
+              <Tab value='2' label='Khuôn mặt' key={2} />
+              <Tab value='3' label='Biển số' key={3} />
               <Tab value='4' label='Phát hiện đám đông' key={4} disabled={!isDetectCrowdEnabled} />
-              <Tab value='5' label='Cấu hình khoanh vùng' key={5} />
-              <Tab value='6' label='Bản đồ' key={6} />
+              <Tab value='5' label='Bản đồ' key={5} />
             </TabList>
           </Grid>
           <Grid item xs={12}>
@@ -68,9 +67,6 @@ const Events = () => {
               <EventCar />
             </TabPanel>
             <TabPanel value='5'>
-              <EventConfig />
-            </TabPanel>
-            <TabPanel value='6'>
               <EventMap />
             </TabPanel>
           </Grid>

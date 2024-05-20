@@ -22,6 +22,7 @@ import ListItemText from '@mui/material/ListItemText'
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction'
 import { TreeItem, TreeView } from '@mui/lab'
 import Pagination from '@mui/material/Pagination'
+
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
@@ -101,6 +102,7 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
       )
     }
   }, [cameraList, sizeScreen])
+
   // ** Vars
   const {
     mode,
@@ -116,6 +118,7 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
     contentWidth,
     verticalNavToggleType
   } = settings
+
   const StyledTreeItem = props => {
     // ** Props
     const { labelText, labelIcon, labelInfo, color, ...other } = props
@@ -139,6 +142,7 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
       />
     )
   }
+
   const handleNodeToggle = (event, nodeIds) => {
     onSetSelectIndex(nodeIds[0])
     setExpanded([nodeIds[0]])
@@ -233,6 +237,7 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
                                   nodeId={camera?.id}
                                   labelText={camera?.deviceName}
                                   labelIcon='tabler:camera'
+
                                   // onClick={() => handleItemClick(camera.id, camera.deviceName)}
                                 />
                               )
