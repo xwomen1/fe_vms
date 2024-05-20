@@ -44,9 +44,27 @@ const dateList = [
         value: '7 ngày'
     },
     {
-        id: 1,
+        id: 3,
         name: 'month',
         value: '30 ngày'
+    },
+]
+
+const minuteList = [
+    {
+        id: 1,
+        name: '1minute',
+        value: '1 phút'
+    },
+    {
+        id: 2,
+        name: '2minute',
+        value: '2 phút'
+    },
+    {
+        id: 3,
+        name: '5minute',
+        value: '5 phút'
     },
 ]
 
@@ -98,6 +116,7 @@ const Storage = ({ id, name, channel }) => {
 
     const [dataDaily, setDataDaily] = useState([])
     const [timeType, setTimeType] = useState(null)
+    const [minuteType, setMinuteType] = useState(null)
     const [dataDailyState, setDataDailyState] = useState(dataDailyDefault)
 
 
@@ -203,6 +222,10 @@ const Storage = ({ id, name, channel }) => {
         setTimeType(type)
     }
 
+    const handleSetMinuteType = (type) => {
+        setMinuteType(type)
+    }
+
     return (
         <Grid container spacing={2}>
             <Grid item xs={12} sm={8}>
@@ -211,10 +234,11 @@ const Storage = ({ id, name, channel }) => {
                         title='Trích clip'
                         action={
                             <Grid container spacing={2}>
+
                                 <Grid item xs={12}>
-                                    <CustomTextField select fullWidth label='Chọn ngày' id='form-layouts-separator-select' defaultValue='week'>
-                                        {dateList.map((date, index) => (
-                                            <MenuItem value={date.name} onClick={() => handleSetTime(date.name)}>{date.value}</MenuItem>
+                                    <CustomTextField select fullWidth id='form-layouts-separator-select' defaultValue='5minute'>
+                                        {minuteList.map((date, index) => (
+                                            <MenuItem value={date.name} onClick={() => handleSetMinuteType(date.name)}>{date.value}</MenuItem>
                                         ))}
                                     </CustomTextField>
                                 </Grid>
@@ -229,6 +253,7 @@ const Storage = ({ id, name, channel }) => {
                             }}
                             // dataDailyProps={dataDailyState}
                             dateType={timeType}
+                            minuteType={minuteType}
                             aria-describedby='validation-basic-last-name'
                         />
                     </CardContent>
