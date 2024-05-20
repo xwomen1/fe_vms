@@ -170,8 +170,7 @@ const Caller = () => {
   function valuetext(value) {
     const timeCurrent = new Date(timeFilter.start_time + value)
 
-    return `${
-      timeCurrent.getFullYear() +
+    return `${timeCurrent.getFullYear() +
       '/' +
       timeDisplay(timeCurrent.getMonth() + 1) +
       '/' +
@@ -180,7 +179,7 @@ const Caller = () => {
       timeDisplay(timeCurrent.getHours()) +
       ':' +
       timeDisplay(timeCurrent.getMinutes())
-    }`
+      }`
   }
 
   const handleIconClick = () => {
@@ -231,7 +230,9 @@ const Caller = () => {
                 <Box className='w-100' sx={{ px: 2 }}>
                   <Slider
                     defaultValue={1}
+
                     // getAriaValueText={'1'}
+
                     shiftStep={0.25}
                     step={0.25}
                     marks
@@ -311,9 +312,8 @@ const Caller = () => {
                     <Icon icon='tabler:minus' size='1em' color='#FFF' />
                   </IconButton>
                   <Typography style={{ color: '#fff', fontWeight: 'bold' }}>
-                    {`${Math.floor(valueRange / (60 * 60 * 1000))} giờ -  ${
-                      (valueRange - 60 * 60 * 1000 * Math.floor(valueRange / (60 * 60 * 1000))) / (60 * 1000)
-                    } phút `}
+                    {`${Math.floor(valueRange / (60 * 60 * 1000))} giờ -  ${(valueRange - 60 * 60 * 1000 * Math.floor(valueRange / (60 * 60 * 1000))) / (60 * 1000)
+                      } phút `}
                   </Typography>
                 </Box>
                 <Box className='w-100'>

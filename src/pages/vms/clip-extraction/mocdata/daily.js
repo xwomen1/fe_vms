@@ -12,6 +12,7 @@ const Daily = ({ dateType, dataDailyProps, callbackOfDaily, disabled, minuteType
     const [dataDaily, setDataDaily] = useState(dataDailyProps || []);
     const [timeType, setTimeType] = useState('month')
     const [minutesType, setMinutesType] = useState('5minute')
+
     const [dataDailyDefault, setDataDailyDefault] = useState([
         {
             label: '',
@@ -170,6 +171,7 @@ const Daily = ({ dateType, dataDailyProps, callbackOfDaily, disabled, minuteType
                 timeLines.push(formattedTime);
             }
         }
+
         return timeLines;
     }
 
@@ -213,6 +215,7 @@ const Daily = ({ dateType, dataDailyProps, callbackOfDaily, disabled, minuteType
 
     const convertTimeToMinutes = (time) => {
         const [hours, minutes] = time.split(':').map(Number)
+
         return hours * 50 + minutes
     }
 
@@ -232,6 +235,7 @@ const Daily = ({ dateType, dataDailyProps, callbackOfDaily, disabled, minuteType
     }
 
     return (
+
         // <div
         //     style={{
         //         width: '100%',

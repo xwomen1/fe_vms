@@ -72,42 +72,7 @@ const dataDailyDefault = [
     {
         label: '',
         value: 1,
-    },
-    // {
-    //     label: 'Thứ 2',
-    //     dayOfWeek: 'MONDAY',
-    //     value: 2,
-    // },
-    // {
-    //     label: 'Thứ 3',
-    //     dayOfWeek: 'TUESDAY',
-    //     value: 3,
-    // },
-    // {
-    //     label: 'Thứ 4',
-    //     dayOfWeek: 'WEDNESDAY',
-    //     value: 4,
-    // },
-    // {
-    //     label: 'Thứ 5',
-    //     dayOfWeek: 'THURSDAY',
-    //     value: 5,
-    // },
-    // {
-    //     label: 'Thứ 6',
-    //     dayOfWeek: 'FRIDAY',
-    //     value: 6,
-    // },
-    // {
-    //     label: 'Thứ 7',
-    //     dayOfWeek: 'SATURDAY',
-    //     value: 7,
-    // },
-    // {
-    //     label: 'CN',
-    //     dayOfWeek: 'SUNDAY',
-    //     value: 8,
-    // },
+    }
 ]
 
 const Storage = ({ id, name, channel }) => {
@@ -238,7 +203,7 @@ const Storage = ({ id, name, channel }) => {
                                 <Grid item xs={12}>
                                     <CustomTextField select fullWidth id='form-layouts-separator-select' defaultValue='5minute'>
                                         {minuteList.map((date, index) => (
-                                            <MenuItem value={date.name} onClick={() => handleSetMinuteType(date.name)}>{date.value}</MenuItem>
+                                            <MenuItem key={date.id} value={date.name} onClick={() => handleSetMinuteType(date.name)}>{date.value}</MenuItem>
                                         ))}
                                     </CustomTextField>
                                 </Grid>
@@ -251,7 +216,9 @@ const Storage = ({ id, name, channel }) => {
                                 setDataDaily(v)
                                 setDataDailyState(v)
                             }}
+
                             // dataDailyProps={dataDailyState}
+
                             dateType={timeType}
                             minuteType={minuteType}
                             aria-describedby='validation-basic-last-name'
