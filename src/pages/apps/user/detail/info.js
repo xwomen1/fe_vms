@@ -331,7 +331,7 @@ const UserDetails = () => {
         }
         const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search', config)
 
-        // setGroupOptions(response.data)
+        setGroupOptions(response.data)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -929,6 +929,7 @@ const UserDetails = () => {
                                 }}
                                 renderInput={params => <CustomTextField {...params} label='Đơn vị' />}
                               />
+                              {console.log(groupOptions)}
                             </TableCell>
                             {console.log(groups, 'group')}
                             <TableCell>{group.groupCode}</TableCell>

@@ -203,7 +203,7 @@ const UserList = ({ apiData }) => {
             Authorization: `Bearer ${token}`
           }
         }
-        let urlDelete = `https://dev-ivi.basesystem.one/smc/smart-parking/api/v0/asset/type/delete/${idDelete}`
+        let urlDelete = `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${idDelete}`
         axios
           .delete(urlDelete, config)
           .then(() => {

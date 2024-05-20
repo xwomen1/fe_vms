@@ -8,6 +8,7 @@ import CustomTextField from "src/@core/components/mui/text-field"
 import Filter from "../popups/filter"
 import View from "../popups/view"
 import Add from "../popups/add"
+import EventDetails from "../popups/eventDetails"
 
 const initValueFilter = {
     location: null,
@@ -523,7 +524,7 @@ const EventList = () => {
             )}
 
             {isOpenView && (
-                <View show={isOpenView} onClose={() => setIsOpenView(false)} data={eventDetail} setReload={() => setReload(reload + 1)} />
+                <EventDetails show={isOpenView} onClose={() => setIsOpenView(false)} data={eventDetail} setReload={() => setReload(reload + 1)} />
             )}
 
             {isOpenEdit && (

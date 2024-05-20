@@ -38,7 +38,6 @@ import Link from 'next/link'
 
 const Add = () => {
   const router = useRouter()
-  const { userId } = router.query
   const [timeValidity, setTimeValidity] = useState('Custom')
   const [user, setUser] = useState(null)
   const [readOnly, setReadOnly] = useState(true)
@@ -68,10 +67,12 @@ const Add = () => {
   const [ava1, setAva1] = useState(null)
   const [ava2, setAva2] = useState(null)
   const [password, setPassword] = useState('')
+  const [userId, setUserId] = useState('')
+
   const [confirmPassword, setConfirmPassword] = useState('')
 
   const handleAddRow = () => {
-    const newRow = { groupName: '', code: '', id: '' } // Thêm groupId vào đây
+    const newRow = { groupName: '', code: '', id: '', groupName: '', name: '', groupCode: '' } // Thêm groupId vào đây
     setRows([...rows, newRow])
   }
 
@@ -273,8 +274,20 @@ const Add = () => {
         },
         config
       )
+      const newUserId = response.data.userId
+      setUserId(newUserId)
+
+      for (const row of rows) {
+        console.log(row.name, 'rows')
+        const groupId = await searchGroupIdAccess(row.name)
+        console.log(groupId, 'gourpID fetch')
+        if (groupId) {
+          await addMemberToGroup(groupId, newUserId)
+        }
+      }
       Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
-      router.push(`/apps/user/detail/${response.data.userId}`)
+
+      // router.push(`/apps/user/detail/${response.data.userId}`)
     } catch (error) {
       console.error('Error updating user details:', error)
       Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi cập nhật dữ liệu.', 'error')
@@ -435,6 +448,51 @@ const Add = () => {
   }
 
   console.log('param', params)
+
+  const searchGroupIdAccess = async (groupName, groupCode) => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.get(
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups?keyword=${groupName}`,
+        config
+      )
+      console.log(response.data.rows[0])
+
+      return response.data.rows[0].id
+    } catch (error) {
+      throw error
+    }
+  }
+
+  const addMemberToGroup = async (groupId, userId) => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.post(
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups/${groupId}/add-member`,
+        { userIds: [userId] },
+        config
+      )
+
+      return response.data
+    } catch (error) {
+      console.error('Error adding member to group:', error)
+      throw error
+    }
+  }
 
   return (
     <div>

@@ -72,7 +72,6 @@ const Caller = () => {
   }
 
   const msToTime = duration => {
-
     const seconds = Math.floor((duration / 1000) % 60)
     const minutes = Math.floor((duration / (1000 * 60)) % 60)
     const hours = Math.floor((duration / (1000 * 60 * 60)) % 24)
@@ -96,7 +95,9 @@ const Caller = () => {
   const [valueFilter, setValueFilter] = useState(valueFilterInit)
 
   const [cameraGroup, setCameraGroup] = useState([])
-  const [cameraHiden, setCameraHiden] = useState([])
+  const [cameraList, setCameraList] = useState([])
+  const [selectIndex, setSelectIndex] = useState(0)
+  const [page, setPage] = useState(1)
   const [play, setPlay] = useState(true)
   const [valueRange, setValueRange] = useState(60 * 60 * 1000)
   const debouncedSearch = useDebounce(valueRange, 700)
@@ -126,26 +127,19 @@ const Caller = () => {
         `${CAMERA_API.CAMERA_GROUP}?deviceTypes=${valueFilter.deviceTypes}&limit=${valueFilter.limit}&page=${valueFilter.page}`
       )
       let listCamera = []
-      let listCameraHiden = []
-      res.data.map(item => {
-        if (item.cameras) {
-          item.cameras.map(camera => {
-            if (listCamera.length < numberShow) {
-              listCamera.push({
-                ...camera,
-                channel: 'Sub'
-              })
-            } else {
-              listCameraHiden.push({
-                ...camera,
-                channel: 'Sub'
-              })
-            }
-          })
-        }
-      })
+      setCameraList(res?.data)
+      if (res.data.length > 0) {
+        res.data[selectIndex]?.cameras.map((camera, index) => {
+          if (index < page * numberShow && index >= (page - 1) * numberShow) {
+            listCamera.push({
+              ...camera,
+              channel: 'Sub'
+            })
+          }
+        })
+      }
+      console.log(listCamera)
       setCameraGroup(listCamera)
-      setCameraHiden(listCameraHiden)
     } catch (error) {
       console.error('Error fetching data: ', error)
     }
@@ -153,12 +147,11 @@ const Caller = () => {
 
   useEffect(() => {
     fetchCameraGroup()
-  }, [reload])
+  }, [reload, page, selectIndex])
 
   const handSetChanel = (id, channel) => {
     let newCamera = cameraGroup.map(item => {
       if (item.id === id) {
-
         return {
           ...item,
           channel: channel
@@ -170,14 +163,11 @@ const Caller = () => {
     setCameraGroup(newCamera)
   }
   function timeDisplay(time) {
-    if (time < 10)
-
-       return '0' + time
+    if (time < 10) return '0' + time
 
     return time
   }
   function valuetext(value) {
-
     const timeCurrent = new Date(timeFilter.start_time + value)
 
     return `${
@@ -211,7 +201,6 @@ const Caller = () => {
       })
     }
 
-
     return marks
   }
 
@@ -242,8 +231,6 @@ const Caller = () => {
                 <Box className='w-100' sx={{ px: 2 }}>
                   <Slider
                     defaultValue={1}
-                    
-                    // getAriaValueText={'1'}
                     shiftStep={0.25}
                     step={0.25}
                     marks
@@ -440,13 +427,16 @@ const Caller = () => {
         </div>
       </Grid>
       <Settings
-        cameraGroup={cameraGroup}
-        cameraHiden={cameraHiden}
-        setNumberShow={number => setNumberShow(number)}
-        setCameraGroup={camera => setCameraGroup(camera)}
-        setCameraHiden={camera => setCameraHiden(camera)}
+        page={page}
+        onSetPage={setPage}
+        selectIndex={selectIndex}
+        onSetSelectIndex={setSelectIndex}
+        cameraList={cameraList}
         sizeScreen={sizeScreen}
-        setSizeScreen={size => setSizeScreen(size)}
+        setSizeScreen={size => {
+          setSizeScreen(size)
+          setNumberShow(size.split('x')[0] * size.split('x')[1])
+        }}
       />
     </DivStyle>
   )

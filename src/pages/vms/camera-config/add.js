@@ -38,6 +38,7 @@ const Add = ({ apiData }) => {
   const [openPopupP, setOpenPopupP] = useState(false)
   const [selectNVR, setSelectedNVR] = useState('')
   const defaultValue = ''
+  const [endURL, setEndUrl] = useState('')
 
   const [openPopupNetwork, setOpenPopupNetwork] = useState(false)
   const [openPopupVideo, setOpenPopupVideo] = useState(false)
@@ -52,6 +53,7 @@ const Add = ({ apiData }) => {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
   const [status1, setStatus1] = useState(25)
+  const [startURL, setStartUrl] = useState('')
 
   const pageSizeOptions = [25, 50, 100]
   const [anchorEl, setAnchorEl] = useState(null)
@@ -112,10 +114,10 @@ const Add = ({ apiData }) => {
     try {
       const payload = {
         url,
+        idBox: selectNVR?.value,
         host,
         userName,
-        passWord,
-        idBox: selectNVR.id
+        passWord
       }
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -138,15 +140,22 @@ const Add = ({ apiData }) => {
 
       // setOpenPopupResponse(true)
     } catch (error) {
-      console.error('Error scanning device:', error.response.statusText)
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message === 'No response from the server device, timeout: scan_device_ip'
+      ) {
+        Swal.fire('Thiết bị chưa phản hồi', '', 'error')
+      } else {
+        Swal.fire('Đã xảy ra lỗi', error.message, 'error')
+      }
 
       setOpenPopupResponse(false)
 
       setLoading(false)
-
-      Swal.fire('Đã xảy ra lỗi', error.response.statusText, 'error')
     }
   }
+
   console.log(response)
 
   const handleRadioChange = event => {
@@ -271,6 +280,56 @@ const Add = ({ apiData }) => {
     handleCloseMenu()
   }
 
+  const handleScanDaiIP = async () => {
+    setOpenPopupResponse(true)
+    setLoading(true)
+    try {
+      const payload = {
+        idBox: selectNVR?.value,
+        startHost: parseInt(startHost),
+        endHost: parseInt(endHost),
+        startURL,
+        endURL,
+        userName,
+        passWord
+      }
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.post(
+        'https://sbs.basesystem.one/ivis/vms/api/v0/device/onvif/devicescanlistip',
+        payload,
+        config
+      )
+
+      setResponse(response.data)
+      setLoading(false)
+
+      toast.success('Thành công')
+
+      // setOpenPopupResponse(true)
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message === 'No response from the server device, timeout: scan_device_ip'
+      ) {
+        Swal.fire('Thiết bị chưa phản hồi', '', 'error')
+      } else {
+        Swal.fire('Đã xảy ra lỗi', error.message, 'error')
+      }
+
+      setOpenPopupResponse(false)
+
+      setLoading(false)
+    }
+  }
+
   const passwords = useCallback(val => {
     setValue(val)
   }, [])
@@ -391,10 +450,11 @@ const Add = ({ apiData }) => {
                   open={openPopupResponse}
                   url={url}
                   port={host}
+                  setReload={() => setReload(reload + 1)}
                   userName={userName}
                   passWord={passWord}
                   response={response}
-                  loadings={loading}
+                  loading={loading}
                   onClose={() => setOpenPopupResponse(false)}
                 />{' '}
               </>
@@ -413,50 +473,86 @@ const Add = ({ apiData }) => {
                     onChange={handleDDNSChange}
                     options={nvrs}
                     getOptionLabel={option => option.label}
-                    renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
+                    renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
                     onFocus={handleComboboxFocus}
 
                     // loading={loading}
                   />{' '}
                 </Grid>
-                <Grid item xs={0.1}></Grid>
-
-                <Grid item xs={2}>
-                  <CustomTextField label='Địa chỉ IP bắt đầu' fullWidth />
-                </Grid>
-                <Grid item xs={0.2}></Grid>
-
-                <Grid item xs={0.4} style={{ marginTop: '2%' }}>
-                  ----
-                </Grid>
-                <Grid item xs={2}>
-                  <CustomTextField label='Địa chỉ IP kết thúc' fullWidth />
-                </Grid>
-                <Grid item xs={0.2}></Grid>
-
-                <Grid item xs={2}>
-                  <CustomTextField label='Cổng bắt đầu' fullWidth />
-                </Grid>
-                <Grid item xs={0.2}></Grid>
-
-                <Grid item xs={0.4} style={{ marginTop: '2%' }}>
-                  ----
-                </Grid>
-                <Grid item xs={2}>
-                  <CustomTextField label='Cổng kết thúc' fullWidth />
-                </Grid>
-                <Grid item xs={2}>
-                  <CustomTextField label='Đăng nhập' fullWidth />
-                </Grid>
                 <Grid item xs={0.4}></Grid>
                 <Grid item xs={2}>
-                  <CustomTextField label='Mật khẩu' type='password' fullWidth />
+                  <CustomTextField
+                    value={startURL}
+                    onChange={e => setStartUrl(e.target.value)}
+                    label='Địa chỉ IP bắt đầu'
+                    fullWidth
+                  />
                 </Grid>
                 <Grid item xs={0.2}></Grid>
 
-                <Grid item xs={4} style={{ marginTop: '2%' }}>
+                <Grid item xs={0.4} style={{ marginTop: '2%' }}>
+                  ----
+                </Grid>
+                <Grid item xs={2}>
+                  <CustomTextField
+                    value={endURL}
+                    onChange={e => setEndUrl(e.target.value)}
+                    label='Địa chỉ IP kết thúc'
+                    fullWidth
+                  />
+                </Grid>
+                <Grid item xs={0.2}></Grid>
+
+                <Grid item xs={2}>
+                  <CustomTextField
+                    value={startHost}
+                    onChange={e => setStartHost(e.target.value)}
+                    label='Cổng bắt đầu'
+                    fullWidth
+                  />
+                </Grid>
+                <Grid item xs={0.2}></Grid>
+
+                <Grid item xs={0.4} style={{ marginTop: '2%' }}>
+                  ----
+                </Grid>
+                <Grid item xs={2}>
+                  <CustomTextField
+                    value={endHost}
+                    onChange={e => setEndHost(e.target.value)}
+                    label='Cổng kết thúc'
+                    fullWidth
+                  />
+                </Grid>
+                <Grid item xs={2}>
+                  <CustomTextField
+                    value={userName}
+                    onChange={e => setUsername(e.target.value)}
+                    label='Đăng nhập'
+                    fullWidth
+                  />
+                </Grid>
+
+                <Grid item xs={0.4}></Grid>
+                <Grid item xs={2}>
+                  <CustomTextField
+                    value={passWord}
+                    onChange={e => setPassWord(e.target.value)}
+                    label='Mật khẩu'
+                    type='password'
+                    fullWidth
+                  />
+                </Grid>
+                <Grid item xs={0.2}></Grid>
+
+                <Grid item xs={4} style={{ marginTop: '1%' }}>
                   <Button>Cancel</Button>
-                  <Button variant='contained'>Quét</Button>
+                  <Button onClick={handleScanDaiIP} variant='contained'>
+                    Quét
+                  </Button>
+                </Grid>
+                <Grid item xs={0.1} style={{ marginTop: '1%', marginLeft: '-20%' }}>
+                  {loading && <CircularProgress style={{ top: '5px' }} />}
                 </Grid>
               </Grid>
             )}
