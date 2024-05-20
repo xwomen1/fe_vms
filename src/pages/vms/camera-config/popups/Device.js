@@ -27,7 +27,22 @@ import axios from 'axios'
 import authConfig from 'src/configs/auth'
 import Swal from 'sweetalert2'
 import ReactMapGL, { Marker, Popup } from '@goongmaps/goong-map-react'
-import { MapPin } from 'tabler-icons-react'
+import { MapPin } from './MapPin'
+
+const CustomMapPin = () => (
+  <svg
+    xmlns='http://www.w3.org/2000/svg'
+    width='40'
+    height='40'
+    viewBox='0 0 24 24'
+    stroke='orange'
+    fill='orange'
+    className='icon icon-tabler icons-tabler-filled icon-tabler-map-pin'
+  >
+    <path stroke='none' d='M0 0h24v24H0z' fill='none' />
+    <path d='M18.364 4.636a9 9 0 0 1 .203 12.519l-.203 .21l-4.243 4.242a3 3 0 0 1 -4.097 .135l-.144 -.135l-4.244 -4.243a9 9 0 0 1 12.728 -12.728zm-6.364 3.364a3 3 0 1 0 0 6a3 3 0 0 0 0 -6z' />
+  </svg>
+)
 
 const Device = ({ onClose, camera }) => {
   const [password, setPassword] = useState('')
@@ -257,7 +272,7 @@ const Device = ({ onClose, camera }) => {
 
       onClose()
     } catch (error) {
-      console.error(error)
+      // console.error(error)
       setLoading(false)
       onClose()
 
@@ -545,7 +560,7 @@ const Device = ({ onClose, camera }) => {
               {lat && lng && (
                 <Marker latitude={parseFloat(lat)} longitude={parseFloat(lng)} offsetLeft={-20} offsetTop={-20}>
                   <div>
-                    <MapPin size={48} strokeWidth={2} color={'#bf40ba'} />
+                    <CustomMapPin />{' '}
                   </div>
                 </Marker>
               )}
