@@ -73,7 +73,7 @@ const UserDetails = () => {
   const [userCode, setUserCode] = useState('')
   const [syncCode, setSyncCode] = useState('')
 
-  const [groups, setGroup] = useState(null)
+  const [groups, setGroup] = useState([])
   const [policies, setPolicies] = useState([])
   const [piId, setPiId] = useState(null)
   const [ava1, setAva1] = useState(null)
@@ -331,7 +331,7 @@ const UserDetails = () => {
         }
         const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search', config)
 
-        setGroupOptions(response.data)
+        // setGroupOptions(response.data)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -353,11 +353,10 @@ const UserDetails = () => {
         }
       }
       const response = await axios.get(`https://dev-ivi.basesystem.one/smc/iam/api/v0/users/${userId}`, config)
-      setData(response.data) // store the fetched data in the state
+      const userData = response.data;
+      setData(userData); 
+      setGroup(userData.userGroups);
 
-      setGroup(response.data.userGroups)
-
-      // setRows(response.data.userGroups)
 
       setPolicies(response.data.policies)
       setPiId(response.data.piId)
@@ -909,44 +908,44 @@ const UserDetails = () => {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {groups.map((group, index) => (
-                          <TableRow key={index}>
-                            <TableCell>
-                              <Autocomplete
-                                options={filteredGroupOptions}
-                                getOptionLabel={option => option.name}
-                                value={groupOptions.find(option => option.name === group.groupName) || null}
-                                onChange={(event, newValue) => {
-                                  const updatedRows = [...groups]
-                                  updatedRows[index].groupName = newValue.name
-                                  updatedRows[index].groupCode = newValue.code
-                                  {
-                                    console.log(group.groupName, 'groupname')
-                                  }
+  {groups.map((group, index) => (
+    <TableRow key={index}>
+      <TableCell>
+        <Autocomplete
+          options={filteredGroupOptions}
+          getOptionLabel={option => option.name}
+          value={
+            groupOptions.find(option => option.name === group.groupName) 
+              ? groupOptions.find(option => option.name === group.groupName)
+              : { name: group.groupName }
+          }          onChange={(event, newValue) => {
+            const updatedRows = [...groups];
+            updatedRows[index].groupName = newValue?.name || '';
+            updatedRows[index].groupCode = newValue?.code || '';
 
-                                  // updatedRows[index].id = newValue.id
-                                  setGroup(updatedRows)
-                                }}
-                                renderInput={params => <CustomTextField {...params} label='Đơn vị' />}
-                              />
-                              {console.log(groupOptions)}
-                            </TableCell>
-                            {console.log(groups, 'group')}
-                            <TableCell>{group.groupCode}</TableCell>
-                            <TableCell align='right'>
-                              {/* Render formatted content in isLeader column */}
-                              {formatIsLeader(group.isLeader)}
-                            </TableCell>
-                            {showPlusColumn && (
-                              <TableCell align='center'>
-                                <IconButton onClick={() => handleDeleteRow(index)}>
-                                  <Icon icon='bi:trash' />
-                                </IconButton>
-                              </TableCell>
-                            )}
-                          </TableRow>
-                        ))}
-                      </TableBody>
+            console.log('Updated group name:', newValue?.name);
+
+            setGroup(updatedRows);
+          }}
+          renderInput={params => <CustomTextField {...params} label='Đơn vị' />}
+        />
+      </TableCell>
+      {console.log('Group:', group)}
+      <TableCell>{group.groupCode}</TableCell>
+      <TableCell align='right'>
+        {/* Render formatted content in isLeader column */}
+        {formatIsLeader(group.isLeader)}
+      </TableCell>
+      {showPlusColumn && (
+        <TableCell align='center'>
+          <IconButton onClick={() => handleDeleteRow(index)}>
+            <Icon icon='bi:trash' />
+          </IconButton>
+        </TableCell>
+      )}
+    </TableRow>
+  ))}
+</TableBody>
                     </Table>
                   </TableContainer>
                 </Grid>
