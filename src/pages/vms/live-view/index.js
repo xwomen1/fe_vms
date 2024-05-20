@@ -57,6 +57,7 @@ const Caller = () => {
   const [cameraList, setCameraList] = useState([])
   const [selectIndex, setSelectIndex] = useState(0)
   const [page, setPage] = useState(1)
+
   const fetchCameraGroup = async () => {
     try {
       const res = await getApi(

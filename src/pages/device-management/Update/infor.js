@@ -29,11 +29,23 @@ import {
   Typography
 } from '@mui/material'
 import CustomTextField from 'src/@core/components/mui/text-field'
+import { padding } from '@mui/system'
 
 const InforAll = ({ idInfor }) => {
   const [device, setDevice] = useState([])
   const [loading, setLoading] = useState(false)
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+  const directionOptions = [
+    { label: 'Chiều vào', value: 'IN' },
+    { label: 'Chiều ra', value: 'OUT' }
+  ]
+
+  const deviceTypeOptions = [
+    { label: 'ACCESS CONTROL', value: 'ACCESS_CONTROL' },
+    { label: 'ENROLL', value: 'ENROLL' },
+    { label: 'BUS', value: 'BUS' }
+  ]
 
   const fetchDataList1 = async () => {
     if (!idInfor) return
@@ -91,6 +103,22 @@ const InforAll = ({ idInfor }) => {
               '& .MuiCardHeader-action': { m: 0 },
               alignItems: ['flex-start', 'center']
             }}
+            action={
+              <Grid container spacing={2}>
+                <Grid item>
+                  <Box sx={{ float: 'right' }}>
+                    <Button aria-label='Bộ lọc'>Hủy</Button>
+                  </Box>
+                </Grid>
+                <Grid item>
+                  <Box sx={{ float: 'right', marginLeft: '2%' }}>
+                    <Button aria-label='Bộ lọc' variant='contained'>
+                      Lưu
+                    </Button>
+                  </Box>
+                </Grid>
+              </Grid>
+            }
           />
         </Card>
         <Grid style={{ margin: '0.3rem' }}></Grid>
@@ -122,12 +150,15 @@ const InforAll = ({ idInfor }) => {
             <Grid item xs={0.1}></Grid>
             <Grid item xs={2.8}>
               <Autocomplete
+                options={deviceTypeOptions}
                 getOptionLabel={option => option.label}
-                renderInput={params => <CustomTextField {...params} label='Loại thiết bị' fullWidth />}
-
-                // onFocus={handleComboboxFocus}
-
-                // loading={loading}
+                value={deviceTypeOptions.find(option => option.value === (device ? device.deviceType : '')) || null}
+                onChange={(event, newValue) => {
+                  if (newValue) {
+                    setDevice(prevDevice => ({ ...prevDevice, deviceType: newValue.value }))
+                  }
+                }}
+                renderInput={params => <CustomTextField {...params} label='loại thiết bị' fullWidth />}
               />{' '}
             </Grid>
             <Grid item xs={0.1}></Grid>
@@ -141,12 +172,15 @@ const InforAll = ({ idInfor }) => {
             <Grid item xs={0.1}></Grid>
             <Grid item xs={2.8} style={{ marginTop: 20 }}>
               <Autocomplete
+                options={directionOptions}
                 getOptionLabel={option => option.label}
+                value={directionOptions.find(option => option.value === (device ? device.direction : '')) || null}
+                onChange={(event, newValue) => {
+                  if (newValue) {
+                    setDevice(prevDevice => ({ ...prevDevice, direction: newValue.value }))
+                  }
+                }}
                 renderInput={params => <CustomTextField {...params} label='Chiều định danh' fullWidth />}
-
-                // onFocus={handleComboboxFocus}
-
-                // loading={loading}
               />{' '}
             </Grid>
             <Grid item xs={0.1}></Grid>

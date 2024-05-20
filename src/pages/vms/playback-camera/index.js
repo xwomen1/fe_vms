@@ -231,7 +231,6 @@ const Caller = () => {
                 <Box className='w-100' sx={{ px: 2 }}>
                   <Slider
                     defaultValue={1}
-                    // getAriaValueText={'1'}
                     shiftStep={0.25}
                     step={0.25}
                     marks
