@@ -88,12 +88,12 @@ const VerticalLayout = props => {
           sx={{ ...(contentHeightFixed && { maxHeight: '100vh' }) }}
         >
           {/* AppBar Component */}
-          <AppBar
+          {/* <AppBar
             toggleNavVisibility={toggleNavVisibility}
             appBarContent={verticalLayoutProps.appBar?.content}
             appBarProps={verticalLayoutProps.appBar?.componentProps}
             {...props}
-          />
+          /> */}
 
           {/* Content */}
           <ContentWrapper

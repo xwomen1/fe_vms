@@ -19,16 +19,7 @@ const navigation = () => {
           title: 'Quyền truy cập',
           icon: 'tabler:shield'
         },
-        {
-          path: '/pages/face_management/list',
-          title: 'Quản lý khuôn mặt',
-          icon: 'tabler:users'
-        },
-        {
-          path: '/pages/car_management/list',
-          title: 'Quản lý Biển số',
-          icon: 'tabler:id-badge-2'
-        },
+
         {
           title: 'Chấm công',
           path: '/timekeeping'
@@ -95,12 +86,22 @@ const navigation = () => {
           path: '/vms/error-system'
         },
         {
-          title: 'Cấu hình camera',
+          title: 'Danh sách camera',
           path: '/vms/camera-config'
         },
         {
-          title: 'Cấu hình nvr',
+          title: 'Danh sách nvr',
           path: '/vms/nvr-config'
+        },
+        {
+          path: '/pages/face_management/list',
+          title: 'Quản lý khuôn mặt',
+          icon: 'tabler:users'
+        },
+        {
+          path: '/pages/car_management/list',
+          title: 'Quản lý Biển số',
+          icon: 'tabler:id-badge-2'
         }
 
         // {
