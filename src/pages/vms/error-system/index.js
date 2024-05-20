@@ -27,6 +27,7 @@ import {
   Typography
 } from '@mui/material'
 import CustomTextField from 'src/@core/components/mui/text-field'
+import { format } from 'date-fns'
 
 const initValueFilter = {
   location: null,
@@ -48,6 +49,12 @@ const EventList = () => {
   const [loading, setLoading] = useState(false)
   const pageSizeOptions = [25, 50, 100]
   const token = localStorage.getItem('authConfig.storageTokenKeyName')
+
+  const formatDateTime = dateTimeString => {
+    const date = new Date(dateTimeString)
+
+    return format(date, 'HH:mm dd/MM/yyyy')
+  }
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage)
@@ -189,7 +196,7 @@ const EventList = () => {
 
                       return (
                         <TableCell key={column.id} align={column.align}>
-                          {column.renderCell ? column.renderCell(value) : value}
+                          {column.field === 'createdAt' ? formatDateTime(value) : value}
                         </TableCell>
                       )
                     })}
