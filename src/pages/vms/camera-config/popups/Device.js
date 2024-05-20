@@ -193,7 +193,7 @@ const Device = ({ onClose, camera }) => {
           setPassword(response.data.password)
           setIpAddress(response.data.ipAddress)
           setHttp(response.data.httpPort)
-          setRows(cameraData.streams || [])
+          setRows(response.data.streams || [])
           setOnvif(response.data.onvif)
           console.log(response.data)
           setLat(response.data.lat)

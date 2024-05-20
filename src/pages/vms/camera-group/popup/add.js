@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Autocomplete,
   TextField,
@@ -12,7 +12,10 @@ import {
   TableHead,
   TableRow,
   IconButton,
-  Checkbox
+  Checkbox,
+  TableCell,
+  TableBody,
+  Typography
 } from '@mui/material'
 import axios from 'axios'
 import authConfig from 'src/configs/auth'
@@ -21,10 +24,7 @@ import { router } from 'websocket'
 import { useRouter } from 'next/router'
 import Grid from '@mui/system/Unstable_Grid/Grid'
 import CustomTextField from 'src/@core/components/mui/text-field'
-import TableCell from '@mui/material/TableCell'
 import Icon from 'src/@core/components/icon'
-import { useEffect, useMemo } from 'react'
-import TableBody from '@mui/material/TableBody'
 
 const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
   const [groupName, setGroupName] = useState('')
@@ -37,6 +37,8 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
   const [camera, setCamera] = useState([])
   const [cameras, setCameras] = useState([])
   const [cameraGroup, setCameraGroup] = useState([])
+  const [errorMessage, setErrorMessage] = useState('')
+
   console.log('id', id)
 
   useEffect(() => {
@@ -55,17 +57,16 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
           const cameraPromises = cameraIds.map(async cameraId => {
             try {
               const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${cameraId}`, config)
-
-              return response.data
+              
+return response.data
             } catch (error) {
               console.error(`Error fetching camera ${cameraId}:`, error)
-
-              return null
+              
+return null
             }
           })
 
           const cameraData = await Promise.all(cameraPromises)
-
           const filteredCameraData = cameraData.filter(data => data !== null)
           setRows(filteredCameraData)
         }
@@ -140,8 +141,8 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
     }
     if (!validateInputs()) {
       console.log('Dữ liệu không hợp lệ')
-
-      return
+      
+return
     }
 
     try {
@@ -164,6 +165,7 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
       onSuccess()
     } catch (error) {
       console.error('Lỗi khi tạo nhóm mới:', error)
+      setErrorMessage(error.response?.data?.message || 'Lỗi khi tạo nhóm mới')
     }
   }
 
@@ -228,7 +230,6 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
                           }}
                           renderInput={params => <TextField {...params} label='Camera' />}
                         />
-                        {console.log(rows)}
                       </TableCell>
                       <TableCell>{row.location}</TableCell>
                       <TableCell>{row.ipAddress}</TableCell>
@@ -242,6 +243,11 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
                   ))}
                 </TableBody>
               </Table>
+              {errorMessage && (
+                <Typography color='error' variant='body2' align='center' style={{marginTop: '2%', fontSize: '16px'}}>
+                  {errorMessage}
+                </Typography>
+              )}
             </TableContainer>
           </Grid>
         </Grid>
