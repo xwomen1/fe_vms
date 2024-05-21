@@ -56,7 +56,7 @@ const InfraPopupAdd = ({ open, onClose, onSuccess, id }) => {
         isParent: true,
         name: name,
         parentID: id,
-        type: type
+        code: type
       }
       const response = await axios.post('https://sbs.basesystem.one/ivis/infrares/api/v0/regions', data, config)
       console.log(data)
