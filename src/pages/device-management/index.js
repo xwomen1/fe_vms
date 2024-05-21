@@ -224,7 +224,7 @@ const AccessControlDevice = () => {
                         <Button
                           size='small'
                           component={Link}
-                          href={`/device-management/Update/${device.parentId}`}
+                          href={`/device-management/Update/${device.id}`}
                           sx={{ color: 'blue', right: '10px' }}
                         >
                           {device.name}

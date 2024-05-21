@@ -30,7 +30,7 @@ const Add = ({
   port,
   userName,
   passWord,
-  loadingDaiIP,
+  loadingOnvif,
   setReload,
   isError,
   popupMessage
@@ -83,11 +83,6 @@ const Add = ({
           name: nvr.name,
           ipAddress: nvr.url,
           macAddress: nvr.macAddress,
-
-          // type: nvr.type,
-
-          // [Todo][Hue][07May24]: check type bet scan result and create
-          // status: nvr.status,
           passWord: passWord,
           userName: userName,
           httpPort: nvr.host
@@ -137,7 +132,7 @@ const Add = ({
       <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Quét nvr</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} alignItems='center'>
-          {loadingDaiIP && <CircularProgress style={{ marginLeft: '50%' }} />}
+          {loadingOnvif && <CircularProgress style={{ marginLeft: '50%' }} />}
           <Grid item xs={12}>
             <TableContainer>
               <Table>
@@ -157,7 +152,7 @@ const Add = ({
                 <TableBody>
                   {response && response.length > 0 ? (
                     response.map((nvr, index) => {
-                      const foundNvr = selectedIds.find(item => item.macAddress === nvr.macAddress)
+                      // const foundNvr = selectedIds.find(item => item.macAddress === nvr.macAddress)
 
                       return (
                         <TableRow key={index}>
@@ -169,17 +164,17 @@ const Add = ({
                           <TableCell sx={{ padding: '16px' }}>{nvr.location}</TableCell>
                           <TableCell sx={{ padding: '16px' }}>{nvr.status}</TableCell>
                           <TableCell sx={{ padding: '16px' }}>
-                            {foundNvr ? (
-                              <IconButton onClick={() => handleDelete(foundNvr.id)}>
-                                {' '}
-                                {/* Truyền id của nvr */}
-                                <Icon icon='tabler:minus' />
-                              </IconButton>
-                            ) : (
-                              <IconButton onClick={() => handleCreateNvr(nvr)}>
-                                <Icon icon='tabler:plus' />
-                              </IconButton>
-                            )}
+                            {/* {foundNvr ? ( */}
+                            <IconButton onClick={() => handleDelete(foundNvr.id)}>
+                              {' '}
+                              {/* Truyền id của nvr */}
+                              <Icon icon='tabler:minus' />
+                            </IconButton>
+                            {/* ) : ( */}
+                            <IconButton onClick={() => handleCreateNvr(nvr)}>
+                              <Icon icon='tabler:plus' />
+                            </IconButton>
+                            {/* )} */}
                             {loading && <CircularProgress style={{ marginLeft: '10%' }} />}
                           </TableCell>
                         </TableRow>
