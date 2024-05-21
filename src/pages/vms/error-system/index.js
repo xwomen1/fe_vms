@@ -184,6 +184,7 @@ const EventList = () => {
                     {column.label}
                   </TableCell>
                 ))}
+                <TableCell style={{ textAlign: 'center' }}>Thao tác</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -200,6 +201,16 @@ const EventList = () => {
                         </TableCell>
                       )
                     })}
+                    <TableCell>
+                      <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center' }}>
+                        <IconButton size='small' sx={{ color: 'text.secondary' }}>
+                          <Icon icon='tabler:check' />
+                        </IconButton>
+                        <IconButton size='small' sx={{ color: 'text.secondary' }}>
+                          <Icon icon='tabler:trash' />
+                        </IconButton>
+                      </Grid>
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (
