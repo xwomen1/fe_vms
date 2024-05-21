@@ -27,6 +27,11 @@ const PassWord = ({ onClose, camera }) => {
   const [httpPort, setHttpPort] = useState('')
   const [username, setUserName] = useState('')
   const classes = useStyles()
+  const [passwordOld, setPasswordOld] = useState('')
+
+  const handlePasswordOldChange = event => {
+    setPasswordOld(event.target.value)
+  }
 
   const handlePasswordChange = event => {
     setPassword(event.target.value)
@@ -58,7 +63,6 @@ const PassWord = ({ onClose, camera }) => {
           setIpAddress(response.data.ipAddress)
           setHttpPort(response.data.httpPort)
           setUserName(response.data.username)
-          console.log(response.data)
         }
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -90,10 +94,11 @@ const PassWord = ({ onClose, camera }) => {
       const response = await axios.put(
         `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/changepassword?idCamera=${camera}`,
         {
-          password: password,
+          passwordNew: password,
           username: username,
           httpPort: httpPort,
-          ipAddress: ipAddress
+          ipAddress: ipAddress,
+          passwordOld: passwordOld
         },
         config
       )
@@ -114,12 +119,28 @@ const PassWord = ({ onClose, camera }) => {
         <Grid container item style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
           <Grid item xs={12}>
             <CustomTextField
-              label='Mật khẩu'
+              label='Mật khẩu cũ'
+              type={showPassword ? 'text' : 'password'}
+              onChange={handlePasswordOldChange}
+              fullWidth
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position='end'>
+                    <IconButton onClick={toggleShowPassword} edge='end'>
+                      {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <CustomTextField
+              label='Mật khẩu mới'
               type={showPassword ? 'text' : 'password'}
               onChange={handlePasswordChange}
               fullWidth
               InputProps={{
-                //Thêm InputProps để thêm IconButton
                 endAdornment: (
                   <InputAdornment position='end'>
                     <IconButton onClick={toggleShowPassword} edge='end'>
@@ -137,7 +158,6 @@ const PassWord = ({ onClose, camera }) => {
               onChange={handleConfirmPasswordChange}
               fullWidth
               InputProps={{
-                //Thêm InputProps để thêm IconButton
                 endAdornment: (
                   <InputAdornment position='end'>
                     <IconButton onClick={toggleShowPassword} edge='end'>
