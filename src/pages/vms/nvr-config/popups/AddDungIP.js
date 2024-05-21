@@ -30,14 +30,16 @@ const Add = ({
   port,
   userName,
   passWord,
-  loadingDaiIP,
+  loadingDungIp,
   setReload,
   isError,
   popupMessage
 }) => {
+  console.log(loadingDungIp, 'loadingDungIp')
   const [selectedIds, setSelectedIds] = useState([])
   const [loading, setLoading] = useState(false)
-  console.log(response, 'res')
+  const [popupMessageDungIP, setPopupMessage] = useState('')
+  const [isErrorDungIP, setIsError] = useState(false)
 
   console.log('url' + url, ' port' + port, 'username' + userName, 'password' + passWord)
 
@@ -69,6 +71,8 @@ const Add = ({
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
       setLoading(true)
+      setPopupMessage('') // Reset thông điệp khi bắt đầu scan
+      setIsError(false) // Reset trạng thái lỗi khi bắt đầu scan
 
       const config = {
         headers: {
@@ -96,15 +100,14 @@ const Add = ({
       )
       setReload()
       setLoading(false)
-      onClose()
 
-      Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
+      setPopupMessage('Thêm thành công')
+      setIsError(false) // Không phải lỗi
     } catch (error) {
       console.error('Error updating user details:', error)
+      setPopupMessage(`${error.response.data.message}`)
+      setIsError(true) // Đánh dấu là lỗi
       setLoading(false)
-      onClose()
-
-      Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi cập nhật dữ liệu.', 'error')
     }
   }
 
@@ -120,15 +123,12 @@ const Add = ({
       }
 
       await axios.delete(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${id}`, config)
-
-      Swal.fire('Xóa camera thành công', '', 'success')
       setReload()
+      setLoading(false)
+      Swal.fire('Xóa camera thành công', '', 'success')
     } catch (error) {
       Swal.fire('Đã xảy ra lỗi', error.message, 'error')
       console.error('Error deleting camera:', error)
-    } finally {
-      onClose()
-      setLoading(false)
     }
   }
 
@@ -137,7 +137,7 @@ const Add = ({
       <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Quét nvr</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} alignItems='center'>
-          {loadingDaiIP && <CircularProgress style={{ marginLeft: '50%' }} />}
+          {loadingDungIp && <CircularProgress style={{ marginLeft: '50%' }} />}
           <Grid item xs={12}>
             <TableContainer>
               <Table>
@@ -157,7 +157,8 @@ const Add = ({
                 <TableBody>
                   {response && response.length > 0 ? (
                     response.map((nvr, index) => {
-                      const foundNvr = selectedIds.find(item => item.macAddress === nvr.macAddress)
+                      const foundNvr =
+                        selectedIds?.length > 0 ? selectedIds.find(item => item.macAddress === nvr.macAddress) : null
 
                       return (
                         <TableRow key={index}>
