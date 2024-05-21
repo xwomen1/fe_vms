@@ -154,20 +154,6 @@ const GPUChart = () => {
                     '& .MuiCardHeader-action': { mb: 0 },
                     '& .MuiCardHeader-content': { mb: [2, 0] }
                 }}
-            // action={
-            //     <DatePickerWrapper>
-            //         <DatePicker
-            //             selectsRange
-            //             endDate={endDate}
-            //             id='apexchart-area'
-            //             selected={startDate}
-            //             startDate={startDate}
-            //             onChange={handleOnChange}
-            //             placeholderText='Click to select a date'
-            //             customInput={<CustomInput start={startDate} end={endDate} />}
-            //         />
-            //     </DatePickerWrapper>
-            // }
             />
             <CardContent>
                 <ReactApexcharts type='area' height={200} options={options} series={series} />
