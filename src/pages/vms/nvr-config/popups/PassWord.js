@@ -1,44 +1,12 @@
 import React, { forwardRef, useEffect, useState } from 'react'
 import CustomTextField from 'src/@core/components/mui/text-field'
-import {
-  Button,
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Fade,
-  Grid,
-  IconButton,
-  InputAdornment
-} from '@mui/material'
+import { Button, CircularProgress, Dialog, DialogActions, Grid, IconButton, InputAdornment } from '@mui/material'
 import axios from 'axios'
 import authConfig from 'src/configs/auth'
 import Swal from 'sweetalert2'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import { makeStyles } from '@material-ui/core/styles'
-import Icon from 'src/@core/components/icon'
-import { styled } from '@mui/material/styles'
-
-const CustomCloseButton = styled(IconButton)(({ theme }) => ({
-  top: 0,
-  right: 0,
-  color: 'grey.500',
-  position: 'absolute',
-  boxShadow: theme.shadows[2],
-  transform: 'translate(10px, -10px)',
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: `${theme.palette.background.paper} !important`,
-  transition: 'transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out',
-  '&:hover': {
-    transform: 'translate(7px, -5px)'
-  }
-}))
-
-const Transition = forwardRef(function Transition(props, ref) {
-  return <Fade ref={ref} {...props} />
-})
 
 const PassWord = ({ onClose, nvr }) => {
   const [passwordOld, setPasswordOld] = useState('')
