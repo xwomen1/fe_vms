@@ -140,13 +140,15 @@ const Review = ({ id, name, channel }) => {
                             <IconButton disabled>
                                 <Icon icon="tabler:player-play-filled" width='48' height='48' style={{ color: '#FF9F43' }} />
                             </IconButton>
-                        </div>}
+                        </div>
+                    }
                     {id !== '' && channel !== '' &&
                         <ViewCamera
                             id={id}
                             name={name}
                             channel={channel}
                             sizeScreen={'1x1'}
+                            timeFilter={timeFilter}
                             handSetChanel={handSetChanel}
                         />
                     }
