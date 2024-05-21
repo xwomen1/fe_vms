@@ -289,8 +289,9 @@ const Add = () => {
 
       // router.push(`/apps/user/detail/${response.data.userId}`)
     } catch (error) {
-      console.error('Error updating user details:', error)
-      Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi cập nhật dữ liệu.', 'error')
+      console.error('Error updating user details:', error);
+      const errorMessage = error.response?.data?.message || 'Đã xảy ra lỗi khi cập nhật dữ liệu.';
+      Swal.fire('Lỗi!', errorMessage, 'error');
     }
   }
 
@@ -691,8 +692,8 @@ const Add = () => {
                             value={row.name}
                             onChange={(event, newValue) => {
                               const updatedRows = [...rows]
-                              updatedRows[index].name = newValue.name
-                              updatedRows[index].code = newValue.code
+                              updatedRows[index].groupName = newValue?.name || '';
+                              updatedRows[index].groupCode = newValue?.code || '';
 
                               // updatedRows[index].id = newValue.id
                               setRows(updatedRows)
