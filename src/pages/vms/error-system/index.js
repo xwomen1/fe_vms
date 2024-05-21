@@ -184,6 +184,7 @@ const EventList = () => {
                     {column.label}
                   </TableCell>
                 ))}
+                <TableCell style={{ textAlign: 'center' }}>Thao tác</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -193,13 +194,22 @@ const EventList = () => {
                     <TableCell>{(page - 1) * pageSize + index + 1}</TableCell>
                     {columns.map(column => {
                       const value = row[column.field]
-
                       return (
                         <TableCell key={column.id} align={column.align}>
                           {column.field === 'createdAt' ? formatDateTime(value) : value}
                         </TableCell>
                       )
                     })}
+                    <TableCell>
+                      <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center' }}>
+                        <IconButton size='small' sx={{ color: 'text.secondary' }}>
+                          <Icon icon='tabler:check' />
+                        </IconButton>
+                        <IconButton size='small' sx={{ color: 'text.secondary' }}>
+                          <Icon icon='tabler:trash' />
+                        </IconButton>
+                      </Grid>
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (

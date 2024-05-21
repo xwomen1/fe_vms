@@ -13,7 +13,7 @@ import authConfig from 'src/configs/auth'
 import Table from '@mui/material/Table'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
-import { Autocomplete, Button, CircularProgress, IconButton } from '@mui/material'
+import { Autocomplete, Button, CircularProgress, IconButton, Paper } from '@mui/material'
 import Swal from 'sweetalert2'
 import { fetchData } from 'src/store/apps/user'
 import { useRouter } from 'next/router'
@@ -224,7 +224,7 @@ const UserList = ({ apiData }) => {
       ) {
         Swal.fire('Thiết bị chưa phản hồi', '', 'error')
       } else {
-        Swal.fire('Đã xảy ra lỗi', error.message, 'error')
+        Swal.fire(`${error.message}`, error.message, 'error')
       }
 
       setOpenPopupResponse(false)

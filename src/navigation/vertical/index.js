@@ -15,6 +15,10 @@ const navigation = () => {
           path: '/event-management'
         },
         {
+          title: 'Thiết bị',
+          path: '/device-management'
+        },
+        {
           path: '/pages/access-rights/list',
           title: 'Quyền truy cập',
           icon: 'tabler:shield'
@@ -253,7 +257,7 @@ const navigation = () => {
       children: [
         {
           title: 'Quản lý thiết bị',
-          path: '/device-management'
+          path: '/device-management/device'
         },
         {
           title: 'Cảnh báo hệ thống',
