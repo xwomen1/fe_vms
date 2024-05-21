@@ -19,7 +19,7 @@ const config = {
   ]
 }
 
-export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => {
+export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel, timeFilter }) => {
   const [websocket, setWebsocket] = useState(null)
   const [text, setText] = useState(null)
   const [rtcPeerConnection, setRtcPeerConnection] = useState(null)
@@ -29,6 +29,9 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
   const [heightDiv, setHeightDiv] = useState(100)
   const [status, setStatus] = useState('')
   const [reload, setReload] = useState(0)
+  const [startTime, setStartTime] = useState(new Date())
+  const [endTime, setEndTime] = useState(new Date())
+
   useEffect(() => {
     const heightCaculator = Math.floor((window.innerHeight - 192) / sizeScreen.split('x')[1])
     setHeightDiv(heightCaculator)
