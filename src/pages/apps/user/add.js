@@ -67,12 +67,11 @@ const Add = () => {
   const [ava1, setAva1] = useState(null)
   const [ava2, setAva2] = useState(null)
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [userId, setUserId] = useState('')
 
-  const [confirmPassword, setConfirmPassword] = useState('')
-
   const handleAddRow = () => {
-    const newRow = { groupName: '', code: '', id: '', groupName: '', name: '', groupCode: '' } // Thêm groupId vào đây
+    const newRow = { groupName: '', code: '', id: '' } // Thêm groupId vào đây
     setRows([...rows, newRow])
   }
 
@@ -278,8 +277,8 @@ const Add = () => {
       setUserId(newUserId)
 
       for (const row of rows) {
-        console.log(row.name, 'rows')
-        const groupId = await searchGroupIdAccess(row.name)
+        console.log(row.groupName, 'rows')
+        const groupId = await searchGroupIdAccess(row.groupName)
         console.log(groupId, 'gourpID fetch')
         if (groupId) {
           await addMemberToGroup(groupId, newUserId)
@@ -287,11 +286,10 @@ const Add = () => {
       }
       Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
 
-      // router.push(`/apps/user/detail/${response.data.userId}`)
+      router.push(`/apps/user/detail/${response.data.userId}`)
     } catch (error) {
-      console.error('Error updating user details:', error);
-      const errorMessage = error.response?.data?.message || 'Đã xảy ra lỗi khi cập nhật dữ liệu.';
-      Swal.fire('Lỗi!', errorMessage, 'error');
+      console.error('Error updating user details:', error)
+      Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi cập nhật dữ liệu.', 'error')
     }
   }
 
@@ -345,6 +343,51 @@ const Add = () => {
 
       return response.data.groupId
     } catch (error) {
+      throw error
+    }
+  }
+
+  const searchGroupIdAccess = async (groupName, groupCode) => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.get(
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups?keyword=${groupName}`,
+        config
+      )
+      console.log(response.data.rows[0])
+
+      return response.data.rows[0].id
+    } catch (error) {
+      throw error
+    }
+  }
+
+  const addMemberToGroup = async (groupId, userId) => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.post(
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups/${groupId}/add-member`,
+        { userIds: [userId] },
+        config
+      )
+
+      return response.data
+    } catch (error) {
+      console.error('Error adding member to group:', error)
       throw error
     }
   }
@@ -449,51 +492,6 @@ const Add = () => {
   }
 
   console.log('param', params)
-
-  const searchGroupIdAccess = async (groupName, groupCode) => {
-    try {
-      const token = localStorage.getItem(authConfig.storageTokenKeyName)
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-
-      const response = await axios.get(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups?keyword=${groupName}`,
-        config
-      )
-      console.log(response.data.rows[0])
-
-      return response.data.rows[0].id
-    } catch (error) {
-      throw error
-    }
-  }
-
-  const addMemberToGroup = async (groupId, userId) => {
-    try {
-      const token = localStorage.getItem(authConfig.storageTokenKeyName)
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-
-      const response = await axios.post(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups/${groupId}/add-member`,
-        { userIds: [userId] },
-        config
-      )
-
-      return response.data
-    } catch (error) {
-      console.error('Error adding member to group:', error)
-      throw error
-    }
-  }
 
   return (
     <div>
@@ -674,7 +672,7 @@ const Add = () => {
                     <TableRow>
                       <TableCell>Đơn vị</TableCell>
                       <TableCell>Mã đơn vị</TableCell>
-                      <TableCell align='right'>Đơn vị</TableCell>
+                      <TableCell align='right'>Là lãnh đạo đơn vị</TableCell>
                       <TableCell align='center'>
                         <IconButton size='small' onClick={handleAddRow} sx={{ marginLeft: '10px' }}>
                           <Icon icon='bi:plus' />
@@ -692,13 +690,13 @@ const Add = () => {
                             value={row.name}
                             onChange={(event, newValue) => {
                               const updatedRows = [...rows]
-                              updatedRows[index].groupName = newValue?.name || '';
-                              updatedRows[index].groupCode = newValue?.code || '';
+                              updatedRows[index].name = newValue.name
+                              updatedRows[index].code = newValue.code
 
                               // updatedRows[index].id = newValue.id
                               setRows(updatedRows)
                             }}
-                            renderInput={params => <CustomTextField {...params} label='Đơn vị' />}
+                            renderInput={params => <TextField {...params} label='Đơn vị' />}
                           />
                         </TableCell>
                         {console.log(rows)}

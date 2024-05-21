@@ -353,10 +353,9 @@ const UserDetails = () => {
         }
       }
       const response = await axios.get(`https://dev-ivi.basesystem.one/smc/iam/api/v0/users/${userId}`, config)
-      const userData = response.data;
-      setData(userData); 
-      setGroup(userData.userGroups);
-
+      const userData = response.data
+      setData(userData)
+      setGroup(userData.userGroups)
 
       setPolicies(response.data.policies)
       setPiId(response.data.piId)
@@ -908,44 +907,45 @@ const UserDetails = () => {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-  {groups.map((group, index) => (
-    <TableRow key={index}>
-      <TableCell>
-        <Autocomplete
-          options={filteredGroupOptions}
-          getOptionLabel={option => option.name}
-          value={
-            groupOptions.find(option => option.name === group.groupName) 
-              ? groupOptions.find(option => option.name === group.groupName)
-              : { name: group.groupName }
-          }          onChange={(event, newValue) => {
-            const updatedRows = [...groups];
-            updatedRows[index].groupName = newValue?.name || '';
-            updatedRows[index].groupCode = newValue?.code || '';
+                        {groups.map((group, index) => (
+                          <TableRow key={index}>
+                            <TableCell>
+                              <Autocomplete
+                                options={filteredGroupOptions}
+                                getOptionLabel={option => option.name}
+                                value={
+                                  groupOptions.find(option => option.name === group.groupName)
+                                    ? groupOptions.find(option => option.name === group.groupName)
+                                    : { name: group.groupName }
+                                }
+                                onChange={(event, newValue) => {
+                                  const updatedRows = [...groups]
+                                  updatedRows[index].groupName = newValue?.name || ''
+                                  updatedRows[index].groupCode = newValue?.code || ''
 
-            console.log('Updated group name:', newValue?.name);
+                                  console.log('Updated group name:', newValue?.name)
 
-            setGroup(updatedRows);
-          }}
-          renderInput={params => <CustomTextField {...params} label='Đơn vị' />}
-        />
-      </TableCell>
-      {console.log('Group:', group)}
-      <TableCell>{group.groupCode}</TableCell>
-      <TableCell align='right'>
-        {/* Render formatted content in isLeader column */}
-        {formatIsLeader(group.isLeader)}
-      </TableCell>
-      {showPlusColumn && (
-        <TableCell align='center'>
-          <IconButton onClick={() => handleDeleteRow(index)}>
-            <Icon icon='bi:trash' />
-          </IconButton>
-        </TableCell>
-      )}
-    </TableRow>
-  ))}
-</TableBody>
+                                  setGroup(updatedRows)
+                                }}
+                                renderInput={params => <CustomTextField {...params} label='Đơn vị' />}
+                              />
+                            </TableCell>
+                            {console.log('Group:', group)}
+                            <TableCell>{group.groupCode}</TableCell>
+                            <TableCell align='right'>
+                              {/* Render formatted content in isLeader column */}
+                              {formatIsLeader(group.isLeader)}
+                            </TableCell>
+                            {showPlusColumn && (
+                              <TableCell align='center'>
+                                <IconButton onClick={() => handleDeleteRow(index)}>
+                                  <Icon icon='bi:trash' />
+                                </IconButton>
+                              </TableCell>
+                            )}
+                          </TableRow>
+                        ))}
+                      </TableBody>
                     </Table>
                   </TableContainer>
                 </Grid>
