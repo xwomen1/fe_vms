@@ -12,7 +12,7 @@ const navigation = () => {
       children: [
         {
           title: 'Sự kiện',
-          path: '/event-management'
+          path: '/access-control/event-management'
         },
         {
           title: 'Thiết bị',
@@ -26,7 +26,7 @@ const navigation = () => {
 
         {
           title: 'Chấm công',
-          path: '/timekeeping'
+          path: '/access-control/time-keeping'
         },
         {
           path: '/pages/report-month/list',

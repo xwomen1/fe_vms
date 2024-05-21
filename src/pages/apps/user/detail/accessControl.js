@@ -276,7 +276,8 @@ const UserDetails = () => {
   }
 
   return (
-    <Grid container spacing={3}>
+    <Grid container spacing={3} component={Paper}>
+      <Grid item xs={12}></Grid>
       <Grid container spacing={2} item xs={12}>
         {/* <IconButton size='small' component={Link} href={`/apps/user/list`} sx={{ color: 'text.secondary' }}>
           <Icon icon='tabler:chevron-left' />
@@ -285,6 +286,7 @@ const UserDetails = () => {
       </Grid>
       <Grid container spacing={2}>
         <div style={{ width: '80%' }}></div>
+        <br></br>
         {editing ? (
           <>
             <Button variant='contained' onClick={saveChanges} sx={{ marginRight: '10px' }}>
@@ -300,7 +302,6 @@ const UserDetails = () => {
           </Button>
         )}
       </Grid>
-
       <Grid item xs={12}>
         <TableContainer style={{ width: '100%' }}>
           <Table>
