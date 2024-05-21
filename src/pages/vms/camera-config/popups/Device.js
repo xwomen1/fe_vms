@@ -248,7 +248,7 @@ const Device = ({ onClose, camera }) => {
         userName: userName,
         password: password,
         ipAddress: ipAddress,
-        http: http,
+        httpPort: http,
         type: cameraGroupSelect,
         onvif: onvif,
         lat: lat.toString(),
