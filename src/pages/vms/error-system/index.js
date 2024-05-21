@@ -194,6 +194,7 @@ const EventList = () => {
                     <TableCell>{(page - 1) * pageSize + index + 1}</TableCell>
                     {columns.map(column => {
                       const value = row[column.field]
+
                       return (
                         <TableCell key={column.id} align={column.align}>
                           {column.field === 'createdAt' ? formatDateTime(value) : value}

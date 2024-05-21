@@ -82,6 +82,7 @@ const Setting = ({ idSetting }) => {
           Authorization: `Bearer ${token}`
         }
       }
+
       const params = {
         ipAddress: device.ipAddress,
         settings: {
@@ -90,6 +91,7 @@ const Setting = ({ idSetting }) => {
           mac: device.settings.mac
         }
       }
+
       const response = await axios.put(
         `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices/${idSetting}`,
         params,

@@ -44,6 +44,8 @@ const InforAll = ({ idInfor }) => {
   const [selectedRegion, setSelectedRegion] = useState(null)
   const [parentId, setParentId] = useState(null)
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
+  const parentIdToFilter = 'fa7f0b8b-56a7-44c7-96d6-997e7fc55304'
+  const postParentId = '3cf287c3-503a-4c49-8d1c-4c60710561f5'
 
   const directionOptions = [
     { label: 'Chiều vào', value: 'IN' },
@@ -79,6 +81,7 @@ const InforAll = ({ idInfor }) => {
         if (matchingRegion) {
           setSelectedRegion(matchingRegion)
         }
+
         return currentRegions
       })
     } catch (error) {
@@ -116,7 +119,9 @@ const InforAll = ({ idInfor }) => {
           `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/device-groups/children-lv1?parentId=${parentGroup.id}`,
           config
         )
+
         const childGroups = childResponse.data || [] // Ensure it's an array
+
         return childGroups.map(child => ({
           ...child,
           parentName: parentGroup.name, // Include parent name for better distinction
@@ -149,6 +154,7 @@ const InforAll = ({ idInfor }) => {
           Authorization: `Bearer ${token}`
         }
       }
+
       const params = {
         name: device.name,
         deviceGroupId: device.deviceGroupId,
@@ -178,6 +184,7 @@ const InforAll = ({ idInfor }) => {
         if (matchingRegion) {
           setSelectedRegion(matchingRegion)
         }
+
         return currentRegions
       })
     } catch (error) {
@@ -187,6 +194,7 @@ const InforAll = ({ idInfor }) => {
       Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi cập nhật dữ liệu.', 'error')
     }
   }
+
   const handleInputChange = (field, value) => {
     setDevice(prevDevice => ({
       ...prevDevice,
@@ -194,8 +202,6 @@ const InforAll = ({ idInfor }) => {
     }))
   }
 
-  const parentIdToFilter = 'fa7f0b8b-56a7-44c7-96d6-997e7fc55304'
-  const postParentId = '3cf287c3-503a-4c49-8d1c-4c60710561f5'
   const fetchRegions = async () => {
     setLoading(true)
     try {
@@ -249,6 +255,7 @@ const InforAll = ({ idInfor }) => {
 
       try {
         setLoading(true)
+
         const config = {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -264,7 +271,6 @@ const InforAll = ({ idInfor }) => {
 
         let response
         try {
-          // Attempt to create a new door-group
           response = await axios.post(
             'https://dev-ivi.basesystem.one/smc/access-control/api/v0/door-groups',
             data,
