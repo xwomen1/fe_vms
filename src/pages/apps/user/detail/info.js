@@ -249,7 +249,11 @@ const UserDetails = () => {
 
       return
     }
+    if (!phoneNumber || phoneNumber.length <= 9) {
+      Swal.fire('Lỗi!', 'Số điện thoại không hợp lệ', 'error')
 
+      return
+    }
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
       const processedGroups = await userGroups(groups) // Call the userGroups function passing rows
