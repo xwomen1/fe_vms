@@ -145,6 +145,8 @@ const Add = () => {
   const handleSyncCodeChange = event => {
     setSyncCode(event.target.value)
   }
+  const policyList = rows1.map(row => row.policyId)
+  console.log(policyList, 'ploust')
 
   const handleTimeValidityChange = event => {
     setTimeValidity(event.target.value)
@@ -263,8 +265,9 @@ const Add = () => {
           availableAt: ava1,
           expiredAt: ava2,
           note: note,
+          policyIds: policyList,
+
           userGroups: processedGroups,
-          policies: userPolicy,
           userAccount: {
             accStatus: 'ACTIVE',
             username: account,
