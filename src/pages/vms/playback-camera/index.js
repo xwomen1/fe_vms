@@ -209,14 +209,16 @@ const Caller = () => {
         {cameraGroup.length > 0 &&
           cameraGroup.map((camera, index) => (
             <Grid item xs={Math.floor(12 / sizeScreen.split('x')[0])} key={index}>
-              <ViewCamera
-                name={camera?.deviceName}
-                id={camera.id}
-                channel={camera.channel}
-                status={camera.status}
-                sizeScreen={sizeScreen}
-                handSetChanel={handSetChanel}
-              />
+              {!play &&
+                <ViewCamera
+                  name={camera?.deviceName}
+                  id={camera.id}
+                  channel={camera.channel}
+                  status={camera.status}
+                  timeFilter={timeFilter}
+                  sizeScreen={sizeScreen}
+                  handSetChanel={handSetChanel}
+                />}
             </Grid>
           ))}
         <div className='video-controls'>
