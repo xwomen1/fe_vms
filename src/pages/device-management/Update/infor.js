@@ -70,8 +70,8 @@ const InforAll = ({ idInfor }) => {
         }
       }
 
-      const response = await axios.get(`https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices?${idInfor}`, config)
-      const deviceData = response.data.results[0]
+      const response = await axios.get(`https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices/${idInfor}`, config)
+      const deviceData = response.data
       setDevice(deviceData)
 
       // Fetch regions and set Autocomplete value if doorName matches any region name

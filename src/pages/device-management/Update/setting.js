@@ -33,8 +33,8 @@ const Setting = ({ idSetting }) => {
         }
       }
 
-      const response = await axios.get(`https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices?${idSetting}`, config)
-      const deviceData = response.data.results[0]
+      const response = await axios.get(`https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices/${idSetting}`, config)
+      const deviceData = response.data
       setDevice(deviceData)
     } catch (error) {
       toast.error(error.message)

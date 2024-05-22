@@ -28,7 +28,7 @@ const Add = ({
   port,
   userName,
   passWord,
-  loadingDaiIP,
+  loadingOnvif,
   setReload,
   isError,
   popupMessage
@@ -132,7 +132,7 @@ const Add = ({
       <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Quét Camera</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} alignItems='center'>
-          {loadingDaiIP && <CircularProgress style={{ marginLeft: '50%' }} />}
+          {loadingOnvif && <CircularProgress style={{ marginLeft: '50%' }} />}
           <Grid item xs={12}>
             <TableContainer>
               <Table>

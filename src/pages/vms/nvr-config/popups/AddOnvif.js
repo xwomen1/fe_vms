@@ -8,19 +8,17 @@ import {
   TableContainer,
   Table,
   TableHead,
+  Box,
   TableRow,
   IconButton,
-  Checkbox
+  CircularProgress
 } from '@mui/material'
 import authConfig from 'src/configs/auth'
 import axios from 'axios'
-
 import Grid from '@mui/system/Unstable_Grid/Grid'
 import TableCell from '@mui/material/TableCell'
 import Icon from 'src/@core/components/icon'
 import TableBody from '@mui/material/TableBody'
-import Swal from 'sweetalert2'
-import CircularProgress from '@mui/material/CircularProgress'
 
 const Add = ({
   open,
@@ -37,9 +35,7 @@ const Add = ({
 }) => {
   const [selectedIds, setSelectedIds] = useState([])
   const [loading, setLoading] = useState(false)
-  console.log(response, 'res')
-
-  console.log('url' + url, ' port' + port, 'username' + userName, 'password' + passWord)
+  const [message, setMessage] = useState({ text: popupMessage, type: 'general', error: isError })
 
   const fetchGroupDataNVR = async () => {
     try {
@@ -65,10 +61,15 @@ const Add = ({
     fetchGroupDataNVR()
   }, [])
 
+  useEffect(() => {
+    setMessage({ text: popupMessage, type: 'general', error: isError })
+  }, [popupMessage, isError])
+
   const handleCreateNvr = async nvr => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
       setLoading(true)
+      setMessage({ text: '', type: '', error: false })
 
       const config = {
         headers: {
@@ -76,7 +77,7 @@ const Add = ({
         }
       }
 
-      const response = await axios.post(
+      await axios.post(
         `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs`,
         {
           location: nvr.location,
@@ -89,24 +90,23 @@ const Add = ({
         },
         config
       )
+
+      setMessage({ text: 'Thêm thành công', type: 'create', error: false })
       setReload()
-      setLoading(false)
-      onClose()
-
-      Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
+      fetchGroupDataNVR()
     } catch (error) {
-      console.error('Error updating user details:', error)
+      console.error('Error creating NVR:', error)
+      setMessage({ text: `${error.response.data.message}`, type: 'create', error: true })
+    } finally {
       setLoading(false)
-      onClose()
-
-      Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi cập nhật dữ liệu.', 'error')
     }
   }
 
-  const handleDelete = async id => {
-    setLoading(true)
+  const handleDeleteNvr = async id => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
+      setLoading(true)
+      setMessage({ text: '', type: '', error: false })
 
       const config = {
         headers: {
@@ -116,20 +116,20 @@ const Add = ({
 
       await axios.delete(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${id}`, config)
 
-      Swal.fire('Xóa camera thành công', '', 'success')
+      setMessage({ text: 'Xóa thành công', type: 'delete', error: false })
       setReload()
+      fetchGroupDataNVR()
     } catch (error) {
-      Swal.fire('Đã xảy ra lỗi', error.message, 'error')
-      console.error('Error deleting camera:', error)
+      console.error('Error deleting NVR:', error)
+      setMessage({ text: `${error.response.data.message}`, type: 'delete', error: true })
     } finally {
-      onClose()
       setLoading(false)
     }
   }
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth='x1' style={{ maxWidth: '80%', margin: 'auto' }}>
-      <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Quét nvr</DialogTitle>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth='xl' style={{ maxWidth: '80%', margin: 'auto' }}>
+      <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Quét NVR</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} alignItems='center'>
           {loadingOnvif && <CircularProgress style={{ marginLeft: '50%' }} />}
@@ -152,7 +152,12 @@ const Add = ({
                 <TableBody>
                   {response && response.length > 0 ? (
                     response.map((nvr, index) => {
-                      // const foundNvr = selectedIds.find(item => item.macAddress === nvr.macAddress)
+                      if (nvr.type !== 'NVR') {
+                        return null // Ẩn dữ liệu không phải là 'NVR'
+                      }
+
+                      const foundNvr =
+                        selectedIds?.length > 0 ? selectedIds.find(item => item.macAddress === nvr.macAddress) : null
 
                       return (
                         <TableRow key={index}>
@@ -164,17 +169,15 @@ const Add = ({
                           <TableCell sx={{ padding: '16px' }}>{nvr.location}</TableCell>
                           <TableCell sx={{ padding: '16px' }}>{nvr.status}</TableCell>
                           <TableCell sx={{ padding: '16px' }}>
-                            {/* {foundNvr ? ( */}
-                            <IconButton onClick={() => handleDelete(foundNvr.id)}>
-                              {' '}
-                              {/* Truyền id của nvr */}
-                              <Icon icon='tabler:minus' />
-                            </IconButton>
-                            {/* ) : ( */}
-                            <IconButton onClick={() => handleCreateNvr(nvr)}>
-                              <Icon icon='tabler:plus' />
-                            </IconButton>
-                            {/* )} */}
+                            {foundNvr ? (
+                              <IconButton onClick={() => handleDeleteNvr(foundNvr.id)}>
+                                <Icon icon='tabler:minus' />
+                              </IconButton>
+                            ) : (
+                              <IconButton onClick={() => handleCreateNvr(nvr)}>
+                                <Icon icon='tabler:plus' />
+                              </IconButton>
+                            )}
                             {loading && <CircularProgress style={{ marginLeft: '10%' }} />}
                           </TableCell>
                         </TableRow>
@@ -182,18 +185,28 @@ const Add = ({
                     })
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={9}>Không có dữ liệu</TableCell>
+                      <TableCell colSpan={8}>Không có dữ liệu</TableCell>
                     </TableRow>
                   )}
                 </TableBody>
               </Table>
-              <div style={{ color: isError ? 'red' : '#ff9f43', textAlign: 'center' }}>{popupMessage}</div>
+              {message.type === 'general' && (
+                <Box style={{ color: message.error ? 'red' : '#ff9f43', textAlign: 'center' }}>{message.text}</Box>
+              )}
+              {message.type === 'create' && (
+                <Box style={{ color: message.error ? 'red' : '#ff9f43', textAlign: 'center' }}>{message.text}</Box>
+              )}
+              {message.type === 'delete' && (
+                <Box style={{ color: message.error ? 'red' : '#ff9f43', textAlign: 'center' }}>{message.text}</Box>
+              )}
             </TableContainer>
           </Grid>
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Hủy</Button>
+        <Button onClick={onClose} variant='contained'>
+          Hủy
+        </Button>
       </DialogActions>
     </Dialog>
   )

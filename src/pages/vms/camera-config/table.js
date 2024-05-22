@@ -344,7 +344,7 @@ const Camera = ({ apiData }) => {
                     <TableCell sx={{ padding: '16px' }}>Địa chỉ IP</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Địa chỉ Mac</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Vị trí</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Trạng thái</TableCell>
+                    <TableCell sx={{ padding: '16px', textAlign: 'center' }}>Trạng thái</TableCell>
 
                     <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
                   </TableRow>
@@ -364,7 +364,23 @@ const Camera = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{assetType.ipAddress}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.macAddress}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.location}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.status.name}</TableCell>
+                      <TableCell sx={{ padding: '16px', textAlign: 'center' }}>
+                        {assetType.status && assetType.status.name ? (
+                          <div
+                            style={{
+                              backgroundColor: assetType.status.name === 'Hoạt động' ? 'lightgreen' : 'orange',
+                              borderRadius: '10px',
+                              padding: '5px 10px',
+                              width: '70%',
+                              display: 'inline-block'
+                            }}
+                          >
+                            {assetType.status.name}
+                          </div>
+                        ) : (
+                          assetType.status.name
+                        )}
+                      </TableCell>
 
                       <TableCell sx={{ padding: '16px' }}>
                         <IconButton size='small' onClick={() => handleAddPClick(assetType.id)}>
