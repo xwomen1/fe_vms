@@ -28,6 +28,7 @@ import authConfig from 'src/configs/auth'
 import Swal from 'sweetalert2'
 import ReactMapGL, { Marker, Popup } from '@goongmaps/goong-map-react'
 import { MapPin } from './MapPin'
+import DDNS from './DDNS'
 
 const CustomMapPin = () => (
   <svg
@@ -46,13 +47,12 @@ const CustomMapPin = () => (
 
 const Device = ({ onClose, camera }) => {
   const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [rows, setRows] = useState([])
-  const [channel, setChannel] = useState([])
+  const [dns, setDns] = useState(false)
   const [cameraGroup, setCameraGroup] = useState([])
   const [regions, setRegions] = useState([])
-
+  const [disable, setDisable] = useState(true)
   const [cameras, setCamera] = useState(null)
   const [selectedProtocol, setSelectedProtocol] = useState(null)
 
@@ -159,7 +159,9 @@ const Device = ({ onClose, camera }) => {
   }
 
   const handleIpAddressChange = event => {
-    setIpAddress(event.target.value)
+    if (!dns) {
+      setIpAddress(event.target.value)
+    }
   }
 
   const handleCheckboxChange = () => {
@@ -221,6 +223,35 @@ const Device = ({ onClose, camera }) => {
     fetchGroupData()
   }, [camera])
   useEffect(() => {
+    const fetchGroupData = async () => {
+      try {
+        if (camera != null) {
+          // Kiểm tra xem popup Network đã mở chưa
+          const token = localStorage.getItem(authConfig.storageTokenKeyName)
+          console.log('token', token)
+
+          const config = {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+
+          const response = await axios.get(
+            `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/{idCamera}?idCamera=${camera}`,
+            config
+          )
+
+          setDns(response.data.ddns)
+          console.log(response.data.ddns)
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+
+    fetchGroupData()
+  }, [camera])
+  useEffect(() => {
     setCameraGroupSelect({
       label: defaultValue,
       value: defaultValue
@@ -248,7 +279,7 @@ const Device = ({ onClose, camera }) => {
         userName: userName,
         password: password,
         ipAddress: ipAddress,
-        http: http,
+        httpPort: http,
         type: cameraGroupSelect,
         onvif: onvif,
         lat: lat.toString(),

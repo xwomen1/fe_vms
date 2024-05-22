@@ -28,13 +28,24 @@ import {
   TableRow,
   Typography
 } from '@mui/material'
+import Link from 'next/link'
 import CustomTextField from 'src/@core/components/mui/text-field'
+import Swal from 'sweetalert2'
+import { CircularProgress } from '@mui/material'
 import { padding } from '@mui/system'
 
 const InforAll = ({ idInfor }) => {
   const [device, setDevice] = useState([])
   const [loading, setLoading] = useState(false)
+  const [deviceGroups, setDeviceGroups] = useState([])
+  const [name, setName] = useState(null)
+  const [idDoor, setIdDoor] = useState(null)
+  const [regions, setRegions] = useState([])
+  const [selectedRegion, setSelectedRegion] = useState(null)
+  const [parentId, setParentId] = useState(null)
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
+  const parentIdToFilter = 'fa7f0b8b-56a7-44c7-96d6-997e7fc55304'
+  const postParentId = '3cf287c3-503a-4c49-8d1c-4c60710561f5'
 
   const directionOptions = [
     { label: 'Chiều vào', value: 'IN' },
@@ -50,33 +61,32 @@ const InforAll = ({ idInfor }) => {
   const fetchDataList1 = async () => {
     if (!idInfor) return
 
-    // Check if idInfor is available before making the API call
-
     setLoading(true)
 
     try {
       const config = {
         headers: {
           Authorization: `Bearer ${token}`
-        },
-        params: {
-          keyword: '',
-          page: 1,
-          limit: 25
         }
       }
 
-      const response = await axios.get(
-        `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices?deviceGroupId=${idInfor}`,
-        config
-      )
-      console.log(response.data.results, 'data')
-      setDevice(response.data.results[0])
+      const response = await axios.get(`https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices?${idInfor}`, config)
+      const deviceData = response.data.results[0]
+      setDevice(deviceData)
 
-      // Process the data here, e.g., setDevice(response.data)
+      // Fetch regions and set Autocomplete value if doorName matches any region name
+      await fetchRegions() // Ensure fetchRegions updates regions before proceeding
+      setRegions(currentRegions => {
+        const matchingRegion = currentRegions.find(region => region.name === deviceData.doorName)
+        if (matchingRegion) {
+          setSelectedRegion(matchingRegion)
+        }
+
+        return currentRegions
+      })
     } catch (error) {
       console.error('Error fetching data:', error)
-      toast.error(error)
+      toast.error(error.message)
     } finally {
       setLoading(false)
     }
@@ -88,7 +98,242 @@ const InforAll = ({ idInfor }) => {
     }
   }, [idInfor]) // Add idInfor as a dependency
 
-  console.log(idInfor, 'infor')
+  const fetchDeviceGroups = async () => {
+    setLoading(true)
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const parentResponse = await axios.get(
+        'https://dev-ivi.basesystem.one/vf/ac-adapters/v1/device-groups/children-lv1',
+        config
+      )
+      const parentGroups = parentResponse.data || [] // Ensure it's an array
+
+      // Fetch child groups for each parent
+      const childGroupsPromises = parentGroups.map(async parentGroup => {
+        const childResponse = await axios.get(
+          `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/device-groups/children-lv1?parentId=${parentGroup.id}`,
+          config
+        )
+
+        const childGroups = childResponse.data || [] // Ensure it's an array
+
+        return childGroups.map(child => ({
+          ...child,
+          parentName: parentGroup.name, // Include parent name for better distinction
+          parentId: parentGroup.id // Include parent id for filtering
+        }))
+      })
+
+      const childGroupsArrays = await Promise.all(childGroupsPromises)
+      const allGroups = parentGroups.concat(childGroupsArrays.flat())
+      setDeviceGroups(allGroups)
+    } catch (error) {
+      console.error('Error fetching device groups:', error)
+      toast.error(error.message || 'Error fetching device groups')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchDeviceGroups()
+  }, [])
+
+  const handleUpdateDevice = async () => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+      setLoading(true)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const params = {
+        name: device.name,
+        deviceGroupId: device.deviceGroupId,
+        serialNumber: device.serialNumber,
+        deviceType: device.deviceType,
+        firmware: device.firmware,
+        model: device.model,
+        direction: device.direction,
+        description: device.description,
+        doorId: idDoor,
+        doorName: name
+      }
+
+      const response = await axios.put(
+        `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices/${idInfor}`,
+        params,
+        config
+      )
+
+      setLoading(false)
+      Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
+
+      // Fetch regions and set Autocomplete value if doorName matches any region name
+      await fetchRegions() // Ensure fetchRegions updates regions before proceeding
+      setRegions(currentRegions => {
+        const matchingRegion = currentRegions.find(region => region.name === name)
+        if (matchingRegion) {
+          setSelectedRegion(matchingRegion)
+        }
+
+        return currentRegions
+      })
+    } catch (error) {
+      console.error('Error updating user details:', error)
+      setLoading(false)
+
+      Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi cập nhật dữ liệu.', 'error')
+    }
+  }
+
+  const handleInputChange = (field, value) => {
+    setDevice(prevDevice => ({
+      ...prevDevice,
+      [field]: value
+    }))
+  }
+
+  const fetchRegions = async () => {
+    setLoading(true)
+    try {
+      const response = await axios.get('https://sbs.basesystem.one/ivis/infrares/api/v0/regions', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      const data = response.data
+
+      const parentRegion = data.find(region => region.id === parentIdToFilter)
+
+      if (parentRegion) {
+        const childResponse = await axios.get(
+          `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentIdToFilter}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        )
+        const childData = childResponse.data
+
+        const combinedData = [
+          {
+            id: parentRegion.id,
+            name: parentRegion.name
+          },
+          ...childData.map(child => ({
+            id: child.id,
+            name: child.name
+          }))
+        ]
+
+        setRegions(combinedData)
+      }
+    } catch (error) {
+      console.error('Error fetching regions:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchRegions()
+  }, [])
+
+  const handleSelection = async (event, newValue) => {
+    if (newValue) {
+      const { id, name } = newValue
+
+      try {
+        setLoading(true)
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+
+        const data = {
+          description: 'string',
+          name: name,
+          parentId: postParentId
+        }
+
+        let response
+        try {
+          response = await axios.post(
+            'https://dev-ivi.basesystem.one/smc/access-control/api/v0/door-groups',
+            data,
+            config
+          )
+
+          // Use the id from the successful creation
+          const doorGroupId = response.data.id
+
+          const doorData = {
+            description: 'string',
+            doorGroupId: doorGroupId,
+            name: name
+          }
+
+          // Post to create a new door
+          await axios.post('https://dev-ivi.basesystem.one/smc/access-control/api/v0/doors', doorData, config)
+        } catch (createError) {
+          if (createError.response && createError.response.status === 400) {
+            const searchResponse = await axios.get(
+              'https://dev-ivi.basesystem.one/smc/access-control/api/v0/door-groups',
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`
+                }
+              }
+            )
+
+            const existingGroup = Object.values(searchResponse.data.rows).find(group => group.name === name)
+
+            if (existingGroup) {
+              const doorData = {
+                description: 'string',
+                doorGroupId: existingGroup.id,
+                name: name
+              }
+
+              // Post to create a new door
+              await axios.post('https://dev-ivi.basesystem.one/smc/access-control/api/v0/doors', doorData, config)
+            } else {
+              throw new Error('Không tìm thấy door-group phù hợp.')
+            }
+          } else {
+            throw createError
+          }
+        }
+      } catch (error) {
+        if (error.response && error.response.status === 400) {
+          const searchResponse = await axios.get('https://dev-ivi.basesystem.one/smc/access-control/api/v0/doors', {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
+          const existingDoor = Object.values(searchResponse.data.rows).find(group => group.name === name)
+          setName(existingDoor.name)
+          setIdDoor(existingDoor.id)
+        }
+        console.error('Error posting data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+  }
 
   return (
     <>
@@ -107,12 +352,14 @@ const InforAll = ({ idInfor }) => {
               <Grid container spacing={2}>
                 <Grid item>
                   <Box sx={{ float: 'right' }}>
-                    <Button aria-label='Bộ lọc'>Hủy</Button>
+                    <Button size='small' component={Link} href={`/device-management`}>
+                      Hủy
+                    </Button>
                   </Box>
                 </Grid>
                 <Grid item>
                   <Box sx={{ float: 'right', marginLeft: '2%' }}>
-                    <Button aria-label='Bộ lọc' variant='contained'>
+                    <Button aria-label='Bộ lọc' variant='contained' onClick={handleUpdateDevice}>
                       Lưu
                     </Button>
                   </Box>
@@ -130,22 +377,44 @@ const InforAll = ({ idInfor }) => {
             style={{ backgroundColor: 'white', width: '100%', padding: '10px', maxHeight: 600, paddingTop: '50px' }}
           >
             <Grid item xs={2.8}>
-              <CustomTextField label='Tên' value={device ? device.name : ''} fullWidth />
+              <CustomTextField
+                label='Tên'
+                value={device ? device.name : ''}
+                onChange={e => handleInputChange('name', e.target.value)}
+                fullWidth
+              />
             </Grid>
             <Grid item xs={0.1}></Grid>
             <Grid item xs={2.8}>
               <Autocomplete
-                getOptionLabel={option => option.label}
+                options={deviceGroups}
+                getOptionLabel={option => option.name}
+                value={
+                  deviceGroups.find(
+                    group => group.id === (device && device.deviceGroup ? device.deviceGroup.id : '')
+                  ) || null
+                }
+                onChange={(event, newValue) => {
+                  if (newValue) {
+                    handleInputChange('deviceGroupId', newValue.id)
+                    setDevice(prevDevice => ({
+                      ...prevDevice,
+                      deviceGroup: { id: newValue.id, name: newValue.name }
+                    }))
+                  }
+                }}
                 renderInput={params => <CustomTextField {...params} label='Nhóm thiết bị' fullWidth />}
-
-                // onFocus={handleComboboxFocus}
-
-                // loading={loading}
-              />{' '}
+                loading={loading}
+              />
             </Grid>
             <Grid item xs={0.1}></Grid>
             <Grid item xs={2.8}>
-              <CustomTextField label='ID thiết bị ' value={device ? device.serialNumber : ''} fullWidth />
+              <CustomTextField
+                label='ID thiết bị '
+                onChange={e => handleInputChange('serialNumber', e.target.value)}
+                value={device ? device.serialNumber : ''}
+                fullWidth
+              />
             </Grid>
             <Grid item xs={0.1}></Grid>
             <Grid item xs={2.8}>
@@ -155,19 +424,29 @@ const InforAll = ({ idInfor }) => {
                 value={deviceTypeOptions.find(option => option.value === (device ? device.deviceType : '')) || null}
                 onChange={(event, newValue) => {
                   if (newValue) {
-                    setDevice(prevDevice => ({ ...prevDevice, deviceType: newValue.value }))
+                    handleInputChange('deviceType', newValue.value)
                   }
                 }}
                 renderInput={params => <CustomTextField {...params} label='loại thiết bị' fullWidth />}
-              />{' '}
+              />
             </Grid>
             <Grid item xs={0.1}></Grid>
             <Grid item xs={2.8} style={{ marginTop: 20 }}>
-              <CustomTextField label='Nâng cấp phiên bản app' value={device ? device.firmware : ''} fullWidth />
+              <CustomTextField
+                label='Nâng cấp phiên bản app'
+                value={device ? device.firmware : ''}
+                onChange={e => handleInputChange('firmware', e.target.value)}
+                fullWidth
+              />
             </Grid>
             <Grid item xs={0.1}></Grid>
             <Grid item xs={2.8} style={{ marginTop: 20 }}>
-              <CustomTextField label='Tên sản phẩm ' value={device ? device.model : ''} fullWidth />
+              <CustomTextField
+                label='Tên sản phẩm '
+                value={device ? device.model : ''}
+                onChange={e => handleInputChange('model', e.target.value)}
+                fullWidth
+              />
             </Grid>
             <Grid item xs={0.1}></Grid>
             <Grid item xs={2.8} style={{ marginTop: 20 }}>
@@ -199,17 +478,37 @@ const InforAll = ({ idInfor }) => {
             <Grid item xs={0.1}></Grid>
             <Grid item xs={2.8} style={{ marginTop: 20 }}>
               <Autocomplete
-                getOptionLabel={option => option.label}
-                renderInput={params => <CustomTextField {...params} label='Vị trí' fullWidth />}
-
-                // onFocus={handleComboboxFocus}
-
-                // loading={loading}
-              />{' '}
+                options={regions}
+                getOptionLabel={option => option.name}
+                onChange={handleSelection}
+                value={selectedRegion} // Set the selected value here
+                renderInput={params => (
+                  <CustomTextField
+                    {...params}
+                    label='Vị trí'
+                    fullWidth
+                    InputProps={{
+                      ...params.InputProps,
+                      endAdornment: (
+                        <>
+                          {loading ? <CircularProgress color='inherit' size={20} /> : null}
+                          {params.InputProps.endAdornment}
+                        </>
+                      )
+                    }}
+                  />
+                )}
+                loading={loading}
+              />
             </Grid>
             <Grid item xs={0.1}></Grid>
             <Grid item xs={2.8} style={{ marginTop: 20 }}>
-              <CustomTextField value={device ? device.description : ''} label='Ghi chú' fullWidth />
+              <CustomTextField
+                label='Ghi chú'
+                value={device ? device.description : ''}
+                onChange={e => handleInputChange('description', e.target.value)}
+                fullWidth
+              />
             </Grid>
             <Grid item xs={0.1}></Grid>
             <p style={{ fontSize: '0.8rem' }}>Khôi phục cài đặt thiết bị</p>
