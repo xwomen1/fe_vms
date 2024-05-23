@@ -27,6 +27,8 @@ import Checkbox from '@mui/material/Checkbox'
 import Cloud from './popups/Cloud'
 import ConnectCamera from './popups/ConnectCamera'
 import VideoConnectCamera from './popups/VideoConnectCamera'
+import PopupScanOnvif from './popups/AddOnvif'
+import PopupScanDungIP from './popups/AddDungIP'
 import PopupScan from './popups/Add'
 import CircularProgress from '@mui/material/CircularProgress'
 import Edit from './popups/Edit'
@@ -61,9 +63,9 @@ const Add = ({ apiData }) => {
   const [selectedValue, setSelectedValue] = useState('')
   const [startHost, setStartHost] = useState('')
   const [endHost, setEndHost] = useState('')
-
+  const [openPopupResponseDungIP, setOpenPopupResponseDungIP] = useState(false)
   const [url, setUrl] = useState('')
-
+  const [reload, setReload] = useState(0)
   const [host, setHost] = useState('')
   const [userName, setUsername] = useState('')
   const [passWord, setPassWord] = useState('')
@@ -72,6 +74,9 @@ const Add = ({ apiData }) => {
   const [loading, setLoading] = useState(false)
   const [selectedNvrId, setSelectedNvrId] = useState(null)
   const [idBox, setIdBox] = useState(null)
+  const [popupMessage, setPopupMessage] = useState('')
+  const [isError, setIsError] = useState(false)
+  const [openPopupResponseOnvif, setOpenPopupResponseOnvif] = useState(false)
 
   const fetchNicTypes = async () => {
     try {
@@ -110,8 +115,10 @@ const Add = ({ apiData }) => {
   }
 
   const handleScan = async () => {
-    setOpenPopupResponse(true)
+    setOpenPopupResponseDungIP(true)
     setLoading(true)
+    setPopupMessage('') // Reset thông điệp khi bắt đầu scan
+    setIsError(false) // Reset trạng thái lỗi khi bắt đầu scan
     try {
       const payload = {
         url,
@@ -136,23 +143,21 @@ const Add = ({ apiData }) => {
 
       setResponse(response.data)
       setLoading(false)
-
-      toast.success('Thành công')
-
-      // setOpenPopupResponse(true)
+      setPopupMessage('Quét thành công')
+      setIsError(false) // Không phải lỗi
     } catch (error) {
       if (
         error.response &&
         error.response.data &&
         error.response.data.message === 'No response from the server device, timeout: scan_device_ip'
       ) {
-        Swal.fire('Thiết bị chưa phản hồi', '', 'error')
+        setPopupMessage('Thiết bị chưa phản hồi')
       } else {
-        Swal.fire('Đã xảy ra lỗi', error.message, 'error')
+        setPopupMessage(`${error.response.data.message}`)
       }
 
-      setOpenPopupResponse(false)
-
+      // // setOpenPopupResponseDungIP(false)
+      setIsError(true) // Đánh dấu là lỗi
       setLoading(false)
     }
   }
@@ -281,9 +286,59 @@ const Add = ({ apiData }) => {
     handleCloseMenu()
   }
 
+  const handleScanOnvif = async () => {
+    setOpenPopupResponseOnvif(true)
+    setLoading(true)
+    setPopupMessage('') // Reset thông điệp khi bắt đầu scan
+    setIsError(false) // Reset trạng thái lỗi khi bắt đầu scan
+    try {
+      const payload = {
+        idBox: selectNVR?.value,
+        userName,
+        passWord
+      }
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.post(
+        'https://sbs.basesystem.one/ivis/vms/api/v0/device/onvif/scandevice',
+        payload,
+        config
+      )
+
+      setResponse(response.data)
+      setLoading(false)
+
+      toast.success('Thành công')
+
+      setPopupMessage('Quét thành công')
+      setIsError(false) // Không phải lỗi
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message === 'No response from the server device, timeout: scan_device'
+      ) {
+        setPopupMessage('Thiết bị chưa phản hồi')
+      } else {
+        setPopupMessage(`${error.response.data.message}`)
+      }
+
+      setIsError(true) // Đánh dấu là lỗi
+      setLoading(false)
+    }
+  }
+
   const handleScanDaiIP = async () => {
     setOpenPopupResponse(true)
     setLoading(true)
+    setPopupMessage('') // Reset thông điệp khi bắt đầu scan
+    setIsError(false) // Reset trạng thái lỗi khi bắt đầu scan
     try {
       const payload = {
         idBox: selectNVR?.value,
@@ -313,20 +368,20 @@ const Add = ({ apiData }) => {
 
       toast.success('Thành công')
 
-      // setOpenPopupResponse(true)
+      setPopupMessage('Quét thành công')
+      setIsError(false) // Không phải lỗi
     } catch (error) {
       if (
         error.response &&
         error.response.data &&
         error.response.data.message === 'No response from the server device, timeout: scan_device_ip'
       ) {
-        Swal.fire('Thiết bị chưa phản hồi', '', 'error')
+        setPopupMessage('Thiết bị chưa phản hồi')
       } else {
-        Swal.fire('Đã xảy ra lỗi', error.message, 'error')
+        setPopupMessage(`${error.response.data.message}`)
       }
 
-      setOpenPopupResponse(false)
-
+      setIsError(true) // Đánh dấu là lỗi
       setLoading(false)
     }
   }
@@ -418,7 +473,7 @@ const Add = ({ apiData }) => {
       }
     }
     fetchFilteredOrAllUsers()
-  }, [page, pageSize, total, value])
+  }, [page, pageSize, total, value, reload])
 
   return (
     <Grid container spacing={6.5}>
@@ -434,7 +489,7 @@ const Add = ({ apiData }) => {
                   <FormControlLabel value='daiIp' control={<Radio />} label='Dải IP' />
                 </Grid>
                 <Grid item>
-                  <FormControlLabel value='onvif' control={<Radio />} label='ON VIF' />
+                  <FormControlLabel value='onvif' control={<Radio />} label='Onvif' />
                 </Grid>
                 <Grid item>
                   <FormControlLabel value='khac' control={<Radio />} label='Khác' />
@@ -499,18 +554,20 @@ const Add = ({ apiData }) => {
                 {loading && <CircularProgress />}
               </Grid>
             )}
-            {openPopupResponse && (
+            {openPopupResponseDungIP && (
               <>
-                <PopupScan
-                  open={openPopupResponse}
+                <PopupScanDungIP
+                  open={openPopupResponseDungIP}
                   url={url}
                   port={host}
                   setReload={() => setReload(reload + 1)}
                   userName={userName}
+                  isError={isError}
+                  popupMessage={popupMessage}
                   passWord={passWord}
                   response={response}
-                  loading={loading}
-                  onClose={() => setOpenPopupResponse(false)}
+                  loadings={loading}
+                  onClose={() => setOpenPopupResponseDungIP(false)}
                 />{' '}
               </>
             )}
@@ -611,6 +668,21 @@ const Add = ({ apiData }) => {
                 </Grid>
               </Grid>
             )}
+            {openPopupResponse && (
+              <>
+                <PopupScan
+                  open={openPopupResponse}
+                  userName={userName}
+                  setReload={() => setReload(reload + 1)}
+                  isError={isError}
+                  popupMessage={popupMessage}
+                  passWord={passWord}
+                  response={response}
+                  loadingDaiIP={loading}
+                  onClose={() => setOpenPopupResponse(false)}
+                />{' '}
+              </>
+            )}
             {selectedValue === 'onvif' && (
               <Grid
                 container
@@ -633,19 +705,47 @@ const Add = ({ apiData }) => {
                 <Grid item xs={0.1}></Grid>
 
                 <Grid item xs={2}>
-                  <CustomTextField label='Đăng nhập' fullWidth />
+                  <CustomTextField
+                    value={userName}
+                    onChange={e => setUsername(e.target.value)}
+                    label='Đăng nhập'
+                    fullWidth
+                  />
                 </Grid>
                 <Grid item xs={0.4}></Grid>
                 <Grid item xs={2}>
-                  <CustomTextField label='Mật khẩu' type='password' fullWidth />
+                  <CustomTextField
+                    value={passWord}
+                    onChange={e => setPassWord(e.target.value)}
+                    label='Mật khẩu'
+                    type='password'
+                    fullWidth
+                  />
                 </Grid>
                 <Grid item xs={0.2}></Grid>
 
                 <Grid item xs={4} style={{ marginTop: '2%' }}>
                   <Button>Cancel</Button>
-                  <Button variant='contained'>Quét</Button>
+                  <Button variant='contained' onClick={handleScanOnvif}>
+                    Quét
+                  </Button>
                 </Grid>
               </Grid>
+            )}
+            {openPopupResponseOnvif && (
+              <>
+                <PopupScanOnvif
+                  open={openPopupResponseOnvif}
+                  userName={userName}
+                  setReload={() => setReload(reload + 1)}
+                  passWord={passWord}
+                  isError={isError}
+                  popupMessage={popupMessage}
+                  response={response}
+                  loadingOnvif={loading}
+                  onClose={() => setOpenPopupResponseOnvif(false)}
+                />{' '}
+              </>
             )}
             {selectedValue === 'khac' && (
               <Grid
@@ -731,8 +831,7 @@ const Add = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>
                         <Checkbox
                           checked={selectedIds.includes(assetType.id)}
-
-                          // onChange={() => handleCheckboxChange(assetType.id)}
+                          onChange={() => handleCheckboxChange(assetType.id)}
                         />
                       </TableCell>
                       <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
@@ -741,7 +840,23 @@ const Add = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{assetType.ipAddress}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.macAddress}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.location}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.status.name}</TableCell>
+                      <TableCell sx={{ padding: '16px', textAlign: 'center' }}>
+                        {assetType.status && assetType.status.name ? (
+                          <div
+                            style={{
+                              backgroundColor: assetType.status.name === 'Hoạt động' ? 'lightgreen' : 'orange',
+                              borderRadius: '10px',
+                              padding: '5px 10px',
+                              width: '70%',
+                              display: 'inline-block'
+                            }}
+                          >
+                            {assetType.status.name}
+                          </div>
+                        ) : (
+                          assetType.status.name
+                        )}
+                      </TableCell>
 
                       <TableCell sx={{ padding: '16px' }}>
                         <IconButton size='small' onClick={() => handleAddPClick(assetType.id)}>

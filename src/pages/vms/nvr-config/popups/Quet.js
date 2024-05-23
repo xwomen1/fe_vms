@@ -30,6 +30,7 @@ const AddCamera = ({ nvr, onClose }) => {
   const { id } = router.query
   const [camera, setCamera] = useState([])
   const [nvrCameraList, setNVRCameraList] = useState([])
+  const [notification, setNotification] = useState({ message: '', type: '' })
 
   console.log(nvr, 'nvr')
 
@@ -73,7 +74,7 @@ const AddCamera = ({ nvr, onClose }) => {
 
     fetchGroupData()
     fetchGroupDataNVR()
-  }, [nvr])
+  }, [nvr, notification])
 
   const handleDelete = async id => {
     setLoading(true)
@@ -93,12 +94,11 @@ const AddCamera = ({ nvr, onClose }) => {
 
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${nvr}`, { cameras: updatedCameras }, config)
 
-      Swal.fire('Xóa camera thành công', '', 'success')
+      setNotification({ message: 'Xóa camera thành công', type: 'success' })
     } catch (error) {
-      Swal.fire('Đã xảy ra lỗi', error.message, 'error')
+      setNotification({ message: `Đã xảy ra lỗi: ${error.message}`, type: 'error' })
       console.error('Error deleting camera:', error)
     } finally {
-      onClose()
       setLoading(false)
     }
   }
@@ -124,13 +124,11 @@ const AddCamera = ({ nvr, onClose }) => {
         ]
       }
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/camera/${nvr}`, params, config)
-      Swal.fire('Thêm thành công', '', 'success')
+      setNotification({ message: 'Thêm thành công', type: 'success' })
     } catch (error) {
-      Swal.fire('Thiết bị chưa phản hồi', error.message, 'error')
+      setNotification({ message: `Thiết bị chưa phản hồi: ${error.message}`, type: 'error' })
       console.error('Error adding member to group:', error)
-      onClose()
     } finally {
-      onClose()
       setLoading(false)
     }
   }
@@ -197,6 +195,11 @@ const AddCamera = ({ nvr, onClose }) => {
                 )}
               </TableBody>
             </Table>
+            {notification.message && (
+              <div style={{ color: notification.type === 'success' ? 'red' : '#ff9f43', textAlign: 'center' }}>
+                {notification.message}
+              </div>
+            )}
           </Grid>
         </Card>
       </Grid>

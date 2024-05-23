@@ -416,12 +416,20 @@ const UserList = ({ apiData }) => {
           }
         }
         const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/nvrs', config)
-        setStatus1(response.data.isOfflineSetting)
-        setNvr(response.data[0].id)
-        setAssetType(response.data)
 
-        setTotal(response.data.page)
-        console.log(response.data[0].id)
+        if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+          setStatus1(response.data.isOfflineSetting || false)
+          setNvr(response.data[0].id)
+          setAssetType(response.data)
+          setTotal(response.data.page || 0)
+          console.log(response.data[0].id)
+        } else {
+          setStatus1(false)
+          setNvr(null)
+          setAssetType([])
+          setTotal(0)
+          console.warn('Response data is empty or invalid')
+        }
       } catch (error) {
         console.error('Error fetching users:', error)
       }
@@ -494,7 +502,7 @@ const UserList = ({ apiData }) => {
                       <FormControlLabel value='daiIp' control={<Radio />} label='Dải IP' />
                     </Grid>
                     <Grid item>
-                      <FormControlLabel value='onvif' control={<Radio />} label='ON VIF' />
+                      <FormControlLabel value='onvif' control={<Radio />} label='Onvif' />
                     </Grid>
                   </Grid>
                 </RadioGroup>
