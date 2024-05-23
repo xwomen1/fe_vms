@@ -251,12 +251,11 @@ const UserList = ({ apiData }) => {
           <TableHeader value={value} handleFilter={handleFilter} toggle={toggleAddUserDrawer} />
           {console.log(userData)}
           <Grid container spacing={2}>
-            {/* <Grid item xs={0.1}></Grid> */}
-            <Grid item xs={2}>
+            <Grid item xs={2} component={Paper}>
               <div>
                 <CustomTextField
                   value={valueGroup}
-                  sx={{ mr: 4 }}
+                  sx={{ ml: 3, mr: 4 }} 
                   placeholder='Search Group'
                   onChange={e => handleFilterGroup(e.target.value)}
                 />
@@ -269,9 +268,9 @@ const UserList = ({ apiData }) => {
                 </TreeView>
               </div>
             </Grid>
-            <Grid item xs={10}>
+            <Grid item xs={0.1}></Grid>
+            <Grid item xs={9.9} component={Paper}>
               <div></div>
-              <Paper elevation={3}>
               <Table>
                 <TableHead>
                   <TableRow>
@@ -312,7 +311,6 @@ const UserList = ({ apiData }) => {
                   ))}
                 </TableBody>
               </Table>
-              </Paper>
 
               <br></br>
               <Grid container spacing={2} style={{ padding: 10 }}>
