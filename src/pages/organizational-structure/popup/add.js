@@ -5,18 +5,17 @@ import authConfig from 'src/configs/auth'
 import Swal from 'sweetalert2'
 import { router } from 'websocket'
 import { useRouter } from 'next/router'
-import CustomTextField from 'src/@core/components/mui/text-field';
+import CustomTextField from 'src/@core/components/mui/text-field'
 
 const InfraPopupAdd = ({ open, onClose, onSuccess }) => {
-  const [adults, setAdults] = useState([]);
-  const [name, setName] = useState('');
-  const [note, setNote] = useState('');
-  const [type, setType] = useState('');
-
+  const [adults, setAdults] = useState([])
+  const [name, setName] = useState('')
+  const [note, setNote] = useState('')
+  const [type, setType] = useState('')
 
   const fetchDataAdults = async () => {
     try {
-      const token = localStorage.getItem(authConfig.storageTokenKeyName);
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
       const config = {
         headers: {
@@ -27,57 +26,56 @@ const InfraPopupAdd = ({ open, onClose, onSuccess }) => {
           sort: '+created_at',
           page: 1
         }
-      };
-      const response = await axios.get('https://sbs.basesystem.one/ivis/infrares/api/v0/regions', config);
+      }
+      const response = await axios.get('https://sbs.basesystem.one/ivis/infrares/api/v0/regions', config)
 
-      setAdults(response.data.length > 0 ? response.data[0].id : '');
-      
-return response.data;
+      setAdults(response.data.length > 0 ? response.data[0].id : '')
+
+      return response.data
     } catch (error) {
-      console.error('Error fetching adult data:', error);
-      
-return [];
+      console.error('Error fetching adult data:', error)
+
+      return []
     }
-  };
-  
+  }
 
   const handleAdd = async () => {
     try {
-      const token = localStorage.getItem(authConfig.storageTokenKeyName);
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
-      };
+      }
 
       const data = {
         detail: note,
         isParent: true,
         name: name,
-        parentID: adults, 
-        type: type
-      };
-      const response = await axios.post('https://sbs.basesystem.one/ivis/infrares/api/v0/regions', data, config);
+        parentID: adults,
+        code: type
+      }
+      const response = await axios.post('https://sbs.basesystem.one/ivis/infrares/api/v0/regions', data, config)
       console.log(data)
-      Swal.fire('Thành công', 'Thêm cơ cấu tổ chứ thành công!', 'success');
+      Swal.fire('Thành công', 'Thêm cơ cấu tổ chứ thành công!', 'success')
 
-      onClose();
+      onClose()
 
       if (onSuccess) {
-        onSuccess();
+        onSuccess()
       }
     } catch (error) {
-      console.error('Error adding infra:', error);
+      console.error('Error adding infra:', error)
 
-      Swal.fire('Error', 'Failed to add infra!', 'error');
+      Swal.fire('Error', 'Failed to add infra!', 'error')
     }
-  };
+  }
 
   useEffect(() => {
-    fetchDataAdults();
-  }, []);
+    fetchDataAdults()
+  }, [])
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
@@ -89,7 +87,7 @@ return [];
           fullWidth
           style={{ marginBottom: '16px' }}
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={e => setName(e.target.value)}
         />
         <CustomTextField
           label='Mã định danh'
@@ -97,7 +95,7 @@ return [];
           fullWidth
           style={{ marginBottom: '16px' }}
           value={type}
-          onChange={(e) => setType(e.target.value)}
+          onChange={e => setType(e.target.value)}
         />
         <CustomTextField
           label='Ghi chú'
@@ -105,7 +103,7 @@ return [];
           fullWidth
           style={{ marginBottom: '16px' }}
           value={note}
-          onChange={(e) => setNote(e.target.value)}
+          onChange={e => setNote(e.target.value)}
         />
       </DialogContent>
       <DialogActions style={{ display: 'flex' }}>
@@ -116,4 +114,4 @@ return [];
   )
 }
 
-export default InfraPopupAdd;
+export default InfraPopupAdd

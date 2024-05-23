@@ -61,8 +61,8 @@ const UserDetails = () => {
             <TabList onChange={handleChange} aria-label='customized tabs example'>
               <Tab value='1' label='Thông tin cá nhân' />
               <Tab value='2' label='Thông tin định danh' />
-              {/* <Tab value='3' label='Kiểm soát vào ra' />
-              <Tab value='4' label='Thông tin gửi xe' /> */}
+              <Tab value='3' label='Kiểm soát vào ra' />
+              {/* <Tab value='4' label='Thông tin gửi xe' /> */}
             </TabList>
           </Grid>
           <TabPanel value='1'>
@@ -71,10 +71,10 @@ const UserDetails = () => {
           <TabPanel value='2'>
             <Identity />
           </TabPanel>
-          {/* <TabPanel value='3'>
+          <TabPanel value='3'>
             <AccessControl />
           </TabPanel>
-          <TabPanel value='4'>
+          {/* <TabPanel value='4'>
             <Parking />
           </TabPanel> */}
         </TabContext>

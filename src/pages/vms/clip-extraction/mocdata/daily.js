@@ -359,8 +359,8 @@ const Daily = ({ dateType, dataDailyProps, callbackOfDaily, disabled, minuteType
 
         // </div>
 
-        <TableContainer component={Paper}>
-            <Table>
+        <TableContainer component={Paper} style={{ maxHeight: 500 }}>
+            <Table stickyHeader>
                 <TableHead>
                     <TableRow>
                         <TableCell>Date</TableCell>

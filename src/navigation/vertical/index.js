@@ -12,7 +12,11 @@ const navigation = () => {
       children: [
         {
           title: 'Sự kiện',
-          path: '/event-management'
+          path: '/access-control/event-management'
+        },
+        {
+          title: 'Thiết bị',
+          path: '/device-management'
         },
         {
           path: '/pages/access-rights/list',
@@ -22,7 +26,7 @@ const navigation = () => {
 
         {
           title: 'Chấm công',
-          path: '/timekeeping'
+          path: '/access-control/time-keeping'
         },
         {
           path: '/pages/report-month/list',
@@ -253,7 +257,7 @@ const navigation = () => {
       children: [
         {
           title: 'Quản lý thiết bị',
-          path: '/device-management'
+          path: '/device-management/device'
         },
         {
           title: 'Cảnh báo hệ thống',

@@ -1,6 +1,9 @@
-import { Button, ButtonGroup, Card, CardContent, CardHeader, Grid, Typography } from "@mui/material";
+import { Grid } from "@mui/material";
 import { useState } from "react";
-import ApexBarChart from "src/views/charts/apex-charts/ApexBarChart";
+import CPUChart from "../charts/CPUChart";
+import GPUChart from "../charts/GPUChart";
+import MemoryChart from "../charts/MemoryChart";
+import ModelAIChart from "../charts/ModelAIChart";
 
 const EventOverview = () => {
     const [, setLoading] = useState(false);
@@ -24,9 +27,22 @@ const EventOverview = () => {
 
     return (
         <>
-            <Grid container spacing={0}>
-                <Grid item xs={12} >
-                    <ApexBarChart />
+            <Grid container spacing={2}>
+                <Grid item xs={6} >
+                    <ModelAIChart />
+                </Grid>
+                <Grid item xs={6} >
+                    <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                            <CPUChart />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <GPUChart />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <MemoryChart />
+                        </Grid>
+                    </Grid>
                 </Grid>
             </Grid>
         </>

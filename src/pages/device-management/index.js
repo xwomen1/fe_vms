@@ -92,7 +92,7 @@ const AccessControlDevice = () => {
   const handleNodeSelect = async (event, nodeId) => {
     if (nodeId) {
       try {
-        const url = `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices?deviceGroupId=${nodeId}`
+        const url = `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices/deviceGroupId=${nodeId}`
 
         // Gọi API
         const response = await axios.get(url, config)
@@ -224,7 +224,7 @@ const AccessControlDevice = () => {
                         <Button
                           size='small'
                           component={Link}
-                          href={`/device-management/Update/${device.parentId}`}
+                          href={`/device-management/Update/${device.id}`}
                           sx={{ color: 'blue', right: '10px' }}
                         >
                           {device.name}

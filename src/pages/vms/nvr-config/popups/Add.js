@@ -10,24 +10,31 @@ import {
   TableHead,
   TableRow,
   IconButton,
-  Checkbox
+  CircularProgress
 } from '@mui/material'
 import authConfig from 'src/configs/auth'
 import axios from 'axios'
-
 import Grid from '@mui/system/Unstable_Grid/Grid'
 import TableCell from '@mui/material/TableCell'
 import Icon from 'src/@core/components/icon'
 import TableBody from '@mui/material/TableBody'
-import Swal from 'sweetalert2'
-import CircularProgress from '@mui/material/CircularProgress'
 
-const Add = ({ open, response, onClose, url, port, userName, passWord, loadings, setReload }) => {
+const Add = ({
+  open,
+  response,
+  onClose,
+  url,
+  port,
+  userName,
+  passWord,
+  loadingDaiIP,
+  setReload,
+  isError,
+  popupMessage
+}) => {
   const [selectedIds, setSelectedIds] = useState([])
   const [loading, setLoading] = useState(false)
-  console.log(response, 'res')
-
-  console.log('url' + url, ' port' + port, 'username' + userName, 'password' + passWord)
+  const [message, setMessage] = useState({ text: popupMessage, type: 'general', error: isError })
 
   const fetchGroupDataNVR = async () => {
     try {
@@ -53,10 +60,15 @@ const Add = ({ open, response, onClose, url, port, userName, passWord, loadings,
     fetchGroupDataNVR()
   }, [])
 
+  useEffect(() => {
+    setMessage({ text: popupMessage, type: 'general', error: isError })
+  }, [popupMessage, isError])
+
   const handleCreateNvr = async nvr => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
       setLoading(true)
+      setMessage({ text: '', type: '', error: false })
 
       const config = {
         headers: {
@@ -64,42 +76,36 @@ const Add = ({ open, response, onClose, url, port, userName, passWord, loadings,
         }
       }
 
-      const response = await axios.post(
+      await axios.post(
         `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs`,
         {
           location: nvr.location,
           name: nvr.name,
           ipAddress: nvr.url,
           macAddress: nvr.macAddress,
-
-          // type: nvr.type,
-
-          // [Todo][Hue][07May24]: check type bet scan result and create
-          // status: nvr.status,
           passWord: passWord,
           userName: userName,
           httpPort: nvr.host
         },
         config
       )
+
+      setMessage({ text: 'Thêm thành công', type: 'create', error: false })
       setReload()
-      setLoading(false)
-      onClose()
-
-      Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
+      fetchGroupDataNVR()
     } catch (error) {
-      console.error('Error updating user details:', error)
+      console.error('Error creating NVR:', error)
+      setMessage({ text: `${error.response.data.message}`, type: 'create', error: true })
+    } finally {
       setLoading(false)
-      onClose()
-
-      Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi cập nhật dữ liệu.', 'error')
     }
   }
 
-  const handleDelete = async id => {
-    setLoading(true)
+  const handleDeleteNvr = async id => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
+      setLoading(true)
+      setMessage({ text: '', type: '', error: false })
 
       const config = {
         headers: {
@@ -109,22 +115,23 @@ const Add = ({ open, response, onClose, url, port, userName, passWord, loadings,
 
       await axios.delete(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${id}`, config)
 
-      Swal.fire('Xóa camera thành công', '', 'success')
+      setMessage({ text: 'Xóa thành công', type: 'delete', error: false })
       setReload()
+      fetchGroupDataNVR()
     } catch (error) {
-      Swal.fire('Đã xảy ra lỗi', error.message, 'error')
-      console.error('Error deleting camera:', error)
+      console.error('Error deleting NVR:', error)
+      setMessage({ text: `${error.response.data.message}`, type: 'delete', error: true })
     } finally {
-      onClose()
       setLoading(false)
     }
   }
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth='x1' style={{ maxWidth: '80%', margin: 'auto' }}>
-      <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Quét nvr</DialogTitle>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth='xl' style={{ maxWidth: '80%', margin: 'auto' }}>
+      <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Quét NVR</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} alignItems='center'>
+          {loadingDaiIP && <CircularProgress style={{ marginLeft: '50%' }} />}
           <Grid item xs={12}>
             <TableContainer>
               <Table>
@@ -140,10 +147,16 @@ const Add = ({ open, response, onClose, url, port, userName, passWord, loadings,
                     <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
                   </TableRow>
                 </TableHead>
+
                 <TableBody>
                   {response && response.length > 0 ? (
                     response.map((nvr, index) => {
-                      const foundNvr = selectedIds.find(item => item.macAddress === nvr.macAddress)
+                      if (nvr.type !== 'NVR') {
+                        return null // Ẩn dữ liệu không phải là 'NVR'
+                      }
+
+                      const foundNvr =
+                        selectedIds?.length > 0 ? selectedIds.find(item => item.macAddress === nvr.macAddress) : null
 
                       return (
                         <TableRow key={index}>
@@ -156,9 +169,7 @@ const Add = ({ open, response, onClose, url, port, userName, passWord, loadings,
                           <TableCell sx={{ padding: '16px' }}>{nvr.status}</TableCell>
                           <TableCell sx={{ padding: '16px' }}>
                             {foundNvr ? (
-                              <IconButton onClick={() => handleDelete(foundNvr.id)}>
-                                {' '}
-                                {/* Truyền id của nvr */}
+                              <IconButton onClick={() => handleDeleteNvr(foundNvr.id)}>
                                 <Icon icon='tabler:minus' />
                               </IconButton>
                             ) : (
@@ -173,17 +184,28 @@ const Add = ({ open, response, onClose, url, port, userName, passWord, loadings,
                     })
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={9}>Không có dữ liệu</TableCell>
+                      <TableCell colSpan={8}>Không có dữ liệu</TableCell>
                     </TableRow>
                   )}
                 </TableBody>
               </Table>
+              {message.type === 'general' && (
+                <div style={{ color: message.error ? 'red' : '#ff9f43', textAlign: 'center' }}>{message.text}</div>
+              )}
+              {message.type === 'create' && (
+                <div style={{ color: message.error ? 'red' : '#ff9f43', textAlign: 'center' }}>{message.text}</div>
+              )}
+              {message.type === 'delete' && (
+                <div style={{ color: message.error ? 'red' : '#ff9f43', textAlign: 'center' }}>{message.text}</div>
+              )}
             </TableContainer>
           </Grid>
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Hủy</Button>
+        <Button onClick={onClose} variant='contained'>
+          Hủy
+        </Button>
       </DialogActions>
     </Dialog>
   )

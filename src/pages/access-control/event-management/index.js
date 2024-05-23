@@ -8,10 +8,6 @@ import {
   Button,
   Card,
   CardHeader,
-  Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
   Grid,
   IconButton,
   Menu,
@@ -48,12 +44,35 @@ const EventList = () => {
   const [pageSize, setPageSize] = useState(25)
   const [loading, setLoading] = useState(false)
   const pageSizeOptions = [25, 50, 100]
-  const token = localStorage.getItem('authConfig.storageTokenKeyName')
+  const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
-  const formatDateTime = dateTimeString => {
-    const date = new Date(dateTimeString)
+  const formatDateTime = dateTime => {
+    const date = typeof dateTime === 'number' ? new Date(dateTime) : new Date(dateTime)
 
-    return format(date, 'HH:mm dd/MM/yyyy')
+    return format(date, 'HH:mm:ss dd/MM/yyyy')
+  }
+
+  const formatTime = dateTime => {
+    const date = typeof dateTime === 'number' ? new Date(dateTime) : new Date(dateTime)
+
+    return format(date, 'dd/MM/yyyy HH:mm:ss')
+  }
+
+  const formatDate = dateTime => {
+    const date = typeof dateTime === 'number' ? new Date(dateTime) : new Date(dateTime)
+
+    return format(date, 'dd/MM/yyyy')
+  }
+
+  const calculateTotalTime = (startTime, endTime) => {
+    const start = new Date(startTime)
+    const end = new Date(endTime)
+    const diff = end - start // milliseconds
+    const hours = Math.floor(diff / (1000 * 60 * 60))
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000)
+
+    return `${hours} giờ ${minutes} phút `
   }
 
   const handlePageChange = (event, newPage) => {
@@ -86,15 +105,18 @@ const EventList = () => {
           Authorization: `Bearer ${token}`
         },
         params: {
-          event_name: value,
+          keyword: value,
           page: page,
           limit: pageSize
         }
       }
 
-      const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/incidents/logs`, config)
-      setDevices(response.data)
-      setTotalPage(Math.ceil(response.count / pageSize))
+      const response = await axios.get(
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/event/user/door`,
+        config
+      )
+      setDevices(response.data.data)
+      setTotalPage(Math.ceil(response.data.count / pageSize))
     } catch (error) {
       console.error('Error fetching data:', error)
       toast.error('Error fetching data')
@@ -108,18 +130,19 @@ const EventList = () => {
   }, [fetchDataList])
 
   const columns = [
-    { id: 1, flex: 0.25, minWidth: 50, align: 'left', field: 'eventName', label: 'Tên sự cố' },
-    { id: 2, flex: 0.15, minWidth: 150, align: 'left', field: 'severity', label: 'Mức độ' },
-    { id: 3, flex: 0.15, minWidth: 100, align: 'left', field: 'createdAt', label: 'Thời gian' },
-    { id: 4, flex: 0.15, minWidth: 100, align: 'left', field: 'location', label: 'Vị trí' },
-    { id: 5, flex: 0.25, minWidth: 50, align: 'left', field: 'status', label: 'Trạng thái' },
-    { id: 6, flex: 0.25, minWidth: 50, align: 'left', field: 'source', label: 'Nguồn' }
+    { id: 1, flex: 0.25, minWidth: 50, align: 'left', field: 'userName', label: 'Họ và tên' },
+    { id: 2, flex: 0.15, minWidth: 150, align: 'left', field: 'accessCode', label: 'Mã nhân viên' },
+    { id: 3, flex: 0.15, minWidth: 100, align: 'left', field: 'doorIn', label: 'Cửa vào' },
+    { id: 4, flex: 0.15, minWidth: 100, align: 'left', field: 'doorOut', label: 'Cửa ra' },
+    { id: 6, flex: 0.25, minWidth: 50, align: 'left', field: 'timeMin', label: 'Thời gian vào' },
+    { id: 7, flex: 0.25, minWidth: 50, align: 'left', field: 'timeMax', label: 'Thời gian ra' },
+    { id: 8, flex: 0.25, minWidth: 50, align: 'left', field: 'totalTime', label: 'Tổng thời gian' }
   ]
 
   return (
     <Card>
       <CardHeader
-        title='Danh sách sự cố'
+        title='Danh sách sự kiện'
         titleTypographyProps={{ sx: { mb: [2, 0] } }}
         sx={{
           py: 4,
@@ -130,7 +153,7 @@ const EventList = () => {
         action={
           <Grid container spacing={2}>
             <Grid item>
-              <Box sx={{ float: 'right' }}>
+              {/* <Box sx={{ float: 'right' }}>
                 <Button
                   aria-label='Bộ lọc'
                   onClick={() => {
@@ -140,7 +163,7 @@ const EventList = () => {
                 >
                   <Icon icon='tabler:filter' />
                 </Button>
-              </Box>
+              </Box> */}
             </Grid>
             <Grid item>
               <CustomTextField
@@ -154,7 +177,7 @@ const EventList = () => {
                     </Box>
                   ),
                   endAdornment: (
-                    <IconButton size='small' title='Clear' aria-label='Clear' onClick={() => setKeyword('')}>
+                    <IconButton size='small' title='Clear' aria-label='Clear' onClick={() => setValue('')}>
                       <Icon fontSize='1.25rem' icon='tabler:x' />
                     </IconButton>
                   )
@@ -174,7 +197,7 @@ const EventList = () => {
         }
       />
       <Grid container spacing={0}>
-        <TableContainer component={Paper} sx={{ maxHeight: 600 }}>
+        <TableContainer component={Paper} sx={{ minHeight: 600, minWidth: 500 }}>
           <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
             <TableHead>
               <TableRow>
@@ -184,7 +207,6 @@ const EventList = () => {
                     {column.label}
                   </TableCell>
                 ))}
-                <TableCell style={{ textAlign: 'center' }}>Thao tác</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -197,26 +219,16 @@ const EventList = () => {
 
                       return (
                         <TableCell key={column.id} align={column.align}>
-                          {column.field === 'createdAt' ? formatDateTime(value) : value}
+                          {column.field === 'timeMin' || column.field === 'timeMax'
+                            ? formatTime(value)
+                            : column.field === 'date'
+                            ? formatDate(row.timeMin)
+                            : column.field === 'totalTime'
+                            ? calculateTotalTime(row.timeMin, row.timeMax)
+                            : value}
                         </TableCell>
                       )
                     })}
-                    <TableCell>
-                      <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center' }}>
-                        {row.eventName === 'Đã kết nối' ? (
-                          <IconButton size='small' sx={{ color: 'text.secondary', visibility: 'hidden' }}>
-                            <Icon icon='tabler:check' />
-                          </IconButton>
-                        ) : (
-                          <IconButton size='small' sx={{ color: 'text.secondary' }}>
-                            <Icon icon='tabler:check' />
-                          </IconButton>
-                        )}
-                        <IconButton size='small' sx={{ color: 'text.secondary' }}>
-                          <Icon icon='tabler:trash' />
-                        </IconButton>
-                      </Grid>
-                    </TableCell>
                   </TableRow>
                 ))
               ) : (

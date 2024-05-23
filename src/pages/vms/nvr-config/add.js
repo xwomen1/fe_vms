@@ -13,7 +13,7 @@ import authConfig from 'src/configs/auth'
 import Table from '@mui/material/Table'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
-import { Autocomplete, Button, CircularProgress, IconButton } from '@mui/material'
+import { Autocomplete, Button, CircularProgress, IconButton, Paper } from '@mui/material'
 import Swal from 'sweetalert2'
 import { fetchData } from 'src/store/apps/user'
 import { useRouter } from 'next/router'
@@ -23,6 +23,8 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 import Link from 'next/link'
 import ChangePassWords from './popups/ChangePassword'
 import Passwords from './popups/PassWord'
+import PopupScanDungIP from './popups/AddDungIP'
+import PopupScanOnvif from './popups/AddOnvif'
 import PopupScan from './popups/Add'
 import { Radio, RadioGroup, FormControlLabel } from '@mui/material'
 
@@ -69,7 +71,7 @@ const UserList = ({ apiData }) => {
 
   const [loading, setLoading] = useState(false)
   const [idNvr, setIdnvr] = useState(null)
-
+  const [reload, setReload] = useState(0)
   const [url, setUrl] = useState('')
   const [nvrs, setNVR] = useState([])
   const [host, setHost] = useState('')
@@ -82,16 +84,21 @@ const UserList = ({ apiData }) => {
   const [startURL, setStartUrl] = useState('')
   const defaultValue = ''
   const [selectNVR, setSelectedNVR] = useState('')
-
   const [openPopupResponse, setOpenPopupResponse] = useState(false)
+  const [openPopupResponseDungIP, setOpenPopupResponseDungIP] = useState(false)
+  const [openPopupResponseOnvif, setOpenPopupResponseOnvif] = useState(false)
+  const [popupMessage, setPopupMessage] = useState('')
+  const [isError, setIsError] = useState(false)
 
   const handlePageChange = newPage => {
     setPage(newPage)
   }
 
   const handleScan = async () => {
-    setOpenPopupResponse(true)
+    setOpenPopupResponseDungIP(true)
     setLoading(true)
+    setPopupMessage('') // Reset thông điệp khi bắt đầu scan
+    setIsError(false) // Reset trạng thái lỗi khi bắt đầu scan
     try {
       const payload = {
         url,
@@ -116,23 +123,21 @@ const UserList = ({ apiData }) => {
 
       setResponse(response.data)
       setLoading(false)
-
-      toast.success('Thành công')
-
-      // setOpenPopupResponse(true)
+      setPopupMessage('Quét thành công')
+      setIsError(false) // Không phải lỗi
     } catch (error) {
       if (
         error.response &&
         error.response.data &&
         error.response.data.message === 'No response from the server device, timeout: scan_device_ip'
       ) {
-        Swal.fire('Thiết bị chưa phản hồi', '', 'error')
+        setPopupMessage('Thiết bị chưa phản hồi')
       } else {
-        Swal.fire('Đã xảy ra lỗi', error.message, 'error')
+        setPopupMessage(`${error.response.data.message}`)
       }
 
-      setOpenPopupResponse(false)
-
+      // // setOpenPopupResponseDungIP(false)
+      setIsError(true) // Đánh dấu là lỗi
       setLoading(false)
     }
   }
@@ -140,6 +145,8 @@ const UserList = ({ apiData }) => {
   const handleScanDaiIP = async () => {
     setOpenPopupResponse(true)
     setLoading(true)
+    setPopupMessage('') // Reset thông điệp khi bắt đầu scan
+    setIsError(false) // Reset trạng thái lỗi khi bắt đầu scan
     try {
       const payload = {
         idBox: selectNVR?.value,
@@ -169,27 +176,29 @@ const UserList = ({ apiData }) => {
 
       toast.success('Thành công')
 
-      // setOpenPopupResponse(true)
+      setPopupMessage('Quét thành công')
+      setIsError(false) // Không phải lỗi
     } catch (error) {
       if (
         error.response &&
         error.response.data &&
         error.response.data.message === 'No response from the server device, timeout: scan_device_ip'
       ) {
-        Swal.fire('Thiết bị chưa phản hồi', '', 'error')
+        setPopupMessage('Thiết bị chưa phản hồi')
       } else {
-        Swal.fire('Đã xảy ra lỗi', error.message, 'error')
+        setPopupMessage(`${error.response.data.message}`)
       }
 
-      setOpenPopupResponse(false)
-
+      setIsError(true) // Đánh dấu là lỗi
       setLoading(false)
     }
   }
 
   const handleScanOnvif = async () => {
-    setOpenPopupResponse(true)
+    setOpenPopupResponseOnvif(true)
     setLoading(true)
+    setPopupMessage('') // Reset thông điệp khi bắt đầu scan
+    setIsError(false) // Reset trạng thái lỗi khi bắt đầu scan
     try {
       const payload = {
         idBox: selectNVR?.value,
@@ -215,20 +224,20 @@ const UserList = ({ apiData }) => {
 
       toast.success('Thành công')
 
-      // setOpenPopupResponse(true)
+      setPopupMessage('Quét thành công')
+      setIsError(false) // Không phải lỗi
     } catch (error) {
       if (
         error.response &&
         error.response.data &&
         error.response.data.message === 'No response from the server device, timeout: scan_device'
       ) {
-        Swal.fire('Thiết bị chưa phản hồi', '', 'error')
+        setPopupMessage('Thiết bị chưa phản hồi')
       } else {
-        Swal.fire('Đã xảy ra lỗi', error.message, 'error')
+        setPopupMessage(`${error.response.data.message}`)
       }
 
-      setOpenPopupResponse(false)
-
+      setIsError(true) // Đánh dấu là lỗi
       setLoading(false)
     }
   }
@@ -407,17 +416,26 @@ const UserList = ({ apiData }) => {
           }
         }
         const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/nvrs', config)
-        setStatus1(response.data.isOfflineSetting)
-        setNvr(response.data[0].id)
-        setAssetType(response.data)
-        setTotal(response.data.page)
-        console.log(response.data[0].id)
+
+        if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+          setStatus1(response.data.isOfflineSetting || false)
+          setNvr(response.data[0].id)
+          setAssetType(response.data)
+          setTotal(response.data.page || 0)
+          console.log(response.data[0].id)
+        } else {
+          setStatus1(false)
+          setNvr(null)
+          setAssetType([])
+          setTotal(0)
+          console.warn('Response data is empty or invalid')
+        }
       } catch (error) {
         console.error('Error fetching users:', error)
       }
     }
     fetchFilteredOrAllUsers()
-  }, [page, pageSize, total, value])
+  }, [page, pageSize, total, value, reload])
 
   console.log(nameNVR, 'idNVR')
 
@@ -484,7 +502,7 @@ const UserList = ({ apiData }) => {
                       <FormControlLabel value='daiIp' control={<Radio />} label='Dải IP' />
                     </Grid>
                     <Grid item>
-                      <FormControlLabel value='onvif' control={<Radio />} label='ON VIF' />
+                      <FormControlLabel value='onvif' control={<Radio />} label='Onvif' />
                     </Grid>
                   </Grid>
                 </RadioGroup>
@@ -550,18 +568,20 @@ const UserList = ({ apiData }) => {
                     </Grid>
                   </Grid>
                 )}
-                {openPopupResponse && (
+                {openPopupResponseDungIP && (
                   <>
-                    <PopupScan
-                      open={openPopupResponse}
+                    <PopupScanDungIP
+                      open={openPopupResponseDungIP}
                       url={url}
                       port={host}
                       setReload={() => setReload(reload + 1)}
                       userName={userName}
+                      isError={isError}
+                      popupMessage={popupMessage}
                       passWord={passWord}
                       response={response}
-                      loading={loading}
-                      onClose={() => setOpenPopupResponse(false)}
+                      loadingDungIp={loading}
+                      onClose={() => setOpenPopupResponseDungIP(false)}
                     />{' '}
                   </>
                 )}
@@ -667,9 +687,11 @@ const UserList = ({ apiData }) => {
                       open={openPopupResponse}
                       userName={userName}
                       setReload={() => setReload(reload + 1)}
+                      isError={isError}
+                      popupMessage={popupMessage}
                       passWord={passWord}
                       response={response}
-                      loading={loading}
+                      loadingDaiIP={loading}
                       onClose={() => setOpenPopupResponse(false)}
                     />{' '}
                   </>
@@ -723,16 +745,18 @@ const UserList = ({ apiData }) => {
                     </Grid>
                   </Grid>
                 )}
-                {openPopupResponse && (
+                {openPopupResponseOnvif && (
                   <>
-                    <PopupScan
-                      open={openPopupResponse}
+                    <PopupScanOnvif
+                      open={openPopupResponseOnvif}
                       userName={userName}
                       setReload={() => setReload(reload + 1)}
                       passWord={passWord}
+                      isError={isError}
+                      popupMessage={popupMessage}
                       response={response}
-                      loading={loading}
-                      onClose={() => setOpenPopupResponse(false)}
+                      loadingOnvif={loading}
+                      onClose={() => setOpenPopupResponseOnvif(false)}
                     />{' '}
                   </>
                 )}

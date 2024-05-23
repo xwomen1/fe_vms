@@ -28,7 +28,7 @@ const Add = ({
   port,
   userName,
   passWord,
-  loadingDaiIP,
+  loadings,
   setReload,
   isError,
   popupMessage
@@ -132,7 +132,7 @@ const Add = ({
       <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Quét Camera</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} alignItems='center'>
-          {loadingDaiIP && <CircularProgress style={{ marginLeft: '50%' }} />}
+          {loadings && <CircularProgress style={{ marginLeft: '50%' }} />}
           <Grid item xs={12}>
             <TableContainer>
               <Table>
@@ -152,11 +152,12 @@ const Add = ({
                 <TableBody>
                   {response && response.length > 0 ? (
                     response.map((camera, index) => {
-                      if (camera.type === 'NVR') {
-                        return null
-                      }
-
                       const foundcamera = selectedIds.find(item => item.macAddress === camera.macAddress)
+
+                      // Kiểm tra nếu type === 'NVR' và không có dữ liệu
+                      if (camera.type === 'NVR' && !foundcamera) {
+                        return null // Ẩn dòng này nếu type === 'NVR' và không có dữ liệu
+                      }
 
                       return (
                         <TableRow key={index}>
@@ -184,7 +185,7 @@ const Add = ({
                     })
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={9}>Không có dữ liệu</TableCell>
+                      <TableCell colSpan={9}>Không tìm thấy camera</TableCell>
                     </TableRow>
                   )}
                 </TableBody>

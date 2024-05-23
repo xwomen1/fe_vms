@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 
 import { Grid, Typography } from '@mui/material'
 
@@ -23,16 +23,37 @@ import { formatTimeShow, formatDate } from 'src/@core/utils/format'
 import { Card, CardContent } from "@mui/material"
 import ViewCamera from "src/@core/components/camera/playback"
 
-
 const valueFilterInit = {
     page: 1,
     limit: 50,
     deviceTypes: 'NVR'
 }
 
+const convertDate = (dateString) => {
+    const date = new Date(dateString)
+    const pad = (num) => String(num).padStart(2, '0');
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1); // Tháng bắt đầu từ 0
+    const day = pad(date.getDate());
+    const hours = pad(date.getHours());
+    const minutes = pad(date.getMinutes());
+    const seconds = pad(date.getSeconds());
+
+    return `${year}${month}${day}T${hours}${minutes}${seconds}`
+}
+
+const eventDates = [
+    new Date('2024-05-01'),
+    new Date('2024-05-15'),
+    new Date('2024-05-20')
+];
+
 const Review = ({ id, name, channel }) => {
-    const [camera, setCamera] = useState()
+    const [camera, setCamera] = useState({ id: '', name: '', channel: '' })
     const [channelCurrent, setChannelCurrent] = useState(null)
+    const [startTime, setStartTime] = useState(new Date())
+    const [endTime, setEndTime] = useState(new Date())
+
     function formatTime(timeInSeconds) {
         const result = new Date(timeInSeconds * 1000).toTimeString().substr(0, 8)
 
@@ -64,6 +85,9 @@ const Review = ({ id, name, channel }) => {
     const debouncedSearch = useDebounce(valueRange, 700)
 
     const onClickPlay = v => {
+        setCamera({ id: id, name: name, channel: channel })
+        setStartTime(convertDate(timeFilter?.start_time))
+        setEndTime(convertDate(timeFilter?.end_time))
         setPlay(v)
 
         // if (videoId) {
@@ -92,6 +116,8 @@ const Review = ({ id, name, channel }) => {
     function valuetext(value) {
 
         const timeCurrent = new Date(timeFilter.start_time + value)
+
+        setStartTime(convertDate(timeCurrent))
 
         return `${timeCurrent.getFullYear() +
             '/' +
@@ -123,7 +149,6 @@ const Review = ({ id, name, channel }) => {
             })
         }
 
-
         return marks
     }
 
@@ -133,22 +158,26 @@ const Review = ({ id, name, channel }) => {
 
     return (
         <Card>
-            <Grid container spacing={2}>
+            <Grid container spacing={0}>
                 <Grid item xs={12}>
-                    {id === '' &&
+                    {camera.id === '' &&
                         <div style={{ height: '70vh', background: '#000', display: 'flex', justifyContent: 'center' }}>
                             <IconButton disabled>
                                 <Icon icon="tabler:player-play-filled" width='48' height='48' style={{ color: '#FF9F43' }} />
                             </IconButton>
-                        </div>}
-                    {id !== '' && channel !== '' &&
+                        </div>
+                    }
+                    {camera.id !== '' &&
                         <ViewCamera
-                            id={id}
-                            name={name}
-                            channel={channel}
+                            id={camera.id}
+                            name={camera.name}
+                            channel={camera.channel}
                             sizeScreen={'1x1'}
+                            startTime={startTime}
+                            endTime={endTime}
                             handSetChanel={handSetChanel}
                         />
+
                     }
                 </Grid>
                 <Grid item xs={12}>
@@ -334,6 +363,7 @@ const Review = ({ id, name, channel }) => {
                                                 end_time: new Date(date).getTime()
                                             })
                                         }}
+                                        highlightDates={eventDates}
                                         popperPlacement='bottom-start'
                                         customInput={
                                             <CustomInput

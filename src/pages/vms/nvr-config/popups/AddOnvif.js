@@ -28,7 +28,7 @@ const Add = ({
   port,
   userName,
   passWord,
-  loadingDaiIP,
+  loadingOnvif,
   setReload,
   isError,
   popupMessage
@@ -37,7 +37,7 @@ const Add = ({
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState({ text: popupMessage, type: 'general', error: isError })
 
-  const fetchGroupDataCamera = async () => {
+  const fetchGroupDataNVR = async () => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -47,25 +47,25 @@ const Add = ({
         }
       }
 
-      const responsecamera = await axios.get(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras?sort=%2Bcreated_at&page=1`,
+      const responsenvr = await axios.get(
+        `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs?sort=%2Bcreated_at&page=1`,
         config
       )
-      setSelectedIds(responsecamera.data)
+      setSelectedIds(responsenvr.data)
     } catch (error) {
-      console.error('Error fetching Camera data:', error)
+      console.error('Error fetching NVR data:', error)
     }
   }
 
   useEffect(() => {
-    fetchGroupDataCamera()
+    fetchGroupDataNVR()
   }, [])
 
   useEffect(() => {
     setMessage({ text: popupMessage, type: 'general', error: isError })
   }, [popupMessage, isError])
 
-  const handleCreateCammera = async camera => {
+  const handleCreateNvr = async nvr => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
       setLoading(true)
@@ -78,31 +78,31 @@ const Add = ({
       }
 
       await axios.post(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras`,
+        `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs`,
         {
-          location: camera.location,
-          name: camera.name,
-          ipAddress: camera.url,
-          macAddress: camera.macAddress,
+          location: nvr.location,
+          name: nvr.name,
+          ipAddress: nvr.url,
+          macAddress: nvr.macAddress,
           passWord: passWord,
           userName: userName,
-          httpPort: camera.host
+          httpPort: nvr.host
         },
         config
       )
 
       setMessage({ text: 'Thêm thành công', type: 'create', error: false })
       setReload()
-      fetchGroupDataCamera()
+      fetchGroupDataNVR()
     } catch (error) {
-      console.error('Error creating Camera:', error)
+      console.error('Error creating NVR:', error)
       setMessage({ text: `${error.response.data.message}`, type: 'create', error: true })
     } finally {
       setLoading(false)
     }
   }
 
-  const handleDeleteCamera = async id => {
+  const handleDeleteNvr = async id => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
       setLoading(true)
@@ -114,13 +114,13 @@ const Add = ({
         }
       }
 
-      await axios.delete(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${id}`, config)
+      await axios.delete(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${id}`, config)
 
       setMessage({ text: 'Xóa thành công', type: 'delete', error: false })
       setReload()
-      fetchGroupDataCamera()
+      fetchGroupDataNVR()
     } catch (error) {
-      console.error('Error deleting Camera:', error)
+      console.error('Error deleting NVR:', error)
       setMessage({ text: `${error.response.data.message}`, type: 'delete', error: true })
     } finally {
       setLoading(false)
@@ -129,10 +129,10 @@ const Add = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth='xl' style={{ maxWidth: '80%', margin: 'auto' }}>
-      <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Quét Camera</DialogTitle>
+      <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Quét NVR</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} alignItems='center'>
-          {loadingDaiIP && <CircularProgress style={{ marginLeft: '50%' }} />}
+          {loadingOnvif && <CircularProgress style={{ marginLeft: '50%' }} />}
           <Grid item xs={12}>
             <TableContainer>
               <Table>
@@ -151,29 +151,30 @@ const Add = ({
 
                 <TableBody>
                   {response && response.length > 0 ? (
-                    response.map((camera, index) => {
-                      if (camera.type === 'NVR') {
-                        return null
+                    response.map((nvr, index) => {
+                      if (nvr.type !== 'NVR') {
+                        return null // Ẩn dữ liệu không phải là 'NVR'
                       }
 
-                      const foundcamera = selectedIds.find(item => item.macAddress === camera.macAddress)
+                      const foundNvr =
+                        selectedIds?.length > 0 ? selectedIds.find(item => item.macAddress === nvr.macAddress) : null
 
                       return (
                         <TableRow key={index}>
                           <TableCell sx={{ padding: '16px' }}>{index + 1}</TableCell>
-                          <TableCell sx={{ padding: '16px' }}>{camera.name}</TableCell>
-                          <TableCell sx={{ padding: '16px' }}>{camera.type}</TableCell>
-                          <TableCell sx={{ padding: '16px' }}>{camera.url}</TableCell>
-                          <TableCell sx={{ padding: '16px' }}>{camera.macAddress}</TableCell>
-                          <TableCell sx={{ padding: '16px' }}>{camera.location}</TableCell>
-                          <TableCell sx={{ padding: '16px' }}>{camera.status}</TableCell>
+                          <TableCell sx={{ padding: '16px' }}>{nvr.name}</TableCell>
+                          <TableCell sx={{ padding: '16px' }}>{nvr.type}</TableCell>
+                          <TableCell sx={{ padding: '16px' }}>{nvr.url}</TableCell>
+                          <TableCell sx={{ padding: '16px' }}>{nvr.macAddress}</TableCell>
+                          <TableCell sx={{ padding: '16px' }}>{nvr.location}</TableCell>
+                          <TableCell sx={{ padding: '16px' }}>{nvr.status}</TableCell>
                           <TableCell sx={{ padding: '16px' }}>
-                            {foundcamera ? (
-                              <IconButton onClick={() => handleDeleteCamera(foundcamera.id)}>
+                            {foundNvr ? (
+                              <IconButton onClick={() => handleDeleteNvr(foundNvr.id)}>
                                 <Icon icon='tabler:minus' />
                               </IconButton>
                             ) : (
-                              <IconButton onClick={() => handleCreateCammera(camera)}>
+                              <IconButton onClick={() => handleCreateNvr(nvr)}>
                                 <Icon icon='tabler:plus' />
                               </IconButton>
                             )}
@@ -184,7 +185,7 @@ const Add = ({
                     })
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={9}>Không có dữ liệu</TableCell>
+                      <TableCell colSpan={8}>Không có dữ liệu</TableCell>
                     </TableRow>
                   )}
                 </TableBody>

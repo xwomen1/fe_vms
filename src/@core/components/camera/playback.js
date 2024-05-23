@@ -19,7 +19,7 @@ const config = {
   ]
 }
 
-export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => {
+export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel, startTime, endTime }) => {
   const [websocket, setWebsocket] = useState(null)
   const [text, setText] = useState(null)
   const [rtcPeerConnection, setRtcPeerConnection] = useState(null)
@@ -29,6 +29,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
   const [heightDiv, setHeightDiv] = useState(100)
   const [status, setStatus] = useState('')
   const [reload, setReload] = useState(0)
+
   useEffect(() => {
     const heightCaculator = Math.floor((window.innerHeight - 192) / sizeScreen.split('x')[1])
     setHeightDiv(heightCaculator)
@@ -72,7 +73,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
       websocket.close()
       createWsConnection()
     }
-  }, [id, channel])
+  }, [id, channel, startTime, endTime])
 
   useEffect(() => {
     createWsConnection()
@@ -145,7 +146,10 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
         websocket.send(
           JSON.stringify({
             id: id,
-            type: 'request'
+            type: 'request',
+            viewType: 'playback',
+            startTime: startTime,
+            endTime: endTime
           })
         )
       })
