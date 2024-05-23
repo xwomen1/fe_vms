@@ -92,7 +92,7 @@ const AccessControlDevice = () => {
   const handleNodeSelect = async (event, nodeId) => {
     if (nodeId) {
       try {
-        const url = `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices?deviceGroupId=${nodeId}`
+        const url = `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices/deviceGroupId=${nodeId}`
 
         // Gọi API
         const response = await axios.get(url, config)

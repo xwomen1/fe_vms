@@ -86,7 +86,7 @@ const EventList = () => {
           Authorization: `Bearer ${token}`
         },
         params: {
-          keyword: value,
+          event_name: value,
           page: page,
           limit: pageSize
         }
@@ -203,9 +203,15 @@ const EventList = () => {
                     })}
                     <TableCell>
                       <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center' }}>
-                        <IconButton size='small' sx={{ color: 'text.secondary' }}>
-                          <Icon icon='tabler:check' />
-                        </IconButton>
+                        {row.eventName === 'Đã kết nối' ? (
+                          <IconButton size='small' sx={{ color: 'text.secondary', visibility: 'hidden' }}>
+                            <Icon icon='tabler:check' />
+                          </IconButton>
+                        ) : (
+                          <IconButton size='small' sx={{ color: 'text.secondary' }}>
+                            <Icon icon='tabler:check' />
+                          </IconButton>
+                        )}
                         <IconButton size='small' sx={{ color: 'text.secondary' }}>
                           <Icon icon='tabler:trash' />
                         </IconButton>
