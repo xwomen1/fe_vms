@@ -92,7 +92,7 @@ const AccessControlDevice = () => {
   const handleNodeSelect = async (event, nodeId) => {
     if (nodeId) {
       try {
-        const url = `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices/deviceGroupId=${nodeId}`
+        const url = `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices/?deviceGroupId=${nodeId}`
 
         // Gọi API
         const response = await axios.get(url, config)
@@ -129,21 +129,14 @@ const AccessControlDevice = () => {
             <Grid container spacing={2}>
               <Grid item>
                 <Box sx={{ float: 'right' }}>
-                  <Button aria-label='Bộ lọc' variant='contained'>
+                  <Button variant='contained'>
                     <Icon icon='tabler:file-export' />
                   </Button>
                 </Box>
               </Grid>
               <Grid item>
                 <Box sx={{ float: 'right' }}>
-                  <Button aria-label='Bộ lọc' variant='contained'>
-                    <Icon icon='tabler:filter' />
-                  </Button>
-                </Box>
-              </Grid>
-              <Grid item>
-                <Box sx={{ float: 'right' }}>
-                  <Button aria-label='Bộ lọc' variant='contained'>
+                  <Button variant='contained'>
                     <Icon icon='tabler:trash' />
                   </Button>
                 </Box>
