@@ -503,13 +503,13 @@ const UserDetails = () => {
     <div>
       {user ? (
         <div>
-          <Grid container spacing={3}>
+          <Grid container spacing={3} component={Paper}>
             <Grid style={{ borderRadius: '0.05%' }}>
               {/* <Grid container spacing={2}>
                 <h3 style={{ color: 'black', marginLeft: '1%' }}> Thông tin người dùng</h3>
               </Grid> */}
 
-              <Grid container spacing={2} style={{ marginLeft: 10 }}>
+              <Grid container spacing={2}>
                 <Grid container spacing={2}>
                   {' '}
                   <Grid item xs={9}>
@@ -528,7 +528,7 @@ const UserDetails = () => {
                     <div style={{ width: '80%' }}></div>
                     {editing ? (
                       <>
-                        <Button variant='contained' onClick={saveChanges} sx={{ marginRight: '10px' }}>
+                        <Button variant='contained' onClick={saveChanges} sx={{ marginRight: '1%' }}>
                           Lưu
                         </Button>
                         <Button variant='contained' onClick={handleCancel}>
