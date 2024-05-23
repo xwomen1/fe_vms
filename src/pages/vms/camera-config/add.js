@@ -89,19 +89,17 @@ const Add = ({ apiData }) => {
         }
       }
 
-      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/nvrs', config)
+      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/device', config)
 
       const nicTypes = response.data.map(item => ({
-        label: item.name,
-        value: item.value,
-        id: item.id
+        label: item.nameDevice,
+        value: item.id
       }))
       setNVR(nicTypes)
 
       // Set selectedNicType here based on your business logic
       if (nicTypes.length > 0) {
-        setSelectedNVR(nicTypes[0].value)
-        setIdBox(nicTypes[0].id)
+        setSelectedNVR(nicTypes[0].id) // Set it to the first value in the array, or adjust as needed
       }
     } catch (error) {
       console.error('Error fetching NIC types:', error)
