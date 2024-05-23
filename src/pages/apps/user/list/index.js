@@ -11,7 +11,7 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import authConfig from 'src/configs/auth'
 import Table from '@mui/material/Table'
-import Paper  from '@mui/material/Paper'
+import Paper from '@mui/material/Paper'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
 import { IconButton } from '@mui/material'
@@ -245,32 +245,32 @@ const UserList = ({ apiData }) => {
   }, [selectedGroups, page, pageSize, total, value])
 
   return (
-<Grid container spacing={6.5} style={{ minWidth: '1000px' }}>
-      <Grid item xs={12}>
-        <Card>
-          <TableHeader value={value} handleFilter={handleFilter} toggle={toggleAddUserDrawer} />
-          {console.log(userData)}
-          <Grid container spacing={2}>
-            <Grid item xs={2} component={Paper}>
-              <div>
-                <CustomTextField
-                  value={valueGroup}
-                  sx={{ ml: 3, mr: 4 }} 
-                  placeholder='Search Group'
-                  onChange={e => handleFilterGroup(e.target.value)}
-                />
-                <TreeView
-                  sx={{ minHeight: 240 }}
-                  defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
-                  defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
-                >
-                  {groups.map(rootGroup => renderGroup(rootGroup))}
-                </TreeView>
-              </div>
-            </Grid>
-            <Grid item xs={0.1}></Grid>
-            <Grid item xs={9.9} component={Paper}>
-              <div></div>
+    <Grid style={{ minWidth: '1000px' }}>
+      <Card>
+        <TableHeader value={value} handleFilter={handleFilter} toggle={toggleAddUserDrawer} />
+        <Grid container spacing={2}>
+          {/* <Grid item xs={0.1}></Grid> */}
+          <Grid item xs={0.2}></Grid>
+
+          <Grid item xs={2} component={Paper}>
+            <div>
+              <CustomTextField
+                value={valueGroup}
+                sx={{ mr: 4 }}
+                placeholder='Search Group'
+                onChange={e => handleFilterGroup(e.target.value)}
+              />
+              <TreeView
+                sx={{ minHeight: 240 }}
+                defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
+                defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
+              >
+                {groups.map(rootGroup => renderGroup(rootGroup))}
+              </TreeView>
+            </div>
+          </Grid>
+          <Grid item xs={9.8}>
+            <Paper elevation={3}>
               <Table>
                 <TableHead>
                   <TableRow>
@@ -311,31 +311,31 @@ const UserList = ({ apiData }) => {
                   ))}
                 </TableBody>
               </Table>
+            </Paper>
 
-              <br></br>
-              <Grid container spacing={2} style={{ padding: 10 }}>
-                <Grid item xs={3}></Grid>
-                <Grid item xs={1.5} style={{ padding: 0 }}>
-                  <IconButton onClick={handleOpenMenu}>
-                    <Icon icon='tabler:selector' />
-                    <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
-                  </IconButton>
-                  <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
-                    {pageSizeOptions.map(size => (
-                      <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
-                        {size}
-                      </MenuItem>
-                    ))}
-                  </Menu>
-                </Grid>
-                <Grid item xs={6}>
-                  <Pagination count={total} color='primary' onChange={(event, page) => handlePageChange(page)} />
-                </Grid>
+            <br></br>
+            <Grid container spacing={2} style={{ padding: 10 }}>
+              <Grid item xs={3}></Grid>
+              <Grid item xs={1.5} style={{ padding: 0 }}>
+                <IconButton onClick={handleOpenMenu}>
+                  <Icon icon='tabler:selector' />
+                  <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
+                </IconButton>
+                <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+                  {pageSizeOptions.map(size => (
+                    <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
+                      {size}
+                    </MenuItem>
+                  ))}
+                </Menu>
+              </Grid>
+              <Grid item xs={6}>
+                <Pagination count={total} color='primary' onChange={(event, page) => handlePageChange(page)} />
               </Grid>
             </Grid>
           </Grid>
-        </Card>
-      </Grid>
+        </Grid>
+      </Card>
     </Grid>
   )
 }
