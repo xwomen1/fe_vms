@@ -23,7 +23,6 @@ import { formatTimeShow, formatDate } from 'src/@core/utils/format'
 import { Card, CardContent } from "@mui/material"
 import ViewCamera from "src/@core/components/camera/playback"
 
-
 const valueFilterInit = {
     page: 1,
     limit: 50,
@@ -42,6 +41,12 @@ const convertDate = (dateString) => {
 
     return `${year}${month}${day}T${hours}${minutes}${seconds}`
 }
+
+const eventDates = [
+    new Date('2024-05-01'),
+    new Date('2024-05-15'),
+    new Date('2024-05-20')
+];
 
 const Review = ({ id, name, channel }) => {
     const [camera, setCamera] = useState({ id: '', name: '', channel: '' })
@@ -112,6 +117,8 @@ const Review = ({ id, name, channel }) => {
 
         const timeCurrent = new Date(timeFilter.start_time + value)
 
+        setStartTime(convertDate(timeCurrent))
+
         return `${timeCurrent.getFullYear() +
             '/' +
             timeDisplay(timeCurrent.getMonth() + 1) +
@@ -151,8 +158,15 @@ const Review = ({ id, name, channel }) => {
 
     return (
         <Card>
-            <Grid container spacing={2}>
+            <Grid container spacing={0}>
                 <Grid item xs={12}>
+                    {camera.id === '' &&
+                        <div style={{ height: '70vh', background: '#000', display: 'flex', justifyContent: 'center' }}>
+                            <IconButton disabled>
+                                <Icon icon="tabler:player-play-filled" width='48' height='48' style={{ color: '#FF9F43' }} />
+                            </IconButton>
+                        </div>
+                    }
                     {camera.id !== '' &&
                         <ViewCamera
                             id={camera.id}
@@ -349,6 +363,7 @@ const Review = ({ id, name, channel }) => {
                                                 end_time: new Date(date).getTime()
                                             })
                                         }}
+                                        highlightDates={eventDates}
                                         popperPlacement='bottom-start'
                                         customInput={
                                             <CustomInput
