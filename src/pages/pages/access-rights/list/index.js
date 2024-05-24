@@ -44,6 +44,7 @@ const AccessRight = () => {
   const [isOpenView, setIsOpenView] = useState(false)
   const [dataList, setDataList] = useState([])
   const [dataList1, setDataList1] = useState([])
+  const [errorMessage, setErrorMessage] = useState('')
   const [idDelete, setIdDelete] = useState(null)
   const [idView, setIdView] = useState(null)
   const [total, setTotal] = useState(1)
@@ -187,7 +188,7 @@ const AccessRight = () => {
 
   const fetchDataList = async () => {
     setLoading(true)
-
+    setErrorMessage('')
     try {
       const config = {
         headers: {
@@ -210,8 +211,9 @@ const AccessRight = () => {
 
       setDataList(response.data.rows)
     } catch (error) {
-      console.error('Error fetching data:', error)
-      toast.error(error)
+      console.error('Error fetching data3:', error.message)
+      setErrorMessage(`Không có dữ liệu ... (${error.message})`)
+      toast.error(error.message)
     } finally {
       setLoading(false)
     }
@@ -253,7 +255,7 @@ const AccessRight = () => {
 
   const fetchDataList1 = async () => {
     setLoading(true)
-
+    setErrorMessage('')
     try {
       const config = {
         headers: {
@@ -277,8 +279,9 @@ const AccessRight = () => {
       setDataList1(response.data.rows)
       setTotal(response.data.totalPage)
     } catch (error) {
-      console.error('Error fetching data:', error)
-      toast.error(error)
+      console.error('Error fetching data3:', error.message)
+      setErrorMessage(`Không có dữ liệu ... (${error.message})`)
+      toast.error(error.message)
     } finally {
       setLoading(false)
     }
@@ -418,6 +421,7 @@ const AccessRight = () => {
   const handleDelete = () => {
     if (idDelete != null) {
       setLoading(true)
+      setErrorMessage('')
 
       const config = {
         headers: {
@@ -436,8 +440,8 @@ const AccessRight = () => {
           setReload(reload + 1)
         })
         .catch(error => {
-          console.error('Error fetching data:', error)
-          toast.error(error)
+          setErrorMessage(`lỗi trong quá trình xóa ... (${error.message})`)
+          toast.error(error.message)
         })
         .finally(() => {
           setLoading(false)
@@ -556,8 +560,26 @@ const AccessRight = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {rows.slice(0, pageSize).map((row, index) => {
-                        return (
+                      {loading ? (
+                        <TableRow>
+                          <TableCell colSpan={columns.length + 2} align='center'>
+                            Đang tải dữ liệu...
+                          </TableCell>
+                        </TableRow>
+                      ) : errorMessage ? (
+                        <TableRow>
+                          <TableCell style={{ color: 'red' }} colSpan={columns.length + 2} align='center'>
+                            Error: {errorMessage}
+                          </TableCell>
+                        </TableRow>
+                      ) : rows.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={columns.length + 2} align='center'>
+                            Không có dữ liệu
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        rows.slice(0, pageSize).map((row, index) => (
                           <TableRow hover tabIndex={-1} key={index}>
                             <TableCell>{(page - 1) * pageSize + index + 1}</TableCell>
                             {columns.map(column => {
@@ -584,10 +606,17 @@ const AccessRight = () => {
                               </Grid>
                             </TableCell>
                           </TableRow>
-                        )
-                      })}
+                        ))
+                      )}
                     </TableBody>
                   </Table>
+                  {errorMessage.length > 0 && (
+                    <Box sx={{ color: 'red', textAlign: 'center', width: '100%' }}>
+                      <Typography style={{ color: 'red' }} variant='body2'>
+                        Error: {errorMessage}
+                      </Typography>
+                    </Box>
+                  )}
                 </TableContainer>
               </Grid>
               <Grid container spacing={2} style={{ padding: 10 }}>
@@ -636,8 +665,26 @@ const AccessRight = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {dataList1.slice(0, pageSize).map((row, index) => {
-                        return (
+                      {loading ? (
+                        <TableRow>
+                          <TableCell colSpan={columns1.length + 2} align='center'>
+                            Đang tải dữ liệu...
+                          </TableCell>
+                        </TableRow>
+                      ) : errorMessage ? (
+                        <TableRow>
+                          <TableCell style={{ color: 'red' }} colSpan={columns1.length + 2} align='center'>
+                            Error: {errorMessage}
+                          </TableCell>
+                        </TableRow>
+                      ) : dataList1.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={columns1.length + 2} align='center'>
+                            Không có dữ liệu
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        dataList1.slice(0, pageSize).map((row, index) => (
                           <TableRow hover tabIndex={-1} key={row.id}>
                             <TableCell>{(page - 1) * pageSize + index + 1}</TableCell>
                             {columns1.map(column => {
@@ -672,8 +719,8 @@ const AccessRight = () => {
                               </Grid>
                             </TableCell>
                           </TableRow>
-                        )
-                      })}
+                        ))
+                      )}
                     </TableBody>
                   </Table>
                 </TableContainer>
