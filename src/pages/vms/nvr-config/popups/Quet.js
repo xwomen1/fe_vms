@@ -196,7 +196,7 @@ const AddCamera = ({ nvr, onClose }) => {
               </TableBody>
             </Table>
             {notification.message && (
-              <div style={{ color: notification.type === 'success' ? 'red' : '#ff9f43', textAlign: 'center' }}>
+              <div style={{ color: notification.type === 'success' ? '#ff9f43' : 'red', textAlign: 'center' }}>
                 {notification.message}
               </div>
             )}
