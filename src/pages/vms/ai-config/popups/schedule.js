@@ -92,7 +92,9 @@ const Schedule = ({ show, onClose, valueFilter, callback, direction, data }) => 
   } = useForm({})
 
   useEffect(() => {
-    setDetail(data)
+    if (data.length !== 0) {
+      setDetail(data)
+    }
   }, [data])
 
 
@@ -203,7 +205,7 @@ const Schedule = ({ show, onClose, valueFilter, callback, direction, data }) => 
             Hủy
           </Button>
           <Button type='submit' variant='contained' onClick={handleSubmit(onSubmit)}>
-            Thêm
+            {data.length > 0 ? 'Sửa' : 'Thêm'}
           </Button>
         </DialogActions>
       </Dialog>

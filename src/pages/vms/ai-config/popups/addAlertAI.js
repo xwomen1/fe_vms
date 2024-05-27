@@ -142,7 +142,6 @@ const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => 
         const params = {
             camera_id: cameraId,
             cameraaiproperty: [
-                ...data,
                 {
                     cameraModelAI: {
                         ...values

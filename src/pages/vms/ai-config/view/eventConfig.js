@@ -257,6 +257,7 @@ const EventConfig = () => {
   useEffect(() => {
     if (idCameraSelect != null) {
       fetchModelAICamera()
+      setEventSelect(null)
     }
   }, [idCameraSelect, reload])
 
@@ -615,7 +616,6 @@ const EventConfig = () => {
         >
           <CardHeader title={alert?.cameraModelAI?.modelName} />
           <CardContent>
-            <Typography variant='h5'></Typography>
             <Typography variant='body1' alignLeft={2}>
               Độ nhạy: {alert?.cameraModelAI?.characteristicValue}
             </Typography>
@@ -666,7 +666,6 @@ const EventConfig = () => {
       </StyledTreeItem>
     );
   }
-
 
   return (
     <>
@@ -722,7 +721,7 @@ const EventConfig = () => {
             <Grid item xs={12}>
               <Card>
                 <CardHeader title='Cảnh báo AI' />
-                <CardContent sx={{ height: '51vh', overflow: 'auto' }}>
+                <CardContent sx={{ height: '60vh', overflow: 'auto' }}>
                   {alertAIListView()}
                 </CardContent>
                 <CardActions>
@@ -754,11 +753,9 @@ const EventConfig = () => {
                               <Button
                                 onClick={() => {
                                   clearAction()
-                                  setLineSelect([])
-                                  setAreaSelect([])
                                 }}
                                 variant='outlined'
-                                disabled={!eventSelect}
+                                disabled={eventSelect === null}
                               >
                                 Clear
                               </Button>
@@ -769,7 +766,7 @@ const EventConfig = () => {
                                   setIsDraw('')
                                 }}
                                 variant='outlined'
-                                disabled={!eventSelect}
+                                disabled={eventSelect === null}
                               >
                                 Hủy
                               </Button>
@@ -786,7 +783,7 @@ const EventConfig = () => {
                                   setIsDraw('')
                                 }}
                                 variant='outlined'
-                                disabled={!eventSelect}
+                                disabled={eventSelect === null}
                               >
                                 Lưu
                               </Button>
@@ -818,7 +815,7 @@ const EventConfig = () => {
                                   clearAction()
                                 }}
                                 variant='outlined'
-                                disabled={!eventSelect}
+                                disabled={eventSelect === null}
                               >
                                 Khoanh vùng
                               </Button>
@@ -831,7 +828,7 @@ const EventConfig = () => {
                                   clearAction()
                                 }}
                                 variant='outlined'
-                                disabled={!eventSelect}
+                                disabled={eventSelect === null}
                               >
                                 Rào ảo
                               </Button>
@@ -841,11 +838,9 @@ const EventConfig = () => {
                                 style={{ width: '100%' }}
                                 onClick={() => {
                                   clearAction()
-                                  setLineSelect([])
-                                  setAreaSelect([])
                                 }}
                                 variant='outlined'
-                                disabled={!eventSelect}
+                                disabled={eventSelect === null}
                               >
                                 Xóa
                               </Button>
@@ -855,7 +850,7 @@ const EventConfig = () => {
                                 style={{ width: '100%' }}
                                 onClick={() => setIsOpenSchedule(true)}
                                 variant='outlined'
-                                disabled={!eventSelect}
+                                disabled={eventSelect === null}
                               >
                                 Lịch
                               </Button>
@@ -1013,8 +1008,9 @@ const EventConfig = () => {
             setIsOpenModelAIType(null)
             setIsOpenModelAI(false)
           }}
+          data={alertList}
           typePopup={isOpenModelAIType}
-          cameraId={idCameraSelect}
+          cameraId={cameraAIPropertyId}
           setReload={() => setReload(reload + 1)}
         />
       }
