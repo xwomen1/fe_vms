@@ -220,28 +220,28 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
                     return (
                       <StyledTreeItem
                         key={index}
-                        labelText={`(${group.cameras.length}) ${group.name} `}
+                        labelText={`(${group.cameras?.length}) ${group.name} `}
                         nodeId={index + ''}
                         labelIcon='tabler:folder'
-                        disabled={group.cameras.length == 0}
+                        disabled={group.cameras?.length == 0}
                       >
-                        {group.cameras && group.cameras.length > 0
+                        {group.cameras && group.cameras?.length > 0
                           ? group.cameras.map((camera, idx) => {
-                              // const matchedEvent = eventsData.find(event => event.id === camera.id)
-                              // const status = matchedEvent?.status
+                            // const matchedEvent = eventsData.find(event => event.id === camera.id)
+                            // const status = matchedEvent?.status
 
-                              return (
-                                <StyledTreeItem
-                                  disabled={true}
-                                  key={camera?.id}
-                                  nodeId={camera?.id}
-                                  labelText={camera?.deviceName}
-                                  labelIcon='tabler:camera'
+                            return (
+                              <StyledTreeItem
+                                disabled={true}
+                                key={camera?.id}
+                                nodeId={camera?.id}
+                                labelText={camera?.deviceName}
+                                labelIcon='tabler:camera'
 
-                                  // onClick={() => handleItemClick(camera.id, camera.deviceName)}
-                                />
-                              )
-                            })
+                              // onClick={() => handleItemClick(camera.id, camera.deviceName)}
+                              />
+                            )
+                          })
                           : null}
                       </StyledTreeItem>
                     )

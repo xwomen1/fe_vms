@@ -95,6 +95,7 @@ const Schedule = ({ show, onClose, valueFilter, callback, direction, data }) => 
     setDetail(data)
   }, [data])
 
+
   useEffect(() => {
     if (detail) {
       setDetailFormValue()

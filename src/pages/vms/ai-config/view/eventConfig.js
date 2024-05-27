@@ -282,8 +282,7 @@ const EventConfig = () => {
       setCameraAIPropertyId(null)
     }
 
-    setAreaSelect([])
-    setLineSelect([])
+    clearAction()
   }, [alertAIList])
 
   useEffect(() => {
@@ -529,7 +528,7 @@ const EventConfig = () => {
     setLoading(true)
 
     const changedAlerts = alertList.map(alert => {
-      return alert.aitype === eventSelect ? { ...alert, calendarDays: data?.calendarDays } : alert
+      return alert.cameraModelAI?.modelName === eventSelect ? { ...alert, calendarDays: data?.calendarDays } : alert
     })
 
     await updateAlertList(changedAlerts)
@@ -539,7 +538,7 @@ const EventConfig = () => {
     setLoading(true)
 
     const changedAlerts = alertList.map(alert => {
-      return alert.aitype === typeAI ? { ...alert, isactive: !alert.isactive } : alert
+      return alert.cameraModelAI?.modelName === typeAI ? { ...alert, isactive: !alert.isactive } : alert
     })
 
     await updateAlertList(changedAlerts)
@@ -559,7 +558,7 @@ const EventConfig = () => {
     }
 
     const changedAlerts = alertList.map(alert => {
-      return alert.aitype === eventSelect ? { ...alert, cameraaizone: cameraAiZone } : alert
+      return alert.cameraModelAI?.modelName === eventSelect ? { ...alert, cameraaizone: cameraAiZone } : alert
     })
 
     await updateAlertList(changedAlerts)
@@ -580,7 +579,7 @@ const EventConfig = () => {
     }
 
     const changedAlerts = alertList.map(alert => {
-      return alert.aitype === eventSelect ? { ...alert, cameraaizone: cameraAiZone } : alert
+      return alert.cameraModelAI?.modelName === eventSelect ? { ...alert, cameraaizone: cameraAiZone } : alert
     })
 
     await updateAlertList(changedAlerts)
@@ -592,7 +591,7 @@ const EventConfig = () => {
         <Card
           onClick={() => {
             if (alert.isactive == true) {
-              setEventSelect(alert?.aitype)
+              setEventSelect(alert?.cameraModelAI?.modelName)
 
               if (alert.cameraaizone.vfences === null) {
                 let arr = Object.entries(alert.cameraaizone.vzone).map(([key, value]) => ({ ...value }))
@@ -611,7 +610,7 @@ const EventConfig = () => {
           }}
           sx={{
             marginBottom: 5,
-            background: eventSelect === alert?.aitype ? 'rgb(0, 123, 255, 0.5)' : null
+            background: eventSelect === alert?.cameraModelAI?.modelName ? 'rgb(0, 123, 255, 0.5)' : null
           }}
         >
           <CardHeader title={alert?.cameraModelAI?.modelName} />
@@ -634,7 +633,7 @@ const EventConfig = () => {
             }}
             color={alert.isactive === false ? 'success' : 'primary'}
             onClick={() => {
-              handleActiveAlertAI(alert?.aitype)
+              handleActiveAlertAI(alert?.cameraModelAI?.modelName)
             }}
           >
             {alert.isactive == true ? 'Tắt cảnh báo ' : 'Bật cảnh báo'}
@@ -1014,7 +1013,6 @@ const EventConfig = () => {
             setIsOpenModelAIType(null)
             setIsOpenModelAI(false)
           }}
-          data={alertList}
           typePopup={isOpenModelAIType}
           cameraId={idCameraSelect}
           setReload={() => setReload(reload + 1)}
