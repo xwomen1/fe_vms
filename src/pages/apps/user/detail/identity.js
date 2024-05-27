@@ -509,7 +509,7 @@ const UserDetails = () => {
                 <h3 style={{ color: 'black', marginLeft: '1%' }}> Thông tin người dùng</h3>
               </Grid> */}
 
-              <Grid container spacing={2}>
+              <Grid container spacing={2} style={{ color: 'black', marginLeft: '1%' }}>
                 <Grid container spacing={2}>
                   {' '}
                   <Grid item xs={9}>
@@ -565,7 +565,7 @@ const UserDetails = () => {
                   </Grid>
                   <Grid item xs={4}></Grid>
                   <Grid item xs={12}>
-                    <h2 style={{ color: 'black', marginLeft: '1%' }}> Hình ảnh khuôn mặt</h2>
+                    <h2 style={{ color: 'black', marginLeft: '15%' }}> Hình ảnh khuôn mặt</h2>
                   </Grid>
                   <div>
                     {(identityData?.faces?.length && (
@@ -648,9 +648,9 @@ const UserDetails = () => {
                           <TableCell>Trạng thái</TableCell>
 
                           <TableCell align='center'>
-                            <IconButton size='small' sx={{ marginLeft: '10px', color: 'blue' }}>
+                            <Button variant='contained' size='small'>
                               Thêm thẻ <Icon icon='bi:plus' />
-                            </IconButton>
+                            </Button>
                           </TableCell>
                         </TableRow>
                       </TableHead>

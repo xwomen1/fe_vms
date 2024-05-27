@@ -74,6 +74,8 @@ const Add = ({ apiData }) => {
   const [loading, setLoading] = useState(false)
   const [selectedNvrId, setSelectedNvrId] = useState(null)
   const [idBox, setIdBox] = useState(null)
+  const [idBoxs, setIdBoxs] = useState(selectNVR?.value)
+
   const [popupMessage, setPopupMessage] = useState('')
   const [isError, setIsError] = useState(false)
   const [openPopupResponseOnvif, setOpenPopupResponseOnvif] = useState(false)
@@ -160,7 +162,7 @@ const Add = ({ apiData }) => {
     }
   }
 
-  console.log(response)
+  console.log(selectNVR)
 
   const handleRadioChange = event => {
     setSelectedValue(event.target.value)
@@ -557,6 +559,7 @@ const Add = ({ apiData }) => {
                 <PopupScanDungIP
                   open={openPopupResponseDungIP}
                   url={url}
+                  idBox={idBoxs}
                   port={host}
                   setReload={() => setReload(reload + 1)}
                   userName={userName}
@@ -671,6 +674,7 @@ const Add = ({ apiData }) => {
                 <PopupScan
                   open={openPopupResponse}
                   userName={userName}
+                  idBox={selectNVR}
                   setReload={() => setReload(reload + 1)}
                   isError={isError}
                   popupMessage={popupMessage}
@@ -739,6 +743,7 @@ const Add = ({ apiData }) => {
                   passWord={passWord}
                   isError={isError}
                   popupMessage={popupMessage}
+                  idBox={idBoxs}
                   response={response}
                   loadingOnvif={loading}
                   onClose={() => setOpenPopupResponseOnvif(false)}

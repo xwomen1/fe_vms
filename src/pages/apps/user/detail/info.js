@@ -3,7 +3,8 @@ import { useRouter } from 'next/router'
 import { useState, useEffect, useMemo } from 'react'
 import axios from 'axios'
 import authConfig from 'src/configs/auth'
-import CustomTextField from 'src/@core/components/mui/text-field'
+
+// import TextField from 'src/@core/components/mui/text-field'
 import {
   Grid,
   IconButton,
@@ -17,7 +18,8 @@ import {
   Select,
   MenuItem,
   Autocomplete,
-  Paper
+  Paper,
+  TextField
 } from '@mui/material'
 import Icon from 'src/@core/components/icon'
 import Box from '@mui/material/Box'
@@ -58,6 +60,9 @@ const UserDetails = () => {
   const [expiredAt, setExpiredAt] = useState('')
   const [note, setNote] = useState('')
   const [username, setUserName] = useState('')
+  const [isLoading, setIsLoading] = useState(true) // Add isLoading state
+  const [filteredRegionOptions, setFilteredRegionOptions] = useState(user?.level)
+  const [filteredContractOptions, setFilteredContractOptions] = useState(user?.contractType)
 
   const [timeEndMorning, setTimeEndMorning] = useState('')
   const [timeStartAfternoon, setTimeStartAfternoon] = useState('')
@@ -70,6 +75,12 @@ const UserDetails = () => {
   const [email, setEmail] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
   const [identityNumber, setIdentityNumber] = useState('')
+  const [gender, setGender] = useState('')
+  const [selectedRegion, setSelectedRegion] = useState(user?.level.id)
+  const [selectContract, setSelectContract] = useState(user?.contractType.id)
+  const [contractOptions, setContractOptions] = useState([])
+
+  const [regionOptions, setRegionOptions] = useState([])
   const [userCode, setUserCode] = useState('')
   const [syncCode, setSyncCode] = useState('')
 
@@ -107,7 +118,78 @@ const UserDetails = () => {
 
     return epochSeconds
   }
+  useEffect(() => {
+    const fetchRegions = async () => {
+      try {
+        const response = await axios.get(
+          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=953a140f-76e4-4841-9871-b9f30b3a37a7'
+        )
 
+        const regions = response.data.map(region => ({
+          value: region.name,
+          label: region.name,
+          id: region.id
+        }))
+        setRegionOptions(regions)
+
+        console.log(regions)
+      } catch (error) {
+        console.error('Error fetching regions:', error)
+      }
+    }
+
+    fetchRegions()
+  }, [])
+  useEffect(() => {
+    const fetchRegions = async () => {
+      try {
+        const response = await axios.get(
+          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=17a24f4a-4402-4a3f-b341-2afa8e67fba6'
+        )
+
+        const regions = response.data.map(region => ({
+          value: region.name,
+          label: region.name,
+          id: region.id
+        }))
+        setContractOptions(regions)
+
+        console.log(regions)
+      } catch (error) {
+        console.error('Error fetching regions:', error)
+      }
+    }
+
+    fetchRegions()
+  }, [])
+
+  const fetchRegionName = async regionId => {
+    try {
+      const response = await axios.get(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${regionId}`)
+
+      return response.data.name
+    } catch (error) {
+      console.error('Error fetching region name:', error)
+
+      return ''
+    }
+  }
+
+  const handleRegionChange = selectedOption => {
+    setSelectedRegion(selectedOption)
+
+    const selectedRegionId = selectedOption ? selectedOption.id : null
+    const filteredRegions = regionOptions.filter(region => region.parentId === selectedRegionId)
+    setFilteredRegionOptions(selectedRegionId)
+    console.log(selectedOption, 'filterregion')
+  }
+
+  const handleContractChange = selectedOption => {
+    setSelectContract(selectedOption)
+
+    const selectedContractId = selectedOption ? selectedOption.id : null
+    setFilteredContractOptions(selectedContractId)
+  }
   function showAlertConfirm(options, intl) {
     const defaultProps = {
       title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
@@ -154,6 +236,10 @@ const UserDetails = () => {
 
   const handleIdentityNumberChange = event => {
     setIdentityNumber(event.target.value)
+  }
+
+  const handleGenderChange = event => {
+    setGender(event.target.value)
   }
 
   const handleUserCodeChange = event => {
@@ -207,9 +293,11 @@ const UserDetails = () => {
   }
   console.log(groups)
 
-  const saveChanges = async () => {
+  const saveChanges = async regionId => {
     setReadOnly(true)
     setEditing(false)
+    const genderMapping = { MALE: 'MALE', FEMALE: 'FEMALE', OTHER: 'OTHER' }
+    const genderValue = genderMapping[gender]
     if (!fullNameValue || fullNameValue.length <= 3) {
       Swal.fire('Lỗi!', 'Tên không được để trống và độ dài phải >3', 'error')
 
@@ -268,6 +356,13 @@ const UserDetails = () => {
           Authorization: `Bearer ${token}`
         }
       }
+      if (selectedRegion) {
+        console.log('Selected region:', selectedRegion)
+
+        // Perform any further actions here, such as fetching data based on selected region ID
+      }
+      const selectedRegionId = selectedRegion.value
+
       await axios.put(
         `https://dev-ivi.basesystem.one/smc/iam/api/v0/users`,
         {
@@ -282,12 +377,15 @@ const UserDetails = () => {
           userStatus: status1,
           userGroups: processedGroups,
           policyIds: policyList,
+          gender: gender, // Gửi giá trị gender đã được cập nhật
           timeEndAfternoon: convertStringToTimeArray(timeEndAfternoon),
           timeStartAfternoon: convertStringToTimeArray(timeStartAfternoon),
           timeStartMorning: convertStringToTimeArray(dateTime),
           timeEndMorning: convertStringToTimeArray(timeEndMorning),
-          availableAt: ava1,
-          expiredAt: ava2,
+          availableAt: ava1 || isoToEpoch(new Date()),
+          expiredAt: ava2 || isoToEpoch(new Date()),
+          level: filteredRegionOptions || selectedRegion.id,
+          contractType: filteredContractOptions || selectContract.id,
           note: note
         },
         config
@@ -295,7 +393,7 @@ const UserDetails = () => {
       Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
     } catch (error) {
       console.error('Error updating user details:', error)
-      Swal.fire('Lỗi!', error.response.data.message, 'error')
+      Swal.fire('Lỗi!', error?.response?.data?.message, 'error')
     }
     fetchUserData()
   }
@@ -367,6 +465,8 @@ const UserDetails = () => {
       setEmail(response.data.email)
       setPhoneNumber(response.data.phoneNumber)
       setIdentityNumber(response.data.identityNumber)
+      setGender(response.data.gender)
+
       setUserCode(response.data.userCode)
       setSyncCode(response.data.syncCode)
       setStatus1(response.data.userStatus)
@@ -376,6 +476,18 @@ const UserDetails = () => {
       setNote(response.data.note)
       setStatus(response.data.userAccount.accStatus)
 
+      // if (response.data.level) {
+      const regionName = await fetchRegionName(response.data.level)
+      setSelectedRegion({ id: response.data.level, name: regionName })
+      console.log(regionName, 'regionsname')
+
+      // }
+
+      // if (response.data.contractType) {
+      const contractName = await fetchRegionName(response.data.contractType)
+      setSelectContract({ id: response.data.contractType, name: contractName })
+
+      // }
       if (response.data.userGroups && response.data.userGroups.length > 0) {
         setDefaultGroup(response.data.userGroups[0])
       }
@@ -608,7 +720,19 @@ const UserDetails = () => {
         setLeaderOfUnit(response.data.userGroups[0].isLeader)
         setNote(response.data.note)
         setStatus(response.data.userAccount.accStatus)
+        setGender(response.data.gender)
 
+        // if (response.data.level) {
+        const regionName = await fetchRegionName(response.data.level)
+        setSelectedRegion({ id: response.data.level, name: regionName })
+        console.log(regionName, 'regionsname')
+
+        // }
+        // if (response.data.contractType) {
+        const contractName = await fetchRegionName(response.data.contractType)
+        setSelectContract({ id: response.data.contractType, name: contractName })
+
+        // }
         if (response.data.timeStartMorning) {
           const [hour, minute] = response.data.timeStartMorning
           const timeString = `${hour}:${minute.toString().padStart(2, '0')}`
@@ -696,16 +820,17 @@ const UserDetails = () => {
               </Grid>
               <Grid container spacing={2}>
                 <Grid item xs={4}>
-                  <CustomTextField label='Tên' value={fullNameValue} onChange={handleFullNameChange} fullWidth />
+                  <TextField label='Tên' value={fullNameValue} onChange={handleFullNameChange} fullWidth />
                 </Grid>
                 {console.log(user.userAccount.accStatus)}
                 <Grid item xs={4}>
-                  <CustomTextField label='Email' value={email} onChange={handleEmailChange} fullWidth />
+                  <TextField label='Email' value={email} onChange={handleEmailChange} fullWidth />
                 </Grid>
+
                 <Grid item xs={3.8}>
                   {' '}
                   {/* Sửa đổi xs={4} thành xs={8} */}
-                  <CustomTextField
+                  <TextField
                     label='Số điện thoại'
                     value={phoneNumber}
                     onChange={handlePhoneNumberChange}
@@ -713,30 +838,70 @@ const UserDetails = () => {
                   />
                 </Grid>
                 <Grid item xs={4}>
-                  <CustomTextField
+                  {/* Update Select to use the gender state */}
+                  <FormControl fullWidth>
+                    <InputLabel id='gender-label'>Giới tính</InputLabel>
+                    <Select
+                      labelId='gender-label'
+                      id='gender-select'
+                      value={gender} // Use the gender state
+                      onChange={handleGenderChange} // Update onChange handler
+                    >
+                      {/* MenuItems for gender options */}
+                      <MenuItem value='MALE'>Nam</MenuItem>
+                      <MenuItem value='FEMALE'>Nữ</MenuItem>
+                      <MenuItem value='OTHER'>Khác</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={4}>
+                  <TextField
                     label='Số giấy tờ'
                     value={identityNumber}
                     onChange={handleIdentityNumberChange}
                     fullWidth
                   />
                 </Grid>
+                <Grid item xs={3.8}>
+                  <TextField label='Mã người dùng' defaultValue={userCode} onChange={handleUserCodeChange} fullWidth />
+                </Grid>
                 <Grid item xs={4}>
-                  <CustomTextField
-                    label='Mã người dùng'
-                    defaultValue={userCode}
-                    onChange={handleUserCodeChange}
-                    fullWidth
-                  />
+                  <TextField label='Mã đồng bộ' defaultValue={syncCode} onChange={handleSyncCodeChange} fullWidth />
+                </Grid>
+                <Grid item xs={4}>
+                  <FormControl fullWidth>
+                    <InputLabel id='region-label'>Cấp bậc</InputLabel>
+                    <Select
+                      labelId='region-label'
+                      id='region-select'
+                      value={selectedRegion ? selectedRegion.id : ''}
+                      onChange={e => handleRegionChange(regionOptions.find(opt => opt.id === e.target.value))}
+                    >
+                      {regionOptions.map(option => (
+                        <MenuItem key={option.id} value={option.id}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </Grid>
                 <Grid item xs={3.8}>
-                  <CustomTextField
-                    label='Mã đồng bộ'
-                    defaultValue={syncCode}
-                    onChange={handleSyncCodeChange}
-                    fullWidth
-                  />
+                  <FormControl fullWidth>
+                    <InputLabel id='region-label'>Loại hợp đồng</InputLabel>
+                    <Select
+                      labelId='region-label'
+                      id='region-select'
+                      value={selectContract ? selectContract.id : ''}
+                      onChange={e => handleContractChange(contractOptions.find(opt => opt.id === e.target.value))}
+                    >
+                      {contractOptions.map(option => (
+                        <MenuItem key={option.id} value={option.id}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>{' '}
                 </Grid>
-
                 <Grid item xs={2} style={{ marginTop: '1.1%' }}>
                   Trạng thái
                   <Switch
@@ -841,40 +1006,68 @@ const UserDetails = () => {
                     </Select>
                   </FormControl>
                 </Grid>
-                <Grid item xs={8}>
-                  {timeValidity === 'Custom' && (
-                    <Grid container spacing={2}>
-                      {user.availableAt && (
-                        <Grid item xs={4}>
+
+                {timeValidity === 'Custom' &&
+                  (user.availableAt ? (
+                    <Grid item xs={8}>
+                      <Grid container spacing={2}>
+                        <Grid item xs={2}>
                           <DatePicker
-                            selected={new Date(availableAt)}
+                            selected={new Date(user.availableAt)}
                             onChange={handleStartDateChange}
                             showTimeSelect
                             timeIntervals={15}
                             timeCaption='Time'
-                            dateFormat='MMMM d, yyyy '
+                            dateFormat='MMMM d, yyyy'
                             customInput={<CustomInput label='Ngày bắt đầu' />}
                           />
                         </Grid>
-                      )}
-                      {user.expiredAt && (
-                        <Grid item xs={4}>
-                          <DatePicker
-                            selected={new Date(expiredAt)}
-                            onChange={handleEndDateChange}
-                            showTimeSelect
-                            timeIntervals={15}
-                            timeCaption='Time'
-                            dateFormat='MMMM d, yyyy '
-                            customInput={<CustomInput label='Ngày kết thúc' />}
-                          />
-                        </Grid>
-                      )}
+                        {user.expiredAt && (
+                          <Grid item xs={4}>
+                            <DatePicker
+                              selected={new Date(user.expiredAt)}
+                              onChange={handleEndDateChange}
+                              showTimeSelect
+                              timeIntervals={15}
+                              timeCaption='Time'
+                              dateFormat='MMMM d, yyyy'
+                              customInput={<CustomInput label='Ngày kết thúc' />}
+                            />
+                          </Grid>
+                        )}
+                      </Grid>
                     </Grid>
-                  )}
-                </Grid>
+                  ) : (
+                    <Grid container spacing={2}>
+                      <Grid item xs={0.1}></Grid>
+                      <Grid item xs={2}>
+                        <DatePicker
+                          selected={availableAt || new Date()}
+                          onChange={handleStartDateChange}
+                          showTimeSelect
+                          timeIntervals={15}
+                          timeCaption='Time'
+                          dateFormat='MMMM d, yyyy'
+                          customInput={<CustomInput label='Ngày bắt đầu' />}
+                          fullWidth
+                        />
+                      </Grid>
+                      <Grid item xs={3}>
+                        <DatePicker
+                          selected={expiredAt || new Date()}
+                          onChange={handleEndDateChange}
+                          showTimeSelect
+                          timeIntervals={15}
+                          timeCaption='Time'
+                          dateFormat='MMMM d, yyyy'
+                          customInput={<CustomInput label='Ngày kết thúc' />}
+                        />
+                      </Grid>
+                    </Grid>
+                  ))}
+
                 <Grid item xs={11.8}>
-                  <CustomTextField
+                  <TextField
                     rows={4}
                     multiline
                     label='Ghi chú'
@@ -931,7 +1124,7 @@ const UserDetails = () => {
 
                                   setGroup(updatedRows)
                                 }}
-                                renderInput={params => <CustomTextField {...params} label='Đơn vị' />}
+                                renderInput={params => <TextField {...params} label='Đơn vị' />}
                               />
                             </TableCell>
                             {console.log('Group:', group)}
@@ -960,7 +1153,7 @@ const UserDetails = () => {
                   <Typography variant='h5'>Thông tin tài khoản</Typography>
                 </Grid>
                 <Grid item xs={4}>
-                  <CustomTextField
+                  <TextField
                     label='Tài khoản'
                     defaultValue={user?.userAccount.username}
                     onChange={handleUserNameChange}
@@ -970,7 +1163,7 @@ const UserDetails = () => {
                   />
                 </Grid>
                 <Grid item xs={4}>
-                  <CustomTextField
+                  <TextField
                     label='Loại tài khoản'
                     defaultValue={user?.userAccount.identityProviderType}
                     id='form-props-read-only-input'
@@ -1057,7 +1250,7 @@ const UserDetails = () => {
                                   // updatedRows[index].id = newValue.id
                                   setPolicies(updatedRows)
                                 }}
-                                renderInput={params => <CustomTextField {...params} label='Đơn vị' />}
+                                renderInput={params => <TextField {...params} label='Đơn vị' />}
                               />
                             </TableCell>
                             <TableCell>{policy.policyCode}</TableCell>

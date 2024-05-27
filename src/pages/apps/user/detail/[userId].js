@@ -10,7 +10,6 @@ import MuiTabList from '@mui/lab/TabList'
 import Info from './info'
 import Identity from './identity'
 import AccessControl from './accessControl'
-
 import Parking from './parking'
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
@@ -46,24 +45,28 @@ const UserDetails = () => {
 
   return (
     <div>
-      <Grid container spacing={3} style={{ marginTop: 10 }}>
+      <Grid container spacing={3} style={{ marginTop: 10 }} alignItems='center'>
         <TabContext value={value}>
-          <Grid container spacing={2} item xs={6}>
-            <IconButton size='small' component={Link} href={`/apps/user/list`} sx={{ color: 'text.secondary' }}>
-              <Button variant='contained' component={Link} href={`/apps/user/list`}>
-                <Icon icon='tabler:chevron-left' />
-                Quay lại
-              </Button>
-            </IconButton>
+          <Grid item xs={4} container alignItems='center'>
+            <Button
+              variant='contained'
+              component={Link}
+              href={`/apps/user/list`}
+              startIcon={<Icon icon='tabler:chevron-left' />}
+            >
+              Quay lại
+            </Button>
           </Grid>
-          <Grid style={{ marginLeft: 200 }}>
-            {' '}
-            <TabList onChange={handleChange} aria-label='customized tabs example'>
-              <Tab value='1' label='Thông tin cá nhân' />
-              <Tab value='2' label='Thông tin định danh' />
-              <Tab value='3' label='Kiểm soát vào ra' />
-              {/* <Tab value='4' label='Thông tin gửi xe' /> */}
-            </TabList>
+          <Grid item xs={8} container={2}>
+            <Grid item xs={6}></Grid>
+            <Grid item xs={6}>
+              <TabList onChange={handleChange} aria-label='customized tabs example'>
+                <Tab value='1' label='Thông tin cá nhân' />
+                <Tab value='2' label='Thông tin định danh' />
+                <Tab value='3' label='Kiểm soát vào ra' />
+                {/* <Tab value='4' label='Thông tin gửi xe' /> */}
+              </TabList>
+            </Grid>
           </Grid>
           <TabPanel value='1'>
             <Info />

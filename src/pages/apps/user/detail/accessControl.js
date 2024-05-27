@@ -276,86 +276,83 @@ const UserDetails = () => {
     setShowPlusColumn(!showPlusColumn)
   }
 
-    return (
-      <Grid container spacing={3} component={Paper} style={{ width: '100vw', height: 'auto', padding: '1%' }}>
-        <Grid item xs={12}>
-          <Box display="flex" justifyContent="flex-end" sx={{ marginRight: '4%' }}>
-            {editing ? (
-              <>
-                <Button variant='contained' onClick={saveChanges} sx={{ marginRight: '1%' }}>
-                  Lưu
-                </Button>
-                <Button variant='contained' onClick={handleCancel}>
-                  Huỷ
-                </Button>
-              </>
-            ) : (
-              <Button variant='contained' onClick={toggleEdit}>
-                Chỉnh sửa
+  return (
+    <Grid container spacing={3} component={Paper} style={{ width: '95vw', height: 'auto', padding: '1%' }}>
+      <Grid item xs={11.8}>
+        <Box display='flex' justifyContent='flex-end' sx={{ marginRight: '4%' }}>
+          {editing ? (
+            <>
+              <Button variant='contained' onClick={saveChanges} sx={{ marginRight: '1%' }}>
+                Lưu
               </Button>
-            )}
-          </Box>
-        </Grid>
-        <Grid item xs={12}>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={{ width: '30%' }}>Đơn vị</TableCell>
-                  <TableCell sx={{ width: '70%' }}>Mã đơn vị</TableCell>
+              <Button variant='contained' onClick={handleCancel}>
+                Huỷ
+              </Button>
+            </>
+          ) : (
+            <Button variant='contained' onClick={toggleEdit}>
+              Chỉnh sửa
+            </Button>
+          )}
+        </Box>
+      </Grid>
+      <Grid item xs={11.8}>
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ width: '30%' }}>Đơn vị</TableCell>
+                <TableCell sx={{ width: '70%' }}>Mã đơn vị</TableCell>
+                {showPlusColumn && (
+                  <TableCell align='center'>
+                    <IconButton size='small' onClick={handleAddRow} sx={{ marginLeft: '10px' }}>
+                      <Icon icon='bi:plus' />
+                    </IconButton>
+                  </TableCell>
+                )}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.map((row, index) => (
+                <TableRow key={index}>
+                  <TableCell sx={{ width: '30%' }}>
+                    <Autocomplete
+                      options={groupOptions.filter(option => !rows.some(row => row.id === option.id))}
+                      getOptionLabel={option => option.name}
+                      value={groupOptions.find(option => option.name === row.groupName) || null}
+                      onChange={async (event, newValue) => {
+                        if (editing) {
+                          const updatedRows = [...rows]
+                          updatedRows[index].groupName = newValue ? newValue.name : ''
+                          updatedRows[index].id = newValue ? newValue.id : ''
+                          updatedRows[index].description = await getListAccessGroupNamesByUserGroupId(
+                            newValue ? newValue.id : ''
+                          )
+
+                          setRows(updatedRows)
+                        }
+                      }}
+                      disabled={!editing}
+                      renderInput={params => <TextField {...params} label='Đơn vị' />}
+                    />
+                  </TableCell>
+                  <TableCell sx={{ width: '70%' }}>{row.description}</TableCell>
                   {showPlusColumn && (
                     <TableCell align='center'>
-                      <IconButton size='small' onClick={handleAddRow} sx={{ marginLeft: '10px' }}>
-                        <Icon icon='bi:plus' />
-                      </IconButton>
+                      {index >= 0 && (
+                        <IconButton size='small' onClick={() => handleDeleteRow(index)}>
+                          <Icon icon='bi:trash' />
+                        </IconButton>
+                      )}
                     </TableCell>
                   )}
                 </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row, index) => (
-                  <TableRow key={index}>
-                    <TableCell sx={{ width: '30%' }}>
-                      <Autocomplete
-                        options={groupOptions.filter(option => !rows.some(row => row.id === option.id))}
-                        getOptionLabel={option => option.name}
-                        value={groupOptions.find(option => option.name === row.groupName) || null}
-                        onChange={async (event, newValue) => {
-                          if (editing) {
-                            const updatedRows = [...rows];
-                            updatedRows[index].groupName = newValue ? newValue.name : '';
-                            updatedRows[index].id = newValue ? newValue.id : '';
-                            updatedRows[index].description = await getListAccessGroupNamesByUserGroupId(
-                              newValue ? newValue.id : ''
-                            );
-      
-                            setRows(updatedRows);
-                          }
-                        }}
-                        disabled={!editing}
-                        renderInput={params => <TextField {...params} label='Đơn vị' />}
-                      />
-                    </TableCell>
-                    <TableCell sx={{ width: '70%' }}>
-                      {row.description}
-                    </TableCell>
-                    {showPlusColumn && (
-                      <TableCell align='center'>
-                        {index >= 0 && (
-                          <IconButton size='small' onClick={() => handleDeleteRow(index)}>
-                            <Icon icon='bi:trash' />
-                          </IconButton>
-                        )}
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Grid>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </Grid>
-      
+    </Grid>
   )
 }
 
