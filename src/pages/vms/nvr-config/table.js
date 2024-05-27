@@ -42,7 +42,7 @@ const UserList = ({ apiData }) => {
   const [IPNVR, setIPNVR] = useState(null)
   const [openPopup, setOpenPopup] = useState(false)
   const [openPopupP, setOpenPopupP] = useState(false)
-
+  const defaultCameraID = '0eb23593-a9b1-4278-9fb1-4d18f30ed6ff'
   const [openPopupNetwork, setOpenPopupNetwork] = useState(false)
   const [openPopupVideo, setOpenPopupVideo] = useState(false)
   const [openPopupImage, setOpenPopupImage] = useState(false)
@@ -247,8 +247,6 @@ const UserList = ({ apiData }) => {
     }
     fetchFilteredOrAllUsers()
   }, [page, pageSize, total, value])
-
-  console.log(nameNVR, 'idNVR')
 
   return (
     <Grid container spacing={6.5}>

@@ -352,7 +352,7 @@ const InforAll = ({ idInfor }) => {
               <Grid container spacing={2}>
                 <Grid item>
                   <Box sx={{ float: 'right' }}>
-                    <Button size='small' component={Link} href={`/device-management`}>
+                    <Button variant='contained' component={Link} href={`/device-management`}>
                       Hủy
                     </Button>
                   </Box>

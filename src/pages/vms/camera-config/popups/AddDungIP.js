@@ -121,7 +121,7 @@ const Add = ({
       fetchGroupDataCamera()
     } catch (error) {
       console.error('Error deleting Camera:', error)
-      setMessage({ text: `${error.response.data.message}`, type: 'delete', error: true })
+      setMessage({ text: `${error.response.message}`, type: 'delete', error: true })
     } finally {
       setLoading(false)
     }
@@ -151,41 +151,44 @@ const Add = ({
 
                 <TableBody>
                   {response && response.length > 0 ? (
-                    response.map((camera, index) => {
-                      const foundcamera = selectedIds.find(item => item.macAddress === camera.macAddress)
+                    response.filter(camera => camera.type !== 'NVR').length > 0 ? (
+                      response
+                        .filter(camera => camera.type !== 'NVR')
+                        .map((camera, index) => {
+                          const foundcamera = selectedIds.find(item => item.macAddress === camera.macAddress)
 
-                      // Kiểm tra nếu type === 'NVR' và không có dữ liệu
-                      if (camera.type === 'NVR' && !foundcamera) {
-                        return null // Ẩn dòng này nếu type === 'NVR' và không có dữ liệu
-                      }
-
-                      return (
-                        <TableRow key={index}>
-                          <TableCell sx={{ padding: '16px' }}>{index + 1}</TableCell>
-                          <TableCell sx={{ padding: '16px' }}>{camera.name}</TableCell>
-                          <TableCell sx={{ padding: '16px' }}>{camera.type}</TableCell>
-                          <TableCell sx={{ padding: '16px' }}>{camera.url}</TableCell>
-                          <TableCell sx={{ padding: '16px' }}>{camera.macAddress}</TableCell>
-                          <TableCell sx={{ padding: '16px' }}>{camera.location}</TableCell>
-                          <TableCell sx={{ padding: '16px' }}>{camera.status}</TableCell>
-                          <TableCell sx={{ padding: '16px' }}>
-                            {foundcamera ? (
-                              <IconButton onClick={() => handleDeleteCamera(foundcamera.id)}>
-                                <Icon icon='tabler:minus' />
-                              </IconButton>
-                            ) : (
-                              <IconButton onClick={() => handleCreateCammera(camera)}>
-                                <Icon icon='tabler:plus' />
-                              </IconButton>
-                            )}
-                            {loading && <CircularProgress style={{ marginLeft: '10%' }} />}
-                          </TableCell>
-                        </TableRow>
-                      )
-                    })
+                          return (
+                            <TableRow key={index}>
+                              <TableCell sx={{ padding: '16px' }}>{index + 1}</TableCell>
+                              <TableCell sx={{ padding: '16px' }}>{camera.name}</TableCell>
+                              <TableCell sx={{ padding: '16px' }}>{camera.type}</TableCell>
+                              <TableCell sx={{ padding: '16px' }}>{camera.url}</TableCell>
+                              <TableCell sx={{ padding: '16px' }}>{camera.macAddress}</TableCell>
+                              <TableCell sx={{ padding: '16px' }}>{camera.location}</TableCell>
+                              <TableCell sx={{ padding: '16px' }}>{camera.status}</TableCell>
+                              <TableCell sx={{ padding: '16px' }}>
+                                {foundcamera ? (
+                                  <IconButton onClick={() => handleDeleteCamera(foundcamera.id)}>
+                                    <Icon icon='tabler:minus' />
+                                  </IconButton>
+                                ) : (
+                                  <IconButton onClick={() => handleCreateCammera(camera)}>
+                                    <Icon icon='tabler:plus' />
+                                  </IconButton>
+                                )}
+                                {loading && <CircularProgress style={{ marginLeft: '10%' }} />}
+                              </TableCell>
+                            </TableRow>
+                          )
+                        })
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={9}>Không tìm thấy camera</TableCell>
+                      </TableRow>
+                    )
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={9}>Không tìm thấy camera</TableCell>
+                      <TableCell colSpan={9}>Không có dữ liệu</TableCell>
                     </TableRow>
                   )}
                 </TableBody>

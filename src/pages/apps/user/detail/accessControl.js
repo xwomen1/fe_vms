@@ -32,6 +32,7 @@ import DatePicker from 'react-datepicker'
 import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
 import Swal from 'sweetalert2'
 import Link from 'next/link'
+import { auto } from '@popperjs/core'
 
 const UserDetails = () => {
   const router = useRouter()
@@ -276,40 +277,32 @@ const UserDetails = () => {
   }
 
   return (
-    <Grid container spacing={3} component={Paper}>
-      <Grid item xs={12}></Grid>
-      <Grid container spacing={2} item xs={12}>
-        {/* <IconButton size='small' component={Link} href={`/apps/user/list`} sx={{ color: 'text.secondary' }}>
-          <Icon icon='tabler:chevron-left' />
-        </IconButton> */}
-        {/* <h2 style={{ color: 'black' }}>Thêm mới người dùng: </h2> */}
-      </Grid>
-      <Grid container spacing={2}>
-        <div style={{ width: '80%' }}></div>
-        <br></br>
-        {editing ? (
-          <>
-            <Button variant='contained' onClick={saveChanges} sx={{ marginRight: '10px' }}>
-              Lưu
+    <Grid container spacing={3} component={Paper} style={{ width: '95vw', height: 'auto', padding: '1%' }}>
+      <Grid item xs={11.8}>
+        <Box display='flex' justifyContent='flex-end' sx={{ marginRight: '4%' }}>
+          {editing ? (
+            <>
+              <Button variant='contained' onClick={saveChanges} sx={{ marginRight: '1%' }}>
+                Lưu
+              </Button>
+              <Button variant='contained' onClick={handleCancel}>
+                Huỷ
+              </Button>
+            </>
+          ) : (
+            <Button variant='contained' onClick={toggleEdit}>
+              Chỉnh sửa
             </Button>
-            <Button variant='contained' onClick={handleCancel}>
-              Huỷ
-            </Button>
-          </>
-        ) : (
-          <Button variant='contained' onClick={toggleEdit}>
-            Chỉnh sửa
-          </Button>
-        )}
+          )}
+        </Box>
       </Grid>
-      <Grid item xs={12}>
-        <TableContainer style={{ width: '100%' }}>
+      <Grid item xs={11.8}>
+        <TableContainer>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ minWidth: 300 }}>Đơn vị</TableCell>
-                <TableCell sx={{ minWidth: 300 }}>Mã đơn vị</TableCell>
-
+                <TableCell sx={{ width: '30%' }}>Đơn vị</TableCell>
+                <TableCell sx={{ width: '70%' }}>Mã đơn vị</TableCell>
                 {showPlusColumn && (
                   <TableCell align='center'>
                     <IconButton size='small' onClick={handleAddRow} sx={{ marginLeft: '10px' }}>
@@ -322,14 +315,13 @@ const UserDetails = () => {
             <TableBody>
               {rows.map((row, index) => (
                 <TableRow key={index}>
-                  <TableCell>
+                  <TableCell sx={{ width: '30%' }}>
                     <Autocomplete
                       options={groupOptions.filter(option => !rows.some(row => row.id === option.id))}
                       getOptionLabel={option => option.name}
                       value={groupOptions.find(option => option.name === row.groupName) || null}
                       onChange={async (event, newValue) => {
                         if (editing) {
-                          // Chỉ cho phép thay đổi khi đang trong trạng thái chỉnh sửa
                           const updatedRows = [...rows]
                           updatedRows[index].groupName = newValue ? newValue.name : ''
                           updatedRows[index].id = newValue ? newValue.id : ''
@@ -340,14 +332,11 @@ const UserDetails = () => {
                           setRows(updatedRows)
                         }
                       }}
-                      disabled={!editing} // Tắt khi không trong trạng thái chỉnh sửa
+                      disabled={!editing}
                       renderInput={params => <TextField {...params} label='Đơn vị' />}
                     />
                   </TableCell>
-                  <TableCell>
-                    {row.description}
-                    {console.log(rows)}
-                  </TableCell>
+                  <TableCell sx={{ width: '70%' }}>{row.description}</TableCell>
                   {showPlusColumn && (
                     <TableCell align='center'>
                       {index >= 0 && (

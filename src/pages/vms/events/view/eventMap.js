@@ -1,441 +1,696 @@
 import {
-    Box, Button, Card, CardActions, CardContent, CardHeader, Checkbox, Grid, IconButton,
-    Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow
-} from "@mui/material"
-import { useEffect, useState } from "react"
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
+  Checkbox,
+  Grid,
+  IconButton,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow
+} from '@mui/material'
+import { useEffect, useState } from 'react'
 import DatePicker from 'react-datepicker'
 import Icon from 'src/@core/components/icon'
-import CustomTextField from "src/@core/components/mui/text-field"
+import CustomTextField from 'src/@core/components/mui/text-field'
 import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
-import DatePickerWrapper from "src/@core/styles/libs/react-datepicker"
+import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 
-import ReactMapGL, { Marker, Popup as Popup, Source, Layer } from '@goongmaps/goong-map-react'
+import ReactMapGL, { Marker, Popup, Source, Layer } from '@goongmaps/goong-map-react'
 
 import authConfig from 'src/configs/auth'
-import toast from "react-hot-toast"
-import axios from "axios"
+import toast from 'react-hot-toast'
+import axios from 'axios'
 import * as XLSX from 'xlsx'
 
 const columns = [
-    {
-        id: 1,
-        flex: 0.15,
-        type: 'date',
-        width: 50,
-        align: 'right',
-        label: 'Ngày giờ',
-        field: 'time',
-        valueGetter: params => new Date(params.value)
-    },
-    {
-        id: 2,
-        flex: 0.25,
-        width: 50,
-        align: 'right',
-        field: 'event',
-        label: 'Sự kiện'
-    },
-    {
-        id: 3,
-        flex: 0.15,
-        width: 50,
-        align: 'right',
-        label: 'Camera',
-        field: 'camera',
-    },
-]
-
-const rows = [
-    {
-        time: '03/05/2024',
-        event: 'Nhận diện',
-        camera: 'Cam 1',
-        latitude: '21.027974',
-        longitude: '105.817700'
-    },
-    {
-        time: '04/05/2024',
-        event: 'Biển số',
-        camera: 'Cam 2',
-        latitude: '21.027498979352664',
-        longitude: '105.82610264411711'
-    },
-    {
-        time: '05/05/2024',
-        event: 'Biển số',
-        camera: 'Cam 3',
-        latitude: '21.024535898438057',
-        longitude: '105.83191767326018'
-    },
-    {
-        time: '06/05/2024',
-        event: 'Nhận diện',
-        camera: 'Cam 5',
-        latitude: '21.023254547908486',
-        longitude: '105.8227337895938'
-    },
-    {
-        time: '07/05/2024',
-        event: 'Nhận diện',
-        camera: 'Cam 1',
-        latitude: '21.026821',
-        longitude: '105.820900'
-    },
+  {
+    id: 1,
+    flex: 0.15,
+    type: 'timestamp',
+    width: 50,
+    align: 'right',
+    label: 'Ngày giờ',
+    field: 'timestamp',
+    valueGetter: params => new Date(params.field)
+  },
+  {
+    id: 2,
+    flex: 0.25,
+    type: 'eventTypeString',
+    width: 50,
+    align: 'right',
+    field: 'event',
+    label: 'Sự kiện',
+    field: 'eventTypeString'
+  },
+  {
+    id: 3,
+    flex: 0.15,
+    width: 50,
+    align: 'right',
+    label: 'Camera',
+    field: 'camName'
+  }
 ]
 
 const EventMap = () => {
-    const [loading, setLoading] = useState(false)
-    const [keyword, setKeyword] = useState('')
-    const [startTime, setStartTime] = useState(null)
-    const [endTime, setEndTime] = useState(null)
-    const [isOpenGroup, setIsOpenGroup] = useState([])
-    const [selected, setSelected] = useState([])
-    const [isOpenTable, setIsOpenTable] = useState(false)
-    const [dataList, setDataList] = useState(null)
-    const [points, setPoints] = useState([])
-    const [selectedPoints, setSelectedPoints] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [keyword, setKeyword] = useState('')
+  const [startTime, setStartTime] = useState(null)
+  const [endTime, setEndTime] = useState(null)
+  const [isOpenGroup, setIsOpenGroup] = useState([])
+  const [selected, setSelected] = useState([])
+  const [isOpenTable, setIsOpenTable] = useState(false)
+  const [dataList, setDataList] = useState(null)
+  const [rows, setRows] = useState([])
+  const [selectedPoints, setSelectedPoints] = useState([])
+  const [connections, setConnections] = useState([])
+  const [selectedTimes, setSelectedTimes] = useState([])
 
-    const [viewport, setViewport] = useState({
-        longitude: 105.834160,
-        latitude: 21.027763,
-        zoom: 15
-    })
+  const [selectedCameraIds, setSelectedCameraIds] = useState([]) // State for selected camera IDs
+  const [longLat, setLongLat] = useState([]) // State for selected camera IDs
+  const [isReconnected, setIsReconnected] = useState(false)
 
-    const token = localStorage.getItem(authConfig.storageTokenKeyName)
+  const [viewport, setViewport] = useState({
+    longitude: 105.83416,
+    latitude: 21.027763,
+    zoom: 15
+  })
 
-    const config = {
-        headers: {
-            Authorization: `Bearer ${token}`
-        },
+  const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  }
+
+  // const handleTimeSelect = time => {
+  //   // Thêm thời điểm mới vào mảng
+  //   const newSelectedTimes = [...selectedTimes, time]
+
+  //   // Kiểm tra nếu mảng có hơn 3 thời điểm, sắp xếp mảng theo thời gian từ lớn đến bé
+  //   if (newSelectedTimes.length > 3) {
+  //     newSelectedTimes.sort((a, b) => b - a)
+  //   } else {
+  //     newSelectedTimes.sort((a, b) => a - b)
+  //   }
+
+  //   // Cập nhật mảng đã sắp xếp
+  //   setSelectedTimes(newSelectedTimes)
+  //   console.log(newSelectedTimes)
+
+  //   // Sau khi chọn đủ 3 thời điểm, gọi hàm connectPoints để vẽ đường nối
+  //   if (newSelectedTimes.length === 3) {
+  //     connectPoints(newSelectedTimes[0], newSelectedTimes[1])
+  //     connectPoints(newSelectedTimes[1], newSelectedTimes[2])
+  //   }
+  // }
+
+  const connectPoints = (time1, time2) => {
+    const point1 = findPointByTime(time1)
+    const point2 = findPointByTime(time2)
+
+    if (point1 && point2) {
+      drawLineOnMap(point1, point2)
+
+      // Kiểm tra nếu mảng có hơn 3 điểm được chọn thì xoá điểm trước đó được nối
+      if (selectedTimes.length === 3) {
+        deletePreviousConnection()
+      }
+      console.log(`Connecting points ${point1.timestamp} and ${point2.timestamp}`)
+    }
+  }
+
+  const deletePreviousConnection = () => {
+    if (connections.length > 0) {
+      // Xoá điểm được nối từ mảng connections
+      const updatedConnections = [...connections]
+      updatedConnections.pop() // Xoá điểm cuối cùng
+      setConnections(updatedConnections)
+    }
+  }
+
+  const sortPointsByTime = points => {
+    return points.sort((a, b) => a.timestamp - b.timestamp)
+  }
+
+  const handleTimeSelect = (time, longitude, latitude) => {
+    let newSelectedTimes = [...selectedTimes, { time, longitude, latitude }]
+
+    // Sắp xếp các điểm theo timestamp
+    newSelectedTimes.sort((a, b) => a.time - b.time)
+
+    // Nếu có hơn 3 điểm, chỉ giữ lại 3 điểm mới nhất
+    if (newSelectedTimes.length > 3) {
+      newSelectedTimes = newSelectedTimes.slice(-3)
+      setIsReconnected(true) // Đánh dấu rằng các kết nối được vẽ lại
+    } else {
+      setIsReconnected(false)
     }
 
-    const GOONG_MAP_KEY = 'MaRpQPZORjHfEMC3tpTGCLlPqo5qXDkzvcemJZWO'
+    setSelectedTimes(newSelectedTimes)
 
+    // Tạo kết nối giữa các điểm theo thứ tự timestamp
+    let newConnections = []
+    if (newSelectedTimes.length >= 2) {
+      for (let i = 0; i < newSelectedTimes.length - 1; i++) {
+        newConnections.push([newSelectedTimes[i], newSelectedTimes[i + 1]])
+      }
+    }
+    setConnections(newConnections)
+  }
 
-    useEffect(() => {
-        fetchDataList()
+  const findPointByTime = time => {
+    const point = selectedPoints.find(point => point.timestamp === time)
+
+    return point || null
+  }
+
+  const drawLineOnMap = (point1, point2) => {
+    if (point1 && point2 && point1.longitude && point1.latitude && point2.longitude && point2.latitude) {
+      setConnections(prevConnections => [
+        ...prevConnections,
+        {
+          type: 'Feature',
+          geometry: {
+            type: 'LineString',
+            coordinates: [
+              [parseFloat(point1.longitude), parseFloat(point1.latitude)],
+              [parseFloat(point2.longitude), parseFloat(point2.latitude)]
+            ]
+          }
+        }
+      ])
+    }
+  }
+
+  useEffect(() => {
+    if (selectedTimes.length === 2) {
+      // Nối time thứ 1 với time thứ 2 và time thứ 2 với time thứ 3
+      connectPoints(selectedTimes[0], selectedTimes[1])
+      connectPoints(selectedTimes[1], selectedTimes[2])
+    } else if (selectedTimes.length === 1) {
+      // Nối time thứ 1 với time thứ 3
+      connectPoints(selectedTimes[0], selectedTimes[2])
+    }
+  }, [selectedTimes])
+
+  const CustomMapPin = () => (
+    <svg
+      xmlns='http://www.w3.org/2000/svg'
+      width='40'
+      height='40'
+      viewBox='0 0 24 24'
+      stroke='orange'
+      fill='orange'
+      className='icon icon-tabler icons-tabler-filled icon-tabler-map-pin'
+    >
+      <path stroke='none' d='M0 0h24v24H0z' fill='none' />
+      <path d='M18.364 4.636a9 9 0 0 1 .203 12.519l-.203 .21l-4.243 4.242a3 3 0 0 1 -4.097 .135l-.144 -.135l-4.244 -4.243a9 9 0 0 1 12.728 -12.728zm-6.364 3.364a3 3 0 1 0 0 6a3 3 0 0 0 0 -6z' />
+    </svg>
+  )
+  const GOONG_MAP_KEY = 'MaRpQPZORjHfEMC3tpTGCLlPqo5qXDkzvcemJZWO'
+
+  const handleSearch = async () => {
+    setLoading(true)
+    try {
+      const startEpoch = startTime ? Math.floor(startTime.getTime()) : ''
+      const endEpoch = endTime ? Math.floor(endTime.getTime()) : ''
+
+      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/routine`, {
+        params: {
+          keyword,
+          startTime: startEpoch,
+          endTime: endEpoch
+        },
+        ...config
+      })
+      setRows(res.data || [])
+      setIsOpenTable(true)
+    } catch (error) {
+      console.error('Error fetching events: ', error)
+      toast.error(error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleZoomIn = () => {
+    setViewport(prevState => ({
+      ...prevState,
+      zoom: Math.min(prevState.zoom + 1, 20) // Maximum zoom level of 20
+    }))
+  }
+
+  const handleZoomOut = () => {
+    setViewport(prevState => ({
+      ...prevState,
+      zoom: Math.max(prevState.zoom - 1, 1) // Minimum zoom level of 1
+    }))
+  }
+
+  // Chuyển đổi timestamp thành định dạng "dd mm yyyy hh mm ss"
+  const convertTimestampToDateTimeString = timestamp => {
+    const dateObj = new Date(timestamp)
+    const day = ('0' + dateObj.getDate()).slice(-2)
+    const month = ('0' + (dateObj.getMonth() + 1)).slice(-2)
+    const year = dateObj.getFullYear()
+    const hours = ('0' + dateObj.getHours()).slice(-2)
+    const minutes = ('0' + dateObj.getMinutes()).slice(-2)
+    const seconds = ('0' + dateObj.getSeconds()).slice(-2)
+
+    return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`
+  }
+
+  // Cập nhật cột timestamp trong bảng thành định dạng "dd mm yyyy hh mm ss"
+  const updatedRows = rows.map(row => ({
+    ...row,
+    timestamp: convertTimestampToDateTimeString(row.timestamp)
+  }))
+
+  const handleSelectAllClick = event => {
+    if (event.target.checked) {
+      const newSelected = rows.map(n => n.time)
+      setSelected(newSelected)
+
+      return
+    }
+    setSelected([])
+  }
+
+  const calculateConnections = () => {
+    const lines = []
+    const sortedPoints = [...selectedPoints].sort((a, b) => a.timestamp - b.timestamp)
+
+    for (let i = 0; i < sortedPoints.length - 1; i++) {
+      const startPoint = sortedPoints[i]
+      const endPoint = sortedPoints[i + 1]
+      lines.push({
+        type: 'Feature',
+        geometry: {
+          type: 'LineString',
+          coordinates: [
+            [parseFloat(startPoint.longitude), parseFloat(startPoint.latitude)],
+            [parseFloat(endPoint.longitude), parseFloat(endPoint.latitude)]
+          ]
+        },
+        properties: {
+          timestamp: startPoint.timestamp
+        }
+      })
+    }
+    setConnections(lines)
+  }
+
+  const clearConnections = () => {
+    setConnections([])
+  }
+
+  const handleCameraSelect = (event, cameraId, LongitudeOfCam, LatitudeOfCam, timestamp) => {
+    if (event.target.checked && LongitudeOfCam && LatitudeOfCam) {
+      setSelectedCameraIds(prevIds => [...prevIds, cameraId])
+      setSelectedPoints(prevPoints => [
+        ...prevPoints,
+        { longitude: LongitudeOfCam, latitude: LatitudeOfCam, timestamp }
+      ])
+      handleTimeSelect(timestamp, LongitudeOfCam, LatitudeOfCam)
+    } else {
+      setSelectedCameraIds(prevIds => prevIds.filter(id => id !== cameraId))
+      setSelectedPoints(prevPoints =>
+        prevPoints.filter(point => point.longitude !== LongitudeOfCam || point.latitude !== LatitudeOfCam)
+      )
+      setSelectedTimes(prevTimes => prevTimes.filter(time => time.time !== timestamp))
+    }
+  }
+  useEffect(() => {
+    connections.forEach(connection => {
+      connectPoints(connection[0], connection[1])
+    })
+  }, [connections])
+  useEffect(() => {
+    if (isReconnected) {
+      console.log('Các kết nối đã được vẽ lại.')
+    }
+  }, [isReconnected])
+  useEffect(() => {
+    console.log('Mảng các camera đang được select:', selectedCameraIds)
+  }, [selectedCameraIds])
+
+  // Hàm sắp xếp các điểm theo thời gian tăng dần
+  const sortSelectedPointsByTime = () => {
+    const sortedPoints = [...selectedPoints].sort((a, b) => a.timestamp - b.timestamp)
+    console.log('Mảng được sắp xếp theo thời gian:', sortedPoints)
+    setSelectedPoints(sortedPoints)
+  }
+
+  const handleExport = async () => {
+    const excelData = rows.reduce((acc, row) => {
+      acc.push({
+        'Ngày giờ': row.time,
+        'Sự kiện': row.event,
+        Camera: row.camera
+      })
+
+      return acc
     }, [])
 
-    const fetchDataList = async () => {
-        setLoading(true)
-        try {
-            const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras`, config)
-            setDataList(res.data)
-        } catch (error) {
-            console.error('Error fetching data: ', error)
-            toast.error(error.message)
-        } finally {
-            setLoading(false)
+    const ws = XLSX.utils.json_to_sheet(excelData)
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'Map')
+
+    XLSX.writeFile(wb, 'Map.xlsx')
+  }
+
+  const epochToDate = epoch => {
+    const dateObj = new Date(epoch)
+    const year = dateObj.getFullYear()
+    const month = ('0' + (dateObj.getMonth() + 1)).slice(-2)
+    const day = ('0' + dateObj.getDate()).slice(-2)
+    const hours = ('0' + dateObj.getHours()).slice(-2)
+    const minutes = ('0' + dateObj.getMinutes()).slice(-2)
+    const seconds = ('0' + dateObj.getSeconds()).slice(-2)
+
+    return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`
+  }
+
+  // Sử dụng hàm epochToDate để chuyển đổi epoch timestamp sang dạng ngày tháng năm và giờ phút giây
+  const epochTimestamp = 1621766000000 // Ví dụ với một epoch timestamp cụ thể
+  const formattedDate = epochToDate(epochTimestamp)
+
+  const viewMap = () => (
+    <Grid container spacing={2}>
+      <ReactMapGL
+        {...viewport}
+        width='100%'
+        height='65vh'
+        onViewportChange={newViewport => setViewport(newViewport)}
+        goongApiAccessToken={GOONG_MAP_KEY}
+      >
+        <Button onClick={handleZoomIn} variant='contained'>
+          +
+        </Button>
+        <Button onClick={handleZoomOut} variant='contained'>
+          -
+        </Button>
+        {selectedPoints.map((point, index) => (
+          <Marker
+            key={index}
+            latitude={parseFloat(point.latitude)}
+            longitude={parseFloat(point.longitude)}
+            offsetLeft={-20}
+            offsetTop={-20}
+          >
+            <div>
+              <CustomMapPin />
+            </div>
+          </Marker>
+        ))}
+        <Source type='geojson' data={{ type: 'FeatureCollection', features: renderConnections() }}>
+          <Layer
+            id='lines'
+            type='line'
+            layout={{
+              'line-cap': 'round',
+              'line-join': 'round'
+            }}
+            paint={{
+              'line-color': 'orange',
+              'line-width': 2
+            }}
+          />
+        </Source>
+      </ReactMapGL>
+    </Grid>
+  )
+
+  const isSelected = name => selected.indexOf(name) !== -1
+  const sortedPoints = selectedPoints.slice().sort((a, b) => a.timestamp - b.timestamp)
+
+  const renderConnections = () => {
+    const lines = []
+    for (let i = 0; i < sortedPoints.length - 1; i++) {
+      const startPoint = sortedPoints[i]
+      const endPoint = sortedPoints[i + 1]
+      lines.push({
+        type: 'Feature',
+        geometry: {
+          type: 'LineString',
+          coordinates: [
+            [parseFloat(startPoint.longitude), parseFloat(startPoint.latitude)],
+            [parseFloat(endPoint.longitude), parseFloat(endPoint.latitude)]
+          ]
         }
+      })
     }
 
-    const handleSearch = e => {
-        setKeyword(e.target.value)
+    return lines
+  }
+
+  const calculateCenter = () => {
+    if (selectedPoints.length === 0) {
+      // Trả về giá trị mặc định nếu không có điểm nào được chọn
+      return {
+        latitude: 21.027763,
+        longitude: 105.83416,
+        zoom: 15
+      }
     }
 
-    const handleSelectAllClick = (event) => {
-        if (event.target.checked) {
-            const newSelected = rows.map((n) => n.time)
-            setSelected(newSelected)
+    // Tính tổng tất cả các vị trí
+    const totalLatitude = selectedPoints.reduce((acc, point) => acc + parseFloat(point.latitude), 0)
+    const totalLongitude = selectedPoints.reduce((acc, point) => acc + parseFloat(point.longitude), 0)
 
-            return
-        }
-        setSelected([])
+    // Tính trung bình vị trí của các điểm được chọn
+    const averageLatitude = totalLatitude / selectedPoints.length
+    const averageLongitude = totalLongitude / selectedPoints.length
+
+    // Tính khoảng cách lớn nhất từ trung tâm đến các điểm
+    const maxDistance = selectedPoints.reduce((acc, point) => {
+      const distance = Math.sqrt(
+        Math.pow(parseFloat(point.latitude) - averageLatitude, 2) +
+          Math.pow(parseFloat(point.longitude) - averageLongitude, 2)
+      )
+
+      return Math.max(acc, distance)
+    }, 0)
+
+    // Tính zoom level dựa trên khoảng cách lớn nhất
+    const zoom = Math.min(Math.floor(Math.log2((360 * 0.8) / maxDistance)), 20)
+
+    return {
+      latitude: averageLatitude,
+      longitude: averageLongitude,
+      zoom: zoom
     }
+  }
 
-    const handleClick = (event, name, longitude, latitude) => {
-        const selectedIndex = selected.indexOf(name)
-        let newSelected = []
-        let newSelectedPoints = [...selectedPoints] // Sao chép danh sách các điểm đã chọn
+  // Hàm cập nhật viewport
+  const updateViewport = () => {
+    const newViewport = calculateCenter()
+    setViewport(newViewport)
+  }
 
-        if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selected, name)
-            newSelectedPoints.push({ longitude, latitude }) // Thêm điểm mới vào danh sách
-        } else {
-            newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1))
-            const indexToRemove = newSelectedPoints.findIndex(point => point.longitude === longitude && point.latitude === latitude)
-            if (indexToRemove !== -1) {
-                newSelectedPoints.splice(indexToRemove, 1) // Loại bỏ điểm đã chọn khỏi danh sách
-            }
-        }
-        setSelected(newSelected)
-        setSelectedPoints(newSelectedPoints)
+  useEffect(() => {
+    // Mỗi khi selectedPoints thay đổi, cập nhật lại viewport
+    updateViewport()
+  }, [selectedPoints])
+  useEffect(() => {
+    // Kiểm tra xem đã có dữ liệu từ API hay chưa
+    if (selectedPoints.length > 0) {
+      // Sắp xếp mảng selectedPoints theo timestamp tăng dần
+      const sortedPoints = selectedPoints.slice().sort((a, b) => a.timestamp - b.timestamp)
+
+      // Cập nhật selectedPoints với mảng đã sắp xếp
+      setSelectedPoints(sortedPoints)
     }
+  }, [selectedPoints]) // Khi selectedPoints thay đổi, useEffect này sẽ được gọi
 
-    const handleExport = async () => {
-        const excelData = rows.reduce((acc, row) => {
-            acc.push({
-                'Ngày giờ': row.time,
-                'Sự kiện': row.event,
-                'Camera': row.camera
-            })
+  const viewTable = () => (
+    <TableContainer component={Paper} sx={{ height: '100%', minHeight: 'calc(60vh - 200px)' }}>
+      <Table stickyHeader className='sticky table' sx={{ overflow: 'auto' }}>
+        <TableHead>
+          <TableRow>
+            <TableCell padding='checkbox' sx={{ width: 20 }}>
+              <Checkbox
+                onChange={handleSelectAllClick}
+                checked={rows.length > 0 && selected.length === rows.length}
+                inputProps={{ 'aria-label': 'select all desserts' }}
+                indeterminate={selected.length > 0 && selected.length < rows.length}
+              />
+            </TableCell>
+            {columns.map(column => (
+              <TableCell key={column.id} align={column.align} sx={{ width: column.width }}>
+                {column.label}
+              </TableCell>
+            ))}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {updatedRows.map((row, index) => {
+            const isItemSelected = selectedCameraIds.includes(row.id)
+            const labelId = `enhanced-table-checkbox-${index}`
 
-            return acc
-        }, [])
+            return (
+              <TableRow
+                hover
+                tabIndex={-1}
+                key={index}
+                role='checkbox'
+                selected={isItemSelected}
+                aria-checked={isItemSelected}
+              >
+                <TableCell padding='checkbox'>
+                  <Checkbox
+                    checked={isItemSelected}
+                    onChange={event =>
+                      handleCameraSelect(event, row.id, row.LongtitudeOfCam, row.LatitudeOfCam, row.timestamp)
+                    }
+                    inputProps={{ 'aria-labelledby': labelId }}
+                  />
+                </TableCell>
+                {columns.map(column => {
+                  const value = row[column.field]
 
-        const ws = XLSX.utils.json_to_sheet(excelData)
-        const wb = XLSX.utils.book_new()
-        XLSX.utils.book_append_sheet(wb, ws, 'Map')
+                  return (
+                    <TableCell key={column.id} align={column.align}>
+                      {column.format && typeof value === 'number' ? column.format(value) : value}
+                    </TableCell>
+                  )
+                })}
+              </TableRow>
+            )
+          })}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  )
 
-        XLSX.writeFile(wb, 'Map.xlsx')
-    }
-
-    const viewMap = () => (
-        <Grid container spacing={2}>
-            <ReactMapGL
-                {...viewport}
-                width="100%"
-                height="65vh"
-                onViewportChange={setViewport}
-                goongApiAccessToken={GOONG_MAP_KEY}
-            >
-                {
-                    dataList?.map((marker, index) => {
-                        if (marker?.lat && marker?.long) {
-                            return (
-                                <>
-                                    <Marker
-                                        onClick={() => {
-                                            let isOpen = dataList?.map((x) => false)
-                                            isOpen[index] = true
-                                            setIsOpenGroup(isOpen)
-                                        }}
-                                        latitude={parseFloat(marker?.lat)}
-                                        longitude={parseFloat(marker?.long)}
-                                        offsetLeft={-20}
-                                        offsetTop={-20}
-                                        key={index}
-                                    >
-                                        <div
-                                            style={{ zoom: '10%' }}
-                                        >
-                                            <img src="/images/speaker.png" />
-                                        </div>
-                                    </Marker>
-
-                                    {
-                                        isOpenGroup[index] && (
-                                            <div>
-                                                <Popup
-                                                    latitude={parseFloat(marker?.lat)}
-                                                    longitude={parseFloat(marker?.long)}
-                                                    closeButton={true}
-                                                    closeOnClick={false}
-                                                    onClose={() => {
-                                                        let isOpen = dataList?.map((x) => false)
-                                                        setIsOpenGroup(isOpen)
-                                                    }}
-                                                    anchor="top"
-                                                >
-                                                    <div style={{ fontWeight: 400 }}>
-
-                                                    </div>
-                                                </Popup>
-                                            </div>
-                                        )
-                                    }
-                                </>
-                            )
-                        }
-                    })
-                }
-
-                {selectedPoints.length >= 2 && (
-                    <Source id="line" type="geojson" data={{ type: 'Feature', geometry: { type: 'LineString', coordinates: selectedPoints.map(point => [point.longitude, point.latitude]) } }}>
-                        <Layer
-                            id="measure-lines"
-                            type="line"
-                            paint={{
-                                'line-color': '#FF0000',
-                                'line-width': 2,
-                                'line-dasharray': [2, 2],
-                            }}
-                            layout={{
-                                'line-join': 'round',
-                                'line-cap': 'round'
-                            }}
+  return (
+    <>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <Card>
+            <CardHeader
+              title='Bản đồ'
+              sx={{
+                py: 4,
+                flexDirection: ['column', 'row'],
+                '& .MuiCardHeader-action': { m: 0 },
+                alignItems: ['flex-start', 'center']
+              }}
+              action={
+                <Grid container spacing={2}>
+                  <Grid item>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                      <CustomTextField
+                        value={keyword}
+                        placeholder='Tìm đối tượng'
+                        InputProps={{
+                          startAdornment: (
+                            <Box sx={{ mr: 2, display: 'flex' }}>
+                              <Icon fontSize='1.25rem' icon='tabler:search' />
+                            </Box>
+                          ),
+                          endAdornment: (
+                            <IconButton size='small' title='Clear' aria-label='Clear' onClick={() => setKeyword('')}>
+                              <Icon fontSize='1.25rem' icon='tabler:x' />
+                            </IconButton>
+                          )
+                        }}
+                        onChange={e => setKeyword(e.target.value)}
+                        sx={{
+                          width: {
+                            xs: 1,
+                            sm: 'auto'
+                          },
+                          '& .MuiInputBase-root > svg': {
+                            mr: 2
+                          }
+                        }}
+                      />
+                    </Box>
+                  </Grid>
+                  <Grid item>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                      <Button variant='outlined' onClick={handleSearch}>
+                        Tìm kiếm
+                      </Button>
+                    </Box>
+                  </Grid>
+                  <Grid item>
+                    <DatePickerWrapper>
+                      <div>
+                        <DatePicker
+                          selected={startTime}
+                          id='basic-input'
+                          onChange={date => setStartTime(date)}
+                          placeholderText='Chọn ngày bắt đầu'
+                          customInput={<CustomInput label='Ngày bắt đầu' />}
                         />
-                    </Source>
-                )}
-            </ReactMapGL>
-        </Grid >
-    )
-
-    const isSelected = time => selected.indexOf(time) !== -1
-
-
-    const viewTable = () => (
-        <TableContainer component={Paper} sx={{ maxHeight: 600 }}>
-            <Table sstickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
-                <TableHead>
-                    <TableRow>
-                        <TableCell padding='checkbox' sx={{ width: 20 }}>
-                            <Checkbox
-                                onChange={handleSelectAllClick}
-                                checked={rows.length > 0 && selected.length === rows.length}
-                                inputProps={{ 'aria-label': 'select all desserts' }}
-                                indeterminate={selected.length > 0 && selected.length < rows.length}
-                            />
-                        </TableCell>
-                        {columns.map(column => (
-                            <TableCell key={column.id} align={column.align} sx={{ width: column.width }}>
-                                {column.label}
-                            </TableCell>
-                        ))}
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {rows.map((row, index) => {
-                        const isItemSelected = isSelected(row.time)
-                        const labelId = `enhanced-table-checkbox-${index}`
-
-                        return (
-                            <TableRow
-                                hover
-                                tabIndex={-1}
-                                key={index}
-                                role='checkbox'
-                                selected={isItemSelected}
-                                aria-checked={isItemSelected}
-                                onClick={event => handleClick(event, row.time, row.longitude, row.latitude)}
-
-                            >
-                                <TableCell padding='checkbox'>
-                                    <Checkbox
-                                        checked={isItemSelected}
-                                        inputProps={{ 'aria-labelledby': labelId }}
-                                    />
-                                </TableCell>
-                                {columns.map(column => {
-                                    const value = row[column.field]
-
-                                    return (
-                                        <TableCell key={column.id} align={column.align}>
-                                            {column.format && typeof value === 'number' ? column.format(value) : value}
-                                        </TableCell>
-                                    )
-                                })}
-                            </TableRow>
-                        )
-                    })}
-
-                </TableBody>
-            </Table>
-        </TableContainer>
-    )
-
-    return (
-        <>
-            <Grid container spacing={2}>
-                <Grid item xs={12}>
-                    <Card>
-                        <CardHeader
-                            title='Bản đồ'
-                            sx={{
-                                py: 4,
-                                flexDirection: ['column', 'row'],
-                                '& .MuiCardHeader-action': { m: 0 },
-                                alignItems: ['flex-start', 'center']
-                            }}
-                            action={
-                                <Grid container spacing={2}>
-                                    <Grid item>
-                                        <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
-                                            <CustomTextField
-                                                value={keyword}
-                                                placeholder='Tìm đối tượng'
-                                                InputProps={{
-                                                    startAdornment: (
-                                                        <Box sx={{ mr: 2, display: 'flex' }}>
-                                                            <Icon fontSize='1.25rem' icon='tabler:search' />
-                                                        </Box>
-                                                    ),
-                                                    endAdornment: (
-                                                        <IconButton size='small' title='Clear' aria-label='Clear' onClick={() => setKeyword('')}>
-                                                            <Icon fontSize='1.25rem' icon='tabler:x' />
-                                                        </IconButton>
-                                                    )
-                                                }}
-                                                onChange={(e) => handleSearch(e)}
-                                                sx={{
-                                                    width: {
-                                                        xs: 1,
-                                                        sm: 'auto'
-                                                    },
-                                                    '& .MuiInputBase-root > svg': {
-                                                        mr: 2
-                                                    }
-                                                }}
-                                            />
-                                        </Box>
-                                    </Grid>
-                                    <Grid item>
-                                        <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
-                                            <Button
-                                                variant='outlined'
-                                                onClick={() => {
-                                                    setIsOpenTable(true)
-                                                }}>Tìm kiếm</Button>
-                                        </Box>
-                                    </Grid>
-                                    <Grid item>
-                                        <DatePickerWrapper>
-                                            <div>
-                                                <DatePicker
-                                                    selected={startTime}
-                                                    id='basic-input'
-                                                    onChange={date => setStartTime(date)}
-                                                    placeholderText='Chọn ngày bắt đầu'
-                                                    customInput={<CustomInput label='Ngày bắt đầu' />}
-                                                />
-                                            </div>
-                                        </DatePickerWrapper>
-                                    </Grid>
-                                    <Grid item>
-                                        <DatePickerWrapper>
-                                            <div>
-                                                <DatePicker
-                                                    selected={endTime}
-                                                    id='basic-input'
-                                                    onChange={date => setEndTime(date)}
-                                                    placeholderText='Chọn ngày kết thúc'
-                                                    customInput={<CustomInput label='Ngày kết thúc' />}
-                                                />
-                                            </div>
-                                        </DatePickerWrapper>
-                                    </Grid>
-                                </Grid>
-                            }
+                      </div>
+                    </DatePickerWrapper>
+                  </Grid>
+                  <Grid item>
+                    <DatePickerWrapper>
+                      <div>
+                        <DatePicker
+                          selected={endTime}
+                          id='basic-input'
+                          onChange={date => setEndTime(date)}
+                          placeholderText='Chọn ngày kết thúc'
+                          customInput={<CustomInput label='Ngày kết thúc' />}
                         />
-                    </Card>
+                      </div>
+                    </DatePickerWrapper>
+                  </Grid>
                 </Grid>
-                <Grid item xs={12} sm={isOpenTable ? 9 : 12}>
-                    <Card>
-                        <CardContent>
-                            {viewMap()}
-                        </CardContent>
-                    </Card>
+              }
+            />
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={isOpenTable ? 9 : 12}>
+          <Card>
+            <CardContent>{viewMap()}</CardContent>
+          </Card>
+        </Grid>
+        {isOpenTable && (
+          <Grid item xs={12} sm={3}>
+            <Card>
+              <CardContent sx={{ height: '60vh' }}>{viewTable()}</CardContent>
+              <CardActions sx={{ justifyContent: 'space-around' }}>
+                <Grid container spacing={2}>
+                  <Grid item xs={5}>
+                    <Button variant='contained'>Xóa danh sách</Button>
+                  </Grid>
+                  <Grid item xs={5}>
+                    <Button
+                      variant='contained'
+                      onClick={() => {
+                        setIsOpenTable(false)
+                        setSelectedCameraIds([])
+                        setSelectedPoints([])
+                      }}
+                    >
+                      Đóng bảng
+                    </Button>
+                  </Grid>
                 </Grid>
-                {isOpenTable && (
-                    <Grid item xs={12} sm={3}>
-                        <Card>
-
-                            <CardContent sx={{ height: '60vh' }}>
-                                {viewTable()}
-                            </CardContent>
-                            <CardActions sx={{ justifyContent: 'space-around' }}>
-                                <Grid container spacing={2}>
-                                    <Grid item xs={5}><Button variant='contained'>Xóa danh sách</Button></Grid>
-                                    <Grid item xs={4}><Button variant='contained' onClick={() => handleExport()}>Xuất file</Button></Grid>
-                                    <Grid item xs={3}> <Button variant='contained' onClick={() => setIsOpenTable(false)}>Đóng</Button></Grid>
-                                </Grid>
-                            </CardActions>
-                        </Card>
-                    </Grid>
-                )}
-            </Grid>
-        </>
-    )
+              </CardActions>
+            </Card>
+          </Grid>
+        )}
+      </Grid>
+    </>
+  )
 }
 
 export default EventMap

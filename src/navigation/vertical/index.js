@@ -12,21 +12,24 @@ const navigation = () => {
       children: [
         {
           title: 'Sự kiện',
-          path: '/access-control/event-management'
+          path: '/access-control/event-management',
+          icon: 'tabler:calendar-event'
         },
         {
           title: 'Thiết bị',
-          path: '/device-management'
+          path: '/device-management',
+          icon: 'tabler:accessible'
         },
         {
           path: '/pages/access-rights/list',
           title: 'Quyền truy cập',
-          icon: 'tabler:shield'
+          icon: 'tabler:calendar-month'
         },
 
         {
           title: 'Chấm công',
-          path: '/access-control/time-keeping'
+          path: '/access-control/time-keeping',
+          icon: 'tabler:lock-access'
         },
         {
           path: '/pages/report-month/list',
@@ -58,7 +61,8 @@ const navigation = () => {
       children: [
         {
           title: 'Xem trực tiếp',
-          path: '/vms/live-view'
+          path: '/vms/live-view',
+          icon: 'tabler:video'
         },
 
         // {
@@ -67,40 +71,48 @@ const navigation = () => {
         // },
         {
           title: 'Xem lại',
-          path: '/vms/playback-camera'
+          path: '/vms/playback-camera',
+          icon: 'tabler:video-minus'
         },
         {
           title: 'Trích xuất clip',
-          path: '/vms/clip-extraction'
+          path: '/vms/clip-extraction',
+          icon: 'tabler:file-export'
         },
         {
           title: 'Nhóm camera',
-          path: '/vms/camera-group'
+          path: '/vms/camera-group',
+          icon: 'tabler:schema'
         },
         {
           title: 'Sự kiện AI',
-          path: '/vms/events'
+          path: '/vms/events',
+          icon: 'tabler:timeline-event-exclamation'
         },
         {
           title: 'Cấu hình AI',
-          path: '/vms/ai-config'
+          path: '/vms/ai-config',
+          icon: 'tabler:settings'
         },
         {
           title: 'Sự cố hệ thống',
-          path: '/vms/error-system'
+          path: '/vms/error-system',
+          icon: 'tabler:id-badge-off'
         },
         {
           title: 'Danh sách camera',
-          path: '/vms/camera-config'
+          path: '/vms/camera-config',
+          icon: 'tabler:device-cctv'
         },
         {
           title: 'Danh sách nvr',
-          path: '/vms/nvr-config'
+          path: '/vms/nvr-config',
+          icon: 'tabler:server-2'
         },
         {
           path: '/pages/face_management/list',
           title: 'Quản lý khuôn mặt',
-          icon: 'tabler:users'
+          icon: 'tabler:face-id'
         },
         {
           path: '/pages/car_management/list',
@@ -240,7 +252,7 @@ const navigation = () => {
         },
         {
           title: 'Cơ cấu tổ chức',
-          icon: 'tabler:users',
+          icon: 'tabler:building',
           path: '/organizational-structure'
         },
         {
@@ -257,19 +269,23 @@ const navigation = () => {
       children: [
         {
           title: 'Quản lý thiết bị',
-          path: '/device-management/device'
+          path: '/device-management/device',
+          icon: 'tabler:devices'
         },
         {
           title: 'Cảnh báo hệ thống',
-          path: '/alert-management'
+          path: '/alert-management',
+          icon: 'tabler:zoom-exclamation'
         },
         {
           title: 'OTA',
-          path: '/ota'
+          path: '/ota',
+          icon: 'tabler:download'
         },
         {
           title: 'Logs',
-          path: '/logs'
+          path: '/logs',
+          icon: 'tabler:article'
         }
       ]
     }

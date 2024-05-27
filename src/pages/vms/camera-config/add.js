@@ -74,6 +74,8 @@ const Add = ({ apiData }) => {
   const [loading, setLoading] = useState(false)
   const [selectedNvrId, setSelectedNvrId] = useState(null)
   const [idBox, setIdBox] = useState(null)
+  const [idBoxs, setIdBoxs] = useState(selectNVR?.value)
+
   const [popupMessage, setPopupMessage] = useState('')
   const [isError, setIsError] = useState(false)
   const [openPopupResponseOnvif, setOpenPopupResponseOnvif] = useState(false)
@@ -89,19 +91,17 @@ const Add = ({ apiData }) => {
         }
       }
 
-      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/nvrs', config)
+      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/device', config)
 
       const nicTypes = response.data.map(item => ({
-        label: item.name,
-        value: item.value,
-        id: item.id
+        label: item.nameDevice,
+        value: item.id
       }))
       setNVR(nicTypes)
 
       // Set selectedNicType here based on your business logic
       if (nicTypes.length > 0) {
-        setSelectedNVR(nicTypes[0].value)
-        setIdBox(nicTypes[0].id)
+        setSelectedNVR(nicTypes[0].id) // Set it to the first value in the array, or adjust as needed
       }
     } catch (error) {
       console.error('Error fetching NIC types:', error)
@@ -162,7 +162,7 @@ const Add = ({ apiData }) => {
     }
   }
 
-  console.log(response)
+  console.log(selectNVR)
 
   const handleRadioChange = event => {
     setSelectedValue(event.target.value)
@@ -559,6 +559,7 @@ const Add = ({ apiData }) => {
                 <PopupScanDungIP
                   open={openPopupResponseDungIP}
                   url={url}
+                  idBox={idBoxs}
                   port={host}
                   setReload={() => setReload(reload + 1)}
                   userName={userName}
@@ -673,6 +674,7 @@ const Add = ({ apiData }) => {
                 <PopupScan
                   open={openPopupResponse}
                   userName={userName}
+                  idBox={selectNVR}
                   setReload={() => setReload(reload + 1)}
                   isError={isError}
                   popupMessage={popupMessage}
@@ -741,6 +743,7 @@ const Add = ({ apiData }) => {
                   passWord={passWord}
                   isError={isError}
                   popupMessage={popupMessage}
+                  idBox={idBoxs}
                   response={response}
                   loadingOnvif={loading}
                   onClose={() => setOpenPopupResponseOnvif(false)}

@@ -292,7 +292,7 @@ const Add = () => {
       router.push(`/apps/user/detail/${response.data.userId}`)
     } catch (error) {
       console.error('Error updating user details:', error)
-      Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi cập nhật dữ liệu.', 'error')
+      Swal.fire('Lỗi!', error.response.data.message, 'error')
     }
   }
 

@@ -19,6 +19,7 @@ import Grid from '@mui/system/Unstable_Grid/Grid'
 import TableCell from '@mui/material/TableCell'
 import Icon from 'src/@core/components/icon'
 import TableBody from '@mui/material/TableBody'
+import httpStatusMessages from 'src/message'
 
 const Add = ({
   open,
@@ -31,11 +32,13 @@ const Add = ({
   loadingDaiIP,
   setReload,
   isError,
-  popupMessage
+  popupMessage,
+  idBox
 }) => {
   const [selectedIds, setSelectedIds] = useState([])
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState({ text: popupMessage, type: 'general', error: isError })
+  console.log(idBox, 'idbox')
 
   const fetchGroupDataCamera = async () => {
     try {
@@ -65,7 +68,7 @@ const Add = ({
     setMessage({ text: popupMessage, type: 'general', error: isError })
   }, [popupMessage, isError])
 
-  const handleCreateCammera = async camera => {
+  const handleCreateCamera = async camera => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
       setLoading(true)
@@ -77,7 +80,7 @@ const Add = ({
         }
       }
 
-      await axios.post(
+      const response = await axios.post(
         `https://sbs.basesystem.one/ivis/vms/api/v0/cameras`,
         {
           location: camera.location,
@@ -86,17 +89,27 @@ const Add = ({
           macAddress: camera.macAddress,
           passWord: passWord,
           userName: userName,
-          httpPort: camera.host
+          httpPort: camera.host,
+          box: {
+            id: idBox.value
+          }
         },
         config
       )
 
-      setMessage({ text: 'Thêm thành công', type: 'create', error: false })
+      const message = httpStatusMessages[response.status] || [response.data.message]
+      console.log(response.message)
+      setMessage({ text: message, type: 'create', error: false })
+
       setReload()
       fetchGroupDataCamera()
     } catch (error) {
       console.error('Error creating Camera:', error)
-      setMessage({ text: `${error.response.data.message}`, type: 'create', error: true })
+      if (error.response) {
+        setMessage({ text: `${error.response.data.message}`, type: 'create', error: true })
+      } else {
+        setMessage({ text: 'Network error or server is not responding', type: 'create', error: true })
+      }
     } finally {
       setLoading(false)
     }
@@ -173,7 +186,7 @@ const Add = ({
                                 <Icon icon='tabler:minus' />
                               </IconButton>
                             ) : (
-                              <IconButton onClick={() => handleCreateCammera(camera)}>
+                              <IconButton onClick={() => handleCreateCamera(camera)}>
                                 <Icon icon='tabler:plus' />
                               </IconButton>
                             )}
