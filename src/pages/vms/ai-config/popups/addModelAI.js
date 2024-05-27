@@ -201,7 +201,7 @@ const AddModelAI = ({ show, onClose, setReload, data, id, typePopup }) => {
                             {form.map((item, index) => {
                                 if (item.type === 'TextField') {
                                     return (
-                                        <Grid item xs={item.width}>
+                                        <Grid item xs={item.width} key={index}>
                                             <Controller
                                                 name={item.name}
                                                 control={control}

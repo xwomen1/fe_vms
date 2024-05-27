@@ -56,12 +56,13 @@ const columns = [
 
 const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => {
     const [loading, setLoading] = useState(false)
+    const [message, setMessage] = useState('')
     const [total, setTotal] = useState(1)
     const [page, setPage] = useState(1)
     const [pageSize, setPageSize] = useState(25)
     const pageSizeOptions = [25, 50, 100]
     const [anchorEl, setAnchorEl] = useState(null)
-    const [detail, setDetail] = useState(null)
+    const [alertIdList, setAlertIdList] = useState([])
     const [dataList, setDataList] = useState([])
 
     const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -75,8 +76,26 @@ const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => 
     }
 
     useEffect(() => {
+        const arr = []
+        data.map((alert, index) => {
+            arr.push(alert.cameraModelAI.id)
+        })
+        setAlertIdList(arr)
+    }, [data])
+
+    useEffect(() => {
         fetchModelAIs()
     }, [page, pageSize])
+
+    useEffect(() => {
+        if (message) {
+            const timer = setTimeout(() => {
+                setMessage('')
+            }, 2000) // 1 seconds
+
+            return () => clearTimeout(timer)
+        }
+    }, [message])
 
     const fetchModelAIs = async () => {
         setLoading(true)
@@ -126,27 +145,20 @@ const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => 
     }
 
     const handleSubmit = (values) => {
-
         setLoading(true)
         if (typePopup === 'update') {
             handleUpdateAlert(values)
-        }
-        if (typePopup === 'add') {
+        } else if (typePopup === 'add') {
             handleAddAlert(values)
         }
-
     }
 
     const handleAddAlert = (values) => {
-
         const params = {
             camera_id: cameraId,
             cameraaiproperty: [
                 {
-                    cameraModelAI: {
-                        ...values
-                    }
-                    ,
+                    cameraModelAI: { ...values },
                     cameraAiZone: {
                         vfences: [],
                         vzone: {}
@@ -157,15 +169,14 @@ const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => 
             ]
         }
 
-        axios.post(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties`, { ...params }, config)
+        axios.post(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties`, params, config)
             .then(() => {
-                toast.success('Thêm mới thành công')
+                setMessage('Thành công')
                 setReload()
-                onClose()
             })
             .catch((error) => {
-                console.error('Error fetching data: ', error)
-                toast.error(error)
+                console.error('Lỗi khi lấy dữ liệu: ', error)
+                setMessage(error)
             })
             .finally(() => {
                 setLoading(false)
@@ -173,15 +184,11 @@ const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => 
     }
 
     const handleUpdateAlert = (values) => {
-
         const params = {
             cameraaiproperty: [
                 ...data,
                 {
-                    cameraModelAI: {
-                        ...values
-                    }
-                    ,
+                    cameraModelAI: { ...values },
                     cameraAiZone: {
                         vfences: [],
                         vzone: {}
@@ -192,15 +199,14 @@ const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => 
             ]
         }
 
-        axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties/${cameraId}`, { ...params }, config)
+        axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties/${cameraId}`, params, config)
             .then(() => {
-                toast.success('Thêm mới thành công')
+                setMessage('Thành công')
                 setReload()
-                onClose()
             })
             .catch((error) => {
-                console.error('Error fetching data: ', error)
-                toast.error(error)
+                console.error('Lỗi khi lấy dữ liệu: ', error)
+                setMessage(error)
             })
             .finally(() => {
                 setLoading(false)
@@ -231,6 +237,7 @@ const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => 
                         <Typography variant='h3' sx={{ mb: 3 }}>
                             Danh sách Model AI
                         </Typography>
+                        {message && <Typography color='primary'>{message}</Typography>}
                     </Box>
 
                     <Grid container spacing={2}>
@@ -245,13 +252,14 @@ const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => 
                                                     {column.label}
                                                 </TableCell>
                                             ))}
+                                            <TableCell>Tồn tại</TableCell>
                                             <TableCell align='right'>Thao tác</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
                                         {
                                             dataList.slice(0, pageSize).map((row, index) => (
-                                                <TableRow hover tabIndex={-1} key={index}>
+                                                <TableRow hover tabIndex={-1} key={index} >
                                                     <TableCell>{index + 1}</TableCell>
                                                     {columns.map(column => {
                                                         const value = row[column.field]
@@ -263,6 +271,12 @@ const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => 
                                                         )
                                                     })}
                                                     <TableCell>
+                                                        <Typography color={alertIdList.some(alert => alert === row.id) ? '#28C76F' : 'primary'}>
+                                                            {alertIdList.some(alert => alert === row.id) ? 'Đã thêm' : 'Chưa thêm'}
+                                                        </Typography>
+                                                    </TableCell>
+
+                                                    <TableCell>
                                                         <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center' }}>
                                                             <IconButton
                                                                 size='small'
@@ -270,8 +284,9 @@ const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => 
                                                                 onClick={() => {
                                                                     handleSubmit(row)
                                                                 }}
+                                                                disabled={alertIdList.some(alert => alert === row.id) ? true : false}
                                                             >
-                                                                <Icon icon="tabler:square-plus" />
+                                                                <Icon icon="tabler:square-rounded-plus" />
                                                             </IconButton>
                                                         </Grid>
                                                     </TableCell>

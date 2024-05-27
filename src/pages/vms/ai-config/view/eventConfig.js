@@ -732,6 +732,7 @@ const EventConfig = () => {
                         variant='contained'
                         style={{
                           width: '100%',
+                          marginTop: '10px'
                         }}
                         onClick={() => {
                           setIsOpenModelAI(true)
@@ -1010,7 +1011,7 @@ const EventConfig = () => {
           }}
           data={alertList}
           typePopup={isOpenModelAIType}
-          cameraId={cameraAIPropertyId}
+          cameraId={isOpenModelAIType === 'add' ? idCameraSelect : cameraAIPropertyId}
           setReload={() => setReload(reload + 1)}
         />
       }
