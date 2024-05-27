@@ -5,6 +5,7 @@ import { Grid, Tab, styled } from "@mui/material"
 import AIConfig from "./view/aiConfig"
 import EventConfig from "./view/eventConfig"
 import EventOverview from "./view/eventOverview"
+import ModelAIList from "./view/modelAIList"
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
     borderBottom: '0 !important',
@@ -47,6 +48,7 @@ const Events = () => {
                             <Tab value='1' label='Tổng quan' key={1} />
                             <Tab value='2' label='Cấu hình' key={2} />
                             <Tab value='3' label='Khoanh vùng AI' key={3} />
+                            <Tab value='4' label='Model AI' key={4} />
                         </TabList>
                     </Grid>
                     <Grid item xs={12}>
@@ -58,6 +60,9 @@ const Events = () => {
                         </TabPanel>
                         <TabPanel value='3'>
                             <EventConfig />
+                        </TabPanel>
+                        <TabPanel value='4'>
+                            <ModelAIList />
                         </TabPanel>
                     </Grid>
                 </TabContext>
