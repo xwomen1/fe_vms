@@ -8,7 +8,7 @@ import TabPanel from '@mui/lab/TabPanel'
 import { styled } from '@mui/material/styles'
 import MuiTabList from '@mui/lab/TabList'
 import TabContext from '@mui/lab/TabContext'
-import ViewCamera from 'src/@core/components/camera/playback'
+import ViewCamera from 'src/@core/components/camera/playbackpause'
 import Settings from 'src/@core/components/camera/settings'
 import { getApi } from 'src/@core/utils/requestUltils'
 import { CAMERA_API } from 'src/@core/components/api-url'
@@ -80,12 +80,15 @@ const Caller = () => {
     return count
   }
 
+  const time_start = new Date().getTime() - 60 * 60 * 1000
+  const time_end = new Date().getTime()
+
   const [time, setTime] = useState(new Date())
   const [dateTime, setDateTime] = useState(new Date())
 
   const [timeFilter, setTimeFilter] = useState({
-    start_time: new Date() - 60 * 60 * 1000,
-    end_time: new Date()
+    start_time: time_start,
+    end_time: time_end
   })
   const datePickerRef = useRef(null)
   const [sizeScreen, setSizeScreen] = useState('3x2')
@@ -100,6 +103,9 @@ const Caller = () => {
   const [page, setPage] = useState(1)
   const [play, setPlay] = useState(true)
   const [valueRange, setValueRange] = useState(60 * 60 * 1000)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
+  const [speed, setSpeed] = useState(1)
   const debouncedSearch = useDebounce(valueRange, 700)
 
   const onClickPlay = v => {
@@ -119,6 +125,11 @@ const Caller = () => {
     //     videoId.play();
     //   }
     // }
+  }
+
+  const handleSeekChange = (event, newValue) => {
+    setCurrentTime(newValue)
+    console.log('handleSeekChange', newValue)
   }
 
   const fetchCameraGroup = async () => {
@@ -170,7 +181,8 @@ const Caller = () => {
   function valuetext(value) {
     const timeCurrent = new Date(timeFilter.start_time + value)
 
-    return `${timeCurrent.getFullYear() +
+    return `${
+      timeCurrent.getFullYear() +
       '/' +
       timeDisplay(timeCurrent.getMonth() + 1) +
       '/' +
@@ -179,7 +191,7 @@ const Caller = () => {
       timeDisplay(timeCurrent.getHours()) +
       ':' +
       timeDisplay(timeCurrent.getMinutes())
-      }`
+    }`
   }
 
   const handleIconClick = () => {
@@ -203,22 +215,54 @@ const Caller = () => {
     return marks
   }
 
+  const renderMarksSpeed = () => {
+    const marks = [
+      {
+        value: 0.5,
+        label: '0.5x'
+      },
+      {
+        value: 0.75,
+        label: '0.75x'
+      },
+      {
+        value: 1,
+        label: '1x'
+      },
+      {
+        value: 1.5,
+        label: '1.5x'
+      },
+      {
+        value: 2,
+        label: '2x'
+      }
+    ]
+
+    return marks
+  }
+
   return (
     <DivStyle>
       <Grid container spacing={0}>
         {cameraGroup.length > 0 &&
           cameraGroup.map((camera, index) => (
             <Grid item xs={Math.floor(12 / sizeScreen.split('x')[0])} key={index}>
-              {!play &&
-                <ViewCamera
-                  name={camera?.deviceName}
-                  id={camera.id}
-                  channel={camera.channel}
-                  status={camera.status}
-                  timeFilter={timeFilter}
-                  sizeScreen={sizeScreen}
-                  handSetChanel={handSetChanel}
-                />}
+              <ViewCamera
+                name={camera?.deviceName}
+                id={camera.id}
+                play={play}
+                currentTime={currentTime}
+                onChangeCurrentTime={setCurrentTime}
+                duration={duration}
+                onChangeDuration={setDuration}
+                channel={camera.channel}
+                status={camera.status}
+                startTime={timeFilter?.startTime || time_start}
+                endTime={timeFilter?.endTime || time_end}
+                sizeScreen={sizeScreen}
+                handSetChanel={handSetChanel}
+              />
             </Grid>
           ))}
         <div className='video-controls'>
@@ -232,14 +276,32 @@ const Caller = () => {
                 <Box className='w-100' sx={{ px: 2 }}>
                   <Slider
                     defaultValue={1}
-                    shiftStep={0.25}
+                    min={0.5}
+                    max={2}
                     step={0.25}
-                    marks
-                    min={0.25}
-                    max={4}
-                    valueLabelDisplay='on'
+                    marks={renderMarksSpeed()}
+                    value={speed}
+                    onChange={(event, newValue) => {
+                      setSpeed(newValue)
+                    }}
+                    valueLabelDisplay='auto'
                     color='secondary'
                     sx={{
+                      '& .MuiSlider-thumb': {
+                        width: 8,
+                        height: 8,
+                        transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
+                        '&::before': {
+                          boxShadow: '0 2px 12px 0 rgba(0,0,0,0.4)'
+                        },
+                        '&:hover, &.Mui-focusVisible': {
+                          boxShadow: `0px 0px 0px 8px ${'rgb(0 0 0 / 16%)'}`
+                        },
+                        '&.Mui-active': {
+                          width: 20,
+                          height: 20
+                        }
+                      },
                       '&. MuiSlider-track': {
                         backgroundColor: '#fff'
                       },
@@ -267,7 +329,7 @@ const Caller = () => {
 
                   {timeFilter && (
                     <IconButton onClick={() => onClickPlay(!play)} style={{ padding: 5, margin: '0 8px 0 8px' }}>
-                      {play ? (
+                      {!play ? (
                         <Icon icon='ph:play-light' size='1.2em' color='#FFF' />
                       ) : (
                         <Icon icon='ic:twotone-pause' size='1.2em' color='#FFF' />
@@ -311,8 +373,9 @@ const Caller = () => {
                     <Icon icon='tabler:minus' size='1em' color='#FFF' />
                   </IconButton>
                   <Typography style={{ color: '#fff', fontWeight: 'bold' }}>
-                    {`${Math.floor(valueRange / (60 * 60 * 1000))} giờ -  ${(valueRange - 60 * 60 * 1000 * Math.floor(valueRange / (60 * 60 * 1000))) / (60 * 1000)
-                      } phút `}
+                    {`${Math.floor(valueRange / (60 * 60 * 1000))} giờ -  ${
+                      (valueRange - 60 * 60 * 1000 * Math.floor(valueRange / (60 * 60 * 1000))) / (60 * 1000)
+                    } phút `}
                   </Typography>
                 </Box>
                 <Box className='w-100'>
@@ -323,14 +386,16 @@ const Caller = () => {
                     min={0}
                     max={valueRange}
                     valueLabelDisplay='auto'
+                    onChange={handleSeekChange}
+                    value={currentTime}
                     getAriaValueText={valuetext}
                     valueLabelFormat={valuetext}
                     marks={renderMarks()}
                     aria-labelledby='custom-marks-slider'
                     sx={{
                       '& .MuiSlider-thumb': {
-                        width: 8,
-                        height: 8,
+                        width: 20,
+                        height: 20,
                         transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
                         '&::before': {
                           boxShadow: '0 2px 12px 0 rgba(0,0,0,0.4)'
@@ -372,8 +437,8 @@ const Caller = () => {
                         border: 'none'
                       },
                       '& .MuiSlider-thumb': {
-                        width: 24,
-                        height: 24,
+                        width: 20,
+                        height: 20,
                         backgroundColor: '#fff',
                         '&::before': {
                           boxShadow: '0 4px 8px rgba(0,0,0,0.4)'
