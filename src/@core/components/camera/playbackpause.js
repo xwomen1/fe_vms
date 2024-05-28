@@ -91,6 +91,7 @@ export const ViewCameraPause = ({
         if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {
           setRemoteStream(stream)
           remoteVideoRef.current.srcObject = stream
+
           // remoteVideoRef.current.onloadedmetadata = () => {
 
           //   console.log('videoRef.current.duration', remoteVideoRef.current.duration)
