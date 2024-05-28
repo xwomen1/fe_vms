@@ -107,9 +107,22 @@ export const formatDateTimeShow = data => {
 
 export const formatTimeShow = data => {
   const time = new Date(data)
-  
+
   return `${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}:${time
     .getSeconds()
     .toString()
     .padStart(2, '0')}`
+}
+
+export const convertDateToString = dateString => {
+  const date = new Date(dateString)
+  const pad = num => String(num).padStart(2, '0')
+  const year = date.getFullYear()
+  const month = pad(date.getMonth() + 1)
+  const day = pad(date.getDate())
+  const hours = pad(date.getHours())
+  const minutes = pad(date.getMinutes())
+  const seconds = pad(date.getSeconds())
+
+  return `${year}${month}${day}T${hours}${minutes}${seconds}`
 }

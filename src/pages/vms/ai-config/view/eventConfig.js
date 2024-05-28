@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import axios from "axios"
 import { TreeItem, TreeView } from "@mui/lab"
 import Icon from 'src/@core/components/icon'
-import { Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Slider, Tooltip, Typography, styled, CircularProgress } from "@mui/material"
+import { Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Slider, Tooltip, Typography, styled, CircularProgress, CardActions } from "@mui/material"
 import authConfig from 'src/configs/auth'
 import ViewCamera from "./viewCamera"
 import { AddBox, CameraAlt, FastForward, FastRewind, IndeterminateCheckBox, Pause, PlayArrow, SkipNext, SkipPrevious } from "@mui/icons-material"
@@ -11,6 +11,7 @@ import CustomTextField from "src/@core/components/mui/text-field"
 import Schedule from "../popups/schedule"
 import CustomAutocomplete from "src/@core/components/mui/autocomplete"
 import toast from "react-hot-toast"
+import AddAlertAI from "../popups/addAlertAI"
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   '&:hover > .MuiTreeItem-content:not(.Mui-selected)': {
@@ -141,6 +142,9 @@ const EventConfig = () => {
   const [websocket, setWebsocket] = useState(null)
   const [rtcPeerConnection, setRtcPeerConnection] = useState(null)
 
+  const [isOpenModelAI, setIsOpenModelAI] = useState(false)
+  const [isOpenModelAIType, setIsOpenModelAIType] = useState(null)
+
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
   const config = {
@@ -253,6 +257,7 @@ const EventConfig = () => {
   useEffect(() => {
     if (idCameraSelect != null) {
       fetchModelAICamera()
+      setEventSelect(null)
     }
   }, [idCameraSelect, reload])
 
@@ -278,8 +283,7 @@ const EventConfig = () => {
       setCameraAIPropertyId(null)
     }
 
-    setAreaSelect([])
-    setLineSelect([])
+    clearAction()
   }, [alertAIList])
 
   useEffect(() => {
@@ -525,7 +529,7 @@ const EventConfig = () => {
     setLoading(true)
 
     const changedAlerts = alertList.map(alert => {
-      return alert.aitype === eventSelect ? { ...alert, calendarDays: data?.calendarDays } : alert
+      return alert.cameraModelAI?.modelName === eventSelect ? { ...alert, calendarDays: data?.calendarDays } : alert
     })
 
     await updateAlertList(changedAlerts)
@@ -535,7 +539,7 @@ const EventConfig = () => {
     setLoading(true)
 
     const changedAlerts = alertList.map(alert => {
-      return alert.aitype === typeAI ? { ...alert, isactive: !alert.isactive } : alert
+      return alert.cameraModelAI?.modelName === typeAI ? { ...alert, isactive: !alert.isactive } : alert
     })
 
     await updateAlertList(changedAlerts)
@@ -555,7 +559,7 @@ const EventConfig = () => {
     }
 
     const changedAlerts = alertList.map(alert => {
-      return alert.aitype === eventSelect ? { ...alert, cameraaizone: cameraAiZone } : alert
+      return alert.cameraModelAI?.modelName === eventSelect ? { ...alert, cameraaizone: cameraAiZone } : alert
     })
 
     await updateAlertList(changedAlerts)
@@ -576,7 +580,7 @@ const EventConfig = () => {
     }
 
     const changedAlerts = alertList.map(alert => {
-      return alert.aitype === eventSelect ? { ...alert, cameraaizone: cameraAiZone } : alert
+      return alert.cameraModelAI?.modelName === eventSelect ? { ...alert, cameraaizone: cameraAiZone } : alert
     })
 
     await updateAlertList(changedAlerts)
@@ -588,7 +592,7 @@ const EventConfig = () => {
         <Card
           onClick={() => {
             if (alert.isactive == true) {
-              setEventSelect(alert?.aitype)
+              setEventSelect(alert?.cameraModelAI?.modelName)
 
               if (alert.cameraaizone.vfences === null) {
                 let arr = Object.entries(alert.cameraaizone.vzone).map(([key, value]) => ({ ...value }))
@@ -607,17 +611,16 @@ const EventConfig = () => {
           }}
           sx={{
             marginBottom: 5,
-            background: eventSelect === alert?.aitype ? 'rgb(0, 123, 255, 0.5)' : null
+            background: eventSelect === alert?.cameraModelAI?.modelName ? 'rgb(0, 123, 255, 0.5)' : null
           }}
         >
-          <CardHeader title={alert?.aitype} />
+          <CardHeader title={alert?.cameraModelAI?.modelName} />
           <CardContent>
-            <Typography variant='h5'></Typography>
             <Typography variant='body1' alignLeft={2}>
-              Độ nhạy: {alert?.sensitivity}
+              Độ nhạy: {alert?.cameraModelAI?.characteristicValue}
             </Typography>
             <Typography variant='body1' alignLeft={2}>
-              Đối tượng: {alert?.target}
+              Đối tượng: {alert?.cameraModelAI?.characteristicName}
             </Typography>
           </CardContent>
           <Button
@@ -630,7 +633,7 @@ const EventConfig = () => {
             }}
             color={alert.isactive === false ? 'success' : 'primary'}
             onClick={() => {
-              handleActiveAlertAI(alert?.aitype)
+              handleActiveAlertAI(alert?.cameraModelAI?.modelName)
             }}
           >
             {alert.isactive == true ? 'Tắt cảnh báo ' : 'Bật cảnh báo'}
@@ -663,7 +666,6 @@ const EventConfig = () => {
       </StyledTreeItem>
     );
   }
-
 
   return (
     <>
@@ -698,7 +700,7 @@ const EventConfig = () => {
                   }
                 }}
               />
-              <Box sx={{ height: '400px', overflow: 'auto' }}>
+              <Box sx={{ height: '60vh', overflow: 'auto' }}>
                 <Typography variant='h5' sx={{ mb: 2, mt: 2 }}>
                   CAM Tầng 1
                 </Typography>
@@ -719,140 +721,158 @@ const EventConfig = () => {
             <Grid item xs={12}>
               <Card>
                 <CardHeader title='Cảnh báo AI' />
-                <CardContent sx={{ height: '450px', overflow: 'auto' }}>{alertAIListView()}</CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12}>
-              <Card>
-                <CardContent>
-                  <Box sx={{ marginTop: 5 }}>
-                    {isDraw && (
-                      <Grid container spacing={2}>
-                        <Grid item xs={12} sm={4}>
-                          <Button
-                            onClick={() => {
-                              clearAction()
-                              setLineSelect([])
-                              setAreaSelect([])
-                            }}
-                            variant='outlined'
-                            disabled={!eventSelect}
-                          >
-                            Clear
-                          </Button>
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
-                          <Button
-                            onClick={() => {
-                              setIsDraw('')
-                            }}
-                            variant='outlined'
-                            disabled={!eventSelect}
-                          >
-                            Hủy
-                          </Button>
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
-                          <Button
-                            onClick={() => {
-                              if (isDraw == 'rectangle') {
-                                handleZoning(areaSelect)
-                              }
-                              if (isDraw == 'line') {
-                                handleVirtualFence(lineSelect)
-                              }
-                              setIsDraw('')
-                            }}
-                            variant='outlined'
-                            disabled={!eventSelect}
-                          >
-                            Lưu
-                          </Button>
-                        </Grid>
-                        {isDraw == 'line' && (
-                          <Grid item xs={12}>
-                            <CustomAutocomplete
-                              options={data}
-                              id='autocomplete-custom'
-                              getOptionLabel={option => option.name || ''}
-                              renderInput={params => <CustomTextField {...params} label='' />}
-                              onChange={(e, value) => {
-                                if (value) {
-                                  setDirection(value)
-                                }
-                              }}
-                            />
+                <CardContent sx={{ height: '60vh', overflow: 'auto' }}>
+                  {alertAIListView()}
+                </CardContent>
+                <CardActions>
+
+                  <Grid container spacing={0}>
+                    <Grid item xs={12}>
+                      <Button
+                        variant='contained'
+                        style={{
+                          width: '100%',
+                          marginTop: '10px'
+                        }}
+                        onClick={() => {
+                          setIsOpenModelAI(true)
+                          if (alertList.length > 0) {
+                            setIsOpenModelAIType('update')
+                          } else {
+                            setIsOpenModelAIType('add')
+                          }
+                        }}
+                      >
+                        Thêm mới cảnh báo
+                      </Button>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Box sx={{ marginTop: 5 }}>
+                        {isDraw && (
+                          <Grid container spacing={2}>
+                            <Grid item xs={12} sm={4}>
+                              <Button
+                                onClick={() => {
+                                  clearAction()
+                                }}
+                                variant='outlined'
+                                disabled={eventSelect === null}
+                              >
+                                Clear
+                              </Button>
+                            </Grid>
+                            <Grid item xs={12} sm={4}>
+                              <Button
+                                onClick={() => {
+                                  setIsDraw('')
+                                }}
+                                variant='outlined'
+                                disabled={eventSelect === null}
+                              >
+                                Hủy
+                              </Button>
+                            </Grid>
+                            <Grid item xs={12} sm={4}>
+                              <Button
+                                onClick={() => {
+                                  if (isDraw == 'rectangle') {
+                                    handleZoning(areaSelect)
+                                  }
+                                  if (isDraw == 'line') {
+                                    handleVirtualFence(lineSelect)
+                                  }
+                                  setIsDraw('')
+                                }}
+                                variant='outlined'
+                                disabled={eventSelect === null}
+                              >
+                                Lưu
+                              </Button>
+                            </Grid>
+                            {isDraw == 'line' && (
+                              <Grid item xs={12}>
+                                <CustomAutocomplete
+                                  options={data}
+                                  id='autocomplete-custom'
+                                  getOptionLabel={option => option.name || ''}
+                                  renderInput={params => <CustomTextField {...params} label='' />}
+                                  onChange={(e, value) => {
+                                    if (value) {
+                                      setDirection(value)
+                                    }
+                                  }}
+                                />
+                              </Grid>
+                            )}
                           </Grid>
                         )}
-                      </Grid>
-                    )}
-                    {!isDraw && (
-                      <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6}>
-                          <Button
-                            style={{ width: '100%' }}
-                            onClick={() => {
-                              setIsDraw('rectangle')
-                              clearAction()
-                            }}
-                            variant='outlined'
-                            disabled={!eventSelect}
-                          >
-                            Khoanh vùng
-                          </Button>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <Button
-                            style={{ width: '100%' }}
-                            onClick={() => {
-                              setIsDraw('line')
-                              clearAction()
-                            }}
-                            variant='outlined'
-                            disabled={!eventSelect}
-                          >
-                            Rào ảo
-                          </Button>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <Button
-                            style={{ width: '100%' }}
-                            onClick={() => {
-                              clearAction()
-                              setLineSelect([])
-                              setAreaSelect([])
-                            }}
-                            variant='outlined'
-                            disabled={!eventSelect}
-                          >
-                            Xóa
-                          </Button>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <Button
-                            style={{ width: '100%' }}
-                            onClick={() => setIsOpenSchedule(true)}
-                            variant='outlined'
-                            disabled={!eventSelect}
-                          >
-                            Lịch
-                          </Button>
-                        </Grid>
-                      </Grid>
-                    )}
-                  </Box>
-                </CardContent>
+                        {!isDraw && (
+                          <Grid container spacing={2}>
+                            <Grid item xs={12} sm={6}>
+                              <Button
+                                style={{ width: '100%' }}
+                                onClick={() => {
+                                  setIsDraw('rectangle')
+                                  clearAction()
+                                }}
+                                variant='outlined'
+                                disabled={eventSelect === null}
+                              >
+                                Khoanh vùng
+                              </Button>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <Button
+                                style={{ width: '100%' }}
+                                onClick={() => {
+                                  setIsDraw('line')
+                                  clearAction()
+                                }}
+                                variant='outlined'
+                                disabled={eventSelect === null}
+                              >
+                                Rào ảo
+                              </Button>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <Button
+                                style={{ width: '100%' }}
+                                onClick={() => {
+                                  clearAction()
+                                }}
+                                variant='outlined'
+                                disabled={eventSelect === null}
+                              >
+                                Xóa
+                              </Button>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <Button
+                                style={{ width: '100%' }}
+                                onClick={() => setIsOpenSchedule(true)}
+                                variant='outlined'
+                                disabled={eventSelect === null}
+                              >
+                                Lịch
+                              </Button>
+                            </Grid>
+                          </Grid>
+                        )}
+                      </Box>
+                    </Grid>
+                  </Grid>
+                </CardActions>
               </Card>
             </Grid>
           </Grid>
         </Grid>
         <Grid item xs={12} sm={6}>
           <Card>
-            <CardContent>
+            <CardContent sx={{}}>
               <Box
                 sx={{
                   width: '100%',
-                  height: 530,
+                  height: '70vh',
                   position: 'relative',
                   display: 'flex',
                   flexDirection: 'column',
@@ -981,6 +1001,20 @@ const EventConfig = () => {
       {isOpenSchedule && (
         <Schedule onClose={() => setIsOpenSchedule(false)} show={isOpenSchedule} callback={handleSetSchedule} data={calendar} />
       )}
+
+      {isOpenModelAI &&
+        <AddAlertAI
+          show={isOpenModelAI}
+          onClose={() => {
+            setIsOpenModelAIType(null)
+            setIsOpenModelAI(false)
+          }}
+          data={alertList}
+          typePopup={isOpenModelAIType}
+          cameraId={isOpenModelAIType === 'add' ? idCameraSelect : cameraAIPropertyId}
+          setReload={() => setReload(reload + 1)}
+        />
+      }
     </>
   )
 }

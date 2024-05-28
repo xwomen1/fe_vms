@@ -125,7 +125,6 @@ const AIConfig = () => {
         `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties/camera/${cameraId}`,
         config
       )
-      console.log('res', res.data)
       setAlertAIList(res.data)
     } catch (error) {
       console.error('Error fetching data: ', error)
