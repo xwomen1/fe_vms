@@ -89,6 +89,7 @@ const UserList = ({ apiData }) => {
   const [openPopupResponseOnvif, setOpenPopupResponseOnvif] = useState(false)
   const [popupMessage, setPopupMessage] = useState('')
   const [isError, setIsError] = useState(false)
+  const [idBoxs, setIdBoxs] = useState(selectNVR?.value)
 
   const handlePageChange = newPage => {
     setPage(newPage)
@@ -574,6 +575,7 @@ const UserList = ({ apiData }) => {
                       open={openPopupResponseDungIP}
                       url={url}
                       port={host}
+                      idBox={idBoxs}
                       setReload={() => setReload(reload + 1)}
                       userName={userName}
                       isError={isError}
@@ -688,6 +690,7 @@ const UserList = ({ apiData }) => {
                       userName={userName}
                       setReload={() => setReload(reload + 1)}
                       isError={isError}
+                      idBox={idBoxs}
                       popupMessage={popupMessage}
                       passWord={passWord}
                       response={response}
@@ -753,6 +756,7 @@ const UserList = ({ apiData }) => {
                       setReload={() => setReload(reload + 1)}
                       passWord={passWord}
                       isError={isError}
+                      idBox={idBoxs}
                       popupMessage={popupMessage}
                       response={response}
                       loadingOnvif={loading}
