@@ -5,6 +5,7 @@ import Link from 'next/link'
 import IconButton from '@mui/material/IconButton'
 import Icon from 'src/@core/components/icon'
 import { convertDateToString } from 'src/@core/utils/format'
+import { PlayArrow } from '@material-ui/icons'
 
 const config = {
   bundlePolicy: 'max-bundle',
@@ -29,7 +30,6 @@ export const ViewCameraPause = ({
   startTime,
   endTime,
   play,
-  currentTime,
   onChangeCurrentTime,
   duration,
   onChangeDuration
@@ -82,8 +82,6 @@ export const ViewCameraPause = ({
     setWebsocket(ws)
     const pc = new RTCPeerConnection(config)
     setRtcPeerConnection(pc)
-
-    // listen for remote tracks and add them to remote stream
     pc.ontrack = event => {
       setLoading(false)
       const stream = event.streams[0]
@@ -91,16 +89,13 @@ export const ViewCameraPause = ({
         if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {
           setRemoteStream(stream)
           remoteVideoRef.current.srcObject = stream
-
           // remoteVideoRef.current.onloadedmetadata = () => {
-
-          //   console.log('videoRef.current.duration', remoteVideoRef.current.duration)
-          //   onChangeDuration(remoteVideoRef.current.duration)
+          //   console.log('videoRef.current.duration', remoteVideoRef?.current?.duration)
+          //   // onChangeDuration(remoteVideoRef.current.duration)
           // }
 
           remoteVideoRef.current.ontimeupdate = () => {
             if (remoteVideoRef?.current?.currentTime) {
-              console.log('videoRef.current.currentTime', remoteVideoRef?.current?.currentTime)
               onChangeCurrentTime(remoteVideoRef?.current?.currentTime)
             }
           }
@@ -110,16 +105,27 @@ export const ViewCameraPause = ({
       }
     }
   }
+
   useEffect(() => {
-    if (websocket && channel) {
-      websocket.close()
-      createWsConnection()
+    if (rtcPeerConnection) {
+      // listen for remote tracks and add them to remote stream
+
+      rtcPeerConnection.addEventListener('connectionstatechange', () => {
+        console.log('RTCPeerConnection state:', rtcPeerConnection.connectionState)
+        // setStatus(rtcPeerConnection.connectionState)
+      })
     }
-  }, [id, channel, startTime, endTime])
+  }, [rtcPeerConnection])
+
+  // useEffect(() => {
+  //   if (websocket) {
+  //     websocket.close()
+  //     createWsConnection()
+  //   }
+  // }, [startTime])
 
   useEffect(() => {
     createWsConnection()
-
     return () => {
       if (websocket) {
         websocket.close()
@@ -128,7 +134,20 @@ export const ViewCameraPause = ({
         rtcPeerConnection.close()
       }
     }
-  }, [reload])
+  }, [id])
+
+  // useEffect(() => {
+  //   createWsConnection()
+
+  //   return () => {
+  //     if (websocket) {
+  //       websocket.close()
+  //     }
+  //     if (rtcPeerConnection) {
+  //       rtcPeerConnection.close()
+  //     }
+  //   }
+  // }, [reload])
 
   // send message to WebSocket server
   const sendMessage = message => {
@@ -183,43 +202,27 @@ export const ViewCameraPause = ({
   useEffect(() => {
     if (websocket) {
       setLoading(true)
+      console.log('startTime', convertDateToString(startTime))
       websocket.addEventListener('open', () => {
-        // console.log('WebSocket connection established')
-        // websocket.send(
-        //   JSON.stringify({
-        //     id: id,
-        //     type: 'request'
-        //   })
-        // )
         websocket.send(
           JSON.stringify({
             id: id,
             type: 'request',
             viewType: 'playback',
-            startTime: convertDateToString(startTime + currentTime),
+            startTime: convertDateToString(startTime),
             endTime: convertDateToString(endTime)
           })
         )
       })
       websocket.addEventListener('message', handleMessage)
       websocket.addEventListener('close', () => {
-        // console.log('WebSocket connection closed')
+        console.log('WebSocket connection closed')
       })
       websocket.addEventListener('error', error => {
         console.error('WebSocket error:', error)
       })
     }
-  }, [websocket, channel])
-
-  // set up RTCPeerConnection event listeners
-  useEffect(() => {
-    if (rtcPeerConnection) {
-      rtcPeerConnection.addEventListener('connectionstatechange', () => {
-        console.log('RTCPeerConnection state:', rtcPeerConnection.connectionState)
-        setStatus(rtcPeerConnection.connectionState)
-      })
-    }
-  }, [rtcPeerConnection])
+  }, [websocket])
 
   return (
     <div className='portlet portlet-video live' style={{ width: '100%' }}>
