@@ -104,6 +104,7 @@ const Caller = () => {
   const [play, setPlay] = useState(true)
   const [valueRange, setValueRange] = useState(60 * 60 * 1000)
   const [currentTime, setCurrentTime] = useState(0)
+  const [timePlay, setTimePlay] = useState(time_start)
   const [duration, setDuration] = useState(0)
   const [speed, setSpeed] = useState(1)
   const debouncedSearch = useDebounce(valueRange, 700)
@@ -128,8 +129,10 @@ const Caller = () => {
   }
 
   const handleSeekChange = (event, newValue) => {
-    setCurrentTime(newValue)
-    console.log('handleSeekChange', newValue)
+    setCurrentTime(0)
+    setTimePlay(timeFilter.start_time + newValue)
+    setCameraGroup([])
+    setReload(reload + 1)
   }
 
   const fetchCameraGroup = async () => {
@@ -190,7 +193,9 @@ const Caller = () => {
       ' ' +
       timeDisplay(timeCurrent.getHours()) +
       ':' +
-      timeDisplay(timeCurrent.getMinutes())
+      timeDisplay(timeCurrent.getMinutes()) +
+      ':' +
+      timeDisplay(timeCurrent.getSeconds())
     }`
   }
 
@@ -252,13 +257,14 @@ const Caller = () => {
                 name={camera?.deviceName}
                 id={camera.id}
                 play={play}
-                currentTime={currentTime}
-                onChangeCurrentTime={setCurrentTime}
+                onChangeCurrentTime={time => {
+                  setCurrentTime(1000 * time)
+                }}
                 duration={duration}
                 onChangeDuration={setDuration}
                 channel={camera.channel}
                 status={camera.status}
-                startTime={timeFilter?.startTime || time_start}
+                startTime={timePlay || time_start}
                 endTime={timeFilter?.endTime || time_end}
                 sizeScreen={sizeScreen}
                 handSetChanel={handSetChanel}
@@ -302,8 +308,9 @@ const Caller = () => {
                           height: 20
                         }
                       },
-                      '&. MuiSlider-track': {
-                        backgroundColor: '#fff'
+                      '& .MuiSlider-track': {
+                        backgroundColor: '#fff',
+                        opacity: 0
                       },
                       '& .MuiSlider-rail': {
                         opacity: 0.28,
@@ -347,7 +354,7 @@ const Caller = () => {
                 </div>
               </div>
               <div className='slidecontainer-2'>
-                <Box style={{ display: 'flex', alignItems: 'center' }}>
+                <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'end' }}>
                   <IconButton
                     style={{ padding: 5 }}
                     onClick={() => {
@@ -385,9 +392,9 @@ const Caller = () => {
                     step={2000}
                     min={0}
                     max={valueRange}
-                    valueLabelDisplay='auto'
+                    valueLabelDisplay='on'
                     onChange={handleSeekChange}
-                    value={currentTime}
+                    value={timePlay - timeFilter?.start_time + currentTime}
                     getAriaValueText={valuetext}
                     valueLabelFormat={valuetext}
                     marks={renderMarks()}
@@ -408,7 +415,8 @@ const Caller = () => {
                           height: 20
                         }
                       },
-                      '&. MuiSlider-track': {
+                      '& .MuiSlider-track': {
+                        opacity: 0,
                         backgroundColor: '#fff'
                       },
                       '& .MuiSlider-rail': {

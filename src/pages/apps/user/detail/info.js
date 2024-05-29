@@ -76,8 +76,8 @@ const UserDetails = () => {
   const [phoneNumber, setPhoneNumber] = useState('')
   const [identityNumber, setIdentityNumber] = useState('')
   const [gender, setGender] = useState('')
-  const [selectedRegion, setSelectedRegion] = useState(user?.level.id)
-  const [selectContract, setSelectContract] = useState(user?.contractType.id)
+  const [selectedRegion, setSelectedRegion] = useState('')
+  const [selectContract, setSelectContract] = useState('')
   const [contractOptions, setContractOptions] = useState([])
 
   const [regionOptions, setRegionOptions] = useState([])
@@ -476,18 +476,16 @@ const UserDetails = () => {
       setNote(response.data.note)
       setStatus(response.data.userAccount.accStatus)
 
-      // if (response.data.level) {
-      const regionName = await fetchRegionName(response.data.level)
-      setSelectedRegion({ id: response.data.level, name: regionName })
-      console.log(regionName, 'regionsname')
+      if (response.data.level) {
+        const regionName = await fetchRegionName(response?.data?.level)
+        setSelectedRegion({ id: response.data.level, name: regionName })
+        console.log(regionName, 'regionsname')
+      }
 
-      // }
-
-      // if (response.data.contractType) {
-      const contractName = await fetchRegionName(response.data.contractType)
-      setSelectContract({ id: response.data.contractType, name: contractName })
-
-      // }
+      if (response.data.contractType) {
+        const contractName = await fetchRegionName(response?.data?.contractType)
+        setSelectContract({ id: response.data.contractType, name: contractName })
+      }
       if (response.data.userGroups && response.data.userGroups.length > 0) {
         setDefaultGroup(response.data.userGroups[0])
       }
