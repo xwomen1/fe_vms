@@ -32,7 +32,8 @@ export const ViewCameraPause = ({
   play,
   onChangeCurrentTime,
   duration,
-  onChangeDuration
+  onChangeDuration,
+  volume
 }) => {
   const [websocket, setWebsocket] = useState(null)
   const [text, setText] = useState(null)
@@ -73,6 +74,12 @@ export const ViewCameraPause = ({
   useEffect(() => {
     handlePlayPause(play)
   }, [play])
+
+  useEffect(() => {
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.volume = volume / 100
+    }
+  }, [volume])
 
   const SOCKET_LIVE_VIEW = process.env.NEXT_PUBLIC_SOCKET_CCTT
 
