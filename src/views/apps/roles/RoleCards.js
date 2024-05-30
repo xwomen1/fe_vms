@@ -99,6 +99,7 @@ const RolesCards = () => {
         setSelectedCheckbox(prevSelected => {
           // Check if any of the new scopes are already selected
           const newSelected = scopes.filter(scope => prevSelected.includes(scope))
+
           return newSelected.length > 0 ? newSelected : scopes
         })
 
@@ -124,6 +125,7 @@ const RolesCards = () => {
 
       setRolesArr(prevRolesArr => {
         const allResources = new Set([...prevRolesArr, ...resourcesData.map(resource => resource.resourceName)])
+
         return Array.from(allResources)
       })
     } catch (error) {
@@ -138,14 +140,17 @@ const RolesCards = () => {
     setSelectedCheckbox([])
     setIsIndeterminateCheckbox(false)
   }
+
   const handleSwitchChange = () => {
     // Cập nhật trạng thái của policyData dựa trên trạng thái hiện tại của isAdminAccessActive
+
     const newStatus = isAdminAccessActive ? 'INACTIVE' : 'ACTIVE'
     setPolicyData(prevPolicyData => ({
       ...prevPolicyData,
       status: newStatus
     }))
   }
+
   const handleRoleNameChange = e => {
     const updatedPolicy = { ...policyData, policyName: e.target.value }
     setPolicyData(updatedPolicy)
@@ -156,14 +161,17 @@ const RolesCards = () => {
     const updatedPolicy = { ...policyData, policyCode: e.target.value }
     setPolicyData(updatedPolicy)
   }
+
   const handleUpdate = async () => {
     console.log(currentPolicyId, 'currentPolicyId')
     if (!currentPolicyId) {
       console.error('Policy ID is not set')
+
       return
     }
 
     const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
     const config = {
       headers: {
         Authorization: `Bearer ${token}`
@@ -195,8 +203,10 @@ const RolesCards = () => {
       console.error('Lỗi khi tạo nhóm mới:', error)
     }
   }
+
   const togglePermission = async (resource, scope) => {
     const permission = `${resource}-${scope}`
+
     const isChecked = selectedCheckbox.includes(permission)
 
     try {
@@ -255,6 +265,7 @@ const RolesCards = () => {
 
   const handleAdd = async () => {
     const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
     const config = {
       headers: {
         Authorization: `Bearer ${token}`
@@ -331,7 +342,9 @@ const RolesCards = () => {
   const handleDelete = () => {
     if (idDelete != null) {
       setLoading(true)
+
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
       const config = {
         headers: {
           Authorization: `Bearer ${token}`
@@ -353,6 +366,7 @@ const RolesCards = () => {
         })
     }
   }
+
   const renderCards = () =>
     policy.map((item, index) => (
       <Grid item xs={12} sm={6} lg={4} key={index}>
@@ -512,7 +526,9 @@ const RolesCards = () => {
                   <div className='scrollable-table'>
                     {rolesArr.map((resource, index) => {
                       const id = resource.toLowerCase().split(' ').join('-')
+
                       const resourceScopes = (policyData.scopes || []).filter(scope => scope.resourceName === resource)
+
                       return (
                         <TableRow key={index} sx={{ '& .MuiTableCell-root:first-of-type': { pl: '0 !important' } }}>
                           <TableCell
