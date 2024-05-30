@@ -601,7 +601,7 @@ const AccessRight = () => {
                                     setIsOpenView(true)
                                   }}
                                 >
-                                  <Icon icon='tabler:eye' />
+                                  <Icon icon='tabler:info-circle' />
                                 </IconButton>
                               </Grid>
                             </TableCell>
@@ -706,7 +706,7 @@ const AccessRight = () => {
                                     setIsOpenView(true)
                                   }}
                                 >
-                                  <Icon icon='tabler:eye' />
+                                  <Icon icon='tabler:info-circle' />
                                 </IconButton>
                                 <IconButton
                                   onClick={() => {

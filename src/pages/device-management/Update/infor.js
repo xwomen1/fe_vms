@@ -73,7 +73,9 @@ const InforAll = ({ idInfor }) => {
       const response = await axios.get(`https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices/${idInfor}`, config)
       const deviceData = response.data
       setDevice(deviceData)
-
+      setIdDoor(deviceData.doorId)
+      console.log(deviceData.doorId)
+      setName(deviceData.doorName)
       // Fetch regions and set Autocomplete value if doorName matches any region name
       await fetchRegions() // Ensure fetchRegions updates regions before proceeding
       setRegions(currentRegions => {
@@ -194,7 +196,7 @@ const InforAll = ({ idInfor }) => {
       Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi cập nhật dữ liệu.', 'error')
     }
   }
-
+  console.log(idDoor, 'idDoor')
   const handleInputChange = (field, value) => {
     setDevice(prevDevice => ({
       ...prevDevice,

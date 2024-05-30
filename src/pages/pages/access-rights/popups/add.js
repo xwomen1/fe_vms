@@ -493,8 +493,8 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
               <Grid item xs={2}>
                 <FormControlLabel
                   control={<Checkbox onChange={handleCheckboxChange} />}
-                  label='Tuần'
-                  style={{ marginTop: '30px', marginLeft: '20px' }}
+                  label='Luôn luôn'
+                  style={{ marginTop: '25px'}}
                 />
               </Grid>
               <Grid item>Bảng cấu hình thời gian</Grid>
