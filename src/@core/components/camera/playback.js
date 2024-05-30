@@ -4,6 +4,8 @@ import Button from '@mui/material/Button'
 import Link from 'next/link'
 import IconButton from '@mui/material/IconButton'
 import Icon from 'src/@core/components/icon'
+import { convertDateToString } from 'src/@core/utils/format'
+import { PlayArrow } from '@material-ui/icons'
 
 const config = {
   bundlePolicy: 'max-bundle',
@@ -19,7 +21,19 @@ const config = {
   ]
 }
 
-export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel, startTime, endTime }) => {
+export const ViewCameraPause = ({
+  id,
+  name,
+  channel,
+  sizeScreen,
+  handSetChanel,
+  startTime,
+  endTime,
+  play,
+  onChangeCurrentTime,
+  duration,
+  onChangeDuration
+}) => {
   const [websocket, setWebsocket] = useState(null)
   const [text, setText] = useState(null)
   const [rtcPeerConnection, setRtcPeerConnection] = useState(null)
@@ -45,6 +59,21 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel, start
 
     return [...Array(length)].map(pickRandom).join('')
   }
+
+  const handlePlayPause = () => {
+    if (remoteVideoRef.current) {
+      if (play) {
+        remoteVideoRef.current.play().catch(error => console.error('Error playing video:', error))
+      } else {
+        remoteVideoRef.current.pause()
+      }
+    }
+  }
+
+  useEffect(() => {
+    handlePlayPause(play)
+  }, [play])
+
   const SOCKET_LIVE_VIEW = process.env.NEXT_PUBLIC_SOCKET_CCTT
 
   const createWsConnection = () => {
@@ -53,8 +82,6 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel, start
     setWebsocket(ws)
     const pc = new RTCPeerConnection(config)
     setRtcPeerConnection(pc)
-
-    // listen for remote tracks and add them to remote stream
     pc.ontrack = event => {
       setLoading(false)
       const stream = event.streams[0]
@@ -62,18 +89,41 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel, start
         if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {
           setRemoteStream(stream)
           remoteVideoRef.current.srcObject = stream
+
+          // remoteVideoRef.current.onloadedmetadata = () => {
+          //   console.log('videoRef.current.duration', remoteVideoRef?.current?.duration)
+          //   // onChangeDuration(remoteVideoRef.current.duration)
+          // }
+
+          remoteVideoRef.current.ontimeupdate = () => {
+            if (remoteVideoRef?.current?.currentTime) {
+              onChangeCurrentTime(remoteVideoRef?.current?.currentTime)
+            }
+          }
         }
       } catch (err) {
         console.log(err)
       }
     }
   }
+
   useEffect(() => {
-    if (websocket && channel) {
-      websocket.close()
-      createWsConnection()
+    if (rtcPeerConnection) {
+      // listen for remote tracks and add them to remote stream
+
+      rtcPeerConnection.addEventListener('connectionstatechange', () => {
+        // console.log('RTCPeerConnection state:', rtcPeerConnection.connectionState)
+        // setStatus(rtcPeerConnection.connectionState)
+      })
     }
-  }, [id, channel, startTime, endTime])
+  }, [rtcPeerConnection])
+
+  // useEffect(() => {
+  //   if (websocket) {
+  //     websocket.close()
+  //     createWsConnection()
+  //   }
+  // }, [startTime])
 
   useEffect(() => {
     createWsConnection()
@@ -86,7 +136,20 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel, start
         rtcPeerConnection.close()
       }
     }
-  }, [reload])
+  }, [id])
+
+  // useEffect(() => {
+  //   createWsConnection()
+
+  //   return () => {
+  //     if (websocket) {
+  //       websocket.close()
+  //     }
+  //     if (rtcPeerConnection) {
+  //       rtcPeerConnection.close()
+  //     }
+  //   }
+  // }, [reload])
 
   // send message to WebSocket server
   const sendMessage = message => {
@@ -134,7 +197,6 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel, start
         break
     }
     setText(message?.content)
-    console.log('message', message)
   }
 
   // set up WebSocket event listeners
@@ -142,14 +204,13 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel, start
     if (websocket) {
       setLoading(true)
       websocket.addEventListener('open', () => {
-        // console.log('WebSocket connection established')
         websocket.send(
           JSON.stringify({
             id: id,
             type: 'request',
             viewType: 'playback',
-            startTime: startTime,
-            endTime: endTime
+            startTime: convertDateToString(startTime),
+            endTime: convertDateToString(endTime)
           })
         )
       })
@@ -161,17 +222,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel, start
         console.error('WebSocket error:', error)
       })
     }
-  }, [websocket, channel])
-
-  // set up RTCPeerConnection event listeners
-  useEffect(() => {
-    if (rtcPeerConnection) {
-      rtcPeerConnection.addEventListener('connectionstatechange', () => {
-        console.log('RTCPeerConnection state:', rtcPeerConnection.connectionState)
-        setStatus(rtcPeerConnection.connectionState)
-      })
-    }
-  }, [rtcPeerConnection])
+  }, [websocket])
 
   return (
     <div className='portlet portlet-video live' style={{ width: '100%' }}>
@@ -224,4 +275,4 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel, start
   )
 }
 
-export default ViewCamera
+export default ViewCameraPause
