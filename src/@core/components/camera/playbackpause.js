@@ -89,11 +89,6 @@ export const ViewCameraPause = ({
         if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {
           setRemoteStream(stream)
           remoteVideoRef.current.srcObject = stream
-          // remoteVideoRef.current.onloadedmetadata = () => {
-          //   console.log('videoRef.current.duration', remoteVideoRef?.current?.duration)
-          //   // onChangeDuration(remoteVideoRef.current.duration)
-          // }
-
           remoteVideoRef.current.ontimeupdate = () => {
             if (remoteVideoRef?.current?.currentTime) {
               onChangeCurrentTime(remoteVideoRef?.current?.currentTime)
@@ -112,6 +107,7 @@ export const ViewCameraPause = ({
 
       rtcPeerConnection.addEventListener('connectionstatechange', () => {
         console.log('RTCPeerConnection state:', rtcPeerConnection.connectionState)
+
         // setStatus(rtcPeerConnection.connectionState)
       })
     }
@@ -126,6 +122,7 @@ export const ViewCameraPause = ({
 
   useEffect(() => {
     createWsConnection()
+
     return () => {
       if (websocket) {
         websocket.close()
