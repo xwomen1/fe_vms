@@ -113,9 +113,8 @@ export const ViewCameraPause = ({
       // listen for remote tracks and add them to remote stream
 
       rtcPeerConnection.addEventListener('connectionstatechange', () => {
-        console.log('RTCPeerConnection state:', rtcPeerConnection.connectionState)
-
-        // setStatus(rtcPeerConnection.connectionState)
+        // console.log('RTCPeerConnection state:', rtcPeerConnection.connectionState)
+        setStatus(rtcPeerConnection.connectionState)
       })
     }
   }, [rtcPeerConnection])
@@ -232,20 +231,26 @@ export const ViewCameraPause = ({
     <div className='portlet portlet-video live' style={{ width: '100%' }}>
       <div className='portlet-title'>
         <div className='caption'>
-          <span className='label label-sm bg-red'> {status ? status.toUpperCase() : 'LIVE'}</span>
+          <span className='label label-sm bg-red'> {status ? status.toUpperCase() : 'PLAYBACK'}</span>
           <span className='caption-subject font-dark sbold uppercase'>{name}</span>
         </div>
         <div className='media-top-controls'>
           <div className='btn-group'>
             <Button
               className={`sd_btn btn btn-default btn-xs ${channel === 'Sub' ? 'active' : ''}`}
-              onClick={() => handSetChanel(id, 'Sub')}
+              onClick={() => {
+                handSetChanel(id, 'Sub')
+                // createWsConnection()
+              }}
             >
               SD
             </Button>
             <Button
               className={`hd_btn btn btn-default btn-xs ${channel === 'Main' ? 'active' : ''}`}
-              onClick={() => handSetChanel(id, 'Main')}
+              onClick={() => {
+                handSetChanel(id, 'Main')
+                // createWsConnection()
+              }}
             >
               HD
             </Button>
