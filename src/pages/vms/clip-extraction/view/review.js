@@ -20,40 +20,12 @@ import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
 import { formatTimeShow, formatDate } from 'src/@core/utils/format'
 
-import { Card, CardContent } from "@mui/material"
+import { Card } from "@mui/material"
 import ViewCamera from "src/@core/components/camera/playback"
-
-const valueFilterInit = {
-    page: 1,
-    limit: 50,
-    deviceTypes: 'NVR'
-}
-
-const convertDate = (dateString) => {
-    const date = new Date(dateString)
-    const pad = (num) => String(num).padStart(2, '0');
-    const year = date.getFullYear();
-    const month = pad(date.getMonth() + 1); // Tháng bắt đầu từ 0
-    const day = pad(date.getDate());
-    const hours = pad(date.getHours());
-    const minutes = pad(date.getMinutes());
-    const seconds = pad(date.getSeconds());
-
-    return `${year}${month}${day}T${hours}${minutes}${seconds}`
-}
-
-const eventDates = [
-    new Date('2024-05-01'),
-    new Date('2024-05-15'),
-    new Date('2024-05-20')
-];
+import toast from 'react-hot-toast'
+import { postApi } from 'src/@core/utils/requestUltils'
 
 const Review = ({ id, name, channel }) => {
-    const [camera, setCamera] = useState({ id: '', name: '', channel: '' })
-    const [channelCurrent, setChannelCurrent] = useState(null)
-    const [startTime, setStartTime] = useState(new Date())
-    const [endTime, setEndTime] = useState(new Date())
-
     function formatTime(timeInSeconds) {
         const result = new Date(timeInSeconds * 1000).toTimeString().substr(0, 8)
 
@@ -70,24 +42,71 @@ const Review = ({ id, name, channel }) => {
         return count
     }
 
-    const [time, setTime] = useState(new Date())
+    const [loading, setLoading] = useState(false)
+    const [camera, setCamera] = useState({ id: '', name: '', channel: '' })
+    const [monthOfYear, setMonthOfYear] = useState((new Date()).getMonth() + 1)
+    const [year, setYear] = useState((new Date()).getFullYear())
+    const [eventDates, setEventDates] = useState([])
+    const [speed, setSpeed] = useState(1)
+
+    const time_start = new Date().getTime() - 60 * 60 * 1000
+    const time_end = new Date().getTime()
+
     const [dateTime, setDateTime] = useState(new Date())
 
     const [timeFilter, setTimeFilter] = useState({
-        start_time: new Date() - 60 * 60 * 1000,
-        end_time: new Date()
+        start_time: time_start,
+        end_time: time_end
     })
+
+    const [timePlay, setTimePlay] = useState(time_start)
+    const [currentTime, setCurrentTime] = useState(0)
     const datePickerRef = useRef(null)
-
-
     const [play, setPlay] = useState(true)
     const [valueRange, setValueRange] = useState(60 * 60 * 1000)
     const debouncedSearch = useDebounce(valueRange, 700)
+    const [duration, setDuration] = useState(0)
+    const [reload, setReload] = useState(0)
+
+    useEffect(() => {
+        setCamera({ id: id, name: name, channel: channel })
+    }, [reload])
+
+    const fetchEventDates = async () => {
+        setLoading(true)
+
+        const params = {
+            monthOfYear: monthOfYear,
+            year: year
+        }
+
+        console.log(timePlay)
+
+        try {
+            const res = await postApi(`https://sbs.basesystem.one/ivis/vms/api/v0/playback/camera/${id}`, params)
+            const dataList = [...res.data.DayList?.Days]
+            const dateList = []
+            dataList.forEach((item) => {
+                if (item.Record === true) {
+                    dateList.push(new Date(`${year}-${monthOfYear}-${item?.DayOfMonth}`))
+                }
+            })
+
+            setEventDates(dateList)
+        } catch (error) {
+            if (error.response && error.response.status === 404) {
+                console.error('Error 404: Not Found', error.response.data)
+                setEventDates([])
+            } else {
+                console.error('Error fetching data:', error.message)
+            }
+        } finally {
+            setLoading(false)
+        }
+    }
 
     const onClickPlay = v => {
         setCamera({ id: id, name: name, channel: channel })
-        setStartTime(convertDate(timeFilter?.start_time))
-        setEndTime(convertDate(timeFilter?.end_time))
         setPlay(v)
 
         // if (videoId) {
@@ -116,8 +135,6 @@ const Review = ({ id, name, channel }) => {
     function valuetext(value) {
 
         const timeCurrent = new Date(timeFilter.start_time + value)
-
-        setStartTime(convertDate(timeCurrent))
 
         return `${timeCurrent.getFullYear() +
             '/' +
@@ -152,8 +169,42 @@ const Review = ({ id, name, channel }) => {
         return marks
     }
 
-    const handSetChanel = (channel) => {
-        setChannelCurrent(channel)
+    const renderMarksSpeed = () => {
+        const marks = [
+            {
+                value: 0.5,
+                label: '0.5x'
+            },
+            {
+                value: 0.75,
+                label: '0.75x'
+            },
+            {
+                value: 1,
+                label: '1x'
+            },
+            {
+                value: 1.5,
+                label: '1.5x'
+            },
+            {
+                value: 2,
+                label: '2x'
+            }
+        ]
+
+        return marks
+    }
+
+    const handSetChanel = (id, channel) => {
+        setCamera({ id: id, name: name, channel: channel })
+    }
+
+    const handleSeekChange = (event, newValue) => {
+        setCurrentTime(0)
+        setTimePlay(timeFilter.start_time + newValue)
+        setCamera({ id: '', name: '', channel: '' })
+        setReload(reload + 1)
     }
 
     return (
@@ -172,12 +223,17 @@ const Review = ({ id, name, channel }) => {
                             id={camera.id}
                             name={camera.name}
                             channel={camera.channel}
-                            sizeScreen={'1x1'}
-                            startTime={startTime}
-                            endTime={endTime}
+                            sizeScreen={'1x1.2'}
+                            startTime={timePlay || time_start}
+                            endTime={timeFilter?.end_time || time_end}
+                            play={play}
+                            duration={duration}
+                            onChangeDuration={setDuration}
+                            onChangeCurrentTime={time => {
+                                setCurrentTime(1000 * time)
+                            }}
                             handSetChanel={handSetChanel}
                         />
-
                     }
                 </Grid>
                 <Grid item xs={12}>
@@ -186,18 +242,35 @@ const Review = ({ id, name, channel }) => {
                             <Box className='w-100' sx={{ px: 2 }}>
                                 <Slider
                                     defaultValue={1}
-
-                                    // getAriaValueText={'1'}
-                                    shiftStep={0.25}
+                                    min={0.5}
+                                    max={2}
                                     step={0.25}
-                                    marks
-                                    min={0.25}
-                                    max={4}
-                                    valueLabelDisplay='on'
+                                    marks={renderMarksSpeed()}
+                                    value={speed}
+                                    onChange={(event, newValue) => {
+                                        setSpeed(newValue)
+                                    }}
+                                    valueLabelDisplay='auto'
                                     color='secondary'
                                     sx={{
-                                        '&. MuiSlider-track': {
-                                            backgroundColor: '#fff'
+                                        '& .MuiSlider-thumb': {
+                                            width: 8,
+                                            height: 8,
+                                            transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
+                                            '&::before': {
+                                                boxShadow: '0 2px 12px 0 rgba(0,0,0,0.4)'
+                                            },
+                                            '&:hover, &.Mui-focusVisible': {
+                                                boxShadow: `0px 0px 0px 8px ${'rgb(0 0 0 / 16%)'}`
+                                            },
+                                            '&.Mui-active': {
+                                                width: 20,
+                                                height: 20
+                                            }
+                                        },
+                                        '& .MuiSlider-track': {
+                                            backgroundColor: '#fff',
+                                            opacity: 0
                                         },
                                         '& .MuiSlider-rail': {
                                             opacity: 0.28,
@@ -223,7 +296,7 @@ const Review = ({ id, name, channel }) => {
 
                                 {timeFilter && (
                                     <IconButton onClick={() => onClickPlay(!play)} style={{ padding: 5, margin: '0 8px 0 8px' }}>
-                                        {play ? (
+                                        {!play ? (
                                             <Icon icon='ph:play-light' size='1.2em' color='#FFF' />
                                         ) : (
                                             <Icon icon='ic:twotone-pause' size='1.2em' color='#FFF' />
@@ -241,7 +314,7 @@ const Review = ({ id, name, channel }) => {
                             </div>
                         </div>
                         <div className='slidecontainer-2'>
-                            <Box style={{ display: 'flex', alignItems: 'center' }}>
+                            <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'end' }}>
                                 <IconButton
                                     style={{ padding: 5 }}
                                     onClick={() => {
@@ -278,15 +351,17 @@ const Review = ({ id, name, channel }) => {
                                     step={2000}
                                     min={0}
                                     max={valueRange}
-                                    valueLabelDisplay='auto'
+                                    valueLabelDisplay='on'
+                                    onChange={handleSeekChange}
+                                    value={timePlay - timeFilter?.start_time + currentTime}
                                     getAriaValueText={valuetext}
                                     valueLabelFormat={valuetext}
                                     marks={renderMarks()}
                                     aria-labelledby='custom-marks-slider'
                                     sx={{
                                         '& .MuiSlider-thumb': {
-                                            width: 8,
-                                            height: 8,
+                                            width: 20,
+                                            height: 20,
                                             transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
                                             '&::before': {
                                                 boxShadow: '0 2px 12px 0 rgba(0,0,0,0.4)'
@@ -299,7 +374,8 @@ const Review = ({ id, name, channel }) => {
                                                 height: 20
                                             }
                                         },
-                                        '&. MuiSlider-track': {
+                                        '& .MuiSlider-track': {
+                                            opacity: 0,
                                             backgroundColor: '#fff'
                                         },
                                         '& .MuiSlider-rail': {
@@ -328,8 +404,8 @@ const Review = ({ id, name, channel }) => {
                                             border: 'none'
                                         },
                                         '& .MuiSlider-thumb': {
-                                            width: 24,
-                                            height: 24,
+                                            width: 20,
+                                            height: 20,
                                             backgroundColor: '#fff',
                                             '&::before': {
                                                 boxShadow: '0 4px 8px rgba(0,0,0,0.4)'
@@ -363,6 +439,7 @@ const Review = ({ id, name, channel }) => {
                                                 end_time: new Date(date).getTime()
                                             })
                                         }}
+                                        onInputClick={fetchEventDates}
                                         highlightDates={eventDates}
                                         popperPlacement='bottom-start'
                                         customInput={

@@ -76,7 +76,7 @@ const dataDailyDefault = [
 ]
 
 const Storage = ({ id, name, channel }) => {
-    const [camera, setCamera] = useState()
+    const [camera, setCamera] = useState({ id: id, name: name, channel: channel })
     const [channelCurrent, setChannelCurrent] = useState(null)
 
     const [dataDaily, setDataDaily] = useState([])
@@ -101,13 +101,20 @@ const Storage = ({ id, name, channel }) => {
         return count
     }
 
+    const time_start = new Date().getTime() - 60 * 60 * 1000
+    const time_end = new Date().getTime()
+
     const [time, setTime] = useState(new Date())
     const [dateTime, setDateTime] = useState(new Date())
 
     const [timeFilter, setTimeFilter] = useState({
-        start_time: new Date() - 60 * 60 * 1000,
-        end_time: new Date()
+        start_time: time_start,
+        end_time: time_end
     })
+
+    const [timePlay, setTimePlay] = useState(time_start)
+    const [currentTime, setCurrentTime] = useState(0)
+
     const datePickerRef = useRef(null)
 
 
@@ -179,8 +186,8 @@ const Storage = ({ id, name, channel }) => {
         return marks
     }
 
-    const handSetChanel = (channel) => {
-        setChannelCurrent(channel)
+    const handSetChanel = (id, channel) => {
+        setCamera({ id: id, name: name, channel: channel })
     }
 
     const handleSetTime = (type) => {
@@ -238,10 +245,16 @@ const Storage = ({ id, name, channel }) => {
                                 </div>}
                             {id !== '' && channel !== '' &&
                                 <ViewCamera
-                                    id={id}
-                                    name={name}
-                                    channel={channel}
-                                    sizeScreen={'1x1'}
+                                    name={camera.name}
+                                    id={camera.id}
+                                    channel={camera.channel}
+                                    play={play}
+                                    startTime={timePlay || time_start}
+                                    endTime={timeFilter?.end_time || time_end}
+                                    onChangeCurrentTime={time => {
+                                        setCurrentTime(1000 * time)
+                                    }}
+                                    sizeScreen={'1x1.8'}
                                     handSetChanel={handSetChanel}
                                 />
                             }
