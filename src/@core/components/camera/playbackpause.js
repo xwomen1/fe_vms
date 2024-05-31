@@ -240,6 +240,7 @@ export const ViewCameraPause = ({
               className={`sd_btn btn btn-default btn-xs ${channel === 'Sub' ? 'active' : ''}`}
               onClick={() => {
                 handSetChanel(id, 'Sub')
+
                 // createWsConnection()
               }}
             >
@@ -249,6 +250,7 @@ export const ViewCameraPause = ({
               className={`hd_btn btn btn-default btn-xs ${channel === 'Main' ? 'active' : ''}`}
               onClick={() => {
                 handSetChanel(id, 'Main')
+
                 // createWsConnection()
               }}
             >
