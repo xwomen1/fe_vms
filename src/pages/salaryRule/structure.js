@@ -20,11 +20,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import { fetchData } from 'src/store/apps/user'
 import { useRouter } from 'next/router'
 import axios from 'axios'
-import TableHeader from 'src/views/apps/user/list/TableHeader'
+import TableHeader from 'src/views/apps/user/list/structure'
 import CustomTextField from 'src/@core/components/mui/text-field'
-import UserDetails from '../detail/index'
 import Link from 'next/link'
 import { fetchChatsContacts } from 'src/store/apps/chat'
+import SalaryRulePage from './salaryRule'
 
 const UserList = ({ apiData }) => {
   const [value, setValue] = useState('')
@@ -40,8 +40,13 @@ const UserList = ({ apiData }) => {
   const [groups, setGroups] = useState([])
   const [anchorEl, setAnchorEl] = useState(null)
   const router = useRouter()
-  const [searchGroup, setSearchGroup] = useState('')
+  const [salary, setSalary] = useState('')
   const [contractTypes, setContractTypes] = useState({})
+  const [isSalaryRuleOpen, setIsSalaryRuleOpen] = useState(false)
+
+  const toggleSalaryRule = () => {
+    setIsSalaryRuleOpen(!isSalaryRuleOpen)
+  }
 
   const handlePageChange = newPage => {
     setPage(newPage)
@@ -143,20 +148,42 @@ const UserList = ({ apiData }) => {
             Authorization: `Bearer ${token}`
           },
           params: {
-            keyword: valueGroup
+            keyword: value
           }
         }
         const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search', config)
         const dataWithChildren = addChildrenField(response.data)
         const rootGroups = findRootGroups(dataWithChildren)
-        setGroups(rootGroups)
+        setGroups(response.data)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
     }
 
     fetchGroupData()
-  }, [pageSize, valueGroup])
+  }, [pageSize, valueGroup, page, pageSize, total, value])
+  useEffect(() => {
+    const fetchGroupData = async () => {
+      try {
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+        console.log('token', token)
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+        const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/salary/regulation/', config)
+
+        setSalary(response.data)
+        console.log(response.data.othour)
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+
+    fetchGroupData()
+  }, [])
 
   const addChildrenField = (data, parentId = null) => {
     return data.map(group => {
@@ -228,7 +255,8 @@ const UserList = ({ apiData }) => {
           .then(() => {
             Swal.fire('Xóa thành công', '', 'success')
             const updatedData = userData.filter(user => user.userId !== idDelete)
-            setUserData(updatedData)
+
+            // setUserData(updatedData)
             fetchData()
           })
           .catch(err => {
@@ -239,106 +267,36 @@ const UserList = ({ apiData }) => {
   }
 
   const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen)
-  useEffect(() => {
-    const fetchFilteredOrAllUsers = async () => {
-      try {
-        const token = localStorage.getItem(authConfig.storageTokenKeyName)
-
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          params: {
-            limit: pageSize,
-            page: page,
-            keyword: value
-          }
-        }
-        let url
-        if (selectedGroups.length > 0) {
-          url = `https://dev-ivi.basesystem.one/smc/iam/api/v0/users/search?groupIds=${selectedGroups
-            .map(g => g.groupId)
-            .join(',')}`
-        } else {
-          url = 'https://dev-ivi.basesystem.one/smc/iam/api/v0/users/search'
-        }
-        const response = await axios.get(url, config)
-        setUserData(response.data.rows)
-        setTotal(response.data.totalPage)
-      } catch (error) {
-        console.error('Error fetching users:', error)
-      }
-    }
-    fetchFilteredOrAllUsers()
-  }, [selectedGroups, page, pageSize, total, value])
 
   return (
     <Grid style={{ minWidth: '1000px' }}>
       <Card>
-        <TableHeader value={value} handleFilter={handleFilter} toggle={toggleAddUserDrawer} />
         <Grid container spacing={2}>
-          {/* <Grid item xs={0.1}></Grid> */}
-          <Grid item xs={0.2}></Grid>
+          <Grid item xs={12}>
+            <TableHeader value={value} handleFilter={handleFilter} toggle={toggleSalaryRule} />
 
-          <Grid item xs={2} component={Paper}>
-            <div>
-              <CustomTextField
-                value={valueGroup}
-                sx={{ mr: 4 }}
-                placeholder='Search Group'
-                onChange={e => handleFilterGroup(e.target.value)}
-              />
-              <TreeView
-                sx={{ minHeight: 240 }}
-                defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
-                defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
-              >
-                {groups.map(rootGroup => renderGroup(rootGroup))}
-              </TreeView>
-            </div>
-          </Grid>
-          <Grid item xs={9.8}>
             <Paper elevation={3}>
               <Table>
                 <TableHead>
                   <TableRow>
                     <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Mã định danh</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Full Name</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Email</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Số điện thoại </TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Đơn vị</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Loại hợp đồng</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Tên group</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Công thức áp dụng</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Lương cơ bản</TableCell>
 
-                    <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Ghi chú</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {userData.map((user, index) => (
+                  {groups.map((user, index) => (
                     <TableRow key={user.userId}>
                       <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user.accessCode}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user.fullName}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user.email}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user.phoneNumber}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user.userGroup[0]?.groupName}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{contractTypes[user.contractType] || ''}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{user?.groupName}</TableCell>
 
-                      <TableCell sx={{ padding: '16px' }}>
-                        <Grid container spacing={2}>
-                          <IconButton
-                            size='small'
-                            component={Link}
-                            href={`/apps/user/detail/${user.userId}`}
-                            sx={{ color: 'text.secondary' }}
-                          >
-                            <Icon icon='tabler:eye' />
-                          </IconButton>
-                          <IconButton onClick={() => handleDelete(user.userId)}>
-                            <Icon icon='tabler:trash' />
-                          </IconButton>
-                        </Grid>
-                      </TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{'A+B+C+D'}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{user?.salaryBase}</TableCell>
+
+                      <TableCell sx={{ padding: '16px' }}>{}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

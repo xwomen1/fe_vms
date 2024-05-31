@@ -571,7 +571,7 @@ const UserDetails = () => {
         }
 
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions?limit=25&page=1&parentID=f963e9d4-3d6b-45df-884d-15f93452f2a2',
+          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/parentsID?parentIDf963e9d4-3d6b-45df-884d-15f93452f2a2',
           config
         )
 

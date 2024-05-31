@@ -259,6 +259,16 @@ const navigation = () => {
           title: 'Vai Trò',
           icon: 'tabler:users',
           path: '/list-policy'
+        },
+        {
+          title: 'Bảng lương',
+          icon: 'tabler:coin-pound',
+          path: '/salary'
+        },
+        {
+          title: 'Quy định về lương',
+          icon: 'tabler:moneybag',
+          path: '/salaryRule'
         }
       ]
     },
