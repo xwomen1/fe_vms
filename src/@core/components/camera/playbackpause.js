@@ -32,7 +32,8 @@ export const ViewCameraPause = ({
   play,
   onChangeCurrentTime,
   duration,
-  onChangeDuration
+  onChangeDuration,
+  volume
 }) => {
   const [websocket, setWebsocket] = useState(null)
   const [text, setText] = useState(null)
@@ -74,6 +75,12 @@ export const ViewCameraPause = ({
     handlePlayPause(play)
   }, [play])
 
+  useEffect(() => {
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.volume = volume / 100
+    }
+  }, [volume])
+
   const SOCKET_LIVE_VIEW = process.env.NEXT_PUBLIC_SOCKET_CCTT
 
   const createWsConnection = () => {
@@ -89,11 +96,6 @@ export const ViewCameraPause = ({
         if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {
           setRemoteStream(stream)
           remoteVideoRef.current.srcObject = stream
-          // remoteVideoRef.current.onloadedmetadata = () => {
-          //   console.log('videoRef.current.duration', remoteVideoRef?.current?.duration)
-          //   // onChangeDuration(remoteVideoRef.current.duration)
-          // }
-
           remoteVideoRef.current.ontimeupdate = () => {
             if (remoteVideoRef?.current?.currentTime) {
               onChangeCurrentTime(remoteVideoRef?.current?.currentTime)
@@ -111,8 +113,8 @@ export const ViewCameraPause = ({
       // listen for remote tracks and add them to remote stream
 
       rtcPeerConnection.addEventListener('connectionstatechange', () => {
-        console.log('RTCPeerConnection state:', rtcPeerConnection.connectionState)
-        // setStatus(rtcPeerConnection.connectionState)
+        // console.log('RTCPeerConnection state:', rtcPeerConnection.connectionState)
+        setStatus(rtcPeerConnection.connectionState)
       })
     }
   }, [rtcPeerConnection])
@@ -126,6 +128,7 @@ export const ViewCameraPause = ({
 
   useEffect(() => {
     createWsConnection()
+
     return () => {
       if (websocket) {
         websocket.close()
@@ -228,20 +231,26 @@ export const ViewCameraPause = ({
     <div className='portlet portlet-video live' style={{ width: '100%' }}>
       <div className='portlet-title'>
         <div className='caption'>
-          <span className='label label-sm bg-red'> {status ? status.toUpperCase() : 'LIVE'}</span>
+          <span className='label label-sm bg-red'> {status ? status.toUpperCase() : 'PLAYBACK'}</span>
           <span className='caption-subject font-dark sbold uppercase'>{name}</span>
         </div>
         <div className='media-top-controls'>
           <div className='btn-group'>
             <Button
               className={`sd_btn btn btn-default btn-xs ${channel === 'Sub' ? 'active' : ''}`}
-              onClick={() => handSetChanel(id, 'Sub')}
+              onClick={() => {
+                handSetChanel(id, 'Sub')
+                // createWsConnection()
+              }}
             >
               SD
             </Button>
             <Button
               className={`hd_btn btn btn-default btn-xs ${channel === 'Main' ? 'active' : ''}`}
-              onClick={() => handSetChanel(id, 'Main')}
+              onClick={() => {
+                handSetChanel(id, 'Main')
+                // createWsConnection()
+              }}
             >
               HD
             </Button>

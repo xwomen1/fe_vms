@@ -275,7 +275,7 @@ const ModelAIList = () => {
                                                                     setTypePopup('view')
                                                                 }}
                                                             >
-                                                                <Icon icon='tabler:eye' />
+                                                                <Icon icon="tabler:info-circle" />
                                                             </IconButton>
                                                             <IconButton
                                                                 size='small'

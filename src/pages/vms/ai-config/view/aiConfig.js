@@ -27,7 +27,8 @@ const AIConfig = () => {
   const [keyword, setKeyword] = useState('')
   const [cameraGroup, setCameraGroup] = useState([])
   const [alertAIList, setAlertAIList] = useState([])
-
+  const [dataList, setDataList] = useState([])
+  const [reload, setReload] = useState(0)
   const [switchStates, setSwitchStates] = useState({})
 
   const [total, setTotal] = useState(1)
@@ -85,7 +86,7 @@ const AIConfig = () => {
       field: 'face',
       label: 'Nhận diện khuôn mặt',
       renderCell: row => (
-        <Switch checked={switchStates[row.id]?.face || false} onChange={e => handleSwitchChange(e, row.id, 'face')} />
+        <Switch checked={switchStates[row.id]?.face || false} onChange={e => handleSwitchChange(e, row.id, 'face_recognition', row.alert_id)} />
       )
     },
     {
@@ -98,14 +99,15 @@ const AIConfig = () => {
       renderCell: row => (
         <Switch
           checked={switchStates[row.id]?.licensePlate || false}
-          onChange={e => handleSwitchChange(e, row.id, 'licensePlate')}
+          onChange={e => handleSwitchChange(e, row.id, 'license_plate_recognition', row.alert_id)}
         />
       )
     }
   ]
+
   useEffect(() => {
     fetchCameraGroup()
-  }, [])
+  }, [reload])
 
   const fetchCameraGroup = async () => {
     try {
@@ -119,26 +121,65 @@ const AIConfig = () => {
     }
   }
 
-  const fetchModelAICamera = async cameraId => {
+  const fetchModelAICameras = async (cameraGroup) => {
+    if (!cameraGroup) return
+
     try {
-      const res = await axios.get(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties/camera/${cameraId}`,
-        config
-      )
-      setAlertAIList(res.data)
+      const promises = cameraGroup.map(async (camera) => {
+        const res = await axios.get(
+          `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties/camera/${camera.id}`,
+          config
+        )
+
+        return res?.data[0]
+      })
+
+      const results = await Promise.all(promises)
+      setAlertAIList(results)
     } catch (error) {
       console.error('Error fetching data: ', error)
-      toast(error)
+      toast(error.message)
     }
   }
 
   useEffect(() => {
-    cameraGroup.map(camera => {
-      fetchModelAICamera(camera.id)
-    })
-  }, [cameraGroup])
+    fetchModelAICameras(cameraGroup)
+  }, [cameraGroup, reload])
 
-  const handleSwitchChange = (event, cameraId, type) => {
+
+  useEffect(() => {
+    if (!alertAIList || !cameraGroup) return;
+
+    const data = cameraGroup.map((camera, index) => {
+      const item = alertAIList.find((alert) => alert.camera_id === camera.id)
+      const licensePlate = item?.cameraaiproperty.find((a) => (a.cameraModelAI.type === 'license_plate_recognition'))
+      const face = item?.cameraaiproperty.find((b) => (b.cameraModelAI.type === 'face_recognition'))
+
+      const alert = {
+        alert_id: item?.id,
+        face: face?.isactive,
+        licensePlate: licensePlate?.isactive
+      }
+
+      return alert ? { ...camera, ...alert } : camera
+    })
+    setDataList(data)
+
+    const initialSwitchStates = {}
+    data.forEach((item) => {
+      initialSwitchStates[item.id] = {
+        face: item.face || false,
+        licensePlate: item.licensePlate || false
+      }
+    })
+    setSwitchStates(initialSwitchStates)
+  }, [alertAIList, cameraGroup])
+
+  useEffect(() => {
+
+  }, [dataList, switchStates])
+
+  const handleSwitchChange = (event, cameraId, type, cameraAIPropertyId) => {
     setSwitchStates(prevState => ({
       ...prevState,
       [cameraId]: {
@@ -146,6 +187,35 @@ const AIConfig = () => {
         [type]: event.target.checked
       }
     }))
+
+    handleUpdateAlertIsActive(cameraAIPropertyId, type)
+  }
+
+  const handleUpdateAlertIsActive = async (alertId, type) => {
+    const alert = alertAIList.find((alert) => alert.id === alertId)
+
+    const changedAlerts = alert.cameraaiproperty.map(alert => {
+      return alert.cameraModelAI.type === type ? { ...alert, isactive: !alert.isactive } : alert
+    })
+
+    const params = {
+      cameraaiproperty: [...changedAlerts]
+    }
+
+    try {
+      await axios.put(
+        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties/${alertId}`,
+        { ...params },
+        config
+      )
+      setReload(reload + 1)
+      toast.success('Thao tác thành công')
+    } catch (error) {
+      console.error('Error fetching data: ', error)
+      toast.error(error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handlePageChange = newPage => {
@@ -186,7 +256,7 @@ const AIConfig = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {cameraGroup.slice(0, pageSize).map((row, index) => {
+                {dataList.slice(0, pageSize).map((row, index) => {
                   return (
                     <TableRow hover tabIndex={-1} key={index}>
                       <TableCell align='right'>{index + 1}</TableCell>

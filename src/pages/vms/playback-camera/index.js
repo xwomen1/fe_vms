@@ -94,6 +94,7 @@ const Caller = () => {
   const [sizeScreen, setSizeScreen] = useState('3x2')
   const [reload, setReload] = useState(0)
   const [numberShow, setNumberShow] = useState(6)
+  const [volume, setVolume] = useState(30)
 
   const [valueFilter, setValueFilter] = useState(valueFilterInit)
 
@@ -110,22 +111,15 @@ const Caller = () => {
   const debouncedSearch = useDebounce(valueRange, 700)
 
   const onClickPlay = v => {
-    setPlay(v)
-
-    // if (videoId) {
-    //   if (!v) {
-    //     videoId.pause();
-    //     if (stopAndStartRecord) {
-    //       onClickCut('pause');
-    //     }
-    //   } else {
-    //     if (isScreen && isScreen === 'detail' && onChangeCurTimePlayback) {
-    //       const acb = timeFilter.start_time + parseInt(valueRange) - 6000;
-    //       onChangeCurTimePlayback(acb);
-    //     }
-    //     videoId.play();
-    //   }
-    // }
+    if (v) {
+      setPlay(v)
+      setTimePlay(timePlay + currentTime)
+      setCurrentTime(0)
+      setCameraGroup([])
+      setReload(reload + 1)
+    } else {
+      setPlay(v)
+    }
   }
 
   const handleSeekChange = (event, newValue) => {
@@ -268,6 +262,7 @@ const Caller = () => {
                 endTime={timeFilter?.endTime || time_end}
                 sizeScreen={sizeScreen}
                 handSetChanel={handSetChanel}
+                volume={volume}
               />
             </Grid>
           ))}
@@ -335,7 +330,12 @@ const Caller = () => {
                   )}
 
                   {timeFilter && (
-                    <IconButton onClick={() => onClickPlay(!play)} style={{ padding: 5, margin: '0 8px 0 8px' }}>
+                    <IconButton
+                      onClick={() => {
+                        onClickPlay(!play)
+                      }}
+                      style={{ padding: 5, margin: '0 8px 0 8px' }}
+                    >
                       {!play ? (
                         <Icon icon='ph:play-light' size='1.2em' color='#FFF' />
                       ) : (
@@ -439,6 +439,10 @@ const Caller = () => {
                     defaultValue={30}
                     min={0}
                     max={100}
+                    value={volume}
+                    onChange={(event, vol) => {
+                      setVolume(vol)
+                    }}
                     color='secondary'
                     sx={{
                       '& .MuiSlider-track': {
@@ -479,6 +483,10 @@ const Caller = () => {
                           start_time: new Date(date).getTime() - valueRange,
                           end_time: new Date(date).getTime()
                         })
+                        setCurrentTime(0)
+                        setTimePlay(new Date(date).getTime() - valueRange)
+                        setCameraGroup([])
+                        setReload(reload + 1)
                       }}
                       popperPlacement='bottom-start'
                       customInput={

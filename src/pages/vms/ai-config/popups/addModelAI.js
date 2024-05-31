@@ -30,8 +30,8 @@ const CustomCloseButton = styled(IconButton)(({ theme }) => ({
 const format_form = [
     {
         name: 'type',
-        label: 'Loại Model AI',
-        placeholder: 'Nhập loại model AI',
+        label: 'Mã Model AI',
+        placeholder: 'Nhập mã model AI',
         type: 'TextField',
         data: [],
         require: true,
@@ -48,8 +48,8 @@ const format_form = [
     },
     {
         name: 'characteristicType',
-        label: 'Loại đối tượng',
-        placeholder: 'Nhập loại đối tượng',
+        label: 'Mã thông số',
+        placeholder: 'Nhập mã thông số',
         type: 'TextField',
         data: [],
         require: true,
@@ -57,8 +57,8 @@ const format_form = [
     },
     {
         name: 'characteristicName',
-        label: 'Tên đối tượng',
-        placeholder: 'Nhập tên đối tượng',
+        label: 'Tên thông số',
+        placeholder: 'Nhập tên thông số',
         type: 'TextField',
         data: [],
         require: true,
@@ -120,7 +120,6 @@ const AddModelAI = ({ show, onClose, setReload, data, id, typePopup }) => {
 
     const onSubmit = (values) => {
 
-        // data.id ? handleUpdate(values) : handleAdd(values)
         if (data) {
             handleUpdate(values)
         } else {
@@ -244,7 +243,7 @@ const AddModelAI = ({ show, onClose, setReload, data, id, typePopup }) => {
                     {
                         typePopup === 'add' &&
                         <Button type='submit' variant='contained' onClick={handleSubmit(onSubmit)}>
-                            {data ? 'Sửa' : 'Thêm'}
+                            Lưu
                         </Button>
                     }
                 </DialogActions>
