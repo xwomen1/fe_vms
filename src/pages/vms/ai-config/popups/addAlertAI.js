@@ -56,7 +56,6 @@ const columns = [
 
 const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => {
     const [loading, setLoading] = useState(false)
-    const [message, setMessage] = useState('')
     const [total, setTotal] = useState(1)
     const [page, setPage] = useState(1)
     const [pageSize, setPageSize] = useState(25)
@@ -86,16 +85,6 @@ const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => 
     useEffect(() => {
         fetchModelAIs()
     }, [page, pageSize])
-
-    useEffect(() => {
-        if (message) {
-            const timer = setTimeout(() => {
-                setMessage('')
-            }, 2000) // 1 seconds
-
-            return () => clearTimeout(timer)
-        }
-    }, [message])
 
     const fetchModelAIs = async () => {
         setLoading(true)
@@ -170,9 +159,10 @@ const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => 
         }
 
         axios.post(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties`, params, config)
-            .then(() => {
-                setMessage('Thành công')
+            .then((res) => {
                 setReload()
+                onClose()
+                toast.success(res.message)
             })
             .catch((error) => {
                 console.error('Lỗi khi lấy dữ liệu: ', error)
@@ -200,9 +190,10 @@ const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => 
         }
 
         axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties/${cameraId}`, params, config)
-            .then(() => {
-                setMessage('Thành công')
+            .then((res) => {
                 setReload()
+                onClose()
+                toast.success(res.message)
             })
             .catch((error) => {
                 console.error('Lỗi khi lấy dữ liệu: ', error)
@@ -237,7 +228,6 @@ const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => 
                         <Typography variant='h3' sx={{ mb: 3 }}>
                             Danh sách Model AI
                         </Typography>
-                        {message && <Typography color='primary'>{message}</Typography>}
                     </Box>
 
                     <Grid container spacing={2}>
