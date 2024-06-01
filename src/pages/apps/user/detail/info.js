@@ -721,17 +721,15 @@ const UserDetails = () => {
         setStatus(response.data.userAccount.accStatus)
         setGender(response.data.gender)
 
-        // if (response.data.level) {
-        const regionName = await fetchRegionName(response.data.level)
-        setSelectedRegion({ id: response.data.level, name: regionName })
-        console.log(regionName, 'regionsname')
-
-        // }
-        // if (response.data.contractType) {
-        const contractName = await fetchRegionName(response.data.contractType)
-        setSelectContract({ id: response.data.contractType, name: contractName })
-
-        // }
+        if (response.data.level) {
+          const regionName = await fetchRegionName(response.data.level)
+          setSelectedRegion({ id: response.data.level, name: regionName })
+          console.log(regionName, 'regionsname')
+        }
+        if (response.data.contractType) {
+          const contractName = await fetchRegionName(response.data.contractType)
+          setSelectContract({ id: response.data.contractType, name: contractName })
+        }
         if (response.data.timeStartMorning) {
           const [hour, minute] = response.data.timeStartMorning
           const timeString = `${hour}:${minute.toString().padStart(2, '0')}`
