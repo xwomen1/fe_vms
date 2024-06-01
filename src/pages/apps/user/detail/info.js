@@ -445,55 +445,57 @@ const UserDetails = () => {
 
   const policyList = policies.map(row => row.policyId)
 
-  const fetchUserData = async () => {
-    try {
-      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+  const fetchUserData = async userId => {
+    if (userId != null) {
+      try {
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
-      }
-      const response = await axios.get(`https://dev-ivi.basesystem.one/smc/iam/api/v0/users/${userId}`, config)
-      const userData = response.data
-      setData(userData)
-      setGroup(userData.userGroups)
+        const response = await axios.get(`https://dev-ivi.basesystem.one/smc/iam/api/v0/users/${userId}`, config)
+        const userData = response.data
+        setData(userData)
+        setGroup(userData.userGroups)
 
-      setPolicies(response.data.policies)
-      setPiId(response.data.piId)
-      setFullNameValue(response.data.fullName)
-      setEmail(response.data.email)
-      setPhoneNumber(response.data.phoneNumber)
-      setIdentityNumber(response.data.identityNumber)
-      setGender(response.data.gender)
+        setPolicies(response.data.policies)
+        setPiId(response.data.piId)
+        setFullNameValue(response.data.fullName)
+        setEmail(response.data.email)
+        setPhoneNumber(response.data.phoneNumber)
+        setIdentityNumber(response.data.identityNumber)
+        setGender(response.data.gender)
 
-      setUserCode(response.data.userCode)
-      setSyncCode(response.data.syncCode)
-      setStatus1(response.data.userStatus)
-      setAvailableAt(response.data.availableAt)
-      setExpiredAt(response.data.expiredAt)
-      setUser(response.data)
-      setNote(response.data.note)
-      setStatus(response.data.userAccount.accStatus)
-
-      if (response.data.level) {
-        const regionName = await fetchRegionName(response?.data?.level)
-        setSelectedRegion({ id: response.data.level, name: regionName })
-        console.log(regionName, 'regionsname')
-      }
-
-      if (response.data.contractType) {
-        const contractName = await fetchRegionName(response?.data?.contractType)
-        setSelectContract({ id: response.data.contractType, name: contractName })
-      }
-      if (response.data.userGroups && response.data.userGroups.length > 0) {
-        setDefaultGroup(response.data.userGroups[0])
-      }
-      if (response.data.userAccount && response.data.userAccount.length > 0) {
+        setUserCode(response.data.userCode)
+        setSyncCode(response.data.syncCode)
+        setStatus1(response.data.userStatus)
+        setAvailableAt(response.data.availableAt)
+        setExpiredAt(response.data.expiredAt)
+        setUser(response.data)
+        setNote(response.data.note)
         setStatus(response.data.userAccount.accStatus)
+
+        if (response.data.level) {
+          const regionName = await fetchRegionName(response?.data?.level)
+          setSelectedRegion({ id: response.data.level, name: regionName })
+          console.log(regionName, 'regionsname')
+        }
+
+        if (response.data.contractType) {
+          const contractName = await fetchRegionName(response?.data?.contractType)
+          setSelectContract({ id: response.data.contractType, name: contractName })
+        }
+        if (response.data.userGroups && response.data.userGroups.length > 0) {
+          setDefaultGroup(response.data.userGroups[0])
+        }
+        if (response.data.userAccount && response.data.userAccount.length > 0) {
+          setStatus(response.data.userAccount.accStatus)
+        }
+      } catch (error) {
+        console.error('Error fetching user details:', error)
       }
-    } catch (error) {
-      console.error('Error fetching user details:', error)
     }
   }
 
@@ -538,7 +540,7 @@ const UserDetails = () => {
           .delete(urlDelete, config)
           .then(() => {
             Swal.fire('Xóa thành công', '', 'success')
-            fetchUserData()
+            fetchUserData(userId)
           })
           .catch(err => {
             Swal.fire('Đã xảy ra lỗi', err.response.data.message, 'error')
@@ -775,12 +777,12 @@ const UserDetails = () => {
       }
     }
     if (userId) {
-      fetchUserData()
+      fetchUserData(userId)
     }
   }, [userId, leaderOfUnit])
 
   const handleCancel = () => {
-    fetchUserData()
+    fetchUserData(userId)
 
     setReadOnly(true)
     setEditing(false)
@@ -788,8 +790,8 @@ const UserDetails = () => {
     // setShowPlusColumn(!showPlusColumn)
   }
   useEffect(() => {
-    fetchUserData()
-  }, [])
+    fetchUserData(userId)
+  }, [userId])
   console.log('param', params)
 
   return (
