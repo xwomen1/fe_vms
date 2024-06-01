@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 
 import { Button, CardHeader, DialogActions, Grid, MenuItem, Typography } from '@mui/material'
 
@@ -24,6 +24,8 @@ import { Card, CardContent } from "@mui/material"
 import ViewCamera from "src/@core/components/camera/playback"
 import Daily from '../mocdata/daily'
 import CustomTextField from 'src/@core/components/mui/text-field'
+import { callApi } from 'src/@core/utils/requestUltils'
+import Demo from '../mocdata/demo'
 
 
 const valueFilterInit = {
@@ -76,6 +78,7 @@ const dataDailyDefault = [
 ]
 
 const Storage = ({ id, name, channel }) => {
+    const [loading, setLoading] = useState(false)
     const [camera, setCamera] = useState({ id: id, name: name, channel: channel })
     const [channelCurrent, setChannelCurrent] = useState(null)
 
@@ -117,10 +120,10 @@ const Storage = ({ id, name, channel }) => {
 
     const datePickerRef = useRef(null)
 
-
     const [play, setPlay] = useState(true)
     const [valueRange, setValueRange] = useState(60 * 60 * 1000)
     const debouncedSearch = useDebounce(valueRange, 700)
+    const [dataList, setDataList] = useState([])
 
     const onClickPlay = v => {
         setPlay(v)
@@ -139,6 +142,33 @@ const Storage = ({ id, name, channel }) => {
         //     videoId.play();
         //   }
         // }
+    }
+
+    useEffect(() => {
+        if (id) {
+            fetchDateList()
+        }
+    }, [id])
+
+    const fetchDateList = async () => {
+        setLoading(true)
+
+        try {
+            const res = await callApi(`https://sbs.basesystem.one/ivis/vms/api/v0/playback/camera/${id}`)
+            const data = res.data.MatchList.map((item, index) => {
+                return item.TimeSpan
+            })
+            setDataList(data)
+            console.log('data', data)
+        } catch (error) {
+            if (error.response && error.response.status === 404) {
+                console.error('Error 404: Not Found', error.response.data)
+            } else {
+                console.error('Error fetching data:', error.message)
+            }
+        } finally {
+            setLoading(false)
+        }
     }
 
     function timeDisplay(time) {
@@ -230,6 +260,7 @@ const Storage = ({ id, name, channel }) => {
                             minuteType={minuteType}
                             aria-describedby='validation-basic-last-name'
                         />
+                        {/* <Demo data={dataList} /> */}
                     </CardContent>
                 </Card>
             </Grid>

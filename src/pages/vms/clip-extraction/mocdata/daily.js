@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
+import { Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
 import Icon from 'src/@core/components/icon'
 
 const convertTimeToMinute = (time) => {
@@ -72,6 +72,7 @@ const Daily = ({ dateType, dataDailyProps, callbackOfDaily, disabled, minuteType
     }, [timeLines])
 
     useEffect(() => {
+        console.log('dataDailyDefault', dataDailyDefault)
         setDataDaily(
             dataDailyDefault.map((day) => ({
                 ...day,
@@ -201,6 +202,10 @@ const Daily = ({ dateType, dataDailyProps, callbackOfDaily, disabled, minuteType
         }
 
         const newData = [
+            {
+                label: '',
+                value: 0,
+            },
             ...daysArray.map((day, index) => {
                 return {
                     label: day,
@@ -234,11 +239,17 @@ const Daily = ({ dateType, dataDailyProps, callbackOfDaily, disabled, minuteType
         return timePeriods
     }
 
-    return (
+    useEffect(() => {
+        console.log('timeLines', timeLines)
+        console.log('defaultTimePeriods', defaultTimePeriods)
+        console.log('dataDaily', dataDaily)
+    }, [dataDaily])
 
+    return (
         // <div
         //     style={{
         //         width: '100%',
+        //         overflow: 'auto'
         //     }}
         // >
         //     {dataDaily
@@ -259,7 +270,6 @@ const Daily = ({ dateType, dataDailyProps, callbackOfDaily, disabled, minuteType
         //                             position: 'relative',
         //                             color: 'rgba(0, 0, 0, 0.6)',
         //                             fontSize: 14,
-        //                             // overflow: 'auto'
         //                         }}
         //                     >
         //                         {timeLines.map(
@@ -275,12 +285,7 @@ const Daily = ({ dateType, dataDailyProps, callbackOfDaily, disabled, minuteType
         //                                 </div>
         //                             ),
         //                         )}
-        //                         <div
-        //                             style={{
-        //                                 position: 'absolute',
-        //                                 right: -33,
-        //                             }}
-        //                         >
+        //                         <div>
         //                             24:00
         //                         </div>
         //                     </div>
@@ -359,6 +364,7 @@ const Daily = ({ dateType, dataDailyProps, callbackOfDaily, disabled, minuteType
 
         // </div>
 
+
         <TableContainer component={Paper} style={{ maxHeight: 500 }}>
             <Table stickyHeader>
                 <TableHead>
@@ -381,7 +387,7 @@ const Daily = ({ dateType, dataDailyProps, callbackOfDaily, disabled, minuteType
                             <TableCell colSpan={timeLines.length + 1}
                                 style={{
                                     padding: '0',
-                                    position: 'relative'
+                                    position: 'relative',
                                 }}
                             >
                                 <div
@@ -393,28 +399,31 @@ const Daily = ({ dateType, dataDailyProps, callbackOfDaily, disabled, minuteType
                                         position: 'relative'
                                     }}
                                 >
-                                    {defaultTimePeriods.map((period, idx) => (
-                                        <div
-                                            key={idx.toString()}
-                                            style={{
-                                                width: `${100 / defaultTimePeriods.length}%`,
-                                                cursor: 'pointer',
-                                                position: 'relative',
-                                            }}
-                                            onClick={() => onClickChoiceItem(period, item.value)}
-                                        >
+                                    {defaultTimePeriods.map((period, idx) => {
+                                        return (
                                             <div
+                                                key={idx.toString()}
                                                 style={{
-                                                    width: idx === 0 ? 0 : 1,
-                                                    height: '100%',
-                                                    backgroundColor: 'rgba(0, 0, 0, 0.12)',
-                                                    position: 'absolute',
-                                                    left: 0,
+                                                    width: `${100 / defaultTimePeriods.length}%`,
+                                                    cursor: 'pointer',
+                                                    position: 'relative',
+                                                    background: '#000'
                                                 }}
-                                            />
-                                        </div>
-                                    ))}
-                                    {item.timePeriods?.map((period, idx) => (
+                                                onClick={() => onClickChoiceItem(period, item.value)}
+                                            >
+                                                <div
+                                                    style={{
+                                                        width: idx === 0 ? 0 : 1,
+                                                        height: '100%',
+                                                        backgroundColor: 'rgba(0, 0, 0, 0.12)',
+                                                        position: 'absolute',
+                                                        left: 0,
+                                                    }}
+                                                />
+                                            </div>
+                                        )
+                                    })}
+                                    {/* {item.timePeriods?.map((period, idx) => (
                                         <div
                                             key={idx.toString()}
                                             onClick={() => onClickDeleteItem(item, period)}
@@ -428,7 +437,7 @@ const Daily = ({ dateType, dataDailyProps, callbackOfDaily, disabled, minuteType
                                                 width: `${convertTimeToMinute(period.endTimeInMinute - period.startTimeInMinute)}%`,
                                             }}
                                         />
-                                    ))}
+                                    ))} */}
                                 </div>
                             </TableCell>
                         </TableRow>
@@ -436,6 +445,7 @@ const Daily = ({ dateType, dataDailyProps, callbackOfDaily, disabled, minuteType
                 </TableBody>
             </Table>
         </TableContainer>
+
     );
 };
 
