@@ -280,7 +280,7 @@ const Add = () => {
       setUserId(newUserId)
 
       for (const row of rows) {
-        console.log(row.groupName, 'rows')
+        console.log(row.name, 'rows')
         const groupId = await searchGroupIdAccess(row.name)
         console.log(groupId, 'gourpID fetch')
         if (groupId) {
@@ -390,9 +390,10 @@ const Add = () => {
         `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups?keyword=${groupName}`,
         config
       )
-      console.log(response.data.rows[0])
 
-      if (response.data.length > 0) {
+      if (response.data.rows[0].id) {
+        console.log(response.data.rows[0].id, 'groupid')
+
         return response.data.rows[0].id
       } else {
         const newGroupId = await createNewGroupAccess(groupName, groupCode)
