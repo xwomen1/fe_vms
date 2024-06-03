@@ -80,6 +80,27 @@ const Add = ({ apiData }) => {
   const [isError, setIsError] = useState(false)
   const [openPopupResponseOnvif, setOpenPopupResponseOnvif] = useState(false)
 
+  function showAlertConfirm(options, intl) {
+    const defaultProps = {
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
+      imageWidth: 213,
+      showCancelButton: true,
+      showCloseButton: true,
+      showConfirmButton: true,
+      focusCancel: true,
+      reverseButtons: true,
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
+      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
+      customClass: {
+        content: 'content-class',
+        confirmButton: 'swal-btn-confirm'
+      }
+    }
+
+    return Swal.fire({ ...defaultProps, ...options })
+  }
+  console.log(idBox, 'idbox')
+
   const fetchNicTypes = async () => {
     try {
       // setLoading(true)
@@ -153,7 +174,7 @@ const Add = ({ apiData }) => {
       ) {
         setPopupMessage('Thiết bị chưa phản hồi')
       } else {
-        setPopupMessage(`${error.response.data.message}`)
+        setPopupMessage(`${error.message}`)
       }
 
       // // setOpenPopupResponseDungIP(false)
@@ -188,6 +209,30 @@ const Add = ({ apiData }) => {
     setOpenPopup(false)
   }
 
+  const fetchFilteredOrAllUsers = async () => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        params: {
+          limit: pageSize,
+          page: page,
+          keyword: value
+        }
+      }
+      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/cameras', config)
+      setStatus1(response.data.isOfflineSetting)
+      setAssetType(response.data)
+      setTotal(response.data.page)
+      console.log(response.data[0].id)
+    } catch (error) {
+      console.error('Error fetching users:', error)
+    }
+  }
+
   const handleDelete = idDelete => {
     showAlertConfirm({
       text: 'Bạn có chắc chắn muốn xóa?'
@@ -210,7 +255,7 @@ const Add = ({ apiData }) => {
             Swal.fire('Xóa thành công', '', 'success')
             const updatedData = assettype.filter(assettype => assettype.id !== idDelete)
             setAssetType(updatedData)
-            fetchData()
+            fetchFilteredOrAllUsers()
           })
           .catch(err => {
             Swal.fire('Đã xảy ra lỗi', err.message, 'error')
@@ -326,7 +371,7 @@ const Add = ({ apiData }) => {
       ) {
         setPopupMessage('Thiết bị chưa phản hồi')
       } else {
-        setPopupMessage(`${error.response.data.message}`)
+        setPopupMessage(`${error.message}`)
       }
 
       setIsError(true) // Đánh dấu là lỗi
@@ -378,7 +423,7 @@ const Add = ({ apiData }) => {
       ) {
         setPopupMessage('Thiết bị chưa phản hồi')
       } else {
-        setPopupMessage(`${error.response.data.message}`)
+        setPopupMessage(`${error.message}`)
       }
 
       setIsError(true) // Đánh dấu là lỗi
@@ -559,7 +604,7 @@ const Add = ({ apiData }) => {
                 <PopupScanDungIP
                   open={openPopupResponseDungIP}
                   url={url}
-                  idBox={idBoxs}
+                  idBoxDungIP={idBox}
                   port={host}
                   setReload={() => setReload(reload + 1)}
                   userName={userName}
@@ -677,6 +722,7 @@ const Add = ({ apiData }) => {
                   idBox={selectNVR}
                   setReload={() => setReload(reload + 1)}
                   isError={isError}
+                  idBoxDaiIP={idBox}
                   popupMessage={popupMessage}
                   passWord={passWord}
                   response={response}
@@ -743,7 +789,7 @@ const Add = ({ apiData }) => {
                   passWord={passWord}
                   isError={isError}
                   popupMessage={popupMessage}
-                  idBox={idBoxs}
+                  idBoxOnvif={idBox}
                   response={response}
                   loadingOnvif={loading}
                   onClose={() => setOpenPopupResponseOnvif(false)}
