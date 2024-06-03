@@ -20,11 +20,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import { fetchData } from 'src/store/apps/user'
 import { useRouter } from 'next/router'
 import axios from 'axios'
-import TableHeader from 'src/views/apps/user/list/TableHeader'
+import TableHeader from 'src/views/apps/user/list/OT'
 import CustomTextField from 'src/@core/components/mui/text-field'
-import UserDetails from '../detail/index'
 import Link from 'next/link'
 import { fetchChatsContacts } from 'src/store/apps/chat'
+import SalaryRulePage from '../salaryRule/salaryRule'
 
 const UserList = ({ apiData }) => {
   const [value, setValue] = useState('')
@@ -40,8 +40,13 @@ const UserList = ({ apiData }) => {
   const [groups, setGroups] = useState([])
   const [anchorEl, setAnchorEl] = useState(null)
   const router = useRouter()
-  const [contractName, setContractName] = useState('')
+  const [salary, setSalary] = useState('')
   const [contractTypes, setContractTypes] = useState({})
+  const [isSalaryRuleOpen, setIsSalaryRuleOpen] = useState(false)
+
+  const toggleSalaryRule = () => {
+    setIsSalaryRuleOpen(!isSalaryRuleOpen)
+  }
 
   const handlePageChange = newPage => {
     setPage(newPage)
@@ -100,7 +105,7 @@ const UserList = ({ apiData }) => {
     const fetchAllRegionNames = async () => {
       const newContractTypes = {}
       for (const user of userData) {
-        if (contractName && !newContractTypes[user.contractType]) {
+        if (user.contractType && !newContractTypes[user.contractType]) {
           const regionName = await fetchRegionName(user.contractType)
           newContractTypes[user.contractType] = regionName
         }
@@ -109,7 +114,7 @@ const UserList = ({ apiData }) => {
     }
 
     fetchAllRegionNames()
-  }, [userData, contractName])
+  }, [userData])
 
   const GroupCheckbox = ({ group, checked, onChange }) => {
     return (
@@ -157,6 +162,28 @@ const UserList = ({ apiData }) => {
 
     fetchGroupData()
   }, [pageSize, valueGroup])
+  useEffect(() => {
+    const fetchGroupData = async () => {
+      try {
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+        console.log('token', token)
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+        const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/salary/regulation/', config)
+
+        setSalary(response.data)
+        console.log(response.data.othour)
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+
+    fetchGroupData()
+  }, [])
 
   const addChildrenField = (data, parentId = null) => {
     return data.map(group => {
@@ -264,7 +291,6 @@ const UserList = ({ apiData }) => {
         }
         const response = await axios.get(url, config)
         setUserData(response.data.rows)
-        setContractName(response.data.rows.contractType)
         setTotal(response.data.totalPage)
       } catch (error) {
         console.error('Error fetching users:', error)
@@ -276,7 +302,8 @@ const UserList = ({ apiData }) => {
   return (
     <Grid style={{ minWidth: '1000px' }}>
       <Card>
-        <TableHeader value={value} handleFilter={handleFilter} toggle={toggleAddUserDrawer} />
+        <TableHeader value={value} handleFilter={handleFilter} toggle={toggleSalaryRule} />
+
         <Grid container spacing={2}>
           {/* <Grid item xs={0.1}></Grid> */}
           <Grid item xs={0.2}></Grid>
@@ -306,12 +333,12 @@ const UserList = ({ apiData }) => {
                     <TableCell sx={{ padding: '16px' }}>STT</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Mã định danh</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Full Name</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Email</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Số điện thoại </TableCell>
                     <TableCell sx={{ padding: '16px' }}>Đơn vị</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Loại hợp đồng</TableCell>
 
-                    <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Số giờ OT</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Số ngày công tác</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Phụ cấp</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Tổng thực lĩnh</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -320,26 +347,12 @@ const UserList = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
                       <TableCell sx={{ padding: '16px' }}>{user.accessCode}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{user.fullName}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user.email}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user.phoneNumber}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{user.userGroup[0]?.groupName}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{contractTypes[user.contractType] || ''}</TableCell>
 
-                      <TableCell sx={{ padding: '16px' }}>
-                        <Grid container spacing={2}>
-                          <IconButton
-                            size='small'
-                            component={Link}
-                            href={`/apps/user/detail/${user.userId}`}
-                            sx={{ color: 'text.secondary' }}
-                          >
-                            <Icon icon='tabler:eye' />
-                          </IconButton>
-                          <IconButton onClick={() => handleDelete(user.userId)}>
-                            <Icon icon='tabler:trash' />
-                          </IconButton>
-                        </Grid>
-                      </TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{user?.salary?.ot || '0'}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{user?.salary?.goOnBusiness || '0'}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{user?.salary?.ot || '0'}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{user?.salary?.ot || '0'}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

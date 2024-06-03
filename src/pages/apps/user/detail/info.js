@@ -60,7 +60,9 @@ const UserDetails = () => {
   const [expiredAt, setExpiredAt] = useState('')
   const [note, setNote] = useState('')
   const [username, setUserName] = useState('')
-  const [isLoading, setIsLoading] = useState(true) // Add isLoading state
+  const [level, setLevel] = useState('') // Add isLoading state
+  const [contractName, setContractName] = useState('') // Add isLoading state
+
   const [filteredRegionOptions, setFilteredRegionOptions] = useState(user?.level)
   const [filteredContractOptions, setFilteredContractOptions] = useState(user?.contractType)
 
@@ -445,55 +447,58 @@ const UserDetails = () => {
 
   const policyList = policies.map(row => row.policyId)
 
-  const fetchUserData = async () => {
-    try {
-      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+  const fetchUserData = async userId => {
+    if (userId != null) {
+      try {
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
-      }
-      const response = await axios.get(`https://dev-ivi.basesystem.one/smc/iam/api/v0/users/${userId}`, config)
-      const userData = response.data
-      setData(userData)
-      setGroup(userData.userGroups)
+        const response = await axios.get(`https://dev-ivi.basesystem.one/smc/iam/api/v0/users/${userId}`, config)
+        const userData = response.data
+        setData(userData)
+        setGroup(userData.userGroups)
 
-      setPolicies(response.data.policies)
-      setPiId(response.data.piId)
-      setFullNameValue(response.data.fullName)
-      setEmail(response.data.email)
-      setPhoneNumber(response.data.phoneNumber)
-      setIdentityNumber(response.data.identityNumber)
-      setGender(response.data.gender)
+        setPolicies(response.data.policies)
+        setPiId(response.data.piId)
+        setFullNameValue(response.data.fullName)
+        setEmail(response.data.email)
+        setPhoneNumber(response.data.phoneNumber)
+        setIdentityNumber(response.data.identityNumber)
+        setGender(response.data.gender)
 
-      setUserCode(response.data.userCode)
-      setSyncCode(response.data.syncCode)
-      setStatus1(response.data.userStatus)
-      setAvailableAt(response.data.availableAt)
-      setExpiredAt(response.data.expiredAt)
-      setUser(response.data)
-      setNote(response.data.note)
-      setStatus(response.data.userAccount.accStatus)
-
-      if (response.data.level) {
-        const regionName = await fetchRegionName(response?.data?.level)
-        setSelectedRegion({ id: response.data.level, name: regionName })
-        console.log(regionName, 'regionsname')
-      }
-
-      if (response.data.contractType) {
-        const contractName = await fetchRegionName(response?.data?.contractType)
-        setSelectContract({ id: response.data.contractType, name: contractName })
-      }
-      if (response.data.userGroups && response.data.userGroups.length > 0) {
-        setDefaultGroup(response.data.userGroups[0])
-      }
-      if (response.data.userAccount && response.data.userAccount.length > 0) {
+        setUserCode(response.data.userCode)
+        setSyncCode(response.data.syncCode)
+        setStatus1(response.data.userStatus)
+        setAvailableAt(response.data.availableAt)
+        setExpiredAt(response.data.expiredAt)
+        setUser(response.data)
+        setNote(response.data.note)
         setStatus(response.data.userAccount.accStatus)
+        setLevel(response.data.level)
+        setContractName(response.data.contractType)
+        if (level) {
+          const regionName = await fetchRegionName(response?.data?.level)
+          setSelectedRegion({ id: response.data.level, name: regionName })
+          console.log(regionName, 'regionsname')
+        }
+
+        if (contractName) {
+          const contractName = await fetchRegionName(response?.data?.contractType)
+          setSelectContract({ id: response.data.contractType, name: contractName })
+        }
+        if (response.data.userGroups && response.data.userGroups.length > 0) {
+          setDefaultGroup(response.data.userGroups[0])
+        }
+        if (response.data.userAccount && response.data.userAccount.length > 0) {
+          setStatus(response.data.userAccount.accStatus)
+        }
+      } catch (error) {
+        console.error('Error fetching user details:', error)
       }
-    } catch (error) {
-      console.error('Error fetching user details:', error)
     }
   }
 
@@ -538,7 +543,7 @@ const UserDetails = () => {
           .delete(urlDelete, config)
           .then(() => {
             Swal.fire('Xóa thành công', '', 'success')
-            fetchUserData()
+            fetchUserData(userId)
           })
           .catch(err => {
             Swal.fire('Đã xảy ra lỗi', err.response.data.message, 'error')
@@ -571,7 +576,8 @@ const UserDetails = () => {
         }
 
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions?limit=25&page=1&parentID=f963e9d4-3d6b-45df-884d-15f93452f2a2',
+          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/parentsID?parentID=f963e9d4-3d6b-45df-884d-15f93452f2a2',
+
           config
         )
 
@@ -720,17 +726,15 @@ const UserDetails = () => {
         setStatus(response.data.userAccount.accStatus)
         setGender(response.data.gender)
 
-        // if (response.data.level) {
-        const regionName = await fetchRegionName(response.data.level)
-        setSelectedRegion({ id: response.data.level, name: regionName })
-        console.log(regionName, 'regionsname')
-
-        // }
-        // if (response.data.contractType) {
-        const contractName = await fetchRegionName(response.data.contractType)
-        setSelectContract({ id: response.data.contractType, name: contractName })
-
-        // }
+        if (response.data.level) {
+          const regionName = await fetchRegionName(response.data.level)
+          setSelectedRegion({ id: response.data.level, name: regionName })
+          console.log(regionName, 'regionsname')
+        }
+        if (response.data.contractType) {
+          const contractName = await fetchRegionName(response.data.contractType)
+          setSelectContract({ id: response.data.contractType, name: contractName })
+        }
         if (response.data.timeStartMorning) {
           const [hour, minute] = response.data.timeStartMorning
           const timeString = `${hour}:${minute.toString().padStart(2, '0')}`
@@ -776,12 +780,12 @@ const UserDetails = () => {
       }
     }
     if (userId) {
-      fetchUserData()
+      fetchUserData(userId)
     }
   }, [userId, leaderOfUnit])
 
   const handleCancel = () => {
-    fetchUserData()
+    fetchUserData(userId)
 
     setReadOnly(true)
     setEditing(false)
@@ -789,8 +793,8 @@ const UserDetails = () => {
     // setShowPlusColumn(!showPlusColumn)
   }
   useEffect(() => {
-    fetchUserData()
-  }, [])
+    fetchUserData(userId)
+  }, [userId])
   console.log('param', params)
 
   return (
@@ -1010,27 +1014,33 @@ const UserDetails = () => {
                     <Grid item xs={8}>
                       <Grid container spacing={2}>
                         <Grid item xs={2}>
-                          <DatePicker
-                            selected={new Date(user.availableAt)}
-                            onChange={handleStartDateChange}
-                            showTimeSelect
-                            timeIntervals={15}
-                            timeCaption='Time'
-                            dateFormat='MMMM d, yyyy'
-                            customInput={<CustomInput label='Ngày bắt đầu' />}
-                          />
+                          <DatePickerWrapper>
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                              <div>
+                                <DatePicker
+                                  selected={availableAt}
+                                  onChange={handleStartDateChange}
+                                  dateFormat='MM/dd/yyyy'
+                                  customInput={<CustomInput label='Ngày bắt đầu' />}
+                                />
+                              </div>
+                            </Box>
+                          </DatePickerWrapper>
                         </Grid>
                         {user.expiredAt && (
                           <Grid item xs={4}>
-                            <DatePicker
-                              selected={new Date(user.expiredAt)}
-                              onChange={handleEndDateChange}
-                              showTimeSelect
-                              timeIntervals={15}
-                              timeCaption='Time'
-                              dateFormat='MMMM d, yyyy'
-                              customInput={<CustomInput label='Ngày kết thúc' />}
-                            />
+                            <DatePickerWrapper>
+                              <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                                <div>
+                                  <DatePicker
+                                    selected={expiredAt}
+                                    onChange={handleEndDateChange}
+                                    dateFormat='MM/dd/yyyy'
+                                    customInput={<CustomInput label='Ngày bắt đầu' />}
+                                  />
+                                </div>
+                              </Box>
+                            </DatePickerWrapper>
                           </Grid>
                         )}
                       </Grid>
