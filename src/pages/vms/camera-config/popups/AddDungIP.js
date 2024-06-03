@@ -24,6 +24,7 @@ const Add = ({
   open,
   response,
   onClose,
+  idBoxDungIP,
   url,
   port,
   userName,
@@ -80,6 +81,9 @@ const Add = ({
       await axios.post(
         `https://sbs.basesystem.one/ivis/vms/api/v0/cameras`,
         {
+          box: {
+            id: idBoxDungIP
+          },
           location: camera.location,
           name: camera.name,
           ipAddress: camera.url,

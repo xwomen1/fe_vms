@@ -89,6 +89,7 @@ const UserList = ({ apiData }) => {
   const [openPopupResponseOnvif, setOpenPopupResponseOnvif] = useState(false)
   const [popupMessage, setPopupMessage] = useState('')
   const [isError, setIsError] = useState(false)
+  const [idBox, setIdBox] = useState(null)
   const [idBoxs, setIdBoxs] = useState(selectNVR?.value)
 
   const handlePageChange = newPage => {
@@ -268,6 +269,7 @@ const UserList = ({ apiData }) => {
 
   const handleAddPClick = selectedNvrId => {
     setOpenPopupP(true)
+    setIdBox(cameraId)
     setSelectedNvrId(selectedNvrId)
   }
 
@@ -438,8 +440,6 @@ const UserList = ({ apiData }) => {
     fetchFilteredOrAllUsers()
   }, [page, pageSize, total, value, reload])
 
-  console.log(nameNVR, 'idNVR')
-
   const fetchNicTypes = async () => {
     try {
       // setLoading(true)
@@ -470,12 +470,15 @@ const UserList = ({ apiData }) => {
     }
   }
 
+  console.log(idBox, 'idBoxs')
+
   const handleComboboxFocus = () => {
     fetchNicTypes()
   }
 
   const handleDDNSChange = (event, newValue) => {
     setSelectedNVR(newValue)
+    setIdBox(newValue.value)
   }
   useEffect(() => {
     setSelectedNVR({
@@ -575,7 +578,7 @@ const UserList = ({ apiData }) => {
                       open={openPopupResponseDungIP}
                       url={url}
                       port={host}
-                      idBox={idBoxs}
+                      idBox={idBox}
                       setReload={() => setReload(reload + 1)}
                       userName={userName}
                       isError={isError}
@@ -690,7 +693,7 @@ const UserList = ({ apiData }) => {
                       userName={userName}
                       setReload={() => setReload(reload + 1)}
                       isError={isError}
-                      idBox={idBoxs}
+                      idBox={idBox}
                       popupMessage={popupMessage}
                       passWord={passWord}
                       response={response}
@@ -756,7 +759,7 @@ const UserList = ({ apiData }) => {
                       setReload={() => setReload(reload + 1)}
                       passWord={passWord}
                       isError={isError}
-                      idBox={idBoxs}
+                      idBox={idBox}
                       popupMessage={popupMessage}
                       response={response}
                       loadingOnvif={loading}

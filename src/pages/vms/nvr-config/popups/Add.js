@@ -24,6 +24,7 @@ const Add = ({
   response,
   onClose,
   url,
+  idBox,
   port,
   userName,
   passWord,
@@ -79,6 +80,9 @@ const Add = ({
       await axios.post(
         `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs`,
         {
+          box: {
+            id: idBox
+          },
           location: nvr.location,
           name: nvr.name,
           ipAddress: nvr.url,
