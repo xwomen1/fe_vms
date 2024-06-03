@@ -591,6 +591,7 @@ const UserDetails = () => {
                         faceType={faceType}
                         imageUrl={imageUrl}
                         accessCode={userCode}
+                        fetchUserData={fetchUserData}
                       />
                     )}
                   </div>
