@@ -670,26 +670,32 @@ const Add = () => {
               {timeValidity === 'Custom' && (
                 <Grid container spacing={2}>
                   <Grid item xs={4}>
-                    <DatePicker
-                      selected={availableAt}
-                      onChange={handleStartDateChange}
-                      showTimeSelect
-                      timeIntervals={15}
-                      timeCaption='Time'
-                      dateFormat='MMMM d, yyyy '
-                      customInput={<CustomInput label='Ngày bắt đầu' />}
-                    />
+                    <DatePickerWrapper>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                        <div>
+                          <DatePicker
+                            selected={availableAt}
+                            onChange={handleStartDateChange}
+                            dateFormat='MM/dd/yyyy'
+                            customInput={<CustomInput label='Ngày bắt đầu' />}
+                          />
+                        </div>
+                      </Box>
+                    </DatePickerWrapper>
                   </Grid>
                   <Grid item xs={4}>
-                    <DatePicker
-                      selected={expiredAt}
-                      onChange={handleEndDateChange}
-                      showTimeSelect
-                      timeIntervals={15}
-                      timeCaption='Time'
-                      dateFormat='MMMM d, yyyy '
-                      customInput={<CustomInput label='Ngày kết thúc' />}
-                    />
+                    <DatePickerWrapper>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                        <div>
+                          <DatePicker
+                            selected={expiredAt}
+                            onChange={handleEndDateChange}
+                            dateFormat='MM/dd/yyyy'
+                            customInput={<CustomInput label='Ngày bắt đầu' />}
+                          />
+                        </div>
+                      </Box>
+                    </DatePickerWrapper>
                   </Grid>
                 </Grid>
               )}
