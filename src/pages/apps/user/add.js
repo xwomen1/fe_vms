@@ -691,7 +691,7 @@ const Add = () => {
                             selected={expiredAt}
                             onChange={handleEndDateChange}
                             dateFormat='MM/dd/yyyy'
-                            customInput={<CustomInput label='Ngày bắt đầu' />}
+                            customInput={<CustomInput label='Ngày kết thúc' />}
                           />
                         </div>
                       </Box>

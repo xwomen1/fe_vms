@@ -333,7 +333,7 @@ const UserList = ({ apiData }) => {
                             href={`/apps/user/detail/${user.userId}`}
                             sx={{ color: 'text.secondary' }}
                           >
-                            <Icon icon='tabler:eye' />
+                            <Icon icon='tabler:info-circle' />
                           </IconButton>
                           <IconButton onClick={() => handleDelete(user.userId)}>
                             <Icon icon='tabler:trash' />

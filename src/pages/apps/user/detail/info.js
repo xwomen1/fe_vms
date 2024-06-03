@@ -1049,27 +1049,32 @@ const UserDetails = () => {
                     <Grid container spacing={2}>
                       <Grid item xs={0.1}></Grid>
                       <Grid item xs={2}>
-                        <DatePicker
-                          selected={availableAt || new Date()}
-                          onChange={handleStartDateChange}
-                          showTimeSelect
-                          timeIntervals={15}
-                          timeCaption='Time'
-                          dateFormat='MMMM d, yyyy'
-                          customInput={<CustomInput label='Ngày bắt đầu' />}
-                          fullWidth
-                        />
+                        <DatePickerWrapper>
+                          <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                            <div>
+                              <DatePicker
+                                selected={availableAt}
+                                onChange={handleStartDateChange}
+                                dateFormat='MM/dd/yyyy'
+                                customInput={<CustomInput label='Ngày bắt đầu' />}
+                              />
+                            </div>
+                          </Box>
+                        </DatePickerWrapper>
                       </Grid>
-                      <Grid item xs={3}>
-                        <DatePicker
-                          selected={expiredAt || new Date()}
-                          onChange={handleEndDateChange}
-                          showTimeSelect
-                          timeIntervals={15}
-                          timeCaption='Time'
-                          dateFormat='MMMM d, yyyy'
-                          customInput={<CustomInput label='Ngày kết thúc' />}
-                        />
+                      <Grid item xs={4}>
+                        <DatePickerWrapper>
+                          <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                            <div>
+                              <DatePicker
+                                selected={expiredAt}
+                                onChange={handleEndDateChange}
+                                dateFormat='MM/dd/yyyy'
+                                customInput={<CustomInput label='Ngày kết thúc' />}
+                              />
+                            </div>
+                          </Box>
+                        </DatePickerWrapper>
                       </Grid>
                     </Grid>
                   ))}
