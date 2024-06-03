@@ -393,7 +393,7 @@ const Add = () => {
       console.log(response.data.rows[0])
 
       if (response.data.length > 0) {
-        return response.data[0].id // Trả về groupId nếu tìm thấy
+        return response.data.rows[0].id
       } else {
         const newGroupId = await createNewGroupAccess(groupName, groupCode)
 
