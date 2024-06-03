@@ -281,7 +281,7 @@ const Add = () => {
 
       for (const row of rows) {
         console.log(row.groupName, 'rows')
-        const groupId = await searchGroupIdAccess(row.groupName)
+        const groupId = await searchGroupIdAccess(row.name)
         console.log(groupId, 'gourpID fetch')
         if (groupId) {
           await addMemberToGroup(groupId, newUserId)
@@ -292,7 +292,7 @@ const Add = () => {
       router.push(`/apps/user/detail/${response.data.userId}`)
     } catch (error) {
       console.error('Error updating user details:', error)
-      Swal.fire('Lỗi!', error.response.data.message, 'error')
+      Swal.fire('Lỗi!', error?.response?.data?.message, 'error')
     }
   }
 
@@ -314,7 +314,6 @@ const Add = () => {
       if (response.data.length > 0) {
         return response.data[0].groupId // Trả về groupId nếu tìm thấy
       } else {
-        // Nếu không tìm thấy, tạo nhóm mới và trả về groupId của nhóm mới đó
         const newGroupId = await createNewGroup(groupName, groupCode)
 
         return newGroupId
@@ -350,6 +349,33 @@ const Add = () => {
     }
   }
 
+  const createNewGroupAccess = async (groupName, groupCode) => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+      const groupId = await searchGroupId(groupName, groupCode)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.post(
+        'https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups',
+        {
+          name: groupName,
+          type: 'USER',
+          id: groupId
+        },
+        config
+      )
+
+      return response.data.id
+    } catch (error) {
+      throw error
+    }
+  }
+
   const searchGroupIdAccess = async (groupName, groupCode) => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -366,7 +392,13 @@ const Add = () => {
       )
       console.log(response.data.rows[0])
 
-      return response.data.rows[0].id
+      if (response.data.length > 0) {
+        return response.data[0].id // Trả về groupId nếu tìm thấy
+      } else {
+        const newGroupId = await createNewGroupAccess(groupName, groupCode)
+
+        return newGroupId
+      }
     } catch (error) {
       throw error
     }

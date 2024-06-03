@@ -60,7 +60,9 @@ const UserDetails = () => {
   const [expiredAt, setExpiredAt] = useState('')
   const [note, setNote] = useState('')
   const [username, setUserName] = useState('')
-  const [isLoading, setIsLoading] = useState(true) // Add isLoading state
+  const [level, setLevel] = useState('') // Add isLoading state
+  const [contractName, setContractName] = useState('') // Add isLoading state
+
   const [filteredRegionOptions, setFilteredRegionOptions] = useState(user?.level)
   const [filteredContractOptions, setFilteredContractOptions] = useState(user?.contractType)
 
@@ -476,14 +478,15 @@ const UserDetails = () => {
         setUser(response.data)
         setNote(response.data.note)
         setStatus(response.data.userAccount.accStatus)
-
-        if (response.data.level) {
+        setLevel(response.data.level)
+        setContractName(response.data.contractType)
+        if (level) {
           const regionName = await fetchRegionName(response?.data?.level)
           setSelectedRegion({ id: response.data.level, name: regionName })
           console.log(regionName, 'regionsname')
         }
 
-        if (response.data.contractType) {
+        if (contractName) {
           const contractName = await fetchRegionName(response?.data?.contractType)
           setSelectContract({ id: response.data.contractType, name: contractName })
         }
@@ -1011,27 +1014,33 @@ const UserDetails = () => {
                     <Grid item xs={8}>
                       <Grid container spacing={2}>
                         <Grid item xs={2}>
-                          <DatePicker
-                            selected={new Date(user.availableAt)}
-                            onChange={handleStartDateChange}
-                            showTimeSelect
-                            timeIntervals={15}
-                            timeCaption='Time'
-                            dateFormat='MMMM d, yyyy'
-                            customInput={<CustomInput label='Ngày bắt đầu' />}
-                          />
+                          <DatePickerWrapper>
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                              <div>
+                                <DatePicker
+                                  selected={availableAt}
+                                  onChange={handleStartDateChange}
+                                  dateFormat='MM/dd/yyyy'
+                                  customInput={<CustomInput label='Ngày bắt đầu' />}
+                                />
+                              </div>
+                            </Box>
+                          </DatePickerWrapper>
                         </Grid>
                         {user.expiredAt && (
                           <Grid item xs={4}>
-                            <DatePicker
-                              selected={new Date(user.expiredAt)}
-                              onChange={handleEndDateChange}
-                              showTimeSelect
-                              timeIntervals={15}
-                              timeCaption='Time'
-                              dateFormat='MMMM d, yyyy'
-                              customInput={<CustomInput label='Ngày kết thúc' />}
-                            />
+                            <DatePickerWrapper>
+                              <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                                <div>
+                                  <DatePicker
+                                    selected={expiredAt}
+                                    onChange={handleEndDateChange}
+                                    dateFormat='MM/dd/yyyy'
+                                    customInput={<CustomInput label='Ngày bắt đầu' />}
+                                  />
+                                </div>
+                              </Box>
+                            </DatePickerWrapper>
                           </Grid>
                         )}
                       </Grid>

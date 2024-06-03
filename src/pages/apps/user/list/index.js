@@ -40,7 +40,7 @@ const UserList = ({ apiData }) => {
   const [groups, setGroups] = useState([])
   const [anchorEl, setAnchorEl] = useState(null)
   const router = useRouter()
-  const [searchGroup, setSearchGroup] = useState('')
+  const [contractName, setContractName] = useState('')
   const [contractTypes, setContractTypes] = useState({})
 
   const handlePageChange = newPage => {
@@ -100,7 +100,7 @@ const UserList = ({ apiData }) => {
     const fetchAllRegionNames = async () => {
       const newContractTypes = {}
       for (const user of userData) {
-        if (user.contractType && !newContractTypes[user.contractType]) {
+        if (contractName && !newContractTypes[user.contractType]) {
           const regionName = await fetchRegionName(user.contractType)
           newContractTypes[user.contractType] = regionName
         }
@@ -109,7 +109,7 @@ const UserList = ({ apiData }) => {
     }
 
     fetchAllRegionNames()
-  }, [userData])
+  }, [userData, contractName])
 
   const GroupCheckbox = ({ group, checked, onChange }) => {
     return (
@@ -264,6 +264,7 @@ const UserList = ({ apiData }) => {
         }
         const response = await axios.get(url, config)
         setUserData(response.data.rows)
+        setContractName(response.data.rows.contractType)
         setTotal(response.data.totalPage)
       } catch (error) {
         console.error('Error fetching users:', error)
