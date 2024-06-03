@@ -27,6 +27,9 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 import { callApi } from 'src/@core/utils/requestUltils'
 import Demo from '../mocdata/demo'
 
+import TimeRange from "react-video-timelines-slider"
+import { format } from 'date-fns'
+
 
 const valueFilterInit = {
     page: 1,
@@ -118,31 +121,9 @@ const Storage = ({ id, name, channel }) => {
     const [timePlay, setTimePlay] = useState(time_start)
     const [currentTime, setCurrentTime] = useState(0)
 
-    const datePickerRef = useRef(null)
 
     const [play, setPlay] = useState(true)
-    const [valueRange, setValueRange] = useState(60 * 60 * 1000)
-    const debouncedSearch = useDebounce(valueRange, 700)
     const [dataList, setDataList] = useState([])
-
-    const onClickPlay = v => {
-        setPlay(v)
-
-        // if (videoId) {
-        //   if (!v) {
-        //     videoId.pause();
-        //     if (stopAndStartRecord) {
-        //       onClickCut('pause');
-        //     }
-        //   } else {
-        //     if (isScreen && isScreen === 'detail' && onChangeCurTimePlayback) {
-        //       const acb = timeFilter.start_time + parseInt(valueRange) - 6000;
-        //       onChangeCurTimePlayback(acb);
-        //     }
-        //     videoId.play();
-        //   }
-        // }
-    }
 
     useEffect(() => {
         if (id) {
@@ -171,51 +152,6 @@ const Storage = ({ id, name, channel }) => {
         }
     }
 
-    function timeDisplay(time) {
-        if (time < 10)
-
-            return '0' + time
-
-        return time
-    }
-    function valuetext(value) {
-
-        const timeCurrent = new Date(timeFilter.start_time + value)
-
-        return `${timeCurrent.getFullYear() +
-            '/' +
-            timeDisplay(timeCurrent.getMonth() + 1) +
-            '/' +
-            timeCurrent.getDate() +
-            ' ' +
-            timeDisplay(timeCurrent.getHours()) +
-            ':' +
-            timeDisplay(timeCurrent.getMinutes())
-            }`
-    }
-
-    const handleIconClick = () => {
-        if (datePickerRef.current) {
-            datePickerRef.current.setOpen(true)
-        }
-    }
-
-    const renderMarks = () => {
-        const marks = []
-        const part = 10
-        for (let i = 0; i <= part; i++) {
-            let step = Math.floor(valueRange / part)
-            let timeCurrent = new Date(timeFilter.start_time + step * i)
-            marks.push({
-                value: step * i,
-                label: timeCurrent.getHours() + ':' + timeCurrent.getMinutes()
-            })
-        }
-
-
-        return marks
-    }
-
     const handSetChanel = (id, channel) => {
         setCamera({ id: id, name: name, channel: channel })
     }
@@ -230,17 +166,24 @@ const Storage = ({ id, name, channel }) => {
 
     return (
         <Grid container spacing={2}>
-            <Grid item xs={12} sm={8}>
+            <Grid item xs={12} sm={9}>
                 <Card>
                     <CardHeader
                         title='Trích clip'
                         action={
                             <Grid container spacing={2}>
 
-                                <Grid item xs={12}>
+                                <Grid item xs={6}>
                                     <CustomTextField select fullWidth id='form-layouts-separator-select' defaultValue='5minute'>
-                                        {minuteList.map((date, index) => (
-                                            <MenuItem key={date.id} value={date.name} onClick={() => handleSetMinuteType(date.name)}>{date.value}</MenuItem>
+                                        {minuteList.map((minute, index) => (
+                                            <MenuItem key={minute.id} value={minute.name} onClick={() => handleSetMinuteType(minute.name)}>{minute.value}</MenuItem>
+                                        ))}
+                                    </CustomTextField>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <CustomTextField select fullWidth id='form-layouts-separator-select' defaultValue='day'>
+                                        {dateList.map((date, index) => (
+                                            <MenuItem key={date.id} value={date.name} onClick={() => handleSetTime(date.name)}>{date.value}</MenuItem>
                                         ))}
                                     </CustomTextField>
                                 </Grid>
@@ -248,7 +191,7 @@ const Storage = ({ id, name, channel }) => {
                         }
                     />
                     <CardContent>
-                        <Daily
+                        {/* <Daily
                             callbackOfDaily={(v) => {
                                 setDataDaily(v)
                                 setDataDailyState(v)
@@ -259,12 +202,12 @@ const Storage = ({ id, name, channel }) => {
                             dateType={timeType}
                             minuteType={minuteType}
                             aria-describedby='validation-basic-last-name'
-                        />
-                        {/* <Demo data={dataList} /> */}
+                        /> */}
+                        <Demo data={dataList} dateType={timeType} minuteType={minuteType} />
                     </CardContent>
                 </Card>
             </Grid>
-            <Grid item xs={12} sm={4}>
+            <Grid item xs={12} sm={3}>
                 <Card>
                     <Grid container spacing={2} sx={{ marginBottom: 5 }}>
                         <Grid item xs={12}>

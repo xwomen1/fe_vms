@@ -1,121 +1,129 @@
 import React, { useState, useEffect } from "react"
-import { Box } from "@mui/material"
+import TimeRange from "react-video-timelines-slider";
+import { format } from "date-fns";
+import { Checkbox, FormControlLabel, Grid, Typography } from "@mui/material";
 
-const Demo = ({ data }) => {
+const Demo = ({ data, dateType, minuteType }) => {
     const [dateData, setDateData] = useState([])
+    const [timeType, setTimeType] = useState('day')
+    const [minutesType, setMinutesType] = useState('5minute')
+    const [dayList, setDayList] = useState([])
 
     useEffect(() => {
+        if (dateType) {
+            setTimeType(dateType);
+        }
+    }, [dateType])
+
+    useEffect(() => {
+        if (minuteType) {
+            setMinutesType(minuteType);
+        }
+    }, [minuteType])
+
+    useEffect(() => {
+        console.log('data', data)
         if (data) {
-            console.log('data', data)
-            const transformedData = transformData(data)
-            setDateData(transformedData)
+            setDateData(data)
         }
     }, [data])
 
-    const transformData = (apiData) => {
-        const result = {}
-
-        apiData.forEach(item => {
-            const startTime = new Date(item.StartTime)
-            const endTime = new Date(item.EndTime)
-
-            const startDate = startTime.toISOString().split('T')[0]
-            const endDate = endTime.toISOString().split('T')[0]
-
-            if (!result[startDate]) {
-                result[startDate] = []
-            }
-            if (!result[endDate]) {
-                result[endDate] = []
-            }
-
-            if (startDate === endDate) {
-                result[startDate].push({
-                    startTime: formatTime(startTime),
-                    endTime: formatTime(endTime)
-                })
-            } else {
-                result[startDate].push({
-                    startTime: formatTime(startTime),
-                    endTime: '23:59'
-                })
-
-                const splitTimes = splitByHour(startTime, endTime)
-                splitTimes.forEach(time => {
-                    if (time.date === startDate) {
-                        result[startDate].push(time)
-                    } else {
-                        result[endDate].push(time)
-                    }
-                })
-
-                result[endDate].push({
-                    startTime: '00:00',
-                    endTime: formatTime(endTime)
-                })
-            }
-        })
-
-        return Object.keys(result).map(date => ({
-            date,
-            timeStorage: result[date]
-        }))
-    }
-
-    const formatTime = (date) => {
-        return date.toTimeString().split(':').slice(0, 2).join(':')
-    }
-
-    const splitByHour = (start, end) => {
-        const times = []
-        const startHour = start.getHours()
-        const endHour = end.getHours()
-        const startMinute = start.getMinutes()
-        const endMinute = end.getMinutes()
-
-        for (let hour = startHour; hour <= endHour; hour++) {
-            if (hour === startHour) {
-                times.push({
-                    date: start.toISOString().split('T')[0],
-                    startTime: formatTime(start),
-                    endTime: hour !== endHour ? `${hour + 1}:00` : formatTime(end)
-                })
-            } else if (hour === endHour) {
-                times.push({
-                    date: end.toISOString().split('T')[0],
-                    startTime: `${hour}:00`,
-                    endTime: formatTime(end)
-                })
-            } else {
-                times.push({
-                    date: start.toISOString().split('T')[0],
-                    startTime: `${hour}:00`,
-                    endTime: `${hour + 1}:00`
-                })
-            }
+    useEffect(() => {
+        let interval = 60; // Mặc định là 1 giờ
+        switch (minutesType) {
+            case '1minute':
+                interval = 1; // 12 phút
+                break;
+            case '2minute':
+                interval = 2; // 2 phút
+                break;
+            case '5minute':
+                interval = 5; // 5 phút
+                break;
+            default:
+                break;
         }
+        // setTimeLines(generateTimeLine(interval));
+    }, [minutesType])
 
-        return times
-    }
+    useEffect(() => {
+        getLastDays()
+    }, [timeType])
 
-    if (data.length === 0) {
-        return <div>Loading...</div>
-    }
+    const timeline = [
+        new Date("2022-11-22T21:51:44.054Z"),
+        new Date("2022-11-23T07:15:44.309Z"),
+    ];
+
+    const gap = [
+        {
+            start: new Date("2022-11-23T03:51:44.054Z"),
+            end: new Date("2022-11-23T04:15:44.309Z"),
+        },
+    ];
+    const [selectedInterval, setSelectedInterval] = useState([
+        new Date("2022-11-22T23:51:44.054Z"),
+        new Date("2022-11-23T01:51:44.054Z"),
+    ]);
+    const [timelineScrubberError, setTimelineScrubberError] = useState(false);
+
+    const timelineScrubberErrorHandler = ({ error }) => {
+        setTimelineScrubberError(error);
+    };
+
+    const onChangeCallback = (selectedInterval) => {
+        setSelectedInterval(selectedInterval);
+    };
+
+    const getLastDays = () => {
+        let daysArray = [];
+
+        switch (timeType) {
+            case 'day':
+                daysArray.push(new Date().toISOString().split('T')[0]);
+                break;
+            case 'week':
+                for (let i = 0; i < 7; i++) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    daysArray.push(date.toISOString().split('T')[0]); // Chuyển đổi sang định dạng YYYY-MM-DD
+                }
+                break;
+            case 'month':
+                for (let i = 0; i < 30; i++) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    daysArray.push(date.toISOString().split('T')[0]); // Chuyển đổi sang định dạng YYYY-MM-DD
+                }
+                break;
+            default:
+                break;
+        }
+        setDayList(daysArray)
+    };
 
     return (
-        <div>
-            <h1>Data Display</h1>
-            {dateData.map((day, index) => (
-                <div key={index}>
-                    <h2>{day.date}</h2>
-                    {day.timeStorage?.map((time, idx) => (
-                        <p key={idx}>
-                            Start Time: {time.startTime} - End Time: {time.endTime}
-                        </p>
-                    ))}
-                </div>
-            ))}
-        </div>
+        <Grid container spacing={2}>
+            {dayList.map((day, index) =>
+                <Grid item xs={12} display={'flex'}>
+                    <Typography sx={{ width: '100px' }}>{day}</Typography>
+                    <TimeRange
+                        showNow
+                        error={timelineScrubberError}
+                        ticksNumber={6}
+                        selectedInterval={selectedInterval}
+                        timelineInterval={timeline}
+                        onUpdateCallback={timelineScrubberErrorHandler}
+                        onChangeCallback={onChangeCallback}
+                        disabledIntervals={gap}
+                        step={1}
+                        formatTick={(ms) => format(new Date(ms), "HH:mm:ss")}
+                        formatTooltip={(ms) => format(new Date(ms), "HH:mm:ss.SSS")}
+                        showToolTip={true}
+                    />
+                </Grid>
+            )}
+        </Grid>
     )
 }
 
