@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import axios from "axios"
 import { TreeItem, TreeView } from "@mui/lab"
 import Icon from 'src/@core/components/icon'
-import { Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Slider, Tooltip, Typography, styled, CircularProgress, CardActions } from "@mui/material"
+import { Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Slider, Tooltip, Typography, styled, CircularProgress, CardActions, Dialog, DialogContent, DialogActions } from "@mui/material"
 import authConfig from 'src/configs/auth'
 import ViewCamera from "./viewCamera"
 import { AddBox, CameraAlt, FastForward, FastRewind, IndeterminateCheckBox, Pause, PlayArrow, SkipNext, SkipPrevious } from "@mui/icons-material"
@@ -118,6 +118,7 @@ const EventConfig = () => {
   const [nameCameraSelect, setNameCameraSelect] = useState(null)
   const [alertAIList, setAlertAIList] = useState([])
   const [alertList, setAlertList] = useState([])
+  const [alert, setAlert] = useState(null)
   const [cameraAIPropertyId, setCameraAIPropertyId] = useState(null)
   const [calendar, setCalendar] = useState(null)
 
@@ -144,6 +145,7 @@ const EventConfig = () => {
 
   const [isOpenModelAI, setIsOpenModelAI] = useState(false)
   const [isOpenModelAIType, setIsOpenModelAIType] = useState(null)
+  const [isOpenDel, setIsOpenDel] = useState(false)
 
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -259,6 +261,7 @@ const EventConfig = () => {
       fetchModelAICamera()
       setEventSelect(null)
     }
+    setAlert(null)
   }, [idCameraSelect, reload])
 
   const fetchModelAICamera = async () => {
@@ -586,11 +589,71 @@ const EventConfig = () => {
     await updateAlertList(changedAlerts)
   }
 
+  const handleDeleteAlert = async () => {
+
+    if (alert !== null) {
+      const changedAlerts = alertList.filter(item => item?.cameraModelAI?.id !== alert?.cameraModelAI?.id)
+
+      await updateAlertList(changedAlerts)
+    }
+    setAlert(null)
+  }
+
+  const DeleteView = () => (
+    <Dialog
+      open={isOpenDel}
+      maxWidth='sm'
+      scroll='body'
+      onClose={() => setIsOpenDel(false)}
+      onBackdropClick={() => setIsOpenDel(false)}
+    >
+      <DialogContent
+        sx={{
+          pb: theme => `${theme.spacing(8)} !important`,
+          px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
+          pt: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
+        }}
+      >
+        <Box sx={{ mb: 4, textAlign: 'center' }}>
+          <Typography variant='h3' sx={{ mb: 3 }}>
+            Xác nhận
+          </Typography>
+          <Typography sx={{ color: 'text.secondary' }}>
+            Bạn có chắc chắn muốn xóa <strong style={{ fontStyle: 'italic', color: '#FF9F43' }}>{eventSelect}</strong> không ?
+          </Typography>
+        </Box>
+      </DialogContent>
+      <DialogActions
+        sx={{
+          justifyContent: 'center',
+          px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
+          pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
+        }}
+      >
+        <Button
+          variant='contained'
+          onClick={() => {
+            handleDeleteAlert()
+            setIsOpenDel(false)
+          }}>
+          Đồng ý
+        </Button>
+        <Button variant='tonal' color='secondary'
+          sx={{ mr: 1 }} onClick={() => setIsOpenDel(false)}>
+          Hủy
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
+
   const alertAIListView = () => {
     return alertList.map((alert, index) => (
       <>
         <Card
           onClick={() => {
+
+            setAlert(alert)
+
             if (alert.isactive == true) {
               setEventSelect(alert?.cameraModelAI?.modelName)
 
@@ -721,30 +784,48 @@ const EventConfig = () => {
             <Grid item xs={12}>
               <Card>
                 <CardHeader title='Cảnh báo AI' />
-                <CardContent sx={{ height: '60vh', overflow: 'auto' }}>
+                <CardContent sx={{ height: '60vh', overflow: 'auto' }} >
                   {alertAIListView()}
                 </CardContent>
                 <CardActions>
-
                   <Grid container spacing={0}>
                     <Grid item xs={12}>
-                      <Button
-                        variant='contained'
-                        style={{
-                          width: '100%',
-                          marginTop: '10px'
-                        }}
-                        onClick={() => {
-                          setIsOpenModelAI(true)
-                          if (alertList.length > 0) {
-                            setIsOpenModelAIType('update')
-                          } else {
-                            setIsOpenModelAIType('add')
-                          }
-                        }}
-                      >
-                        Thêm mới cảnh báo
-                      </Button>
+                      <Grid container spacing={2}>
+                        <Grid item xs={6}>
+                          <Button
+                            variant='contained'
+                            style={{
+                              width: '100%',
+                              marginTop: '10px'
+                            }}
+                            onClick={() => {
+                              setIsOpenModelAI(true)
+                              if (alertList.length > 0) {
+                                setIsOpenModelAIType('update')
+                              } else {
+                                setIsOpenModelAIType('add')
+                              }
+                            }}
+                          >
+                            Thêm mới cảnh báo
+                          </Button>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Button
+                            variant='contained'
+                            style={{
+                              width: '100%',
+                              marginTop: '10px'
+                            }}
+                            disabled={alert !== null ? false : true}
+                            onClick={() => {
+                              setIsOpenDel(true)
+                            }}
+                          >
+                            Xóa cảnh báo
+                          </Button>
+                        </Grid>
+                      </Grid>
                     </Grid>
                     <Grid item xs={12}>
                       <Box sx={{ marginTop: 5 }}>
@@ -1015,6 +1096,8 @@ const EventConfig = () => {
           setReload={() => setReload(reload + 1)}
         />
       }
+
+      {isOpenDel && DeleteView()}
     </>
   )
 }
