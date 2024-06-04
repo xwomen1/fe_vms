@@ -295,6 +295,85 @@ const UserDetails = () => {
   }
   console.log(groups)
 
+  const searchGroupIdAccess = async (groupName, groupCode) => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.get(
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups?keyword=${groupName}`,
+        config
+      )
+
+      if (response?.data?.rows[0]?.id) {
+        console.log(response.data.rows[0].id, 'groupid')
+
+        return response.data.rows[0].id
+      } else {
+        const newGroupId = await createNewGroupAccess(groupName, groupCode)
+
+        return newGroupId
+      }
+    } catch (error) {
+      throw error
+    }
+  }
+
+  const addMemberToGroup = async (groupId, userId) => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.post(
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups/${groupId}/add-member`,
+        { userIds: [userId] },
+        config
+      )
+
+      return response.data
+    } catch (error) {
+      console.error('Error adding member to group:', error)
+      throw error
+    }
+  }
+
+  const createNewGroupAccess = async (groupName, groupCode) => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+      const groupId = await searchGroupId(groupName, groupCode)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.post(
+        'https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups',
+        {
+          name: groupName,
+          type: 'USER',
+          id: groupId
+        },
+        config
+      )
+
+      return response.data.id
+    } catch (error) {
+      throw error
+    }
+  }
+
   const saveChanges = async regionId => {
     setReadOnly(true)
     setEditing(false)
@@ -392,6 +471,14 @@ const UserDetails = () => {
         },
         config
       )
+      for (const row of groups) {
+        console.log(row.groupName, 'rows')
+        const groupId = await searchGroupIdAccess(row.groupName)
+        console.log(groupId, 'gourpID fetch')
+        if (groupId) {
+          await addMemberToGroup(groupId, userId)
+        }
+      }
       Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
     } catch (error) {
       console.error('Error updating user details:', error)
