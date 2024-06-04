@@ -178,7 +178,7 @@ const HorizontalLayout = props => {
                   </Typography>
                 </LinkStyled>
               </Box>
-              {/* <Box>
+              <Box>
                 <Toolbar
                   className='horizontal-nav-content-container'
                   sx={{
@@ -192,7 +192,7 @@ const HorizontalLayout = props => {
                     <Navigation {...props} horizontalNavItems={horizontalLayoutProps.navMenu?.navItems} />
                   )}
                 </Toolbar>
-              </Box> */}
+              </Box>
             </Box>
           </Box>
           {/* Navigation Menu */}
