@@ -6,53 +6,135 @@ const navigation = () => {
       path: '/dashboards/analytics'
     },
 
-    {
-      title: 'Sự kiện',
-      path: '/access-control/event-management',
-      icon: 'tabler:calendar-event'
-    },
-    {
-      title: 'Thiết bị',
-      path: '/device-management',
-      icon: 'tabler:accessible'
-    },
-    {
-      path: '/pages/access-rights/list',
-      title: 'Quyền truy cập',
-      icon: 'tabler:calendar-month'
-    },
-
-    {
-      title: 'Chấm công',
-      path: '/access-control/time-keeping',
-      icon: 'tabler:lock-access'
-    },
-    {
-      path: '/pages/report-month/list',
-      title: 'Báo cáo tháng',
-      icon: 'tabler:id'
-    },
-    {
-      path: '/pages/report-month/list',
-      title: 'Sự cố hệ thống ',
-      icon: 'tabler:id'
-    },
-
     // {
-    //   path: '/pages/access-rights/list',
-    //   title: 'Quyền truy cập',
-    //   icon: 'tabler:shield'
+    //   path: '/',
+    //   title: 'Kiểm soát vào ra',
+    //   icon: 'tabler:lock-access',
+    //   children: [
+    //     {
+    //       title: 'Sự kiện',
+    //       path: '/access-control/event-management',
+    //       icon: 'tabler:calendar-event'
+    //     },
+    //     {
+    //       title: 'Thiết bị',
+    //       path: '/device-management',
+    //       icon: 'tabler:accessible'
+    //     },
+    //     {
+    //       path: '/pages/access-rights/list',
+    //       title: 'Quyền truy cập',
+    //       icon: 'tabler:calendar-month'
+    //     },
+
+    //     {
+    //       title: 'Chấm công',
+    //       path: '/access-control/time-keeping',
+    //       icon: 'tabler:lock-access'
+    //     },
+    //     {
+    //       path: '/pages/report-month/list',
+    //       title: 'Báo cáo tháng',
+    //       icon: 'tabler:id'
+    //     }
+
+    //     // {
+    //     //   path: '/pages/access-rights/list',
+    //     //   title: 'Quyền truy cập',
+    //     //   icon: 'tabler:shield'
+    //     // },
+    //     // {
+    //     //   path: '/pages/access-rights/list',
+    //     //   title: 'Thống kê',
+    //     //   icon: 'tabler:statistics/time?tab=%2Fstatistics%2Ftime'
+    //     // },
+    //     // {
+    //     //   path: '/pages/access-rights/list',
+    //     //   title: 'Hẹn lịch',
+    //     //   icon: 'tabler:guest-registrations'
+    //     // }
+    //   ]
     // },
     // {
-    //   path: '/pages/access-rights/list',
-    //   title: 'Thống kê',
-    //   icon: 'tabler:statistics/time?tab=%2Fstatistics%2Ftime'
+    //   path: '/asset',
+    //   title: 'Hệ thống VMS',
+    //   icon: 'tabler:camera',
+    //   children: [
+    {
+      title: 'Xem trực tiếp',
+      path: '/vms/live-view',
+      icon: 'tabler:video'
+    },
+
+    // {
+    //   title: 'Xem trực tiếp 2',
+    //   path: '/vms/live-view-p2p-private'
+    // },
+    {
+      title: 'Xem lại',
+      path: '/vms/playback-camera',
+      icon: 'tabler:video-minus'
+    },
+    {
+      title: 'Trích xuất clip',
+      path: '/vms/clip-extraction',
+      icon: 'tabler:file-export'
+    },
+    {
+      title: 'Nhóm camera',
+      path: '/vms/camera-group',
+      icon: 'tabler:schema'
+    },
+    {
+      title: 'Sự kiện AI',
+      path: '/vms/events',
+      icon: 'tabler:timeline-event-exclamation'
+    },
+    {
+      title: 'Cấu hình AI',
+      path: '/vms/ai-config',
+      icon: 'tabler:settings'
+    },
+    {
+      title: 'Sự cố hệ thống',
+      path: '/vms/error-system',
+      icon: 'tabler:id-badge-off'
+    },
+    {
+      title: 'Danh sách camera',
+      path: '/vms/camera-config',
+      icon: 'tabler:device-cctv'
+    },
+    {
+      title: 'Danh sách nvr',
+      path: '/vms/nvr-config',
+      icon: 'tabler:server-2'
+    },
+    {
+      path: '/pages/face_management/list',
+      title: 'Quản lý khuôn mặt',
+      icon: 'tabler:face-id'
+    },
+    {
+      path: '/pages/car_management/list',
+      title: 'Quản lý Biển số',
+      icon: 'tabler:id-badge-2'
+    },
+
+    // {
+    //   title: 'Quản lý lưu trữ',
+    //   path: '/vms/stores'
     // },
     // {
-    //   path: '/pages/access-rights/list',
-    //   title: 'Hẹn lịch',
-    //   icon: 'tabler:guest-registrations'
+    //   title: 'Thư viện media',
+    //   path: '/vms/library'
+    // },
+    // {
+    //   title: 'Bản đồ số',
+    //   path: '/vms/map'
     // }
+    //   ]
+    // },
 
     // {
     //   path: '/caller',
@@ -160,7 +242,10 @@ const navigation = () => {
     //     }
     //   ]
     // },
-
+    // {
+    //   title: 'User',
+    //   icon: 'tabler:user',
+    //   children: [
     {
       title: 'Người dùng',
       icon: 'tabler:user',
@@ -175,18 +260,20 @@ const navigation = () => {
       title: 'Vai Trò',
       icon: 'tabler:users',
       path: '/apps/roles'
-    },
-    {
-      title: 'Bảng lương',
-      icon: 'tabler:coin-pound',
-      path: '/salary'
-    },
-    {
-      title: 'Quy định về lương',
-      icon: 'tabler:moneybag',
-      path: '/salaryRule'
     }
 
+    //     {
+    //       title: 'Bảng lương',
+    //       icon: 'tabler:coin-pound',
+    //       path: '/salary'
+    //     },
+    //     {
+    //       title: 'Quy định về lương',
+    //       icon: 'tabler:moneybag',
+    //       path: '/salaryRule'
+    //     }
+    //   ]
+    // },
     // {
     //   title: 'Quản lý hệ thống',
     //   path: '/alert-management',
