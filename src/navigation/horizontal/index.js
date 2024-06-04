@@ -195,19 +195,25 @@ const navigation = () => {
     // },
 
     {
-      title: 'Người dùng',
+      title: 'User',
       icon: 'tabler:user',
-      path: '/apps/user/list'
-    },
-    {
-      title: 'Cơ cấu tổ chức',
-      icon: 'tabler:building',
-      path: '/organizational-structure'
-    },
-    {
-      title: 'Vai Trò',
-      icon: 'tabler:users',
-      path: '/apps/roles'
+      children: [
+        {
+          title: 'Người dùng',
+          icon: 'tabler:user',
+          path: '/apps/user/list'
+        },
+        {
+          title: 'Cơ cấu tổ chức',
+          icon: 'tabler:building',
+          path: '/organizational-structure'
+        },
+        {
+          title: 'Vai Trò',
+          icon: 'tabler:users',
+          path: '/apps/roles'
+        }
+      ]
     }
 
     // {
