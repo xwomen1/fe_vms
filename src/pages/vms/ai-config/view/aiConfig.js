@@ -21,6 +21,7 @@ import {
 import { useEffect, useState } from 'react'
 import Icon from 'src/@core/components/icon'
 import toast from 'react-hot-toast'
+import CustomChip from 'src/@core/components/mui/chip'
 
 const AIConfig = () => {
   const [loading, setLoading] = useState(false)
@@ -273,7 +274,17 @@ const AIConfig = () => {
                           </TableCell>
                         )
                       })}
-                      <TableCell align='right'>{row.status.name}</TableCell>
+                      <TableCell align='right'>
+                        {/* {row.status.name} */}
+                        <CustomChip
+                          rounded
+                          size='small'
+                          skin='light'
+                          sx={{ lineHeight: 1 }}
+                          color={row.status.name === 'Không hoạt động' ? 'primary' : 'success'}
+                          label={row.status.name}
+                        />
+                      </TableCell>
                     </TableRow>
                   )
                 })}
