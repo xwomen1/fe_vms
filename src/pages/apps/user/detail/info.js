@@ -782,6 +782,12 @@ const UserDetails = () => {
     option => !policies || !policies.some(policies => policies.policyName === option.policyName)
   )
   console.log(policyOption)
+  useEffect(() => {
+    if (timeValidity === 'Undefined') {
+      setAvailableAt(null)
+      setExpiredAt(null)
+    }
+  }, [timeValidity])
 
   useEffect(() => {
     const fetchUserData = async () => {
