@@ -15,15 +15,10 @@ const RolesComponent = () => {
       <PageHeader
         title={
           <Typography variant='h4' sx={{ mb: 6 }}>
-            Roles List
+            Quản lý phân quyền
           </Typography>
         }
-        subtitle={
-          <Typography sx={{ color: 'text.secondary' }}>
-            A role provided access to predefined menus and features so that depending on <br /> assigned role an
-            administrator can have access to what he need
-          </Typography>
-        }
+        subtitle={<Typography sx={{ color: 'text.secondary' }}></Typography>}
       />
       <Grid item xs={12}>
         <RoleCards />
