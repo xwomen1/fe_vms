@@ -1107,7 +1107,7 @@ const UserDetails = () => {
                                 <DatePicker
                                   selected={availableAt}
                                   onChange={handleStartDateChange}
-                                  dateFormat='MM/dd/yyyy'
+                                  dateFormat='dd/MM/yyyy'
                                   customInput={<CustomInput label='Ngày bắt đầu' />}
                                 />
                               </div>
@@ -1115,15 +1115,15 @@ const UserDetails = () => {
                           </DatePickerWrapper>
                         </Grid>
                         {user.expiredAt && (
-                          <Grid item xs={4}>
+                          <Grid item xs={8}>
                             <DatePickerWrapper>
                               <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
                                 <div>
                                   <DatePicker
                                     selected={expiredAt}
                                     onChange={handleEndDateChange}
-                                    dateFormat='MM/dd/yyyy'
-                                    customInput={<CustomInput label='Ngày bắt đầu' />}
+                                    dateFormat='dd/MM/yyyy'
+                                    customInput={<CustomInput label='Ngày kết thúc' />}
                                   />
                                 </div>
                               </Box>
