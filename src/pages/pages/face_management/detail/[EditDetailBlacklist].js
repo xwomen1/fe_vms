@@ -9,6 +9,7 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 import FileUploader from 'devextreme-react/file-uploader'
 import Icon from 'src/@core/components/icon'
 import ModalImage from '../ModalImage'
+import CustomDialog from '../CustomDialog/CustomDialog'
 import Link from 'next/link'
 import {
   Box,
@@ -61,6 +62,10 @@ const EditFaceManagement = () => {
   const [img2, setImg2] = useState(null)
   const [img3, setImg3] = useState(null)
   const [img4, setImg4] = useState(null)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [dialogTitle, setDialogTitle] = useState('')
+  const [dialogMessage, setDialogMessage] = useState('')
+  const [isSuccess, setIsSuccess] = useState(false)
 
   const buildUrlWithToken = url => {
     const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -252,6 +257,10 @@ const EditFaceManagement = () => {
     fetchFilteredOrAllUsers()
   }, [id])
 
+  const handleDialogClose = () => {
+    setDialogOpen(false)
+  }
+
   const handleUpdate = async () => {
     setLoading(true)
     try {
@@ -267,18 +276,25 @@ const EditFaceManagement = () => {
         name: name,
         note: note,
         mainImageId: fileAvatarId,
-        imgs: listFileId.map((id, index) => ({
+        imgs: listFileId.map(id => ({
           id: id,
           urlImage: listFileUrl[id]
         }))
       }
+
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${id}`, params, config)
-      Swal.fire('Sửa thành công', '', 'success')
+      setDialogTitle('Sửa thông tin thành công')
+      setIsSuccess(true)
       fetchFilteredOrAllUserss()
     } catch (error) {
-      Swal.fire('Sửa không thành công', error.response.data.message, 'error')
+      setDialogTitle('Sửa thông tin không thành công')
+      setDialogMessage(error.response.data.message || 'Sửa không thành công')
+      setIsSuccess(false)
       fetchFilteredOrAllUserss()
       console.error('Error adding member to group:', error)
+    } finally {
+      setLoading(false)
+      setDialogOpen(true)
     }
   }
 
@@ -306,8 +322,8 @@ const EditFaceManagement = () => {
                           >
                             Hủy
                           </Button>
-                          <Button onClick={handleUpdate} variant='contained'>
-                            Cập nhật
+                          <Button onClick={handleUpdate} variant='contained' disabled={loading}>
+                            {loading ? 'Updating...' : 'Cập nhật'}
                           </Button>
                         </Box>
                       </Grid>
@@ -319,6 +335,13 @@ const EditFaceManagement = () => {
                     '& .MuiCardHeader-action': { m: 0 },
                     alignItems: ['flex-start', 'center']
                   }}
+                />
+                <CustomDialog
+                  open={dialogOpen}
+                  handleClose={handleDialogClose}
+                  title={dialogTitle}
+                  message={dialogMessage}
+                  isSuccess={isSuccess}
                 />
                 <Grid item xs={12}>
                   {modalImage && (
