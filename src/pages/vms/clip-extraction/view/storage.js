@@ -140,7 +140,6 @@ const Storage = ({ id, name, channel }) => {
                 return item.TimeSpan
             })
             setDataList(data)
-            console.log('data', data)
         } catch (error) {
             if (error.response && error.response.status === 404) {
                 console.error('Error 404: Not Found', error.response.data)

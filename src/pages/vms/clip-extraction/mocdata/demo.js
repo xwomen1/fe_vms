@@ -1,78 +1,81 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react";
 import TimeRange from "react-video-timelines-slider";
 import { format } from "date-fns";
-import { Checkbox, FormControlLabel, Grid, Typography } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 
 const Demo = ({ data, dateType, minuteType }) => {
-    const [dateData, setDateData] = useState([])
-    const [timeType, setTimeType] = useState('day')
-    const [minutesType, setMinutesType] = useState('5minute')
-    const [dayList, setDayList] = useState([])
+    const [dateData, setDateData] = useState([]);
+    const [timeType, setTimeType] = useState('day');
+    const [minutesType, setMinutesType] = useState('5minute');
+    const [dayList, setDayList] = useState([]);
+    const [timelines, setTimelines] = useState({});
+    const [selectedIntervals, setSelectedIntervals] = useState({});
+    const [timelineScrubberError, setTimelineScrubberError] = useState(false);
+    const [gaps, setGaps] = useState([])
 
     useEffect(() => {
         if (dateType) {
             setTimeType(dateType);
         }
-    }, [dateType])
+    }, [dateType]);
 
     useEffect(() => {
         if (minuteType) {
             setMinutesType(minuteType);
         }
-    }, [minuteType])
-
-    useEffect(() => {
-        console.log('data', data)
-        if (data) {
-            setDateData(data)
-        }
-    }, [data])
+    }, [minuteType]);
 
     useEffect(() => {
         let interval = 60; // Mặc định là 1 giờ
         switch (minutesType) {
             case '1minute':
-                interval = 1; // 12 phút
+                interval = 1;
                 break;
             case '2minute':
-                interval = 2; // 2 phút
+                interval = 2;
                 break;
             case '5minute':
-                interval = 5; // 5 phút
+                interval = 5;
                 break;
             default:
                 break;
         }
-        // setTimeLines(generateTimeLine(interval));
-    }, [minutesType])
+        // setTimeLines(generateTimeLine(interval)); // Hàm này không được cung cấp
+    }, [minutesType]);
 
     useEffect(() => {
-        getLastDays()
-    }, [timeType])
+        getLastDays();
+    }, [timeType]);
 
-    const timeline = [
-        new Date("2022-11-22T21:51:44.054Z"),
-        new Date("2022-11-23T07:15:44.309Z"),
-    ];
+    useEffect(() => {
+        if (data) {
+            console.log('data', data)
+            setDateData(data);
+            updateTimeGaps(data)
+        }
+    }, [data]);
 
-    const gap = [
-        {
-            start: new Date("2022-11-23T03:51:44.054Z"),
-            end: new Date("2022-11-23T04:15:44.309Z"),
-        },
-    ];
-    const [selectedInterval, setSelectedInterval] = useState([
-        new Date("2022-11-22T23:51:44.054Z"),
-        new Date("2022-11-23T01:51:44.054Z"),
-    ]);
-    const [timelineScrubberError, setTimelineScrubberError] = useState(false);
+    useEffect(() => {
+        if (dayList.length) {
+            updateTimelines();
+        }
+    }, [dayList]);
+
+    useEffect(() => {
+        // console.log('timelines', timelines)
+        // console.log('selectedIntervals', selectedIntervals)
+        // updateTimeGap()
+    }, [timelines, selectedIntervals, gaps])
 
     const timelineScrubberErrorHandler = ({ error }) => {
         setTimelineScrubberError(error);
     };
 
-    const onChangeCallback = (selectedInterval) => {
-        setSelectedInterval(selectedInterval);
+    const onChangeCallback = (day) => (selectedInterval) => {
+        setSelectedIntervals(prev => ({
+            ...prev,
+            [day]: selectedInterval
+        }));
     };
 
     const getLastDays = () => {
@@ -86,45 +89,100 @@ const Demo = ({ data, dateType, minuteType }) => {
                 for (let i = 0; i < 7; i++) {
                     const date = new Date();
                     date.setDate(date.getDate() - i);
-                    daysArray.push(date.toISOString().split('T')[0]); // Chuyển đổi sang định dạng YYYY-MM-DD
+                    daysArray.push(date.toISOString().split('T')[0]);
                 }
                 break;
             case 'month':
                 for (let i = 0; i < 30; i++) {
                     const date = new Date();
                     date.setDate(date.getDate() - i);
-                    daysArray.push(date.toISOString().split('T')[0]); // Chuyển đổi sang định dạng YYYY-MM-DD
+                    daysArray.push(date.toISOString().split('T')[0]);
                 }
                 break;
             default:
                 break;
         }
-        setDayList(daysArray)
+        setDayList(daysArray);
     };
+
+    const updateTimelines = () => {
+        const newTimelines = {};
+        const newSelectedIntervals = {};
+
+        dayList.forEach(day => {
+            const date = new Date(day);
+            const start = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0);
+            const end = new Date(start.getTime() + 60 * 60 * 1000); // Thêm 1 giờ vào start
+            newTimelines[day] = [start, new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59)];
+            newSelectedIntervals[day] = [start, end];
+        });
+
+        setTimelines(newTimelines);
+        setSelectedIntervals(newSelectedIntervals);
+    };
+
+    const updateTimeGaps = (data) => {
+        const dateRanges = [];
+        let currentDate = null;
+
+        for (const { StartTime, EndTime } of data) {
+
+
+            const startDate = new Date(StartTime).toLocaleDateString();
+            const endDate = new Date(EndTime).toLocaleDateString();
+
+            console.log('startTime', startDate)
+            console.log('EndTime', endDate)
+
+            if (currentDate === null || startDate !== currentDate) {
+                if (currentDate !== null) {
+                    dateRanges.push({
+                        start: new Date(currentDate).toISOString(),
+                        end: new Date(new Date(currentDate).getFullYear(), new Date(currentDate).getMonth(), new Date(currentDate).getDate(), 23, 59, 59).toISOString()
+                    });
+                }
+                currentDate = startDate;
+            }
+
+            dateRanges.push({
+                start: StartTime,
+                end: EndTime
+            });
+        }
+
+        if (currentDate !== null) {
+            dateRanges.push({
+                start: new Date(currentDate).toISOString(),
+                end: new Date(new Date(currentDate).getFullYear(), new Date(currentDate).getMonth(), new Date(currentDate).getDate(), 23, 59, 59).toISOString()
+            });
+        }
+
+        console.log(dateRanges);
+    }
 
     return (
         <Grid container spacing={2}>
-            {dayList.map((day, index) =>
-                <Grid item xs={12} display={'flex'}>
+            {dayList.map((day, index) => (
+                <Grid item xs={12} display={'flex'} key={index}>
                     <Typography sx={{ width: '100px' }}>{day}</Typography>
                     <TimeRange
                         showNow
                         error={timelineScrubberError}
                         ticksNumber={6}
-                        selectedInterval={selectedInterval}
-                        timelineInterval={timeline}
+                        selectedInterval={selectedIntervals[day] || []}
+                        timelineInterval={timelines[day] || []}
                         onUpdateCallback={timelineScrubberErrorHandler}
-                        onChangeCallback={onChangeCallback}
-                        disabledIntervals={gap}
+                        onChangeCallback={onChangeCallback(day)}
+                        disabledIntervals={[]}
                         step={1}
                         formatTick={(ms) => format(new Date(ms), "HH:mm:ss")}
                         formatTooltip={(ms) => format(new Date(ms), "HH:mm:ss.SSS")}
                         showToolTip={true}
                     />
                 </Grid>
-            )}
+            ))}
         </Grid>
-    )
-}
+    );
+};
 
-export default Demo
+export default Demo;
