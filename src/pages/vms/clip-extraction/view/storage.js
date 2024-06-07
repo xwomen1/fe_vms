@@ -101,6 +101,7 @@ const Storage = ({ id, name, channel }) => {
 
         try {
             const res = await callApi(`https://sbs.basesystem.one/ivis/vms/api/v0/playback/camera/${id}`)
+
             const data = res.data.MatchList.map((item, index) => {
                 return item.TimeSpan
             })

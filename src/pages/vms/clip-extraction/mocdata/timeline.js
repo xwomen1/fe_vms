@@ -71,7 +71,6 @@ const Timeline = ({ data = dataList, dateType, minuteType }) => {
             default:
                 break;
         }
-        // setTimelines(generateTimeLine(interval)); // This function is not provided
     }, [minutesType]);
 
     useEffect(() => {
