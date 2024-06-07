@@ -463,8 +463,8 @@ const UserDetails = () => {
           timeStartAfternoon: convertStringToTimeArray(timeStartAfternoon),
           timeStartMorning: convertStringToTimeArray(dateTime),
           timeEndMorning: convertStringToTimeArray(timeEndMorning),
-          availableAt: ava1 || isoToEpoch(new Date()),
-          expiredAt: ava2 || isoToEpoch(new Date()),
+          availableAt: ava1,
+          expiredAt: ava2,
           level: filteredRegionOptions || selectedRegion.id,
           contractType: filteredContractOptions || selectContract.id,
           note: note
@@ -785,7 +785,9 @@ const UserDetails = () => {
   useEffect(() => {
     if (timeValidity === 'Undefined') {
       setAvailableAt(null)
+      setAva1(null)
       setExpiredAt(null)
+      setAva2(null)
     }
   }, [timeValidity])
 

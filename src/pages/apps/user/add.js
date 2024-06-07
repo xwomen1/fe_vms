@@ -151,6 +151,12 @@ const Add = () => {
   const handleTimeValidityChange = event => {
     setTimeValidity(event.target.value)
   }
+  useEffect(() => {
+    if (timeValidity === 'Undefined') {
+      setAvailableAt(null)
+      setExpiredAt(null)
+    }
+  }, [timeValidity])
 
   // const userGroups = rows.map(row => ({
   //   groupId: row.id,
@@ -262,8 +268,8 @@ const Add = () => {
           timeStartAfternoon: convertStringToTimeArray(timeStartAfternoon),
           timeStartMorning: convertStringToTimeArray(dateTime),
           timeEndMorning: convertStringToTimeArray(timeEndMorning),
-          availableAt: ava1,
-          expiredAt: ava2,
+          availableAt: ava1 || null,
+          expiredAt: ava2 || null,
           note: note,
           policyIds: policyList,
 
