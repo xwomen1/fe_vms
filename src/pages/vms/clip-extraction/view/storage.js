@@ -1,41 +1,15 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 
-import { Button, CardHeader, DialogActions, Grid, MenuItem, Typography } from '@mui/material'
+import { Button, CardHeader, DialogActions, Grid, MenuItem } from '@mui/material'
 
 import IconButton from '@mui/material/IconButton'
 import Icon from 'src/@core/components/icon'
-import useDebounce from './useDebounce'
-import Slider from '@mui/material/Slider'
-import Box from '@mui/material/Box'
-import { Stack } from '@mui/material'
-
-// ** Third Party Imports
-
-import DatePicker from 'react-datepicker'
-
-// ** Styled Component
-import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
-
-// ** Custom Component Imports
-import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
-import { formatTimeShow, formatDate } from 'src/@core/utils/format'
 
 import { Card, CardContent } from "@mui/material"
 import ViewCamera from "src/@core/components/camera/playback"
-import Daily from '../mocdata/daily'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import { callApi } from 'src/@core/utils/requestUltils'
-import Demo from '../mocdata/demo'
-
-import TimeRange from "react-video-timelines-slider"
-import { format } from 'date-fns'
-
-
-const valueFilterInit = {
-    page: 1,
-    limit: 50,
-    deviceTypes: 'NVR'
-}
+import Timeline from '../mocdata/timeline'
 
 const dateList = [
     {
@@ -73,22 +47,12 @@ const minuteList = [
     },
 ]
 
-const dataDailyDefault = [
-    {
-        label: '',
-        value: 1,
-    }
-]
-
 const Storage = ({ id, name, channel }) => {
     const [loading, setLoading] = useState(false)
-    const [camera, setCamera] = useState({ id: id, name: name, channel: channel })
-    const [channelCurrent, setChannelCurrent] = useState(null)
+    const [camera, setCamera] = useState({ id: '', name: '', channel: '' })
 
-    const [dataDaily, setDataDaily] = useState([])
     const [timeType, setTimeType] = useState(null)
     const [minuteType, setMinuteType] = useState(null)
-    const [dataDailyState, setDataDailyState] = useState(dataDailyDefault)
 
 
     function formatTime(timeInSeconds) {
@@ -129,6 +93,7 @@ const Storage = ({ id, name, channel }) => {
         if (id) {
             fetchDateList()
         }
+        setCamera({ id: id, name: name, channel: channel })
     }, [id])
 
     const fetchDateList = async () => {
@@ -190,19 +155,9 @@ const Storage = ({ id, name, channel }) => {
                         }
                     />
                     <CardContent>
-                        {/* <Daily
-                            callbackOfDaily={(v) => {
-                                setDataDaily(v)
-                                setDataDailyState(v)
-                            }}
-
-                            // dataDailyProps={dataDailyState}
-
-                            dateType={timeType}
-                            minuteType={minuteType}
-                            aria-describedby='validation-basic-last-name'
-                        /> */}
-                        <Demo data={dataList} dateType={timeType} minuteType={minuteType} />
+                        {camera.id !== '' &&
+                            <Timeline data={dataList} dateType={timeType} minuteType={minuteType} />
+                        }
                     </CardContent>
                 </Card>
             </Grid>
