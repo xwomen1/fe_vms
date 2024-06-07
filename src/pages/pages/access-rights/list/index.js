@@ -716,6 +716,14 @@ const AccessRight = () => {
                                 >
                                   <Icon icon='tabler:trash' />
                                 </IconButton>
+                                {/* <IconButton
+                                  onClick={() => {
+                                    setIdView(row.id)
+                                    setIsOpenView(true)
+                                  }}
+                                >
+                                  <Icon icon='tabler:edit' />
+                                </IconButton> */}
                               </Grid>
                             </TableCell>
                           </TableRow>

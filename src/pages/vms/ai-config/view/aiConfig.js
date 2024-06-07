@@ -21,6 +21,7 @@ import {
 import { useEffect, useState } from 'react'
 import Icon from 'src/@core/components/icon'
 import toast from 'react-hot-toast'
+import CustomChip from 'src/@core/components/mui/chip'
 
 const AIConfig = () => {
   const [loading, setLoading] = useState(false)
@@ -86,7 +87,10 @@ const AIConfig = () => {
       field: 'face',
       label: 'Nhận diện khuôn mặt',
       renderCell: row => (
-        <Switch checked={switchStates[row.id]?.face || false} onChange={e => handleSwitchChange(e, row.id, 'face_recognition', row.alert_id)} />
+        <Switch
+          checked={switchStates[row.id]?.face || false}
+          onChange={e => handleSwitchChange(e, row.id, 'face_recognition', row.alert_id)}
+        />
       )
     },
     {
@@ -148,36 +152,37 @@ const AIConfig = () => {
 
 
   useEffect(() => {
-    if (!alertAIList || !cameraGroup) return;
+    if (!Array.isArray(alertAIList) || !Array.isArray(cameraGroup)) return;
 
-    const data = cameraGroup.map((camera, index) => {
-      const item = alertAIList.find((alert) => alert.camera_id === camera.id)
-      const licensePlate = item?.cameraaiproperty.find((a) => (a.cameraModelAI.type === 'license_plate_recognition'))
-      const face = item?.cameraaiproperty.find((b) => (b.cameraModelAI.type === 'face_recognition'))
+    const data = cameraGroup.map((camera) => {
+      const item = alertAIList.find((alert) => alert?.camera_id === camera?.id);
+      if (!item) return camera;
+
+      const licensePlate = item.cameraaiproperty.find((a) => a?.cameraModelAI?.type === 'license_plate_recognition');
+      const face = item.cameraaiproperty.find((b) => b?.cameraModelAI?.type === 'face_recognition');
 
       const alert = {
-        alert_id: item?.id,
-        face: face?.isactive,
-        licensePlate: licensePlate?.isactive
-      }
+        alert_id: item?.id || null,
+        face: face?.isactive ? item?.id : null,
+        licensePlate: licensePlate?.isactive ? item?.id : null,
+      };
 
-      return alert ? { ...camera, ...alert } : camera
-    })
-    setDataList(data)
+      return { ...camera, ...alert };
+    });
 
-    const initialSwitchStates = {}
+    setDataList(data);
+
+    const initialSwitchStates = {};
     data.forEach((item) => {
-      initialSwitchStates[item.id] = {
-        face: item.face || false,
-        licensePlate: item.licensePlate || false
-      }
-    })
-    setSwitchStates(initialSwitchStates)
-  }, [alertAIList, cameraGroup])
+      initialSwitchStates[item?.id] = {
+        face: Boolean(item?.face),
+        licensePlate: Boolean(item?.licensePlate),
+      };
+    });
 
-  useEffect(() => {
+    setSwitchStates(initialSwitchStates);
+  }, [alertAIList, cameraGroup]);
 
-  }, [dataList, switchStates])
 
   const handleSwitchChange = (event, cameraId, type, cameraAIPropertyId) => {
     setSwitchStates(prevState => ({
@@ -192,10 +197,10 @@ const AIConfig = () => {
   }
 
   const handleUpdateAlertIsActive = async (alertId, type) => {
-    const alert = alertAIList.find((alert) => alert.id === alertId)
+    const alert = alertAIList.find((alert) => alert?.id === alertId)
 
-    const changedAlerts = alert.cameraaiproperty.map(alert => {
-      return alert.cameraModelAI.type === type ? { ...alert, isactive: !alert.isactive } : alert
+    const changedAlerts = alert?.cameraaiproperty?.map(alert => {
+      return alert?.cameraModelAI?.type === type ? { ...alert, isactive: !alert.isactive } : alert
     })
 
     const params = {
@@ -269,7 +274,17 @@ const AIConfig = () => {
                           </TableCell>
                         )
                       })}
-                      <TableCell align='right'>{row.status.name}</TableCell>
+                      <TableCell align='right'>
+                        {/* {row.status.name} */}
+                        <CustomChip
+                          rounded
+                          size='small'
+                          skin='light'
+                          sx={{ lineHeight: 1 }}
+                          color={row.status.name === 'Không hoạt động' ? 'primary' : 'success'}
+                          label={row.status.name}
+                        />
+                      </TableCell>
                     </TableRow>
                   )
                 })}

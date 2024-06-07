@@ -151,6 +151,12 @@ const Add = () => {
   const handleTimeValidityChange = event => {
     setTimeValidity(event.target.value)
   }
+  useEffect(() => {
+    if (timeValidity === 'Undefined') {
+      setAvailableAt(null)
+      setExpiredAt(null)
+    }
+  }, [timeValidity])
 
   // const userGroups = rows.map(row => ({
   //   groupId: row.id,
@@ -262,8 +268,8 @@ const Add = () => {
           timeStartAfternoon: convertStringToTimeArray(timeStartAfternoon),
           timeStartMorning: convertStringToTimeArray(dateTime),
           timeEndMorning: convertStringToTimeArray(timeEndMorning),
-          availableAt: ava1,
-          expiredAt: ava2,
+          availableAt: ava1 || null,
+          expiredAt: ava2 || null,
           note: note,
           policyIds: policyList,
 
@@ -280,7 +286,7 @@ const Add = () => {
       setUserId(newUserId)
 
       for (const row of rows) {
-        console.log(row.groupName, 'rows')
+        console.log(row.name, 'rows')
         const groupId = await searchGroupIdAccess(row.name)
         console.log(groupId, 'gourpID fetch')
         if (groupId) {
@@ -390,10 +396,11 @@ const Add = () => {
         `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups?keyword=${groupName}`,
         config
       )
-      console.log(response.data.rows[0])
 
-      if (response.data.length > 0) {
-        return response.data[0].id // Trả về groupId nếu tìm thấy
+      if (response.data.rows[0].id) {
+        console.log(response.data.rows[0].id, 'groupid')
+
+        return response.data.rows[0].id
       } else {
         const newGroupId = await createNewGroupAccess(groupName, groupCode)
 
@@ -691,7 +698,7 @@ const Add = () => {
                             selected={expiredAt}
                             onChange={handleEndDateChange}
                             dateFormat='MM/dd/yyyy'
-                            customInput={<CustomInput label='Ngày bắt đầu' />}
+                            customInput={<CustomInput label='Ngày kết thúc' />}
                           />
                         </div>
                       </Box>

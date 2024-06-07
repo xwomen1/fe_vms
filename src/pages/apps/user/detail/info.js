@@ -295,6 +295,85 @@ const UserDetails = () => {
   }
   console.log(groups)
 
+  const searchGroupIdAccess = async (groupName, groupCode) => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.get(
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups?keyword=${groupName}`,
+        config
+      )
+
+      if (response?.data?.rows[0]?.id) {
+        console.log(response.data.rows[0].id, 'groupid')
+
+        return response.data.rows[0].id
+      } else {
+        const newGroupId = await createNewGroupAccess(groupName, groupCode)
+
+        return newGroupId
+      }
+    } catch (error) {
+      throw error
+    }
+  }
+
+  const addMemberToGroup = async (groupId, userId) => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.post(
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups/${groupId}/add-member`,
+        { userIds: [userId] },
+        config
+      )
+
+      return response.data
+    } catch (error) {
+      console.error('Error adding member to group:', error)
+      throw error
+    }
+  }
+
+  const createNewGroupAccess = async (groupName, groupCode) => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+      const groupId = await searchGroupId(groupName, groupCode)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.post(
+        'https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups',
+        {
+          name: groupName,
+          type: 'USER',
+          id: groupId
+        },
+        config
+      )
+
+      return response.data.id
+    } catch (error) {
+      throw error
+    }
+  }
+
   const saveChanges = async regionId => {
     setReadOnly(true)
     setEditing(false)
@@ -384,14 +463,22 @@ const UserDetails = () => {
           timeStartAfternoon: convertStringToTimeArray(timeStartAfternoon),
           timeStartMorning: convertStringToTimeArray(dateTime),
           timeEndMorning: convertStringToTimeArray(timeEndMorning),
-          availableAt: ava1 || isoToEpoch(new Date()),
-          expiredAt: ava2 || isoToEpoch(new Date()),
+          availableAt: ava1,
+          expiredAt: ava2,
           level: filteredRegionOptions || selectedRegion.id,
           contractType: filteredContractOptions || selectContract.id,
           note: note
         },
         config
       )
+      for (const row of groups) {
+        console.log(row.groupName, 'rows')
+        const groupId = await searchGroupIdAccess(row.groupName)
+        console.log(groupId, 'gourpID fetch')
+        if (groupId) {
+          await addMemberToGroup(groupId, userId)
+        }
+      }
       Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
     } catch (error) {
       console.error('Error updating user details:', error)
@@ -695,6 +782,14 @@ const UserDetails = () => {
     option => !policies || !policies.some(policies => policies.policyName === option.policyName)
   )
   console.log(policyOption)
+  useEffect(() => {
+    if (timeValidity === 'Undefined') {
+      setAvailableAt(null)
+      setAva1(null)
+      setExpiredAt(null)
+      setAva2(null)
+    }
+  }, [timeValidity])
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -1020,7 +1115,7 @@ const UserDetails = () => {
                                 <DatePicker
                                   selected={availableAt}
                                   onChange={handleStartDateChange}
-                                  dateFormat='MM/dd/yyyy'
+                                  dateFormat='dd/MM/yyyy'
                                   customInput={<CustomInput label='Ngày bắt đầu' />}
                                 />
                               </div>
@@ -1028,15 +1123,15 @@ const UserDetails = () => {
                           </DatePickerWrapper>
                         </Grid>
                         {user.expiredAt && (
-                          <Grid item xs={4}>
+                          <Grid item xs={8}>
                             <DatePickerWrapper>
                               <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
                                 <div>
                                   <DatePicker
                                     selected={expiredAt}
                                     onChange={handleEndDateChange}
-                                    dateFormat='MM/dd/yyyy'
-                                    customInput={<CustomInput label='Ngày bắt đầu' />}
+                                    dateFormat='dd/MM/yyyy'
+                                    customInput={<CustomInput label='Ngày kết thúc' />}
                                   />
                                 </div>
                               </Box>
@@ -1049,27 +1144,32 @@ const UserDetails = () => {
                     <Grid container spacing={2}>
                       <Grid item xs={0.1}></Grid>
                       <Grid item xs={2}>
-                        <DatePicker
-                          selected={availableAt || new Date()}
-                          onChange={handleStartDateChange}
-                          showTimeSelect
-                          timeIntervals={15}
-                          timeCaption='Time'
-                          dateFormat='MMMM d, yyyy'
-                          customInput={<CustomInput label='Ngày bắt đầu' />}
-                          fullWidth
-                        />
+                        <DatePickerWrapper>
+                          <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                            <div>
+                              <DatePicker
+                                selected={availableAt}
+                                onChange={handleStartDateChange}
+                                dateFormat='MM/dd/yyyy'
+                                customInput={<CustomInput label='Ngày bắt đầu' />}
+                              />
+                            </div>
+                          </Box>
+                        </DatePickerWrapper>
                       </Grid>
-                      <Grid item xs={3}>
-                        <DatePicker
-                          selected={expiredAt || new Date()}
-                          onChange={handleEndDateChange}
-                          showTimeSelect
-                          timeIntervals={15}
-                          timeCaption='Time'
-                          dateFormat='MMMM d, yyyy'
-                          customInput={<CustomInput label='Ngày kết thúc' />}
-                        />
+                      <Grid item xs={4}>
+                        <DatePickerWrapper>
+                          <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                            <div>
+                              <DatePicker
+                                selected={expiredAt}
+                                onChange={handleEndDateChange}
+                                dateFormat='MM/dd/yyyy'
+                                customInput={<CustomInput label='Ngày kết thúc' />}
+                              />
+                            </div>
+                          </Box>
+                        </DatePickerWrapper>
                       </Grid>
                     </Grid>
                   ))}

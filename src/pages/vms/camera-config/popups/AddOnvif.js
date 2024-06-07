@@ -26,6 +26,7 @@ const Add = ({
   onClose,
   url,
   port,
+  idBoxOnvif,
   userName,
   passWord,
   loadingOnvif,
@@ -71,6 +72,22 @@ const Add = ({
       setLoading(true)
       setMessage({ text: '', type: '', error: false })
 
+      // Xác thực các trường đầu vào
+      if (
+        !camera.location ||
+        !camera.name ||
+        !camera.url ||
+        !camera.macAddress ||
+        !camera.host ||
+        !passWord ||
+        !userName
+      ) {
+        setMessage({ text: 'Tất cả các trường đều bắt buộc', type: 'create', error: true })
+        setLoading(false)
+
+        return
+      }
+
       const config = {
         headers: {
           Authorization: `Bearer ${token}`
@@ -80,6 +97,9 @@ const Add = ({
       await axios.post(
         `https://sbs.basesystem.one/ivis/vms/api/v0/cameras`,
         {
+          box: {
+            id: idBoxOnvif
+          },
           location: camera.location,
           name: camera.name,
           ipAddress: camera.url,
@@ -157,6 +177,8 @@ const Add = ({
                       }
 
                       const foundcamera = selectedIds.find(item => item.macAddress === camera.macAddress)
+
+                      console.log(foundcamera, 'foundcamera')
 
                       return (
                         <TableRow key={index}>

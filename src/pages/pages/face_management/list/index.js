@@ -28,6 +28,7 @@ import Swal from 'sweetalert2'
 import { CircularProgress } from '@material-ui/core'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import authConfig from 'src/configs/auth'
+import CustomDialog from '../CustomDialog/CustomDialog'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import * as XLSX from 'xlsx'
@@ -42,7 +43,10 @@ const FaceManagement = () => {
   const [loading, setLoading] = useState(false)
   const [listImage, setListImage] = useState([])
   const [isDeleteDisabled, setIsDeleteDisabled] = useState(true)
-
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [dialogTitle, setDialogTitle] = useState('')
+  const [dialogMessage, setDialogMessage] = useState('')
+  const [isSuccess, setIsSuccess] = useState(false)
   const [anchorEl, setAnchorEl] = useState(null)
   const [pageSize, setPageSize] = useState(25)
   const [total, setTotal] = useState([1])
@@ -104,6 +108,10 @@ const FaceManagement = () => {
     setSelectAll(checked)
   }
 
+  const handleDialogClose = () => {
+    setDialogOpen(false)
+  }
+
   const handleDeleteSelected = () => {
     showAlertConfirm({
       text: 'Bạn có chắc chắn muốn xóa?'
@@ -124,11 +132,19 @@ const FaceManagement = () => {
           axios
             .delete(urlDelete, config)
             .then(() => {
+              setDialogTitle('Xóa khuân mặt thành công')
+              setIsSuccess(true)
               const updatedData = userData.filter(user => user.id !== idDelete)
               setUserData(updatedData)
             })
             .catch(err => {
-              Swal.fire('Đã xảy ra lỗi', err.message, 'error')
+              setDialogTitle('xóa không thành công')
+              setDialogMessage(err.message || 'xóa không thành công')
+              setIsSuccess(false)
+            })
+            .finally(() => {
+              setLoading(false)
+              setDialogOpen(true)
             })
         })
 
@@ -197,7 +213,15 @@ const FaceManagement = () => {
       cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
       customClass: {
         content: 'content-class',
-        confirmButton: 'swal-btn-confirm'
+        confirmButton: 'swal-btn-confirm',
+        cancelButton: 'swal-btn-cancel',
+        actions: 'swal-actions'
+      },
+      didOpen: () => {
+        const confirmButton = Swal.getConfirmButton()
+        if (confirmButton) {
+          confirmButton.style.backgroundColor = '#ff9f43'
+        }
       }
     }
 
@@ -263,12 +287,19 @@ const FaceManagement = () => {
         axios
           .delete(urlDelete, config)
           .then(() => {
-            Swal.fire('Xóa thành công', '', 'success')
+            setDialogTitle('Xóa khuân mặt thành công')
+            setIsSuccess(true)
             const updatedData = userData.filter(user => user.id !== idDelete)
             setUserData(updatedData)
           })
           .catch(err => {
-            Swal.fire('Đã xảy ra lỗi', err.message, 'error')
+            setDialogTitle('xóa không thành công')
+            setDialogMessage(err.message || 'xóa không thành công')
+            setIsSuccess(false)
+          })
+          .finally(() => {
+            setLoading(false)
+            setDialogOpen(true)
           })
       }
     })
@@ -488,6 +519,13 @@ const FaceManagement = () => {
           </Card>
         </Grid>
       </Grid>
+      <CustomDialog
+        open={dialogOpen}
+        handleClose={handleDialogClose}
+        title={dialogTitle}
+        message={dialogMessage}
+        isSuccess={isSuccess}
+      />
     </>
   )
 }

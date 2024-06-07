@@ -40,7 +40,11 @@ const UserList = ({ apiData }) => {
   const [groups, setGroups] = useState([])
   const [anchorEl, setAnchorEl] = useState(null)
   const router = useRouter()
-  const [searchGroup, setSearchGroup] = useState('')
+  const [KPCD, setKpcd] = useState('')
+  const [BHXH, setBhxh] = useState('')
+  const [BHYT, setBhyt] = useState('')
+  const [BHTN, setBhtn] = useState('')
+
   const [contractTypes, setContractTypes] = useState({})
   const [isSalaryRuleOpen, setIsSalaryRuleOpen] = useState(false)
 
@@ -55,7 +59,29 @@ const UserList = ({ apiData }) => {
   const handleViewDetails = userId => {
     router.push(`/${userId}`)
   }
+  useEffect(() => {
+    const fetchSalaryData = async () => {
+      try {
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+
+        const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/salary/regulation/', config)
+        setBhtn(response.data?.bhtn)
+        setBhxh(response.data?.bhxh)
+        setKpcd(response.data?.kpcd)
+        setBhyt(response.data?.bhyt)
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+
+    fetchSalaryData()
+  }, [])
   function showAlertConfirm(options, intl) {
     const defaultProps = {
       title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
@@ -105,7 +131,7 @@ const UserList = ({ apiData }) => {
     const fetchAllRegionNames = async () => {
       const newContractTypes = {}
       for (const user of userData) {
-        if (user.contractType && !newContractTypes[user.contractType]) {
+        if (contractTypes) {
           const regionName = await fetchRegionName(user.contractType)
           newContractTypes[user.contractType] = regionName
         }
@@ -269,6 +295,7 @@ const UserList = ({ apiData }) => {
         }
         const response = await axios.get(url, config)
         setUserData(response.data.rows)
+        setContractTypes(response.data.contractType)
         setTotal(response.data.totalPage)
       } catch (error) {
         console.error('Error fetching users:', error)
@@ -305,19 +332,27 @@ const UserList = ({ apiData }) => {
           </Grid>
           <Grid item xs={9.8}>
             <Paper elevation={3}>
-              <Table>
+              <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
                 <TableHead>
                   <TableRow>
                     <TableCell sx={{ padding: '16px' }}>STT</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Mã định danh</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Full Name</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Đơn vị</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Lương chính</TableCell>
 
                     <TableCell sx={{ padding: '16px' }}>Bậc lương</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Phụ cấp trách nhiệm</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Phụ cấp ăn trưa</TableCell>
+
                     <TableCell sx={{ padding: '16px' }}>Phụ cấp xăng xe</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Phụ cấp điện thoại</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Phụ cấp chi nhánh</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Phụ cấp khác</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>KPCĐ</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>BHXH</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>BHYT</TableCell>
+
+                    <TableCell sx={{ padding: '16px' }}>BHTN</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -327,12 +362,19 @@ const UserList = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{user.accessCode}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{user.fullName}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{user.userGroup[0]?.groupName}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{user.userGroup[0]?.salaryBase}</TableCell>
 
                       <TableCell sx={{ padding: '16px' }}>{user?.salary?.salaryLevel || '0'}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{user?.salary?.responsibilityAllowance || '0'}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{user?.salary?.lunchAllowance || '0'}</TableCell>
+
                       <TableCell sx={{ padding: '16px' }}>{user?.salary?.carAllowance || '0'}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{user?.salary?.phoneAllowance || '0'}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{user?.salary?.brandAllowance || '0'}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{user.userGroup[0]?.salaryBase * KPCD || '0'}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{user.userGroup[0]?.salaryBase * BHXH || '0'}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{user.userGroup[0]?.salaryBase * BHYT || '0'}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{user.userGroup[0]?.salaryBase * BHTN || '0'}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

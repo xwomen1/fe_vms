@@ -105,9 +105,9 @@ const UserList = ({ apiData }) => {
     const fetchAllRegionNames = async () => {
       const newContractTypes = {}
       for (const user of userData) {
-        if (user.contractType && !newContractTypes[user.contractType]) {
-          const regionName = await fetchRegionName(user.contractType)
-          newContractTypes[user.contractType] = regionName
+        if (contractTypes) {
+          const regionName = await fetchRegionName(contractTypes)
+          newContractTypes[contractTypes] = regionName
         }
       }
       setContractTypes(newContractTypes)
@@ -256,6 +256,7 @@ const UserList = ({ apiData }) => {
             Swal.fire('Xóa thành công', '', 'success')
             const updatedData = userData.filter(user => user.userId !== idDelete)
             setUserData(updatedData)
+
             fetchData()
           })
           .catch(err => {
@@ -292,6 +293,7 @@ const UserList = ({ apiData }) => {
         const response = await axios.get(url, config)
         setUserData(response.data.rows)
         setTotal(response.data.totalPage)
+        setContractTypes(response.data.contractType)
       } catch (error) {
         console.error('Error fetching users:', error)
       }

@@ -258,7 +258,7 @@ const navigation = () => {
         {
           title: 'Vai Trò',
           icon: 'tabler:users',
-          path: '/list-policy'
+          path: '/apps/roles'
         },
         {
           title: 'Bảng lương',

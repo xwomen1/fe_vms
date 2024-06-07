@@ -157,23 +157,27 @@ const ModelAIList = () => {
         </Dialog>
     )
 
-    const handleDelete = () => {
+    const handleDelete = async () => {
         if (idDelete != null) {
             setLoading(true)
 
-            axios.delete(`https://sbs.basesystem.one/ivis/vms/api/v0/camera-model-ai/${idDelete}`, config)
-                .then(() => {
-                    toast.success('Xóa thành công')
-                    setIdDelete(null)
-                    setReload(reload + 1)
-                })
-                .catch(error => {
+            try {
+                await axios.delete(`https://sbs.basesystem.one/ivis/vms/api/v0/camera-model-ai/${idDelete}`, config)
+                setReload(reload + 1)
+                setIdDelete(null)
+                toast.success('Xóa thành công')
+            } catch (error) {
+                if (error && error?.response?.data) {
+                    console.error('error', error)
+                    toast.error(error?.response?.data?.message)
+
+                } else {
                     console.error('Error fetching data:', error)
                     toast.error(error)
-                })
-                .finally(() => {
-                    setLoading(false)
-                })
+                }
+            } finally {
+                setLoading(false)
+            }
         }
     }
 
@@ -266,9 +270,7 @@ const ModelAIList = () => {
                                                     })}
                                                     <TableCell>
                                                         <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center' }}>
-                                                            <IconButton
-                                                                size='small'
-                                                                sx={{ color: 'text.secondary' }}
+                                                            <IconButton size='small' sx={{ color: 'text.secondary' }}
                                                                 onClick={() => {
                                                                     setDataModelAI(row)
                                                                     setIsOpenView(true)
@@ -277,8 +279,7 @@ const ModelAIList = () => {
                                                             >
                                                                 <Icon icon="tabler:info-circle" />
                                                             </IconButton>
-                                                            <IconButton
-                                                                size='small'
+                                                            <IconButton size='small'
                                                                 sx={{ color: 'text.secondary' }}
                                                                 onClick={() => {
                                                                     setDataModelAI(row)
@@ -326,12 +327,7 @@ const ModelAIList = () => {
                                     </Box>
                                 </Grid>
                                 <Grid item xs={6}>
-                                    <Pagination
-                                        count={total}
-                                        page={page}
-                                        color='primary'
-                                        onChange={(event, page) => handlePageChange(page)}
-                                    />
+                                    <Pagination page={page} color='primary' onChange={(event, page) => handlePageChange(page)} />
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -340,25 +336,20 @@ const ModelAIList = () => {
             </Card>
             {isOpenAdd &&
                 <AddModelAI
-                    show={isOpenAdd}
-                    typePopup={typePopup}
+                    show={isOpenAdd} typePopup={typePopup}
                     onClose={() => {
                         setTypePopup(null)
                         setIsOpenAdd(false)
-                    }}
-                    setReload={() => setReload(reload + 1)}
+                    }} setReload={() => setReload(reload + 1)}
                 />
             }
             {isOpenView &&
                 <AddModelAI
-                    show={isOpenView}
-                    data={dataModelAI}
-                    typePopup={typePopup}
+                    show={isOpenView} data={dataModelAI} typePopup={typePopup}
                     onClose={() => {
                         setTypePopup(null)
                         setIsOpenView(false)
-                    }}
-                    setReload={() => setReload(reload + 1)}
+                    }} setReload={() => setReload(reload + 1)}
                 />
             }
             {isOpenDel && DeleteView()}

@@ -11,7 +11,7 @@ import { Input } from '@mui/icons-material'
 import Swal from 'sweetalert2'
 import { useRouter } from 'next/router'
 
-const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode }) => {
+const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode, fetchUserData }) => {
   const [imageData, setImageData] = useState(null)
   const [imageNew, setImageDataNew] = useState(null)
   const [imageId, setImageId] = useState(null)
@@ -38,7 +38,7 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode }) => {
         }
       )
 
-      const imageId = uploadResponse.data.data.id
+      const imageId = uploadResponse.data.id
       setImageId(imageId)
 
       const downloadResponse = await axios.get(
@@ -55,7 +55,7 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode }) => {
       setImageDataNew(imageDataUrl)
     } catch (error) {
       console.error('Error uploading image:', error)
-      Swal.fire('Đã xảy ra lỗi', error.response.data.message, 'error')
+      Swal.fire('Đã xảy ra lỗi', error?.response?.data?.message, 'error')
     }
   }
 
@@ -142,6 +142,8 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode }) => {
             }
           )
           console.log('API Response 2:', response2.data)
+          fetchUserData()
+
           Swal.fire('Thêm thành công', '', 'success')
         } catch (error) {
           Swal.fire('Đã xảy ra lỗi', error.response.data.message, 'error')
@@ -165,8 +167,9 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode }) => {
             }
           )
           Swal.fire('Sửa thành công', '', 'success')
+          fetchUserData() // Gọi lại hàm fetchUserData
 
-          router.reload()
+          onClose()
         } catch (error) {
           Swal.fire('Đã xảy ra lỗi', error.response.data.message, 'error')
           onClose()
@@ -188,6 +191,9 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode }) => {
       setLoading(false) // Dừng loading sau khi hoàn thành request
     }
   }
+  useEffect(() => {
+    fetchUserData()
+  }, [])
 
   return (
     <Dialog open={true} onClose={onClose}>
