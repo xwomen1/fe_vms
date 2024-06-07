@@ -206,24 +206,26 @@ const UserList = () => {
   }, [])
 
   return (
-    <Grid container spacing={6}>
-      <Grid item xs={12}>
-        <Card>
-          <TableHeader plan={plan} value={value} handleFilter={handleFilter} handlePlanChange={handlePlanChange} />
-          <DataGrid
-            autoHeight
-            rowHeight={62}
-            rows={store.data}
-            columns={columns}
-            checkboxSelection
-            disableRowSelectionOnClick
-            pageSizeOptions={[10, 25, 50]}
-            paginationModel={paginationModel}
-            onPaginationModelChange={setPaginationModel}
-          />
-        </Card>
-      </Grid>
-    </Grid>
+    <></>
+
+    // <Grid container spacing={6}>
+    //   <Grid item xs={12}>
+    //     <Card>
+    //       <TableHeader plan={plan} value={value} handleFilter={handleFilter} handlePlanChange={handlePlanChange} />
+    //       <DataGrid
+    //         autoHeight
+    //         rowHeight={62}
+    //         rows={store.data}
+    //         columns={columns}
+    //         checkboxSelection
+    //         disableRowSelectionOnClick
+    //         pageSizeOptions={[10, 25, 50]}
+    //         paginationModel={paginationModel}
+    //         onPaginationModelChange={setPaginationModel}
+    //       />
+    //     </Card>
+    //   </Grid>
+    // </Grid>
   )
 }
 

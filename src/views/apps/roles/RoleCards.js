@@ -405,7 +405,7 @@ const RolesCards = () => {
                   Edit Role
                 </Typography>
               </Box>
-              <IconButton
+              {/* <IconButton
                 onClick={() => {
                   setIdDelete(item.policyId)
                   setIsOpenDel(true)
@@ -414,7 +414,7 @@ const RolesCards = () => {
                 sx={{ color: 'text.disabled' }}
               >
                 <Icon icon='tabler:trash' />
-              </IconButton>
+              </IconButton> */}
             </Box>
           </CardContent>
         </Card>
@@ -463,8 +463,7 @@ const RolesCards = () => {
               pt: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
             }}
           >
-            <Typography variant='h3'>{`${dialogTitle} Role`}</Typography>
-            <Typography color='text.secondary'>Set Role Permissions</Typography>
+            <Typography variant='h3'>{`Quản lý quyền`}</Typography>
           </DialogTitle>
           <DialogContent
             sx={{
@@ -583,7 +582,7 @@ const RolesCards = () => {
                 {isEditMode ? 'Sửa' : 'Thêm'}
               </Button>
               <Button color='secondary' variant='tonal' onClick={handleClose}>
-                Cancel
+                Đóng
               </Button>
             </Box>
           </DialogActions>
