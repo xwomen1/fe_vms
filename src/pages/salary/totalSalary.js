@@ -14,7 +14,7 @@ import Table from '@mui/material/Table'
 import Paper from '@mui/material/Paper'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
-import { IconButton } from '@mui/material'
+import { IconButton, TableContainer } from '@mui/material'
 import Swal from 'sweetalert2'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchData } from 'src/store/apps/user'
@@ -50,6 +50,9 @@ const UserList = ({ apiData }) => {
   const [BHXH, setBhxh] = useState('')
   const [BHYT, setBhyt] = useState('')
   const [BHTN, setBhtn] = useState('')
+  const [OT, setOT] = useState('')
+  const [business, setBussiness] = useState('')
+  const [editedTimeDayMonth, setEditedTimeDayMonth] = useState('')
 
   const togglePopup = () => {
     setIsPopupOpen(!isPopupOpen)
@@ -306,6 +309,10 @@ const UserList = ({ apiData }) => {
         setBhxh(response.data?.bhxh)
         setKpcd(response.data?.kpcd)
         setBhyt(response.data?.bhyt)
+        setOT(response.data.othour)
+        setBussiness(response.data.businessDay)
+        setEditedTimeDayMonth(response.data.timeDayMonth)
+
         console.log(response.data.othour)
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -323,7 +330,7 @@ const UserList = ({ apiData }) => {
           {/* <Grid item xs={0.1}></Grid> */}
           <Grid item xs={0.2}></Grid>
 
-          <Grid item xs={2} component={Paper}>
+          <Grid item xs={1.5} component={Paper}>
             <div>
               <CustomTextField
                 value={valueGroup}
@@ -341,73 +348,91 @@ const UserList = ({ apiData }) => {
             </div>
           </Grid>
 
-          <Grid item xs={9.8}>
+          <Grid item xs={10.3} minWidth={500}>
             <Paper elevation={3}>
-              <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Mã định danh</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Full Name</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Đơn vị</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Lương chính</TableCell>
+              <TableContainer component={Paper} style={{ maxWidth: '100%', overflowX: 'auto' }}>
+                <Table stickyHeader aria-label='sticky table'>
+                  {' '}
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ padding: '16px' }}>STT</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Mã định danh</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Full Name</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Đơn vị</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Lương chính</TableCell>
 
-                    <TableCell sx={{ padding: '16px' }}>Bậc lương</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Ngày công</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Bậc lương</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Ngày công</TableCell>
 
-                    <TableCell sx={{ padding: '16px' }}>PC trách nhiệm</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>PC ăn trưa</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>PC trách nhiệm</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>PC ăn trưa</TableCell>
 
-                    <TableCell sx={{ padding: '16px' }}>PC xăng xe</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>PC điện thoại</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>PC khác</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Tổng phụ cấp</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>PC xăng xe</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>PC điện thoại</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>PC khác</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Phụ cấp OT</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Phụ cấp công tác</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Tổng phụ cấp</TableCell>
 
-                    {/* <TableCell sx={{ padding: '16px' }}>KPCĐ</TableCell> */}
-                    <TableCell sx={{ padding: '16px' }}>BHXH</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>BHYT</TableCell>
+                      {/* <TableCell sx={{ padding: '16px' }}>KPCĐ</TableCell> */}
+                      <TableCell sx={{ padding: '16px' }}>BHXH</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>BHYT</TableCell>
 
-                    <TableCell sx={{ padding: '16px' }}>Tổng</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Nhận</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {userData.map((user, index) => (
-                    <TableRow key={user.userId}>
-                      <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user.accessCode}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user.fullName}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user.userGroup[0]?.groupName}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user.userGroup[0]?.salaryBase}</TableCell>
-
-                      <TableCell sx={{ padding: '16px' }}>{user?.salary?.salaryLevel || '0'}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user?.salary?.day || '0'}</TableCell>
-
-                      <TableCell sx={{ padding: '16px' }}>{user?.salary?.responsibilityAllowance || '0'}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user?.salary?.lunchAllowance || '0'}</TableCell>
-
-                      <TableCell sx={{ padding: '16px' }}>{user?.salary?.carAllowance || '0'}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user?.salary?.phoneAllowance || '0'}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user?.salary?.brandAllowance || '0'}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>
-                        {user?.salary?.brandAllowance +
-                          user?.salary?.responsibilityAllowance +
-                          user?.salary?.lunchAllowance +
-                          user?.salary?.carAllowance +
-                          user?.salary?.phoneAllowance || '0'}
-                      </TableCell>
-
-                      {/* <TableCell sx={{ padding: '16px' }}>{user.userGroup[0]?.salaryBase * KPCD || '0'}</TableCell> */}
-                      <TableCell sx={{ padding: '16px' }}>{user.userGroup[0]?.salaryBase * BHXH || '0'}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user.userGroup[0]?.salaryBase * BHYT || '0'}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>
-                        {user.userGroup[0]?.salaryBase * (BHYT + BHXH) || '0'}
-                      </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user?.salary?.brandAllowance || '0'}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Tổng BH</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Nhận</TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHead>
+                  <TableBody>
+                    {userData.map((user, index) => (
+                      <TableRow key={user.userId}>
+                        <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{user.accessCode}</TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{user.fullName}</TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{user.userGroup[0]?.groupName}</TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{user.salary?.salary || 0}</TableCell>
+
+                        <TableCell sx={{ padding: '16px' }}>{user?.salary?.salaryLevel || '0'}</TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{user?.totalWorkDay || '0'}</TableCell>
+
+                        <TableCell sx={{ padding: '16px' }}>{user?.salary?.responsibilityAllowance || '0'}</TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{user?.salary?.lunchAllowance || '0'}</TableCell>
+
+                        <TableCell sx={{ padding: '16px' }}>{user?.salary?.carAllowance || '0'}</TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{user?.salary?.phoneAllowance || '0'}</TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{user?.salary?.brandAllowance || '0'}</TableCell>
+
+                        <TableCell sx={{ padding: '16px' }}>{user?.salary?.ot * OT || '0'}</TableCell>
+
+                        <TableCell sx={{ padding: '16px' }}>{user?.salary?.goOnBusiness * business || '0'}</TableCell>
+                        <TableCell sx={{ padding: '16px' }}>
+                          {user?.salary?.brandAllowance +
+                            user?.salary?.responsibilityAllowance +
+                            user?.salary?.lunchAllowance +
+                            user?.salary?.carAllowance +
+                            user?.salary?.phoneAllowance +
+                            user?.salary?.ot * OT +
+                            user?.salary?.goOnBusiness * business || '0'}
+                        </TableCell>
+                        {/* <TableCell sx={{ padding: '16px' }}>{user.salary?.salary * KPCD || '0'}</TableCell> */}
+                        <TableCell sx={{ padding: '16px' }}>{user.salary?.salary * BHXH || '0'}</TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{user.salary?.salary * BHYT || '0'}</TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{user.salary?.salary * (BHYT + BHXH) || '0'}</TableCell>
+                        <TableCell sx={{ padding: '16px' }}>
+                          {(user.salary?.salary * user?.salary?.salaryLevel * user?.totalWorkDay) / editedTimeDayMonth +
+                            user?.salary?.brandAllowance +
+                            user?.salary?.responsibilityAllowance +
+                            user?.salary?.lunchAllowance +
+                            user?.salary?.carAllowance +
+                            user?.salary?.phoneAllowance +
+                            user?.salary?.ot * OT +
+                            user?.salary?.goOnBusiness * business +
+                            user.salary?.salary * (BHYT + BHXH) || '0'}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
             </Paper>
 
             <br></br>

@@ -87,6 +87,8 @@ const SalaryRulePage = ({ isOpen, onClose, camera }) => {
   const [businessDay, setBussiness] = useState('')
   const [httpMessage, setHttpMessage] = useState('') // State to hold HTTP status message
   const [labelColor, setLabelColor] = useState('')
+  const [BHXH, setBhxh] = useState('')
+  const [BHYT, setBhyt] = useState('')
 
   const fetchSalaryData = async () => {
     try {
@@ -105,6 +107,8 @@ const SalaryRulePage = ({ isOpen, onClose, camera }) => {
       setEditedTimeDayMonth(response.data.timeDayMonth)
       setOT(response.data.othour)
       setBussiness(response.data.businessDay)
+      setBhxh(response.data?.bhxh)
+      setBhyt(response.data?.bhyt)
     } catch (error) {
       console.error('Error fetching data:', error)
     }
@@ -127,6 +131,8 @@ const SalaryRulePage = ({ isOpen, onClose, camera }) => {
         setEditedTimeDayMonth(response.data.timeDayMonth)
         setOT(response.data.othour)
         setBussiness(response.data.businessDay)
+        setBhxh(response.data?.bhxh)
+        setBhyt(response.data?.bhyt)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -243,54 +249,6 @@ const SalaryRulePage = ({ isOpen, onClose, camera }) => {
         {/* )} */}
       </Grid>
       <DialogContent>
-        <h3>BẬC LƯƠNG</h3>
-
-        <CustomCloseButton onClick={onClose}>
-          <Icon icon='tabler:x' fontSize='1.25rem' />
-        </CustomCloseButton>
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell align='center' style={{ fontWeight: 'bold' }}>
-                  STT
-                </TableCell>
-                <TableCell align='center' style={{ fontWeight: 'bold' }}>
-                  Bậc lương
-                </TableCell>
-                <TableCell align='center' style={{ fontWeight: 'bold' }}>
-                  Hệ số
-                </TableCell>
-                <TableCell align='center' style={{ fontWeight: 'bold' }}>
-                  <IconButton onClick={handleAddRow}>
-                    <Icon icon='tabler:plus' fontSize='1.25rem' />
-                  </IconButton>{' '}
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows &&
-                rows.map((row, index) => (
-                  <TableRow key={index}>
-                    <TableCell align='center'>{index + 1}</TableCell>
-                    <TableCell align='center'>
-                      <TextField value={row.salaryLevel} onChange={event => handleSalaryLevelChange(index, event)} />
-                    </TableCell>
-                    <TableCell align='center'>
-                      <TextField value={row.coefficient} onChange={event => handleCoefficientChange(index, event)} />
-                    </TableCell>
-                    <TableCell align='center'>
-                      <IconButton onClick={() => handleDeleteRow(index)}>
-                        <Icon icon='tabler:trash' fontSize='1.25rem' />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <hr></hr>
-
         <Grid>
           <h3> SỐ GIỜ</h3>
           <>
@@ -301,7 +259,7 @@ const SalaryRulePage = ({ isOpen, onClose, camera }) => {
               </Grid>
               <Grid item xs={4} style={{ marginTop: '2%' }}>
                 <CustomTextField
-                  value={editedTimeHourDay}
+                  value={editedTimeHourDay || 0}
                   onChange={e => setEditedTimeHourDay(parseInt(e.target.value))}
                 />
               </Grid>
@@ -317,7 +275,7 @@ const SalaryRulePage = ({ isOpen, onClose, camera }) => {
               </Grid>
               <Grid item xs={4} style={{ marginTop: '2%' }}>
                 <CustomTextField
-                  value={editedTimeDayMonth}
+                  value={editedTimeDayMonth || 0}
                   onChange={e => setEditedTimeDayMonth(parseInt(e.target.value))}
                 />
               </Grid>
@@ -337,7 +295,7 @@ const SalaryRulePage = ({ isOpen, onClose, camera }) => {
               <p style={{ fontSize: 20 }}> Mức lương OT/giờ: </p>
             </Grid>
             <Grid item xs={4} style={{ marginTop: '2%' }}>
-              <CustomTextField value={othour} onChange={e => setOT(parseInt(e.target.value))} />
+              <CustomTextField value={othour || 0} onChange={e => setOT(parseInt(e.target.value))} />
             </Grid>
             <Grid item xs={2}>
               {' '}
@@ -350,13 +308,41 @@ const SalaryRulePage = ({ isOpen, onClose, camera }) => {
               <p style={{ fontSize: 20 }}> Mức lương công tác/ngày: </p>
             </Grid>
             <Grid item xs={4} style={{ marginTop: '2%' }}>
-              <CustomTextField value={businessDay} onChange={e => setBussiness(parseInt(e.target.value))} />
+              <CustomTextField value={businessDay || 0} onChange={e => setBussiness(parseInt(e.target.value))} />
             </Grid>
             <Grid item xs={2}>
               {' '}
               <p style={{ fontSize: 20 }}> (đồng)</p>
             </Grid>
           </Grid>
+          <hr></hr>
+          <Grid container spacing={2}>
+            <Grid item xs={5}>
+              {' '}
+              <p style={{ fontSize: 20 }}> Bảo hiểm xã hội: </p>
+            </Grid>
+            <Grid item xs={4} style={{ marginTop: '2%' }}>
+              <CustomTextField value={BHXH || 0} onChange={e => setBhxh(parseInt(e.target.value))} />
+            </Grid>
+            <Grid item xs={2}>
+              {' '}
+              <p style={{ fontSize: 20 }}> (%)</p>
+            </Grid>
+          </Grid>
+          <Grid container spacing={2}>
+            <Grid item xs={5}>
+              {' '}
+              <p style={{ fontSize: 20 }}> Bảo hiểm y tế: </p>
+            </Grid>
+            <Grid item xs={4} style={{ marginTop: '2%' }}>
+              <CustomTextField value={BHYT || 0} onChange={e => setBhyt(parseInt(e.target.value))} />
+            </Grid>
+            <Grid item xs={2}>
+              {' '}
+              <p style={{ fontSize: 20 }}> (%)</p>
+            </Grid>
+          </Grid>
+          <Grid></Grid>
         </Grid>
       </DialogContent>
     </div>
