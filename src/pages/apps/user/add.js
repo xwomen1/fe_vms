@@ -193,11 +193,7 @@ const Add = () => {
 
       return
     }
-    if (!syncCode) {
-      Swal.fire('Lỗi!', 'Mã đồng bộ không được để trống', 'error')
 
-      return
-    }
     if (!account) {
       Swal.fire('Lỗi!', 'Tên tài khoản không được để trống', 'error')
 
@@ -256,14 +252,8 @@ const Add = () => {
           phoneNumber: phoneNumber,
           identityNumber: identityNumber,
           userCode: userCode,
-          syncCode: syncCode,
           userStatus: status1,
-          timeEndAfternoon: convertStringToTimeArray(timeEndAfternoon),
-          timeStartAfternoon: convertStringToTimeArray(timeStartAfternoon),
-          timeStartMorning: convertStringToTimeArray(dateTime),
-          timeEndMorning: convertStringToTimeArray(timeEndMorning),
-          availableAt: ava1,
-          expiredAt: ava2,
+
           note: note,
           policyIds: policyList,
 
@@ -567,140 +557,12 @@ const Add = () => {
             <Grid item xs={4}>
               <CustomTextField label='Mã người dùng' onChange={handleUserCodeChange} fullWidth />
             </Grid>
-            <Grid item xs={3.8}>
-              <CustomTextField label='Mã đồng bộ' onChange={handleSyncCodeChange} fullWidth />
-            </Grid>
+
             <Grid item xs={2} style={{ marginTop: '1.1%' }}>
               Trạng thái
               <Switch checked={status1 === 'ACTIVE'} onChange={handleStatusChange} color='primary' label='Trạng thái' />
             </Grid>
-            <Grid item xs={1} style={{ marginTop: '2%' }}>
-              Ca sáng:
-            </Grid>
 
-            <Grid item xs={1}>
-              <DatePickerWrapper>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
-                  <div>
-                    <DatePicker
-                      showTimeSelect
-                      selected={dateTime}
-                      timeIntervals={15}
-                      showTimeSelectOnly
-                      dateFormat='h:mm '
-                      id='time-only-picker'
-                      onChange={date => handleTimeChange(date)}
-                      customInput={<CustomInput />}
-                    />
-                  </div>
-                </Box>
-              </DatePickerWrapper>
-            </Grid>
-            <Grid item xs={1}>
-              <DatePickerWrapper>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
-                  <div>
-                    <DatePicker
-                      showTimeSelect
-                      selected={timeEndMorning}
-                      timeIntervals={15}
-                      showTimeSelectOnly
-                      dateFormat='h:mm '
-                      id='time-only-picker'
-                      onChange={date => handleTimeEndMorningChange(date)}
-                      customInput={<CustomInput />}
-                    />
-                  </div>
-                </Box>
-              </DatePickerWrapper>
-            </Grid>
-            <Grid item xs={1} style={{ marginTop: '2%' }}>
-              Ca chiều:
-            </Grid>
-            <Grid item xs={1}>
-              <DatePickerWrapper>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
-                  <div>
-                    <DatePicker
-                      showTimeSelect
-                      selected={timeStartAfternoon}
-                      timeIntervals={15}
-                      showTimeSelectOnly
-                      dateFormat='h:mm '
-                      id='time-only-picker'
-                      onChange={date => handleTimeStartAfetrnoonChange(date)}
-                      customInput={<CustomInput />}
-                    />
-                  </div>
-                </Box>
-              </DatePickerWrapper>
-            </Grid>
-            <Grid item xs={1}>
-              <DatePickerWrapper>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
-                  <div>
-                    <DatePicker
-                      showTimeSelect
-                      selected={timeEndAfternoon}
-                      timeIntervals={15}
-                      showTimeSelectOnly
-                      dateFormat='h:mm '
-                      id='time-only-picker'
-                      onChange={date => handleTimeEndAfternoonChange(date)}
-                      customInput={<CustomInput />}
-                    />
-                  </div>
-                </Box>
-              </DatePickerWrapper>
-            </Grid>
-            <Grid item xs={3.8}>
-              <FormControl fullWidth>
-                <InputLabel id='time-validity-label'>Thời gian hiệu lực</InputLabel>
-                <Select
-                  labelId='time-validity-label'
-                  id='time-validity-select'
-                  value={timeValidity}
-                  onChange={handleTimeValidityChange}
-                >
-                  <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
-                  <MenuItem value='Undefined'>Không xác định</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={8}>
-              {timeValidity === 'Custom' && (
-                <Grid container spacing={2}>
-                  <Grid item xs={4}>
-                    <DatePickerWrapper>
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
-                        <div>
-                          <DatePicker
-                            selected={availableAt}
-                            onChange={handleStartDateChange}
-                            dateFormat='MM/dd/yyyy'
-                            customInput={<CustomInput label='Ngày bắt đầu' />}
-                          />
-                        </div>
-                      </Box>
-                    </DatePickerWrapper>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <DatePickerWrapper>
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
-                        <div>
-                          <DatePicker
-                            selected={expiredAt}
-                            onChange={handleEndDateChange}
-                            dateFormat='MM/dd/yyyy'
-                            customInput={<CustomInput label='Ngày kết thúc' />}
-                          />
-                        </div>
-                      </Box>
-                    </DatePickerWrapper>
-                  </Grid>
-                </Grid>
-              )}
-            </Grid>
             <Grid item xs={11.8}>
               <CustomTextField rows={4} multiline label='Ghi chú' onChange={handleNoteChange} fullWidth />
             </Grid>

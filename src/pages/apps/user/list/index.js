@@ -309,7 +309,6 @@ const UserList = ({ apiData }) => {
                     <TableCell sx={{ padding: '16px' }}>Email</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Số điện thoại </TableCell>
                     <TableCell sx={{ padding: '16px' }}>Đơn vị</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Loại hợp đồng</TableCell>
 
                     <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
                   </TableRow>
@@ -323,7 +322,6 @@ const UserList = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{user.email}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{user.phoneNumber}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{user.userGroup[0]?.groupName}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{contractTypes[user.contractType] || ''}</TableCell>
 
                       <TableCell sx={{ padding: '16px' }}>
                         <Grid container spacing={2}>
