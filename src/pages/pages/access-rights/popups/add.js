@@ -112,8 +112,7 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
   const [userGroupId, setUserGroupId] = useState(null)
   const [isCheckboxChecked, setIsCheckboxChecked] = useState(false)
   const [dataDailyState, setDataDailyState] = useState(dataDailyDefault)
-  const API_REGIONS = `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/`
-
+  const [selectedGroupId, setSelectedGroupId] = useState('')
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
   const config = {
@@ -147,12 +146,18 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
     }
   }
 
+  const API_REGIONS = `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/`
+
+  const API_POST_URL = `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups`
+
   const fetchDepartment = async () => {
     setLoading(true)
     try {
-      const res = await axios.get(`${API_REGIONS}/?parentId=342e46d6-abbb-4941-909e-3309e7487304`, config)
+      const res = await axios.get(`${API_REGIONS}/?parentId=f963e9d4-3d6b-45df-884d-15f93452f2a2`, config)
       const group = res.data
+
       groupName.push(...res.data)
+      setGroupName(group)
       group.map((item, index) => {
         if (item.isParent == true) {
           fetchDepartmentChildren(item.id)
@@ -168,10 +173,52 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
       const res = await axios.get(`${API_REGIONS}?parentId=${idParent}`, config)
       const groupChildren = [...res.data]
       groupName.push(...groupChildren)
+      setGroupName(prevState => [...prevState, ...groupChildren])
     } catch (error) {
       console.error('Error fetching data3: ', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleSelectChange = async selectedValue => {
+    try {
+      const selectedGroup = groupName.find(group => group.id === selectedValue)
+
+      if (!selectedGroup) {
+        console.error('Selected group not found:', selectedValue)
+
+        return
+      }
+
+      const postData = {
+        id: selectedGroup.id,
+        name: selectedGroup.name,
+        type: 'USER'
+      }
+
+      const response = await axios.post(API_POST_URL, postData)
+
+      console.log('POST request successful:', response.data)
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        const selectedGroup = groupName.find(group => group.id === selectedValue)
+
+        try {
+          const selectedGroup = groupName.find(group => group.id === selectedValue)
+          const res = await axios.get(API_POST_URL, config)
+
+          const userGroups = res.data.rows
+          const matchedGroup = userGroups.find(group => group.name === selectedGroup.name)
+          if (matchedGroup) {
+            setSelectedGroupId(matchedGroup.id)
+          } else {
+            console.error('Matched group not found in user groups:', selectedGroup.name)
+          }
+        } catch (error) {
+          console.error('Error fetching user groups:', error)
+        }
+      }
     }
   }
 
@@ -213,7 +260,12 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
       values['startDate'] = format(startDate, 'yyyy-MM-dd')
       values['endDate'] = format(endDate, 'yyyy-MM-dd')
 
-      await handleAddSchedule(values)
+      const scheduleId = await handleAddSchedule(values)
+      const doorAccessId = await handleAddDoorAccesses(values, scheduleId)
+      const accessGroupId = await handleAddSAccessGroup(values, doorAccessId)
+
+      // Gọi hàm cuối cùng với các ID đã tạo
+      await handleAdd(values, scheduleId, doorAccessId, accessGroupId)
     } catch (err) {
       setErrorMessages([err.message])
       console.error('Error in onSubmit: ', err)
@@ -222,7 +274,6 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
 
   const handleAddSchedule = async values => {
     setLoading(true)
-
     try {
       const params = {
         name: values?.nameCalendar,
@@ -246,10 +297,10 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
         { ...params },
         config
       )
-      const scheduleId = res.data.id
-      const doorId = values.doorInId
 
-      await handleAddDoorAccesses(values, scheduleId, doorId)
+      const scheduleId = res.data.id
+
+      return scheduleId // Trả về scheduleId
     } catch (err) {
       setErrorMessages([err.response.data.message])
       console.error('Error in handleAddSchedule: ', err)
@@ -258,7 +309,7 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
     }
   }
 
-  const handleAddDoorAccesses = async (values, scheduleId, doorId) => {
+  const handleAddDoorAccesses = async (values, scheduleId) => {
     try {
       const params = {
         name: values?.nameCalendar,
@@ -266,7 +317,7 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
         policies: [
           {
             applyMode: 'CUSTOMIZE',
-            doorId: doorId,
+            doorId: values.doorInId,
             scheduleId: scheduleId !== null ? scheduleId : undefined
           }
         ]
@@ -277,9 +328,10 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
         { ...params },
         config
       )
+
       const doorAccessId = res.data.id
 
-      await handleAddSAccessGroup(values, doorAccessId)
+      return doorAccessId // Trả về doorAccessId
     } catch (err) {
       setErrorMessages([err.response.data.message])
       console.error('Error in handleAddDoorAccesses: ', err)
@@ -289,7 +341,6 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
 
   const handleAddSAccessGroup = async (values, doorAccessId) => {
     setLoading(true)
-
     try {
       const params = {
         name: values?.nameCalendar,
@@ -298,22 +349,35 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
         userGroupId: values?.groupId
       }
 
-      await axios.post(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/access-groups`, { ...params }, config)
-      await handleAdd(values)
+      const res = await axios.post(
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/access-groups`,
+        { ...params },
+        config
+      )
+
+      const accessGroupId = res.data.id
+
+      return accessGroupId // Trả về accessGroupId
     } catch (err) {
       setErrorMessages([err.response.data.message])
+
       console.error('Error in handleAddSAccessGroup: ', err)
     } finally {
       setLoading(false)
     }
   }
 
-  const handleAdd = async values => {
+  const handleAdd = async (values, scheduleId, doorAccessId, accessGroupId) => {
     setLoading(true)
-
     try {
+      console.log(values)
+
       const params = {
-        ...values
+        ...values,
+        scheduleId: scheduleId,
+        doorAccessId: doorAccessId,
+        accessGroupId: accessGroupId,
+        groupId: selectedGroupId
       }
 
       await axios.post(
@@ -326,6 +390,7 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
       onClose()
     } catch (err) {
       setErrorMessages([err.response.data.message])
+
       console.error('Error in handleAdd: ', err)
     } finally {
       setLoading(false)
@@ -386,10 +451,13 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
                     <CustomTextField
                       select
                       fullWidth
-                      label='Phòng ban'
-                      SelectProps={{
-                        value: value,
-                        onChange: e => onChange(e)
+                      label='Công ty'
+                      value={value}
+                      onChange={e => {
+                        const selectedValue = e.target.value
+                        console.log(selectedValue)
+                        onChange(selectedValue)
+                        handleSelectChange(selectedValue)
                       }}
                       id='validation-basic-select'
                       error={Boolean(errors.groupId)}
@@ -494,7 +562,7 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
                 <FormControlLabel
                   control={<Checkbox onChange={handleCheckboxChange} />}
                   label='Luôn luôn'
-                  style={{ marginTop: '25px'}}
+                  style={{ marginTop: '25px' }}
                 />
               </Grid>
               <Grid item>Bảng cấu hình thời gian</Grid>

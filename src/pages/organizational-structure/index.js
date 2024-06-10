@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import Grid from '@mui/material/Grid';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import TreeView from '@mui/lab/TreeView';
-import TreeItem from '@mui/lab/TreeItem';
-import axios from 'axios';
-import Icon from 'src/@core/components/icon';
+import React, { useState, useEffect } from 'react'
+import Grid from '@mui/material/Grid'
+import Tabs from '@mui/material/Tabs'
+import Tab from '@mui/material/Tab'
+import TreeView from '@mui/lab/TreeView'
+import TreeItem from '@mui/lab/TreeItem'
+import axios from 'axios'
+import Icon from 'src/@core/components/icon'
 import {
   Button,
   IconButton,
@@ -18,62 +18,62 @@ import {
   TableContainer,
   TableHead,
   TableRow
-} from '@mui/material';
-import authConfig from 'src/configs/auth';
-import CustomTextField from 'src/@core/components/mui/text-field';
-import DeletePopup from './popup/delete';
-import DetailPopup from './detail/detailInfra';
-import AddPopup from './popup/add';
-import PopUpAdd from './popup/AddChild';
+} from '@mui/material'
+import authConfig from 'src/configs/auth'
+import CustomTextField from 'src/@core/components/mui/text-field'
+import DeletePopup from './popup/delete'
+import DetailPopup from './detail/detailInfra'
+import AddPopup from './popup/add'
+import PopUpAdd from './popup/AddChild'
 
 const OrganizationalStructure = () => {
-  const [infra, setInfra] = useState([]);
-  const [selectedTab, setSelectedTab] = useState(0);
-  const [treeData, setTreeData] = useState({});
-  const [expandedNodes, setExpandedNodes] = useState([]);
-  const [childData, setChildData] = useState([]);
-  const [openPopup, setOpenPopup] = useState(false);
-  const [openPopupId, setOpenPopupId] = useState(null);
-  const [openPopupDetail, setOpenPopupDetail] = useState(false);
-  const [openPopupAdd, setOpenPopupAdd] = useState(false);
-  const [showPlusIcon, setShowPlusIcon] = useState(false);
-  const [openPopupAddChild, setOpenPopupAddChild] = useState(false);
-  const [selectId, setSelectIds] = useState(null);
-  const [selectedNodeId, setSelectedNodeId] = useState(null);
+  const [infra, setInfra] = useState([])
+  const [selectedTab, setSelectedTab] = useState(0)
+  const [treeData, setTreeData] = useState({})
+  const [expandedNodes, setExpandedNodes] = useState([])
+  const [childData, setChildData] = useState([])
+  const [openPopup, setOpenPopup] = useState(false)
+  const [openPopupId, setOpenPopupId] = useState(null)
+  const [openPopupDetail, setOpenPopupDetail] = useState(false)
+  const [openPopupAdd, setOpenPopupAdd] = useState(false)
+  const [showPlusIcon, setShowPlusIcon] = useState(false)
+  const [openPopupAddChild, setOpenPopupAddChild] = useState(false)
+  const [selectId, setSelectIds] = useState(null)
+  const [selectedNodeId, setSelectedNodeId] = useState(null)
 
-  const handleShowItemDetail = (item) => {
-    setSelectedItemDetail(item);
-  };
+  const handleShowItemDetail = item => {
+    setSelectedItemDetail(item)
+  }
 
   const handleOpenPopup = id => {
-    setOpenPopupId(id);
-    setOpenPopup(true);
-  };
+    setOpenPopupId(id)
+    setOpenPopup(true)
+  }
 
   const handleOpenPopupDetail = id => {
-    setOpenPopupId(id);
-    setOpenPopupDetail(true);
-  };
+    setOpenPopupId(id)
+    setOpenPopupDetail(true)
+  }
 
   const handleCloseDetail = () => {
-    setOpenPopupDetail(false);
-  };
+    setOpenPopupDetail(false)
+  }
 
   const handleClose = () => {
-    setOpenPopup(false);
-  };
+    setOpenPopup(false)
+  }
 
   const handleCloseAdd = () => {
-    setOpenPopupAdd(false);
-  };
+    setOpenPopupAdd(false)
+  }
 
   const handleOpenAdd = () => {
-    setOpenPopupAdd(true);
-  };
+    setOpenPopupAdd(true)
+  }
 
   const fetchFilter = async () => {
     try {
-      const token = localStorage.getItem(authConfig.storageTokenKeyName);
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
       const config = {
         headers: {
@@ -84,42 +84,43 @@ const OrganizationalStructure = () => {
           page: 1,
           keyword: ''
         }
-      };
-      const response = await axios.get('https://sbs.basesystem.one/ivis/infrares/api/v0/regions/adults', config);
-      setInfra(response.data);
+      }
+      const response = await axios.get('https://sbs.basesystem.one/ivis/infrares/api/v0/regions/adults', config)
+      setInfra(response.data)
 
       // Fetch child data for the first tab after infra data is loaded
       if (response.data.length > 0) {
-        fetchChildData(response.data[0].id);
-        fetchTreeData(response.data[0].id);
+        fetchChildData(response.data[0].id)
+
+        // fetchTreeData(response.data[0].id)
       }
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error('Error fetching users:', error)
     }
-  };
+  }
 
   const handleAddPClick = id => {
-    setOpenPopupAddChild(true);
-    setSelectIds(id);
-    console.log(id, 'nodeid');
-  };
+    setOpenPopupAddChild(true)
+    setSelectIds(id)
+    console.log(id, 'nodeid')
+  }
 
   const handleClosePPopup = () => {
-    setOpenPopupAddChild(false);
-    fetchChildrenById();
-  };
+    setOpenPopupAddChild(false)
+    fetchChildrenById()
+  }
 
   const handleSuccess = async () => {
-    await fetchFilter();
-    setSelectedTab(0);
+    await fetchFilter()
+    setSelectedTab(0)
     if (selectedNodeId) {
-      await fetchChildData(selectedNodeId);
+      await fetchChildData(selectedNodeId)
     }
-  };
+  }
 
   const fetchChildData = async parentId => {
     try {
-      const token = localStorage.getItem(authConfig.storageTokenKeyName);
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
       const response = await axios.get(
         `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`,
@@ -128,32 +129,32 @@ const OrganizationalStructure = () => {
             Authorization: `Bearer ${token}`
           }
         }
-      );
+      )
 
-      setChildData(response.data);
+      setChildData(response.data)
       setTreeData(prevTreeData => ({
         ...prevTreeData,
         [parentId]: response.data
-      }));
+      }))
     } catch (error) {
-      console.error('Error fetching children:', error);
+      console.error('Error fetching children:', error)
     }
-  };
+  }
 
   useEffect(() => {
-    fetchFilter();
-  }, []);
+    fetchFilter()
+  }, [])
 
   const handleChangeTab = async (event, newValue) => {
-    setSelectedTab(newValue);
-    setTreeData({});
-    setExpandedNodes([]);
-    await fetchChildData(infra[newValue]?.id);
-  };
+    setSelectedTab(newValue)
+    setTreeData({})
+    setExpandedNodes([])
+    await fetchChildData(infra[newValue]?.id)
+  }
 
   const fetchChildrenById = async parentId => {
     try {
-      const token = localStorage.getItem(authConfig.storageTokenKeyName);
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
       const response = await axios.get(
         `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`,
@@ -162,43 +163,48 @@ const OrganizationalStructure = () => {
             Authorization: `Bearer ${token}`
           }
         }
-      );
-      setChildData(response.data);
-      
-return response.data;
-    } catch (error) {
-      console.error('Error fetching children:', error);
-      
-return [];
-    }
-  };
+      )
+      setChildData(response.data)
 
-  const handleFetchChildren = async (nodeId) => {
-    const isExpanded = expandedNodes.includes(nodeId);
+      return response.data
+    } catch (error) {
+      console.error('Error fetching children:', error)
+
+      return []
+    }
+  }
+
+  const handleFetchChildren = async nodeId => {
+    const isExpanded = expandedNodes.includes(nodeId)
     if (isExpanded) {
-      setExpandedNodes(expandedNodes.filter(id => id !== nodeId));
+      setExpandedNodes(expandedNodes.filter(id => id !== nodeId))
     } else {
-      const childrenData = await fetchChildrenById(nodeId);
+      const childrenData = await fetchChildrenById(nodeId)
       setTreeData(prevTreeData => ({
         ...prevTreeData,
         [nodeId]: childrenData
-      }));
-      setExpandedNodes([...expandedNodes, nodeId]);
-      setSelectedNodeId(nodeId);
+      }))
+      setExpandedNodes([...expandedNodes, nodeId])
+      setSelectedNodeId(nodeId)
     }
-    setShowPlusIcon(true);
-  };
+    setShowPlusIcon(true)
+  }
 
   const renderTreeItems = nodes => {
     return nodes.map(node => {
-      const hasChildren = treeData[node.id] && treeData[node.id].length > 0;
+      const hasChildren = treeData[node.id] && treeData[node.id].length > 0
 
       return (
         <TreeItem
           key={node.id}
           nodeId={node.id}
           label={
-            <Box display='flex' alignItems='center' style={{ marginLeft: '5%' }} onClick={() => fetchChildData(node.id)}>
+            <Box
+              display='flex'
+              alignItems='center'
+              style={{ marginLeft: '5%' }}
+              onClick={() => fetchChildData(node.id)}
+            >
               <Typography>{node.name}</Typography>
               <IconButton style={{ marginLeft: 'auto' }} size='small' onClick={() => handleAddPClick(node.id)}>
                 <Icon icon='bi:plus' />
@@ -218,12 +224,12 @@ return [];
         >
           {hasChildren && renderTreeItems(treeData[node.id])}
         </TreeItem>
-      );
-    });
-  };
+      )
+    })
+  }
 
-  const currentTabInfra = infra[selectedTab] || {};
-  const rootNodes = treeData[currentTabInfra.id] || [];
+  const currentTabInfra = infra[selectedTab] || {}
+  const rootNodes = treeData[currentTabInfra.id] || []
 
   return (
     <Grid container spacing={2}>
