@@ -260,4 +260,13 @@ const Timeline = ({ data = dataList, dateType, minuteType }) => {
     );
 };
 
+Timeline.getInitialProps = async () => {
+    // Chuẩn bị dữ liệu cần thiết ở đây
+    return {
+        data: dataList,
+        dateType: 'day',
+        minuteType: '5minute',
+    };
+};
+
 export default Timeline;
