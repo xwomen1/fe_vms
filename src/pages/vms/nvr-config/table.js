@@ -13,7 +13,7 @@ import authConfig from 'src/configs/auth'
 import Table from '@mui/material/Table'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
-import { IconButton } from '@mui/material'
+import { IconButton, Box } from '@mui/material'
 import Swal from 'sweetalert2'
 import { fetchData } from 'src/store/apps/user'
 import { useRouter } from 'next/router'
@@ -184,6 +184,10 @@ const UserList = ({ apiData }) => {
     setValue(val)
   }, [])
 
+  const handleFilter = useCallback(val => {
+    setValue(val)
+  }, [])
+
   console.log(total, 'totalpage')
 
   const statusText = status1 ? 'Đang hoạt động' : 'Không hoạt động'
@@ -236,11 +240,19 @@ const UserList = ({ apiData }) => {
           }
         }
         const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/nvrs', config)
-        setStatus1(response.data.isOfflineSetting)
-        setNvr(response.data[0].id)
-        setAssetType(response.data)
-        setTotal(response.data.page)
-        console.log(response.data[0].id)
+        if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+          setStatus1(response.data.isOfflineSetting || false)
+          setNvr(response.data[0].id)
+          setAssetType(response.data)
+          setTotal(response.data.page)
+          console.log(response.data[0].id)
+        } else {
+          setStatus1(false)
+          setNvr(null)
+          setAssetType([])
+          setTotal(0)
+          console.warn('Response data is empty or invalid')
+        }
       } catch (error) {
         console.error('Error fetching users:', error)
       }
@@ -252,18 +264,50 @@ const UserList = ({ apiData }) => {
     <Grid container spacing={6.5}>
       <Grid item xs={12}>
         <Card>
-          {selectedIds === null ? (
-            <TableHeader />
-          ) : (
-            <TableHeader
-              value={value}
-              passwords={handleAddRoleClick}
-              networks={handleAddNetworkClick}
-              images={handleAddImageClick}
-              videos={handleAddVideoClick}
-              cloud={handleAddCloudClick}
-            />
-          )}{' '}
+          <Grid container spacing={1}>
+            <Grid item xs={10}>
+              {selectedIds === null ? (
+                <TableHeader />
+              ) : (
+                <TableHeader
+                  value={value}
+                  passwords={handleAddRoleClick}
+                  networks={handleAddNetworkClick}
+                  images={handleAddImageClick}
+                  videos={handleAddVideoClick}
+                  cloud={handleAddCloudClick}
+                />
+              )}
+            </Grid>
+            <Grid item xs={2} style={{ marginTop: '1%' }}>
+              <CustomTextField
+                value={value}
+                onChange={e => handleFilter(e.target.value)}
+                placeholder='Search…'
+                InputProps={{
+                  startAdornment: (
+                    <Box sx={{ mr: 2, display: 'flex' }}>
+                      <Icon fontSize='1.25rem' icon='tabler:search' />
+                    </Box>
+                  ),
+                  endAdornment: (
+                    <IconButton size='small' title='Clear' aria-label='Clear'>
+                      <Icon fontSize='1.25rem' icon='tabler:x' />
+                    </IconButton>
+                  )
+                }}
+                sx={{
+                  width: {
+                    xs: 1,
+                    sm: 'auto'
+                  },
+                  '& .MuiInputBase-root > svg': {
+                    mr: 2
+                  }
+                }}
+              />
+            </Grid>
+          </Grid>
           <Grid container spacing={2}>
             <Grid item xs={0.1}></Grid>
 
