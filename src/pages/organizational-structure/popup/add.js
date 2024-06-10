@@ -59,7 +59,7 @@ const InfraPopupAdd = ({ open, onClose, onSuccess }) => {
       }
       const response = await axios.post('https://sbs.basesystem.one/ivis/infrares/api/v0/regions', data, config)
       console.log(data)
-      Swal.fire('Thành công', 'Thêm cơ cấu tổ chứ thành công!', 'success')
+      Swal.fire('Thành công', 'Thêm cơ cấu tổ chức thành công!', 'success')
 
       onClose()
 
