@@ -14,7 +14,7 @@ import Table from '@mui/material/Table'
 import Paper from '@mui/material/Paper'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
-import { IconButton } from '@mui/material'
+import { IconButton, TableContainer } from '@mui/material'
 import Swal from 'sweetalert2'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchData } from 'src/store/apps/user'
@@ -49,6 +49,7 @@ const UserList = ({ apiData }) => {
   const [BHXH, setBhxh] = useState('')
   const [BHYT, setBhyt] = useState('')
   const [BHTN, setBhtn] = useState('')
+  const [salary, setSalary] = useState('')
 
   const [contractTypes, setContractTypes] = useState({})
   const [isSalaryRuleOpen, setIsSalaryRuleOpen] = useState(false)
@@ -135,6 +136,7 @@ const UserList = ({ apiData }) => {
         setBhxh(response.data?.bhxh)
         setKpcd(response.data?.kpcd)
         setBhyt(response.data?.bhyt)
+        setSalary(response.data.salary)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -423,125 +425,119 @@ const UserList = ({ apiData }) => {
           </Grid>
           <Grid item xs={10.3}>
             <Paper elevation={3}>
-              <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Mã định danh</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Full Name</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Đơn vị</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Lương chính</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Bậc lương</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Phụ cấp trách nhiệm</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Phụ cấp ăn trưa</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Phụ cấp xăng xe</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Phụ cấp điện thoại</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Phụ cấp khác</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>KPCĐ</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>BHXH</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>BHYT</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>BHTN</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Hành động</TableCell> {/* Add this line */}
-                  </TableRow>
-                </TableHead>
-
-                <TableBody>
-                  {userData.map((user, index) => (
-                    <TableRow key={user.userId}>
-                      <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user.accessCode}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user.fullName}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user.userGroup[0]?.groupName}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>
-                        {editRow === user.userId ? (
-                          <CustomTextField
-                            value={editData.salary?.salary}
-                            onChange={e => handleChange('salary', e.target.value)}
-                          />
-                        ) : (
-                          user?.salary?.salary || '0'
-                        )}
-                      </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>
-                        {editRow === user.userId ? (
-                          <CustomTextField
-                            value={editData.salary?.salaryLevel}
-                            onChange={e => handleChange('salaryLevel', e.target.value)}
-                          />
-                        ) : (
-                          user?.salary?.salaryLevel || '0'
-                        )}
-                      </TableCell>
-
-                      <TableCell sx={{ padding: '16px' }}>
-                        {editRow === user.userId ? (
-                          <CustomTextField
-                            value={editData.salary?.responsibilityAllowance}
-                            onChange={e => handleChange('responsibilityAllowance', e.target.value)}
-                          />
-                        ) : (
-                          user?.salary?.responsibilityAllowance || '0'
-                        )}
-                      </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>
-                        {editRow === user.userId ? (
-                          <CustomTextField
-                            value={editData.salary?.lunchAllowance}
-                            onChange={e => handleChange('lunchAllowance', e.target.value)}
-                          />
-                        ) : (
-                          user?.salary?.lunchAllowance || '0'
-                        )}
-                      </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>
-                        {editRow === user.userId ? (
-                          <CustomTextField
-                            value={editData.salary?.carAllowance}
-                            onChange={e => handleChange('carAllowance', e.target.value)}
-                          />
-                        ) : (
-                          user?.salary?.carAllowance || '0'
-                        )}
-                      </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>
-                        {editRow === user.userId ? (
-                          <CustomTextField
-                            value={editData.salary?.phoneAllowance}
-                            onChange={e => handleChange('phoneAllowance', e.target.value)}
-                          />
-                        ) : (
-                          user?.salary?.phoneAllowance || '0'
-                        )}
-                      </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>
-                        {editRow === user.userId ? (
-                          <CustomTextField
-                            value={editData.salary?.brandAllowance}
-                            onChange={e => handleChange('brandAllowance', e.target.value)}
-                          />
-                        ) : (
-                          user?.salary?.brandAllowance || '0'
-                        )}
-                      </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user.salary?.salary * KPCD || '0'}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user.salary?.salary * BHXH || '0'}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user.salary?.salary * BHYT || '0'}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user.salary?.salary * BHTN || '0'}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>
-                        {editRow === user.userId ? (
-                          <IconButton onClick={() => handleSave(user.userId)}>
-                            <Icon icon='tabler:check' />
-                          </IconButton>
-                        ) : (
-                          <IconButton onClick={() => handleEdit(user)}>
-                            <Icon icon='tabler:pencil' />
-                          </IconButton>
-                        )}
-                      </TableCell>
+              <TableContainer component={Paper} style={{ maxWidth: '100%', overflowX: 'auto' }}>
+                <Table stickyHeader aria-label='sticky table'>
+                  {' '}
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>STT</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Mã định danh</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Full Name</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Đơn vị</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Lương cơ bản</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Bậc lương</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phụ cấp trách nhiệm</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phụ cấp ăn trưa</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phụ cấp xăng xe</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phụ cấp điện thoại</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phụ cấp khác</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>KPCĐ</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>BHXH</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>BHYT</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>BHTN</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Hành động</TableCell>{' '}
+                      {/* Add this line */}
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHead>
+                  <TableBody>
+                    {userData.map((user, index) => (
+                      <TableRow key={user.userId}>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{(page - 1) * pageSize + index + 1}</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{user.accessCode}</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{user.fullName}</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{user.userGroup[0]?.groupName}</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{salary || '0'}</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                          {editRow === user.userId ? (
+                            <CustomTextField
+                              value={editData.salary?.salaryLevel}
+                              onChange={e => handleChange('salaryLevel', e.target.value)}
+                            />
+                          ) : (
+                            user?.salary?.salaryLevel || '0'
+                          )}
+                        </TableCell>
+
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                          {editRow === user.userId ? (
+                            <CustomTextField
+                              value={editData.salary?.responsibilityAllowance}
+                              onChange={e => handleChange('responsibilityAllowance', e.target.value)}
+                            />
+                          ) : (
+                            user?.salary?.responsibilityAllowance || '0'
+                          )}
+                        </TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                          {editRow === user.userId ? (
+                            <CustomTextField
+                              value={editData.salary?.lunchAllowance}
+                              onChange={e => handleChange('lunchAllowance', e.target.value)}
+                            />
+                          ) : (
+                            user?.salary?.lunchAllowance || '0'
+                          )}
+                        </TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                          {editRow === user.userId ? (
+                            <CustomTextField
+                              value={editData.salary?.carAllowance}
+                              onChange={e => handleChange('carAllowance', e.target.value)}
+                            />
+                          ) : (
+                            user?.salary?.carAllowance || '0'
+                          )}
+                        </TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                          {editRow === user.userId ? (
+                            <CustomTextField
+                              value={editData.salary?.phoneAllowance}
+                              onChange={e => handleChange('phoneAllowance', e.target.value)}
+                            />
+                          ) : (
+                            user?.salary?.phoneAllowance || '0'
+                          )}
+                        </TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                          {editRow === user.userId ? (
+                            <CustomTextField
+                              value={editData.salary?.brandAllowance}
+                              onChange={e => handleChange('brandAllowance', e.target.value)}
+                            />
+                          ) : (
+                            user?.salary?.brandAllowance || '0'
+                          )}
+                        </TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{user.salary?.salary * KPCD || '0'}</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{user.salary?.salary * BHXH || '0'}</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{user.salary?.salary * BHYT || '0'}</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{user.salary?.salary * BHTN || '0'}</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                          {editRow === user.userId ? (
+                            <IconButton onClick={() => handleSave(user.userId)}>
+                              <Icon icon='tabler:check' />
+                            </IconButton>
+                          ) : (
+                            <IconButton onClick={() => handleEdit(user)}>
+                              <Icon icon='tabler:pencil' />
+                            </IconButton>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
             </Paper>
 
             <br></br>

@@ -89,6 +89,7 @@ const SalaryRulePage = ({ isOpen, onClose, camera }) => {
   const [labelColor, setLabelColor] = useState('')
   const [BHXH, setBhxh] = useState('')
   const [BHYT, setBhyt] = useState('')
+  const [salary, setSalary] = useState('')
 
   const fetchSalaryData = async () => {
     try {
@@ -109,6 +110,7 @@ const SalaryRulePage = ({ isOpen, onClose, camera }) => {
       setBussiness(response.data.businessDay)
       setBhxh(response.data?.bhxh)
       setBhyt(response.data?.bhyt)
+      setSalary(response.data.salary)
     } catch (error) {
       console.error('Error fetching data:', error)
     }
@@ -133,6 +135,7 @@ const SalaryRulePage = ({ isOpen, onClose, camera }) => {
         setBussiness(response.data.businessDay)
         setBhxh(response.data?.bhxh)
         setBhyt(response.data?.bhyt)
+        setSalary(response.data.salary)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -192,6 +195,7 @@ const SalaryRulePage = ({ isOpen, onClose, camera }) => {
         timeHourDay: editedTimeHourDay,
         timeDayMonth: editedTimeDayMonth,
         othour: othour,
+        salary: salary,
         businessDay: businessDay,
         salaryLevels: rows.map(row => ({
           salaryLevel: parseInt(row.salaryLevel),
@@ -250,6 +254,25 @@ const SalaryRulePage = ({ isOpen, onClose, camera }) => {
       </Grid>
       <DialogContent>
         <Grid>
+          <h3>LƯƠNG CƠ BẢN</h3>
+          <>
+            <Grid container spacing={2}>
+              <Grid item xs={5}>
+                {' '}
+                <p style={{ fontSize: 20 }}>Lương cơ bản/ngày</p>
+              </Grid>
+              <Grid item xs={4} style={{ marginTop: '2%' }}>
+                <CustomTextField value={salary || 0} onChange={e => setSalary(parseInt(e.target.value))} />
+              </Grid>
+              <Grid item xs={2}>
+                {' '}
+                <p style={{ fontSize: 20 }}> (đồng)</p>
+              </Grid>
+            </Grid>
+          </>
+        </Grid>
+        <hr></hr>
+        <Grid>
           <h3> SỐ GIỜ</h3>
           <>
             <Grid container spacing={2}>
@@ -299,13 +322,13 @@ const SalaryRulePage = ({ isOpen, onClose, camera }) => {
             </Grid>
             <Grid item xs={2}>
               {' '}
-              <p style={{ fontSize: 20 }}> (đồng)</p>
+              <p style={{ fontSize: 20 }}> (%)</p>
             </Grid>
           </Grid>
           <Grid container spacing={2}>
             <Grid item xs={5}>
               {' '}
-              <p style={{ fontSize: 20 }}> Mức lương công tác/ngày: </p>
+              <p style={{ fontSize: 20 }}>Phụ cấp công tác/ngày: </p>
             </Grid>
             <Grid item xs={4} style={{ marginTop: '2%' }}>
               <CustomTextField value={businessDay || 0} onChange={e => setBussiness(parseInt(e.target.value))} />

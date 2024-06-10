@@ -14,7 +14,7 @@ import Table from '@mui/material/Table'
 import Paper from '@mui/material/Paper'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
-import { IconButton } from '@mui/material'
+import { IconButton, TableContainer } from '@mui/material'
 import Swal from 'sweetalert2'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchData } from 'src/store/apps/user'
@@ -44,6 +44,8 @@ const UserList = ({ apiData }) => {
   const [anchorEl, setAnchorEl] = useState(null)
   const router = useRouter()
   const [salary, setSalary] = useState('')
+  const [editedTimeHourDay, setEditedTimeHourDay] = useState('')
+  const [editedTimeDayMonth, setEditedTimeDayMonth] = useState('')
   const [contractTypes, setContractTypes] = useState({})
   const [isSalaryRuleOpen, setIsSalaryRuleOpen] = useState(false)
   const [editRow, setEditRow] = useState(null) // New state for edit mode
@@ -201,7 +203,9 @@ const UserList = ({ apiData }) => {
         }
         const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/salary/regulation/', config)
 
-        setSalary(response.data)
+        setSalary(response.data.salary)
+        setEditedTimeHourDay(response.data.timeHourDay)
+        setEditedTimeDayMonth(response.data.timeDayMonth)
         console.log(response.data.othour)
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -435,29 +439,30 @@ const UserList = ({ apiData }) => {
           </Grid>
           <Grid item xs={9.8}>
             <Paper elevation={3}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Mã định danh</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Full Name</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Đơn vị</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Số giờ OT</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Phụ cấp OT</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Số ngày công tác</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Phụ cấp công tác</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Hành động</TableCell> {/* Add this line */}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {userData.map((user, index) => (
-                    <TableRow key={user.userId}>
-                      <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user.accessCode}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user.fullName}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user.userGroup[0]?.groupName}</TableCell>
+              <TableContainer component={Paper} style={{ maxWidth: '100%', overflowX: 'auto' }}>
+                <Table stickyHeader aria-label='sticky table'>
+                  {' '}
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ padding: '16px' }}>STT</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Mã định danh</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Full Name</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Đơn vị</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Số giờ OT</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Phụ cấp OT</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Số ngày công tác</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Phụ cấp công tác</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Hành động</TableCell> {/* Add this line */}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {userData.map((user, index) => (
+                      <TableRow key={user.userId}>
+                        <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{user.accessCode}</TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{user.fullName}</TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{user.userGroup[0]?.groupName}</TableCell>
 
-                      <TableCell sx={{ padding: '16px' }}>
                         <TableCell sx={{ padding: '16px' }}>
                           {editRow === user.userId ? (
                             <CustomTextField
@@ -468,35 +473,39 @@ const UserList = ({ apiData }) => {
                             user?.salary?.ot || '0'
                           )}
                         </TableCell>
-                      </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user?.salary?.ot * OT || '0'}</TableCell>
+                        <TableCell sx={{ padding: '16px' }}>
+                          {((salary * user?.salary?.salaryLevel) / (editedTimeHourDay * editedTimeDayMonth)) *
+                            (OT / 100) *
+                            user?.salary?.ot || '0'}
+                        </TableCell>
 
-                      <TableCell sx={{ padding: '16px' }}>
-                        {editRow === user.userId ? (
-                          <CustomTextField
-                            value={editData.salary?.goOnBusiness}
-                            onChange={e => handleChange('goOnBusiness', e.target.value)}
-                          />
-                        ) : (
-                          user?.salary?.goOnBusiness || '0'
-                        )}
-                      </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user?.salary?.goOnBusiness * business || '0'}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>
-                        {editRow === user.userId ? (
-                          <IconButton onClick={() => handleSave(user.userId)}>
-                            <Icon icon='tabler:check' />
-                          </IconButton>
-                        ) : (
-                          <IconButton onClick={() => handleEdit(user)}>
-                            <Icon icon='tabler:pencil' />
-                          </IconButton>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                        <TableCell sx={{ padding: '16px' }}>
+                          {editRow === user.userId ? (
+                            <CustomTextField
+                              value={editData.salary?.goOnBusiness}
+                              onChange={e => handleChange('goOnBusiness', e.target.value)}
+                            />
+                          ) : (
+                            user?.salary?.goOnBusiness || '0'
+                          )}
+                        </TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{user?.salary?.goOnBusiness * business || '0'}</TableCell>
+                        <TableCell sx={{ padding: '16px' }}>
+                          {editRow === user.userId ? (
+                            <IconButton onClick={() => handleSave(user.userId)}>
+                              <Icon icon='tabler:check' />
+                            </IconButton>
+                          ) : (
+                            <IconButton onClick={() => handleEdit(user)}>
+                              <Icon icon='tabler:pencil' />
+                            </IconButton>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
             </Paper>
 
             <br></br>

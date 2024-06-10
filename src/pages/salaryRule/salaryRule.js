@@ -89,6 +89,7 @@ const SalaryRulePage = ({ isOpen, onClose, camera }) => {
   const [labelColor, setLabelColor] = useState('')
   const [BHXH, setBhxh] = useState('')
   const [BHYT, setBhyt] = useState('')
+  const [KPCD, setKpcd] = useState('')
 
   const fetchSalaryData = async () => {
     try {
@@ -109,6 +110,7 @@ const SalaryRulePage = ({ isOpen, onClose, camera }) => {
       setBussiness(response.data.businessDay)
       setBhxh(response.data?.bhxh)
       setBhyt(response.data?.bhyt)
+      setKpcd(response.data?.kpcd)
     } catch (error) {
       console.error('Error fetching data:', error)
     }
@@ -250,6 +252,22 @@ const SalaryRulePage = ({ isOpen, onClose, camera }) => {
       </Grid>
       <DialogContent>
         <Grid>
+          <Grid container spacing={2}>
+            <Grid item xs={5}>
+              {' '}
+              <p style={{ fontSize: 20 }}>Số giờ tính công trên 1 ngày:</p>
+            </Grid>
+            <Grid item xs={4} style={{ marginTop: '2%' }}>
+              <CustomTextField
+                value={editedTimeHourDay || 0}
+                onChange={e => setEditedTimeHourDay(parseInt(e.target.value))}
+              />
+            </Grid>
+            <Grid item xs={2}>
+              {' '}
+              <p style={{ fontSize: 20 }}> (giờ)</p>
+            </Grid>
+          </Grid>
           <h3> SỐ GIỜ</h3>
           <>
             <Grid container spacing={2}>

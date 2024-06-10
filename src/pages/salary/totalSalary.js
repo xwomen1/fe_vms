@@ -51,8 +51,10 @@ const UserList = ({ apiData }) => {
   const [BHYT, setBhyt] = useState('')
   const [BHTN, setBhtn] = useState('')
   const [OT, setOT] = useState('')
-  const [business, setBussiness] = useState('')
+  const [salaries, setSalaries] = useState('')
+  const [editedTimeHourDay, setEditedTimeHourDay] = useState('')
   const [editedTimeDayMonth, setEditedTimeDayMonth] = useState('')
+  const [business, setBussiness] = useState('')
 
   const togglePopup = () => {
     setIsPopupOpen(!isPopupOpen)
@@ -310,9 +312,10 @@ const UserList = ({ apiData }) => {
         setKpcd(response.data?.kpcd)
         setBhyt(response.data?.bhyt)
         setOT(response.data.othour)
+        setSalaries(response.data.salary)
         setBussiness(response.data.businessDay)
+        setEditedTimeHourDay(response.data.timeHourDay)
         setEditedTimeDayMonth(response.data.timeDayMonth)
-
         console.log(response.data.othour)
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -355,78 +358,118 @@ const UserList = ({ apiData }) => {
                   {' '}
                   <TableHead>
                     <TableRow>
-                      <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>Mã định danh</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>Full Name</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>Đơn vị</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>Lương chính</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>STT</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Mã định danh</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Full Name</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Đơn vị</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Lương cơ bản</TableCell>
 
-                      <TableCell sx={{ padding: '16px' }}>Bậc lương</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>Ngày công</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Bậc lương</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Lương chính</TableCell>
 
-                      <TableCell sx={{ padding: '16px' }}>PC trách nhiệm</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>PC ăn trưa</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Ngày công</TableCell>
 
-                      <TableCell sx={{ padding: '16px' }}>PC xăng xe</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>PC điện thoại</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>PC khác</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>Phụ cấp OT</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>Phụ cấp công tác</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>Tổng phụ cấp</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>PC trách nhiệm</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>PC ăn trưa</TableCell>
 
-                      {/* <TableCell sx={{ padding: '16px' }}>KPCĐ</TableCell> */}
-                      <TableCell sx={{ padding: '16px' }}>BHXH</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>BHYT</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>PC xăng xe</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>PC điện thoại</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>PC khác</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phụ cấp OT</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phụ cấp công tác</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Tổng phụ cấp</TableCell>
 
-                      <TableCell sx={{ padding: '16px' }}>Tổng BH</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>Nhận</TableCell>
+                      {/* <TableCell sx={{ padding: '16px' , whiteSpace: 'nowrap' }}>KPCĐ</TableCell> */}
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>BHXH</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>BHYT</TableCell>
+
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Tổng BH</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Nhận</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {userData.map((user, index) => (
                       <TableRow key={user.userId}>
-                        <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
-                        <TableCell sx={{ padding: '16px' }}>{user.accessCode}</TableCell>
-                        <TableCell sx={{ padding: '16px' }}>{user.fullName}</TableCell>
-                        <TableCell sx={{ padding: '16px' }}>{user.userGroup[0]?.groupName}</TableCell>
-                        <TableCell sx={{ padding: '16px' }}>{user.salary?.salary || 0}</TableCell>
+                        <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>
+                          {(page - 1) * pageSize + index + 1}{' '}
+                        </TableCell>
+                        <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>{user.accessCode}</TableCell>
+                        <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>{user.fullName}</TableCell>
+                        <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>
+                          {user.userGroup[0]?.groupName}
+                        </TableCell>
+                        <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>{salaries || 0}</TableCell>
 
-                        <TableCell sx={{ padding: '16px' }}>{user?.salary?.salaryLevel || '0'}</TableCell>
-                        <TableCell sx={{ padding: '16px' }}>{user?.totalWorkDay || '0'}</TableCell>
+                        <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>
+                          {user?.salary?.salaryLevel || '0'}
+                        </TableCell>
+                        <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>
+                          {user?.salary?.salaryLevel * salaries || '0'}
+                        </TableCell>
 
-                        <TableCell sx={{ padding: '16px' }}>{user?.salary?.responsibilityAllowance || '0'}</TableCell>
-                        <TableCell sx={{ padding: '16px' }}>{user?.salary?.lunchAllowance || '0'}</TableCell>
+                        <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>
+                          {user?.totalWorkDay || '0'}
+                        </TableCell>
 
-                        <TableCell sx={{ padding: '16px' }}>{user?.salary?.carAllowance || '0'}</TableCell>
-                        <TableCell sx={{ padding: '16px' }}>{user?.salary?.phoneAllowance || '0'}</TableCell>
-                        <TableCell sx={{ padding: '16px' }}>{user?.salary?.brandAllowance || '0'}</TableCell>
+                        <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>
+                          {user?.salary?.responsibilityAllowance || '0'}
+                        </TableCell>
+                        <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>
+                          {user?.salary?.lunchAllowance || '0'}
+                        </TableCell>
 
-                        <TableCell sx={{ padding: '16px' }}>{user?.salary?.ot * OT || '0'}</TableCell>
+                        <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>
+                          {user?.salary?.carAllowance || '0'}
+                        </TableCell>
+                        <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>
+                          {user?.salary?.phoneAllowance || '0'}
+                        </TableCell>
+                        <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>
+                          {user?.salary?.brandAllowance || '0'}
+                        </TableCell>
 
-                        <TableCell sx={{ padding: '16px' }}>{user?.salary?.goOnBusiness * business || '0'}</TableCell>
-                        <TableCell sx={{ padding: '16px' }}>
+                        <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>
+                          {((salaries * user?.salary?.salaryLevel) / (editedTimeHourDay * editedTimeDayMonth)) *
+                            (OT / 100) *
+                            user?.salary?.ot || '0'}
+                        </TableCell>
+
+                        <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>
+                          {user?.salary?.goOnBusiness * business || '0'}
+                        </TableCell>
+                        <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>
                           {user?.salary?.brandAllowance +
                             user?.salary?.responsibilityAllowance +
                             user?.salary?.lunchAllowance +
                             user?.salary?.carAllowance +
                             user?.salary?.phoneAllowance +
-                            user?.salary?.ot * OT +
+                            ((salaries * user?.salary?.salaryLevel) / (editedTimeHourDay * editedTimeDayMonth)) *
+                              (OT / 100) *
+                              user?.salary?.ot +
                             user?.salary?.goOnBusiness * business || '0'}
                         </TableCell>
-                        {/* <TableCell sx={{ padding: '16px' }}>{user.salary?.salary * KPCD || '0'}</TableCell> */}
-                        <TableCell sx={{ padding: '16px' }}>{user.salary?.salary * BHXH || '0'}</TableCell>
-                        <TableCell sx={{ padding: '16px' }}>{user.salary?.salary * BHYT || '0'}</TableCell>
-                        <TableCell sx={{ padding: '16px' }}>{user.salary?.salary * (BHYT + BHXH) || '0'}</TableCell>
-                        <TableCell sx={{ padding: '16px' }}>
-                          {(user.salary?.salary * user?.salary?.salaryLevel * user?.totalWorkDay) / editedTimeDayMonth +
+                        {/* <TableCell sx={{ padding: '16px' , whiteSpace: 'nowrap' }}>{salaries * user?.salary?.salaryLevel * KPCD || '0'}</TableCell> */}
+                        <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>
+                          {(salaries * user?.salary?.salaryLevel * BHXH) / 100 || '0'}
+                        </TableCell>
+                        <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>
+                          {(salaries * user?.salary?.salaryLevel * BHYT) / 100 || '0'}
+                        </TableCell>
+                        <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>
+                          {(salaries * user?.salary?.salaryLevel * (BHYT + BHXH)) / 100 || '0'}
+                        </TableCell>
+                        <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>
+                          {(salaries * user?.salary?.salaryLevel * user?.totalWorkDay) / editedTimeDayMonth +
                             user?.salary?.brandAllowance +
                             user?.salary?.responsibilityAllowance +
                             user?.salary?.lunchAllowance +
                             user?.salary?.carAllowance +
                             user?.salary?.phoneAllowance +
-                            user?.salary?.ot * OT +
-                            user?.salary?.goOnBusiness * business +
-                            user.salary?.salary * (BHYT + BHXH) || '0'}
+                            ((salaries * user?.salary?.salaryLevel) / (editedTimeHourDay * editedTimeDayMonth)) *
+                              (OT / 100) *
+                              user?.salary?.ot +
+                            user?.salary?.goOnBusiness * business -
+                            (salaries * user?.salary?.salaryLevel * (BHYT + BHXH)) / 100 || '0'}
                         </TableCell>
                       </TableRow>
                     ))}
