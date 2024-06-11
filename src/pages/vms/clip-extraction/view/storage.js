@@ -1,36 +1,15 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 
-import { Button, CardHeader, DialogActions, Grid, MenuItem, Typography } from '@mui/material'
+import { Button, CardHeader, DialogActions, Grid, MenuItem } from '@mui/material'
 
 import IconButton from '@mui/material/IconButton'
 import Icon from 'src/@core/components/icon'
-import useDebounce from './useDebounce'
-import Slider from '@mui/material/Slider'
-import Box from '@mui/material/Box'
-import { Stack } from '@mui/material'
-
-// ** Third Party Imports
-
-import DatePicker from 'react-datepicker'
-
-// ** Styled Component
-import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
-
-// ** Custom Component Imports
-import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
-import { formatTimeShow, formatDate } from 'src/@core/utils/format'
 
 import { Card, CardContent } from "@mui/material"
 import ViewCamera from "src/@core/components/camera/playback"
-import Daily from '../mocdata/daily'
 import CustomTextField from 'src/@core/components/mui/text-field'
-
-
-const valueFilterInit = {
-    page: 1,
-    limit: 50,
-    deviceTypes: 'NVR'
-}
+import { callApi } from 'src/@core/utils/requestUltils'
+import Timeline from '../mocdata/timeline'
 
 const dateList = [
     {
@@ -68,21 +47,12 @@ const minuteList = [
     },
 ]
 
-const dataDailyDefault = [
-    {
-        label: '',
-        value: 1,
-    }
-]
-
 const Storage = ({ id, name, channel }) => {
-    const [camera, setCamera] = useState({ id: id, name: name, channel: channel })
-    const [channelCurrent, setChannelCurrent] = useState(null)
+    const [loading, setLoading] = useState(false)
+    const [camera, setCamera] = useState({ id: '', name: '', channel: '' })
 
-    const [dataDaily, setDataDaily] = useState([])
     const [timeType, setTimeType] = useState(null)
     const [minuteType, setMinuteType] = useState(null)
-    const [dataDailyState, setDataDailyState] = useState(dataDailyDefault)
 
 
     function formatTime(timeInSeconds) {
@@ -115,75 +85,36 @@ const Storage = ({ id, name, channel }) => {
     const [timePlay, setTimePlay] = useState(time_start)
     const [currentTime, setCurrentTime] = useState(0)
 
-    const datePickerRef = useRef(null)
-
 
     const [play, setPlay] = useState(true)
-    const [valueRange, setValueRange] = useState(60 * 60 * 1000)
-    const debouncedSearch = useDebounce(valueRange, 700)
+    const [dataList, setDataList] = useState([])
 
-    const onClickPlay = v => {
-        setPlay(v)
-
-        // if (videoId) {
-        //   if (!v) {
-        //     videoId.pause();
-        //     if (stopAndStartRecord) {
-        //       onClickCut('pause');
-        //     }
-        //   } else {
-        //     if (isScreen && isScreen === 'detail' && onChangeCurTimePlayback) {
-        //       const acb = timeFilter.start_time + parseInt(valueRange) - 6000;
-        //       onChangeCurTimePlayback(acb);
-        //     }
-        //     videoId.play();
-        //   }
-        // }
-    }
-
-    function timeDisplay(time) {
-        if (time < 10)
-
-            return '0' + time
-
-        return time
-    }
-    function valuetext(value) {
-
-        const timeCurrent = new Date(timeFilter.start_time + value)
-
-        return `${timeCurrent.getFullYear() +
-            '/' +
-            timeDisplay(timeCurrent.getMonth() + 1) +
-            '/' +
-            timeCurrent.getDate() +
-            ' ' +
-            timeDisplay(timeCurrent.getHours()) +
-            ':' +
-            timeDisplay(timeCurrent.getMinutes())
-            }`
-    }
-
-    const handleIconClick = () => {
-        if (datePickerRef.current) {
-            datePickerRef.current.setOpen(true)
+    useEffect(() => {
+        if (id) {
+            fetchDateList()
         }
-    }
+        setCamera({ id: id, name: name, channel: channel })
+    }, [id])
 
-    const renderMarks = () => {
-        const marks = []
-        const part = 10
-        for (let i = 0; i <= part; i++) {
-            let step = Math.floor(valueRange / part)
-            let timeCurrent = new Date(timeFilter.start_time + step * i)
-            marks.push({
-                value: step * i,
-                label: timeCurrent.getHours() + ':' + timeCurrent.getMinutes()
+    const fetchDateList = async () => {
+        setLoading(true)
+
+        try {
+            const res = await callApi(`https://sbs.basesystem.one/ivis/vms/api/v0/playback/camera/${id}`)
+
+            const data = res.data.MatchList.map((item, index) => {
+                return item.TimeSpan
             })
+            setDataList(data)
+        } catch (error) {
+            if (error.response && error.response.status === 404) {
+                console.error('Error 404: Not Found', error.response.data)
+            } else {
+                console.error('Error fetching data:', error.message)
+            }
+        } finally {
+            setLoading(false)
         }
-
-
-        return marks
     }
 
     const handSetChanel = (id, channel) => {
@@ -200,17 +131,24 @@ const Storage = ({ id, name, channel }) => {
 
     return (
         <Grid container spacing={2}>
-            <Grid item xs={12} sm={8}>
+            <Grid item xs={12} sm={9}>
                 <Card>
                     <CardHeader
                         title='Trích clip'
                         action={
                             <Grid container spacing={2}>
 
-                                <Grid item xs={12}>
+                                <Grid item xs={6}>
                                     <CustomTextField select fullWidth id='form-layouts-separator-select' defaultValue='5minute'>
-                                        {minuteList.map((date, index) => (
-                                            <MenuItem key={date.id} value={date.name} onClick={() => handleSetMinuteType(date.name)}>{date.value}</MenuItem>
+                                        {minuteList.map((minute, index) => (
+                                            <MenuItem key={minute.id} value={minute.name} onClick={() => handleSetMinuteType(minute.name)}>{minute.value}</MenuItem>
+                                        ))}
+                                    </CustomTextField>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <CustomTextField select fullWidth id='form-layouts-separator-select' defaultValue='day'>
+                                        {dateList.map((date, index) => (
+                                            <MenuItem key={date.id} value={date.name} onClick={() => handleSetTime(date.name)}>{date.value}</MenuItem>
                                         ))}
                                     </CustomTextField>
                                 </Grid>
@@ -218,22 +156,13 @@ const Storage = ({ id, name, channel }) => {
                         }
                     />
                     <CardContent>
-                        <Daily
-                            callbackOfDaily={(v) => {
-                                setDataDaily(v)
-                                setDataDailyState(v)
-                            }}
-
-                            // dataDailyProps={dataDailyState}
-
-                            dateType={timeType}
-                            minuteType={minuteType}
-                            aria-describedby='validation-basic-last-name'
-                        />
+                        {camera.id !== '' &&
+                            <Timeline data={dataList} dateType={timeType} minuteType={minuteType} />
+                        }
                     </CardContent>
                 </Card>
             </Grid>
-            <Grid item xs={12} sm={4}>
+            <Grid item xs={12} sm={3}>
                 <Card>
                     <Grid container spacing={2} sx={{ marginBottom: 5 }}>
                         <Grid item xs={12}>
