@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import TimeRange from "react-video-timelines-slider";
 import { format } from "date-fns";
 import { Grid, Typography } from "@mui/material";
+import TimeRange from "src/@core/components/timelines";
 
 const convertDateToString = (date) => {
     const pad = (num) => String(num).padStart(2, '0');
