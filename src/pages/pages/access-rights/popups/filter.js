@@ -48,9 +48,12 @@ const defaultValues = {
 
 const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
   const [loading, setLoading] = useState(false)
-  const API_REGIONS = `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/`
+  const API_ENDPOINT = 'https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups'
+  const API_POST_URL = `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups`
   const ExpandIcon = direction === 'rtl' ? 'tabler:chevron-left' : 'tabler:chevron-right'
   const [doorList, setDoorList] = useState([])
+  const [selectedGroupId, setSelectedGroupId] = useState('')
+  const [selectedGroupName, setSelectedGroupName] = useState('')
   const [groupName, setGroupName] = useState([])
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -84,28 +87,35 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
   const fetchDepartment = async () => {
     setLoading(true)
     try {
-      const res = await axios.get(`${API_REGIONS}/?parentId=342e46d6-abbb-4941-909e-3309e7487304`, config)
-      const group = res.data
-      groupName.push(...res.data)
-      group.map((item, index) => {
-        if (item.isParent == true) {
+      const res = await axios.get(API_ENDPOINT)
+      const group = res.data.rows
+      setGroupName(group)
+
+      // Loop through each group and fetch its children if it's a parent
+
+      group.forEach(item => {
+        if (item.type === 'USER') {
           fetchDepartmentChildren(item.id)
         }
       })
     } catch (error) {
       console.error('Error fetching data: ', error)
+    } finally {
+      setLoading(false)
     }
   }
 
   const fetchDepartmentChildren = async idParent => {
     try {
-      const res = await axios.get(`${API_REGIONS}?parentId=${idParent}`, config)
-      const groupChildren = [...res.data]
-      groupName.push(...groupChildren)
+      const res = await axios.get(API_ENDPOINT, {
+        params: {
+          parentId: idParent
+        }
+      })
+      const groupChildren = res.data.data.rows
+      setGroupName(prevState => [...prevState, ...groupChildren])
     } catch (error) {
       console.error('Error fetching data: ', error)
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -129,7 +139,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
   }
 
   const onSubmit = values => {
-    var detail = { ...values }
+    var detail = { ...values } // Thêm selectedGroupId vào object detail trước khi callback
     callback(detail)
     onClose()
   }
@@ -170,10 +180,17 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                       select
                       fullWidth
                       defaultValue=''
-                      label='Phòng ban'
+                      label='Công ty'
                       SelectProps={{
                         value: value,
-                        onChange: e => onChange(e)
+                        onChange: e => onChange(e),
+                        MenuProps: {
+                          PaperProps: {
+                            style: {
+                              maxHeight: 200 // Đặt chiều cao tối đa của menu
+                            }
+                          }
+                        }
                       }}
                       id='validation-basic-select'
                       error={Boolean(errors.select)}
@@ -194,26 +211,29 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                   name='doorInId'
                   control={control}
                   render={({ field: { value, onChange } }) => (
-                    <CustomTextField
-                      select
-                      fullWidth
-                      defaultValue=''
-                      label='Cửa vào'
-                      SelectProps={{
-                        value: value,
-                        onChange: e => onChange(e)
-                      }}
-                      id='validation-basic-select'
-                      error={Boolean(errors.doorInId)}
-                      aria-describedby='validation-basic-select'
-                      {...(errors.doorInId && { helperText: 'This field is required' })}
-                    >
-                      {doorList.map(door => (
-                        <MenuItem key={door.id} value={door.id}>
-                          {door.name}
-                        </MenuItem>
-                      ))}
-                    </CustomTextField>
+                    console.log(value),
+                    (
+                      <CustomTextField
+                        select
+                        fullWidth
+                        defaultValue=''
+                        label='Cửa vào'
+                        SelectProps={{
+                          value: value,
+                          onChange: e => onChange(e)
+                        }}
+                        id='validation-basic-select'
+                        error={Boolean(errors.doorInId)}
+                        aria-describedby='validation-basic-select'
+                        {...(errors.doorInId && { helperText: 'This field is required' })}
+                      >
+                        {doorList.map(door => (
+                          <MenuItem key={door.id} value={door.id}>
+                            {door.name}
+                          </MenuItem>
+                        ))}
+                      </CustomTextField>
+                    )
                   )}
                 />
               </Grid>

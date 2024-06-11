@@ -66,12 +66,12 @@ const UserDetails = () => {
   const [filteredRegionOptions, setFilteredRegionOptions] = useState(user?.level)
   const [filteredContractOptions, setFilteredContractOptions] = useState(user?.contractType)
 
-  const [timeEndMorning, setTimeEndMorning] = useState('')
-  const [timeStartAfternoon, setTimeStartAfternoon] = useState('')
-  const [timeEndAfternoon, setTimeEndAfternoon] = useState('')
+  const [timeEndMorning, setTimeEndMorning] = useState(new Date())
+  const [timeStartAfternoon, setTimeStartAfternoon] = useState(new Date())
+  const [timeEndAfternoon, setTimeEndAfternoon] = useState(new Date())
   const [showPlusColumn, setShowPlusColumn] = useState(true)
 
-  const [dateTime, setDateTime] = useState('')
+  const [dateTime, setDateTime] = useState(new Date())
   const [startDate, setStartDate] = useState(new Date())
   const [fullNameValue, setFullNameValue] = useState('')
   const [email, setEmail] = useState('')
@@ -124,7 +124,7 @@ const UserDetails = () => {
     const fetchRegions = async () => {
       try {
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=953a140f-76e4-4841-9871-b9f30b3a37a7'
+          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/parentsID?parentID=953a140f-76e4-4841-9871-b9f30b3a37a7'
         )
 
         const regions = response.data.map(region => ({
@@ -146,7 +146,7 @@ const UserDetails = () => {
     const fetchRegions = async () => {
       try {
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=17a24f4a-4402-4a3f-b341-2afa8e67fba6'
+          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/parentsID?parentID=17a24f4a-4402-4a3f-b341-2afa8e67fba6'
         )
 
         const regions = response.data.map(region => ({
@@ -915,6 +915,10 @@ const UserDetails = () => {
 
                 {/* )} */}
               </Grid>
+
+              <Grid item xs={12} style={{ height: 10 }}>
+                {' '}
+              </Grid>
               <Grid container spacing={2}>
                 <Grid item xs={4}>
                   <TextField label='Tên' value={fullNameValue} onChange={handleFullNameChange} fullWidth />
@@ -1358,7 +1362,7 @@ const UserDetails = () => {
                                   // updatedRows[index].id = newValue.id
                                   setPolicies(updatedRows)
                                 }}
-                                renderInput={params => <TextField {...params} label='Đơn vị' />}
+                                renderInput={params => <TextField {...params} label='Vai trò' />}
                               />
                             </TableCell>
                             <TableCell>{policy.policyCode}</TableCell>
