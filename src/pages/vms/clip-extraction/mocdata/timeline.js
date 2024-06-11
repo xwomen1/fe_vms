@@ -97,9 +97,6 @@ const Timeline = ({ data = dataList, dateType, minuteType }) => {
         }
     }, [dateData]);
 
-    useEffect(() => {
-    }, [gaps])
-
     const timelineScrubberErrorHandler = ({ error }) => {
         setTimelineScrubberError(error);
     };
