@@ -3,7 +3,6 @@ import { useRouter } from 'next/router'
 import { useState, useEffect, useMemo } from 'react'
 import axios from 'axios'
 import authConfig from 'src/configs/auth'
-import CustomTextField from 'src/@core/components/mui/text-field'
 import {
   Grid,
   IconButton,
@@ -11,12 +10,12 @@ import {
   FormControlLabel,
   Checkbox,
   Switch,
-  TextField,
   Typography,
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  TextField
 } from '@mui/material'
 import Icon from 'src/@core/components/icon'
 import Autocomplete from '@mui/material/Autocomplete'
@@ -69,6 +68,14 @@ const Add = () => {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [userId, setUserId] = useState('')
+  const [selectedRegion, setSelectedRegion] = useState('')
+  const [selectContract, setSelectContract] = useState('')
+  const [contractOptions, setContractOptions] = useState([])
+  const [filteredRegionOptions, setFilteredRegionOptions] = useState(user?.level)
+  const [filteredContractOptions, setFilteredContractOptions] = useState(user?.contractType)
+  const [gender, setGender] = useState('')
+
+  const [regionOptions, setRegionOptions] = useState([])
 
   const handleAddRow = () => {
     const newRow = { groupName: '', code: '', id: '' } // Thêm groupId vào đây
@@ -148,6 +155,10 @@ const Add = () => {
   const policyList = rows1.map(row => row.policyId)
   console.log(policyList, 'ploust')
 
+  const handleGenderChange = event => {
+    setGender(event.target.value)
+  }
+
   const handleTimeValidityChange = event => {
     setTimeValidity(event.target.value)
   }
@@ -163,6 +174,33 @@ const Add = () => {
   //   policyName: true,
   //   isLeader: false
   // }))
+  const fetchRegionName = async regionId => {
+    try {
+      const response = await axios.get(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${regionId}`)
+
+      return response.data.name
+    } catch (error) {
+      console.error('Error fetching region name:', error)
+
+      return ''
+    }
+  }
+
+  const handleRegionChange = selectedOption => {
+    setSelectedRegion(selectedOption)
+
+    const selectedRegionId = selectedOption ? selectedOption.id : null
+    const filteredRegions = regionOptions.filter(region => region.parentId === selectedRegionId)
+    setFilteredRegionOptions(selectedRegionId)
+    console.log(selectedOption, 'filterregion')
+  }
+
+  const handleContractChange = selectedOption => {
+    setSelectContract(selectedOption)
+
+    const selectedContractId = selectedOption ? selectedOption.id : null
+    setFilteredContractOptions(selectedContractId)
+  }
 
   const userPolicy = rows1.map(row => ({
     policyId: row.policyId
@@ -239,6 +277,8 @@ const Add = () => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
       const processedGroups = await userGroups(rows) // Call the userGroups function passing rows
+      const genderMapping = { MALE: 'MALE', FEMALE: 'FEMALE', OTHER: 'OTHER' }
+
       if (processedGroups.length === 0) {
         Swal.fire('Lỗi!', 'Nhóm người dùng không được để trống.', 'error')
 
@@ -270,9 +310,11 @@ const Add = () => {
           timeEndMorning: convertStringToTimeArray(timeEndMorning),
           availableAt: ava1 || null,
           expiredAt: ava2 || null,
+          gender: gender,
           note: note,
           policyIds: policyList,
-
+          level: filteredRegionOptions || selectedRegion.id,
+          contractType: filteredContractOptions || selectContract.id,
           userGroups: processedGroups,
           userAccount: {
             accStatus: 'ACTIVE',
@@ -468,6 +510,50 @@ const Add = () => {
     updatedRows.splice(index, 1)
     setRows(updatedRows)
   }
+  useEffect(() => {
+    const fetchRegions = async () => {
+      try {
+        const response = await axios.get(
+          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/parentsID?parentID=953a140f-76e4-4841-9871-b9f30b3a37a7'
+        )
+
+        const regions = response.data.map(region => ({
+          value: region.name,
+          label: region.name,
+          id: region.id
+        }))
+        setRegionOptions(regions)
+
+        console.log(regions)
+      } catch (error) {
+        console.error('Error fetching regions:', error)
+      }
+    }
+
+    fetchRegions()
+  }, [])
+  useEffect(() => {
+    const fetchRegions = async () => {
+      try {
+        const response = await axios.get(
+          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/parentsID?parentID=17a24f4a-4402-4a3f-b341-2afa8e67fba6'
+        )
+
+        const regions = response.data.map(region => ({
+          value: region.name,
+          label: region.name,
+          id: region.id
+        }))
+        setContractOptions(regions)
+
+        console.log(regions)
+      } catch (error) {
+        console.error('Error fetching regions:', error)
+      }
+    }
+
+    fetchRegions()
+  }, [])
 
   useEffect(() => {
     const fetchGroupData = async () => {
@@ -557,24 +643,78 @@ const Add = () => {
               </Button>
             </>
           </Grid>
+          <Grid item xs={12} style={{ height: 10 }}>
+            {' '}
+          </Grid>
           <Grid container spacing={2} style={{ marginLeft: 10 }}>
             <Grid item xs={4}>
-              <CustomTextField label='Tên' onChange={handleFullNameChange} fullWidth />
+              <TextField label='Tên' onChange={handleFullNameChange} fullWidth />
             </Grid>
             <Grid item xs={4}>
-              <CustomTextField label='Email' onChange={handleEmailChange} fullWidth />
+              <TextField label='Email' onChange={handleEmailChange} fullWidth />
             </Grid>
             <Grid item xs={3.8}>
-              <CustomTextField label='Số điện thoại' onChange={handlePhoneNumberChange} fullWidth />
+              <TextField label='Số điện thoại' onChange={handlePhoneNumberChange} fullWidth />
             </Grid>
             <Grid item xs={4}>
-              <CustomTextField label='Số giấy tờ' onChange={handleIdentityNumberChange} fullWidth />
+              {/* Update Select to use the gender state */}
+              <FormControl fullWidth>
+                <InputLabel id='gender-label'>Giới tính</InputLabel>
+                <Select
+                  labelId='gender-label'
+                  id='gender-select'
+                  value={gender} // Use the gender state
+                  onChange={handleGenderChange} // Update onChange handler
+                >
+                  {/* MenuItems for gender options */}
+                  <MenuItem value='MALE'>Nam</MenuItem>
+                  <MenuItem value='FEMALE'>Nữ</MenuItem>
+                  <MenuItem value='OTHER'>Khác</MenuItem>
+                </Select>
+              </FormControl>
             </Grid>
             <Grid item xs={4}>
-              <CustomTextField label='Mã người dùng' onChange={handleUserCodeChange} fullWidth />
+              <TextField label='Số giấy tờ' onChange={handleIdentityNumberChange} fullWidth />
             </Grid>
             <Grid item xs={3.8}>
-              <CustomTextField label='Mã đồng bộ' onChange={handleSyncCodeChange} fullWidth />
+              <TextField label='Mã người dùng' onChange={handleUserCodeChange} fullWidth />
+            </Grid>
+            <Grid item xs={4}>
+              <TextField label='Mã đồng bộ' onChange={handleSyncCodeChange} fullWidth />
+            </Grid>
+            <Grid item xs={4}>
+              <FormControl fullWidth>
+                <InputLabel id='region-label'>Cấp bậc</InputLabel>
+                <Select
+                  labelId='region-label'
+                  id='region-select'
+                  value={selectedRegion ? selectedRegion.id : ''}
+                  onChange={e => handleRegionChange(regionOptions.find(opt => opt.id === e.target.value))}
+                >
+                  {regionOptions.map(option => (
+                    <MenuItem key={option.id} value={option.id}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={3.8}>
+              <FormControl fullWidth>
+                <InputLabel id='region-label'>Loại hợp đồng</InputLabel>
+                <Select
+                  labelId='region-label'
+                  id='region-select'
+                  value={selectContract ? selectContract.id : ''}
+                  onChange={e => handleContractChange(contractOptions.find(opt => opt.id === e.target.value))}
+                >
+                  {contractOptions.map(option => (
+                    <MenuItem key={option.id} value={option.id}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>{' '}
             </Grid>
             <Grid item xs={2} style={{ marginTop: '1.1%' }}>
               Trạng thái
@@ -708,7 +848,7 @@ const Add = () => {
               )}
             </Grid>
             <Grid item xs={11.8}>
-              <CustomTextField rows={4} multiline label='Ghi chú' onChange={handleNoteChange} fullWidth />
+              <TextField rows={4} multiline label='Ghi chú' onChange={handleNoteChange} fullWidth />
             </Grid>
             <Grid item xs={12}>
               <Typography variant='h5'>Đơn vị</Typography>
@@ -780,18 +920,13 @@ const Add = () => {
                 <Typography variant='h5'>Thông tin tài khoản</Typography>
               </Grid>
               <Grid item xs={4}>
-                <CustomTextField label='Tài khoản' onChange={handleAccountChange} fullWidth />
+                <TextField label='Tài khoản' onChange={handleAccountChange} fullWidth />
               </Grid>
               <Grid item xs={4}>
-                <CustomTextField label='Mật khẩu' type='password' onChange={handlePasswordChange} fullWidth />
+                <TextField label='Mật khẩu' type='password' onChange={handlePasswordChange} fullWidth />
               </Grid>
               <Grid item xs={3.8}>
-                <CustomTextField
-                  label='Xác nhận mật khẩu'
-                  type='password'
-                  onChange={handleConfirmPasswordChange}
-                  fullWidth
-                />
+                <TextField label='Xác nhận mật khẩu' type='password' onChange={handleConfirmPasswordChange} fullWidth />
               </Grid>
               <Grid item xs={2} style={{ marginTop: '1.1%' }}>
                 <FormControlLabel

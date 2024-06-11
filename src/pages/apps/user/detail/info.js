@@ -124,7 +124,7 @@ const UserDetails = () => {
     const fetchRegions = async () => {
       try {
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=953a140f-76e4-4841-9871-b9f30b3a37a7'
+          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/parentsID?parentID=953a140f-76e4-4841-9871-b9f30b3a37a7'
         )
 
         const regions = response.data.map(region => ({
@@ -146,7 +146,7 @@ const UserDetails = () => {
     const fetchRegions = async () => {
       try {
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=17a24f4a-4402-4a3f-b341-2afa8e67fba6'
+          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/parentsID?parentID=17a24f4a-4402-4a3f-b341-2afa8e67fba6'
         )
 
         const regions = response.data.map(region => ({
@@ -914,6 +914,10 @@ const UserDetails = () => {
                 </>
 
                 {/* )} */}
+              </Grid>
+
+              <Grid item xs={12} style={{ height: 10 }}>
+                {' '}
               </Grid>
               <Grid container spacing={2}>
                 <Grid item xs={4}>
