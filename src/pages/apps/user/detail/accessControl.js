@@ -290,21 +290,7 @@ const UserDetails = () => {
           </>
         </Box>
       </Grid>
-      <Grid item xs={4}>
-        <TextField label='Tên' fullWidth />
-      </Grid>
-      <Grid item xs={4}>
-        <TextField label='Email' fullWidth />
-      </Grid>
 
-      <Grid item xs={3.8}>
-        {' '}
-        {/* Sửa đổi xs={4} thành xs={8} */}
-        <TextField
-          label='Số điện thoại'
-          fullWidth // Thêm thuộc tính fullWidth vào đây
-        />
-      </Grid>
       <Grid item xs={12}>
         <TableContainer>
           <Table>

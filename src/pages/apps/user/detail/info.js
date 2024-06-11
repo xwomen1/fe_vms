@@ -66,12 +66,12 @@ const UserDetails = () => {
   const [filteredRegionOptions, setFilteredRegionOptions] = useState(user?.level)
   const [filteredContractOptions, setFilteredContractOptions] = useState(user?.contractType)
 
-  const [timeEndMorning, setTimeEndMorning] = useState('')
-  const [timeStartAfternoon, setTimeStartAfternoon] = useState('')
-  const [timeEndAfternoon, setTimeEndAfternoon] = useState('')
+  const [timeEndMorning, setTimeEndMorning] = useState(new Date())
+  const [timeStartAfternoon, setTimeStartAfternoon] = useState(new Date())
+  const [timeEndAfternoon, setTimeEndAfternoon] = useState(new Date())
   const [showPlusColumn, setShowPlusColumn] = useState(true)
 
-  const [dateTime, setDateTime] = useState('')
+  const [dateTime, setDateTime] = useState(new Date())
   const [startDate, setStartDate] = useState(new Date())
   const [fullNameValue, setFullNameValue] = useState('')
   const [email, setEmail] = useState('')
@@ -1358,7 +1358,7 @@ const UserDetails = () => {
                                   // updatedRows[index].id = newValue.id
                                   setPolicies(updatedRows)
                                 }}
-                                renderInput={params => <TextField {...params} label='Đơn vị' />}
+                                renderInput={params => <TextField {...params} label='Vai trò' />}
                               />
                             </TableCell>
                             <TableCell>{policy.policyCode}</TableCell>

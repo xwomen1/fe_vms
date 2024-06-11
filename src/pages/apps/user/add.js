@@ -840,7 +840,7 @@ const Add = () => {
                                 updatedRows[index].policyId = newValue.policyId
                                 setRows1(updatedRows)
                               }}
-                              renderInput={params => <TextField {...params} label='Đơn vị' />}
+                              renderInput={params => <TextField {...params} label='Vai trò' />}
                             />
                           </TableCell>
                           <TableCell>{row.description}</TableCell>
