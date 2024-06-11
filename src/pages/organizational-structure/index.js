@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Grid from '@mui/material/Grid'
 import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
@@ -29,6 +29,7 @@ import PopUpAdd from './popup/AddChild'
 const OrganizationalStructure = () => {
   const [infra, setInfra] = useState([])
   const [selectedTab, setSelectedTab] = useState(0)
+  const selectedTabRef = useRef(selectedTab) // Create a ref for selectedTab
   const [treeData, setTreeData] = useState({})
   const [expandedNodes, setExpandedNodes] = useState([])
   const [childData, setChildData] = useState([])
@@ -40,6 +41,10 @@ const OrganizationalStructure = () => {
   const [openPopupAddChild, setOpenPopupAddChild] = useState(false)
   const [selectId, setSelectIds] = useState(null)
   const [selectedNodeId, setSelectedNodeId] = useState(null)
+  const [operationType, setOperationType] = useState(null) // State to track the operation type
+  useEffect(() => {
+    selectedTabRef.current = selectedTab // Update ref whenever selectedTab changes
+  }, [selectedTab])
 
   const handleShowItemDetail = item => {
     setSelectedItemDetail(item)
@@ -48,6 +53,7 @@ const OrganizationalStructure = () => {
   const handleOpenPopup = id => {
     setOpenPopupId(id)
     setOpenPopup(true)
+    setOperationType('delete')
   }
 
   const handleOpenPopupDetail = id => {
@@ -69,6 +75,7 @@ const OrganizationalStructure = () => {
 
   const handleOpenAdd = () => {
     setOpenPopupAdd(true)
+    setOperationType('add')
   }
 
   const fetchFilter = async () => {
@@ -90,9 +97,7 @@ const OrganizationalStructure = () => {
 
       // Fetch child data for the first tab after infra data is loaded
       if (response.data.length > 0) {
-        fetchChildData(response.data[0].id)
-
-        // fetchTreeData(response.data[0].id)
+        fetchChildData(response.data[selectedTab].id)
       }
     } catch (error) {
       console.error('Error fetching users:', error)
@@ -102,6 +107,7 @@ const OrganizationalStructure = () => {
   const handleAddPClick = id => {
     setOpenPopupAddChild(true)
     setSelectIds(id)
+    setOperationType('addChild')
     console.log(id, 'nodeid')
   }
 
@@ -112,10 +118,23 @@ const OrganizationalStructure = () => {
 
   const handleSuccess = async () => {
     await fetchFilter()
-    setSelectedTab(0)
+    if (operationType === 'delete') {
+      // Set to the previous tab if it's not the first one
+      if (selectedTabRef.current > 0) {
+        setSelectedTab(selectedTabRef.current)
+      } else {
+        setSelectedTab(0)
+      }
+    } else if (operationType === 'add') {
+      // Set to the last tab
+      setSelectedTab(infra.length)
+    } else {
+      setSelectedTab(selectedTabRef.current)
+    }
     if (selectedNodeId) {
       await fetchChildData(selectedNodeId)
     }
+    setOperationType(null) // Reset the operation type
   }
 
   const fetchChildData = async parentId => {
@@ -284,15 +303,20 @@ const OrganizationalStructure = () => {
                   style={{ marginBottom: '16px' }}
                 />
               </Box>
-
+              <Box onClick={() => handleOpenPopupDetail(currentTabInfra.id)}>
               <CustomTextField
                 label='Mã'
                 type='text'
-                value={currentTabInfra.type}
+                value={currentTabInfra.code}
                 fullWidth
                 style={{ marginBottom: '16px' }}
               />
+              </Box>
+
+              <Box onClick={() => handleOpenPopupDetail(currentTabInfra.id)}>
               <CustomTextField label='Ghi chú' type='text' value={currentTabInfra.detail} fullWidth />
+              </Box>
+
             </Paper>
             <Paper elevation={3} style={{ padding: '16px', flexGrow: 1 }}>
               <TableContainer component={Paper}>
@@ -311,7 +335,7 @@ const OrganizationalStructure = () => {
                         <TableRow key={child.id}>
                           <TableCell>{index + 1}</TableCell>
                           <TableCell>{child.name}</TableCell>
-                          <TableCell>{child.type}</TableCell>
+                          <TableCell>{child.code}</TableCell>
                           <TableCell sx={{ padding: '16px' }}>
                             <IconButton size='small'>
                               <Icon icon='tabler:edit' onClick={() => handleOpenPopupDetail(child.id)} />
