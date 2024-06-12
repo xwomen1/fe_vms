@@ -14,7 +14,7 @@ import Table from '@mui/material/Table'
 import Paper from '@mui/material/Paper'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
-import { IconButton } from '@mui/material'
+import { Button, IconButton } from '@mui/material'
 import Swal from 'sweetalert2'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchData } from 'src/store/apps/user'
@@ -275,6 +275,12 @@ const UserList = ({ apiData }) => {
 
   return (
     <Grid style={{ minWidth: '1000px' }}>
+      <Grid>
+        <Button variant='contained' style={{ marginBottom: '1%' }}>
+          {' '}
+          Danh sách người dùng
+        </Button>
+      </Grid>
       <Card>
         <TableHeader value={value} handleFilter={handleFilter} toggle={toggleAddUserDrawer} />
         <Grid container spacing={2}>

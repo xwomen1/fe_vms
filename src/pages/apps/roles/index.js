@@ -8,15 +8,16 @@ import PageHeader from 'src/@core/components/page-header'
 // ** Demo Components Imports
 import Table from 'src/views/apps/roles/Table'
 import RoleCards from 'src/views/apps/roles/RoleCards'
+import { Button } from '@mui/material'
 
 const RolesComponent = () => {
   return (
     <Grid container spacing={6}>
       <PageHeader
         title={
-          <Typography variant='h4' sx={{ mb: 6 }}>
-            Quản lý phân quyền
-          </Typography>
+          <Grid>
+            <Button variant='contained'>Quản lý phân quyền</Button>
+          </Grid>
         }
         subtitle={<Typography sx={{ color: 'text.secondary' }}></Typography>}
       />

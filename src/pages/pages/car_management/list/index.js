@@ -355,9 +355,11 @@ const Car_management = () => {
       ) : (
         <Grid container spacing={6.5}>
           <Grid item xs={12}>
+            <Grid style={{ marginBottom: '1%' }}>
+              <Button variant='contained'> Danh sách biển số</Button>
+            </Grid>
             <Card>
               <CardHeader
-                title='Quản lý Biển số'
                 titleTypographyProps={{ sx: { mb: [2, 0] } }}
                 action={
                   <Grid container spacing={2}>
