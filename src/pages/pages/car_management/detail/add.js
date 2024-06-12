@@ -1,509 +1,554 @@
-import React from "react";
+import React from 'react'
 import {
-    Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Tab, TableContainer, Paper,
-    Table, TableHead, TableRow, TableCell, TableBody, Pagination, Menu, MenuItem, Dialog, DialogContent,
-    DialogActions,
-    Typography,
-    TextField,
-    Input
-} from "@mui/material";
-import {Fragment, useState, useEffect,useRef } from 'react';
-import axios from 'axios';
-import { makeStyles } from '@material-ui/core/styles';
-import authConfig from 'src/configs/auth';
-import Swal from 'sweetalert2';
-import FileUploader from 'devextreme-react/file-uploader';
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Grid,
+  IconButton,
+  Tab,
+  TableContainer,
+  Paper,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Pagination,
+  Menu,
+  MenuItem,
+  Dialog,
+  DialogContent,
+  DialogActions,
+  Typography,
+  TextField,
+  Input
+} from '@mui/material'
+import { Fragment, useState, useEffect, useRef } from 'react'
+import axios from 'axios'
+import { makeStyles } from '@material-ui/core/styles'
+import authConfig from 'src/configs/auth'
+import Swal from 'sweetalert2'
+import CustomDialog from '../../face_management/CustomDialog/CustomDialog'
+import FileUploader from 'devextreme-react/file-uploader'
 import CircularProgress from '@mui/material/CircularProgress'
-import ModalImage from '../ModalImage';
+import ModalImage from '../ModalImage'
 import Icon from 'src/@core/components/icon'
-import ImageCropper from '../ImageCropperPopup';
-import Link from 'next/link';
+import ImageCropper from '../ImageCropperPopup'
+import Link from 'next/link'
 
 const AddFaceManagement = () => {
+  const classes = useStyles()
+  const [loading, setLoading] = useState(false)
+  const [showLoading, setShowLoading] = useState(false)
+  const [modalImage, setModalImage] = useState(null)
+  const [listFileId, setListFileId] = useState([])
+  const listFileUrl = []
+  const [listImage, setListImage] = useState([])
+  const [fileAvatarId, setFileAvatarId] = useState(null)
+  const [listFileUpload, setListFileUpload] = useState([])
+  const [name, setName] = useState(null)
+  const [note, setNote] = useState(null)
+  const [showCropper, setShowCopper] = useState(false)
+  const [isNameEntered, setIsNameEntered] = useState(false)
+  const fileUploader1 = useRef(null)
+  const fileUploader2 = useRef(null)
+  const [avatarImage, setAvatarImage] = useState(null)
+  const [fileAvatarImg, setFileAvatarImg] = useState(null)
+  const ALLOWED_FILE_EXTENSIONS = ['.jpg', '.jpeg', '.gif', '.png']
+  const [isDoubleClick, setIsDoubleClick] = useState(false)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [dialogTitle, setDialogTitle] = useState('')
+  const [dialogMessage, setDialogMessage] = useState('')
+  const [isSuccess, setIsSuccess] = useState(false)
+  const [redirectUrl, setRedirectUrl] = useState('')
 
-    const classes = useStyles();
-    const [loading, setLoading] = useState(false);
-    const [showLoading, setShowLoading] = useState(false);
-    const [modalImage, setModalImage] = useState(null);
-    const [listFileId, setListFileId] = useState([]);
-    const listFileUrl = [];
-    const [listImage, setListImage] = useState([]);
-    const [fileAvatarId, setFileAvatarId] = useState(null);
-    const [listFileUpload, setListFileUpload] = useState([]);
-    const [name, setName] = useState(null);
-    const [note, setNote] = useState(null);
-    const [showCropper, setShowCopper] = useState(false);
-    const [isNameEntered, setIsNameEntered] = useState(false);
-    const fileUploader1 = useRef(null);
-    const fileUploader2 = useRef(null);
-    const [avatarImage, setAvatarImage] = useState(null);
-    const [fileAvatarImg, setFileAvatarImg] = useState(null);
-    const ALLOWED_FILE_EXTENSIONS = ['.jpg', '.jpeg', '.gif', '.png'];
-    const [isDoubleClick, setIsDoubleClick] = useState(false);
+  const handleInputChange = e => {
+    const value = e.target.value
+    setName(value)
+    setIsNameEntered(!!value)
+  }
 
-    const handleInputChange = (e) => {
-        const value = e.target.value;
-        setName(value);
-        setIsNameEntered(!!value); 
-    };
+  useEffect(() => {
+    if (!showCropper) {
+      setIsDoubleClick(false)
+    }
+  }, [showCropper])
 
-      useEffect(() => {
-        if (!showCropper) {
-          setIsDoubleClick(false);
+  const fileListToBase64 = async fileList => {
+    function getBase64(file) {
+      const reader = new FileReader()
+
+      return new Promise(resolve => {
+        reader.onload = ev => {
+          resolve(ev.target.result)
         }
-      }, [showCropper]);
-    
-      const fileListToBase64 = async (fileList) => {
-        function getBase64(file) {
+        reader.readAsDataURL(file)
+      })
+    }
 
-          const reader = new FileReader();
+    const promises = []
 
-          return new Promise((resolve) => {
-            reader.onload = (ev) => {
-              resolve(ev.target.result);
-            };
-            reader.readAsDataURL(file);
-          });
-        }
+    for (let i = 0; i < fileList.length; i++) {
+      promises.push(getBase64(fileList[i]))
+    }
 
-        const promises = [];
+    const data = await Promise.all(promises)
 
-        for (let i = 0; i < fileList.length; i++) {
-          promises.push(getBase64(fileList[i]));
-        }
+    return data
+  }
 
-        const data = await Promise.all(promises);
+  useEffect(() => {
+    async function fetchData() {
+      const arrayOfBase64 = await fileListToBase64(listFileUpload)
 
-        return data;
-      };
-    
-      useEffect(() => {
-        async function fetchData() {
+      setListImage(arrayOfBase64)
+    }
+    if (listFileUpload.length > 0) {
+      fetchData()
+    }
+  }, [listFileUpload])
 
-          const arrayOfBase64 = await fileListToBase64(listFileUpload);
-          
-          setListImage(arrayOfBase64);
-        }
-        if (listFileUpload.length > 0) {
-          fetchData();
-        }
-      }, [listFileUpload]);
-
-    const renderImage = listFileUpload.length > 0 && listImage.length > 0 && (
-        <div className={classes.cardImageContainer}>
-          {listImage.length < 5 && (
-            <div className="add-btn card-img" id="dropzone-external-2">
-            <div style={{ alignSelf: 'center', margin: 'auto',marginLeft:'100px' }}>
-                   <Icon icon='tabler:plus' />
-               </div>
-              <FileUploader
-                style={{opacity:'0'}}
-                id="file-uploader-2"
-                dialogTrigger="#dropzone-external-2"
-                dropZone="#dropzone-external-2"
-                multiple
-                allowedFileExtensions={ALLOWED_FILE_EXTENSIONS}
-                uploadMode="useButtons"
-                visible={false}
-                onValueChanged={(e) => {
-                  onDragDropImage(e);
-                }}
-                ref={fileUploader2}
-              />
-            </div>
-          )}
-          {listImage.map((image, index) => (
-            <div className="card-img" key={index}>
-              <img
-                src={image}
-                alt=""
-                className="hover-image"
-                onDoubleClick={() => {
-                  setShowCopper(true);
-                  setAvatarImage(image);
-                  setFileAvatarImg(listFileUpload[listImage.indexOf(image)]);
-                  setFileAvatarId(listFileId[listImage.indexOf(image)]);
-                }} />
-              <IconButton
-                className="close"
-                onClick={() => {
-
-                  const listFileUploadTmp = [...listFileUpload];
-
-                  listFileUploadTmp.splice(listImage.indexOf(image), 1);
-                  setListFileUpload(listFileUploadTmp);
-                }}
-                color='primary'
-              >
-                -
-              </IconButton>
-              <IconButton
-                color='primary'
-                className="full"
-                onClick={() => {
-                  setModalImage(image);
-                }}
-              >
-                <Icon icon='tabler:maximize' />
-              </IconButton>
-            </div>
-          ))}
+  const renderImage = listFileUpload.length > 0 && listImage.length > 0 && (
+    <div className={classes.cardImageContainer}>
+      {listImage.length < 5 && (
+        <div className='add-btn card-img' id='dropzone-external-2'>
+          <div style={{ alignSelf: 'center', margin: 'auto', marginLeft: '100px' }}>
+            <Icon icon='tabler:plus' />
+          </div>
+          <FileUploader
+            style={{ opacity: '0' }}
+            id='file-uploader-2'
+            dialogTrigger='#dropzone-external-2'
+            dropZone='#dropzone-external-2'
+            multiple
+            allowedFileExtensions={ALLOWED_FILE_EXTENSIONS}
+            uploadMode='useButtons'
+            visible={false}
+            onValueChanged={e => {
+              onDragDropImage(e)
+            }}
+            ref={fileUploader2}
+          />
         </div>
-      );
+      )}
+      {listImage.map((image, index) => (
+        <div className='card-img' key={index}>
+          <img
+            src={image}
+            alt=''
+            className='hover-image'
+            onDoubleClick={() => {
+              setShowCopper(true)
+              setAvatarImage(image)
+              setFileAvatarImg(listFileUpload[listImage.indexOf(image)])
+              setFileAvatarId(listFileId[listImage.indexOf(image)])
+            }}
+          />
+          <IconButton
+            className='close'
+            onClick={() => {
+              const listFileUploadTmp = [...listFileUpload]
 
-    const onDragDropImage = async (e) => {
-        if (e.value.length > 0) {
-            if (e.value.length + listFileUpload.length > 5) {
-                Swal.fire({
-                    text: 'Tối đa 5 file',
-                    icon: 'error',
-                    showCancelButton: false,
-                    showCloseButton: false,
-                    showConfirmButton: true,
-                    focusConfirm: true,
-                    confirmButtonColor: '#40a574',
-                    confirmButtonText: 'Đóng',
-                    customClass: {
-                        content: 'content-class',
-                    },
-                });
-            } else {
+              listFileUploadTmp.splice(listImage.indexOf(image), 1)
+              setListFileUpload(listFileUploadTmp)
+            }}
+            color='primary'
+          >
+            -
+          </IconButton>
+          <IconButton
+            color='primary'
+            className='full'
+            onClick={() => {
+              setModalImage(image)
+            }}
+          >
+            <Icon icon='tabler:maximize' />
+          </IconButton>
+        </div>
+      ))}
+    </div>
+  )
 
-                const files = listFileUpload.concat(e.value);
+  const onDragDropImage = async e => {
+    if (e.value.length > 0) {
+      if (e.value.length + listFileUpload.length > 5) {
+        Swal.fire({
+          text: 'Tối đa 5 file',
+          icon: 'error',
+          showCancelButton: false,
+          showCloseButton: false,
+          showConfirmButton: true,
+          focusConfirm: true,
+          confirmButtonColor: '#40a574',
+          confirmButtonText: 'Đóng',
+          customClass: {
+            content: 'content-class'
+          }
+        })
+      } else {
+        const files = listFileUpload.concat(e.value)
 
+        const formData = new FormData()
 
-                const formData = new FormData();
-
-
-                for (const file of files) {
-                    formData.append('files', file);
-                }
-                setShowLoading(true);
-
-                const token = localStorage.getItem(authConfig.storageTokenKeyName);
-
-                const config = {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                };
-    
-                try {
-
-                    const res = await axios.post(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/upload/multi`, formData, config);
-                    setListFileUpload(files);
-    
-                    const fileIds = res.data.map((x) => x.id);
-    
-                    const arr = [...listFileId, ...fileIds];
-
-                    setListFileId([...arr].slice(0, 5));
-                } catch (error) {
-
-                    console.error('Error occurred during upload:', error);
-
-                } finally {
-                    setShowLoading(false);
-                }
-            }
-            if (fileUploader2?.current?.instance) {
-                fileUploader2.current.instance.reset();
-            }
-            if (fileUploader1?.current?.instance) {
-                fileUploader1.current.instance.reset();
-            }
+        for (const file of files) {
+          formData.append('files', file)
         }
-    };
+        setShowLoading(true)
 
-    const handleAddBlacklist = async () => {
-        setLoading(true);
-        setShowLoading(true);
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+
         try {
-            const token = localStorage.getItem(authConfig.storageTokenKeyName);
-            
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            };
-    
-            const params = {
-                name: name,
-                mainImageId: fileAvatarId,
-                imgs: listFileId.map((id, index) => ({
-                    id: id,
-                    urlImage: listFileUrl[id],
-                })),
-                note: note,
-            };
-            const response = await axios.post(`https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates`, params, config);
-            const newId = response.data.id; 
-            Swal.fire('Thêm đối tượng thành công', '', 'success')
-            window.location.href = `/pages/car_management/detail/${newId}`;
+          const res = await axios.post(
+            `https://sbs.basesystem.one/ivis/storage/api/v0/libraries/upload/multi`,
+            formData,
+            config
+          )
+          setListFileUpload(files)
+
+          const fileIds = res.data.map(x => x.id)
+
+          const arr = [...listFileId, ...fileIds]
+
+          setListFileId([...arr].slice(0, 5))
         } catch (error) {
-            Swal.fire('Đã xảy ra lỗi', error.message, 'error');
-            console.error('Error adding member to group:', error);
+          console.error('Error occurred during upload:', error)
         } finally {
-
-            setLoading(false);
+          setShowLoading(false)
         }
-    };
+      }
+      if (fileUploader2?.current?.instance) {
+        fileUploader2.current.instance.reset()
+      }
+      if (fileUploader1?.current?.instance) {
+        fileUploader1.current.instance.reset()
+      }
+    }
+  }
 
-    return(
-        <>
-        <div className={classes.loadingContainer}>
+  const handleDialogClose = () => {
+    setDialogOpen(false)
+    if (isSuccess && redirectUrl) {
+      window.location.href = redirectUrl
+    }
+  }
+
+  const handleAddBlacklist = async () => {
+    setLoading(true)
+    setShowLoading(true)
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const params = {
+        name: name,
+        mainImageId: fileAvatarId,
+        imgs: listFileId.map((id, index) => ({
+          id: id,
+          urlImage: listFileUrl[id]
+        })),
+        note: note
+      }
+      const response = await axios.post(`https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates`, params, config)
+      const newId = response.data.id
+      setDialogTitle('Thêm biển số thành công')
+      setIsSuccess(true)
+      setRedirectUrl(`/pages/car_management/detail/${newId}`)
+    } catch (error) {
+      setDialogTitle('Thêm không thành công')
+      setDialogMessage(error.response.data.message || 'Thêm không thành công')
+      setIsSuccess(false)
+      console.error('Error adding member to group:', error)
+    } finally {
+      setLoading(false)
+      setDialogOpen(true)
+    }
+  }
+
+  return (
+    <>
+      <div className={classes.loadingContainer}>
         {loading && <CircularProgress className={classes.circularProgress} />}
-         <Grid container spacing={6.5} style={{zIndex:'0'}}>
-            <Grid item xs={12}>
-                <Card>
-                <CardHeader
-                            title='Thêm mới biển số xe'
-                            titleTypographyProps={{ sx: { mb: [2, 0] } }}
-                            action={
-                                <Grid container spacing={2}>
-                                    <Grid item>
-                                        <Box sx={{ float: 'right' }}>
-                                            <Button 
-                                            style={{background:'#E0D7D7',
-                                            color:'#000000',
-                                            right:'20px'}}
-                                            component={Link}
-                                            href={`/pages/car_management/list`}
-                                            sx={{ color: 'blue' }}
-                                             >
-                                            Hủy
-                                            </Button>
-                                            <Button
-                                             disabled={!isNameEntered}
-                                            onClick={handleAddBlacklist}
-                                            variant='contained'
-                                            >
-                                            Thêm mới
-                                            </Button>
-                                        </Box>
-                                    </Grid>
-
-                                </Grid>
-                            }
-                            sx={{
-                                py: 4,
-                                flexDirection: ['column', 'row'],
-                                '& .MuiCardHeader-action': { m: 0 },
-                                alignItems: ['flex-start', 'center']
-                            }}
-                        />
-                    <Grid item xs={12}>
-                    {(showLoading || loading)}
-                    {modalImage && (
-                        <ModalImage
-                        imageUrl={modalImage}
-                        onClose={() => {
-                            setModalImage(null);
-                        }}
-                        />
-                    )}
-                    {showCropper && (
-                    <ImageCropper
+        <Grid container spacing={6.5} style={{ zIndex: '0' }}>
+          <Grid item xs={12}>
+            <Card>
+              <CardHeader
+                title='Thêm mới biển số xe'
+                titleTypographyProps={{ sx: { mb: [2, 0] } }}
+                action={
+                  <Grid container spacing={2}>
+                    <Grid item>
+                      <Box sx={{ float: 'right' }}>
+                        <Button
+                          style={{ background: '#E0D7D7', color: '#000000', right: '20px' }}
+                          component={Link}
+                          href={`/pages/car_management/list`}
+                          sx={{ color: 'blue' }}
+                        >
+                          Hủy
+                        </Button>
+                        <Button disabled={!isNameEntered} onClick={handleAddBlacklist} variant='contained'>
+                          Thêm mới
+                        </Button>
+                      </Box>
+                    </Grid>
+                  </Grid>
+                }
+                sx={{
+                  py: 4,
+                  flexDirection: ['column', 'row'],
+                  '& .MuiCardHeader-action': { m: 0 },
+                  alignItems: ['flex-start', 'center']
+                }}
+              />
+              <CustomDialog
+                open={dialogOpen}
+                handleClose={handleDialogClose}
+                title={dialogTitle}
+                message={dialogMessage}
+                isSuccess={isSuccess}
+              />
+              <Grid item xs={12}>
+                {showLoading || loading}
+                {modalImage && (
+                  <ModalImage
+                    imageUrl={modalImage}
                     onClose={() => {
-                        setShowCopper(false);
+                      setModalImage(null)
+                    }}
+                  />
+                )}
+                {showCropper && (
+                  <ImageCropper
+                    onClose={() => {
+                      setShowCopper(false)
                     }}
                     fileAvatar={fileAvatarImg}
                     avatarImage={avatarImage}
                     setAvatarImage={setAvatarImage}
                     setFileAvatar={setFileAvatarImg}
-                    />
-                     )}
-                        <div className={classes.container}>
-                            <div className={classes.avatar_container}>
-                            <div
-                                style={{
-                                textAlign: 'center',
-                                width: '192px',
-                                }}
-                            >
-                                <p
-                                style={{
-                                    fontSize: '18px',
-                                    lineHeight: '22px',
-                                    margin: '0px',
-                                }}
-                                >
-                                {`Ảnh đại diện`}
-                                </p>
-                                <div
-                                style={{
-                                    background: '#CED1D7',
-                                    borderRadius: '8px',
-                                    display: 'flex',
-                                    margin: 'auto',
-                                    width: '192px',
-                                    height: '192px',
-                                }}
-                                >
-                                <img
-                                    alt=""
-                                    src={avatarImage || `data:image/svg+xml;utf8,${encodeURIComponent(MaskGroup)}`}
-                                    style={{
-                                    marginBottom: `${avatarImage ? '' : '-10%'}`,
-                                    objectFit: 'contain',
-                                    width: `${avatarImage ? '100%' : ''}`,
-                                    height: `${avatarImage ? '100%' : ''}`,
-                                    }}
-                                />
-                                </div>
-                                <Input
-                                id="eventName"
-                                eventname="eventName"
-                                placeholder={`      Nhập tên đối tượng`}
-                                stylingmode="outlined"
-                                defaultValue=""
-                                mode="text"
-                                style={{
-                                    border: '1px solid rgba(0, 0, 0, 0.12)',
-                                    borderRadius: '4px',
-                                    marginTop: '10px',
-                                }}
-                                onInput={(e) => {
-                                    setName(e.target.value);
-                                }}
-                                onChange={handleInputChange}
-                                />
-                            </div>
-                            <div
-                                    style={{
-                                        marginLeft:'300px',
-                                        width:'65%',
-                                        marginTop:'-260px'
-                                    }}
-                                >
-                                     <p
-                                            style={{
-                                                fontSize: '18px',
-                                                lineHeight: '22px',
-                                                margin: '0px',
-                                            }}
-                                        >
-                                        Ghi chú
-                                        </p>
+                  />
+                )}
+                <div className={classes.container}>
+                  <div className={classes.avatar_container}>
+                    <div
+                      style={{
+                        textAlign: 'center',
+                        width: '192px'
+                      }}
+                    >
+                      <p
+                        style={{
+                          fontSize: '18px',
+                          lineHeight: '22px',
+                          margin: '0px'
+                        }}
+                      >
+                        {`Ảnh đại diện`}
+                      </p>
+                      <div
+                        style={{
+                          background: '#CED1D7',
+                          borderRadius: '8px',
+                          display: 'flex',
+                          margin: 'auto',
+                          width: '192px',
+                          height: '192px'
+                        }}
+                      >
+                        <img
+                          alt=''
+                          src={avatarImage || `data:image/svg+xml;utf8,${encodeURIComponent(MaskGroup)}`}
+                          style={{
+                            marginBottom: `${avatarImage ? '' : '-10%'}`,
+                            objectFit: 'contain',
+                            width: `${avatarImage ? '100%' : ''}`,
+                            height: `${avatarImage ? '100%' : ''}`
+                          }}
+                        />
+                      </div>
+                      <Input
+                        id='eventName'
+                        eventname='eventName'
+                        placeholder={`      Nhập tên đối tượng`}
+                        stylingmode='outlined'
+                        defaultValue=''
+                        mode='text'
+                        style={{
+                          border: '1px solid rgba(0, 0, 0, 0.12)',
+                          borderRadius: '4px',
+                          marginTop: '10px'
+                        }}
+                        onInput={e => {
+                          setName(e.target.value)
+                        }}
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                    <div
+                      style={{
+                        marginLeft: '300px',
+                        width: '65%',
+                        marginTop: '-260px'
+                      }}
+                    >
+                      <p
+                        style={{
+                          fontSize: '18px',
+                          lineHeight: '22px',
+                          margin: '0px'
+                        }}
+                      >
+                        Ghi chú
+                      </p>
 
-                                    <TextField
-                                    rows={4}
-                                    multiline
-                                    variant='standard'
-                                    style={{
-                                        border: '1px solid rgba(0, 0, 0, 0.12)',
-                                        borderRadius: '10px',
-                                        width:'100%'
-                                    }}
-                                    defaultValue=''
-                                    placeholder='  Nhập ghi chú ...!'
-                                    onInput={(e) => {
-                                        setNote(e.target.value);
-                                    }}
-                                    id='textarea-standard-static'
-                                    />
-                                </div>
-                            <div style={{ color: 'red', float: 'left', position: 'absolute', bottom: '50% ', left: '50%', fontSize: 20 }}>
-                                {`Nhấn đúp chuột vào ảnh để tạo Avatar`}
-                            </div>
-                            <div style={{ color: 'red', float: 'left', position: 'absolute', bottom: '45% ', left: '50%', fontSize: 20 }}>
-                                {`Tên đối tượng bắt buộc phải nhập`}
-                            </div>
+                      <TextField
+                        rows={4}
+                        multiline
+                        variant='standard'
+                        style={{
+                          border: '1px solid rgba(0, 0, 0, 0.12)',
+                          borderRadius: '10px',
+                          width: '100%'
+                        }}
+                        defaultValue=''
+                        placeholder='  Nhập ghi chú ...!'
+                        onInput={e => {
+                          setNote(e.target.value)
+                        }}
+                        id='textarea-standard-static'
+                      />
+                    </div>
+                    <div
+                      style={{
+                        color: 'red',
+                        float: 'left',
+                        position: 'absolute',
+                        bottom: '50% ',
+                        left: '50%',
+                        fontSize: 20
+                      }}
+                    >
+                      {`Nhấn đúp chuột vào ảnh để tạo Avatar`}
+                    </div>
+                    <div
+                      style={{
+                        color: 'red',
+                        float: 'left',
+                        position: 'absolute',
+                        bottom: '45% ',
+                        left: '50%',
+                        fontSize: 20
+                      }}
+                    >
+                      {`Tên đối tượng bắt buộc phải nhập`}
+                    </div>
+                  </div>
+                  {listFileUpload.length === 0 && (
+                    <p style={{ margin: '35px 0px 0px 0px', marginTop: '250px', marginLeft: '10px' }}>
+                      <div></div>
 
-                            </div>
-                            {listFileUpload.length === 0 && (
-                            <p style={{ margin: '35px 0px 0px 0px' ,marginTop:'250px',marginLeft:'10px'}}>
-
-                                <div></div>
-
-                                {`Ảnh của đối tượng : (Tối đa 5 ảnh)`}
-                            </p>
-                            )}
-                            {listFileUpload.length > 0 && (
-                            <p style={{ margin: '35px 0px 0px 0px',marginTop:'250px',marginLeft:'10px' }}>
-                                {`Ảnh của đối tượng ${listFileUpload.length}/5)`}
-                            </p>
-                            )}
-                            <div
+                      {`Ảnh của đối tượng : (Tối đa 5 ảnh)`}
+                    </p>
+                  )}
+                  {listFileUpload.length > 0 && (
+                    <p style={{ margin: '35px 0px 0px 0px', marginTop: '250px', marginLeft: '10px' }}>
+                      {`Ảnh của đối tượng ${listFileUpload.length}/5)`}
+                    </p>
+                  )}
+                  <div
+                    style={{
+                      marginTop: '20px',
+                      minHeight: '422px',
+                      display: 'flex',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    {listFileUpload.length === 0 && (
+                      <Fragment>
+                        <div
+                          className='cropper'
+                          style={{
+                            display: 'flex'
+                          }}
+                          id='dropzone-external'
+                        >
+                          <div
                             style={{
-                                marginTop: '20px',
-                                minHeight: '422px',
-                                display: 'flex',
-                                justifyContent: 'center',
+                              margin: 'auto',
+                              alignSelf: 'center',
+                              textAlign: 'center'
                             }}
-                            >
-                            {listFileUpload.length === 0 && (
-                                <Fragment>
-                                <div
-                                    className="cropper"
-                                    style={{
-                                    display: 'flex',
-                                    }}
-                                    id="dropzone-external"
-                                >
-                                    <div
-                                    style={{
-                                        margin: 'auto',
-                                        alignSelf: 'center',
-                                        textAlign: 'center',
-                                    }}
-                                    >
-                                    <div>
-                                        <img alt="" src={`data:image/svg+xml;utf8,${encodeURIComponent(svgPath)}`}  />
-                                    </div>
-                                    <p
-                                        style={{
-                                        fontSize: '16px',
-                                        lineHeight: '19px',
-                                        }}
-                                    >
-                                        {`Kéo thả ảnh`}
-                                    </p>
-                                    <p
-                                        style={{
-                                        fontSize: '16px',
-                                        lineHeight: '19px',
-                                        }}
-                                    >
-                                        {`Hoặc`}
-                                    </p>
-                                    <Button
-                                        style={{
-                                        width: '200px',
-                                        height: '50px',
-                                        border: 'none',
-                                        }}
-                                        color="primary"
-                                        variant='contained'
-                                    >
-                                        {`Tải ảnh lên`}
-                                    </Button>
-                                    </div>
-                                </div>
-                                <FileUploader
-                                    style={{opacity:'0'}}
-                                    id="file-uploader"
-                                    dialogTrigger="#dropzone-external"
-                                    dropZone="#dropzone-external"
-                                    multiple
-                                    allowedFileExtensions={ALLOWED_FILE_EXTENSIONS}
-                                    uploadMode="useButtons"
-                                    visible={false}
-                                    onValueChanged={onDragDropImage}
-                                    ref={fileUploader1}
-                                />
-                                </Fragment>
-                            )}
-                            {renderImage}
+                          >
+                            <div>
+                              <img alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(svgPath)}`} />
                             </div>
+                            <p
+                              style={{
+                                fontSize: '16px',
+                                lineHeight: '19px'
+                              }}
+                            >
+                              {`Kéo thả ảnh`}
+                            </p>
+                            <p
+                              style={{
+                                fontSize: '16px',
+                                lineHeight: '19px'
+                              }}
+                            >
+                              {`Hoặc`}
+                            </p>
+                            <Button
+                              style={{
+                                width: '200px',
+                                height: '50px',
+                                border: 'none'
+                              }}
+                              color='primary'
+                              variant='contained'
+                            >
+                              {`Tải ảnh lên`}
+                            </Button>
+                          </div>
                         </div>
-                    </Grid>
-                </Card>
-            </Grid>
-         </Grid>
-         </div>
-        </>
-    )
+                        <FileUploader
+                          style={{ opacity: '0' }}
+                          id='file-uploader'
+                          dialogTrigger='#dropzone-external'
+                          dropZone='#dropzone-external'
+                          multiple
+                          allowedFileExtensions={ALLOWED_FILE_EXTENSIONS}
+                          uploadMode='useButtons'
+                          visible={false}
+                          onValueChanged={onDragDropImage}
+                          ref={fileUploader1}
+                        />
+                      </Fragment>
+                    )}
+                    {renderImage}
+                  </div>
+                </div>
+              </Grid>
+            </Card>
+          </Grid>
+        </Grid>
+      </div>
+    </>
+  )
 }
 
 const svgPath = `<svg width="85" height="84" viewBox="0 0 85 84" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -550,132 +595,132 @@ const MaskGroup = `<svg width="21" height="23" viewBox="0 0 193 173" fill="none"
 `
 
 const useStyles = makeStyles(() => ({
-    loadingContainer: {
-        position: 'relative',
-        minHeight: '100px', // Đặt độ cao tùy ý
-        zIndex: 0,
-      },
-      circularProgress: {
-        position: 'absolute',
-        top: '40%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        zIndex: 99999, // Đặt z-index cao hơn so với Grid container
-      },
-    cancelBtn: {
-        width: '116px',
-        height: '40px',
-        background: '#E2E2E2',
-        border: '1px solid #DDDDDD',
-        boxSizing: 'border-box',
-        borderRadius: '8px',
-        '& .dx-button-content': { display: 'block' },
+  loadingContainer: {
+    position: 'relative',
+    minHeight: '100px', // Đặt độ cao tùy ý
+    zIndex: 0
+  },
+  circularProgress: {
+    position: 'absolute',
+    top: '40%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    zIndex: 99999 // Đặt z-index cao hơn so với Grid container
+  },
+  cancelBtn: {
+    width: '116px',
+    height: '40px',
+    background: '#E2E2E2',
+    border: '1px solid #DDDDDD',
+    boxSizing: 'border-box',
+    borderRadius: '8px',
+    '& .dx-button-content': { display: 'block' }
+  },
+  addBtn: {
+    width: '104px',
+    height: '40px',
+    background: '#00554A',
+    boxShadow: '0px 4px 10px rgba(16, 156, 241, 0.24)',
+    borderRadius: '8px',
+    color: '#fff',
+    '& .dx-button-content': { display: 'block' }
+  },
+  container: {
+    width: '100%',
+    padding: '30px 50px 0px 50px',
+    boxShadow: '0px 6px 18px rgba(0, 0, 0, 0.06)',
+    borderRadius: '10px'
+  },
+  avatar_container: {
+    width: '100%',
+    '& .cropper': {
+      height: '422px',
+      float: 'left'
     },
-    addBtn: {
-        width: '104px',
-        height: '40px',
-        background: '#00554A',
-        boxShadow: '0px 4px 10px rgba(16, 156, 241, 0.24)',
-        borderRadius: '8px',
-        color: '#fff',
-        '& .dx-button-content': { display: 'block' },
+    '& .cropper .box': {
+      display: 'inline-block',
+      padding: '10px',
+      boxSizing: 'border-box'
     },
-    container: {
-        width:'100%',
-        padding: '30px 50px 0px 50px',
-        boxShadow: '0px 6px 18px rgba(0, 0, 0, 0.06)',
-        borderRadius: '10px',
+    '& .cropper .img-preview': {
+      overflow: 'hidden'
+    }
+  },
+  related_image: {
+    height: '179px',
+    width: '100%',
+    marginTop: '28px'
+  },
+  vertical: {
+    height: '180px',
+    position: 'relative',
+    float: 'right',
+    marginTop: '-226.04px',
+    marginRight: '28.9px'
+  },
+  icon: {
+    float: 'right',
+    position: 'relative',
+    marginTop: '-420px',
+    padding: '10px',
+    color: '#fff'
+  },
+  cardImageContainer: {
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    flexFlow: 'wrap',
+    '& .add-btn': {
+      border: '1.5px dashed rgba(0, 0, 0, 0.48)'
     },
-    avatar_container: {
-        width: '100%',
-        '& .cropper': {
-            height: '422px',
-            float: 'left'
-        },
-        '& .cropper .box': {
-            display: 'inline-block',
-            padding: '10px',
-            boxSizing: 'border-box',
-        },
-        '& .cropper .img-preview': {
-            overflow: 'hidden',
-        },
-    },
-    related_image: {
-        height: '179px',
-        width: '100%',
-        marginTop: '28px',
-    },
-    vertical: {
-        height: '180px',
-        position: 'relative',
-        float: 'right',
-        marginTop: '-226.04px',
-        marginRight: '28.9px',
-    },
-    icon: {
-        float: 'right',
-        position: 'relative',
-        marginTop: '-420px',
-        padding: '10px',
-        color: '#fff',
-    },
-    cardImageContainer: {
+    '& .card-img': {
+      position: 'relative',
+      width: '230px',
+      height: '230px',
+      display: 'flex',
+      margin: '10px',
+      '& .hover-image': {
         width: '100%',
         height: '100%',
-        display: 'flex',
-        flexFlow: 'wrap',
-        '& .add-btn': {
-            border: '1.5px dashed rgba(0, 0, 0, 0.48)',
-        },
-        '& .card-img': {
-            position: 'relative',
-            width: '230px',
-            height: '230px',
-            display: 'flex',
-            margin: '10px',
-            '& .hover-image': {
-                width: '100%',
-                height: '100%',
-                background: 'rgb(206, 209, 215)',
-                objectFit: 'contain',
-                borderRadius: '8px',
-            },
-        },
-        '& .card-img .close': {
-            display: 'none',
-            padding: '0px',
-            position: 'absolute',
-            top: '10px',
-            width:'25px',
-            right: '5px',
-            backgroundColor: '#fff',
-            '& .MuiIconButton-label': {
-                width: '24px',
-                height: '24px',
-            },
-        },
-        '& .card-img:hover .close': {
-            display: 'block',
-        },
-        '& .card-img .full': {
-            display: 'none',
-            padding: '0px',
-            position: 'absolute',
-            right: '5px',
-            bottom: '5px',
-            width:'25px',
-            height:'25px',
-            backgroundColor: '#fff',
-            '& .MuiIconButton-label': {
-                width: '24px',
-                height: '24px',
-            },
-        },
-        '& .card-img:hover .full': {
-            display: 'block',
-        },
+        background: 'rgb(206, 209, 215)',
+        objectFit: 'contain',
+        borderRadius: '8px'
+      }
     },
-}));
+    '& .card-img .close': {
+      display: 'none',
+      padding: '0px',
+      position: 'absolute',
+      top: '10px',
+      width: '25px',
+      right: '5px',
+      backgroundColor: '#fff',
+      '& .MuiIconButton-label': {
+        width: '24px',
+        height: '24px'
+      }
+    },
+    '& .card-img:hover .close': {
+      display: 'block'
+    },
+    '& .card-img .full': {
+      display: 'none',
+      padding: '0px',
+      position: 'absolute',
+      right: '5px',
+      bottom: '5px',
+      width: '25px',
+      height: '25px',
+      backgroundColor: '#fff',
+      '& .MuiIconButton-label': {
+        width: '24px',
+        height: '24px'
+      }
+    },
+    '& .card-img:hover .full': {
+      display: 'block'
+    }
+  }
+}))
 
 export default AddFaceManagement

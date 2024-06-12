@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
+import { Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
 import Icon from 'src/@core/components/icon'
 
 const convertTimeToMinute = (time) => {
@@ -10,7 +10,7 @@ const convertTimeToMinute = (time) => {
 
 const Daily = ({ dateType, dataDailyProps, callbackOfDaily, disabled, minuteType }) => {
     const [dataDaily, setDataDaily] = useState(dataDailyProps || []);
-    const [timeType, setTimeType] = useState('month')
+    const [timeType, setTimeType] = useState('day')
     const [minutesType, setMinutesType] = useState('5minute')
 
     const [dataDailyDefault, setDataDailyDefault] = useState([
@@ -201,6 +201,10 @@ const Daily = ({ dateType, dataDailyProps, callbackOfDaily, disabled, minuteType
         }
 
         const newData = [
+            {
+                label: '',
+                value: 0,
+            },
             ...daysArray.map((day, index) => {
                 return {
                     label: day,
@@ -234,208 +238,132 @@ const Daily = ({ dateType, dataDailyProps, callbackOfDaily, disabled, minuteType
         return timePeriods
     }
 
+    // useEffect(() => {
+    //     console.log('timeLines', timeLines)
+    //     console.log('defaultTimePeriods', defaultTimePeriods)
+    //     console.log('dataDaily', dataDaily)
+    // }, [dataDaily])
+
     return (
-
-        // <div
-        //     style={{
-        //         width: '100%',
-        //     }}
-        // >
-        //     {dataDaily
-        //         .sort(function (a, b) {
-        //             return a.value - b.value;
-        //         })
-        //         .map((item, index) => {
-        //             if (item.value === 0) {
-        //                 return (
-        //                     <div
-        //                         key={index.toString()}
-        //                         style={{
-        //                             display: 'flex',
-        //                             flexDirection: 'row',
-        //                             alignItems: 'center',
-        //                             marginLeft: 93,
-        //                             width: 'calc(100% - 150px)',
-        //                             position: 'relative',
-        //                             color: 'rgba(0, 0, 0, 0.6)',
-        //                             fontSize: 14,
-        //                             // overflow: 'auto'
-        //                         }}
-        //                     >
-        //                         {timeLines.map(
-        //                             (a, b) => (
-        //                                 <div
-        //                                     key={b.toString()}
-        //                                     style={{
-        //                                         width: `${100 / 6}%`,
-        //                                         margin: '2px'
-        //                                     }}
-        //                                 >
-        //                                     {a}
-        //                                 </div>
-        //                             ),
-        //                         )}
-        //                         <div
-        //                             style={{
-        //                                 position: 'absolute',
-        //                                 right: -33,
-        //                             }}
-        //                         >
-        //                             24:00
-        //                         </div>
-        //                     </div>
-        //                 );
-        //             }
-
-        //             return (
-        //                 <div
-        //                     key={index.toString()}
-        //                     style={{
-        //                         display: 'flex',
-        //                         flexDirection: 'row',
-        //                         alignItems: 'center',
-        //                         width: '100%',
-        //                         marginTop: 6,
-        //                         fontSize: 14,
-        //                         fontWeight: 400,
-        //                         color: 'rgba(0, 0, 0, 0.6)',
-        //                     }}
-        //                 >
-        //                     <div style={{ minWidth: 80 }}>{item.label}</div>
-        //                     <div
-        //                         style={{
-        //                             display: 'flex',
-        //                             flexDirection: 'row',
-        //                             alignItems: 'center',
-        //                             width: '100%',
-        //                             height: 36,
-        //                             borderRadius: 4,
-        //                             position: 'relative',
-        //                             border: '1px solid rgba(0, 0, 0, 0.06)',
-        //                         }}
-        //                     >
-        //                         {defaultTimePeriods.map((a, b) => (
-        //                             <div
-        //                                 style={{
-        //                                     width: `${100 / 6}%`,
-        //                                     cursor: 'pointer',
-        //                                 }}
-        //                                 onClick={() => {
-        //                                     onClickChoiceItem(a, item.value);
-        //                                 }}
-        //                                 key={b.toString()}
-        //                             >
-        //                                 <div
-        //                                     style={{
-        //                                         width: b === 0 ? 0 : 1,
-        //                                         height: 36,
-        //                                         backgroundColor: 'rgba(0, 0, 0, 0.12)',
-        //                                     }}
-        //                                 />
-        //                             </div>
-        //                         ))}
-        //                         {item.timePeriods?.map((a, b) => (
-        //                             <div
-        //                                 key={b.toString()}
-        //                                 onClick={() => {
-        //                                     onClickDeleteItem(item, a);
-        //                                 }}
-        //                                 style={{
-        //                                     position: 'absolute',
-        //                                     left: `${convertTimeToMinute(a.startTimeInMinute)}%`,
-        //                                     height: 36,
-        //                                     background: '#7EBBFC',
-        //                                     cursor: 'pointer',
-        //                                     opacity: 0.8,
-        //                                     width: `${convertTimeToMinute(a.endTimeInMinute - a.startTimeInMinute)}%`,
-        //                                 }}
-        //                             />
-        //                         ))}
-        //                     </div>
-        //                 </div>
-        //             );
-        //         })}
-
-
-        // </div>
-
-        <TableContainer component={Paper} style={{ maxHeight: 500 }}>
-            <Table stickyHeader>
-                <TableHead>
-                    <TableRow>
-                        <TableCell>Date</TableCell>
-                        {timeLines.map((time, index) => (
-                            <TableCell key={index} align="center">
-                                {time}
-                            </TableCell>
-                        ))}
-                        <TableCell align="center">24:00</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {dataDailyDefault.sort((a, b) => a.value - b.value).map((item, index) => (
-                        <TableRow key={index.toString()}>
-                            <TableCell component="th" scope="row">
-                                {item.label}
-                            </TableCell>
-                            <TableCell colSpan={timeLines.length + 1}
+        <div
+            style={{
+                width: '100%',
+                overflow: 'auto'
+            }}
+        >
+            {dataDaily
+                .sort(function (a, b) {
+                    return a.value - b.value;
+                })
+                .map((item, index) => {
+                    if (item.value === 0) {
+                        return (
+                            <div
+                                key={index.toString()}
                                 style={{
-                                    padding: '0',
-                                    position: 'relative'
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    marginLeft: 93,
+                                    width: 'calc(100% - 150px)',
+                                    position: 'relative',
+                                    color: 'rgba(0, 0, 0, 0.6)',
+                                    fontSize: 14,
                                 }}
                             >
-                                <div
-                                    style={{
-                                        display: 'flex',
-                                        flexDirection: 'row',
-                                        alignItems: 'center',
-                                        height: '100%',
-                                        position: 'relative'
-                                    }}
-                                >
-                                    {defaultTimePeriods.map((period, idx) => (
+                                {timeLines.map(
+                                    (a, b) => (
                                         <div
-                                            key={idx.toString()}
+                                            key={b.toString()}
                                             style={{
-                                                width: `${100 / defaultTimePeriods.length}%`,
-                                                cursor: 'pointer',
-                                                position: 'relative',
+                                                width: `${100 / 6}%`,
+                                                margin: '2px'
                                             }}
-                                            onClick={() => onClickChoiceItem(period, item.value)}
                                         >
-                                            <div
-                                                style={{
-                                                    width: idx === 0 ? 0 : 1,
-                                                    height: '100%',
-                                                    backgroundColor: 'rgba(0, 0, 0, 0.12)',
-                                                    position: 'absolute',
-                                                    left: 0,
-                                                }}
-                                            />
+                                            {a}
                                         </div>
-                                    ))}
-                                    {item.timePeriods?.map((period, idx) => (
-                                        <div
-                                            key={idx.toString()}
-                                            onClick={() => onClickDeleteItem(item, period)}
-                                            style={{
-                                                position: 'absolute',
-                                                left: `${convertTimeToMinute(period.startTimeInMinute)}%`,
-                                                height: '36px',
-                                                backgroundColor: '#7EBBFC',
-                                                cursor: 'pointer',
-                                                opacity: 0.8,
-                                                width: `${convertTimeToMinute(period.endTimeInMinute - period.startTimeInMinute)}%`,
-                                            }}
-                                        />
-                                    ))}
+                                    ),
+                                )}
+                                <div>
+                                    24:00
                                 </div>
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </TableContainer>
+                            </div>
+                        );
+                    }
+
+                    return (
+                        <div
+                            key={index.toString()}
+                            style={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                width: '100%',
+                                marginTop: 6,
+                                fontSize: 14,
+                                fontWeight: 400,
+                                color: 'rgba(0, 0, 0, 0.6)',
+                            }}
+                        >
+                            <div style={{ minWidth: 80 }}>{item.label}</div>
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    width: '100%',
+                                    height: 36,
+                                    borderRadius: 4,
+                                    position: 'relative',
+                                    border: '1px solid rgba(0, 0, 0, 0.06)',
+                                }}
+                            >
+                                {defaultTimePeriods.map((a, b) => (
+                                    <div
+                                        style={{
+                                            width: `${100 / 6}%`,
+                                            cursor: 'pointer',
+                                        }}
+                                        onClick={() => {
+                                            onClickChoiceItem(a, item.value);
+                                            console.log('a', a)
+                                        }}
+                                        key={b.toString()}
+                                    >
+                                        {/* <div
+                                            style={{
+                                                // width: '${100 / 6}%',
+                                                height: 36,
+                                                backgroundColor: 'rgba(0, 0, 0, 0.12)',
+                                            }}
+                                        /> */}
+                                    </div>
+                                ))}
+                                {item.timePeriods?.map((a, b) => (
+                                    <div
+                                        key={b.toString()}
+                                        onClick={() => {
+                                            onClickDeleteItem(item, a);
+                                            console.log('item', item)
+                                        }}
+                                        style={{
+                                            position: 'absolute',
+                                            left: `${convertTimeToMinute(a.startTimeInMinute)}%`,
+                                            height: 36,
+                                            background: '#7EBBFC',
+                                            cursor: 'pointer',
+                                            opacity: 0.8,
+                                            width: `${convertTimeToMinute(a.endTimeInMinute - a.startTimeInMinute)}%`,
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    );
+                })}
+
+
+        </div>
     );
 };
 

@@ -9,6 +9,7 @@ import { CircularProgress } from '@material-ui/core'
 import Icon from 'src/@core/components/icon'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import FileUploader from 'devextreme-react/file-uploader'
+import CustomDialog from '../../face_management/CustomDialog/CustomDialog'
 import ModalImage from '../ModalImage'
 import Link from 'next/link'
 import {
@@ -55,7 +56,10 @@ const UpDateCar = () => {
   const [name, setName] = useState(null)
   const [note, setNote] = useState(null)
   const fileUploader1 = useRef(null)
-
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [dialogTitle, setDialogTitle] = useState('')
+  const [dialogMessage, setDialogMessage] = useState('')
+  const [isSuccess, setIsSuccess] = useState(false)
   const fileUploader2 = useRef(null)
   const [showLoading, setShowLoading] = useState(false)
   const [isDoubleClick, setIsDoubleClick] = useState(false)
@@ -303,6 +307,10 @@ const UpDateCar = () => {
     fetchFilteredOrAllUsers()
   }, [id])
 
+  const handleDialogClose = () => {
+    setDialogOpen(false)
+  }
+
   const handleUpdate = async () => {
     setLoading(true)
     try {
@@ -324,12 +332,18 @@ const UpDateCar = () => {
         }))
       }
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates/${id}`, params, config)
-      Swal.fire('Sửa thành công', '', 'success')
+      setDialogTitle('Sửa thông tin thành công')
+      setIsSuccess(true)
       fetchFilteredOrAllUserss()
     } catch (error) {
-      Swal.fire('Sửa không thành công', error.response.data.message, 'error')
-
+      setDialogTitle('Sửa thông tin không thành công')
+      setDialogMessage(error.response.data.message || 'Sửa không thành công')
+      setIsSuccess(false)
+      fetchFilteredOrAllUserss()
       console.error('Error adding member to group:', error)
+    } finally {
+      setLoading(false)
+      setDialogOpen(true)
     }
   }
   console.log(avatarImage, 'avatarImage')
@@ -371,6 +385,13 @@ const UpDateCar = () => {
                     '& .MuiCardHeader-action': { m: 0 },
                     alignItems: ['flex-start', 'center']
                   }}
+                />
+                <CustomDialog
+                  open={dialogOpen}
+                  handleClose={handleDialogClose}
+                  title={dialogTitle}
+                  message={dialogMessage}
+                  isSuccess={isSuccess}
                 />
                 <Grid item xs={12}>
                   <TableContainer>

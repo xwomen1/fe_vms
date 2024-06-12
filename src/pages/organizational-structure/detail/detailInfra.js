@@ -32,9 +32,9 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
           }
         }
         const response = await axios.get(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${id}`, config)
-        setName(response.data.name)
-        setType(response.data.type)
-        setDetail(response.data.detail)
+        setName(response.data.name || '')
+        setType(response.data.type || '')
+        setDetail(response.data.detail || '')
       } catch (error) {
         console.error('Error fetching data:', error)
       }

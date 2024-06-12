@@ -100,7 +100,7 @@ const UserList = ({ apiData }) => {
     const fetchAllRegionNames = async () => {
       const newContractTypes = {}
       for (const user of userData) {
-        if (contractName && !newContractTypes[user.contractType]) {
+        if (user.contractType) {
           const regionName = await fetchRegionName(user.contractType)
           newContractTypes[user.contractType] = regionName
         }
@@ -109,7 +109,7 @@ const UserList = ({ apiData }) => {
     }
 
     fetchAllRegionNames()
-  }, [userData, contractName])
+  }, [userData])
 
   const GroupCheckbox = ({ group, checked, onChange }) => {
     return (

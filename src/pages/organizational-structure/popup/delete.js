@@ -3,11 +3,11 @@ import { Autocomplete, TextField, Button, Dialog, DialogTitle, DialogContent, Di
 import axios from 'axios'
 import authConfig from 'src/configs/auth'
 import Swal from 'sweetalert2'
-import { router } from 'websocket'
 import { useRouter } from 'next/router'
 
 const InfraPopup = ({ open, id, onClose, onSuccess }) => {
   const router = useRouter()
+  const [errorOccurred, setErrorOccurred] = useState(false) // Thêm trạng thái để xác định xem đã xảy ra lỗi hay không
 
   const handleDelete = () => {
     const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -31,9 +31,17 @@ const InfraPopup = ({ open, id, onClose, onSuccess }) => {
         onSuccess()
       })
       .catch(error => {
+        setErrorOccurred(true) // Đặt trạng thái lỗi thành true khi xảy ra lỗi
         Swal.fire('Đã xảy ra lỗi', error.message, 'error')
       })
   }
+
+  // Sử dụng useEffect để đóng popup khi đã xảy ra lỗi
+  useEffect(() => {
+    if (errorOccurred) {
+      onClose()
+    }
+  }, [errorOccurred, onClose])
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>

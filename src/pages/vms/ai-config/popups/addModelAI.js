@@ -64,15 +64,6 @@ const format_form = [
         require: true,
         width: 6,
     },
-    {
-        name: 'characteristicValue',
-        label: 'Độ nhạy',
-        placeholder: 'Nhập độ nhạy',
-        type: 'TextField',
-        data: [],
-        require: true,
-        width: 6,
-    }
 ]
 
 const AddModelAI = ({ show, onClose, setReload, data, id, typePopup }) => {
@@ -223,6 +214,9 @@ const AddModelAI = ({ show, onClose, setReload, data, id, typePopup }) => {
                                     )
                                 }
                             })}
+                            <Button variant='contained' color='primary' sx={{ margin: '10px' }}>
+                                Thêm
+                            </Button>
                         </Grid>
                     </form>
                 </DialogContent>
