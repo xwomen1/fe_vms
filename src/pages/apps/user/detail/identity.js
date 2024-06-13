@@ -128,7 +128,7 @@ const UserDetails = () => {
     setIsFaceEnabled(!isFaceEnabled)
   }
 
-  const statusText = isFaceEnabled ? 'Không hoạt động' : 'Đang hoạt động'
+  const statusText = status1 ? 'Đang hoạt động' : 'Không hoạt động'
 
   const statusText1 = !fingerIdentifyUpdatedAt ? 'Đã định danh' : 'Chưa định danh'
 
@@ -512,7 +512,7 @@ const UserDetails = () => {
               <Grid container spacing={2} style={{ color: 'black', marginLeft: '1%' }}>
                 <Grid container spacing={2}>
                   {' '}
-                  <Grid item xs={9}>
+                  <Grid item xs={3}>
                     <h2 style={{ color: 'black', marginLeft: '1%' }}> Thông tin định danh khuôn mặt</h2>
                   </Grid>
                   <Grid item xs={3} style={{ marginTop: '1.1%' }}>

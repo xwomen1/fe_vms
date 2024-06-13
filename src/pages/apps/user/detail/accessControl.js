@@ -32,7 +32,6 @@ import DatePicker from 'react-datepicker'
 import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
 import Swal from 'sweetalert2'
 import Link from 'next/link'
-import { auto } from '@popperjs/core'
 
 const UserDetails = () => {
   const router = useRouter()
@@ -277,27 +276,30 @@ const UserDetails = () => {
   }
 
   return (
-    <Grid container spacing={2} component={Paper} sx={{ width: '100%', height: 'auto', padding: '1%' }}>
-      <Grid item xs={12}>
-        <Box display='flex' justifyContent='flex-end' sx={{ marginRight: '4%' }}>
-          <>
-            <Button variant='contained' onClick={saveChanges} sx={{ marginRight: '1%' }}>
-              Lưu
-            </Button>
-            <Button variant='contained' onClick={handleCancel}>
-              Huỷ
-            </Button>
-          </>
-        </Box>
+    <Grid container spacing={3} component={Paper}>
+      <Grid item xs={3}>
+        <h2 style={{ color: 'black', marginLeft: '15%' }}> </h2>
       </Grid>
-
+      <Grid container spacing={2}>
+        <div style={{ width: '80%' }}></div>
+        <br></br>
+        <>
+          <Button variant='contained' onClick={saveChanges} sx={{ marginRight: '10px' }}>
+            Lưu
+          </Button>
+          <Button variant='contained' onClick={handleCancel}>
+            Huỷ
+          </Button>
+        </>
+      </Grid>
       <Grid item xs={12}>
-        <TableContainer>
-          <Table>
+        <TableContainer component={Paper} sx={{ minHeight: 600, minWidth: 1400 }}>
+          <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
             <TableHead>
               <TableRow>
-                <TableCell>Đơn vị</TableCell>
-                <TableCell>Mã đơn vị</TableCell>
+                <TableCell sx={{ minWidth: 300 }}>Nhóm người dùng</TableCell>
+                <TableCell sx={{ minWidth: 300 }}>Lịch theo nhóm</TableCell>
+
                 <TableCell align='center'>
                   <IconButton size='small' onClick={handleAddRow} sx={{ marginLeft: '10px' }}>
                     <Icon icon='bi:plus' />
@@ -308,29 +310,30 @@ const UserDetails = () => {
             <TableBody>
               {rows.map((row, index) => (
                 <TableRow key={index}>
-                  <TableCell sx={{ width: '30%' }}>
+                  <TableCell>
                     <Autocomplete
                       options={groupOptions.filter(option => !rows.some(row => row.id === option.id))}
                       getOptionLabel={option => option.name}
                       value={groupOptions.find(option => option.name === row.groupName) || null}
                       onChange={async (event, newValue) => {
-                        if (editing) {
-                          const updatedRows = [...rows]
-                          updatedRows[index].groupName = newValue ? newValue.name : ''
-                          updatedRows[index].id = newValue ? newValue.id : ''
-                          updatedRows[index].description = await getListAccessGroupNamesByUserGroupId(
-                            newValue ? newValue.id : ''
-                          )
+                        // Chỉ cho phép thay đổi khi đang trong trạng thái chỉnh sửa
+                        const updatedRows = [...rows]
+                        updatedRows[index].groupName = newValue ? newValue.name : ''
+                        updatedRows[index].id = newValue ? newValue.id : ''
+                        updatedRows[index].description = await getListAccessGroupNamesByUserGroupId(
+                          newValue ? newValue.id : ''
+                        )
 
-                          setRows(updatedRows)
-                        }
+                        setRows(updatedRows)
                       }}
-                      disabled={!editing}
                       renderInput={params => <TextField {...params} label='Đơn vị' />}
                     />
                   </TableCell>
-                  <TableCell sx={{ width: '50%' }}>{row.description}</TableCell>
-                  <TableCell align='center' sx={{ width: '20%' }}>
+                  <TableCell>
+                    {row.description}
+                    {console.log(rows)}
+                  </TableCell>
+                  <TableCell align='center'>
                     {index >= 0 && (
                       <IconButton size='small' onClick={() => handleDeleteRow(index)}>
                         <Icon icon='bi:trash' />
