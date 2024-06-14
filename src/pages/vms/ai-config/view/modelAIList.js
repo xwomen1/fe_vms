@@ -269,7 +269,7 @@ const ModelAIList = () => {
                                                         )
                                                     })}
                                                     <TableCell>
-                                                        <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center' }}>
+                                                        <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'end' }}>
                                                             <IconButton size='small' sx={{ color: 'text.secondary' }}
                                                                 onClick={() => {
                                                                     setDataModelAI(row)
