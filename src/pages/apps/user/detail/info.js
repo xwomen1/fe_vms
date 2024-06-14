@@ -463,8 +463,8 @@ const UserDetails = () => {
           timeStartAfternoon: convertStringToTimeArray(timeStartAfternoon),
           timeStartMorning: convertStringToTimeArray(dateTime),
           timeEndMorning: convertStringToTimeArray(timeEndMorning),
-          availableAt: ava1,
-          expiredAt: ava2,
+          availableAt: ava1 || availableAt,
+          expiredAt: ava2 || expiredAt,
           level: filteredRegionOptions || selectedRegion.id,
           contractType: filteredContractOptions || selectContract.id,
           note: note
