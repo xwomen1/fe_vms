@@ -1,11 +1,10 @@
-import { useState, forwardRef, useEffect } from 'react'
+import React, { useState, forwardRef, useEffect } from 'react'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import Icon from 'src/@core/components/icon'
 import { Box, Button, Card, Dialog, DialogActions, DialogContent, Fade, Grid, IconButton, MenuItem, Typography, styled } from '@mui/material'
 import authConfig from 'src/configs/auth'
 import axios from 'axios'
 import { Controller, useForm } from 'react-hook-form'
-import Daily from '../mocdata/daily'
 import toast from 'react-hot-toast'
 
 const Transition = forwardRef(function Transition(props, ref) {
@@ -27,49 +26,84 @@ const CustomCloseButton = styled(IconButton)(({ theme }) => ({
     }
 }))
 
+// const format_form = [
+//     [
+//         {
+//             name: 'type',
+//             label: 'Mã Model AI',
+//             placeholder: 'Nhập mã model AI',
+//             type: 'TextField',
+//             data: [],
+//             require: true,
+//             width: 6,
+//         },
+//         {
+//             name: 'modelName',
+//             label: 'Tên Model AI',
+//             placeholder: 'Nhập tên Model AI',
+//             type: 'TextField',
+//             data: [],
+//             require: true,
+//             width: 6,
+//         },
+//     ],
+//     [
+//         {
+//             name: 'characteristicType',
+//             label: 'Mã thông số',
+//             placeholder: 'Nhập mã thông số',
+//             type: 'TextField',
+//             data: [],
+//             require: true,
+//             width: 4,
+//         },
+//         {
+//             name: 'characteristicName',
+//             label: 'Tên thông số',
+//             placeholder: 'Nhập tên thông số',
+//             type: 'TextField',
+//             data: [],
+//             require: true,
+//             width: 4,
+//         },
+//         {
+//             name: 'characteristicValue',
+//             label: 'Giá trị thông số',
+//             placeholder: 'Nhập giá trị thông số',
+//             type: 'TextField',
+//             data: [],
+//             require: true,
+//             width: 3,
+//             defaultValue: 35
+//         }
+//     ]
+// ]
+
 const format_form = [
     {
         name: 'type',
         label: 'Mã Model AI',
         placeholder: 'Nhập mã model AI',
         type: 'TextField',
-        data: [],
         require: true,
-        width: 6,
+        width: 6
     },
     {
         name: 'modelName',
         label: 'Tên Model AI',
         placeholder: 'Nhập tên Model AI',
         type: 'TextField',
-        data: [],
         require: true,
-        width: 6,
+        width: 6
     },
-    {
-        name: 'characteristicType',
-        label: 'Mã thông số',
-        placeholder: 'Nhập mã thông số',
-        type: 'TextField',
-        data: [],
-        require: true,
-        width: 6,
-    },
-    {
-        name: 'characteristicName',
-        label: 'Tên thông số',
-        placeholder: 'Nhập tên thông số',
-        type: 'TextField',
-        data: [],
-        require: true,
-        width: 6,
-    },
-]
+];
 
 const AddModelAI = ({ show, onClose, setReload, data, id, typePopup }) => {
     const [loading, setLoading] = useState(false)
     const [detail, setDetail] = useState(null)
     const [form, setForm] = useState(format_form)
+    const [characteristic, setCharacteristic] = useState([])
+    const [characteristicsIndex, setCharacteristicsIndex] = useState(0)
 
     const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -89,7 +123,11 @@ const AddModelAI = ({ show, onClose, setReload, data, id, typePopup }) => {
     } = useForm({})
 
     useEffect(() => {
-        setDetail(data)
+        if (data) {
+            handleUpdateForm(data)
+            handleUpdateDetail(data)
+            setCharacteristicsIndex(data?.characteristic.length)
+        }
     }, [data])
 
     useEffect(() => {
@@ -102,21 +140,135 @@ const AddModelAI = ({ show, onClose, setReload, data, id, typePopup }) => {
         reset(detail)
     }
 
-
     const onReset = (values) => {
         var detail = {}
         callback(detail)
         onClose()
     }
 
+    const handleUpdateDetail = (data) => {
+        const characteristicData = {};
+        const characteristicList = data?.characteristic || [];
+
+        for (let i = 0; i < data?.characteristic?.length; i++) {
+            const item = characteristicList[i];
+            characteristicData[`characteristics[${i}].characteristicType`] = item.characteristicType;
+            characteristicData[`characteristics[${i}].characteristicName`] = item.characteristicName;
+            characteristicData[`characteristics[${i}].characteristicValue`] = item.characteristicValue;
+        }
+
+        const formData = {
+            ...data,
+            ...characteristicData
+        };
+
+        setDetail(formData)
+    };
+
+    const handleUpdateForm = (data) => {
+
+        const characteristicForm = []
+
+        for (let i = 0; i < data?.characteristic?.length; i++) {
+            characteristicForm.push({
+                name: `characteristics[${i}].characteristicType`,
+                label: 'Mã thông số',
+                placeholder: 'Nhập mã thông số',
+                type: 'TextField',
+                require: true,
+                width: 4
+            },
+                {
+                    name: `characteristics[${i}].characteristicName`,
+                    label: 'Tên thông số',
+                    placeholder: 'Nhập tên thông số',
+                    type: 'TextField',
+                    require: true,
+                    width: 4
+                },
+                {
+                    name: `characteristics[${i}].characteristicValue`,
+                    label: 'Giá trị thông số',
+                    placeholder: '35',
+                    type: 'TextField',
+                    require: true,
+                    width: 3,
+                    defaultValue: '35'
+                })
+        }
+
+        setForm((prevForm) => [
+            ...prevForm,
+            ...characteristicForm
+        ])
+    }
+
+    const handleAddNewField = () => {
+        setForm((prevForm) => [
+            ...prevForm,
+            {
+                name: `characteristics[${characteristicsIndex}].characteristicType`,
+                label: 'Mã thông số',
+                placeholder: 'Nhập mã thông số',
+                type: 'TextField',
+                require: true,
+                width: 4
+            },
+            {
+                name: `characteristics[${characteristicsIndex}].characteristicName`,
+                label: 'Tên thông số',
+                placeholder: 'Nhập tên thông số',
+                type: 'TextField',
+                require: true,
+                width: 4
+            },
+            {
+                name: `characteristics[${characteristicsIndex}].characteristicValue`,
+                label: 'Giá trị thông số',
+                placeholder: '35',
+                type: 'TextField',
+                require: true,
+                width: 3,
+                defaultValue: '35'
+            }
+        ]);
+        setCharacteristicsIndex(characteristicsIndex + 1)
+    };
+
+    const handleRemoveField = () => {
+        let startIndex = 0;
+        let endIndex = form?.length - 3;
+
+        const formNew = form.slice(startIndex, endIndex)
+        setForm(formNew)
+
+        characteristic.pop()
+        setCharacteristicsIndex(characteristicsIndex - 1)
+    };
+
     const onSubmit = (values) => {
 
+        // Lấy giá trị từ form
+        const { type, modelName, characteristics } = values;
+
+        // Tạo đối tượng detail để gửi đi
+        const detail = {
+            modelName: modelName,
+            type: type,
+            characteristic: characteristics.map((characteristic) => ({
+                characteristicName: characteristic.characteristicName,
+                characteristicType: characteristic.characteristicType,
+                characteristicValue: characteristic.characteristicValue
+            }))
+        };
+
         if (data) {
-            handleUpdate(values)
+            handleUpdate(detail);
         } else {
-            handleAdd(values)
+            handleAdd(detail);
         }
-        onClose()
+
+        onClose();
     }
 
     const handleAdd = (values) => {
@@ -132,8 +284,14 @@ const AddModelAI = ({ show, onClose, setReload, data, id, typePopup }) => {
                 onClose()
             })
             .catch((error) => {
-                console.error('Error fetching data: ', error)
-                toast.error(error)
+                if (error && error?.response?.data) {
+                    console.error('error', error)
+                    toast.error(error?.response?.data?.message)
+
+                } else {
+                    console.error('Error fetching data:', error)
+                    toast.error(error)
+                }
             })
             .finally(() => {
                 setLoading(false)
@@ -153,8 +311,14 @@ const AddModelAI = ({ show, onClose, setReload, data, id, typePopup }) => {
                 onClose()
             })
             .catch((error) => {
-                console.error('Error fetching data: ', error)
-                toast.error(error)
+                if (error && error?.response?.data) {
+                    console.error('error', error)
+                    toast.error(error?.response?.data?.message)
+
+                } else {
+                    console.error('Error fetching data:', error)
+                    toast.error(error)
+                }
             })
             .finally(() => {
                 setLoading(false)
@@ -189,34 +353,46 @@ const AddModelAI = ({ show, onClose, setReload, data, id, typePopup }) => {
                     <form>
                         <Grid container spacing={2}>
                             {form.map((item, index) => {
-                                if (item.type === 'TextField') {
+                                if (item.type === "TextField") {
                                     return (
-                                        <Grid item xs={item.width} key={index}>
+                                        <Grid item xs={item.width} key={index} sx={{ display: 'flex', alignItems: 'center' }}>
                                             <Controller
                                                 name={item.name}
                                                 control={control}
-                                                rules={{ required: true }}
+                                                rules={{ required: item.require }}
                                                 render={({ field: { value, onChange } }) => (
                                                     <CustomTextField
                                                         fullWidth
-                                                        disabled={typePopup === 'view' ? true : false}
+                                                        disabled={typePopup === 'view'}
                                                         value={value}
                                                         label={item.label}
                                                         onChange={onChange}
                                                         placeholder={item.placeholder}
-                                                        error={Boolean(errors.nameCalendar)}
+                                                        error={Boolean(errors[item.name])}
                                                         aria-describedby='validation-basic-last-name'
-                                                        {...(errors.nameCalendar && { helperText: 'Trường này bắt buộc' })}
+                                                        {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
                                                     />
                                                 )}
                                             />
+
                                         </Grid>
                                     )
                                 }
+
                             })}
-                            <Button variant='contained' color='primary' sx={{ margin: '10px' }}>
-                                Thêm
-                            </Button>
+                            {typePopup !== 'view' &&
+                                <Grid item xs={12}>
+                                    <Typography sx={{ mb: 3, fontSize: '16px', fontStyle: 'italic', color: '#FF9F43' }}>Thêm các thông số Model AI</Typography>
+                                    <Button variant='contained' color='primary' sx={{ margin: '10px' }} onClick={handleAddNewField}>
+                                        Thêm
+                                    </Button>
+                                    {/* {form.length > 2 &&
+                                        <Button variant='contained' color='error' sx={{ margin: '10px' }} onClick={() => handleRemoveField()} >
+                                            Xóa
+                                        </Button>
+                                    } */}
+                                </Grid>
+                            }
                         </Grid>
                     </form>
                 </DialogContent>
@@ -234,16 +410,16 @@ const AddModelAI = ({ show, onClose, setReload, data, id, typePopup }) => {
                     >
                         {typePopup === 'view' ? 'Đóng' : 'Hủy'}
                     </Button>
-                    {
-                        typePopup === 'add' &&
+                    {typePopup === 'add' && (
                         <Button type='submit' variant='contained' onClick={handleSubmit(onSubmit)}>
                             Lưu
                         </Button>
-                    }
+                    )}
                 </DialogActions>
             </Dialog>
-        </Card>
-    )
+        </Card >
+    );
+
 }
 
 export default AddModelAI
