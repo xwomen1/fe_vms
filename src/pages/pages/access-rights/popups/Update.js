@@ -360,7 +360,6 @@ const View = ({ show, onClose, id, setReload, filter }) => {
                         render={({ field: { value, onChange } }) => (
                           <CustomTextField
                             fullWidth
-                            disabled={true}
                             value={value}
                             label={item.label}
                             onChange={onChange}
@@ -410,7 +409,7 @@ const View = ({ show, onClose, id, setReload, filter }) => {
           }}
         >
           <Button variant='contained' onClick={onClose}>
-            Đóng
+            Lưu
           </Button>
         </DialogActions>
       </Dialog>

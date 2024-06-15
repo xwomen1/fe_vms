@@ -310,7 +310,7 @@ const Camera = ({ apiData }) => {
       <Grid item xs={12}>
         <Card>
           <Grid container spacing={1}>
-            <Grid item xs={10}>
+            <Grid item xs={9}>
               {selectedIds === null ? (
                 <TableHeader />
               ) : (
@@ -324,9 +324,10 @@ const Camera = ({ apiData }) => {
                 />
               )}
             </Grid>
-            <Grid item xs={2} style={{ marginTop: '1%' }}>
+            <Grid item xs={3} style={{ marginTop: '1%' }}>
               <CustomTextField
                 value={value}
+                autoComplete='off'
                 onChange={e => handleFilter(e.target.value)}
                 placeholder='Search…'
                 InputProps={{

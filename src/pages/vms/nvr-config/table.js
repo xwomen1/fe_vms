@@ -265,7 +265,7 @@ const UserList = ({ apiData }) => {
       <Grid item xs={12}>
         <Card>
           <Grid container spacing={1}>
-            <Grid item xs={10}>
+            <Grid item xs={9}>
               {selectedIds === null ? (
                 <TableHeader />
               ) : (
@@ -279,7 +279,7 @@ const UserList = ({ apiData }) => {
                 />
               )}
             </Grid>
-            <Grid item xs={2} style={{ marginTop: '1%' }}>
+            <Grid item xs={3} style={{ marginTop: '1%' }}>
               <CustomTextField
                 value={value}
                 onChange={e => handleFilter(e.target.value)}
