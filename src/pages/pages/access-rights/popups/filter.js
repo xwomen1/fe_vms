@@ -144,6 +144,17 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
     onClose()
   }
 
+  const handleClear = (onChange, field) => {
+    onChange('')
+    if (field === 'groupId') {
+      setSelectedGroupId('')
+    } else if (field === 'doorInId') {
+      // Handle doorInId clear
+    } else if (field === 'doorOutId') {
+      // Handle doorOutId clear
+    }
+  }
+
   return (
     <Card>
       <Dialog
@@ -176,33 +187,47 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                   name='groupId'
                   control={control}
                   render={({ field: { value, onChange } }) => (
-                    <CustomTextField
-                      select
-                      fullWidth
-                      defaultValue=''
-                      label='Công ty'
-                      SelectProps={{
-                        value: value,
-                        onChange: e => onChange(e),
-                        MenuProps: {
-                          PaperProps: {
-                            style: {
-                              maxHeight: 200 // Đặt chiều cao tối đa của menu
+                    <Box position='relative'>
+                      <CustomTextField
+                        select
+                        fullWidth
+                        defaultValue=''
+                        label='Công ty'
+                        SelectProps={{
+                          value: value,
+                          onChange: e => {
+                            onChange(e)
+                            setSelectedGroupId(e.target.value)
+                          },
+                          MenuProps: {
+                            PaperProps: {
+                              style: {
+                                maxHeight: 200 // Đặt chiều cao tối đa của menu
+                              }
                             }
                           }
-                        }
-                      }}
-                      id='validation-basic-select'
-                      error={Boolean(errors.select)}
-                      aria-describedby='validation-basic-select'
-                      {...(errors.select && { helperText: 'This field is required' })}
-                    >
-                      {groupName.map(item => (
-                        <MenuItem key={item.id} value={item.id}>
-                          {item.name}
-                        </MenuItem>
-                      ))}
-                    </CustomTextField>
+                        }}
+                        id='validation-basic-select'
+                        error={Boolean(errors.groupId)}
+                        aria-describedby='validation-basic-select'
+                        {...(errors.groupId && { helperText: 'This field is required' })}
+                      >
+                        {groupName.map(item => (
+                          <MenuItem key={item.id} value={item.id}>
+                            {item.name}
+                          </MenuItem>
+                        ))}
+                      </CustomTextField>
+                      {value && (
+                        <IconButton
+                          size='small'
+                          style={{ position: 'absolute', right: 25, top: 25 }}
+                          onClick={() => handleClear(onChange, 'groupId')}
+                        >
+                          <Icon icon='tabler:x' fontSize='1rem' />
+                        </IconButton>
+                      )}
+                    </Box>
                   )}
                 />
               </Grid>
@@ -211,8 +236,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                   name='doorInId'
                   control={control}
                   render={({ field: { value, onChange } }) => (
-                    console.log(value),
-                    (
+                    <Box position='relative'>
                       <CustomTextField
                         select
                         fullWidth
@@ -233,7 +257,16 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                           </MenuItem>
                         ))}
                       </CustomTextField>
-                    )
+                      {value && (
+                        <IconButton
+                          size='small'
+                          style={{ position: 'absolute', right: 25, top: 25 }}
+                          onClick={() => handleClear(onChange, 'doorInId')}
+                        >
+                          <Icon icon='tabler:x' fontSize='1rem' />
+                        </IconButton>
+                      )}
+                    </Box>
                   )}
                 />
               </Grid>
@@ -242,26 +275,37 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                   name='doorOutId'
                   control={control}
                   render={({ field: { value, onChange } }) => (
-                    <CustomTextField
-                      select
-                      fullWidth
-                      defaultValue=''
-                      label='Cửa ra'
-                      SelectProps={{
-                        value: value,
-                        onChange: e => onChange(e)
-                      }}
-                      id='validation-basic-select'
-                      error={Boolean(errors.doorOutId)}
-                      aria-describedby='validation-basic-select'
-                      {...(errors.doorOutId && { helperText: 'This field is required' })}
-                    >
-                      {doorList.map(door => (
-                        <MenuItem key={door.id} value={door.id}>
-                          {door.name}
-                        </MenuItem>
-                      ))}
-                    </CustomTextField>
+                    <Box position='relative'>
+                      <CustomTextField
+                        select
+                        fullWidth
+                        defaultValue=''
+                        label='Cửa ra'
+                        SelectProps={{
+                          value: value,
+                          onChange: e => onChange(e)
+                        }}
+                        id='validation-basic-select'
+                        error={Boolean(errors.doorOutId)}
+                        aria-describedby='validation-basic-select'
+                        {...(errors.doorOutId && { helperText: 'This field is required' })}
+                      >
+                        {doorList.map(door => (
+                          <MenuItem key={door.id} value={door.id}>
+                            {door.name}
+                          </MenuItem>
+                        ))}
+                      </CustomTextField>
+                      {value && (
+                        <IconButton
+                          size='small'
+                          style={{ position: 'absolute', right: 25, top: 25 }}
+                          onClick={() => handleClear(onChange, 'doorOutId')}
+                        >
+                          <Icon icon='tabler:x' fontSize='1rem' />
+                        </IconButton>
+                      )}
+                    </Box>
                   )}
                 />
               </Grid>
