@@ -44,7 +44,7 @@ const InforAll = ({ idInfor }) => {
   const [selectedRegion, setSelectedRegion] = useState(null)
   const [parentId, setParentId] = useState(null)
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
-  const parentIdToFilter = 'fa7f0b8b-56a7-44c7-96d6-997e7fc55304'
+
   const postParentId = '3cf287c3-503a-4c49-8d1c-4c60710561f5'
 
   const directionOptions = [
@@ -206,6 +206,7 @@ const InforAll = ({ idInfor }) => {
       [field]: value
     }))
   }
+  const parentIdToFilter = 'fa7f0b8b-56a7-44c7-96d6-997e7fc55304'
 
   const fetchRegions = async () => {
     setLoading(true)
@@ -230,16 +231,11 @@ const InforAll = ({ idInfor }) => {
         )
         const childData = childResponse.data
 
-        const combinedData = [
-          {
-            id: parentRegion.id,
-            name: parentRegion.name
-          },
-          ...childData.map(child => ({
-            id: child.id,
-            name: child.name
-          }))
-        ]
+        // Chỉ lấy dữ liệu của "child regions"
+        const combinedData = childData.map(child => ({
+          id: child.id,
+          name: child.name
+        }))
 
         setRegions(combinedData)
       }
@@ -488,24 +484,28 @@ const InforAll = ({ idInfor }) => {
                 onChange={handleSelection}
                 value={selectedRegion} // Set the selected value here
                 renderInput={params => (
-                  <CustomTextField
-                    {...params}
-                    label='Vị trí'
-                    fullWidth
-                    InputProps={{
-                      ...params.InputProps,
-                      endAdornment: (
-                        <>
-                          {loading ? <CircularProgress color='inherit' size={20} /> : null}
-                          {params.InputProps.endAdornment}
-                        </>
-                      )
-                    }}
-                  />
+                  <>
+                    {console.log({ ...params }, 'params')}
+                    <CustomTextField
+                      {...params}
+                      label='Vị trí'
+                      fullWidth
+                      InputProps={{
+                        ...params.InputProps,
+                        endAdornment: (
+                          <>
+                            {loading ? <CircularProgress color='inherit' size={20} /> : null}
+                            {params.InputProps.endAdornment}
+                          </>
+                        )
+                      }}
+                    />
+                  </>
                 )}
                 loading={loading}
               />
             </Grid>
+
             <Grid item xs={0.1}></Grid>
             <Grid item xs={2.8} style={{ marginTop: 20 }}>
               <CustomTextField

@@ -91,7 +91,7 @@ const ImportPopup = ({ open, handleClose }) => {
         }
       }
 
-      const response = await axios.post('https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/import', formData, config)
+      const response = await axios.post('https://sbs.basesystem.one/ivis/vms/api/v0/cameras/import', formData, config)
 
       console.log('Import successful')
       if (response.data && response.data.length > 0) {
@@ -102,7 +102,7 @@ const ImportPopup = ({ open, handleClose }) => {
         setStatusMessage(response.data.message)
       }
     } catch (error) {
-      console.error('Error importing nvrs:', error)
+      console.error('Error importing cameras:', error)
     } finally {
       setLoading(false)
     }
@@ -140,7 +140,7 @@ const ImportPopup = ({ open, handleClose }) => {
         responseType: 'blob' // Ensure the response is in blob format
       }
 
-      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/sample-data', config)
+      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/cameras/sample-data', config)
 
       const blob = new Blob([response.data], { type: 'text/csv' })
 
@@ -172,7 +172,7 @@ const ImportPopup = ({ open, handleClose }) => {
         responseType: 'blob' // Ensure the response is in blob format
       }
 
-      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/imported/download', config)
+      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/cameras/imported/download', config)
 
       const blob = new Blob([response.data], { type: 'application/octet-stream' })
 
@@ -182,7 +182,7 @@ const ImportPopup = ({ open, handleClose }) => {
       // Create a temporary anchor element to trigger the download
       const link = document.createElement('a')
       link.href = url
-      link.setAttribute('download', 'Exported-nvrs.csv') // Set the correct file name and extension
+      link.setAttribute('download', 'Exported-cameras.csv') // Set the correct file name and extension
       document.body.appendChild(link)
       link.click()
 
@@ -195,7 +195,7 @@ const ImportPopup = ({ open, handleClose }) => {
 
   return (
     <Dialog open={open} onClose={handleDialogClose}>
-      <DialogTitle>Import Nvrs</DialogTitle>
+      <DialogTitle>Import Camera</DialogTitle>
       <Grid container spacing={0}>
         <Grid item xs={12}>
           <DialogContent>

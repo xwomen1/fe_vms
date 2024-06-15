@@ -151,6 +151,10 @@ const PassWord = ({ onClose, camera }) => {
           <Grid container item style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
             <Grid item xs={12}>
               <CustomTextField
+                InputLabelProps={{
+                  shrink: true
+                }}
+                autoComplete='old-password'
                 label='Mật khẩu cũ'
                 type={showPassword ? 'text' : 'password'}
                 onChange={handlePasswordOldChange}
@@ -168,7 +172,11 @@ const PassWord = ({ onClose, camera }) => {
             </Grid>
             <Grid item xs={12}>
               <CustomTextField
+                InputLabelProps={{
+                  shrink: true
+                }}
                 label='Mật khẩu mới'
+                autoComplete='new-password'
                 type={showPassword ? 'text' : 'password'}
                 onChange={handlePasswordChange}
                 fullWidth
@@ -186,6 +194,7 @@ const PassWord = ({ onClose, camera }) => {
             <Grid item xs={12}>
               <CustomTextField
                 label='Xác nhận mật khẩu'
+                autoComplete='off'
                 type={showPassword ? 'text' : 'password'}
                 onChange={handleConfirmPasswordChange}
                 fullWidth

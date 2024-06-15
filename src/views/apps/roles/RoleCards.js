@@ -373,9 +373,9 @@ const RolesCards = () => {
         <Card>
           <CardContent>
             <Box sx={{ mb: 1.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography sx={{ color: 'text.secondary' }}>{`Total ${
+              <Typography sx={{ color: 'text.secondary' }}>{`Tổng số users ${
                 userCounts[item.policyId] || 0
-              } users`}</Typography>
+              } `}</Typography>
               <AvatarGroup
                 max={4}
                 className='pull-up'

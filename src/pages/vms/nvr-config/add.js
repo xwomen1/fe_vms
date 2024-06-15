@@ -27,7 +27,7 @@ import PopupScanDungIP from './popups/AddDungIP'
 import PopupScanOnvif from './popups/AddOnvif'
 import PopupScan from './popups/Add'
 import { Radio, RadioGroup, FormControlLabel } from '@mui/material'
-
+import ImportPopup from './popups/ImportPopup'
 import Network from './popups/Network'
 import Video from './popups/video'
 import Images from './popups/Image'
@@ -45,6 +45,7 @@ const UserList = ({ apiData }) => {
   const [idNVR, setId] = useState([])
   const [nameNVR, setNameNvr] = useState(null)
   const [IPNVR, setIPNVR] = useState(null)
+  const [openPopupImport, setOpenImportPopup] = useState(false)
   const [openPopup, setOpenPopup] = useState(false)
   const [openPopupP, setOpenPopupP] = useState(false)
 
@@ -271,6 +272,10 @@ const UserList = ({ apiData }) => {
     setOpenPopup(false) // Đóng Popup khi cần thiết
   }
 
+  const handleClosePopupImport = () => {
+    setOpenImportPopup(false) // Đóng Popup khi cần thiết
+  }
+
   const handleAddPClick = selectedNvrId => {
     setOpenPopupP(true)
     setIdBox(cameraId)
@@ -484,6 +489,11 @@ const UserList = ({ apiData }) => {
     setSelectedNVR(newValue)
     setIdBox(newValue.value)
   }
+
+  const handleOpenPopup = () => {
+    setOpenImportPopup(true)
+  }
+
   useEffect(() => {
     setSelectedNVR({
       label: defaultValue,
@@ -497,7 +507,7 @@ const UserList = ({ apiData }) => {
         <Card>
           <Grid container spacing={0} style={{ marginTop: '1%' }}>
             <Grid container spacing={0}>
-              <Grid item xs={10}>
+              <Grid item xs={8}>
                 <div>
                   <RadioGroup value={selectedValue} onChange={handleRadioChange} style={{ marginLeft: 50 }}>
                     <Grid container spacing={2}>
@@ -771,7 +781,12 @@ const UserList = ({ apiData }) => {
                   )}
                 </div>
               </Grid>
-              <Grid item xs={2}>
+              <Grid item xs={4} style={{ display: 'flex' }}>
+                <Grid item style={{ marginRight: '4%' }}>
+                  <Button variant='contained' onClick={handleOpenPopup}>
+                    <Icon icon='tabler:file-import' />
+                  </Button>
+                </Grid>
                 <Grid item>
                   <CustomTextField
                     value={value}
@@ -930,6 +945,7 @@ const UserList = ({ apiData }) => {
           nvr={selectedIds}
         />
       </Grid>
+      <ImportPopup open={openPopupImport} handleClose={handleClosePopupImport} />
     </Grid>
   )
 }
