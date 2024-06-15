@@ -10,6 +10,8 @@ import ViewCamera from "src/@core/components/camera/playback"
 import CustomTextField from 'src/@core/components/mui/text-field'
 import { callApi } from 'src/@core/utils/requestUltils'
 import Timeline from '../mocdata/timeline'
+import axios from 'axios'
+import toast from 'react-hot-toast'
 
 const dateList = [
     {
@@ -53,6 +55,8 @@ const Storage = ({ id, name, channel }) => {
 
     const [timeType, setTimeType] = useState(null)
     const [minuteType, setMinuteType] = useState(null)
+    const [startTime, setStartTime] = useState(null)
+    const [endTime, setEndTime] = useState(null)
 
 
     function formatTime(timeInSeconds) {
@@ -71,18 +75,6 @@ const Storage = ({ id, name, channel }) => {
         return count
     }
 
-    const time_start = new Date().getTime() - 60 * 60 * 1000
-    const time_end = new Date().getTime()
-
-    const [time, setTime] = useState(new Date())
-    const [dateTime, setDateTime] = useState(new Date())
-
-    const [timeFilter, setTimeFilter] = useState({
-        start_time: time_start,
-        end_time: time_end
-    })
-
-    const [timePlay, setTimePlay] = useState(time_start)
     const [currentTime, setCurrentTime] = useState(0)
 
 
@@ -117,6 +109,56 @@ const Storage = ({ id, name, channel }) => {
         }
     }
 
+    const handleDownloadFile = async () => {
+        setLoading(true)
+
+        if (camera.id !== '') {
+            try {
+                const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/video/download?idCamera=${camera.id}&startTime=${startTime}&endTime=${endTime}`)
+                const videoDownloadUrl = res.data[0].videoDownLoad[0].video
+
+                if (videoDownloadUrl) {
+                    await handleExportLinkDownload(videoDownloadUrl)
+                } else {
+                    toast.error('Không tìm thấy URL tải về video')
+                }
+            } catch (error) {
+                if (error && error?.response?.data) {
+                    console.error('error', error)
+                    toast.error(error?.response?.data?.message)
+
+                } else {
+                    console.error('Error fetching data:', error)
+                    toast.error(error)
+                }
+            } finally {
+                setLoading(false)
+            }
+        }
+    }
+
+    const handleExportLinkDownload = async (linkDownload) => {
+
+        const axiosInstance = axios.create();
+        try {
+            const response = await axiosInstance.get(linkDownload, {
+                responseType: 'blob',
+            });
+
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'clip.mp4');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            toast.error(error?.message || 'An error occurred while downloading the file.');
+        }
+    };
+
+
     const handSetChanel = (id, channel) => {
         setCamera({ id: id, name: name, channel: channel })
     }
@@ -127,6 +169,11 @@ const Storage = ({ id, name, channel }) => {
 
     const handleSetMinuteType = (type) => {
         setMinuteType(type)
+    }
+
+    const handleSetTimeSelected = (data) => {
+        setStartTime(data?.startTime)
+        setEndTime(data?.endTime)
     }
 
     return (
@@ -157,7 +204,7 @@ const Storage = ({ id, name, channel }) => {
                     />
                     <CardContent>
                         {camera.id !== '' &&
-                            <Timeline data={dataList} dateType={timeType} minuteType={minuteType} />
+                            <Timeline data={dataList} dateType={timeType} minuteType={minuteType} callback={handleSetTimeSelected} />
                         }
                     </CardContent>
                 </Card>
@@ -178,8 +225,8 @@ const Storage = ({ id, name, channel }) => {
                                     id={camera.id}
                                     channel={camera.channel}
                                     play={play}
-                                    startTime={timePlay || time_start}
-                                    endTime={timeFilter?.end_time || time_end}
+                                    startTime={startTime}
+                                    endTime={endTime}
                                     onChangeCurrentTime={time => {
                                         setCurrentTime(1000 * time)
                                     }}
@@ -196,7 +243,7 @@ const Storage = ({ id, name, channel }) => {
                             pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
                         }}
                     >
-                        <Button type='submit' variant='contained'>
+                        <Button type='submit' variant='contained' onClick={() => handleDownloadFile()}>
                             Xuất file
                         </Button>
                     </DialogActions>
