@@ -5,7 +5,7 @@ COPY package.json ./
 RUN yarn install 
 
 FROM node:lts as builder
-WORKDIR /accessfe
+WORKDIR /access-fe
 COPY . .
 COPY --from=dependencies /access-fe/node_modules ./node_modules
 RUN yarn build
