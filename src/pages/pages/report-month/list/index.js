@@ -41,13 +41,14 @@ function ReportMonth({ history }) {
   const [loading, setLoading] = useState(false)
   const [valueFilter, setValueFilter, incrementPage] = useUrlState(initValueFilter)
   const [start, setStart] = useState(null)
+  const [users, setUsers] = useState([])
   const [end, setEnd] = useState(null)
   const [daysInRange, setDaysInRange] = useState([])
   const [groups, setGroups] = useState([])
   const [valueGroup, setValueGroup] = useState('')
   const [selectedGroups, setSelectedGroups] = useState([])
   const [dataResource, setDataResource] = useState([])
-  const [selectedGroupId, setSelectedGroupId] = useState(null)
+  const [selectedGroupId, setSelectedGroupId] = useState('')
 
   const {
     handleSubmit,
@@ -60,14 +61,6 @@ function ReportMonth({ history }) {
   } = useForm({
     defaultValues: valueFilter
   })
-
-  useEffect(() => {
-    if (selectedGroupId !== null) {
-      setValueFilter({ ...valueFilter, page: 1 })
-      setDataResource([])
-      fetchDataSource()
-    }
-  }, [selectedGroupId])
 
   useEffect(() => {
     fetchDataSource()
@@ -89,21 +82,11 @@ function ReportMonth({ history }) {
         }
       }
 
-      const response = await axios.post(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/event/search/user`,
-        {},
+      const response = await axios.get(
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/event/user/inout`,
         config
       )
-
-      if (response.data.rows.length > 0) {
-        // Cập nhật dữ liệu mới vào mảng tạm thời
-        setDataResource(prevData => [...prevData, ...response.data.rows])
-
-        // Tăng trang
-        incrementPage()
-      } else {
-        console.log('No more data to fetch.')
-      }
+      setUsers(response.data)
       reset(valueFilter)
     } catch (error) {
       console.error('Error fetching data:', error)
@@ -111,6 +94,13 @@ function ReportMonth({ history }) {
       setLoading(false)
     }
   }
+  useEffect(() => {
+    if (selectedGroupId !== null) {
+      setValueFilter({ ...valueFilter, page: 1 })
+      setDataResource([])
+      fetchDataSource()
+    }
+  }, [selectedGroupId])
 
   useEffect(() => {
     const fetchGroupData = async () => {
@@ -162,8 +152,18 @@ function ReportMonth({ history }) {
   const handleGroupCheckboxChange = (groupId, checked) => {
     if (checked) {
       setSelectedGroups(prevGroups => [...prevGroups, { groupId }])
+      setSelectedGroupId({ groupId }) // Cập nhật groupId khi chọn
     } else {
       setSelectedGroups(prevGroups => prevGroups.filter(g => g.groupId !== groupId))
+      if (selectedGroups.length === 1 && selectedGroups[0].groupId === groupId) {
+        setSelectedGroupId('') // Đặt selectedGroupId thành null nếu không còn nhóm nào được chọn
+      } else {
+        setSelectedGroupId(prevGroups => {
+          if (prevGroups.length === 0) return ''
+
+          return prevGroups[prevGroups.length - 1]
+        })
+      }
     }
   }
 
@@ -181,51 +181,28 @@ function ReportMonth({ history }) {
     )
   }
 
+  const handleLabelClick = group => {
+    const isChecked = selectedGroups.some(g => g.groupId === group.groupId)
+    handleGroupCheckboxChange(group.groupId, !isChecked)
+  }
+
   const renderGroup = group => (
     <TreeItem
       key={group.groupId}
       nodeId={group.groupId}
       label={
-        <GroupCheckbox
-          group={group}
-          checked={selectedGroups.some(g => g.groupId === group.groupId)}
-          onChange={handleGroupCheckboxChange}
-        />
+        <div onClick={() => handleLabelClick(group)}>
+          <GroupCheckbox
+            group={group}
+            checked={selectedGroups.some(g => g.groupId === group.groupId)}
+            onChange={handleGroupCheckboxChange}
+          />
+        </div>
       }
     >
       {group.children && group.children.map(childGroup => renderGroup(childGroup))}
     </TreeItem>
   )
-
-  const groupedData =
-    dataResource.length > 0
-      ? dataResource.reduce((acc, employee) => {
-          const userId = employee?.user_id
-
-          if (!acc[userId]) {
-            acc[userId] = {
-              fullName: employee?.fullName,
-              timeValues: []
-            }
-          }
-
-          if (!acc[userId].timeMax || employee?.timeMax > acc[userId]?.timeMax) {
-            acc[userId].timeMax = employee?.timeMax
-          }
-          if (!acc[userId].timeMin || employee?.timeMin < acc[userId]?.timeMin) {
-            acc[userId].timeMin = employee?.timeMin
-          }
-
-          acc[userId].timeValues.push({
-            timeMin: employee?.timeMin,
-            timeMax: employee?.timeMax
-          })
-
-          return acc
-        }, {})
-      : {}
-
-  const groupedDataArray = Object.values(groupedData)
 
   useEffect(() => {
     const today = new Date()
@@ -254,7 +231,7 @@ function ReportMonth({ history }) {
     const workbook = XLSX.utils.book_new()
 
     // Tạo một worksheet từ dữ liệu đã gộp cho khoảng ngày đã chọn
-    const filteredData = groupedDataArray.map(employee => {
+    const filteredData = users.map(employee => {
       const row = {
         'Họ tên nhân viên': employee.fullName
       }
@@ -262,9 +239,9 @@ function ReportMonth({ history }) {
       daysInRange.forEach(day => {
         const formattedDay = format(parse(day, 'dd/MM/yyyy', new Date()), 'dd/MM/yyyy')
 
-        const matchingTimes = employee.timeValues.filter(time => {
-          const startDate = format(new Date(time.timeMin), 'dd/MM/yyyy')
-          const endDate = format(new Date(time.timeMax), 'dd/MM/yyyy')
+        const matchingTimes = employee.eventEachUsers.filter(time => {
+          const startDate = format(new Date(time.minEventAt), 'dd/MM/yyyy')
+          const endDate = format(new Date(time.maxEventAt), 'dd/MM/yyyy')
 
           return isWithinInterval(parse(formattedDay, 'dd/MM/yyyy', new Date()), {
             start: parse(startDate, 'dd/MM/yyyy', new Date()),
@@ -273,15 +250,15 @@ function ReportMonth({ history }) {
         })
 
         const totalDuration = matchingTimes.reduce((sum, time) => {
-          const startTime = format(new Date(time.timeMin), 'HH:mm')
-          const endTime = format(new Date(time.timeMax), 'HH:mm')
+          const startTime = format(new Date(time.minEventAt), 'HH:mm')
+          const endTime = format(new Date(time.maxEventAt), 'HH:mm')
 
           const lunchStart = '12:00'
           const lunchEnd = '13:30'
 
           // Nếu thời gian nằm ngoài thời gian nghỉ trưa hoặc không nằm trong thời gian làm việc
           if (endTime <= lunchStart || startTime >= lunchEnd) {
-            sum += time.timeMax - time.timeMin
+            sum += time.maxEventAt - time.minEventAt
           } else {
             // Trường hợp còn lại, tính thời gian làm việc trừ thời gian nghỉ trưa
             if (startTime < lunchStart) {
@@ -297,7 +274,8 @@ function ReportMonth({ history }) {
 
         const formattedTimes = matchingTimes
           .map(
-            time => `Vào: ${format(new Date(time.timeMin), 'HH:mm')} - Ra: ${format(new Date(time.timeMax), 'HH:mm')}`
+            time =>
+              `Vào: ${format(new Date(time.minEventAt), 'HH:mm')} - Ra: ${format(new Date(time.maxEventAt), 'HH:mm')}`
           )
           .join('\n')
         const totalTime = formatDuration(totalDuration)
@@ -366,14 +344,15 @@ function ReportMonth({ history }) {
             <Autocomplete
               disablePortal
               id='treeview-autocomplete'
-              options={groups}
+              options={groups || ''}
               style={{ width: '60%', marginLeft: 50 }}
               autoHighlight
               getOptionLabel={option => option.groupName}
-              renderInput={params => <CustomTextField placeholder='Placeholder' {...params} label='Phòng ban' />}
+              renderInput={params => <CustomTextField placeholder='Phòng ban' {...params} label='Phòng ban' />}
               renderOption={(props, option) => (
                 <div {...props}>
                   <TreeView
+                    style={{ width: '100%' }}
                     defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
                     defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
                   >
@@ -382,8 +361,9 @@ function ReportMonth({ history }) {
                 </div>
               )}
               onChange={(e, value) => {
-                setSelectedGroupId(value)
+                setSelectedGroupId(value ? { groupId: value.groupId } : '')
               }}
+              value={selectedGroupId ? groups.find(g => g.groupId === selectedGroupId.groupId) : null}
             />
           </Grid>
           <Grid item xs={12} sm={3}>
@@ -449,7 +429,7 @@ function ReportMonth({ history }) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {groupedDataArray.map((employee, employeeIndex) => (
+              {users.map((employee, employeeIndex) => (
                 <TableRow key={employeeIndex}>
                   <TableCell
                     key={employeeIndex}
@@ -466,9 +446,10 @@ function ReportMonth({ history }) {
                   {daysInRange.map((day, dayIndex) => {
                     const formattedDay = format(parse(day, 'dd/MM/yyyy', new Date()), 'dd/MM/yyyy')
 
-                    const matchingTimes = employee.timeValues.filter(time => {
-                      const startDate = format(new Date(time.timeMin), 'dd/MM/yyyy')
-                      const endDate = format(new Date(time.timeMax), 'dd/MM/yyyy')
+                    // Kiểm tra xem eventEachUsers có tồn tại và là một mảng
+                    const matchingTimes = (employee.eventEachUsers || []).filter(time => {
+                      const startDate = format(new Date(time.minEventAt), 'dd/MM/yyyy')
+                      const endDate = format(new Date(time.maxEventAt), 'dd/MM/yyyy')
 
                       return isWithinInterval(parse(formattedDay, 'dd/MM/yyyy', new Date()), {
                         start: parse(startDate, 'dd/MM/yyyy', new Date()),
@@ -477,15 +458,15 @@ function ReportMonth({ history }) {
                     })
 
                     const totalDuration = matchingTimes.reduce((sum, time) => {
-                      const startTime = format(new Date(time.timeMin), 'HH:mm')
-                      const endTime = format(new Date(time.timeMax), 'HH:mm')
+                      const startTime = format(new Date(time.minEventAt), 'HH:mm')
+                      const endTime = format(new Date(time.maxEventAt), 'HH:mm')
 
                       const lunchStart = '12:00'
                       const lunchEnd = '13:30'
 
                       // Nếu thời gian nằm ngoài thời gian nghỉ trưa hoặc không nằm trong thời gian làm việc
                       if (endTime <= lunchStart || startTime >= lunchEnd) {
-                        sum += time.timeMax - time.timeMin
+                        sum += time.maxEventAt - time.minEventAt
                       } else {
                         // Trường hợp còn lại, tính thời gian làm việc trừ thời gian nghỉ trưa
                         if (startTime < lunchStart) {
@@ -510,7 +491,8 @@ function ReportMonth({ history }) {
                       >
                         {matchingTimes.map((time, timeIndex) => (
                           <div key={timeIndex}>
-                            {format(new Date(time.timeMin), ' HH:mm')} - {format(new Date(time.timeMax), ' HH:mm')}
+                            {format(new Date(time.minEventAt), ' HH:mm')} -{' '}
+                            {format(new Date(time.maxEventAt), ' HH:mm')}
                           </div>
                         ))}
                         {matchingTimes.length > 0 && (

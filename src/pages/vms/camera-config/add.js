@@ -561,7 +561,7 @@ const Add = ({ apiData }) => {
         <Grid item xs={12}>
           <Card>
             <Grid container spacing={2} style={{ marginTop: '1%' }}>
-              <Grid item xs={9}>
+              <Grid item xs={8}>
                 <div>
                   <RadioGroup value={selectedValue} onChange={handleRadioChange} style={{ marginLeft: 50 }}>
                     <Grid container spacing={2}>
@@ -581,7 +581,7 @@ const Add = ({ apiData }) => {
                   </RadioGroup>
                 </div>
               </Grid>
-              <Grid item xs={3} style={{ display: 'flex' }}>
+              <Grid item xs={4} style={{ display: 'flex' }}>
                 <Grid item>
                   <Button variant='contained' onClick={handleOpenPopup}>
                     <Icon icon='tabler:file-import' />

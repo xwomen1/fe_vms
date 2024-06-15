@@ -1,16 +1,39 @@
-import { useEffect, useRef, useState } from "react"
-import axios from "axios"
-import { TreeItem, TreeView } from "@mui/lab"
+import { useEffect, useRef, useState } from 'react'
+import axios from 'axios'
+import { TreeItem, TreeView } from '@mui/lab'
 import Icon from 'src/@core/components/icon'
-import { Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Slider, Tooltip, Typography, styled, CircularProgress } from "@mui/material"
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Grid,
+  IconButton,
+  Slider,
+  Tooltip,
+  Typography,
+  styled,
+  CircularProgress
+} from '@mui/material'
 import authConfig from 'src/configs/auth'
-import ViewCamera from "./viewCamera"
-import { AddBox, CameraAlt, FastForward, FastRewind, IndeterminateCheckBox, Pause, PlayArrow, SkipNext, SkipPrevious } from "@mui/icons-material"
-import { format } from "date-fns"
-import CustomTextField from "src/@core/components/mui/text-field"
-import Schedule from "../popups/schedule"
-import CustomAutocomplete from "src/@core/components/mui/autocomplete"
-import toast from "react-hot-toast"
+import ViewCamera from './viewCamera'
+import {
+  AddBox,
+  CameraAlt,
+  FastForward,
+  FastRewind,
+  IndeterminateCheckBox,
+  Pause,
+  PlayArrow,
+  SkipNext,
+  SkipPrevious
+} from '@mui/icons-material'
+import { format } from 'date-fns'
+import CustomTextField from 'src/@core/components/mui/text-field'
+import Schedule from '../popups/schedule'
+import CustomAutocomplete from 'src/@core/components/mui/autocomplete'
+import toast from 'react-hot-toast'
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   '&:hover > .MuiTreeItem-content:not(.Mui-selected)': {
@@ -45,8 +68,7 @@ const StyledTreeItem = props => {
     <StyledTreeItemRoot
       {...other}
       label={
-        <Box
-          sx={{ py: 1, display: 'flex', alignItems: 'center', '& svg': { mr: 1 } }}>
+        <Box sx={{ py: 1, display: 'flex', alignItems: 'center', '& svg': { mr: 1 } }}>
           <Icon icon={labelIcon} color={colorText} />
           <Typography variant='body2' sx={{ flexGrow: 1, fontWeight: 500 }} color={colorText}>
             {labelText}
@@ -155,13 +177,13 @@ const EventConfig = () => {
     bundlePolicy: 'max-bundle',
     iceServers: [
       {
-        urls: 'stun:dev-ivis-camera-api.basesystem.one:3478',
+        urls: 'stun:dev-ivis-camera-api.basesystem.one:3478'
       },
       {
         urls: 'turn:dev-ivis-camera-api.basesystem.one:3478',
         username: 'demo',
-        credential: 'demo',
-      },
+        credential: 'demo'
+      }
     ]
   }
 
@@ -171,19 +193,16 @@ const EventConfig = () => {
 
     setWebsocket(ws)
 
-    //create RTCPeerConnection 
+    //create RTCPeerConnection
     const pc = new RTCPeerConnection(configWs)
     setRtcPeerConnection(pc)
 
     //listen for remote tracks and add them to remote stream
 
-    pc.ontrack = (event) => {
+    pc.ontrack = event => {
       const stream = event.streams[0]
-      if (
-        !remoteVideoRef.current?.srcObject ||
-        remoteVideoRef.current?.srcObject.id !== stream.id
-      ) {
-        setRemoteStream(stream);
+      if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {
+        setRemoteStream(stream)
         remoteVideoRef.current.srcObject = stream
       }
     }
@@ -200,13 +219,13 @@ const EventConfig = () => {
     }
   }
 
-  const handleMessage = async (event) => {
+  const handleMessage = async event => {
     const message = JSON.parse(event.data)
     const newMessage = JSON.parse(message?.data)
     setEventData(newMessage)
   }
 
-  const handleClose = async (event) => {
+  const handleClose = async event => {
     if (websocket) {
       websocket.close()
     }
@@ -220,11 +239,11 @@ const EventConfig = () => {
 
   useEffect(() => {
     if (websocket) {
-      websocket.addEventListener('open', (event) => { })
+      websocket.addEventListener('open', event => {})
 
       websocket.addEventListener('message', handleMessage)
 
-      websocket.addEventListener('error', (error) => {
+      websocket.addEventListener('error', error => {
         console.error('WebSocket error: ', error)
       })
 
@@ -498,9 +517,9 @@ const EventConfig = () => {
     setKeyword(e.target.value)
   }
 
-  const handleItemClick = (cameraId, cameraName) => {
+  const handleItemClick = (cameraId, camName) => {
     setIdCameraSelect(cameraId)
-    setNameCameraSelect(cameraName)
+    setNameCameraSelect(camName)
   }
 
   const updateAlertList = async changedAlerts => {
@@ -648,25 +667,27 @@ const EventConfig = () => {
       <StyledTreeItem key={group.id} nodeId={group.id} labelText={group.name} labelIcon='tabler:folder'>
         {group.cameras && group.cameras.length > 0
           ? group.cameras.map(camera => {
-            const matchedEvent = eventsData.find(event => event.id === camera.id)
-            const labelText = matchedEvent ? `${camera.deviceName} (${matchedEvent.statusValue.name})` : camera.deviceName;
+              const matchedEvent = eventsData.find(event => event.id === camera.id)
 
-            return (
-              <StyledTreeItem
-                key={camera.id}
-                nodeId={camera.id}
-                labelText={camera.deviceName}
-                matchedEvent={matchedEvent ? matchedEvent : ''}
-                labelIcon='tabler:camera'
-                onClick={() => handleItemClick(camera.id, camera.deviceName)}
-              />
-            );
-          })
+              const labelText = matchedEvent
+                ? `${camera.deviceName} (${matchedEvent.statusValue.name})`
+                : camera.deviceName
+
+              return (
+                <StyledTreeItem
+                  key={camera.id}
+                  nodeId={camera.id}
+                  labelText={camera.deviceName}
+                  matchedEvent={matchedEvent ? matchedEvent : ''}
+                  labelIcon='tabler:camera'
+                  onClick={() => handleItemClick(camera.id, camera.deviceName)}
+                />
+              )
+            })
           : null}
       </StyledTreeItem>
-    );
+    )
   }
-
 
   return (
     <>
@@ -982,7 +1003,12 @@ const EventConfig = () => {
       </Grid>
 
       {isOpenSchedule && (
-        <Schedule onClose={() => setIsOpenSchedule(false)} show={isOpenSchedule} callback={handleSetSchedule} data={calendar} />
+        <Schedule
+          onClose={() => setIsOpenSchedule(false)}
+          show={isOpenSchedule}
+          callback={handleSetSchedule}
+          data={calendar}
+        />
       )}
     </>
   )
