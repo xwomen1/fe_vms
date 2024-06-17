@@ -34,9 +34,8 @@ const dataList = [
     },
 ];
 
-const Timeline = ({ data = dataList, dateType, minuteType, callback }) => {
+const Timeline = ({ data, minuteType, callback }) => {
     const [dateData, setDateData] = useState([]);
-    const [timeType, setTimeType] = useState('day');
     const [minutesType, setMinutesType] = useState('5minute');
     const [dayList, setDayList] = useState([]);
     const [timelines, setTimelines] = useState({});
@@ -45,11 +44,6 @@ const Timeline = ({ data = dataList, dateType, minuteType, callback }) => {
     const [gaps, setGaps] = useState([]);
     const [selectedTime, setSelectedTime] = useState({})
 
-    useEffect(() => {
-        if (dateType) {
-            setTimeType(dateType);
-        }
-    }, [dateType]);
 
     useEffect(() => {
         if (minuteType) {
@@ -76,7 +70,7 @@ const Timeline = ({ data = dataList, dateType, minuteType, callback }) => {
 
     useEffect(() => {
         getLastDays();
-    }, [timeType]);
+    }, []);
 
     useEffect(() => {
         if (data) {
@@ -123,30 +117,9 @@ const Timeline = ({ data = dataList, dateType, minuteType, callback }) => {
 
     const getLastDays = () => {
         let daysArray = [];
-
-        switch (timeType) {
-            case 'day':
-                daysArray.push(new Date().toISOString().split('T')[0]);
-                break;
-            case 'week':
-                for (let i = 0; i < 7; i++) {
-                    const date = new Date();
-                    date.setDate(date.getDate() - i);
-                    daysArray.push(date.toISOString().split('T')[0]);
-                }
-                break;
-            case 'month':
-                for (let i = 0; i < 30; i++) {
-                    const date = new Date();
-                    date.setDate(date.getDate() - i);
-                    daysArray.push(date.toISOString().split('T')[0]);
-                }
-                break;
-            default:
-                break;
-        }
+        daysArray.push(new Date().toISOString().split('T')[0]);
         setDayList(daysArray);
-    };
+    }
 
     const updateTimelines = () => {
         const newTimelines = {};
