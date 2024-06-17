@@ -34,7 +34,7 @@ const dataList = [
     },
 ];
 
-const Timeline = ({ data = dataList, dateType, minuteType }) => {
+const Timeline = ({ data = dataList, dateType, minuteType, callback }) => {
     const [dateData, setDateData] = useState([]);
     const [timeType, setTimeType] = useState('day');
     const [minutesType, setMinutesType] = useState('5minute');
@@ -43,6 +43,7 @@ const Timeline = ({ data = dataList, dateType, minuteType }) => {
     const [selectedIntervals, setSelectedIntervals] = useState({});
     const [timelineScrubberError, setTimelineScrubberError] = useState(false);
     const [gaps, setGaps] = useState([]);
+    const [selectedTime, setSelectedTime] = useState({})
 
     useEffect(() => {
         if (dateType) {
@@ -97,6 +98,17 @@ const Timeline = ({ data = dataList, dateType, minuteType }) => {
         }
     }, [dateData]);
 
+    useEffect(() => {
+        if (Array.isArray(selectedTime) && selectedTime.length === 2 && selectedTime.every(item => item instanceof Date)) {
+            const detail = {
+                startTime: selectedTime[0],
+                endTime: selectedTime[1]
+            }
+            callback(detail)
+        }
+    }, [selectedTime])
+
+
     const timelineScrubberErrorHandler = ({ error }) => {
         setTimelineScrubberError(error);
     };
@@ -106,6 +118,7 @@ const Timeline = ({ data = dataList, dateType, minuteType }) => {
             ...prev,
             [day]: selectedInterval,
         }));
+        setSelectedTime(selectedInterval)
     };
 
     const getLastDays = () => {

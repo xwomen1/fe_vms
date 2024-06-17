@@ -254,7 +254,7 @@ export const ViewCameraPause = ({
           ref={remoteVideoRef}
           playsInline
           autoPlay
-          srcObject={remoteStream}
+          srcobject={remoteStream}
         />
         {(status === 'failed' || status == 'disconnected') && (
           <IconButton
