@@ -11,6 +11,7 @@ import Schedule from "../popups/schedule"
 import CustomAutocomplete from "src/@core/components/mui/autocomplete"
 import toast from "react-hot-toast"
 import AddAlertAI from "../popups/addAlertAI"
+import Review from "./viewCamera"
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   '&:hover > .MuiTreeItem-content:not(.Mui-selected)': {
@@ -952,7 +953,7 @@ const EventConfig = () => {
               <Box
                 sx={{
                   width: '100%',
-                  height: '70vh',
+                  height: '80vh',
                   position: 'relative',
                   display: 'flex',
                   flexDirection: 'column',
@@ -962,31 +963,27 @@ const EventConfig = () => {
               >
                 <Box
                   sx={{
-                    width: 640,
-                    height: 360,
+                    width: ' 100%',
+                    height: '100%',
                     background: '#ccc',
                     borderRadius: 2
                   }}
                 >
-                  {idCameraSelect != null &&
-                    <ViewCamera key={idCameraSelect} id={idCameraSelect} channel={'Sub'}
-                    />
-                  }
+                  <div>
+                    <Review key={idCameraSelect} id={idCameraSelect} name={nameCameraSelect} channel={'Sub'} />
+                  </div>
                   <canvas
                     ref={canvasRef}
-                    width='640'
-                    height='360'
+                    width={660}
+                    height={450}
                     style={{
                       background: 'none',
                       position: 'absolute',
                       opacity: 0.5,
-                      top: 21
+                      top: 0
                     }}
                     id='cameraEdit'
                   />
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Typography variant='h5'>{nameCameraSelect}</Typography>
                 </Box>
               </Box>
             </CardContent>
