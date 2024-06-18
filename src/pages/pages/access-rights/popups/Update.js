@@ -9,7 +9,9 @@ import {
   Checkbox,
   Dialog,
   DialogActions,
+  TextField,
   DialogContent,
+  Autocomplete,
   Fade,
   FormControlLabel,
   Grid,
@@ -26,6 +28,8 @@ import 'react-datepicker/dist/react-datepicker.css'
 import 'react-perfect-scrollbar/dist/css/styles.css'
 import Daily from '../mocdata/daily'
 import toast from 'react-hot-toast'
+import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
+import format from 'date-fns/format'
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Fade ref={ref} {...props} />
@@ -112,7 +116,7 @@ const format_form = [
     name: 'groupName',
     label: 'Phòng ban',
     placeholder: 'Phòng ban',
-    type: 'TextField',
+    type: 'Autocomplete',
     require: true,
     width: 6
   },
@@ -120,7 +124,7 @@ const format_form = [
     name: 'doorInName',
     label: 'Cửa vào',
     placeholder: 'Cửa vào',
-    type: 'TextField',
+    type: 'AutocompleteDoorIn',
     require: true,
     width: 6
   },
@@ -128,7 +132,7 @@ const format_form = [
     name: 'doorOutName',
     label: 'Cửa ra',
     placeholder: 'Cửa ra',
-    type: 'TextField',
+    type: 'AutocompleteDoorOut',
     require: true,
     width: 6
   },
@@ -136,7 +140,7 @@ const format_form = [
     name: 'startDate',
     label: 'Ngày bắt đầu',
     placeholder: 'Ngày bắt đầu',
-    type: 'TextField',
+    type: 'startDate',
     data: [],
     require: false,
     width: 6
@@ -145,7 +149,7 @@ const format_form = [
     name: 'endDate',
     label: 'Ngày Kết thúc',
     placeholder: 'Ngày kết thúc',
-    type: 'TextField',
+    type: 'endDate',
     data: [],
     require: false,
     width: 6
@@ -161,16 +165,19 @@ const format_form = [
   }
 ]
 
-const View = ({ show, onClose, id, setReload, filter }) => {
+const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAccessId, idScheduleId }) => {
   const [loading, setLoading] = useState(false)
   const [start, setStart] = useState(null)
   const [end, setEnd] = useState(null)
   const [detail, setDetail] = useState(null)
   const [dataDaily, setDataDaily] = useState([])
+  const [doorList, setDoorList] = useState([])
   const [isCheckboxChecked, setIsCheckboxChecked] = useState(false)
   const [dataDailyState, setDataDailyState] = useState(dataDailyDefault)
   const [form, setForm] = useState(format_form)
-
+  const [userGroups, setUserGroups] = useState([])
+  const [selectedDoorOutId, setSelectedDoorOutId] = useState(null)
+  const [selectedDoorInId, setSelectedDoorInId] = useState(null)
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
   const config = {
@@ -186,6 +193,7 @@ const View = ({ show, onClose, id, setReload, filter }) => {
     setError,
     setValue,
     reset,
+    getValues,
     clearErrors,
     formState: { errors }
   } = useForm({
@@ -194,7 +202,11 @@ const View = ({ show, onClose, id, setReload, filter }) => {
 
   useEffect(() => {
     fetchDataList()
+    fetchUserGroups()
+    fetchDoorList()
   }, [])
+
+  console.log(idAccessGroupId, idDoorAccessId, idScheduleId)
 
   useEffect(() => {
     if (detail) {
@@ -222,10 +234,27 @@ const View = ({ show, onClose, id, setReload, filter }) => {
       setLoading(false)
     }
   }
-
-  const handleCheckboxChange = event => {
-    setIsCheckboxChecked(event.target.checked)
+  const fetchDoorList = async () => {
+    try {
+      const res = await axios.get(
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/doors
+            `,
+        config
+      )
+      setDoorList(res.data.rows)
+    } catch (error) {
+      console.error('Error fetching data1: ', error)
+    }
   }
+  const fetchUserGroups = async () => {
+    try {
+      const response = await axios.get('https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups', config)
+      setUserGroups(response.data.rows)
+    } catch (error) {
+      console.error('Error fetching user groups: ', error)
+    }
+  }
+  console.log(detail?.id, 'detail')
 
   const ViewContent = () => {
     const transformCalendarDays = calendarDays => {
@@ -323,6 +352,53 @@ const View = ({ show, onClose, id, setReload, filter }) => {
     )
   }
 
+  const handleSave = async () => {
+    try {
+      setLoading(true)
+
+      const formData = {
+        nameCalendar: getValues('nameCalendar') || '',
+        groupId: getValues('groupId') || '',
+        doorInId: getValues('doorInId') || '',
+        doorOutId: getValues('doorOutId') || '',
+        startDate: getValues('startDate') ? format(new Date(getValues('startDate')), 'yyyy-MM-dd') : null,
+        endDate: getValues('endDate') ? format(new Date(getValues('endDate')), 'yyyy-MM-dd') : null,
+        calendarDays: dataDaily,
+        scheduleId: idScheduleId,
+        doorAccessId: idDoorAccessId,
+        accessGroupId: idAccessGroupId
+      }
+      console.log(detail.startDate, 'startDate')
+      console.log(detail.endDate, 'enddate')
+
+      await axios.put(
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/calendar/configuration/${id}`,
+        formData,
+        config
+      )
+      setReload()
+      toast.success('Cập nhật thành công')
+    } catch (error) {
+      console.error('Error updating data: ', error)
+      toast.error(error.message || 'Có lỗi xảy ra khi cập nhật')
+    } finally {
+      setLoading(false)
+      onClose()
+    }
+  }
+
+  const handleDoorOutIdChange = newValue => {
+    setSelectedDoorOutId(newValue)
+  }
+
+  const handleDoorInIdChange = newValue => {
+    setSelectedDoorInId(newValue)
+  }
+
+  const filterDoorList = doorIdToExclude => {
+    return doorList.filter(option => option.id !== doorIdToExclude)
+  }
+
   return (
     <Card>
       <Dialog
@@ -373,6 +449,106 @@ const View = ({ show, onClose, id, setReload, filter }) => {
                     </Grid>
                   )
                 }
+                if (item.type == 'Autocomplete') {
+                  return (
+                    <Grid item xs={12} sm={4} key={index}>
+                      <Controller
+                        name='groupId'
+                        control={control}
+                        rules={{ required: true }}
+                        render={({ field: { value, onChange } }) => {
+                          // Convert `value` to the correct option object
+                          const selectedOption = userGroups.find(option => option.id === value) || null
+                          console.log('value:', value)
+                          console.log('selectedOption:', selectedOption)
+
+                          return (
+                            <>
+                              <Autocomplete
+                                fullWidth
+                                id='autocomplete-custom'
+                                label='Công ty'
+                                value={selectedOption}
+                                options={userGroups}
+                                getOptionLabel={option => option.name || ''}
+                                renderInput={params => (
+                                  <CustomTextField {...params} label='Công ty' placeholder='Khác' />
+                                )}
+                                onChange={(event, newValue) => {
+                                  onChange(newValue ? newValue.id : null)
+                                }}
+                              />
+                            </>
+                          )
+                        }}
+                      />
+                    </Grid>
+                  )
+                }
+                if (item.type === 'AutocompleteDoorIn') {
+                  const filteredDoorList = filterDoorList(selectedDoorOutId)
+                  return (
+                    <Grid item xs={12} sm={4} key={index}>
+                      <Controller
+                        name='doorInId'
+                        control={control}
+                        rules={{ required: true }}
+                        render={({ field: { value, onChange } }) => {
+                          const selectedOption = filteredDoorList.find(option => option.id === value) || null
+
+                          return (
+                            <Autocomplete
+                              fullWidth
+                              id='autocomplete-doorInId'
+                              label='Cửa vào'
+                              value={selectedOption}
+                              options={filteredDoorList}
+                              getOptionLabel={option => option.name || ''}
+                              renderInput={params => <CustomTextField {...params} label='Cửa vào' placeholder='Khác' />}
+                              onChange={(event, newValue) => {
+                                onChange(newValue ? newValue.id : null)
+                                handleDoorInIdChange(newValue ? newValue.id : null) // Save selected doorInId
+                              }}
+                            />
+                          )
+                        }}
+                      />
+                    </Grid>
+                  )
+                }
+
+                if (item.type === 'AutocompleteDoorOut') {
+                  const filteredDoorList = filterDoorList(selectedDoorInId)
+                  return (
+                    <Grid item xs={12} sm={4} key={index}>
+                      <Controller
+                        name='doorOutId'
+                        control={control}
+                        rules={{ required: true }}
+                        render={({ field: { value, onChange } }) => {
+                          const selectedOption = doorList.find(option => option.id === value) || null
+
+                          return (
+                            <Autocomplete
+                              fullWidth
+                              id='autocomplete-doorOutId'
+                              label='Cửa ra'
+                              value={selectedOption}
+                              options={filteredDoorList}
+                              getOptionLabel={option => option.name || ''}
+                              renderInput={params => <CustomTextField {...params} label='Cửa ra' placeholder='Khác' />}
+                              onChange={(event, newValue) => {
+                                onChange(newValue ? newValue.id : null)
+                                handleDoorOutIdChange(newValue ? newValue.id : null) // Save selected doorOutId
+                              }}
+                            />
+                          )
+                        }}
+                      />
+                    </Grid>
+                  )
+                }
+
                 if (item.type == 'Schedule') {
                   return (
                     <Grid item xs={12} key={index}>
@@ -396,6 +572,60 @@ const View = ({ show, onClose, id, setReload, filter }) => {
                     </Grid>
                   )
                 }
+                if (item.type === 'startDate') {
+                  return (
+                    <Grid item xs={12} sm={4} key={index}>
+                      <Controller
+                        name='startDate'
+                        control={control}
+                        rules={{ required: item.require }}
+                        render={({ field: { value, onChange } }) => (
+                          <DatePickerWrapper>
+                            <DatePicker
+                              selected={value ? new Date(value) : null}
+                              onChange={onChange}
+                              customInput={
+                                <CustomTextField
+                                  fullWidth
+                                  label='Ngày bắt đầu'
+                                  error={Boolean(errors.startDate)}
+                                  helperText={errors.startDate ? 'Trường này bắt buộc' : ''}
+                                />
+                              }
+                            />
+                          </DatePickerWrapper>
+                        )}
+                      />
+                    </Grid>
+                  )
+                }
+                if (item.type === 'endDate') {
+                  return (
+                    <Grid item xs={12} sm={4} key={index}>
+                      <Controller
+                        name='endDate'
+                        control={control}
+                        rules={{ required: item.require }}
+                        render={({ field: { value, onChange } }) => (
+                          <DatePickerWrapper>
+                            <DatePicker
+                              selected={value ? new Date(value) : null}
+                              onChange={onChange}
+                              customInput={
+                                <CustomTextField
+                                  fullWidth
+                                  label='Ngày kết thúc'
+                                  error={Boolean(errors.endDate)}
+                                  helperText={errors.endDate ? 'Trường này bắt buộc' : ''}
+                                />
+                              }
+                            />
+                          </DatePickerWrapper>
+                        )}
+                      />
+                    </Grid>
+                  )
+                }
               })}
               <Grid item xs={12}></Grid>
             </Grid>
@@ -409,7 +639,10 @@ const View = ({ show, onClose, id, setReload, filter }) => {
           }}
         >
           <Button variant='contained' onClick={onClose}>
-            Lưu
+            Hủy
+          </Button>
+          <Button variant='contained' onClick={handleSave} disabled={loading}>
+            {loading ? 'Đang lưu...' : 'Lưu'}
           </Button>
         </DialogActions>
       </Dialog>

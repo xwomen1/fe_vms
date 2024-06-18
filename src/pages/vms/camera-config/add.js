@@ -605,7 +605,7 @@ const Add = ({ apiData }) => {
     fetchFilteredOrAllUsers()
   }, [page, pageSize, total, value, reload])
 
-  const top100Films = [{ title: 'Onvif' }, { title: 'Hik' }]
+  const top100Films = [{ title: 'Onvif' }, { title: 'Hik Version' }]
 
   return (
     <>
@@ -623,12 +623,6 @@ const Add = ({ apiData }) => {
                       <Grid item>
                         <FormControlLabel value='daiIp' control={<Radio />} label='Dải IP' />
                       </Grid>
-                      {/* <Grid item>
-                        <FormControlLabel value='onvif' control={<Radio />} label='Onvif' />
-                      </Grid>
-                      <Grid item>
-                        <FormControlLabel value='khac' control={<Radio />} label='Khác' />
-                      </Grid> */}
                       <Grid item xs={3}>
                         <Autocomplete
                           fullWidth
@@ -945,7 +939,7 @@ const Add = ({ apiData }) => {
                 )}
               </Grid>
               <Grid item xs={12}>
-                {selectedValue === 'hik' && (
+                {selectedValue === 'hik version' && (
                   <Grid
                     container
                     item
@@ -986,7 +980,7 @@ const Add = ({ apiData }) => {
                     </Grid>
                     <Grid item xs={0.2}></Grid>
 
-                    <Grid item xs={4} style={{ marginTop: '2%' }}>
+                    <Grid item xs={4} style={{ marginTop: '1%' }}>
                       <Button>Cancel</Button>
                       <Button variant='contained' onClick={handleScanHik}>
                         Quét
