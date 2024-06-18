@@ -55,7 +55,13 @@ const Storage = ({ id, name, channel }) => {
     const [minuteType, setMinuteType] = useState(null)
     const [startTime, setStartTime] = useState(null)
     const [endTime, setEndTime] = useState(null)
-    const [startDate, setStartDate] = useState(new Date())
+
+    const [startDate, setStartDate] = useState(() => {
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+        return yesterday;
+    });
     const [endDate, setEndDate] = useState(new Date())
 
 
@@ -117,8 +123,14 @@ const Storage = ({ id, name, channel }) => {
         setLoading(true)
 
         if (camera.id !== '') {
+
+            const params = {
+                startTime: convertDateToString(startTime),
+                endTime: convertDateToString(endTime)
+            }
+
             try {
-                const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/video/download?idCamera=${camera.id}&startTime=${startTime}&endTime=${endTime}`)
+                const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/video/download?idCamera=${camera.id}&startTime=${params.startTime}&endTime=${params.endTime}`)
                 const videoDownloadUrl = res.data[0].videoDownLoad[0].video
 
                 if (videoDownloadUrl) {
@@ -195,7 +207,7 @@ const Storage = ({ id, name, channel }) => {
                                                 <DatePicker
                                                     selected={startDate}
                                                     id='basic-input'
-                                                    maxDate={new Date()}
+                                                    maxDate={endDate}
                                                     onChange={date => setStartDate(date)}
                                                     customInput={<CustomInput label='Ngày bắt đầu' />}
                                                 />
@@ -232,7 +244,7 @@ const Storage = ({ id, name, channel }) => {
                     />
                     <CardContent>
                         {camera.id !== '' &&
-                            <Timeline data={dataList} minuteType={minuteType} callback={handleSetTimeSelected} />
+                            <Timeline data={dataList} minuteType={minuteType} startDate={startDate} endDate={endDate} callback={handleSetTimeSelected} />
                         }
                     </CardContent>
                 </Card>
