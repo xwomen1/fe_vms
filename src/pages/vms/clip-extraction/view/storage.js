@@ -60,6 +60,7 @@ const Storage = ({ id, name, channel }) => {
         const today = new Date();
         const yesterday = new Date(today);
         yesterday.setDate(today.getDate() - 1);
+
         return yesterday;
     });
     const [endDate, setEndDate] = useState(new Date())
