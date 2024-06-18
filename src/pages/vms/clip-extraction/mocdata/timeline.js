@@ -34,22 +34,15 @@ const dataList = [
     },
 ];
 
-const Timeline = ({ data = dataList, dateType, minuteType, callback }) => {
+const Timeline = ({ data, minuteType, callback, startDate, endDate }) => {
     const [dateData, setDateData] = useState([]);
-    const [timeType, setTimeType] = useState('day');
     const [minutesType, setMinutesType] = useState('5minute');
-    const [dayList, setDayList] = useState([]);
+    const [dateList, setDateList] = useState([]);
     const [timelines, setTimelines] = useState({});
     const [selectedIntervals, setSelectedIntervals] = useState({});
     const [timelineScrubberError, setTimelineScrubberError] = useState(false);
     const [gaps, setGaps] = useState([]);
     const [selectedTime, setSelectedTime] = useState({})
-
-    useEffect(() => {
-        if (dateType) {
-            setTimeType(dateType);
-        }
-    }, [dateType]);
 
     useEffect(() => {
         if (minuteType) {
@@ -75,8 +68,10 @@ const Timeline = ({ data = dataList, dateType, minuteType, callback }) => {
     }, [minutesType]);
 
     useEffect(() => {
-        getLastDays();
-    }, [timeType]);
+        const datesInRange = handleUpdateListDate(startDate, endDate)
+        const dateOfList = datesInRange.map(date => date.toISOString().split('T')[0])
+        setDateList(dateOfList)
+    }, [startDate, endDate]);
 
     useEffect(() => {
         if (data) {
@@ -86,10 +81,10 @@ const Timeline = ({ data = dataList, dateType, minuteType, callback }) => {
     }, [data]);
 
     useEffect(() => {
-        if (dayList.length) {
+        if (dateList.length) {
             updateTimelines();
         }
-    }, [dayList]);
+    }, [dateList]);
 
     useEffect(() => {
         if (dateData.length) {
@@ -121,41 +116,27 @@ const Timeline = ({ data = dataList, dateType, minuteType, callback }) => {
         setSelectedTime(selectedInterval)
     };
 
-    const getLastDays = () => {
-        let daysArray = [];
+    const handleUpdateListDate = (start, end) => {
+        const dates = []
+        const date = new Date(start?.getTime())
 
-        switch (timeType) {
-            case 'day':
-                daysArray.push(new Date().toISOString().split('T')[0]);
-                break;
-            case 'week':
-                for (let i = 0; i < 7; i++) {
-                    const date = new Date();
-                    date.setDate(date.getDate() - i);
-                    daysArray.push(date.toISOString().split('T')[0]);
-                }
-                break;
-            case 'month':
-                for (let i = 0; i < 30; i++) {
-                    const date = new Date();
-                    date.setDate(date.getDate() - i);
-                    daysArray.push(date.toISOString().split('T')[0]);
-                }
-                break;
-            default:
-                break;
+        while (date <= end) {
+            dates.push(new Date(date))
+            date.setDate(date.getDate() + 1)
         }
-        setDayList(daysArray);
-    };
+
+        return dates
+    }
 
     const updateTimelines = () => {
         const newTimelines = {};
         const newSelectedIntervals = {};
 
-        dayList.forEach((day) => {
+        dateList.forEach((day) => {
             const date = new Date(day);
             const start = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0);
             const end = new Date(start.getTime() + 60 * 60 * 1000); // Add 1 hour to start
+
             newTimelines[day] = [start, new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59)];
             newSelectedIntervals[day] = [start, end];
         });
@@ -247,7 +228,7 @@ const Timeline = ({ data = dataList, dateType, minuteType, callback }) => {
 
     return (
         <Grid container spacing={2}>
-            {dayList.map((day, index) => (
+            {dateList.map((day, index) => (
                 <Grid item xs={12} display={'flex'} key={index}>
                     <Typography sx={{ width: '100px' }}>{day}</Typography>
                     <TimeRange
@@ -268,15 +249,6 @@ const Timeline = ({ data = dataList, dateType, minuteType, callback }) => {
             ))}
         </Grid>
     );
-};
-
-Timeline.getInitialProps = async () => {
-    // Chuẩn bị dữ liệu cần thiết ở đây
-    return {
-        data: dataList,
-        dateType: 'day',
-        minuteType: '5minute',
-    };
 };
 
 export default Timeline;
