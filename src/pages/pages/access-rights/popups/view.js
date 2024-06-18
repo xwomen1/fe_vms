@@ -367,6 +367,7 @@ const View = ({ show, onClose, id, setReload, filter }) => {
                             error={Boolean(errors[item.name])}
                             aria-describedby='validation-basic-last-name'
                             {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
+                            disabled
                           />
                         )}
                       />

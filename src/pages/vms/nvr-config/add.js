@@ -551,7 +551,7 @@ const UserList = ({ apiData }) => {
     })
   }, [defaultValue])
 
-  const top100Films = [{ title: 'Onvif' }, { title: 'Hik' }]
+  const top100Films = [{ title: 'Onvif' }, { title: 'Hik Version' }]
 
   return (
     <Grid container spacing={6.5}>
@@ -877,7 +877,7 @@ const UserList = ({ apiData }) => {
                     />{' '}
                   </>
                 )}
-                {selectedValue === 'hik' && (
+                {selectedValue === 'hik version' && (
                   <Grid
                     container
                     item
@@ -918,7 +918,7 @@ const UserList = ({ apiData }) => {
                     </Grid>
                     <Grid item xs={0.2}></Grid>
 
-                    <Grid item xs={4} style={{ marginTop: '2%' }}>
+                    <Grid item xs={4} style={{ marginTop: '1%' }}>
                       <Button>Cancel</Button>
                       <Button variant='contained' onClick={handleScanHik}>
                         Quét
