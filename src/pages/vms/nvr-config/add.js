@@ -25,6 +25,7 @@ import ChangePassWords from './popups/ChangePassword'
 import Passwords from './popups/PassWord'
 import PopupScanDungIP from './popups/AddDungIP'
 import PopupScanOnvif from './popups/AddOnvif'
+import PopupScanHik from './popups/AddHik'
 import PopupScan from './popups/Add'
 import { Radio, RadioGroup, FormControlLabel } from '@mui/material'
 import ImportPopup from './popups/ImportPopup'
@@ -87,6 +88,7 @@ const UserList = ({ apiData }) => {
   const [selectNVR, setSelectedNVR] = useState('')
   const [openPopupResponse, setOpenPopupResponse] = useState(false)
   const [openPopupResponseDungIP, setOpenPopupResponseDungIP] = useState(false)
+  const [openPopupResponseHik, setOpenPopupResponseHik] = useState(false)
   const [openPopupResponseOnvif, setOpenPopupResponseOnvif] = useState(false)
   const [popupMessage, setPopupMessage] = useState('')
   const [isError, setIsError] = useState(false)
@@ -140,6 +142,54 @@ const UserList = ({ apiData }) => {
       }
 
       // // setOpenPopupResponseDungIP(false)
+      setIsError(true) // Đánh dấu là lỗi
+      setLoading(false)
+    }
+  }
+
+  const handleScanHik = async () => {
+    setOpenPopupResponseHik(true)
+    setLoading(true)
+    setPopupMessage('') // Reset thông điệp khi bắt đầu scan
+    setIsError(false) // Reset trạng thái lỗi khi bắt đầu scan
+    try {
+      const payload = {
+        idBox: selectNVR?.value,
+        userName,
+        passWord
+      }
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.post(
+        'https://sbs.basesystem.one/ivis/vms/api/v0/device/onvif/devicescanhikivision',
+        payload,
+        config
+      )
+
+      setResponse(response.data)
+      setLoading(false)
+
+      toast.success('Thành công')
+
+      setPopupMessage('Quét thành công')
+      setIsError(false) // Không phải lỗi
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message === 'No response from the server device, timeout: scan_device'
+      ) {
+        setPopupMessage('Thiết bị chưa phản hồi')
+      } else {
+        setPopupMessage(`${error.response.data.message}`)
+      }
+
       setIsError(true) // Đánh dấu là lỗi
       setLoading(false)
     }
@@ -501,6 +551,8 @@ const UserList = ({ apiData }) => {
     })
   }, [defaultValue])
 
+  const top100Films = [{ title: 'Onvif' }, { title: 'Hik Version' }]
+
   return (
     <Grid container spacing={6.5}>
       <Grid item xs={12}>
@@ -517,268 +569,18 @@ const UserList = ({ apiData }) => {
                       <Grid item>
                         <FormControlLabel value='daiIp' control={<Radio />} label='Dải IP' />
                       </Grid>
-                      <Grid item>
-                        <FormControlLabel value='onvif' control={<Radio />} label='Onvif' />
+                      <Grid item xs={3}>
+                        <Autocomplete
+                          fullWidth
+                          options={top100Films}
+                          id='autocomplete-custom'
+                          getOptionLabel={option => option.title || ''}
+                          renderInput={params => <CustomTextField placeholder='Khác' {...params} />}
+                          onChange={(event, value) => setSelectedValue(value ? value.title.toLowerCase() : '')}
+                        />
                       </Grid>
                     </Grid>
                   </RadioGroup>
-                  {selectedValue === 'dungIp' && (
-                    <Grid
-                      container
-                      item
-                      component={Paper}
-                      style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
-                    >
-                      <Grid item xs={1.8}>
-                        <Autocomplete
-                          value={selectNVR}
-                          onChange={handleDDNSChange}
-                          options={nvrs}
-                          getOptionLabel={option => option.label}
-                          renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
-                          onFocus={handleComboboxFocus}
-
-                          // loading={loading}
-                        />{' '}
-                      </Grid>
-                      <Grid item xs={0.1}></Grid>
-                      <Grid item xs={2.4}>
-                        <CustomTextField
-                          value={url}
-                          onChange={e => setUrl(e.target.value)}
-                          label='Địa chỉ IP'
-                          fullWidth
-                        />
-                      </Grid>
-                      <Grid item xs={0.1}></Grid>
-                      <Grid item xs={2.4}>
-                        <CustomTextField value={host} onChange={e => setHost(e.target.value)} label='Cổng' fullWidth />
-                      </Grid>
-                      <Grid item xs={0.1}></Grid>
-                      <Grid item xs={2.4}>
-                        <CustomTextField
-                          value={userName}
-                          onChange={e => setUsername(e.target.value)}
-                          label='Đăng nhập'
-                          fullWidth
-                        />
-                      </Grid>
-                      <Grid item xs={0.1}></Grid>
-                      <Grid item xs={2}>
-                        <CustomTextField
-                          value={passWord}
-                          onChange={e => setPassWord(e.target.value)}
-                          label='Mật khẩu'
-                          type='password'
-                          fullWidth
-                        />
-                      </Grid>
-                      <Grid item xs={2} style={{ marginTop: '1%' }}>
-                        <Button style={{ marginLeft: '5%' }}>Cancel</Button>
-                        <Button style={{ marginLeft: '5%' }} onClick={handleScan} variant='contained'>
-                          Quét
-                        </Button>
-                      </Grid>
-                      <Grid item xs={0.1} style={{ marginTop: '1%' }}>
-                        {loading && <CircularProgress style={{ top: '5px' }} />}
-                      </Grid>
-                    </Grid>
-                  )}
-                  {openPopupResponseDungIP && (
-                    <>
-                      <PopupScanDungIP
-                        open={openPopupResponseDungIP}
-                        url={url}
-                        port={host}
-                        idBox={idBox}
-                        setReload={() => setReload(reload + 1)}
-                        userName={userName}
-                        isError={isError}
-                        popupMessage={popupMessage}
-                        passWord={passWord}
-                        response={response}
-                        loadingDungIp={loading}
-                        onClose={() => setOpenPopupResponseDungIP(false)}
-                      />{' '}
-                    </>
-                  )}
-                  {selectedValue === 'daiIp' && (
-                    <Grid
-                      container
-                      item
-                      component={Paper}
-                      style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
-                    >
-                      <Grid item xs={1.8}>
-                        <Autocomplete
-                          value={selectNVR}
-                          onChange={handleDDNSChange}
-                          options={nvrs}
-                          getOptionLabel={option => option.label}
-                          renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
-                          onFocus={handleComboboxFocus}
-
-                          // loading={loading}
-                        />{' '}
-                      </Grid>
-                      <Grid item xs={0.4}></Grid>
-                      <Grid item xs={2}>
-                        <CustomTextField
-                          value={startURL}
-                          onChange={e => setStartUrl(e.target.value)}
-                          label='Địa chỉ IP bắt đầu'
-                          fullWidth
-                        />
-                      </Grid>
-                      <Grid item xs={0.2}></Grid>
-
-                      <Grid item xs={0.4} style={{ marginTop: '2%' }}>
-                        ----
-                      </Grid>
-                      <Grid item xs={2}>
-                        <CustomTextField
-                          value={endURL}
-                          onChange={e => setEndUrl(e.target.value)}
-                          label='Địa chỉ IP kết thúc'
-                          fullWidth
-                        />
-                      </Grid>
-                      <Grid item xs={0.2}></Grid>
-
-                      <Grid item xs={2}>
-                        <CustomTextField
-                          value={startHost}
-                          onChange={e => setStartHost(e.target.value)}
-                          label='Cổng bắt đầu'
-                          fullWidth
-                        />
-                      </Grid>
-                      <Grid item xs={0.2}></Grid>
-
-                      <Grid item xs={0.4} style={{ marginTop: '2%' }}>
-                        ----
-                      </Grid>
-                      <Grid item xs={2}>
-                        <CustomTextField
-                          value={endHost}
-                          onChange={e => setEndHost(e.target.value)}
-                          label='Cổng kết thúc'
-                          fullWidth
-                        />
-                      </Grid>
-                      <Grid item xs={2}>
-                        <CustomTextField
-                          value={userName}
-                          onChange={e => setUsername(e.target.value)}
-                          label='Đăng nhập'
-                          fullWidth
-                        />
-                      </Grid>
-
-                      <Grid item xs={0.4}></Grid>
-                      <Grid item xs={2}>
-                        <CustomTextField
-                          value={passWord}
-                          onChange={e => setPassWord(e.target.value)}
-                          label='Mật khẩu'
-                          type='password'
-                          fullWidth
-                        />
-                      </Grid>
-                      <Grid item xs={0.2}></Grid>
-
-                      <Grid item xs={4} style={{ marginTop: '1%' }}>
-                        <Button>Cancel</Button>
-                        <Button onClick={handleScanDaiIP} variant='contained'>
-                          Quét
-                        </Button>
-                      </Grid>
-                      <Grid item xs={0.1} style={{ marginTop: '1%', marginLeft: '-20%' }}>
-                        {loading && <CircularProgress style={{ top: '5px' }} />}
-                      </Grid>
-                    </Grid>
-                  )}
-                  {openPopupResponse && (
-                    <>
-                      <PopupScan
-                        open={openPopupResponse}
-                        userName={userName}
-                        setReload={() => setReload(reload + 1)}
-                        isError={isError}
-                        idBox={idBox}
-                        popupMessage={popupMessage}
-                        passWord={passWord}
-                        response={response}
-                        loadingDaiIP={loading}
-                        onClose={() => setOpenPopupResponse(false)}
-                      />{' '}
-                    </>
-                  )}
-                  {selectedValue === 'onvif' && (
-                    <Grid
-                      container
-                      item
-                      component={Paper}
-                      style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
-                    >
-                      <Grid item xs={1.8}>
-                        <Autocomplete
-                          value={selectNVR}
-                          onChange={handleDDNSChange}
-                          options={nvrs}
-                          getOptionLabel={option => option.label}
-                          renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
-                          onFocus={handleComboboxFocus}
-
-                          // loading={loading}
-                        />{' '}
-                      </Grid>
-
-                      <Grid item xs={0.4}></Grid>
-                      <Grid item xs={2}>
-                        <CustomTextField
-                          value={userName}
-                          onChange={e => setUsername(e.target.value)}
-                          label='Đăng nhập'
-                          fullWidth
-                        />
-                      </Grid>
-                      <Grid item xs={0.4}></Grid>
-                      <Grid item xs={2}>
-                        <CustomTextField
-                          value={passWord}
-                          onChange={e => setPassWord(e.target.value)}
-                          label='Mật khẩu'
-                          type='password'
-                          fullWidth
-                        />
-                      </Grid>
-                      <Grid item xs={0.2}></Grid>
-
-                      <Grid item xs={4} style={{ marginTop: '1%' }}>
-                        <Button>Cancel</Button>
-                        <Button variant='contained' onClick={handleScanOnvif}>
-                          Quét
-                        </Button>
-                      </Grid>
-                    </Grid>
-                  )}
-                  {openPopupResponseOnvif && (
-                    <>
-                      <PopupScanOnvif
-                        open={openPopupResponseOnvif}
-                        userName={userName}
-                        setReload={() => setReload(reload + 1)}
-                        passWord={passWord}
-                        isError={isError}
-                        idBox={idBox}
-                        popupMessage={popupMessage}
-                        response={response}
-                        loadingOnvif={loading}
-                        onClose={() => setOpenPopupResponseOnvif(false)}
-                      />{' '}
-                    </>
-                  )}
                 </div>
               </Grid>
               <Grid item xs={4} style={{ display: 'flex' }}>
@@ -815,6 +617,331 @@ const UserList = ({ apiData }) => {
                     }}
                   />
                 </Grid>
+              </Grid>
+              <Grid item xs={12}>
+                {' '}
+                {selectedValue === 'dungIp' && (
+                  <Grid
+                    container
+                    item
+                    component={Paper}
+                    style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
+                  >
+                    <Grid item xs={1.8}>
+                      <Autocomplete
+                        value={selectNVR}
+                        onChange={handleDDNSChange}
+                        options={nvrs}
+                        getOptionLabel={option => option.label}
+                        renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
+                        onFocus={handleComboboxFocus}
+
+                        // loading={loading}
+                      />{' '}
+                    </Grid>
+                    <Grid item xs={0.1}></Grid>
+                    <Grid item xs={2.4}>
+                      <CustomTextField
+                        value={url}
+                        onChange={e => setUrl(e.target.value)}
+                        label='Địa chỉ IP'
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={0.1}></Grid>
+                    <Grid item xs={2.4}>
+                      <CustomTextField value={host} onChange={e => setHost(e.target.value)} label='Cổng' fullWidth />
+                    </Grid>
+                    <Grid item xs={0.1}></Grid>
+                    <Grid item xs={2.4}>
+                      <CustomTextField
+                        value={userName}
+                        onChange={e => setUsername(e.target.value)}
+                        label='Đăng nhập'
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={0.1}></Grid>
+                    <Grid item xs={2}>
+                      <CustomTextField
+                        value={passWord}
+                        onChange={e => setPassWord(e.target.value)}
+                        label='Mật khẩu'
+                        type='password'
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={2} style={{ marginTop: '1%' }}>
+                      <Button style={{ marginLeft: '5%' }}>Cancel</Button>
+                      <Button style={{ marginLeft: '5%' }} onClick={handleScan} variant='contained'>
+                        Quét
+                      </Button>
+                    </Grid>
+                    <Grid item xs={0.1} style={{ marginTop: '1%' }}>
+                      {loading && <CircularProgress style={{ top: '5px' }} />}
+                    </Grid>
+                  </Grid>
+                )}
+                {openPopupResponseDungIP && (
+                  <>
+                    <PopupScanDungIP
+                      open={openPopupResponseDungIP}
+                      url={url}
+                      port={host}
+                      idBox={idBox}
+                      setReload={() => setReload(reload + 1)}
+                      userName={userName}
+                      isError={isError}
+                      popupMessage={popupMessage}
+                      passWord={passWord}
+                      response={response}
+                      loadingDungIp={loading}
+                      onClose={() => setOpenPopupResponseDungIP(false)}
+                    />{' '}
+                  </>
+                )}
+                {selectedValue === 'daiIp' && (
+                  <Grid
+                    container
+                    item
+                    component={Paper}
+                    style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
+                  >
+                    <Grid item xs={1.8}>
+                      <Autocomplete
+                        value={selectNVR}
+                        onChange={handleDDNSChange}
+                        options={nvrs}
+                        getOptionLabel={option => option.label}
+                        renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
+                        onFocus={handleComboboxFocus}
+
+                        // loading={loading}
+                      />{' '}
+                    </Grid>
+                    <Grid item xs={0.4}></Grid>
+                    <Grid item xs={2}>
+                      <CustomTextField
+                        value={startURL}
+                        onChange={e => setStartUrl(e.target.value)}
+                        label='Địa chỉ IP bắt đầu'
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={0.2}></Grid>
+
+                    <Grid item xs={0.4} style={{ marginTop: '2%' }}>
+                      ----
+                    </Grid>
+                    <Grid item xs={2}>
+                      <CustomTextField
+                        value={endURL}
+                        onChange={e => setEndUrl(e.target.value)}
+                        label='Địa chỉ IP kết thúc'
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={0.2}></Grid>
+
+                    <Grid item xs={2}>
+                      <CustomTextField
+                        value={startHost}
+                        onChange={e => setStartHost(e.target.value)}
+                        label='Cổng bắt đầu'
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={0.2}></Grid>
+
+                    <Grid item xs={0.4} style={{ marginTop: '2%' }}>
+                      ----
+                    </Grid>
+                    <Grid item xs={2}>
+                      <CustomTextField
+                        value={endHost}
+                        onChange={e => setEndHost(e.target.value)}
+                        label='Cổng kết thúc'
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={2}>
+                      <CustomTextField
+                        value={userName}
+                        onChange={e => setUsername(e.target.value)}
+                        label='Đăng nhập'
+                        fullWidth
+                      />
+                    </Grid>
+
+                    <Grid item xs={0.4}></Grid>
+                    <Grid item xs={2}>
+                      <CustomTextField
+                        value={passWord}
+                        onChange={e => setPassWord(e.target.value)}
+                        label='Mật khẩu'
+                        type='password'
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={0.2}></Grid>
+
+                    <Grid item xs={4} style={{ marginTop: '1%' }}>
+                      <Button>Cancel</Button>
+                      <Button onClick={handleScanDaiIP} variant='contained'>
+                        Quét
+                      </Button>
+                    </Grid>
+                    <Grid item xs={0.1} style={{ marginTop: '1%', marginLeft: '-20%' }}>
+                      {loading && <CircularProgress style={{ top: '5px' }} />}
+                    </Grid>
+                  </Grid>
+                )}
+                {openPopupResponse && (
+                  <>
+                    <PopupScan
+                      open={openPopupResponse}
+                      userName={userName}
+                      setReload={() => setReload(reload + 1)}
+                      isError={isError}
+                      idBox={idBox}
+                      popupMessage={popupMessage}
+                      passWord={passWord}
+                      response={response}
+                      loadingDaiIP={loading}
+                      onClose={() => setOpenPopupResponse(false)}
+                    />{' '}
+                  </>
+                )}
+                {selectedValue === 'onvif' && (
+                  <Grid
+                    container
+                    item
+                    component={Paper}
+                    style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
+                  >
+                    <Grid item xs={1.8}>
+                      <Autocomplete
+                        value={selectNVR}
+                        onChange={handleDDNSChange}
+                        options={nvrs}
+                        getOptionLabel={option => option.label}
+                        renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
+                        onFocus={handleComboboxFocus}
+
+                        // loading={loading}
+                      />{' '}
+                    </Grid>
+
+                    <Grid item xs={0.4}></Grid>
+                    <Grid item xs={2}>
+                      <CustomTextField
+                        value={userName}
+                        onChange={e => setUsername(e.target.value)}
+                        label='Đăng nhập'
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={0.4}></Grid>
+                    <Grid item xs={2}>
+                      <CustomTextField
+                        value={passWord}
+                        onChange={e => setPassWord(e.target.value)}
+                        label='Mật khẩu'
+                        type='password'
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={0.2}></Grid>
+
+                    <Grid item xs={4} style={{ marginTop: '1%' }}>
+                      <Button>Cancel</Button>
+                      <Button variant='contained' onClick={handleScanOnvif}>
+                        Quét
+                      </Button>
+                    </Grid>
+                  </Grid>
+                )}
+                {openPopupResponseOnvif && (
+                  <>
+                    <PopupScanOnvif
+                      open={openPopupResponseOnvif}
+                      userName={userName}
+                      setReload={() => setReload(reload + 1)}
+                      passWord={passWord}
+                      isError={isError}
+                      idBox={idBox}
+                      popupMessage={popupMessage}
+                      response={response}
+                      loadingOnvif={loading}
+                      onClose={() => setOpenPopupResponseOnvif(false)}
+                    />{' '}
+                  </>
+                )}
+                {selectedValue === 'hik version' && (
+                  <Grid
+                    container
+                    item
+                    component={Paper}
+                    style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
+                  >
+                    <Grid item xs={1.8}>
+                      <Autocomplete
+                        value={selectNVR}
+                        onChange={handleDDNSChange}
+                        options={nvrs}
+                        getOptionLabel={option => option.label}
+                        renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
+                        onFocus={handleComboboxFocus}
+
+                        // loading={loading}
+                      />{' '}
+                    </Grid>
+                    <Grid item xs={0.1}></Grid>
+
+                    <Grid item xs={2}>
+                      <CustomTextField
+                        value={userName}
+                        onChange={e => setUsername(e.target.value)}
+                        label='Đăng nhập'
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={0.4}></Grid>
+                    <Grid item xs={2}>
+                      <CustomTextField
+                        value={passWord}
+                        onChange={e => setPassWord(e.target.value)}
+                        label='Mật khẩu'
+                        type='password'
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={0.2}></Grid>
+
+                    <Grid item xs={4} style={{ marginTop: '1%' }}>
+                      <Button>Cancel</Button>
+                      <Button variant='contained' onClick={handleScanHik}>
+                        Quét
+                      </Button>
+                    </Grid>
+                  </Grid>
+                )}
+                {openPopupResponseHik && (
+                  <>
+                    <PopupScanHik
+                      open={openPopupResponseHik}
+                      userName={userName}
+                      setReload={() => setReload(reload + 1)}
+                      passWord={passWord}
+                      isError={isError}
+                      idBox={idBox}
+                      popupMessage={popupMessage}
+                      response={response}
+                      loadingOnvif={loading}
+                      onClose={() => setOpenPopupResponseHik(false)}
+                    />{' '}
+                  </>
+                )}
               </Grid>
               <Table>
                 <TableHead>

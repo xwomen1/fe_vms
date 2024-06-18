@@ -267,7 +267,7 @@ const EventList = () => {
         cameraName: valueFilter?.cameraName || '',
         startTime: valueFilter?.startTime || '',
         endTime: valueFilter?.endTime || '',
-        typeOfAIEvent: 'car'
+        eventType: 'LICENSE_PLATE_RECOGNITION'
       }
     }
     setLoading(true)

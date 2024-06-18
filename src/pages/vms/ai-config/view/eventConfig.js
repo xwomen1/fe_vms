@@ -2,16 +2,16 @@ import { useEffect, useRef, useState } from "react"
 import axios from "axios"
 import { TreeItem, TreeView } from "@mui/lab"
 import Icon from 'src/@core/components/icon'
-import { Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Slider, Tooltip, Typography, styled, CircularProgress, CardActions, Dialog, DialogContent, DialogActions } from "@mui/material"
+import { Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Typography, styled, CardActions, Dialog, DialogContent, DialogActions } from "@mui/material"
 import authConfig from 'src/configs/auth'
 import ViewCamera from "./viewCamera"
-import { AddBox, CameraAlt, FastForward, FastRewind, IndeterminateCheckBox, Pause, PlayArrow, SkipNext, SkipPrevious } from "@mui/icons-material"
 import { format } from "date-fns"
 import CustomTextField from "src/@core/components/mui/text-field"
 import Schedule from "../popups/schedule"
 import CustomAutocomplete from "src/@core/components/mui/autocomplete"
 import toast from "react-hot-toast"
 import AddAlertAI from "../popups/addAlertAI"
+import Review from "./viewCamera"
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   '&:hover > .MuiTreeItem-content:not(.Mui-selected)': {
@@ -953,7 +953,7 @@ const EventConfig = () => {
               <Box
                 sx={{
                   width: '100%',
-                  height: '70vh',
+                  height: '80vh',
                   position: 'relative',
                   display: 'flex',
                   flexDirection: 'column',
@@ -963,116 +963,28 @@ const EventConfig = () => {
               >
                 <Box
                   sx={{
-                    width: 640,
-                    height: 360,
+                    width: ' 100%',
+                    height: '100%',
                     background: '#ccc',
                     borderRadius: 2
                   }}
                 >
-                  {idCameraSelect != null && <ViewCamera key={idCameraSelect} id={idCameraSelect} channel={'Sub'} />}
+                  <div>
+                    <Review key={idCameraSelect} id={idCameraSelect} name={nameCameraSelect} channel={'Sub'} />
+                  </div>
                   <canvas
                     ref={canvasRef}
-                    width='640'
-                    height='360'
+                    width={660}
+                    height={450}
                     style={{
                       background: 'none',
                       position: 'absolute',
                       opacity: 0.5,
-                      top: 21
+                      top: 0
                     }}
                     id='cameraEdit'
                   />
                 </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Typography variant='h5'>{nameCameraSelect}</Typography>
-                </Box>
-
-                <div style={{ width: '100%', marginTop: 20, padding: 5 }}>
-                  <Box display='flex' flexDirection='column' position='relative'>
-                    <div style={{ position: 'absolute', top: -30, right: -30 }}>
-                      <Tooltip title='Thu nhỏ'>
-                        <IconButton
-                          disabled={zoom < 50}
-                          onClick={() => {
-                            setZoom(zoom - 60)
-                          }}
-                        >
-                          <IndeterminateCheckBox />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title='Phóng to'>
-                        <IconButton
-                          disabled={zoom > 1440}
-                          onClick={() => {
-                            setZoom(zoom + 60)
-                          }}
-                        >
-                          <AddBox />
-                        </IconButton>
-                      </Tooltip>
-                    </div>
-                    <div className='' style={{ background: '#000', height: 25, display: 'flex', marginTop: 5 }}>
-                      <div
-                        style={{ background: '#F85B3B', width: 2, height: '100%', marginRight: 20, marginLeft: 100 }}
-                      ></div>
-                      <div style={{ background: 'green', width: 2, height: '100%', marginRight: 100 }}></div>
-                      <div style={{ background: 'blue', width: 2, height: '100%' }}></div>
-                      <div
-                        style={{ background: '#F85B3B', width: 2, height: '100%', marginRight: 20, marginLeft: 100 }}
-                      ></div>
-                      <div style={{ background: 'green', width: 2, height: '100%', marginRight: 100 }}></div>
-                      <div style={{ background: 'blue', width: 2, height: '100%' }}></div>
-                      <div
-                        style={{ background: '#F85B3B', width: 2, height: '100%', marginRight: 20, marginLeft: 100 }}
-                      ></div>
-                      <div style={{ background: 'green', width: 2, height: '100%', marginRight: 100 }}></div>
-                      <div style={{ background: 'blue', width: 2, height: '100%' }}></div>
-                    </div>
-                    <Slider
-                      style={{
-                        position: 'absolute',
-                        top: 15
-                      }}
-                      value={progress}
-                      onChange={handleSliderChange}
-                      step={0.1}
-                      min={0}
-                      max={100}
-                      marks={marks}
-                      size='small'
-                      defaultValue={70}
-                      aria-label='Small'
-                      valueLabelDisplay='off'
-                      ValueLabelComponent={({ children, value }) => (
-                        <Tooltip open={false} title={valueLabelFormat(value)}>
-                          {children}
-                        </Tooltip>
-                      )}
-                    />
-                  </Box>
-                </div>
-                <div style={{ width: '100%', height: 50, marginTop: 30 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
-                    <IconButton color='primary'>
-                      <CameraAlt />
-                    </IconButton>
-                    <IconButton color='primary'>
-                      <SkipPrevious />
-                    </IconButton>
-                    <IconButton color='primary'>
-                      <FastRewind />
-                    </IconButton>
-                    <IconButton color='primary' onClick={handlePlayClick} aria-label={isPlaying ? 'pause' : 'play'}>
-                      {isPlaying ? <Pause /> : <PlayArrow />}
-                    </IconButton>
-                    <IconButton color='primary'>
-                      <FastForward />
-                    </IconButton>
-                    <IconButton color='primary'>
-                      <SkipNext />
-                    </IconButton>
-                  </Box>
-                </div>
               </Box>
             </CardContent>
           </Card>

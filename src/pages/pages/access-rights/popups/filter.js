@@ -112,7 +112,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
           parentId: idParent
         }
       })
-      const groupChildren = res.data.data.rows
+      const groupChildren = res.data.rows
       setGroupName(prevState => [...prevState, ...groupChildren])
     } catch (error) {
       console.error('Error fetching data: ', error)
@@ -187,47 +187,50 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                   name='groupId'
                   control={control}
                   render={({ field: { value, onChange } }) => (
-                    <Box position='relative'>
-                      <CustomTextField
-                        select
-                        fullWidth
-                        defaultValue=''
-                        label='Công ty'
-                        SelectProps={{
-                          value: value,
-                          onChange: e => {
-                            onChange(e)
-                            setSelectedGroupId(e.target.value)
-                          },
-                          MenuProps: {
-                            PaperProps: {
-                              style: {
-                                maxHeight: 200 // Đặt chiều cao tối đa của menu
+                    console.log(value),
+                    (
+                      <Box position='relative'>
+                        <CustomTextField
+                          select
+                          fullWidth
+                          defaultValue=''
+                          label='Công ty'
+                          SelectProps={{
+                            value: value,
+                            onChange: e => {
+                              onChange(e)
+                              setSelectedGroupId(e.target.value)
+                            },
+                            MenuProps: {
+                              PaperProps: {
+                                style: {
+                                  maxHeight: 200 // Đặt chiều cao tối đa của menu
+                                }
                               }
                             }
-                          }
-                        }}
-                        id='validation-basic-select'
-                        error={Boolean(errors.groupId)}
-                        aria-describedby='validation-basic-select'
-                        {...(errors.groupId && { helperText: 'This field is required' })}
-                      >
-                        {groupName.map(item => (
-                          <MenuItem key={item.id} value={item.id}>
-                            {item.name}
-                          </MenuItem>
-                        ))}
-                      </CustomTextField>
-                      {value && (
-                        <IconButton
-                          size='small'
-                          style={{ position: 'absolute', right: 25, top: 25 }}
-                          onClick={() => handleClear(onChange, 'groupId')}
+                          }}
+                          id='validation-basic-select'
+                          error={Boolean(errors.groupId)}
+                          aria-describedby='validation-basic-select'
+                          {...(errors.groupId && { helperText: 'This field is required' })}
                         >
-                          <Icon icon='tabler:x' fontSize='1rem' />
-                        </IconButton>
-                      )}
-                    </Box>
+                          {groupName.map(item => (
+                            <MenuItem key={item.id} value={item.id}>
+                              {item.name}
+                            </MenuItem>
+                          ))}
+                        </CustomTextField>
+                        {value && (
+                          <IconButton
+                            size='small'
+                            style={{ position: 'absolute', right: 25, top: 25 }}
+                            onClick={() => handleClear(onChange, 'groupId')}
+                          >
+                            <Icon icon='tabler:x' fontSize='1rem' />
+                          </IconButton>
+                        )}
+                      </Box>
+                    )
                   )}
                 />
               </Grid>
