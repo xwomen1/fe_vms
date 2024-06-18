@@ -234,6 +234,7 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
       setLoading(false)
     }
   }
+
   const fetchDoorList = async () => {
     try {
       const res = await axios.get(
@@ -246,6 +247,7 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
       console.error('Error fetching data1: ', error)
     }
   }
+
   const fetchUserGroups = async () => {
     try {
       const response = await axios.get('https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups', config)
@@ -487,6 +489,7 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
                 }
                 if (item.type === 'AutocompleteDoorIn') {
                   const filteredDoorList = filterDoorList(selectedDoorOutId)
+
                   return (
                     <Grid item xs={12} sm={4} key={index}>
                       <Controller
@@ -519,6 +522,7 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
 
                 if (item.type === 'AutocompleteDoorOut') {
                   const filteredDoorList = filterDoorList(selectedDoorInId)
+
                   return (
                     <Grid item xs={12} sm={4} key={index}>
                       <Controller
