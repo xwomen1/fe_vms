@@ -953,7 +953,6 @@ const EventConfig = () => {
               <Box
                 sx={{
                   width: '100%',
-                  height: '80vh',
                   position: 'relative',
                   display: 'flex',
                   flexDirection: 'column',
@@ -965,7 +964,7 @@ const EventConfig = () => {
                   sx={{
                     width: ' 100%',
                     height: '100%',
-                    background: '#ccc',
+                    background: 'none',
                     borderRadius: 2
                   }}
                 >
@@ -974,13 +973,13 @@ const EventConfig = () => {
                   </div>
                   <canvas
                     ref={canvasRef}
-                    width={660}
-                    height={450}
                     style={{
+                      minHeight: 426,
+                      minWidth: 600,
                       background: 'none',
                       position: 'absolute',
                       opacity: 0.5,
-                      top: 0
+                      top: 10
                     }}
                     id='cameraEdit'
                   />

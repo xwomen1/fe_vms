@@ -19,9 +19,8 @@ import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 // ** Custom Component Imports
 import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
 import { formatTimeShow } from 'src/@core/utils/format'
-
+import ViewCamera from './playblack'
 import { Card } from "@mui/material"
-import ViewCamera from "src/@core/components/camera/playback"
 import { postApi } from 'src/@core/utils/requestUltils'
 
 const Review = ({ id, name, channel }) => {
