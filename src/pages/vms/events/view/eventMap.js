@@ -43,9 +43,9 @@ const columns = [
   },
   {
     id: 2,
-    flex: 0.25,
+    flex: 0.15,
     type: 'eventTypeString',
-    width: 50,
+    minWidth: 10,
     align: 'right',
     field: 'event',
     label: 'Sự kiện',
@@ -73,7 +73,7 @@ const EventMap = () => {
   const [connections, setConnections] = useState([])
   const [selectedTimes, setSelectedTimes] = useState([])
 
-  const [selectedCameraIds, setSelectedCameraIds] = useState([]) // State for selected camera IDs
+  const [selectedCameraIds, setSelectedCameraIds] = useState([])
   const [isReconnected, setIsReconnected] = useState(false)
 
   const [viewport, setViewport] = useState({
@@ -99,38 +99,62 @@ const EventMap = () => {
     if (isReconnected) {
     }
   }, [isReconnected])
-  useEffect(() => {
-  }, [selectedCameraIds])
+  useEffect(() => {}, [selectedCameraIds])
 
   useEffect(() => {
-    if (selectedTimes.length === 2) {
-      // Nối time thứ 1 với time thứ 2 và time thứ 2 với time thứ 3
-      connectPoints(selectedTimes[0], selectedTimes[1])
-      connectPoints(selectedTimes[1], selectedTimes[2])
-    } else if (selectedTimes.length === 1) {
-      // Nối time thứ 1 với time thứ 3
-      connectPoints(selectedTimes[0], selectedTimes[2])
+    if (selectedTimes.length >= 2) {
+      const lastIndex = selectedTimes.length - 1
+      const lastTwoPoints = [selectedTimes[lastIndex - 1], selectedTimes[lastIndex]]
+
+      connectPoints(lastTwoPoints)
     }
   }, [selectedTimes])
 
-
   useEffect(() => {
-    // Mỗi khi selectedPoints thay đổi, cập nhật lại viewport
     updateViewport()
   }, [selectedPoints])
 
-  useEffect(() => {
-    // Kiểm tra xem đã có dữ liệu từ API hay chưa
-    if (selectedPoints.length > 0) {
-      // Sắp xếp mảng selectedPoints theo timestamp tăng dần
-      const sortedPoints = selectedPoints.slice().sort((a, b) => a.timestamp - b.timestamp)
+  function parseDateString(dateString) {
+    if (!dateString || typeof dateString !== 'string') {
+      console.error('Invalid dateString:', dateString)
 
-      // Cập nhật selectedPoints với mảng đã sắp xếp
+      return null
+    }
+
+    const [date, time] = dateString.split(' ')
+    if (!date || !time) {
+      console.error('Invalid date or time in dateString:', dateString)
+
+      return null
+    }
+
+    const [day, month, year] = date.split('/').map(Number)
+    const [hours, minutes, seconds] = time.split(':').map(Number)
+
+    if (isNaN(day) || isNaN(month) || isNaN(year) || isNaN(hours) || isNaN(minutes) || isNaN(seconds)) {
+      console.error('Invalid date components in dateString:', dateString)
+
+      return null
+    }
+
+    return new Date(year, month - 1, day, hours, minutes, seconds).getTime()
+  }
+
+  useEffect(() => {
+    if (selectedPoints.length > 0) {
+      const sortedPoints = selectedPoints.slice().sort((a, b) => {
+        const timestampA = parseDateString(a.timestamp)
+        const timestampB = parseDateString(b.timestamp)
+
+        return timestampA - timestampB
+      })
+
+      console.log('After sorting:', sortedPoints)
+
       setSelectedPoints(sortedPoints)
     }
-  }, [selectedPoints]) // Khi selectedPoints thay đổi, useEffect này sẽ được gọi
+  }, [selectedPoints])
 
-  // Hàm cập nhật viewport
   const updateViewport = () => {
     const newViewport = calculateCenter()
     setViewport(newViewport)
@@ -139,14 +163,14 @@ const EventMap = () => {
   const handleZoomIn = () => {
     setViewport(prevState => ({
       ...prevState,
-      zoom: Math.min(prevState.zoom + 1, 20) // Maximum zoom level of 20
+      zoom: Math.min(prevState.zoom + 1, 20)
     }))
   }
 
   const handleZoomOut = () => {
     setViewport(prevState => ({
       ...prevState,
-      zoom: Math.max(prevState.zoom - 1, 1) // Minimum zoom level of 1
+      zoom: Math.max(prevState.zoom - 1, 1)
     }))
   }
 
@@ -166,7 +190,13 @@ const EventMap = () => {
         },
         ...config
       })
-      setRows(res.data || [])
+
+      const formattedData = res.data.map(item => ({
+        ...item,
+        timestamp: new Date(item.timestamp).getTime() // Chuyển đổi timestamp về dạng epoch
+      }))
+
+      setRows(formattedData || [])
       setIsOpenTable(true)
     } catch (error) {
       console.error('Error fetching events: ', error)
@@ -176,18 +206,21 @@ const EventMap = () => {
     }
   }
 
+  const connectPoints = points => {
+    // Kiểm tra xem points có phải là một mảng không
+    if (!Array.isArray(points) || points.length < 2) {
+      // Nếu không phải mảng hoặc độ dài của nó không đủ, không thực hiện gì cả
+      return
+    }
 
-  const connectPoints = (time1, time2) => {
-    const point1 = findPointByTime(time1)
-    const point2 = findPointByTime(time2)
+    const [point1, point2] = points
+    const { longitude: lon1, latitude: lat1 } = point1
+    const { longitude: lon2, latitude: lat2 } = point2
 
-    if (point1 && point2) {
+    // Nếu cả hai điểm đều có tọa độ, thì nối chúng trên bản đồ
+    if (lon1 && lat1 && lon2 && lat2) {
       drawLineOnMap(point1, point2)
-
-      // Kiểm tra nếu mảng có hơn 3 điểm được chọn thì xoá điểm trước đó được nối
-      if (selectedTimes.length === 3) {
-        deletePreviousConnection()
-      }
+      console.log('Đường nối từ', point1.time, 'đến', point2.time)
     }
   }
 
@@ -233,21 +266,20 @@ const EventMap = () => {
   }
 
   const drawLineOnMap = (point1, point2) => {
-    if (point1 && point2 && point1.longitude && point1.latitude && point2.longitude && point2.latitude) {
-      setConnections(prevConnections => [
-        ...prevConnections,
-        {
-          type: 'Feature',
-          geometry: {
-            type: 'LineString',
-            coordinates: [
-              [parseFloat(point1.longitude), parseFloat(point1.latitude)],
-              [parseFloat(point2.longitude), parseFloat(point2.latitude)]
-            ]
-          }
-        }
-      ])
+    // Tạo một đường thẳng trên bản đồ từ point1 đến point2
+    const newConnection = {
+      type: 'Feature',
+      geometry: {
+        type: 'LineString',
+        coordinates: [
+          [parseFloat(point1.longitude), parseFloat(point1.latitude)],
+          [parseFloat(point2.longitude), parseFloat(point2.latitude)]
+        ]
+      }
     }
+
+    // Thêm đường vừa tạo vào mảng connections
+    setConnections(prevConnections => [...prevConnections, newConnection])
   }
 
   // Chuyển đổi timestamp thành định dạng "dd mm yyyy hh mm ss"
@@ -264,34 +296,42 @@ const EventMap = () => {
   }
 
   // Cập nhật cột timestamp trong bảng thành định dạng "dd mm yyyy hh mm ss"
-  const updatedRows = rows.sort((function (a, b) { return a.timestamp - b.timestamp })).map(row => ({
-    ...row,
-    timestamp: convertTimestampToDateTimeString(row.timestamp)
-  }))
+  const updatedRows = rows
+    .sort(function (a, b) {
+      return a.timestamp - b.timestamp
+    })
+    .map(row => ({
+      ...row,
+      timestamp: convertTimestampToDateTimeString(row.timestamp)
+    }))
 
-  const handleSelectAllClick = (event) => {
+  const handleSelectAllClick = event => {
     if (event.target.checked) {
-      const newSelected = rows.map((n) => n.id);
-      setSelectedCameraIds(newSelected);
+      const newSelected = rows.map(n => n.id)
+      setSelectedCameraIds(newSelected)
 
-      // Tạo mới mảng selectedPoints
-      const newSelectedPoints = rows.map((row) => ({
-        longitude: row.LongtitudeOfCam,
-        latitude: row.LatitudeOfCam,
-        timestamp: row.timestamp,
-      }));
-      setSelectedPoints(newSelectedPoints);
+      // Sắp xếp lại các điểm theo thứ tự của chúng trong dữ liệu API
+      const sortedRows = rows.sort((a, b) => a.timestamp - b.timestamp)
+
+      const newSelectedPoints = sortedRows
+        .filter(row => row.LongtitudeOfCam && row.LatitudeOfCam) // Lọc ra các điểm có tọa độ
+        .map(row => ({
+          longitude: row.LongtitudeOfCam,
+          latitude: row.LatitudeOfCam,
+          timestamp: row.timestamp
+        }))
+      setSelectedPoints(newSelectedPoints)
 
       // Gọi hàm handleTimeSelect với các điểm mới được chọn
-      newSelectedPoints.forEach((point) => {
-        handleTimeSelect(point.timestamp, point.longitude, point.latitude);
-      });
+      newSelectedPoints.forEach(point => {
+        handleTimeSelect(point.timestamp, point.longitude, point.latitude)
+      })
     } else {
-      setSelectedCameraIds([]);
-      setSelectedPoints([]);
-      setSelectedTimes([]);
+      setSelectedCameraIds([])
+      setSelectedPoints([])
+      setSelectedTimes([])
     }
-  };
+  }
 
   const handleCameraSelect = (event, cameraId, LongitudeOfCam, LatitudeOfCam, timestamp) => {
     if (event.target.checked && LongitudeOfCam && LatitudeOfCam) {
@@ -300,7 +340,11 @@ const EventMap = () => {
         ...prevPoints,
         { longitude: LongitudeOfCam, latitude: LatitudeOfCam, timestamp }
       ])
-      handleTimeSelect(timestamp, LongitudeOfCam, LatitudeOfCam)
+
+      // Gọi handleTimeSelect khi đã có đủ 3 điểm
+      if (selectedPoints.length === 2) {
+        handleTimeSelect(timestamp, LongitudeOfCam, LatitudeOfCam)
+      }
     } else {
       setSelectedCameraIds(prevIds => prevIds.filter(id => id !== cameraId))
       setSelectedPoints(prevPoints =>
@@ -309,7 +353,6 @@ const EventMap = () => {
       setSelectedTimes(prevTimes => prevTimes.filter(time => time.time !== timestamp))
     }
   }
-
 
   const handleExport = async () => {
     const excelData = rows.reduce((acc, row) => {
@@ -410,6 +453,7 @@ const EventMap = () => {
   const sortedPoints = selectedPoints.slice().sort((a, b) => a.timestamp - b.timestamp)
 
   const renderConnections = () => {
+    const sortedPoints = selectedPoints.slice().sort((a, b) => a.timestamp - b.timestamp)
     const lines = []
     for (let i = 0; i < sortedPoints.length - 1; i++) {
       const startPoint = sortedPoints[i]
@@ -451,7 +495,7 @@ const EventMap = () => {
     const maxDistance = selectedPoints.reduce((acc, point) => {
       const distance = Math.sqrt(
         Math.pow(parseFloat(point.latitude) - averageLatitude, 2) +
-        Math.pow(parseFloat(point.longitude) - averageLongitude, 2)
+          Math.pow(parseFloat(point.longitude) - averageLongitude, 2)
       )
 
       return Math.max(acc, distance)
@@ -610,13 +654,13 @@ const EventMap = () => {
             />
           </Card>
         </Grid>
-        <Grid item xs={12} sm={isOpenTable ? 9 : 12}>
+        <Grid item xs={12} sm={isOpenTable ? 8 : 12}>
           <Card>
             <CardContent>{viewMap()}</CardContent>
           </Card>
         </Grid>
         {isOpenTable && (
-          <Grid item xs={12} sm={3}>
+          <Grid item xs={12} sm={4}>
             <Card>
               <CardContent sx={{ height: '60vh' }}>{viewTable()}</CardContent>
               <CardActions sx={{ justifyContent: 'space-around' }}>

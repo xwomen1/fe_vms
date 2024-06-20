@@ -63,6 +63,10 @@ const AccessRight = () => {
     {
       id: 'setPermissions',
       value: 'Thiết lập quyền'
+    },
+    {
+      id: 'setPermissions',
+      value: 'Thiết lập quyền'
     }
   ]
 
