@@ -103,12 +103,17 @@ const Timeline = ({ data, minuteType, callback, startDate, endDate }) => {
         }
     }, [selectedTime])
 
+    useEffect(() => {
+        console.log('selectedIntervals', selectedIntervals);
+    }, [selectedIntervals])
+
 
     const timelineScrubberErrorHandler = ({ error }) => {
         setTimelineScrubberError(error);
     };
 
     const onChangeCallback = (day) => (selectedInterval) => {
+        console.log('selectedInterval', selectedInterval);
         setSelectedIntervals((prev) => ({
             ...prev,
             [day]: selectedInterval,
@@ -229,20 +234,21 @@ const Timeline = ({ data, minuteType, callback, startDate, endDate }) => {
     return (
         <Grid container spacing={2}>
             {dateList.map((day, index) => (
-                <Grid item xs={12} display={'flex'} key={index}>
-                    <Typography sx={{ width: '100px' }}>{day}</Typography>
+                <Grid item xs={12} key={index} style={{ marginBottom: '10px' }}>
+                    <Typography sx={{ minWidth: '100px' }}>Ngày {day} :</Typography>
                     <TimeRange
                         showNow
                         error={timelineScrubberError}
-                        ticksNumber={6}
+                        ticksNumber={24 * 2} // 12 ticks to show every 5 minutes
                         selectedInterval={selectedIntervals[day] || []}
                         timelineInterval={timelines[day] || []}
                         onUpdateCallback={timelineScrubberErrorHandler}
                         onChangeCallback={onChangeCallback(day)}
                         disabledIntervals={gaps || []}
-                        step={1}
-                        formatTick={(ms) => format(new Date(ms), "HH:mm:ss")}
-                        formatTooltip={(ms) => format(new Date(ms), "HH:mm:ss.SSS")}
+                        //step={10 * 60 * 1000} // 10 minutes
+                        step={10 * 60 * 1000}
+                        formatTick={(ms) => format(new Date(ms), "HH:mm")}
+                        formatTooltip={(ms) => format(new Date(ms), "HH:mm:ss")}
                         showToolTip={true}
                     />
                 </Grid>

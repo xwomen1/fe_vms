@@ -7,6 +7,8 @@ const Tick = ({ tick, count, format }) => {
         width: `${100 / count}%`,
         left: `${tick.percent}%`,
     };
+    const TimeFormat = ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00']
+    const formattedTickValue = format(tick.value);
 
     return (
         <>
@@ -14,9 +16,11 @@ const Tick = ({ tick, count, format }) => {
                 className='react_time_range__tick_marker__large'
                 style={{ left: `${tick.percent}%` }}
             />
-            <div className='react_time_range__tick_label' style={tickLabelStyle}>
-                {format(tick.value)}
-            </div>
+            {TimeFormat.includes(formattedTickValue) && (
+                <div className='react_time_range__tick_label' style={tickLabelStyle}>
+                    {formattedTickValue}
+                </div>
+            )}
         </>
     );
 };
