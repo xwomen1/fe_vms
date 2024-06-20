@@ -28,6 +28,7 @@ import Cloud from './popups/Cloud'
 import ConnectCamera from './popups/ConnectCamera'
 import VideoConnectCamera from './popups/VideoConnectCamera'
 import PopupScanOnvif from './popups/AddOnvif'
+import PopupScanHik from './popups/AddHik'
 import PopupScanDungIP from './popups/AddDungIP'
 import PopupScan from './popups/Add'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -81,6 +82,7 @@ const Add = ({ apiData }) => {
   const [popupMessage, setPopupMessage] = useState('')
   const [isError, setIsError] = useState(false)
   const [openPopupResponseOnvif, setOpenPopupResponseOnvif] = useState(false)
+  const [openPopupResponseHik, setOpenPopupResponseHik] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [dialogTitle, setDialogTitle] = useState('')
   const [dialogMessage, setDialogMessage] = useState('')
@@ -412,6 +414,54 @@ const Add = ({ apiData }) => {
     }
   }
 
+  const handleScanHik = async () => {
+    setOpenPopupResponseHik(true)
+    setLoading(true)
+    setPopupMessage('') // Reset thông điệp khi bắt đầu scan
+    setIsError(false) // Reset trạng thái lỗi khi bắt đầu scan
+    try {
+      const payload = {
+        idBox: selectNVR?.value,
+        userName,
+        passWord
+      }
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.post(
+        'https://sbs.basesystem.one/ivis/vms/api/v0/device/onvif/devicescanhikivision',
+        payload,
+        config
+      )
+
+      setResponse(response.data)
+      setLoading(false)
+
+      toast.success('Thành công')
+
+      setPopupMessage('Quét thành công')
+      setIsError(false) // Không phải lỗi
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message === 'No response from the server device, timeout: scan_device'
+      ) {
+        setPopupMessage('Thiết bị chưa phản hồi')
+      } else {
+        setPopupMessage(`${error.message}`)
+      }
+
+      setIsError(true) // Đánh dấu là lỗi
+      setLoading(false)
+    }
+  }
+
   const handleScanDaiIP = async () => {
     setOpenPopupResponse(true)
     setLoading(true)
@@ -555,6 +605,8 @@ const Add = ({ apiData }) => {
     fetchFilteredOrAllUsers()
   }, [page, pageSize, total, value, reload])
 
+  const top100Films = [{ title: 'Onvif' }, { title: 'Hik Version' }]
+
   return (
     <>
       <Grid container spacing={6.5}>
@@ -571,11 +623,15 @@ const Add = ({ apiData }) => {
                       <Grid item>
                         <FormControlLabel value='daiIp' control={<Radio />} label='Dải IP' />
                       </Grid>
-                      <Grid item>
-                        <FormControlLabel value='onvif' control={<Radio />} label='Onvif' />
-                      </Grid>
-                      <Grid item>
-                        <FormControlLabel value='khac' control={<Radio />} label='Khác' />
+                      <Grid item xs={3}>
+                        <Autocomplete
+                          fullWidth
+                          options={top100Films}
+                          id='autocomplete-custom'
+                          getOptionLabel={option => option.title || ''}
+                          renderInput={params => <CustomTextField placeholder='Khác' {...params} />}
+                          onChange={(event, value) => setSelectedValue(value ? value.title.toLowerCase() : '')}
+                        />
                       </Grid>
                     </Grid>
                   </RadioGroup>
@@ -883,23 +939,13 @@ const Add = ({ apiData }) => {
                 )}
               </Grid>
               <Grid item xs={12}>
-                {selectedValue === 'khac' && (
+                {selectedValue === 'hik version' && (
                   <Grid
                     container
                     item
                     component={Paper}
                     style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
                   >
-                    <Grid item xs={2}>
-                      <FormControl fullWidth>
-                        <InputLabel id='time-validity-label'>Chọn</InputLabel>
-                        <Select labelId='time-validity-label' id='time-validity-select'>
-                          <MenuItem value='Custom'>Dahua</MenuItem>
-                          <MenuItem value='Undefined'>Hikvision</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={0.4}></Grid>
                     <Grid item xs={1.8}>
                       <Autocomplete
                         value={selectNVR}
@@ -915,19 +961,48 @@ const Add = ({ apiData }) => {
                     <Grid item xs={0.1}></Grid>
 
                     <Grid item xs={2}>
-                      <CustomTextField label='Đăng nhập' fullWidth />
+                      <CustomTextField
+                        value={userName}
+                        onChange={e => setUsername(e.target.value)}
+                        label='Đăng nhập'
+                        fullWidth
+                      />
                     </Grid>
                     <Grid item xs={0.4}></Grid>
                     <Grid item xs={2}>
-                      <CustomTextField label='Mật khẩu' type='password' fullWidth />
+                      <CustomTextField
+                        value={passWord}
+                        onChange={e => setPassWord(e.target.value)}
+                        label='Mật khẩu'
+                        type='password'
+                        fullWidth
+                      />
                     </Grid>
                     <Grid item xs={0.2}></Grid>
 
-                    <Grid item xs={3} style={{ marginTop: '2%' }}>
+                    <Grid item xs={4} style={{ marginTop: '1%' }}>
                       <Button>Cancel</Button>
-                      <Button variant='contained'>Quét</Button>
+                      <Button variant='contained' onClick={handleScanHik}>
+                        Quét
+                      </Button>
                     </Grid>
                   </Grid>
+                )}
+                {openPopupResponseHik && (
+                  <>
+                    <PopupScanHik
+                      open={openPopupResponseHik}
+                      userName={userName}
+                      setReload={() => setReload(reload + 1)}
+                      passWord={passWord}
+                      isError={isError}
+                      popupMessage={popupMessage}
+                      idBoxOnvif={idBox}
+                      response={response}
+                      loadingOnvif={loading}
+                      onClose={() => setOpenPopupResponseHik(false)}
+                    />{' '}
+                  </>
                 )}
               </Grid>
             </Grid>

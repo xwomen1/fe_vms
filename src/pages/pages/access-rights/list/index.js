@@ -33,6 +33,8 @@ import * as XLSX from 'xlsx'
 import Filter from '../popups/filter'
 import Add from '../popups/add'
 import View from '../popups/view'
+import Update from '../popups/Update'
+import devices from 'devextreme/core/devices'
 
 const AccessRight = () => {
   const [reload, setReload] = useState(0)
@@ -42,11 +44,16 @@ const AccessRight = () => {
   const [isOpenDel, setIsOpenDel] = useState(false)
   const [isOpenAdd, setIsOpenAdd] = useState(false)
   const [isOpenView, setIsOpenView] = useState(false)
+  const [isOpenUpdate, setIsOpenUpdate] = useState(false)
   const [dataList, setDataList] = useState([])
   const [dataList1, setDataList1] = useState([])
   const [errorMessage, setErrorMessage] = useState('')
   const [idDelete, setIdDelete] = useState(null)
+  const [scheduleId, setScheduleId] = useState(null)
+  const [doorAccessId, setDoorAccessId] = useState(null)
+  const [accessGroupId, setAccessGroupId] = useState(null)
   const [idView, setIdView] = useState(null)
+  const [idUpdate, setIdUpdate] = useState(null)
   const [total, setTotal] = useState(1)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
@@ -299,7 +306,7 @@ const AccessRight = () => {
     fetchDataList()
     fetchDataList1()
   }, [])
-
+  console.log(dataList1)
   useEffect(() => {
     if (tab === 'overview') {
       fetchDataList()
@@ -720,14 +727,17 @@ const AccessRight = () => {
                                 >
                                   <Icon icon='tabler:trash' />
                                 </IconButton>
-                                {/* <IconButton
+                                <IconButton
                                   onClick={() => {
-                                    setIdView(row.id)
-                                    setIsOpenView(true)
+                                    setIdUpdate(row.id)
+                                    setScheduleId(row.scheduleId)
+                                    setDoorAccessId(row.doorAccessId)
+                                    setAccessGroupId(row.accessGroupId)
+                                    setIsOpenUpdate(true)
                                   }}
                                 >
                                   <Icon icon='tabler:edit' />
-                                </IconButton> */}
+                                </IconButton>
                               </Grid>
                             </TableCell>
                           </TableRow>
@@ -785,6 +795,17 @@ const AccessRight = () => {
           show={isOpenView}
           onClose={() => setIsOpenView(false)}
           id={idView}
+          setReload={() => setReload(reload + 1)}
+        />
+      )}
+      {isOpenUpdate && (
+        <Update
+          show={isOpenUpdate}
+          onClose={() => setIsOpenUpdate(false)}
+          idScheduleId={scheduleId}
+          idDoorAccessId={doorAccessId}
+          idAccessGroupId={accessGroupId}
+          id={idUpdate}
           setReload={() => setReload(reload + 1)}
         />
       )}

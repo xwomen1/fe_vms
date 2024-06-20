@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-import { Button, CardHeader, DialogActions, Grid, MenuItem } from '@mui/material'
+import { Box, Button, CardHeader, DialogActions, Grid, MenuItem, Typography } from '@mui/material'
 
 import IconButton from '@mui/material/IconButton'
 import Icon from 'src/@core/components/icon'
@@ -12,24 +12,10 @@ import { callApi } from 'src/@core/utils/requestUltils'
 import Timeline from '../mocdata/timeline'
 import axios from 'axios'
 import toast from 'react-hot-toast'
-
-const dateList = [
-    {
-        id: 1,
-        name: 'day',
-        value: '1 ngày'
-    },
-    {
-        id: 2,
-        name: 'week',
-        value: '7 ngày'
-    },
-    {
-        id: 3,
-        name: 'month',
-        value: '30 ngày'
-    },
-]
+import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
+import DatePicker from 'react-datepicker'
+import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
+import { utils } from 'xlsx'
 
 const minuteList = [
     {
@@ -49,14 +35,47 @@ const minuteList = [
     },
 ]
 
+
+const convertDateToString = (date) => {
+    const pad = (num) => String(num).padStart(2, '0');
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1);
+    const day = pad(date.getDate());
+    const hours = pad(date.getHours());
+    const minutes = pad(date.getMinutes());
+    const seconds = pad(date.getSeconds());
+
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`;
+}
+
+const convertDateToString1 = (date) => {
+    const pad = (num) => String(num).padStart(2, '0');
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1);
+    const day = pad(date.getDate());
+    const hours = pad(date.getHours());
+    const minutes = pad(date.getMinutes());
+    const seconds = pad(date.getSeconds());
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+};
+
 const Storage = ({ id, name, channel }) => {
     const [loading, setLoading] = useState(false)
     const [camera, setCamera] = useState({ id: '', name: '', channel: '' })
 
-    const [timeType, setTimeType] = useState(null)
     const [minuteType, setMinuteType] = useState(null)
     const [startTime, setStartTime] = useState(null)
     const [endTime, setEndTime] = useState(null)
+
+    const [startDate, setStartDate] = useState(() => {
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+
+        return yesterday;
+    });
+    const [endDate, setEndDate] = useState(new Date())
 
 
     function formatTime(timeInSeconds) {
@@ -77,7 +96,6 @@ const Storage = ({ id, name, channel }) => {
 
     const [currentTime, setCurrentTime] = useState(0)
 
-
     const [play, setPlay] = useState(true)
     const [dataList, setDataList] = useState([])
 
@@ -86,13 +104,18 @@ const Storage = ({ id, name, channel }) => {
             fetchDateList()
         }
         setCamera({ id: id, name: name, channel: channel })
-    }, [id])
+    }, [id, startDate, endDate])
 
     const fetchDateList = async () => {
         setLoading(true)
 
+        const params = {
+            startTime: convertDateToString(startDate),
+            endTime: convertDateToString(endDate)
+        }
+
         try {
-            const res = await callApi(`https://sbs.basesystem.one/ivis/vms/api/v0/playback/camera/${id}`)
+            const res = await callApi(`https://sbs.basesystem.one/ivis/vms/api/v0/playback/camera/${id}?startTime=${params.startTime}&endTime=${params.endTime}`)
 
             const data = res.data.MatchList.map((item, index) => {
                 return item.TimeSpan
@@ -113,8 +136,14 @@ const Storage = ({ id, name, channel }) => {
         setLoading(true)
 
         if (camera.id !== '') {
+
+            const params = {
+                startTime: convertDateToString(startTime),
+                endTime: convertDateToString(endTime)
+            }
+
             try {
-                const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/video/download?idCamera=${camera.id}&startTime=${startTime}&endTime=${endTime}`)
+                const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/video/download?idCamera=${camera.id}&startTime=${params.startTime}&endTime=${params.endTime}`)
                 const videoDownloadUrl = res.data[0].videoDownLoad[0].video
 
                 if (videoDownloadUrl) {
@@ -184,27 +213,51 @@ const Storage = ({ id, name, channel }) => {
                         title='Trích clip'
                         action={
                             <Grid container spacing={2}>
-
-                                <Grid item xs={6}>
-                                    <CustomTextField select fullWidth id='form-layouts-separator-select' defaultValue='5minute'>
-                                        {minuteList.map((minute, index) => (
-                                            <MenuItem key={minute.id} value={minute.name} onClick={() => handleSetMinuteType(minute.name)}>{minute.value}</MenuItem>
-                                        ))}
-                                    </CustomTextField>
+                                <Grid item xs={4}>
+                                    <DatePickerWrapper>
+                                        <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                                            <div>
+                                                <DatePicker
+                                                    selected={startDate}
+                                                    id='basic-input'
+                                                    maxDate={endDate}
+                                                    onChange={date => setStartDate(date)}
+                                                    customInput={<CustomInput label='Ngày bắt đầu' />}
+                                                />
+                                            </div>
+                                        </Box>
+                                    </DatePickerWrapper>
                                 </Grid>
-                                <Grid item xs={6}>
-                                    <CustomTextField select fullWidth id='form-layouts-separator-select' defaultValue='day'>
-                                        {dateList.map((date, index) => (
-                                            <MenuItem key={date.id} value={date.name} onClick={() => handleSetTime(date.name)}>{date.value}</MenuItem>
-                                        ))}
-                                    </CustomTextField>
+                                <Grid item xs={4}>
+                                    <DatePickerWrapper>
+                                        <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                                            <div>
+                                                <DatePicker
+                                                    selected={endDate}
+                                                    id='basic-input'
+                                                    maxDate={new Date()}
+                                                    onChange={date => setEndDate(date)}
+                                                    customInput={<CustomInput label='Ngày kết thúc' />}
+                                                />
+                                            </div>
+                                        </Box>
+                                    </DatePickerWrapper>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                                        <CustomTextField select fullWidth id='form-layouts-separator-select' defaultValue='5minute' label='Default'>
+                                            {minuteList.map((minute, index) => (
+                                                <MenuItem key={minute.id} value={minute.name} onClick={() => handleSetMinuteType(minute.name)}>{minute.value}</MenuItem>
+                                            ))}
+                                        </CustomTextField>
+                                    </Box>
                                 </Grid>
                             </Grid>
                         }
                     />
                     <CardContent>
                         {camera.id !== '' &&
-                            <Timeline data={dataList} dateType={timeType} minuteType={minuteType} callback={handleSetTimeSelected} />
+                            <Timeline data={dataList} minuteType={minuteType} startDate={startDate} endDate={endDate} callback={handleSetTimeSelected} />
                         }
                     </CardContent>
                 </Card>
@@ -238,11 +291,19 @@ const Storage = ({ id, name, channel }) => {
                     </Grid>
                     <DialogActions
                         sx={{
+                            flexDirection: 'column',
                             justifyContent: 'center',
                             px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
                             pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
                         }}
                     >
+                        {/* {startTime instanceof Date && endTime instanceof Date &&
+                            <Typography style={{ fontSize: '11px', marginBottom: '5px' }}>
+                                <span style={{ color: "#FF9F43" }}>{convertDateToString1(startTime)}</span> /
+                                <span style={{ color: '#FF9F43' }}>{convertDateToString1(endTime)}</span>
+                            </Typography>
+                        } */}
+
                         <Button type='submit' variant='contained' onClick={() => handleDownloadFile()}>
                             Xuất file
                         </Button>

@@ -267,7 +267,7 @@ const EventList = () => {
         cameraName: valueFilter?.cameraName || '',
         startTime: valueFilter?.startTime || '',
         endTime: valueFilter?.endTime || '',
-        typeOfAIEvent: 'person'
+        eventType: 'AI_EVENT_BLACKLIST_FACE_RECOGNITION'
       }
     }
     setLoading(true)
