@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-import { Box, Button, CardHeader, DialogActions, Grid, MenuItem } from '@mui/material'
+import { Box, Button, CardHeader, DialogActions, Grid, MenuItem, Typography } from '@mui/material'
 
 import IconButton from '@mui/material/IconButton'
 import Icon from 'src/@core/components/icon'
@@ -47,6 +47,18 @@ const convertDateToString = (date) => {
 
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`;
 }
+
+const convertDateToString1 = (date) => {
+    const pad = (num) => String(num).padStart(2, '0');
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1);
+    const day = pad(date.getDate());
+    const hours = pad(date.getHours());
+    const minutes = pad(date.getMinutes());
+    const seconds = pad(date.getSeconds());
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+};
 
 const Storage = ({ id, name, channel }) => {
     const [loading, setLoading] = useState(false)
@@ -279,11 +291,19 @@ const Storage = ({ id, name, channel }) => {
                     </Grid>
                     <DialogActions
                         sx={{
+                            flexDirection: 'column',
                             justifyContent: 'center',
                             px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
                             pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
                         }}
                     >
+                        {/* {startTime instanceof Date && endTime instanceof Date &&
+                            <Typography style={{ fontSize: '11px', marginBottom: '5px' }}>
+                                <span style={{ color: "#FF9F43" }}>{convertDateToString1(startTime)}</span> /
+                                <span style={{ color: '#FF9F43' }}>{convertDateToString1(endTime)}</span>
+                            </Typography>
+                        } */}
+
                         <Button type='submit' variant='contained' onClick={() => handleDownloadFile()}>
                             Xuất file
                         </Button>
