@@ -29,6 +29,18 @@ import authConfig from 'src/configs/auth'
 import toast from 'react-hot-toast'
 import axios from 'axios'
 import * as XLSX from 'xlsx'
+import { current } from '@reduxjs/toolkit'
+
+const formatCameraName = name => {
+  const maxLength = '10px'
+  if (name.length > maxLength) {
+    const midIndex = Math.floor(name.length / 2)
+
+    return `${name.slice(0, midIndex)}\n${name.slice(midIndex)}`
+  }
+
+  return name
+}
 
 const columns = [
   {
@@ -36,7 +48,7 @@ const columns = [
     flex: 0.15,
     type: 'timestamp',
     width: 50,
-    align: 'right',
+    align: 'left',
     label: 'Ngày giờ',
     field: 'timestamp',
     valueGetter: params => new Date(params.field)
@@ -46,18 +58,20 @@ const columns = [
     flex: 0.15,
     type: 'eventTypeString',
     minWidth: 10,
-    align: 'right',
+    align: 'left',
     field: 'event',
     label: 'Sự kiện',
     field: 'eventTypeString'
   },
   {
     id: 3,
-    flex: 0.15,
-    width: 50,
-    align: 'right',
+    width: '10px',
+    align: 'left',
     label: 'Camera',
-    field: 'camName'
+    field: 'camName',
+
+    // Sử dụng hàm formatCameraName để chia tên camera thành 2 dòng nếu quá dài
+    format: value => formatCameraName(value)
   }
 ]
 
@@ -140,6 +154,10 @@ const EventMap = () => {
     return new Date(year, month - 1, day, hours, minutes, seconds).getTime()
   }
 
+  const deepEqual = (obj1, obj2) => {
+    return JSON.stringify(obj1) === JSON.stringify(obj2)
+  }
+
   useEffect(() => {
     if (selectedPoints.length > 0) {
       const sortedPoints = selectedPoints.slice().sort((a, b) => {
@@ -149,9 +167,9 @@ const EventMap = () => {
         return timestampA - timestampB
       })
 
-      console.log('After sorting:', sortedPoints)
-
-      setSelectedPoints(sortedPoints)
+      if (!deepEqual(sortedPoints, selectedPoints)) {
+        setSelectedPoints(sortedPoints)
+      }
     }
   }, [selectedPoints])
 
@@ -220,7 +238,6 @@ const EventMap = () => {
     // Nếu cả hai điểm đều có tọa độ, thì nối chúng trên bản đồ
     if (lon1 && lat1 && lon2 && lat2) {
       drawLineOnMap(point1, point2)
-      console.log('Đường nối từ', point1.time, 'đến', point2.time)
     }
   }
 
@@ -231,32 +248,6 @@ const EventMap = () => {
       updatedConnections.pop() // Xoá điểm cuối cùng
       setConnections(updatedConnections)
     }
-  }
-
-  const handleTimeSelect = (time, longitude, latitude) => {
-    let newSelectedTimes = [...selectedTimes, { time, longitude, latitude }]
-
-    // Sắp xếp các điểm theo timestamp
-    newSelectedTimes.sort((a, b) => a.time - b.time)
-
-    // Nếu có hơn 3 điểm, chỉ giữ lại 3 điểm mới nhất
-    if (newSelectedTimes.length > 3) {
-      newSelectedTimes = newSelectedTimes.slice(-3)
-      setIsReconnected(true) // Đánh dấu rằng các kết nối được vẽ lại
-    } else {
-      setIsReconnected(false)
-    }
-
-    setSelectedTimes(newSelectedTimes)
-
-    // Tạo kết nối giữa các điểm theo thứ tự timestamp
-    let newConnections = []
-    if (newSelectedTimes.length >= 2) {
-      for (let i = 0; i < newSelectedTimes.length - 1; i++) {
-        newConnections.push([newSelectedTimes[i], newSelectedTimes[i + 1]])
-      }
-    }
-    setConnections(newConnections)
   }
 
   const findPointByTime = time => {
@@ -295,7 +286,6 @@ const EventMap = () => {
     return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`
   }
 
-  // Cập nhật cột timestamp trong bảng thành định dạng "dd mm yyyy hh mm ss"
   const updatedRows = rows
     .sort(function (a, b) {
       return a.timestamp - b.timestamp
@@ -323,9 +313,6 @@ const EventMap = () => {
       setSelectedPoints(newSelectedPoints)
 
       // Gọi hàm handleTimeSelect với các điểm mới được chọn
-      newSelectedPoints.forEach(point => {
-        handleTimeSelect(point.timestamp, point.longitude, point.latitude)
-      })
     } else {
       setSelectedCameraIds([])
       setSelectedPoints([])
@@ -335,15 +322,17 @@ const EventMap = () => {
 
   const handleCameraSelect = (event, cameraId, LongitudeOfCam, LatitudeOfCam, timestamp) => {
     if (event.target.checked && LongitudeOfCam && LatitudeOfCam) {
-      setSelectedCameraIds(prevIds => [...prevIds, cameraId])
-      setSelectedPoints(prevPoints => [
-        ...prevPoints,
-        { longitude: LongitudeOfCam, latitude: LatitudeOfCam, timestamp }
-      ])
+      // Kiểm tra xem điểm đã tồn tại chưa trước khi thêm mới
+      const pointExists = selectedPoints.some(
+        point => point.longitude === LongitudeOfCam && point.latitude === LatitudeOfCam && point.timestamp === timestamp
+      )
 
-      // Gọi handleTimeSelect khi đã có đủ 3 điểm
-      if (selectedPoints.length === 2) {
-        handleTimeSelect(timestamp, LongitudeOfCam, LatitudeOfCam)
+      if (!pointExists) {
+        setSelectedCameraIds(prevIds => [...prevIds, cameraId])
+        setSelectedPoints(prevPoints => [
+          ...prevPoints,
+          { longitude: LongitudeOfCam, latitude: LatitudeOfCam, timestamp }
+        ])
       }
     } else {
       setSelectedCameraIds(prevIds => prevIds.filter(id => id !== cameraId))
