@@ -35,7 +35,8 @@ import {
   DialogActions,
   Typography,
   TextField,
-  Input
+  Input,
+  CircularProgress
 } from '@mui/material'
 
 const EditFaceManagement = () => {
@@ -300,309 +301,320 @@ const EditFaceManagement = () => {
 
   return (
     <>
-      {showLoading || loading ? (
-        <div>Loading...</div>
-      ) : (
-        <>
-          <Grid container spacing={6.5}>
+      <Grid container spacing={6.5}>
+        <div>
+          {loading && (
+            <CircularProgress style={{ marginLeft: '50%', marginTop: '25%', position: 'absolute', zIndex: '2' }} />
+          )}
+        </div>
+        <div>
+          {showLoading && (
+            <CircularProgress style={{ marginLeft: '50%', marginTop: '25%', position: 'absolute', zIndex: '2' }} />
+          )}
+        </div>
+        <Grid item xs={12} style={{ position: 'relative', zIndex: '1' }}>
+          <Card>
+            <CardHeader
+              title='Đối tượng danh sách'
+              titleTypographyProps={{ sx: { mb: [2, 0] } }}
+              action={
+                <Grid container spacing={2}>
+                  <Grid item>
+                    <Box sx={{ float: 'right' }}>
+                      <Button
+                        style={{ background: '#E0D7D7', color: '#000000', right: '20px' }}
+                        component={Link}
+                        href={`/pages/face_management/list`}
+                        sx={{ color: 'blue' }}
+                      >
+                        Hủy
+                      </Button>
+                      <Button onClick={handleUpdate} variant='contained' disabled={loading}>
+                        {loading ? 'Updating...' : 'Cập nhật'}
+                      </Button>
+                    </Box>
+                  </Grid>
+                </Grid>
+              }
+              sx={{
+                py: 4,
+                flexDirection: ['column', 'row'],
+                '& .MuiCardHeader-action': { m: 0 },
+                alignItems: ['flex-start', 'center']
+              }}
+            />
+            <CustomDialog
+              open={dialogOpen}
+              handleClose={handleDialogClose}
+              title={dialogTitle}
+              message={dialogMessage}
+              isSuccess={isSuccess}
+            />
             <Grid item xs={12}>
-              <Card>
-                <CardHeader
-                  title='Đối tượng danh sách'
-                  titleTypographyProps={{ sx: { mb: [2, 0] } }}
-                  action={
-                    <Grid container spacing={2}>
-                      <Grid item>
-                        <Box sx={{ float: 'right' }}>
-                          <Button
-                            style={{ background: '#E0D7D7', color: '#000000', right: '20px' }}
-                            component={Link}
-                            href={`/pages/face_management/list`}
-                            sx={{ color: 'blue' }}
-                          >
-                            Hủy
-                          </Button>
-                          <Button onClick={handleUpdate} variant='contained' disabled={loading}>
-                            {loading ? 'Updating...' : 'Cập nhật'}
-                          </Button>
-                        </Box>
-                      </Grid>
-                    </Grid>
-                  }
-                  sx={{
-                    py: 4,
-                    flexDirection: ['column', 'row'],
-                    '& .MuiCardHeader-action': { m: 0 },
-                    alignItems: ['flex-start', 'center']
+              {modalImage && (
+                <ModalImage
+                  imageUrl={modalImage}
+                  onClose={() => {
+                    setModalImage(null)
                   }}
                 />
-                <CustomDialog
-                  open={dialogOpen}
-                  handleClose={handleDialogClose}
-                  title={dialogTitle}
-                  message={dialogMessage}
-                  isSuccess={isSuccess}
-                />
-                <Grid item xs={12}>
-                  {modalImage && (
-                    <ModalImage
-                      imageUrl={modalImage}
-                      onClose={() => {
-                        setModalImage(null)
+              )}
+              <div className={classes.container}>
+                <div className={classes.avatar_container}>
+                  <div
+                    style={{
+                      textAlign: 'center',
+                      width: '192px'
+                    }}
+                  >
+                    <p
+                      style={{
+                        fontSize: '18px',
+                        lineHeight: '22px',
+                        margin: '0px'
                       }}
-                    />
-                  )}
-                  <div className={classes.container}>
-                    <div className={classes.avatar_container}>
-                      <div
+                    >
+                      Ảnh đại diện
+                    </p>
+                    <div
+                      style={{
+                        background: '#CED1D7',
+                        borderRadius: '8px',
+                        display: 'flex',
+                        margin: 'auto',
+                        width: '192px',
+                        height: '192px'
+                      }}
+                    >
+                      <img
+                        alt=''
+                        src={avatarImage}
                         style={{
-                          textAlign: 'center',
-                          width: '192px'
+                          marginBottom: `${avatarImage ? '' : '-10%'}`,
+                          objectFit: 'contain',
+                          width: `${avatarImage ? '100%' : ''}`,
+                          height: `${avatarImage ? '100%' : ''}`
                         }}
+                      />
+                    </div>
+                    <div
+                      style={{
+                        border: '1px solid rgba(0, 0, 0, 0.12)',
+                        borderRadius: '10px',
+                        marginTop: '10px',
+                        textAlign: 'center'
+                      }}
+                    >
+                      <CustomTextField
+                        disabled={loading == true}
+                        id='eventName'
+                        eventname='eventName'
+                        placeholder={`Tên đối tượng`}
+                        defaultValue=''
+                        value={name || ''}
+                        onInput={e => {
+                          setName(e.target.value)
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style={{
+                    marginLeft: '300px',
+                    width: '65%',
+                    marginTop: '-265px'
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: '18px',
+                      lineHeight: '22px',
+                      margin: '0px'
+                    }}
+                  >
+                    Ghi chú
+                  </p>
+
+                  <TextField
+                    disabled={loading == true}
+                    rows={4}
+                    multiline
+                    variant='standard'
+                    style={{
+                      border: '1px solid rgba(0, 0, 0, 0.12)',
+                      borderRadius: '10px',
+                      width: '100%'
+                    }}
+                    defaultValue=''
+                    placeholder='  Nhập ghi chú ...!'
+                    value={`${note}` || ''}
+                    onInput={e => {
+                      setNote(e.target.value)
+                    }}
+                    id='textarea-standard-static'
+                  />
+                </div>
+
+                {listFileUpload.length === 0 && (
+                  <p style={{ margin: '35px 0px 0px 0px', marginTop: '250px', marginLeft: '20px' }}>
+                    <div></div>
+
+                    {`Ảnh của đối tượng : ( tối đa 5 ảnh)`}
+                  </p>
+                )}
+
+                {listFileUpload.length > 0 && (
+                  <p style={{ margin: '35px 0px 0px 0px', marginTop: '200px', marginLeft: '10px' }}>
+                    {`Ảnh của đối tượng: ${listFileUpload.length}/5`}
+                  </p>
+                )}
+
+                <div
+                  style={{
+                    marginTop: '50px',
+                    minHeight: '422px',
+                    display: 'flex',
+                    justifyContent: 'center'
+                  }}
+                >
+                  {listFileUpload.length === 0 && (
+                    <Fragment>
+                      <div
+                        className='cropper'
+                        style={{
+                          display: 'flex'
+                        }}
+                        id='dropzone-external'
                       >
-                        <p
-                          style={{
-                            fontSize: '18px',
-                            lineHeight: '22px',
-                            margin: '0px'
-                          }}
-                        >
-                          Ảnh đại diện
-                        </p>
                         <div
                           style={{
-                            background: '#CED1D7',
-                            borderRadius: '8px',
-                            display: 'flex',
                             margin: 'auto',
-                            width: '192px',
-                            height: '192px'
-                          }}
-                        >
-                          <img
-                            alt=''
-                            src={avatarImage}
-                            style={{
-                              marginBottom: `${avatarImage ? '' : '-10%'}`,
-                              objectFit: 'contain',
-                              width: `${avatarImage ? '100%' : ''}`,
-                              height: `${avatarImage ? '100%' : ''}`
-                            }}
-                          />
-                        </div>
-                        <div
-                          style={{
-                            border: '1px solid rgba(0, 0, 0, 0.12)',
-                            borderRadius: '10px',
-                            marginTop: '10px',
+                            alignSelf: 'center',
                             textAlign: 'center'
                           }}
                         >
-                          <CustomTextField
-                            id='eventName'
-                            eventname='eventName'
-                            placeholder={`Tên đối tượng`}
-                            defaultValue=''
-                            value={name || ''}
-                            onInput={e => {
-                              setName(e.target.value)
+                          <div>
+                            <img alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(svgPath)}`} />
+                          </div>
+                          <p
+                            style={{
+                              fontSize: '16px',
+                              lineHeight: '19px'
                             }}
-                          />
+                          >
+                            {`Kéo thả ảnh`}
+                          </p>
+                          <p
+                            style={{
+                              fontSize: '16px',
+                              lineHeight: '19px'
+                            }}
+                          >
+                            {`Hoặc`}
+                          </p>
+                          <Button
+                            style={{
+                              boxShadow: '0px 4px 10px rgba(16, 156, 241, 0.24)',
+                              borderRadius: '8px',
+                              width: '200px',
+                              height: '50px'
+                            }}
+                            variant='contained'
+                            color='primary'
+                          >
+                            {`Tải ảnh lên`}
+                          </Button>
                         </div>
                       </div>
-                    </div>
-                    <div
-                      style={{
-                        marginLeft: '300px',
-                        width: '65%',
-                        marginTop: '-265px'
-                      }}
-                    >
-                      <p
-                        style={{
-                          fontSize: '18px',
-                          lineHeight: '22px',
-                          margin: '0px'
-                        }}
-                      >
-                        Ghi chú
-                      </p>
-
-                      <TextField
-                        rows={4}
-                        multiline
-                        variant='standard'
-                        style={{
-                          border: '1px solid rgba(0, 0, 0, 0.12)',
-                          borderRadius: '10px',
-                          width: '100%'
-                        }}
-                        defaultValue=''
-                        placeholder='  Nhập ghi chú ...!'
-                        value={`${note}` || ''}
-                        onInput={e => {
-                          setNote(e.target.value)
-                        }}
-                        id='textarea-standard-static'
+                      <FileUploader
+                        style={{ opacity: '0' }}
+                        id='file-uploader'
+                        dialogTrigger='#dropzone-external'
+                        dropZone='#dropzone-external'
+                        multiple
+                        allowedFileExtensions={ALLOWED_FILE_EXTENSIONS}
+                        uploadMode='useButtons'
+                        visible={false}
+                        onValueChanged={onDragDropImage}
+                        ref={fileUploader1}
                       />
-                    </div>
-                    {listFileUpload.length === 0 && (
-                      <p style={{ margin: '35px 0px 0px 0px', marginTop: '250px', marginLeft: '20px' }}>
-                        <div></div>
+                    </Fragment>
+                  )}
 
-                        {`Ảnh của đối tượng : ( tối đa 5 ảnh)`}
-                      </p>
-                    )}
-                    {listFileUpload.length > 0 && (
-                      <p style={{ margin: '35px 0px 0px 0px', marginTop: '200px', marginLeft: '10px' }}>
-                        {`Ảnh của đối tượng: ${listFileUpload.length}/5`}
-                      </p>
-                    )}
-                    <div
-                      style={{
-                        marginTop: '50px',
-                        minHeight: '422px',
-                        display: 'flex',
-                        justifyContent: 'center'
-                      }}
-                    >
-                      {listFileUpload.length === 0 && (
-                        <Fragment>
-                          <div
-                            className='cropper'
-                            style={{
-                              display: 'flex'
-                            }}
-                            id='dropzone-external'
-                          >
-                            <div
-                              style={{
-                                margin: 'auto',
-                                alignSelf: 'center',
-                                textAlign: 'center'
-                              }}
-                            >
-                              <div>
-                                <img alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(svgPath)}`} />
-                              </div>
-                              <p
-                                style={{
-                                  fontSize: '16px',
-                                  lineHeight: '19px'
-                                }}
-                              >
-                                {`Kéo thả ảnh`}
-                              </p>
-                              <p
-                                style={{
-                                  fontSize: '16px',
-                                  lineHeight: '19px'
-                                }}
-                              >
-                                {`Hoặc`}
-                              </p>
-                              <Button
-                                style={{
-                                  boxShadow: '0px 4px 10px rgba(16, 156, 241, 0.24)',
-                                  borderRadius: '8px',
-                                  width: '200px',
-                                  height: '50px'
-                                }}
-                                variant='contained'
-                                color='primary'
-                              >
-                                {`Tải ảnh lên`}
-                              </Button>
-                            </div>
+                  {listFileUpload.length > 0 && listImage.length > 0 && (
+                    <div className={classes.cardImageContainer}>
+                      {listImage.length < 5 && (
+                        <div className='add-btn card-img' id='dropzone-external-2'>
+                          <div style={{ alignSelf: 'center', margin: 'auto', marginLeft: '100px' }}>
+                            <Icon color='primary' icon='tabler:plus' />
                           </div>
                           <FileUploader
+                            disabled={loading == true}
                             style={{ opacity: '0' }}
-                            id='file-uploader'
-                            dialogTrigger='#dropzone-external'
-                            dropZone='#dropzone-external'
+                            id='file-uploader-2'
+                            dialogTrigger='#dropzone-external-2'
+                            dropZone='#dropzone-external-2'
                             multiple
                             allowedFileExtensions={ALLOWED_FILE_EXTENSIONS}
                             uploadMode='useButtons'
                             visible={false}
-                            onValueChanged={onDragDropImage}
-                            ref={fileUploader1}
+                            onValueChanged={e => {
+                              onDragDropImage(e)
+                            }}
+                            ref={fileUploader2}
                           />
-                        </Fragment>
-                      )}
-                      {listFileUpload.length > 0 && listImage.length > 0 && (
-                        <div className={classes.cardImageContainer}>
-                          {listImage.length < 5 && (
-                            <div className='add-btn card-img' id='dropzone-external-2'>
-                              <div style={{ alignSelf: 'center', margin: 'auto', marginLeft: '100px' }}>
-                                <Icon color='primary' icon='tabler:plus' />
-                              </div>
-                              <FileUploader
-                                style={{ opacity: '0' }}
-                                id='file-uploader-2'
-                                dialogTrigger='#dropzone-external-2'
-                                dropZone='#dropzone-external-2'
-                                multiple
-                                allowedFileExtensions={ALLOWED_FILE_EXTENSIONS}
-                                uploadMode='useButtons'
-                                visible={false}
-                                onValueChanged={e => {
-                                  onDragDropImage(e)
-                                }}
-                                ref={fileUploader2}
-                              />
-                            </div>
-                          )}
-                          {listImage.map((image, index) => (
-                            <div className='card-img' key={index}>
-                              <img
-                                src={image}
-                                alt=''
-                                className='hover-image'
-                                onDoubleClick={() => {
-                                  // setShowCopper(true);
-
-                                  setAvatarImage(image)
-                                  setFileAvatarImg(listFileUpload[listImage.indexOf(image)])
-                                  setFileAvatarId(listFileId[listImage.indexOf(image)])
-                                }}
-                              />
-                              <IconButton
-                                className='close'
-                                onClick={() => {
-                                  const listFileUploadImgId = [...listFileId]
-                                  const listFileUploadTmp = [...listFileUpload]
-                                  const indexId = listFileUploadTmp.indexOf(image)
-                                  listFileUploadImgId.splice(indexId, 1)
-                                  listFileUploadTmp.splice(indexId, 1)
-                                  setListFileId(listFileUploadImgId)
-                                  setListFileUpload(listFileUploadTmp)
-                                  setListImage(listFileUploadTmp)
-                                }}
-                                color='primary'
-                              >
-                                -
-                              </IconButton>
-                              <IconButton
-                                className='full'
-                                color='primary'
-                                onClick={() => {
-                                  setModalImage(image)
-                                }}
-                              >
-                                <Icon icon='tabler:maximize' />
-                              </IconButton>
-                            </div>
-                          ))}
                         </div>
                       )}
+                      {listImage.map((image, index) => (
+                        <div className='card-img' key={index}>
+                          <img
+                            src={image}
+                            alt=''
+                            className='hover-image'
+                            onDoubleClick={() => {
+                              // setShowCopper(true);
+
+                              setAvatarImage(image)
+                              setFileAvatarImg(listFileUpload[listImage.indexOf(image)])
+                              setFileAvatarId(listFileId[listImage.indexOf(image)])
+                            }}
+                          />
+                          <IconButton
+                            className='close'
+                            onClick={() => {
+                              const listFileUploadImgId = [...listFileId]
+                              const listFileUploadTmp = [...listFileUpload]
+                              const indexId = listFileUploadTmp.indexOf(image)
+                              listFileUploadImgId.splice(indexId, 1)
+                              listFileUploadTmp.splice(indexId, 1)
+                              setListFileId(listFileUploadImgId)
+                              setListFileUpload(listFileUploadTmp)
+                              setListImage(listFileUploadTmp)
+                            }}
+                            color='primary'
+                          >
+                            -
+                          </IconButton>
+                          <IconButton
+                            className='full'
+                            color='primary'
+                            onClick={() => {
+                              setModalImage(image)
+                            }}
+                          >
+                            <Icon icon='tabler:maximize' />
+                          </IconButton>
+                        </div>
+                      ))}
                     </div>
-                  </div>
-                </Grid>
-              </Card>
+                  )}
+                </div>
+              </div>
             </Grid>
-          </Grid>
-        </>
-      )}
+          </Card>
+        </Grid>
+      </Grid>
     </>
   )
 }

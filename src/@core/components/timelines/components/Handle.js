@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const Handle = ({
     error,
@@ -45,7 +45,7 @@ const Handle = ({
             <div
                 role='slider'
                 aria-valuemin={min}
-                aria-valuemax={max}
+                aria-valuemax={max} // distance min and max is : 5*60*1000
                 aria-valuenow={value}
                 className={`react_time_range__handle_container${disabled ? "__disabled" : ""
                     }`}

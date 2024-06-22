@@ -142,12 +142,17 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
       />
     )
   }
+  console.log(onSetPage, 'onSetPage')
 
   const handleNodeToggle = (event, nodeIds) => {
     onSetSelectIndex(nodeIds[0])
     setExpanded([nodeIds[0]])
     onSetPage(1)
   }
+
+  useEffect(() => {
+    onSetPage(1)
+  }, [totalPage])
 
   return (
     <div className='customizer'>
@@ -227,21 +232,21 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
                       >
                         {group.cameras && group.cameras?.length > 0
                           ? group.cameras.map((camera, idx) => {
-                            // const matchedEvent = eventsData.find(event => event.id === camera.id)
-                            // const status = matchedEvent?.status
+                              // const matchedEvent = eventsData.find(event => event.id === camera.id)
+                              // const status = matchedEvent?.status
 
-                            return (
-                              <StyledTreeItem
-                                disabled={true}
-                                key={camera?.id}
-                                nodeId={camera?.id}
-                                labelText={camera?.deviceName}
-                                labelIcon='tabler:camera'
+                              return (
+                                <StyledTreeItem
+                                  disabled={true}
+                                  key={camera?.id}
+                                  nodeId={camera?.id}
+                                  labelText={camera?.deviceName}
+                                  labelIcon='tabler:camera'
 
-                              // onClick={() => handleItemClick(camera.id, camera.deviceName)}
-                              />
-                            )
-                          })
+                                  // onClick={() => handleItemClick(camera.id, camera.deviceName)}
+                                />
+                              )
+                            })
                           : null}
                       </StyledTreeItem>
                     )

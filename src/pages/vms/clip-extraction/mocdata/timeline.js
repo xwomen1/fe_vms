@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import { Grid, Typography } from "@mui/material";
 import TimeRange from "src/@core/components/timelines";
 
-const convertDateToString = (date) => {
+const convertDateToString1 = (date) => {
     const pad = (num) => String(num).padStart(2, '0');
     const year = date.getFullYear();
     const month = pad(date.getMonth() + 1);
@@ -15,40 +15,27 @@ const convertDateToString = (date) => {
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
 };
 
-const dataList = [
-    {
-        StartTime: '2024-06-04T06:14:59Z',
-        EndTime: '2024-06-05T06:30:30Z'
-    },
-    {
-        StartTime: '2024-06-05T10:14:59Z',
-        EndTime: '2024-06-06T06:30:30Z'
-    },
-    {
-        StartTime: '2024-06-06T06:40:30Z',
-        EndTime: '2024-06-06T12:30:30Z'
-    },
-    {
-        StartTime: '2024-06-06T12:50:30Z',
-        EndTime: '2024-06-06T22:30:30Z'
-    },
-];
+const convertDateToString = (date) => {
+    const pad = (num) => String(num).padStart(2, '0');
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1);
+    const day = pad(date.getDate());
+    const hours = pad(date.getHours());
+    const minutes = pad(date.getMinutes());
+    const seconds = pad(date.getSeconds());
 
-const Timeline = ({ data = dataList, dateType, minuteType }) => {
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+};
+
+const Timeline = ({ data, minuteType, callback, startDate, endDate }) => {
     const [dateData, setDateData] = useState([]);
-    const [timeType, setTimeType] = useState('day');
     const [minutesType, setMinutesType] = useState('5minute');
-    const [dayList, setDayList] = useState([]);
+    const [dateList, setDateList] = useState([]);
     const [timelines, setTimelines] = useState({});
     const [selectedIntervals, setSelectedIntervals] = useState({});
     const [timelineScrubberError, setTimelineScrubberError] = useState(false);
     const [gaps, setGaps] = useState([]);
-
-    useEffect(() => {
-        if (dateType) {
-            setTimeType(dateType);
-        }
-    }, [dateType]);
+    const [selectedTime, setSelectedTime] = useState({})
 
     useEffect(() => {
         if (minuteType) {
@@ -74,8 +61,10 @@ const Timeline = ({ data = dataList, dateType, minuteType }) => {
     }, [minutesType]);
 
     useEffect(() => {
-        getLastDays();
-    }, [timeType]);
+        const datesInRange = handleUpdateListDate(startDate, endDate)
+        const dateOfList = datesInRange.map(date => date.toISOString().split('T')[0])
+        setDateList(dateOfList)
+    }, [startDate, endDate]);
 
     useEffect(() => {
         if (data) {
@@ -85,10 +74,10 @@ const Timeline = ({ data = dataList, dateType, minuteType }) => {
     }, [data]);
 
     useEffect(() => {
-        if (dayList.length) {
+        if (dateList.length) {
             updateTimelines();
         }
-    }, [dayList]);
+    }, [dateList]);
 
     useEffect(() => {
         if (dateData.length) {
@@ -97,59 +86,72 @@ const Timeline = ({ data = dataList, dateType, minuteType }) => {
         }
     }, [dateData]);
 
+    useEffect(() => {
+        console.log('selectedTime', selectedTime);
+        if (Array.isArray(selectedTime) && selectedTime.length === 2 && selectedTime.every(item => item instanceof Date)) {
+            const detail = {
+                startTime: selectedTime[0],
+                endTime: selectedTime[1]
+            }
+            callback(detail)
+        }
+    }, [selectedTime])
+
+
+    useEffect(() => {
+    }, [selectedIntervals])
+
     const timelineScrubberErrorHandler = ({ error }) => {
         setTimelineScrubberError(error);
     };
 
-    const onChangeCallback = (day) => (selectedInterval) => {
-        setSelectedIntervals((prev) => ({
-            ...prev,
-            [day]: selectedInterval,
-        }));
+    const onChangeCallback = (day, intervalIndex) => (selectedInterval) => {
+        setSelectedIntervals((prev) => {
+            const newSelectedIntervals = { ...prev };
+            newSelectedIntervals[day][intervalIndex] = selectedInterval;
+
+            return newSelectedIntervals;
+        });
+        setSelectedTime(selectedInterval);
     };
 
-    const getLastDays = () => {
-        let daysArray = [];
+    const handleUpdateListDate = (start, end) => {
+        const dates = []
+        const date = new Date(start?.getTime())
 
-        switch (timeType) {
-            case 'day':
-                daysArray.push(new Date().toISOString().split('T')[0]);
-                break;
-            case 'week':
-                for (let i = 0; i < 7; i++) {
-                    const date = new Date();
-                    date.setDate(date.getDate() - i);
-                    daysArray.push(date.toISOString().split('T')[0]);
-                }
-                break;
-            case 'month':
-                for (let i = 0; i < 30; i++) {
-                    const date = new Date();
-                    date.setDate(date.getDate() - i);
-                    daysArray.push(date.toISOString().split('T')[0]);
-                }
-                break;
-            default:
-                break;
+        while (date <= end) {
+            dates.push(new Date(date))
+            date.setDate(date.getDate() + 1)
         }
-        setDayList(daysArray);
-    };
+
+        return dates
+    }
 
     const updateTimelines = () => {
         const newTimelines = {};
         const newSelectedIntervals = {};
 
-        dayList.forEach((day) => {
+        dateList.forEach((day) => {
             const date = new Date(day);
-            const start = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0);
-            const end = new Date(start.getTime() + 60 * 60 * 1000); // Add 1 hour to start
-            newTimelines[day] = [start, new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59)];
-            newSelectedIntervals[day] = [start, end];
+            const start1 = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0);
+            const end1 = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 11, 59, 59);
+            const start2 = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0);
+            const end2 = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59);
+
+            newTimelines[day] = [
+                [start1, end1],
+                [start2, end2]
+            ];
+            newSelectedIntervals[day] = [
+                [start1, new Date(start1.getTime() + 10 * 60 * 1000)],
+                [start2, new Date(start2.getTime() + 10 * 60 * 1000)]
+            ];
         });
 
         setTimelines(newTimelines);
         setSelectedIntervals(newSelectedIntervals);
     };
+
 
     const splitDataByDay = (data) => {
         const newData = [];
@@ -171,18 +173,18 @@ const Timeline = ({ data = dataList, dateType, minuteType }) => {
                 startOfNextDay.setHours(0, 0, 0, 0); // Set giờ đầu tiên của ngày tiếp theo
 
                 newData.push({
-                    StartTime: convertDateToString(startTime),
-                    EndTime: convertDateToString(endOfDay),
+                    StartTime: convertDateToString1(startTime),
+                    EndTime: convertDateToString1(endOfDay),
                 });
 
                 newData.push({
-                    StartTime: convertDateToString(startOfNextDay),
-                    EndTime: convertDateToString(endTime),
+                    StartTime: convertDateToString1(startOfNextDay),
+                    EndTime: convertDateToString1(endTime),
                 });
             } else {
                 newData.push({
-                    StartTime: convertDateToString(startTime),
-                    EndTime: convertDateToString(endTime),
+                    StartTime: convertDateToString1(startTime),
+                    EndTime: convertDateToString1(endTime),
                 });
             }
         });
@@ -234,36 +236,39 @@ const Timeline = ({ data = dataList, dateType, minuteType }) => {
 
     return (
         <Grid container spacing={2}>
-            {dayList.map((day, index) => (
-                <Grid item xs={12} display={'flex'} key={index}>
-                    <Typography sx={{ width: '100px' }}>{day}</Typography>
-                    <TimeRange
-                        showNow
-                        error={timelineScrubberError}
-                        ticksNumber={6}
-                        selectedInterval={selectedIntervals[day] || []}
-                        timelineInterval={timelines[day] || []}
-                        onUpdateCallback={timelineScrubberErrorHandler}
-                        onChangeCallback={onChangeCallback(day)}
-                        disabledIntervals={gaps || []}
-                        step={1}
-                        formatTick={(ms) => format(new Date(ms), "HH:mm:ss")}
-                        formatTooltip={(ms) => format(new Date(ms), "HH:mm:ss.SSS")}
-                        showToolTip={true}
-                    />
+
+            {/* {
+                Array.isArray(selectedTime) && selectedTime.length === 2 && selectedTime.every(item => item instanceof Date) &&
+                <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center' }}>
+                    <Typography>Khoảng thời gian đã chọn:  <span style={{ color: "#FF9F43" }}>{convertDateToString(selectedTime[0])}</span> đến <span style={{ color: '#FF9F43' }}>{convertDateToString(selectedTime[1])}</span></Typography>
+                </Grid>
+            } */}
+
+            {dateList.map((day, index) => (
+                <Grid item xs={12} key={index} style={{ marginBottom: '10px' }}>
+                    <Typography sx={{ minWidth: '100px' }}>Ngày {day} :</Typography>
+                    {(timelines[day] || []).map((interval, intervalIndex) => (
+                        <TimeRange
+                            key={`${day}-${intervalIndex}`}
+                            showNow
+                            error={timelineScrubberError}
+                            ticksNumber={24 * 2} // 12 ticks to show every 5 minutes
+                            selectedInterval={selectedIntervals[day][intervalIndex] || []}
+                            timelineInterval={interval || []}
+                            onUpdateCallback={timelineScrubberErrorHandler}
+                            onChangeCallback={onChangeCallback(day, intervalIndex)}
+                            disabledIntervals={gaps || []}
+                            step={10 * 60 * 1000}
+                            formatTick={(ms) => format(new Date(ms), "HH:mm")}
+                            formatTooltip={(ms) => format(new Date(ms), "HH:mm:ss")}
+                            showToolTip={true}
+                        />
+                    ))}
                 </Grid>
             ))}
         </Grid>
     );
-};
 
-Timeline.getInitialProps = async () => {
-    // Chuẩn bị dữ liệu cần thiết ở đây
-    return {
-        data: dataList,
-        dateType: 'day',
-        minuteType: '5minute',
-    };
 };
 
 export default Timeline;

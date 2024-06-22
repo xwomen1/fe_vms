@@ -29,6 +29,18 @@ import authConfig from 'src/configs/auth'
 import toast from 'react-hot-toast'
 import axios from 'axios'
 import * as XLSX from 'xlsx'
+import { current } from '@reduxjs/toolkit'
+
+const formatCameraName = name => {
+  const maxLength = '10px'
+  if (name.length > maxLength) {
+    const midIndex = Math.floor(name.length / 2)
+
+    return `${name.slice(0, midIndex)}\n${name.slice(midIndex)}`
+  }
+
+  return name
+}
 
 const columns = [
   {
@@ -36,28 +48,30 @@ const columns = [
     flex: 0.15,
     type: 'timestamp',
     width: 50,
-    align: 'right',
+    align: 'left',
     label: 'Ngày giờ',
     field: 'timestamp',
     valueGetter: params => new Date(params.field)
   },
   {
     id: 2,
-    flex: 0.25,
+    flex: 0.15,
     type: 'eventTypeString',
-    width: 50,
-    align: 'right',
+    minWidth: 10,
+    align: 'left',
     field: 'event',
     label: 'Sự kiện',
     field: 'eventTypeString'
   },
   {
     id: 3,
-    flex: 0.15,
-    width: 50,
-    align: 'right',
+    width: '10px',
+    align: 'left',
     label: 'Camera',
-    field: 'camName'
+    field: 'camName',
+
+    // Sử dụng hàm formatCameraName để chia tên camera thành 2 dòng nếu quá dài
+    format: value => formatCameraName(value)
   }
 ]
 
@@ -66,17 +80,14 @@ const EventMap = () => {
   const [keyword, setKeyword] = useState('')
   const [startTime, setStartTime] = useState(null)
   const [endTime, setEndTime] = useState(null)
-  const [isOpenGroup, setIsOpenGroup] = useState([])
   const [selected, setSelected] = useState([])
   const [isOpenTable, setIsOpenTable] = useState(false)
-  const [dataList, setDataList] = useState(null)
   const [rows, setRows] = useState([])
   const [selectedPoints, setSelectedPoints] = useState([])
   const [connections, setConnections] = useState([])
   const [selectedTimes, setSelectedTimes] = useState([])
 
-  const [selectedCameraIds, setSelectedCameraIds] = useState([]) // State for selected camera IDs
-  const [longLat, setLongLat] = useState([]) // State for selected camera IDs
+  const [selectedCameraIds, setSelectedCameraIds] = useState([])
   const [isReconnected, setIsReconnected] = useState(false)
 
   const [viewport, setViewport] = useState({
@@ -93,40 +104,140 @@ const EventMap = () => {
     }
   }
 
-  // const handleTimeSelect = time => {
-  //   // Thêm thời điểm mới vào mảng
-  //   const newSelectedTimes = [...selectedTimes, time]
+  useEffect(() => {
+    connections.forEach(connection => {
+      connectPoints(connection[0], connection[1])
+    })
+  }, [connections])
+  useEffect(() => {
+    if (isReconnected) {
+    }
+  }, [isReconnected])
+  useEffect(() => {}, [selectedCameraIds])
 
-  //   // Kiểm tra nếu mảng có hơn 3 thời điểm, sắp xếp mảng theo thời gian từ lớn đến bé
-  //   if (newSelectedTimes.length > 3) {
-  //     newSelectedTimes.sort((a, b) => b - a)
-  //   } else {
-  //     newSelectedTimes.sort((a, b) => a - b)
-  //   }
+  useEffect(() => {
+    if (selectedTimes.length >= 2) {
+      const lastIndex = selectedTimes.length - 1
+      const lastTwoPoints = [selectedTimes[lastIndex - 1], selectedTimes[lastIndex]]
 
-  //   // Cập nhật mảng đã sắp xếp
-  //   setSelectedTimes(newSelectedTimes)
-  //   console.log(newSelectedTimes)
+      connectPoints(lastTwoPoints)
+    }
+  }, [selectedTimes])
 
-  //   // Sau khi chọn đủ 3 thời điểm, gọi hàm connectPoints để vẽ đường nối
-  //   if (newSelectedTimes.length === 3) {
-  //     connectPoints(newSelectedTimes[0], newSelectedTimes[1])
-  //     connectPoints(newSelectedTimes[1], newSelectedTimes[2])
-  //   }
-  // }
+  useEffect(() => {
+    updateViewport()
+  }, [selectedPoints])
 
-  const connectPoints = (time1, time2) => {
-    const point1 = findPointByTime(time1)
-    const point2 = findPointByTime(time2)
+  function parseDateString(dateString) {
+    if (!dateString || typeof dateString !== 'string') {
+      console.error('Invalid dateString:', dateString)
 
-    if (point1 && point2) {
-      drawLineOnMap(point1, point2)
+      return null
+    }
 
-      // Kiểm tra nếu mảng có hơn 3 điểm được chọn thì xoá điểm trước đó được nối
-      if (selectedTimes.length === 3) {
-        deletePreviousConnection()
+    const [date, time] = dateString.split(' ')
+    if (!date || !time) {
+      console.error('Invalid date or time in dateString:', dateString)
+
+      return null
+    }
+
+    const [day, month, year] = date.split('/').map(Number)
+    const [hours, minutes, seconds] = time.split(':').map(Number)
+
+    if (isNaN(day) || isNaN(month) || isNaN(year) || isNaN(hours) || isNaN(minutes) || isNaN(seconds)) {
+      console.error('Invalid date components in dateString:', dateString)
+
+      return null
+    }
+
+    return new Date(year, month - 1, day, hours, minutes, seconds).getTime()
+  }
+
+  const deepEqual = (obj1, obj2) => {
+    return JSON.stringify(obj1) === JSON.stringify(obj2)
+  }
+
+  useEffect(() => {
+    if (selectedPoints.length > 0) {
+      const sortedPoints = selectedPoints.slice().sort((a, b) => {
+        const timestampA = parseDateString(a.timestamp)
+        const timestampB = parseDateString(b.timestamp)
+
+        return timestampA - timestampB
+      })
+
+      if (!deepEqual(sortedPoints, selectedPoints)) {
+        setSelectedPoints(sortedPoints)
       }
-      console.log(`Connecting points ${point1.timestamp} and ${point2.timestamp}`)
+    }
+  }, [selectedPoints])
+
+  const updateViewport = () => {
+    const newViewport = calculateCenter()
+    setViewport(newViewport)
+  }
+
+  const handleZoomIn = () => {
+    setViewport(prevState => ({
+      ...prevState,
+      zoom: Math.min(prevState.zoom + 1, 20)
+    }))
+  }
+
+  const handleZoomOut = () => {
+    setViewport(prevState => ({
+      ...prevState,
+      zoom: Math.max(prevState.zoom - 1, 1)
+    }))
+  }
+
+  const GOONG_MAP_KEY = 'MaRpQPZORjHfEMC3tpTGCLlPqo5qXDkzvcemJZWO'
+
+  const handleSearch = async () => {
+    setLoading(true)
+    try {
+      const startEpoch = startTime ? Math.floor(startTime.getTime()) : ''
+      const endEpoch = endTime ? Math.floor(endTime.getTime()) : ''
+
+      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/routine?sort=-created_at`, {
+        params: {
+          keyword,
+          startTime: startEpoch,
+          endTime: endEpoch
+        },
+        ...config
+      })
+
+      const formattedData = res.data.map(item => ({
+        ...item,
+        timestamp: new Date(item.timestamp).getTime() // Chuyển đổi timestamp về dạng epoch
+      }))
+
+      setRows(formattedData || [])
+      setIsOpenTable(true)
+    } catch (error) {
+      console.error('Error fetching events: ', error)
+      toast.error(error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const connectPoints = points => {
+    // Kiểm tra xem points có phải là một mảng không
+    if (!Array.isArray(points) || points.length < 2) {
+      // Nếu không phải mảng hoặc độ dài của nó không đủ, không thực hiện gì cả
+      return
+    }
+
+    const [point1, point2] = points
+    const { longitude: lon1, latitude: lat1 } = point1
+    const { longitude: lon2, latitude: lat2 } = point2
+
+    // Nếu cả hai điểm đều có tọa độ, thì nối chúng trên bản đồ
+    if (lon1 && lat1 && lon2 && lat2) {
+      drawLineOnMap(point1, point2)
     }
   }
 
@@ -139,36 +250,6 @@ const EventMap = () => {
     }
   }
 
-  const sortPointsByTime = points => {
-    return points.sort((a, b) => a.timestamp - b.timestamp)
-  }
-
-  const handleTimeSelect = (time, longitude, latitude) => {
-    let newSelectedTimes = [...selectedTimes, { time, longitude, latitude }]
-
-    // Sắp xếp các điểm theo timestamp
-    newSelectedTimes.sort((a, b) => a.time - b.time)
-
-    // Nếu có hơn 3 điểm, chỉ giữ lại 3 điểm mới nhất
-    if (newSelectedTimes.length > 3) {
-      newSelectedTimes = newSelectedTimes.slice(-3)
-      setIsReconnected(true) // Đánh dấu rằng các kết nối được vẽ lại
-    } else {
-      setIsReconnected(false)
-    }
-
-    setSelectedTimes(newSelectedTimes)
-
-    // Tạo kết nối giữa các điểm theo thứ tự timestamp
-    let newConnections = []
-    if (newSelectedTimes.length >= 2) {
-      for (let i = 0; i < newSelectedTimes.length - 1; i++) {
-        newConnections.push([newSelectedTimes[i], newSelectedTimes[i + 1]])
-      }
-    }
-    setConnections(newConnections)
-  }
-
   const findPointByTime = time => {
     const point = selectedPoints.find(point => point.timestamp === time)
 
@@ -176,86 +257,20 @@ const EventMap = () => {
   }
 
   const drawLineOnMap = (point1, point2) => {
-    if (point1 && point2 && point1.longitude && point1.latitude && point2.longitude && point2.latitude) {
-      setConnections(prevConnections => [
-        ...prevConnections,
-        {
-          type: 'Feature',
-          geometry: {
-            type: 'LineString',
-            coordinates: [
-              [parseFloat(point1.longitude), parseFloat(point1.latitude)],
-              [parseFloat(point2.longitude), parseFloat(point2.latitude)]
-            ]
-          }
-        }
-      ])
+    // Tạo một đường thẳng trên bản đồ từ point1 đến point2
+    const newConnection = {
+      type: 'Feature',
+      geometry: {
+        type: 'LineString',
+        coordinates: [
+          [parseFloat(point1.longitude), parseFloat(point1.latitude)],
+          [parseFloat(point2.longitude), parseFloat(point2.latitude)]
+        ]
+      }
     }
-  }
 
-  useEffect(() => {
-    if (selectedTimes.length === 2) {
-      // Nối time thứ 1 với time thứ 2 và time thứ 2 với time thứ 3
-      connectPoints(selectedTimes[0], selectedTimes[1])
-      connectPoints(selectedTimes[1], selectedTimes[2])
-    } else if (selectedTimes.length === 1) {
-      // Nối time thứ 1 với time thứ 3
-      connectPoints(selectedTimes[0], selectedTimes[2])
-    }
-  }, [selectedTimes])
-
-  const CustomMapPin = () => (
-    <svg
-      xmlns='http://www.w3.org/2000/svg'
-      width='40'
-      height='40'
-      viewBox='0 0 24 24'
-      stroke='orange'
-      fill='orange'
-      className='icon icon-tabler icons-tabler-filled icon-tabler-map-pin'
-    >
-      <path stroke='none' d='M0 0h24v24H0z' fill='none' />
-      <path d='M18.364 4.636a9 9 0 0 1 .203 12.519l-.203 .21l-4.243 4.242a3 3 0 0 1 -4.097 .135l-.144 -.135l-4.244 -4.243a9 9 0 0 1 12.728 -12.728zm-6.364 3.364a3 3 0 1 0 0 6a3 3 0 0 0 0 -6z' />
-    </svg>
-  )
-  const GOONG_MAP_KEY = 'MaRpQPZORjHfEMC3tpTGCLlPqo5qXDkzvcemJZWO'
-
-  const handleSearch = async () => {
-    setLoading(true)
-    try {
-      const startEpoch = startTime ? Math.floor(startTime.getTime()) : ''
-      const endEpoch = endTime ? Math.floor(endTime.getTime()) : ''
-
-      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/routine`, {
-        params: {
-          keyword,
-          startTime: startEpoch,
-          endTime: endEpoch
-        },
-        ...config
-      })
-      setRows(res.data || [])
-      setIsOpenTable(true)
-    } catch (error) {
-      console.error('Error fetching events: ', error)
-      toast.error(error.message)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleZoomIn = () => {
-    setViewport(prevState => ({
-      ...prevState,
-      zoom: Math.min(prevState.zoom + 1, 20) // Maximum zoom level of 20
-    }))
-  }
-
-  const handleZoomOut = () => {
-    setViewport(prevState => ({
-      ...prevState,
-      zoom: Math.max(prevState.zoom - 1, 1) // Minimum zoom level of 1
-    }))
+    // Thêm đường vừa tạo vào mảng connections
+    setConnections(prevConnections => [...prevConnections, newConnection])
   }
 
   // Chuyển đổi timestamp thành định dạng "dd mm yyyy hh mm ss"
@@ -271,58 +286,54 @@ const EventMap = () => {
     return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`
   }
 
-  // Cập nhật cột timestamp trong bảng thành định dạng "dd mm yyyy hh mm ss"
-  const updatedRows = rows.map(row => ({
-    ...row,
-    timestamp: convertTimestampToDateTimeString(row.timestamp)
-  }))
+  const updatedRows = rows
+    .sort(function (a, b) {
+      return a.timestamp - b.timestamp
+    })
+    .map(row => ({
+      ...row,
+      timestamp: convertTimestampToDateTimeString(row.timestamp)
+    }))
 
   const handleSelectAllClick = event => {
     if (event.target.checked) {
-      const newSelected = rows.map(n => n.time)
-      setSelected(newSelected)
+      const newSelected = rows.map(n => n.id)
+      setSelectedCameraIds(newSelected)
 
-      return
+      // Sắp xếp lại các điểm theo thứ tự của chúng trong dữ liệu API
+      const sortedRows = rows.sort((a, b) => a.timestamp - b.timestamp)
+
+      const newSelectedPoints = sortedRows
+        .filter(row => row.LongtitudeOfCam && row.LatitudeOfCam) // Lọc ra các điểm có tọa độ
+        .map(row => ({
+          longitude: row.LongtitudeOfCam,
+          latitude: row.LatitudeOfCam,
+          timestamp: row.timestamp
+        }))
+      setSelectedPoints(newSelectedPoints)
+
+      // Gọi hàm handleTimeSelect với các điểm mới được chọn
+    } else {
+      setSelectedCameraIds([])
+      setSelectedPoints([])
+      setSelectedTimes([])
     }
-    setSelected([])
-  }
-
-  const calculateConnections = () => {
-    const lines = []
-    const sortedPoints = [...selectedPoints].sort((a, b) => a.timestamp - b.timestamp)
-
-    for (let i = 0; i < sortedPoints.length - 1; i++) {
-      const startPoint = sortedPoints[i]
-      const endPoint = sortedPoints[i + 1]
-      lines.push({
-        type: 'Feature',
-        geometry: {
-          type: 'LineString',
-          coordinates: [
-            [parseFloat(startPoint.longitude), parseFloat(startPoint.latitude)],
-            [parseFloat(endPoint.longitude), parseFloat(endPoint.latitude)]
-          ]
-        },
-        properties: {
-          timestamp: startPoint.timestamp
-        }
-      })
-    }
-    setConnections(lines)
-  }
-
-  const clearConnections = () => {
-    setConnections([])
   }
 
   const handleCameraSelect = (event, cameraId, LongitudeOfCam, LatitudeOfCam, timestamp) => {
     if (event.target.checked && LongitudeOfCam && LatitudeOfCam) {
-      setSelectedCameraIds(prevIds => [...prevIds, cameraId])
-      setSelectedPoints(prevPoints => [
-        ...prevPoints,
-        { longitude: LongitudeOfCam, latitude: LatitudeOfCam, timestamp }
-      ])
-      handleTimeSelect(timestamp, LongitudeOfCam, LatitudeOfCam)
+      // Kiểm tra xem điểm đã tồn tại chưa trước khi thêm mới
+      const pointExists = selectedPoints.some(
+        point => point.longitude === LongitudeOfCam && point.latitude === LatitudeOfCam && point.timestamp === timestamp
+      )
+
+      if (!pointExists) {
+        setSelectedCameraIds(prevIds => [...prevIds, cameraId])
+        setSelectedPoints(prevPoints => [
+          ...prevPoints,
+          { longitude: LongitudeOfCam, latitude: LatitudeOfCam, timestamp }
+        ])
+      }
     } else {
       setSelectedCameraIds(prevIds => prevIds.filter(id => id !== cameraId))
       setSelectedPoints(prevPoints =>
@@ -330,26 +341,6 @@ const EventMap = () => {
       )
       setSelectedTimes(prevTimes => prevTimes.filter(time => time.time !== timestamp))
     }
-  }
-  useEffect(() => {
-    connections.forEach(connection => {
-      connectPoints(connection[0], connection[1])
-    })
-  }, [connections])
-  useEffect(() => {
-    if (isReconnected) {
-      console.log('Các kết nối đã được vẽ lại.')
-    }
-  }, [isReconnected])
-  useEffect(() => {
-    console.log('Mảng các camera đang được select:', selectedCameraIds)
-  }, [selectedCameraIds])
-
-  // Hàm sắp xếp các điểm theo thời gian tăng dần
-  const sortSelectedPointsByTime = () => {
-    const sortedPoints = [...selectedPoints].sort((a, b) => a.timestamp - b.timestamp)
-    console.log('Mảng được sắp xếp theo thời gian:', sortedPoints)
-    setSelectedPoints(sortedPoints)
   }
 
   const handleExport = async () => {
@@ -385,6 +376,21 @@ const EventMap = () => {
   // Sử dụng hàm epochToDate để chuyển đổi epoch timestamp sang dạng ngày tháng năm và giờ phút giây
   const epochTimestamp = 1621766000000 // Ví dụ với một epoch timestamp cụ thể
   const formattedDate = epochToDate(epochTimestamp)
+
+  const CustomMapPin = () => (
+    <svg
+      xmlns='http://www.w3.org/2000/svg'
+      width='40'
+      height='40'
+      viewBox='0 0 24 24'
+      stroke='orange'
+      fill='orange'
+      className='icon icon-tabler icons-tabler-filled icon-tabler-map-pin'
+    >
+      <path stroke='none' d='M0 0h24v24H0z' fill='none' />
+      <path d='M18.364 4.636a9 9 0 0 1 .203 12.519l-.203 .21l-4.243 4.242a3 3 0 0 1 -4.097 .135l-.144 -.135l-4.244 -4.243a9 9 0 0 1 12.728 -12.728zm-6.364 3.364a3 3 0 1 0 0 6a3 3 0 0 0 0 -6z' />
+    </svg>
+  )
 
   const viewMap = () => (
     <Grid container spacing={2}>
@@ -436,6 +442,7 @@ const EventMap = () => {
   const sortedPoints = selectedPoints.slice().sort((a, b) => a.timestamp - b.timestamp)
 
   const renderConnections = () => {
+    const sortedPoints = selectedPoints.slice().sort((a, b) => a.timestamp - b.timestamp)
     const lines = []
     for (let i = 0; i < sortedPoints.length - 1; i++) {
       const startPoint = sortedPoints[i]
@@ -493,27 +500,6 @@ const EventMap = () => {
     }
   }
 
-  // Hàm cập nhật viewport
-  const updateViewport = () => {
-    const newViewport = calculateCenter()
-    setViewport(newViewport)
-  }
-
-  useEffect(() => {
-    // Mỗi khi selectedPoints thay đổi, cập nhật lại viewport
-    updateViewport()
-  }, [selectedPoints])
-  useEffect(() => {
-    // Kiểm tra xem đã có dữ liệu từ API hay chưa
-    if (selectedPoints.length > 0) {
-      // Sắp xếp mảng selectedPoints theo timestamp tăng dần
-      const sortedPoints = selectedPoints.slice().sort((a, b) => a.timestamp - b.timestamp)
-
-      // Cập nhật selectedPoints với mảng đã sắp xếp
-      setSelectedPoints(sortedPoints)
-    }
-  }, [selectedPoints]) // Khi selectedPoints thay đổi, useEffect này sẽ được gọi
-
   const viewTable = () => (
     <TableContainer component={Paper} sx={{ height: '100%', minHeight: 'calc(60vh - 200px)' }}>
       <Table stickyHeader className='sticky table' sx={{ overflow: 'auto' }}>
@@ -522,9 +508,9 @@ const EventMap = () => {
             <TableCell padding='checkbox' sx={{ width: 20 }}>
               <Checkbox
                 onChange={handleSelectAllClick}
-                checked={rows.length > 0 && selected.length === rows.length}
+                checked={rows.length > 0 && selectedCameraIds.length === rows.length}
                 inputProps={{ 'aria-label': 'select all desserts' }}
-                indeterminate={selected.length > 0 && selected.length < rows.length}
+                indeterminate={selectedCameraIds.length > 0 && selectedCameraIds.length < rows.length}
               />
             </TableCell>
             {columns.map(column => (
@@ -657,13 +643,13 @@ const EventMap = () => {
             />
           </Card>
         </Grid>
-        <Grid item xs={12} sm={isOpenTable ? 9 : 12}>
+        <Grid item xs={12} sm={isOpenTable ? 8 : 12}>
           <Card>
             <CardContent>{viewMap()}</CardContent>
           </Card>
         </Grid>
         {isOpenTable && (
-          <Grid item xs={12} sm={3}>
+          <Grid item xs={12} sm={4}>
             <Card>
               <CardContent sx={{ height: '60vh' }}>{viewTable()}</CardContent>
               <CardActions sx={{ justifyContent: 'space-around' }}>

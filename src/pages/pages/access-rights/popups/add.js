@@ -113,6 +113,7 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
   const [isCheckboxChecked, setIsCheckboxChecked] = useState(false)
   const [dataDailyState, setDataDailyState] = useState(dataDailyDefault)
   const [selectedGroupId, setSelectedGroupId] = useState('')
+  const [selectedDoorInId, setSelectedDoorInId] = useState('')
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
   const config = {
@@ -260,123 +261,21 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
       values['startDate'] = format(startDate, 'yyyy-MM-dd')
       values['endDate'] = format(endDate, 'yyyy-MM-dd')
 
-      const scheduleId = await handleAddSchedule(values)
-      const doorAccessId = await handleAddDoorAccesses(values, scheduleId)
-      const accessGroupId = await handleAddSAccessGroup(values, doorAccessId)
-
       // Gọi hàm cuối cùng với các ID đã tạo
-      await handleAdd(values, scheduleId, doorAccessId, accessGroupId)
+      await handleAdd(values)
     } catch (err) {
       setErrorMessages([err.message])
       console.error('Error in onSubmit: ', err)
     }
   }
 
-  const handleAddSchedule = async values => {
-    setLoading(true)
-    try {
-      const params = {
-        name: values?.nameCalendar,
-        description: values?.nameCalendar,
-        listHoliday: [],
-        scheduleWeeklyRequest: values.calendarDays.map(day => {
-          return {
-            dayOfWeek: day.dayOfWeek,
-            times: day.timePeriods.map(period => {
-              return {
-                endTimeInMinute: period.endTimeInMinute,
-                startTimeInMinute: period.startTimeInMinute
-              }
-            })
-          }
-        })
-      }
-
-      const res = await axios.post(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/schedules`,
-        { ...params },
-        config
-      )
-
-      const scheduleId = res.data.id
-
-      return scheduleId // Trả về scheduleId
-    } catch (err) {
-      setErrorMessages([err.response.data.message])
-      console.error('Error in handleAddSchedule: ', err)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleAddDoorAccesses = async (values, scheduleId) => {
-    try {
-      const params = {
-        name: values?.nameCalendar,
-        description: values?.nameCalendar,
-        policies: [
-          {
-            applyMode: 'CUSTOMIZE',
-            doorId: values.doorInId,
-            scheduleId: scheduleId !== null ? scheduleId : undefined
-          }
-        ]
-      }
-
-      const res = await axios.post(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/door-accesses`,
-        { ...params },
-        config
-      )
-
-      const doorAccessId = res.data.id
-
-      return doorAccessId // Trả về doorAccessId
-    } catch (err) {
-      setErrorMessages([err.response.data.message])
-      console.error('Error in handleAddDoorAccesses: ', err)
-      setLoading(false)
-    }
-  }
-
-  const handleAddSAccessGroup = async (values, doorAccessId) => {
-    setLoading(true)
-    try {
-      const params = {
-        name: values?.nameCalendar,
-        description: values?.nameCalendar,
-        doorAccessIds: [doorAccessId],
-        userGroupId: values?.groupId
-      }
-
-      const res = await axios.post(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/access-groups`,
-        { ...params },
-        config
-      )
-
-      const accessGroupId = res.data.id
-
-      return accessGroupId // Trả về accessGroupId
-    } catch (err) {
-      setErrorMessages([err.response.data.message])
-
-      console.error('Error in handleAddSAccessGroup: ', err)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleAdd = async (values, scheduleId, doorAccessId, accessGroupId) => {
+  const handleAdd = async values => {
     setLoading(true)
     try {
       console.log(values)
 
       const params = {
         ...values,
-        scheduleId: scheduleId,
-        doorAccessId: doorAccessId,
-        accessGroupId: accessGroupId,
         groupId: selectedGroupId
       }
 
@@ -395,6 +294,10 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
     } finally {
       setLoading(false)
     }
+  }
+
+  const getFilteredDoorList = excludeId => {
+    return doorList.filter(door => door.id !== excludeId)
   }
 
   return (
@@ -486,12 +389,15 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
                       label='Cửa vào'
                       SelectProps={{
                         value: value,
-                        onChange: e => onChange(e)
+                        onChange: e => {
+                          onChange(e)
+                          setSelectedDoorInId(e.target.value) // Update the selected doorInId
+                        }
                       }}
                       id='validation-basic-select'
                       error={Boolean(errors.doorInId)}
                       aria-describedby='validation-basic-select'
-                      {...(errors.doorOutId && { helperText: 'Trường này bắt buộc' })}
+                      {...(errors.doorInId && { helperText: 'Trường này bắt buộc' })}
                     >
                       {doorList.map(door => (
                         <MenuItem key={door.id} value={door.id}>
@@ -502,33 +408,38 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
                   )}
                 />
               </Grid>
+
               <Grid item xs={4}>
                 <Controller
                   name='doorOutId'
                   control={control}
                   rules={{ required: true }}
-                  render={({ field: { value, onChange } }) => (
-                    <CustomTextField
-                      select
-                      fullWidth
-                      defaultValue=''
-                      label='Cửa ra'
-                      SelectProps={{
-                        value: value,
-                        onChange: e => onChange(e)
-                      }}
-                      id='validation-basic-select'
-                      error={Boolean(errors.doorOutId)}
-                      aria-describedby='validation-basic-select'
-                      {...(errors.doorOutId && { helperText: 'Trường này bắt buộc' })}
-                    >
-                      {doorList.map(door => (
-                        <MenuItem key={door.id} value={door.id}>
-                          {door.name}
-                        </MenuItem>
-                      ))}
-                    </CustomTextField>
-                  )}
+                  render={({ field: { value, onChange } }) => {
+                    const filteredDoorList = getFilteredDoorList(selectedDoorInId)
+
+                    return (
+                      <CustomTextField
+                        select
+                        fullWidth
+                        defaultValue=''
+                        label='Cửa ra'
+                        SelectProps={{
+                          value: value,
+                          onChange: e => onChange(e)
+                        }}
+                        id='validation-basic-select'
+                        error={Boolean(errors.doorOutId)}
+                        aria-describedby='validation-basic-select'
+                        {...(errors.doorOutId && { helperText: 'Trường này bắt buộc' })}
+                      >
+                        {filteredDoorList.map(door => (
+                          <MenuItem key={door.id} value={door.id}>
+                            {door.name}
+                          </MenuItem>
+                        ))}
+                      </CustomTextField>
+                    )
+                  }}
                 />
               </Grid>
               <Grid item xs={3}>

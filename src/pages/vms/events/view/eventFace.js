@@ -30,6 +30,7 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 import Filter from '../popups/filter'
 import View from '../popups/view'
 import Add from '../popups/add'
+import EventDetails from '../popups/eventDetails'
 
 const initValueFilter = {
   location: null,
@@ -59,7 +60,7 @@ const EventList = () => {
   const [websocket, setWebsocket] = useState(null)
   const [rtcPeerConnection, setRtcPeerConnection] = useState(null)
 
-  const [total, setTotal] = useState(1)
+  const [total, setTotalPage] = useState(0)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
   const pageSizeOptions = [25, 50, 100]
@@ -156,7 +157,7 @@ const EventList = () => {
     // create WebSocket connection
 
     const ws = new WebSocket(
-      `wss://sbs.basesystem.one/ivis/cmsgo/api/v0/websocket/topic/list_ai_event/be571c00-41cf-4878-a1de-b782625da62a`
+      `wss://sbs.basesystem.one/ivis/vms/api/v0/websocket/topic/list_ai_event/be571c00-41cf-4878-a1de-b782625da62a`
     )
 
     setWebsocket(ws)
@@ -223,18 +224,18 @@ const EventList = () => {
   useEffect(() => {
     const newList = []
 
-    deviceList?.rows.map((item, index) => {
+    deviceList?.map((item, index) => {
       if (index === 0) {
         newList.push(eventsData)
         newList.push(item)
         setCount(count + 1)
-        deviceList?.rows.pop()
+        deviceList?.pop()
       } else {
         newList.push(item)
       }
     })
 
-    // setDeviceList({ rows: [...newList] })
+    setDeviceList([...newList])
   }, [eventsData])
 
   useEffect(() => {
@@ -259,21 +260,22 @@ const EventList = () => {
     const params = {
       ...config1,
       params: {
-        keyword: keyword || '',
+        camName: keyword || '',
         limit: pageSize,
-        page: page,
+        page: parseInt(page),
         location: valueFilter?.location || '',
         cameraName: valueFilter?.cameraName || '',
         startTime: valueFilter?.startTime || '',
-        endTime: valueFilter?.endTime || ''
+        endTime: valueFilter?.endTime || '',
+        eventType: 'AI_EVENT_BLACKLIST_FACE_RECOGNITION'
       }
     }
     setLoading(true)
     try {
-      const res = await axios.get(`https://sbs.basesystem.one/ivis/cmsgo/api/v0/aievents`, params)
-      setDeviceList(res.data.data) // lỗi
-      setCount(res.data.count)
-      setTotal(res.data.totalPage)
+      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/genimage?`, params)
+      setDeviceList(res.data)
+      setCount(res.count)
+      setTotalPage(Math.ceil(res.count / pageSize))
     } catch (error) {
       console.error('Error fetching data:', error)
       toast.error(error)
@@ -281,8 +283,13 @@ const EventList = () => {
       setLoading(false)
     }
   }
+  console.log(pageSize, 'pageSize')
+  console.log(page, 'page')
+  console.log(total, 'total')
+  console.log(count, 'count')
+  console.log(deviceList, 'deviceList')
 
-  const handlePageChange = newPage => {
+  const handlePageChange = (event, newPage) => {
     setPage(newPage)
   }
 
@@ -371,7 +378,7 @@ const EventList = () => {
       }
 
       axios
-        .delete(`https://sbs.basesystem.one/ivis/cmsgo/api/v0/aievents/delete/${idDelete}`, config)
+        .delete(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/delete/${idDelete}`, config)
         .then(() => {
           toast.success('Xóa thành công')
           setIdDelete(null)
@@ -391,7 +398,7 @@ const EventList = () => {
     <>
       <Card>
         <CardHeader
-          title='Khuôn mặt'
+          title='Danh sách sự kiện AI'
           titleTypographyProps={{ sx: { mb: [2, 0] } }}
           sx={{
             py: 4,
@@ -460,8 +467,8 @@ const EventList = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {deviceList ? (
-                  deviceList.rows.slice(0, pageSize).map((row, index) => (
+                {deviceList?.slice(0, pageSize).map((row, index) => {
+                  return (
                     <TableRow hover tabIndex={-1} key={index}>
                       <TableCell>{index + 1}</TableCell>
                       {columns.map(column => {
@@ -506,20 +513,14 @@ const EventList = () => {
                         </Grid>
                       </TableCell>
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={columns.length + 1} align='center'>
-                      Không có dữ liệu
-                    </TableCell>
-                  </TableRow>
-                )}
+                  )
+                })}
               </TableBody>
             </Table>
           </TableContainer>
         </Grid>
         <br />
-        {/* <Grid container spacing={2} style={{ padding: 10 }}>
+        <Grid container spacing={2} style={{ padding: 10 }}>
           <Grid item xs={3}></Grid>
           <Grid item xs={1}>
             <span style={{ fontSize: 15 }}> dòng/trang</span>
@@ -539,9 +540,9 @@ const EventList = () => {
             </Box>
           </Grid>
           <Grid item xs={6}>
-            <Pagination count={total} page={page} color='primary' onChange={(event, page) => handlePageChange(page)} />
+            <Pagination count={total} page={page} color='primary' onChange={handlePageChange} />
           </Grid>
-        </Grid> */}
+        </Grid>
       </Card>
 
       {isOpenFilter && (
@@ -549,7 +550,7 @@ const EventList = () => {
       )}
 
       {isOpenView && (
-        <View
+        <EventDetails
           show={isOpenView}
           onClose={() => setIsOpenView(false)}
           data={eventDetail}
