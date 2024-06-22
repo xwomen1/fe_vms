@@ -245,7 +245,7 @@ const EventList = () => {
 
   useEffect(() => {
     if (rtcPeerConnection) {
-      rtcPeerConnection.addEventListener('connectionstatechange', () => {})
+      rtcPeerConnection.addEventListener('connectionstatechange', () => { })
     }
   }, [rtcPeerConnection])
 
@@ -287,11 +287,6 @@ const EventList = () => {
       setLoading(false)
     }
   }
-  console.log(pageSize, 'pageSize')
-  console.log(page, 'page')
-  console.log(total, 'total')
-  console.log(count, 'count')
-  console.log(deviceList, 'deviceList')
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage)

@@ -68,6 +68,7 @@ const Review = ({ id, name, channel }) => {
     const debouncedSearch = useDebounce(valueRange, 700)
     const [duration, setDuration] = useState(0)
     const [reload, setReload] = useState(0)
+    const [volume, setVolume] = useState(30)
 
     useEffect(() => {
         setCamera({ id: id, name: name, channel: channel })
@@ -80,8 +81,6 @@ const Review = ({ id, name, channel }) => {
             monthOfYear: monthOfYear,
             year: year
         }
-
-        console.log(timePlay)
 
         try {
             const res = await postApi(`https://sbs.basesystem.one/ivis/vms/api/v0/playback/camera/${id}`, params)
@@ -212,6 +211,7 @@ const Review = ({ id, name, channel }) => {
                             onChangeCurrentTime={time => {
                                 setCurrentTime(1000 * time)
                             }}
+                            volume={volume}
                             handSetChanel={handSetChanel}
                         />
                     }
@@ -337,6 +337,9 @@ const Review = ({ id, name, channel }) => {
                                     defaultValue={30}
                                     min={0}
                                     max={100}
+                                    onChange={(event, vol) => {
+                                        setVolume(vol)
+                                    }}
                                     color='secondary'
                                     sx={{
                                         '& .MuiSlider-track': {
