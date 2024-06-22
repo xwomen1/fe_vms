@@ -1,9 +1,23 @@
-import { forwardRef, useState } from "react"
+import { forwardRef, useEffect, useState } from "react"
 import Icon from 'src/@core/components/icon'
 import { Box, Button, Card, Dialog, DialogActions, DialogContent, Fade, Grid, IconButton, Tab, Typography, styled } from "@mui/material"
 import { TabContext, TabList, TabPanel } from "@mui/lab"
 import View from "./view"
 import Review from "./review"
+import axios from "axios"
+import toast from "react-hot-toast"
+
+const convertDateToString = (date) => {
+    const pad = (num) => String(num).padStart(2, '0');
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1);
+    const day = pad(date.getDate());
+    const hours = pad(date.getHours());
+    const minutes = pad(date.getMinutes());
+    const seconds = pad(date.getSeconds());
+
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`;
+}
 
 const CustomCloseButton = styled(IconButton)(({ theme }) => ({
     top: 0,
@@ -25,11 +39,84 @@ const Transition = forwardRef(function Transition(props, ref) {
 })
 
 const EventDetails = ({ show, onClose, data, setReload }) => {
+    const [loading, setLoading] = useState(false)
     const [value, setValue] = useState('1')
+    const [camera, setCamera] = useState(null)
+    const [timestamp, setTimestamp] = useState(data?.timestamp)
+    const [startTime, setStartTime] = useState(new Date().getTime() - 10 * 60 * 1000)
+    const [endTime, setEndTime] = useState(new Date().getTime())
+
+    useEffect(() => {
+        setStartTime(timestamp - 5 * 60 * 1000)
+        setEndTime(timestamp + 5 * 60 * 1000)
+    }, [timestamp])
+
+    useEffect(() => {
+        setCamera(data?.cameraId)
+    }, [data])
 
     const handleChange = (event, newValue) => {
         setValue(newValue)
     }
+
+    const handleDownloadFile = async () => {
+        setLoading(true)
+
+        if (camera !== null) {
+
+            const params = {
+                startTime: convertDateToString(new Date(startTime)),
+                endTime: convertDateToString(new Date(endTime))
+            }
+
+            console.log('params: ', params);
+
+            try {
+                const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/video/download?idCamera=${camera}&startTime=${params.startTime}&endTime=${params.endTime}`)
+                const videoDownloadUrl = res.data[0].videoDownLoad[0].video
+
+                if (videoDownloadUrl) {
+                    await handleExportLinkDownload(videoDownloadUrl)
+                } else {
+                    toast.error('Không tìm thấy URL tải về video')
+                }
+            } catch (error) {
+                if (error && error?.response?.data) {
+                    console.error('error', error)
+                    toast.error(error?.response?.data?.message)
+
+                } else {
+                    console.error('Error fetching data:', error)
+                    toast.error(error)
+                }
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        onClose()
+    }
+
+    const handleExportLinkDownload = async (linkDownload) => {
+
+        const axiosInstance = axios.create();
+        try {
+            const response = await axiosInstance.get(linkDownload, {
+                responseType: 'blob',
+            });
+
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'clip.mp4');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            toast.error(error?.message || 'An error occurred while downloading the file.');
+        }
+    };
 
     return (
         <Card>
@@ -70,7 +157,7 @@ const EventDetails = ({ show, onClose, data, setReload }) => {
                                     <View data={data} />
                                 </TabPanel>
                                 <TabPanel value='2'>
-                                    <Review data={data} id={data.cameraId} channel={'sub'} />
+                                    <Review data={data} id={data.cameraId} name={data.camName} channel={'sub'} />
                                 </TabPanel>
                             </Grid>
                         </TabContext>
@@ -83,6 +170,12 @@ const EventDetails = ({ show, onClose, data, setReload }) => {
                         pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
                     }}
                 >
+                    {
+                        value === '2' &&
+                        <Button type='submit' variant='contained' onClick={() => handleDownloadFile()}>
+                            Xuất file
+                        </Button>
+                    }
                     <Button variant='contained' onClick={onClose}>Đóng</Button>
                 </DialogActions>
             </Dialog>

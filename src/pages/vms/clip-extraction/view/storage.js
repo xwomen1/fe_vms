@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react'
 
-import { Box, Button, CardHeader, DialogActions, Grid, MenuItem, Typography } from '@mui/material'
+import { Box, Button, CardHeader, DialogActions, Grid, MenuItem } from '@mui/material'
 
 import IconButton from '@mui/material/IconButton'
 import Icon from 'src/@core/components/icon'
 
 import { Card, CardContent } from "@mui/material"
-import ViewCamera from "src/@core/components/camera/playback"
 import CustomTextField from 'src/@core/components/mui/text-field'
 import { callApi } from 'src/@core/utils/requestUltils'
 import Timeline from '../mocdata/timeline'
@@ -15,28 +14,18 @@ import toast from 'react-hot-toast'
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import DatePicker from 'react-datepicker'
 import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
-import { utils } from 'xlsx'
+import ViewCameraPause from 'src/@core/components/camera/playbackpause'
 
 const minuteList = [
     {
         id: 1,
-        name: '1minute',
-        value: '1 phút'
-    },
-    {
-        id: 2,
-        name: '2minute',
-        value: '2 phút'
-    },
-    {
-        id: 3,
-        name: '5minute',
-        value: '5 phút'
+        name: '10minute',
+        value: '10 phút'
     },
 ]
 
 
-const convertDateToString = (date) => {
+const convertDateToString1 = (date) => {
     const pad = (num) => String(num).padStart(2, '0');
     const year = date.getFullYear();
     const month = pad(date.getMonth() + 1);
@@ -48,25 +37,22 @@ const convertDateToString = (date) => {
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`;
 }
 
-const convertDateToString1 = (date) => {
-    const pad = (num) => String(num).padStart(2, '0');
-    const year = date.getFullYear();
-    const month = pad(date.getMonth() + 1);
-    const day = pad(date.getDate());
-    const hours = pad(date.getHours());
-    const minutes = pad(date.getMinutes());
-    const seconds = pad(date.getSeconds());
-
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-};
-
 const Storage = ({ id, name, channel }) => {
     const [loading, setLoading] = useState(false)
     const [camera, setCamera] = useState({ id: '', name: '', channel: '' })
+    const [reload, setReload] = useState(0)
+    const [duration, setDuration] = useState(0)
+    const [volume, setVolume] = useState(30)
 
     const [minuteType, setMinuteType] = useState(null)
-    const [startTime, setStartTime] = useState(null)
-    const [endTime, setEndTime] = useState(null)
+
+    const [startTime, setStartTime] = useState(
+        new Date().getTime() - 60 * 60 * 1000
+    )
+
+    const [endTime, setEndTime] = useState(
+        new Date().getTime()
+    )
 
     const [startDate, setStartDate] = useState(() => {
         const today = new Date();
@@ -96,22 +82,22 @@ const Storage = ({ id, name, channel }) => {
 
     const [currentTime, setCurrentTime] = useState(0)
 
-    const [play, setPlay] = useState(true)
+    const [play, setPlay] = useState(false)
     const [dataList, setDataList] = useState([])
 
     useEffect(() => {
         if (id) {
+            setCamera({ id: id, name: name, channel: channel })
             fetchDateList()
         }
-        setCamera({ id: id, name: name, channel: channel })
     }, [id, startDate, endDate])
 
     const fetchDateList = async () => {
         setLoading(true)
 
         const params = {
-            startTime: convertDateToString(startDate),
-            endTime: convertDateToString(endDate)
+            startTime: convertDateToString1(startDate),
+            endTime: convertDateToString1(endDate)
         }
 
         try {
@@ -133,41 +119,69 @@ const Storage = ({ id, name, channel }) => {
     }
 
     const handleDownloadFile = async () => {
-        setLoading(true)
+        setLoading(true);
 
-        if (camera.id !== '') {
+        const timeDistance = endTime - startTime;
 
-            const params = {
-                startTime: convertDateToString(startTime),
-                endTime: convertDateToString(endTime)
+        if (timeDistance <= 30 * 60 * 1000) {
+            const params = [];
+            let length = 0;
+            if (timeDistance <= 10 * 60 * 1000) {
+                length += 1;
+            } else if (timeDistance <= 20 * 60 * 1000) {
+                length += 2;
+            } else if (timeDistance <= 30 * 60 * 1000) {
+                length += 3;
             }
 
-            try {
-                const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/video/download?idCamera=${camera.id}&startTime=${params.startTime}&endTime=${params.endTime}`)
-                const videoDownloadUrl = res.data[0].videoDownLoad[0].video
 
-                if (videoDownloadUrl) {
-                    await handleExportLinkDownload(videoDownloadUrl)
-                } else {
-                    toast.error('Không tìm thấy URL tải về video')
-                }
-            } catch (error) {
-                if (error && error?.response?.data) {
-                    console.error('error', error)
-                    toast.error(error?.response?.data?.message)
+            for (let i = 0; i < length; i++) {
+                const start = startTime + i * 10 * 60 * 1000;
+                const end = startTime + (i + 1) * 10 * 60 * 1000;
 
-                } else {
-                    console.error('Error fetching data:', error)
-                    toast.error(error)
-                }
-            } finally {
-                setLoading(false)
+                params.push({
+                    start: convertDateToString1(new Date(start)),
+                    end: convertDateToString1(new Date(end))
+                });
             }
+
+            if (camera.id !== '') {
+                try {
+                    const requests = params.map(async (time) => {
+                        try {
+                            const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/video/download?idCamera=${camera.id}&startTime=${time.start}&endTime=${time.end}`);
+                            if (res.data && res.data[0] && res.data[0].videoDownLoad && res.data[0].videoDownLoad[0] && res.data[0].videoDownLoad[0].video) {
+                                const videoDownloadUrl = res.data[0].videoDownLoad[0].video;
+                                await handleExportLinkDownload(videoDownloadUrl);
+                            } else {
+                                toast.error('Không tìm thấy URL tải về video', { duration: 6000 });
+                            }
+                        } catch (error) {
+                            if (error && error.response && error.response.data) {
+                                console.error('error', error);
+                                toast.error(error.response.data.message, { duration: 6000 });
+                            } else {
+                                console.error('Error fetching data:', error);
+                                toast.error(error.message || 'An error occurred while fetching data.', { duration: 6000 });
+                            }
+                        }
+                    });
+
+                    await Promise.all(requests);
+                } catch (error) {
+                    console.error('Unexpected error:', error);
+                    toast.error('An unexpected error occurred while downloading videos.', { duration: 6000 });
+                }
+            }
+
+            setLoading(false);
+        } else {
+            toast.error('Tổng thời gian không được vượt quá 30 phút', { duration: 6000 });
         }
-    }
+    };
+
 
     const handleExportLinkDownload = async (linkDownload) => {
-
         const axiosInstance = axios.create();
         try {
             const response = await axiosInstance.get(linkDownload, {
@@ -183,7 +197,7 @@ const Storage = ({ id, name, channel }) => {
             document.body.removeChild(link);
         } catch (error) {
             console.error('Error fetching data:', error);
-            toast.error(error?.message || 'An error occurred while downloading the file.');
+            toast.error(error.message || 'An error occurred while downloading the file.');
         }
     };
 
@@ -201,8 +215,14 @@ const Storage = ({ id, name, channel }) => {
     }
 
     const handleSetTimeSelected = (data) => {
-        setStartTime(data?.startTime)
-        setEndTime(data?.endTime)
+        setCurrentTime(0)
+        setPlay(!play)
+        setStartTime(data?.startTime?.getTime())
+        setEndTime(data?.endTime?.getTime())
+    }
+
+    const onClickPlay = v => {
+        setPlay(v)
     }
 
     return (
@@ -245,7 +265,7 @@ const Storage = ({ id, name, channel }) => {
                                 </Grid>
                                 <Grid item xs={4}>
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
-                                        <CustomTextField select fullWidth id='form-layouts-separator-select' defaultValue='5minute' label='Default'>
+                                        <CustomTextField select fullWidth id='form-layouts-separator-select' defaultValue='10minute' label='Độ dài tối đa một video'>
                                             {minuteList.map((minute, index) => (
                                                 <MenuItem key={minute.id} value={minute.name} onClick={() => handleSetMinuteType(minute.name)}>{minute.value}</MenuItem>
                                             ))}
@@ -266,44 +286,49 @@ const Storage = ({ id, name, channel }) => {
                 <Card>
                     <Grid container spacing={2} sx={{ marginBottom: 5 }}>
                         <Grid item xs={12}>
-                            {id === '' &&
+                            {(camera.id === '' || play === false) &&
                                 <div style={{ height: '30vh', background: '#000', display: 'flex', justifyContent: 'center' }}>
                                     <IconButton disabled>
                                         <Icon icon="tabler:player-play-filled" width='48' height='48' style={{ color: '#FF9F43' }} />
                                     </IconButton>
                                 </div>}
-                            {id !== '' && channel !== '' &&
-                                <ViewCamera
+                            {camera.id !== '' && play &&
+                                <ViewCameraPause
                                     name={camera.name}
                                     id={camera.id}
                                     channel={camera.channel}
                                     play={play}
                                     startTime={startTime}
                                     endTime={endTime}
+                                    duration={duration}
+                                    onChangeDuration={setDuration}
                                     onChangeCurrentTime={time => {
                                         setCurrentTime(1000 * time)
                                     }}
                                     sizeScreen={'1x1.8'}
                                     handSetChanel={handSetChanel}
+                                    volume={volume}
                                 />
                             }
+                        </Grid>
+                        <Grid item xs={12}>
+
                         </Grid>
                     </Grid>
                     <DialogActions
                         sx={{
-                            flexDirection: 'column',
                             justifyContent: 'center',
                             px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
                             pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
                         }}
                     >
-                        {/* {startTime instanceof Date && endTime instanceof Date &&
-                            <Typography style={{ fontSize: '11px', marginBottom: '5px' }}>
-                                <span style={{ color: "#FF9F43" }}>{convertDateToString1(startTime)}</span> /
-                                <span style={{ color: '#FF9F43' }}>{convertDateToString1(endTime)}</span>
-                            </Typography>
-                        } */}
-
+                        <IconButton onClick={() => onClickPlay(!play)} style={{ padding: 5, margin: '0 8px 0 8px' }}>
+                            {play === false ? (
+                                <Icon icon='ph:play-light' size='1.2em' color='#000' />
+                            ) : (
+                                <Icon icon='ic:twotone-pause' size='1.2em' color='#000' />
+                            )}
+                        </IconButton>
                         <Button type='submit' variant='contained' onClick={() => handleDownloadFile()}>
                             Xuất file
                         </Button>
