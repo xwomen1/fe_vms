@@ -99,21 +99,25 @@ const EventList = () => {
     {
       id: 1,
       flex: 0.25,
-      minWidth: 50,
-      align: 'right',
+      maxWidth: 50,
+      align: 'center',
       field: 'imageObject',
       label: 'Hình ảnh',
       renderCell: value => (
-        <Box>
-          <img src={value} alt='' width={50} height={50} style={{ objectFit: 'contain' }} />
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          <img
+            src={value}
+            alt=''
+            style={{ maxWidth: '100%', height: 'auto', objectFit: 'contain' }}
+          />
         </Box>
       )
     },
     {
       id: 2,
       flex: 0.15,
-      minWidth: 150,
-      align: 'right',
+      maxWidth: 150,
+      align: 'center',
       label: 'Sự kiện',
       field: 'eventTypeString',
       renderCell: value => <Chip label={value} color={eventTypeColors[value]} />
@@ -121,16 +125,16 @@ const EventList = () => {
     {
       id: 3,
       flex: 0.15,
-      minWidth: 230,
-      align: 'right',
+      maxWidth: 50,
+      align: 'center',
       field: 'description',
       label: 'Tên đối tượng'
     },
     {
       id: 4,
       flex: 0.15,
-      minWidth: 230,
-      align: 'right',
+      maxWidth: 50,
+      align: 'center',
       field: 'timestamp',
       label: 'Thời gian',
       renderCell: value => new Date(value).toLocaleString()
@@ -138,16 +142,16 @@ const EventList = () => {
     {
       id: 5,
       flex: 0.25,
-      minWidth: 50,
-      align: 'right',
+      maxWidth: 90,
+      align: 'center',
       field: 'camName',
       label: 'Camera'
     },
     {
       id: 6,
       flex: 0.25,
-      minWidth: 50,
-      align: 'right',
+      maxWidth: 50,
+      align: 'center',
       field: 'location',
       label: 'Khu vực'
     }
@@ -452,13 +456,13 @@ const EventList = () => {
             <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
               <TableHead>
                 <TableRow>
-                  <TableCell>STT</TableCell>
+                <TableCell style={{width: '20px'}}>STT</TableCell>
                   {columns.map(column => (
-                    <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
+                    <TableCell key={column.id} align={column.align} sx={{ maxWidth: column.maxWidth }}>
                       {column.label}
                     </TableCell>
                   ))}
-                  <TableCell>Thao tác</TableCell>
+                <TableCell style={{width: '30px'}}>Thao tác</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -466,15 +470,15 @@ const EventList = () => {
                   return (
                     <TableRow hover tabIndex={-1} key={index}>
                       <TableCell>{index + 1}</TableCell>
-                      {columns.map(column => {
-                        const value = row[column.field]
+                      {columns.map(({ field, renderCell, align, maxWidth  }) => {
+                      const value = row[field]
 
-                        return (
-                          <TableCell key={column.id} align={column.align}>
-                            {column.renderCell ? column.renderCell(value) : value}
-                          </TableCell>
-                        )
-                      })}
+                      return (
+                        <TableCell key={field} align={align} sx={{ maxWidth, wordBreak: 'break-word', flexWrap: 'wrap' }}>
+                          {renderCell ? renderCell(value) : value}
+                        </TableCell>
+                      )
+                    })}
                       <TableCell>
                         <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center' }}>
                           <IconButton
