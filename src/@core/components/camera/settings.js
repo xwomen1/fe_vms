@@ -143,6 +143,7 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
     )
   }
   console.log(onSetPage, 'onSetPage')
+
   const handleNodeToggle = (event, nodeIds) => {
     onSetSelectIndex(nodeIds[0])
     setExpanded([nodeIds[0]])
