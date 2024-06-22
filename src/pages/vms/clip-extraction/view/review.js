@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useCallback  } from 'react'
 
 import { Grid, Typography } from '@mui/material'
 
@@ -24,6 +24,7 @@ import { Card } from "@mui/material"
 import ViewCamera from "src/@core/components/camera/playback"
 import toast from 'react-hot-toast'
 import { postApi } from 'src/@core/utils/requestUltils'
+import debounce from 'lodash.debounce'
 
 const Review = ({ id, name, channel }) => {
     function formatTime(timeInSeconds) {
@@ -169,33 +170,6 @@ const Review = ({ id, name, channel }) => {
         return marks
     }
 
-    const renderMarksSpeed = () => {
-        const marks = [
-            {
-                value: 0.5,
-                label: '0.5x'
-            },
-            {
-                value: 0.75,
-                label: '0.75x'
-            },
-            {
-                value: 1,
-                label: '1x'
-            },
-            {
-                value: 1.5,
-                label: '1.5x'
-            },
-            {
-                value: 2,
-                label: '2x'
-            }
-        ]
-
-        return marks
-    }
-
     const handSetChanel = (id, channel) => {
         setCamera({ id: id, name: name, channel: channel })
     }
@@ -204,8 +178,14 @@ const Review = ({ id, name, channel }) => {
         setCurrentTime(0)
         setTimePlay(timeFilter.start_time + newValue)
         setCamera({ id: '', name: '', channel: '' })
-        setReload(reload + 1)
     }
+
+    const handleSeekChangeCommitted = useCallback(
+        debounce(() => {
+            setReload(reload => reload + 1)
+        }, 700),
+        []
+    )
 
     return (
         <Card>
@@ -239,74 +219,32 @@ const Review = ({ id, name, channel }) => {
                 <Grid item xs={12}>
                     <div className='bottom-controls' style={{ background: '#000' }}>
                         <div className='left-controls'>
-                            <Box className='w-100' sx={{ px: 2 }}>
-                                <Slider
-                                    defaultValue={1}
-                                    min={0.5}
-                                    max={2}
-                                    step={0.25}
-                                    marks={renderMarksSpeed()}
-                                    value={speed}
-                                    onChange={(event, newValue) => {
-                                        setSpeed(newValue)
+                        <div className='w-100' style={{ display: 'flex', justifyContent: 'center', gap: '35px' }}>
+                            {timeFilter && (
+                                <IconButton
+                                    style={{ padding: 5, margin: '35px 4px 0 4px' }}
+                                    onClick={() => {
+                                        // onChangeRange(1);
                                     }}
-                                    valueLabelDisplay='auto'
-                                    color='secondary'
-                                    sx={{
-                                        '& .MuiSlider-thumb': {
-                                            width: 8,
-                                            height: 8,
-                                            transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
-                                            '&::before': {
-                                                boxShadow: '0 2px 12px 0 rgba(0,0,0,0.4)'
-                                            },
-                                            '&:hover, &.Mui-focusVisible': {
-                                                boxShadow: `0px 0px 0px 8px ${'rgb(0 0 0 / 16%)'}`
-                                            },
-                                            '&.Mui-active': {
-                                                width: 20,
-                                                height: 20
-                                            }
-                                        },
-                                        '& .MuiSlider-track': {
-                                            backgroundColor: '#fff',
-                                            opacity: 0
-                                        },
-                                        '& .MuiSlider-rail': {
-                                            opacity: 0.28,
-                                            backgroundColor: '#fff'
-                                        },
-                                        '& .MuiSlider-markLabel': {
-                                            color: '#fff'
-                                        }
-                                    }}
-                                />
-                            </Box>
-                            <div className='w-100' style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                {timeFilter && (
-                                    <IconButton
-                                        style={{ padding: 5, margin: '0 8px 0 8px' }}
-                                        onClick={() => {
-                                            // onChangeRange(1);
-                                        }}
-                                    >
-                                        <Icon icon='mage:previous' size='1.2em' color='#FFF' />
-                                    </IconButton>
-                                )}
-
-                                {timeFilter && (
-                                    <IconButton onClick={() => onClickPlay(!play)} style={{ padding: 5, margin: '0 8px 0 8px' }}>
-                                        {!play ? (
-                                            <Icon icon='ph:play-light' size='1.2em' color='#FFF' />
-                                        ) : (
-                                            <Icon icon='ic:twotone-pause' size='1.2em' color='#FFF' />
-                                        )}
-                                    </IconButton>
-                                )}
-                                <IconButton style={{ padding: 5, margin: '0 8px 0 8px' }}>
-                                    <Icon icon='mage:next' size='1em' color='#FFF' />
+                                >
+                                    <Icon icon='mage:previous' size='1.2em' color='#FFF' />
                                 </IconButton>
-                            </div>
+                            )}
+
+                            {timeFilter && (
+                                <IconButton onClick={() => onClickPlay(!play)} style={{ padding: 5, margin: '35px 4px 0 4px' }}>
+                                    {!play ? (
+                                        <Icon icon='ph:play-light' size='1.2em' color='#FFF' />
+                                    ) : (
+                                        <Icon icon='ic:twotone-pause' size='1.2em' color='#FFF' />
+                                    )}
+                                </IconButton>
+                            )}
+                            <IconButton style={{ padding: 5, margin: '35px 4px 0 4px' }}>
+                                <Icon icon='mage:next' size='1em' color='#FFF' />
+                            </IconButton>
+                        </div>
+
 
                             <div style={{ marginTop: 8 }} className='time'>
                                 <time id='time-elapsed'>{`${formatTimeShow(timeFilter.start_time)}`}</time>
@@ -357,6 +295,7 @@ const Review = ({ id, name, channel }) => {
                                     getAriaValueText={valuetext}
                                     valueLabelFormat={valuetext}
                                     marks={renderMarks()}
+                                    onChangeCommitted={(event, newValue) => handleSeekChangeCommitted()}
                                     aria-labelledby='custom-marks-slider'
                                     sx={{
                                         '& .MuiSlider-thumb': {
@@ -404,8 +343,8 @@ const Review = ({ id, name, channel }) => {
                                             border: 'none'
                                         },
                                         '& .MuiSlider-thumb': {
-                                            width: 20,
-                                            height: 20,
+                                            width: 10,
+                                            height: 10,
                                             backgroundColor: '#fff',
                                             '&::before': {
                                                 boxShadow: '0 4px 8px rgba(0,0,0,0.4)'
