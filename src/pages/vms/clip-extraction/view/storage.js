@@ -6,7 +6,6 @@ import IconButton from '@mui/material/IconButton'
 import Icon from 'src/@core/components/icon'
 
 import { Card, CardContent } from "@mui/material"
-// import ViewCamera from "src/@core/components/camera/playback"
 import CustomTextField from 'src/@core/components/mui/text-field'
 import { callApi } from 'src/@core/utils/requestUltils'
 import Timeline from '../mocdata/timeline'
@@ -15,8 +14,6 @@ import toast from 'react-hot-toast'
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import DatePicker from 'react-datepicker'
 import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
-import { convertDateToString } from 'src/@core/utils/format'
-import { ca } from 'date-fns/locale'
 import ViewCameraPause from 'src/@core/components/camera/playbackpause'
 
 const minuteList = [
@@ -25,16 +22,6 @@ const minuteList = [
         name: '10minute',
         value: '10 phút'
     },
-    // {
-    //     id: 2,
-    //     name: '2minute',
-    //     value: '2 phút'
-    // },
-    // {
-    //     id: 3,
-    //     name: '5minute',
-    //     value: '5 phút'
-    // },
 ]
 
 
@@ -58,9 +45,11 @@ const Storage = ({ id, name, channel }) => {
     const [volume, setVolume] = useState(30)
 
     const [minuteType, setMinuteType] = useState(null)
+
     const [startTime, setStartTime] = useState(
         new Date().getTime() - 60 * 60 * 1000
     )
+
     const [endTime, setEndTime] = useState(
         new Date().getTime()
     )
@@ -128,78 +117,6 @@ const Storage = ({ id, name, channel }) => {
             setLoading(false)
         }
     }
-
-    // const handleDownloadFile = async () => {
-    //     setLoading(true)
-
-    //     const timeDistance = endTime - startTime;
-
-    //     if (timeDistance <= 30 * 60 * 1000) {
-    //         const params = []
-
-    //         for (let i = 1; i < 4; i++) {
-    //             const start = startTime + i * 30 * 60 * 1000
-    //             const end = startTime + (i + 1) * 30 * 60 * 1000
-
-    //             params.push({
-    //                 start: convertDateToString1(new Date(start)),
-    //                 end: convertDateToString1(new Date(end))
-    //             })
-    //         }
-
-    //         if (camera.id !== '') {
-
-    //             params.map((time, index) => {
-    //                 try {
-    //                     const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/video/download?idCamera=${camera.id}&startTime=${item.start}&endTime=${item.end}`)
-    //                     const videoDownloadUrl = res.data[0].videoDownLoad[0].video
-
-    //                     if (videoDownloadUrl) {
-    //                         await handleExportLinkDownload(videoDownloadUrl)
-    //                     } else {
-    //                         toast.error('Không tìm thấy URL tải về video', { duration: 6000 })
-    //                     }
-    //                 } catch (error) {
-    //                     if (error && error?.response?.data) {
-    //                         console.error('error', error)
-    //                         toast.error(error?.response?.data?.message, { duration: 6000 })
-
-    //                     } else {
-    //                         console.error('Error fetching data:', error)
-    //                         toast.error(error, { duration: 6000 })
-    //                     }
-    //                 } finally {
-    //                     setLoading(false)
-    //                 }
-    //             })
-    //         }
-    //     }
-
-    //     if (timeDistance > 30 * 60 * 1000) {
-    //         toast.error('Tổng thời gian không được vượt quá 30 phút', { duration: 6000 })
-    //     }
-    // }
-
-    // const handleExportLinkDownload = async (linkDownload) => {
-
-    //     const axiosInstance = axios.create();
-    //     try {
-    //         const response = await axiosInstance.get(linkDownload, {
-    //             responseType: 'blob',
-    //         });
-
-    //         const url = window.URL.createObjectURL(new Blob([response.data]));
-    //         const link = document.createElement('a');
-    //         link.href = url;
-    //         link.setAttribute('download', 'clip.mp4');
-    //         document.body.appendChild(link);
-    //         link.click();
-    //         document.body.removeChild(link);
-    //     } catch (error) {
-    //         console.error('Error fetching data:', error);
-    //         toast.error(error?.message || 'An error occurred while downloading the file.');
-    //     }
-    // };
 
     const handleDownloadFile = async () => {
         setLoading(true);

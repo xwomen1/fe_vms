@@ -270,4 +270,5 @@ const Timeline = ({ data, minuteType, callback, startDate, endDate }) => {
         </Grid>
     );
 };
+
 export default Timeline;
