@@ -375,7 +375,8 @@ const Add = ({ apiData }) => {
       const payload = {
         idBox: selectNVR?.value,
         userName,
-        passWord
+        passWord,
+        protocol: '0'
       }
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -423,7 +424,8 @@ const Add = ({ apiData }) => {
       const payload = {
         idBox: selectNVR?.value,
         userName,
-        passWord
+        passWord,
+        protocol: '1'
       }
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -605,7 +607,7 @@ const Add = ({ apiData }) => {
     fetchFilteredOrAllUsers()
   }, [page, pageSize, total, value, reload])
 
-  const top100Films = [{ title: 'Onvif' }, { title: 'Hik Version' }]
+  const top100Films = [{ title: 'Onvif' }, { title: 'Hikivision' }]
 
   return (
     <>
@@ -939,7 +941,7 @@ const Add = ({ apiData }) => {
                 )}
               </Grid>
               <Grid item xs={12}>
-                {selectedValue === 'hik version' && (
+                {selectedValue === 'hikivision' && (
                   <Grid
                     container
                     item
