@@ -273,13 +273,13 @@ const navigation = () => {
       ]
     },
     {
-      title: 'Quản lý hệ thống',
+      title: 'Cài đặt nâng cao',
       path: '/alert-management',
       icon: 'tabler:settings-automation',
       children: [
         {
-          title: 'Quản lý thiết bị',
-          path: '/device-management/device',
+          title: 'Quản lý nhóm quyền truy cập',
+          path: '/mappingACToInf',
           icon: 'tabler:devices'
         },
         {

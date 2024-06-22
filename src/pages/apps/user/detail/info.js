@@ -32,8 +32,7 @@ import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import DatePicker from 'react-datepicker'
 import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
-import RolePopup from './popup/AddGroup'
-import PolicyPopup from './popup/AddPolicy'
+
 import Swal from 'sweetalert2'
 
 const UserDetails = () => {
@@ -83,6 +82,8 @@ const UserDetails = () => {
   const [contractOptions, setContractOptions] = useState([])
 
   const [regionOptions, setRegionOptions] = useState([])
+  const [regionName, setRegionName] = useState([])
+
   const [userCode, setUserCode] = useState('')
   const [syncCode, setSyncCode] = useState('')
 
@@ -261,7 +262,7 @@ const UserDetails = () => {
   }
 
   const handleAddRow = () => {
-    const newRow = { groupName: '', groupCode: '', id: '' } // Thêm groupId vào đây
+    const newRow = { groupName: '', groupCode: '', id: '', parentId: '' } // Thêm groupId vào đây
     setGroup([...groups, newRow])
   }
 
@@ -667,6 +668,14 @@ const UserDetails = () => {
 
           config
         )
+
+        const regions = response.data.map(region => ({
+          value: region.name,
+          label: region.name,
+          id: region.id,
+          parentId: region.parentID // Lưu lại parentID của regions
+        }))
+        setRegionName(regions)
 
         setGroupOptions(response.data)
       } catch (error) {
@@ -1227,14 +1236,22 @@ const UserDetails = () => {
                                     ? groupOptions.find(option => option.name === group.groupName)
                                     : { name: group.groupName }
                                 }
-                                onChange={(event, newValue) => {
+                                onChange={async (event, newValue) => {
                                   const updatedRows = [...groups]
                                   updatedRows[index].groupName = newValue?.name || ''
                                   updatedRows[index].groupCode = newValue?.code || ''
+                                  updatedRows[index].parentId = newValue?.parentID || ''
 
                                   console.log('Updated group name:', newValue?.name)
+                                  console.log('Updated group name:', newValue?.name)
+                                  console.log('Parent ID:', newValue?.parentID) // Log ra parentId
 
+                                  const parentName = await fetchRegionName(newValue?.parentID)
+                                  updatedRows[index].parentName = parentName || ''
+
+                                  console.log('Parent name:', parentName) // Log ra tên của parentId
                                   setGroup(updatedRows)
+                                  console.log(updatedRows, 'hihih')
                                 }}
                                 renderInput={params => <TextField {...params} label='Đơn vị' />}
                               />
