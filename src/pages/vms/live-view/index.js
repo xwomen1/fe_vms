@@ -101,7 +101,7 @@ const Caller = () => {
   }
 
   return (
-    <DivStyle>
+    <DivStyle style={{ backgroundColor: 'black', minHeight: '100vh', color: 'white' }}>
       <Grid container spacing={0}>
         {cameraGroup.length > 0 &&
           cameraGroup.map((camera, index) => (
