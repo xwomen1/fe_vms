@@ -159,9 +159,9 @@ function ReportMonth({ history }) {
         setSelectedGroupId('') // Đặt selectedGroupId thành null nếu không còn nhóm nào được chọn
       } else {
         setSelectedGroupId(prevGroups => {
-          if (prevGroups.length === 0) return ''
+          if (prevGroups?.length === 0) return ''
 
-          return prevGroups[prevGroups.length - 1]
+          return prevGroups[prevGroups?.length - 1]
         })
       }
     }

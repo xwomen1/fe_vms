@@ -242,7 +242,9 @@ const Caller = () => {
   }
 
   return (
-    <DivStyle>
+    <DivStyle
+      style={{ backgroundColor: 'black', width: '100%', minHeight: '100vh', color: 'white', position: 'relative' }}
+    >
       <Grid container spacing={0}>
         {cameraGroup.length > 0 &&
           cameraGroup.map((camera, index) => (
