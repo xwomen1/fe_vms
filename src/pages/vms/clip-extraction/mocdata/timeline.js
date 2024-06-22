@@ -87,7 +87,6 @@ const Timeline = ({ data, minuteType, callback, startDate, endDate }) => {
     }, [dateData]);
 
     useEffect(() => {
-        console.log('selectedTime', selectedTime);
         if (Array.isArray(selectedTime) && selectedTime.length === 2 && selectedTime.every(item => item instanceof Date)) {
             const detail = {
                 startTime: selectedTime[0],
@@ -99,7 +98,7 @@ const Timeline = ({ data, minuteType, callback, startDate, endDate }) => {
 
 
     useEffect(() => {
-    }, [selectedIntervals])
+    }, [gaps])
 
     const timelineScrubberErrorHandler = ({ error }) => {
         setTimelineScrubberError(error);
@@ -151,7 +150,6 @@ const Timeline = ({ data, minuteType, callback, startDate, endDate }) => {
         setTimelines(newTimelines);
         setSelectedIntervals(newSelectedIntervals);
     };
-
 
     const splitDataByDay = (data) => {
         const newData = [];
@@ -216,10 +214,13 @@ const Timeline = ({ data, minuteType, callback, startDate, endDate }) => {
             const start = new Date(data[i].EndTime);
             const end = new Date(data[i + 1].StartTime);
 
-            dataDate.push({
-                start: end,
-                end: start,
-            });
+            // Kiểm tra xem start và end có trùng nhau không
+            if (start.getTime() !== end.getTime()) {
+                dataDate.push({
+                    start: end,
+                    end: start,
+                });
+            }
         }
 
         // Thêm khoảng trống từ thời gian cuối cùng đến thời gian hiện tại
@@ -237,12 +238,12 @@ const Timeline = ({ data, minuteType, callback, startDate, endDate }) => {
     return (
         <Grid container spacing={2}>
 
-            {/* {
+            {
                 Array.isArray(selectedTime) && selectedTime.length === 2 && selectedTime.every(item => item instanceof Date) &&
                 <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center' }}>
-                    <Typography>Khoảng thời gian đã chọn:  <span style={{ color: "#FF9F43" }}>{convertDateToString(selectedTime[0])}</span> đến <span style={{ color: '#FF9F43' }}>{convertDateToString(selectedTime[1])}</span></Typography>
+                    <Typography>Khoảng thời gian đã chọn:  <span style={{ color: "#FF9F43", fontWeight: 600 }}>{convertDateToString(selectedTime[0])}</span> đến <span style={{ color: "#FF9F43", fontWeight: 600 }}>{convertDateToString(selectedTime[1])}</span></Typography>
                 </Grid>
-            } */}
+            }
 
             {dateList.map((day, index) => (
                 <Grid item xs={12} key={index} style={{ marginBottom: '10px' }}>
@@ -268,7 +269,5 @@ const Timeline = ({ data, minuteType, callback, startDate, endDate }) => {
             ))}
         </Grid>
     );
-
 };
-
 export default Timeline;
