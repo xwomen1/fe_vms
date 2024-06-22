@@ -108,7 +108,7 @@ const EventList = () => {
           <img
             src={value}
             alt=''
-            style={{ maxWidth: '100%', height: 'auto', objectFit: 'contain' }}
+            style={{ maxWidth: '40%', height: 'auto', objectFit: 'contain' }}
           />
         </Box>
       )
@@ -452,7 +452,7 @@ const EventList = () => {
           }
         />
         <Grid container spacing={0}>
-          <TableContainer component={Paper} sx={{ maxHeight: 600 }}>
+          <TableContainer component={Paper} sx={{ maxHeight: 1000 }}>
             <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
             <TableHead>
               <TableRow>

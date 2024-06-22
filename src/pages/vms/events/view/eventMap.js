@@ -44,11 +44,28 @@ const formatCameraName = name => {
 
 const columns = [
   {
+    id: 0,
+    flex: 0.25,
+    maxWidth: 50,
+    align: 'center',
+    field: 'imageObject',
+    label: 'Hình ảnh',
+    renderCell: value => (
+      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <img
+          src={value}
+          alt=''
+          style={{ maxWidth: '60%', height: 'auto', objectFit: 'contain' }}
+        />
+      </Box>
+    )
+  },
+  {
     id: 1,
     flex: 0.15,
     type: 'timestamp',
-    width: 50,
-    align: 'left',
+    maxWidth: 70,
+    align: 'center',
     label: 'Ngày giờ',
     field: 'timestamp',
     valueGetter: params => new Date(params.field)
@@ -57,16 +74,16 @@ const columns = [
     id: 2,
     flex: 0.15,
     type: 'eventTypeString',
-    minWidth: 10,
-    align: 'left',
+    maxWidth: 70,
+    align: 'center',
     field: 'event',
     label: 'Sự kiện',
     field: 'eventTypeString'
   },
   {
     id: 3,
-    width: '10px',
-    align: 'left',
+    maxWidth: 60,
+    align: 'center',
     label: 'Camera',
     field: 'camName',
 
@@ -502,22 +519,22 @@ const EventMap = () => {
 
   const viewTable = () => (
     <TableContainer component={Paper} sx={{ height: '100%', minHeight: 'calc(60vh - 200px)' }}>
-      <Table stickyHeader className='sticky table' sx={{ overflow: 'auto' }}>
-        <TableHead>
-          <TableRow>
+      <Table stickyHeader className='sticky table' sx={{ overflow: 'auto' }} style={{width:'750px'}}>
+        <TableHead >
+          <TableRow >
             <TableCell padding='checkbox' sx={{ width: 20 }}>
               <Checkbox
                 onChange={handleSelectAllClick}
-                checked={rows.length > 0 && selectedCameraIds.length === rows.length}
+                checked={rows.length >= 0 && selectedCameraIds.length === rows.length}
                 inputProps={{ 'aria-label': 'select all desserts' }}
                 indeterminate={selectedCameraIds.length > 0 && selectedCameraIds.length < rows.length}
               />
             </TableCell>
-            {columns.map(column => (
-              <TableCell key={column.id} align={column.align} sx={{ width: column.width }}>
-                {column.label}
-              </TableCell>
-            ))}
+                 {columns.map(({ id, label, field, align, maxWidth, renderCell }) => (
+                  <TableCell key={id} align={align} sx={{ maxWidth }}>
+                    {label}
+                  </TableCell>
+                ))}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -543,12 +560,13 @@ const EventMap = () => {
                     inputProps={{ 'aria-labelledby': labelId }}
                   />
                 </TableCell>
-                {columns.map(column => {
-                  const value = row[column.field]
+                {columns.map(({ field, renderCell, align, width, maxWidth}) => {
+                      const value = row[field]
 
                   return (
-                    <TableCell key={column.id} align={column.align}>
-                      {column.format && typeof value === 'number' ? column.format(value) : value}
+                    <TableCell key={field} align={align}  sx={{ width, maxWidth, wordBreak: 'break-word', flexWrap: 'wrap' }}>
+                      {/* {columns.format && typeof value === 'number' ? columns.format(value) : value} */}
+                      {renderCell ? renderCell(value) : value}
                     </TableCell>
                   )
                 })}
