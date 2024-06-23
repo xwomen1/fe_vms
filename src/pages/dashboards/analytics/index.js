@@ -29,9 +29,9 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 import { format } from 'date-fns'
 import authConfig from 'src/configs/auth'
 import Icon from 'src/@core/components/icon'
-import Chart from 'react-apexcharts'
 import { Cell, Pie, PieChart } from 'recharts'
 import { Legend } from 'chart.js'
+import dynamic from 'next/dynamic'
 
 const EventList = () => {
   const [deviceList, setDeviceList] = useState(null)
@@ -300,7 +300,7 @@ const EventList = () => {
         }
       }
     ],
-    colors: ['#0088FE', '#FF8042']
+    colors: ['#FF9933', '#0099FF']
   }
 
   const pieChartData = [
@@ -342,8 +342,8 @@ const EventList = () => {
   }, [fetchDataList1])
 
   const columns1 = [
-    { id: 1, flex: 0.25, minWidth: 50, align: 'left', field: 'eventName', label: 'Tên sự cố' },
-    { id: 2, flex: 0.15, minWidth: 150, align: 'left', field: 'severity', label: 'Mức độ' },
+    { id: 1, flex: 0.25, minWidth: 70, align: 'left', field: 'eventName', label: 'Tên sự cố' },
+    { id: 2, flex: 0.15, minWidth: 50, align: 'left', field: 'severity', label: 'Mức độ' },
     { id: 4, flex: 0.15, minWidth: 100, align: 'left', field: 'createdAt', label: 'Thời gian' },
     { id: 5, flex: 0.15, minWidth: 100, align: 'left', field: 'location', label: 'Vị trí' },
     { id: 6, flex: 0.25, minWidth: 50, align: 'left', field: 'status', label: 'Trạng thái' },
@@ -351,6 +351,7 @@ const EventList = () => {
   ]
 
   // Prepare data for the pie chart
+  const ApexCharts = dynamic(() => import('react-apexcharts'), { ssr: false })
 
   return (
     <>
@@ -425,9 +426,9 @@ const EventList = () => {
           </Grid>
         </Card>
         <Grid container spacing={2}>
-          <Grid item xs={6}>
+          <Grid item xs={8}>
             <Grid>
-              <h2>Top 5 sự cố hệ thống</h2>
+              <p style={{marginLeft:'3%', fontSize: '20px'}}>Top 5 sự cố hệ thống</p>
             </Grid>
             <Card>
               <Grid container spacing={0}>
@@ -472,13 +473,13 @@ const EventList = () => {
               <br />
             </Card>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={4}>
             <Grid>
-              <h2>Danh sách camera</h2>
+              <p style={{marginLeft:'3%', fontSize: '20px'}}>Danh sách camera</p>
             </Grid>
             <Card>
               {/* Add Pie Chart here */}
-              <Chart options={pieChartOptions} series={pieChartData} type='pie' width={380} />
+              <ApexCharts  options={pieChartOptions} series={pieChartData} type='pie' width={380} />
             </Card>
           </Grid>
         </Grid>
