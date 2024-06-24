@@ -110,6 +110,11 @@ const navigation = () => {
           icon: 'tabler:server-2'
         },
         {
+          title: 'Smart NVR',
+          path: '/vms/smart-nvr',
+          icon: 'tabler:accessible'
+        },
+        {
           path: '/pages/face_management/list',
           title: 'Quản lý khuôn mặt',
           icon: 'tabler:face-id'
@@ -119,11 +124,6 @@ const navigation = () => {
           title: 'Quản lý Biển số',
           icon: 'tabler:id-badge-2'
         }
-
-        // {
-        //   title: 'Quản lý lưu trữ',
-        //   path: '/vms/stores'
-        // },
         // {
         //   title: 'Thư viện media',
         //   path: '/vms/library'
