@@ -129,23 +129,6 @@ const Events = () => {
     }
   }
 
-  // useEffect(() => {
-  //   const newList = []
-
-  //   deviceList?.map((item, index) => {
-  //     if (index === 0) {
-  //       newList.push(eventsData)
-  //       newList.push(item)
-  //       setCount(count + 1)
-  //       deviceList?.pop()
-  //     } else {
-  //       newList.push(item)
-  //     }
-  //   })
-
-  //   setDeviceList([...newList])
-  // }, [eventsData])
-
   useEffect(() => {
     if (rtcPeerConnection) {
       rtcPeerConnection.addEventListener('connectionstatechange', () => {})

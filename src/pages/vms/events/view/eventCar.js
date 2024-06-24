@@ -70,20 +70,6 @@ const EventList = ({ eventData }) => {
     }
   }
 
-  const config = {
-    bundlePolicy: 'max-bundle',
-    iceServers: [
-      {
-        urls: 'stun:dev-ivis-camera-api.basesystem.one:3478'
-      },
-      {
-        urls: 'turn:dev-ivis-camera-api.basesystem.one:3478',
-        username: 'demo',
-        credential: 'demo'
-      }
-    ]
-  }
-
   const eventTypeColors = {
     'Phát hiện sự kiện AI': 'success',
     'Phát hiện đối tượng nguy hiểm': 'error',
