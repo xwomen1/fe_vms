@@ -68,12 +68,14 @@ const Storage = ({ id, name, channel }) => {
         const yesterday = new Date(today);
         yesterday.setDate(today.getDate() - 1);
         yesterday.setHours(0, 0, 0, 0); // Thiết lập thời gian về 00:00:00
+
         return yesterday;
     });
 
     const [endDate, setEndDate] = useState(() => {
         const today = new Date();
         today.setHours(23, 59, 59, 999); // Thiết lập thời gian về 23:59:59
+
         return today;
     });
 
