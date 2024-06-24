@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback  } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 
 import { Grid, Typography } from '@mui/material'
 
@@ -24,7 +24,6 @@ import { Card } from "@mui/material"
 import ViewCamera from "src/@core/components/camera/playback"
 import toast from 'react-hot-toast'
 import { postApi } from 'src/@core/utils/requestUltils'
-import debounce from 'lodash.debounce'
 
 const Review = ({ id, name, channel }) => {
     function formatTime(timeInSeconds) {
@@ -175,16 +174,10 @@ const Review = ({ id, name, channel }) => {
 
     const handleSeekChange = (event, newValue) => {
         setCurrentTime(0)
+        setReload(reload + 1)
         setTimePlay(timeFilter.start_time + newValue)
         setCamera({ id: '', name: '', channel: '' })
     }
-
-    const handleSeekChangeCommitted = useCallback(
-        debounce(() => {
-            setReload(reload => reload + 1)
-        }, 700),
-        []
-    )
 
     return (
         <Card>
@@ -219,31 +212,31 @@ const Review = ({ id, name, channel }) => {
                 <Grid item xs={12}>
                     <div className='bottom-controls' style={{ background: '#000' }}>
                         <div className='left-controls'>
-                        <div className='w-100' style={{ display: 'flex', justifyContent: 'center', gap: '35px' }}>
-                            {timeFilter && (
-                                <IconButton
-                                    style={{ padding: 5, margin: '35px 4px 0 4px' }}
-                                    onClick={() => {
-                                        // onChangeRange(1);
-                                    }}
-                                >
-                                    <Icon icon='mage:previous' size='1.2em' color='#FFF' />
-                                </IconButton>
-                            )}
+                            <div className='w-100' style={{ display: 'flex', justifyContent: 'center', gap: '35px' }}>
+                                {timeFilter && (
+                                    <IconButton
+                                        style={{ padding: 5, margin: '35px 4px 0 4px' }}
+                                        onClick={() => {
+                                            // onChangeRange(1);
+                                        }}
+                                    >
+                                        <Icon icon='mage:previous' size='1.2em' color='#FFF' />
+                                    </IconButton>
+                                )}
 
-                            {timeFilter && (
-                                <IconButton onClick={() => onClickPlay(!play)} style={{ padding: 5, margin: '35px 4px 0 4px' }}>
-                                    {!play ? (
-                                        <Icon icon='ph:play-light' size='1.2em' color='#FFF' />
-                                    ) : (
-                                        <Icon icon='ic:twotone-pause' size='1.2em' color='#FFF' />
-                                    )}
+                                {timeFilter && (
+                                    <IconButton onClick={() => onClickPlay(!play)} style={{ padding: 5, margin: '35px 4px 0 4px' }}>
+                                        {!play ? (
+                                            <Icon icon='ph:play-light' size='1.2em' color='#FFF' />
+                                        ) : (
+                                            <Icon icon='ic:twotone-pause' size='1.2em' color='#FFF' />
+                                        )}
+                                    </IconButton>
+                                )}
+                                <IconButton style={{ padding: 5, margin: '35px 4px 0 4px' }}>
+                                    <Icon icon='mage:next' size='1em' color='#FFF' />
                                 </IconButton>
-                            )}
-                            <IconButton style={{ padding: 5, margin: '35px 4px 0 4px' }}>
-                                <Icon icon='mage:next' size='1em' color='#FFF' />
-                            </IconButton>
-                        </div>
+                            </div>
 
 
                             <div style={{ marginTop: 8 }} className='time'>
@@ -295,7 +288,6 @@ const Review = ({ id, name, channel }) => {
                                     getAriaValueText={valuetext}
                                     valueLabelFormat={valuetext}
                                     marks={renderMarks()}
-                                    onChangeCommitted={(event, newValue) => handleSeekChangeCommitted()}
                                     aria-labelledby='custom-marks-slider'
                                     sx={{
                                         '& .MuiSlider-thumb': {
