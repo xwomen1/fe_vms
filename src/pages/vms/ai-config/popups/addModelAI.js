@@ -39,59 +39,6 @@ const CustomCloseButton = styled(IconButton)(({ theme }) => ({
   }
 }))
 
-// const format_form = [
-//     [
-//         {
-//             name: 'type',
-//             label: 'Mã Model AI',
-//             placeholder: 'Nhập mã model AI',
-//             type: 'TextField',
-//             data: [],
-//             require: true,
-//             width: 6,
-//         },
-//         {
-//             name: 'modelName',
-//             label: 'Tên Model AI',
-//             placeholder: 'Nhập tên Model AI',
-//             type: 'TextField',
-//             data: [],
-//             require: true,
-//             width: 6,
-//         },
-//     ],
-//     [
-//         {
-//             name: 'characteristicType',
-//             label: 'Mã thông số',
-//             placeholder: 'Nhập mã thông số',
-//             type: 'TextField',
-//             data: [],
-//             require: true,
-//             width: 4,
-//         },
-//         {
-//             name: 'characteristicName',
-//             label: 'Tên thông số',
-//             placeholder: 'Nhập tên thông số',
-//             type: 'TextField',
-//             data: [],
-//             require: true,
-//             width: 4,
-//         },
-//         {
-//             name: 'characteristicValue',
-//             label: 'Giá trị thông số',
-//             placeholder: 'Nhập giá trị thông số',
-//             type: 'TextField',
-//             data: [],
-//             require: true,
-//             width: 3,
-//             defaultValue: 35
-//         }
-//     ]
-// ]
-
 const format_form = [
   {
     name: 'type',
