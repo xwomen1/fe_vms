@@ -10,6 +10,7 @@ import MuiTabList from '@mui/lab/TabList'
 import Info from './info'
 import Identity from './identity'
 import AccessControl from './accessControl'
+import Resume from './resume '
 import Parking from './parking'
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
@@ -58,12 +59,13 @@ const UserDetails = () => {
             </Button>
           </Grid>
           <Grid item xs={8} container={2}>
-            <Grid item xs={6}></Grid>
-            <Grid item xs={6}>
+            <Grid item xs={4}></Grid>
+            <Grid item xs={8}>
               <TabList onChange={handleChange} aria-label='customized tabs example'>
                 <Tab value='1' label='Thông tin cá nhân' />
                 <Tab value='2' label='Thông tin định danh' />
                 <Tab value='3' label='Kiểm soát vào ra' />
+                <Tab value='4' label='Sơ yếu lý lịch' />
                 {/* <Tab value='4' label='Thông tin gửi xe' /> */}
               </TabList>
             </Grid>
@@ -76,6 +78,9 @@ const UserDetails = () => {
           </TabPanel>
           <TabPanel value='3'>
             <AccessControl />
+          </TabPanel>
+          <TabPanel value='4'>
+            <Resume />
           </TabPanel>
           {/* <TabPanel value='4'>
             <Parking />
