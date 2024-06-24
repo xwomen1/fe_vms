@@ -54,14 +54,28 @@ const Storage = ({ id, name, channel }) => {
         new Date().getTime()
     )
 
+    // const [startDate, setStartDate] = useState(() => {
+    //     const today = new Date();
+    //     const yesterday = new Date(today);
+    //     yesterday.setDate(today.getDate() - 2);
+
+    //     return yesterday;
+    // });
+    // const [endDate, setEndDate] = useState(new Date())
+
     const [startDate, setStartDate] = useState(() => {
         const today = new Date();
         const yesterday = new Date(today);
         yesterday.setDate(today.getDate() - 1);
-
+        yesterday.setHours(0, 0, 0, 0); // Thiết lập thời gian về 00:00:00
         return yesterday;
     });
-    const [endDate, setEndDate] = useState(new Date())
+
+    const [endDate, setEndDate] = useState(() => {
+        const today = new Date();
+        today.setHours(23, 59, 59, 999); // Thiết lập thời gian về 23:59:59
+        return today;
+    });
 
 
     function formatTime(timeInSeconds) {
