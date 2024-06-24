@@ -94,6 +94,7 @@ function ReportMonth({ history }) {
       setLoading(false)
     }
   }
+
   // useEffect(() => {
   //   if (selectedGroupId !== null) {
   //     setValueFilter({ ...valueFilter, page: 1 })
