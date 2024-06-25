@@ -42,7 +42,7 @@ const initValueFilter = {
   page: 1
 }
 
-const EventList = () => {
+const EventList = ({ eventData }) => {
   const [keyword, setKeyword] = useState('')
   const [valueFilter, setValueFilter] = useState(initValueFilter)
   const [loading, setLoading] = useState(false)
@@ -54,11 +54,7 @@ const EventList = () => {
   const [idDelete, setIdDelete] = useState(null)
   const [deviceList, setDeviceList] = useState(null)
   const [reload, setReload] = useState(0)
-  const [eventsData, setEventData] = useState('')
-  const defaultCameraID = '0eb23593-a9b1-4278-9fb1-4d18f30ed6ff'
   const [count, setCount] = useState('')
-  const [websocket, setWebsocket] = useState(null)
-  const [rtcPeerConnection, setRtcPeerConnection] = useState(null)
 
   const [total, setTotalPage] = useState(0)
   const [page, setPage] = useState(1)
@@ -72,20 +68,6 @@ const EventList = () => {
     headers: {
       Authorization: `Bearer ${token}`
     }
-  }
-
-  const config = {
-    bundlePolicy: 'max-bundle',
-    iceServers: [
-      {
-        urls: 'stun:dev-ivis-camera-api.basesystem.one:3478'
-      },
-      {
-        urls: 'turn:dev-ivis-camera-api.basesystem.one:3478',
-        username: 'demo',
-        credential: 'demo'
-      }
-    ]
   }
 
   const eventTypeColors = {
@@ -105,11 +87,7 @@ const EventList = () => {
       label: 'Hình ảnh',
       renderCell: value => (
         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-          <img
-            src={value}
-            alt=''
-            style={{ maxWidth: '40%', height: 'auto', objectFit: 'contain' }}
-          />
+          <img src={value} alt='' style={{ maxWidth: '40%', height: 'auto', objectFit: 'contain' }} />
         </Box>
       )
     },
@@ -158,79 +136,11 @@ const EventList = () => {
   ]
 
   useEffect(() => {
-    // create WebSocket connection
-
-    const ws = new WebSocket(
-      `wss://sbs.basesystem.one/ivis/vms/api/v0/websocket/topic/list_ai_event/be571c00-41cf-4878-a1de-b782625da62a`
-    )
-
-    setWebsocket(ws)
-
-    // create RTCPeerConnection
-
-    const pc = new RTCPeerConnection(config)
-    setRtcPeerConnection(pc)
-
-    // listen for remote tracks and add them to remote stream
-
-    pc.ontrack = event => {
-      const stream = event.streams[0]
-      if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {
-        setRemoteStream(stream)
-        remoteVideoRef.current.srcObject = stream
-      }
-    }
-
-    // close WebSocket and RTCPeerConnection on component unmount
-
-    return () => {
-      if (websocket) {
-        websocket.close()
-      }
-      if (rtcPeerConnection) {
-        rtcPeerConnection.close()
-      }
-    }
-  }, [])
-
-  const handleMessage = async event => {
-    const message = JSON.parse(event.data)
-    const newMessage = JSON.parse(message?.data)
-    setEventData(newMessage)
-  }
-
-  useEffect(() => {
-    if (websocket) {
-      websocket.addEventListener('open', () => {
-        websocket.send(
-          JSON.stringify({
-            id: defaultCameraID,
-            type: 'request'
-          })
-        )
-      })
-      websocket.addEventListener('message', handleMessage)
-
-      websocket.addEventListener('error', error => {
-        console.error('WebSocket error:', error)
-      })
-
-      websocket.addEventListener('close', handleClose)
-    }
-  }, [websocket])
-
-  const handleClose = async event => {
-    if (websocket) {
-      websocket.close()
-    }
-  }
-
-  useEffect(() => {
     const newList = []
 
     deviceList?.map((item, index) => {
       if (index === 0) {
-        newList.push(eventsData)
+        newList.push(eventData)
         newList.push(item)
         setCount(count + 1)
         deviceList?.pop()
@@ -240,13 +150,7 @@ const EventList = () => {
     })
 
     setDeviceList([...newList])
-  }, [eventsData])
-
-  useEffect(() => {
-    if (rtcPeerConnection) {
-      rtcPeerConnection.addEventListener('connectionstatechange', () => { })
-    }
-  }, [rtcPeerConnection])
+  }, [eventData])
 
   useEffect(() => {
     fetchDataList()
@@ -456,13 +360,13 @@ const EventList = () => {
             <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
               <TableHead>
                 <TableRow>
-                <TableCell style={{width: '20px'}}>STT</TableCell>
-                {columns.map(({ id, label, field, renderCell, align, maxWidth }) => (
-                  <TableCell key={id} align={align} sx={{ maxWidth }}>
-                    {label}
-                  </TableCell>
-                ))}
-                <TableCell style={{width: '30px'}}>Thao tác</TableCell>
+                  <TableCell style={{ width: '20px' }}>STT</TableCell>
+                  {columns.map(({ id, label, field, renderCell, align, maxWidth }) => (
+                    <TableCell key={id} align={align} sx={{ maxWidth }}>
+                      {label}
+                    </TableCell>
+                  ))}
+                  <TableCell style={{ width: '30px' }}>Thao tác</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -470,15 +374,19 @@ const EventList = () => {
                   return (
                     <TableRow hover tabIndex={-1} key={index}>
                       <TableCell>{index + 1}</TableCell>
-                      {columns.map(({ field, renderCell, align, maxWidth  }) => {
-                      const value = row[field]
+                      {columns.map(({ field, renderCell, align, maxWidth }) => {
+                        const value = row[field]
 
-                      return (
-                        <TableCell key={field} align={align} sx={{ maxWidth, wordBreak: 'break-word', flexWrap: 'wrap' }}>
-                          {renderCell ? renderCell(value) : value}
-                        </TableCell>
-                      )
-                    })}
+                        return (
+                          <TableCell
+                            key={field}
+                            align={align}
+                            sx={{ maxWidth, wordBreak: 'break-word', flexWrap: 'wrap' }}
+                          >
+                            {renderCell ? renderCell(value) : value}
+                          </TableCell>
+                        )
+                      })}
                       <TableCell>
                         <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center' }}>
                           <IconButton
