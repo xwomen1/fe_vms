@@ -167,7 +167,7 @@ const Review = ({ id, name, channel, data }) => {
                             id={camera.id}
                             name={camera.name}
                             channel={camera.channel}
-                            sizeScreen={'1x1.2'}
+                            sizeScreen={'1x2'}
                             startTime={timePlay || time_start}
                             endTime={timeFilter?.end_time || time_end}
                             play={play}
