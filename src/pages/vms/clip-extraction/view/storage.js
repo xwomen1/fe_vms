@@ -54,15 +54,6 @@ const Storage = ({ id, name, channel }) => {
         new Date().getTime()
     )
 
-    // const [startDate, setStartDate] = useState(() => {
-    //     const today = new Date();
-    //     const yesterday = new Date(today);
-    //     yesterday.setDate(today.getDate() - 2);
-
-    //     return yesterday;
-    // });
-    // const [endDate, setEndDate] = useState(new Date())
-
     const [startDate, setStartDate] = useState(() => {
         const today = new Date();
         const yesterday = new Date(today);
@@ -107,6 +98,9 @@ const Storage = ({ id, name, channel }) => {
         }
     }, [id])
 
+    useEffect(() => {
+    }, [dataList])
+
     const fetchDateList = async () => {
         if (camera.id !== '') {
             setLoading(true)
@@ -122,6 +116,7 @@ const Storage = ({ id, name, channel }) => {
                 const data = res.data.MatchList.map((item, index) => {
                     return item.TimeSpan
                 })
+
                 setDataList(data)
             } catch (error) {
                 if (error && error.response && error.response.data) {
