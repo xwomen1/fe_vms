@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-import { Box, Button, CardHeader, DialogActions, Grid, MenuItem } from '@mui/material'
+import { Box, Button, CardHeader, DialogActions, Grid, MenuItem, Typography } from '@mui/material'
 
 import IconButton from '@mui/material/IconButton'
 import Icon from 'src/@core/components/icon'
@@ -104,33 +104,36 @@ const Storage = ({ id, name, channel }) => {
     useEffect(() => {
         if (id) {
             setCamera({ id: id, name: name, channel: channel })
-            fetchDateList()
         }
-    }, [id, startDate, endDate])
+    }, [id])
 
     const fetchDateList = async () => {
-        setLoading(true)
+        if (camera.id !== '') {
+            setLoading(true)
 
-        const params = {
-            startTime: convertDateToString1(startDate),
-            endTime: convertDateToString1(endDate)
-        }
-
-        try {
-            const res = await callApi(`https://sbs.basesystem.one/ivis/vms/api/v0/playback/camera/${id}?startTime=${params.startTime}&endTime=${params.endTime}`)
-
-            const data = res.data.MatchList.map((item, index) => {
-                return item.TimeSpan
-            })
-            setDataList(data)
-        } catch (error) {
-            if (error.response && error.response.status === 404) {
-                console.error('Error 404: Not Found', error.response.data)
-            } else {
-                console.error('Error fetching data:', error.message)
+            const params = {
+                startTime: convertDateToString1(startDate),
+                endTime: convertDateToString1(endDate)
             }
-        } finally {
-            setLoading(false)
+
+            try {
+                const res = await callApi(`https://sbs.basesystem.one/ivis/vms/api/v0/playback/camera/${camera.id}?startTime=${params.startTime}&endTime=${params.endTime}`)
+
+                const data = res.data.MatchList.map((item, index) => {
+                    return item.TimeSpan
+                })
+                setDataList(data)
+            } catch (error) {
+                if (error && error.response && error.response.data) {
+                    console.error('error', error);
+                    toast.error(error.response.data.message, { duration: 6000 });
+                } else {
+                    console.error('Error fetching data:', error);
+                    toast.error(error.message || 'An error occurred while fetching data.', { duration: 6000 });
+                }
+            } finally {
+                setLoading(false)
+            }
         }
     }
 
@@ -249,7 +252,8 @@ const Storage = ({ id, name, channel }) => {
                         title='Trích clip'
                         action={
                             <Grid container spacing={2}>
-                                <Grid item xs={4}>
+                                <Grid item xs={3}></Grid>
+                                <Grid item xs={3}>
                                     <DatePickerWrapper>
                                         <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
                                             <div>
@@ -264,7 +268,7 @@ const Storage = ({ id, name, channel }) => {
                                         </Box>
                                     </DatePickerWrapper>
                                 </Grid>
-                                <Grid item xs={4}>
+                                <Grid item xs={3}>
                                     <DatePickerWrapper>
                                         <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
                                             <div>
@@ -279,7 +283,8 @@ const Storage = ({ id, name, channel }) => {
                                         </Box>
                                     </DatePickerWrapper>
                                 </Grid>
-                                <Grid item xs={4}>
+
+                                {/* <Grid item xs={3}>
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
                                         <CustomTextField select fullWidth id='form-layouts-separator-select' defaultValue='10minute' label='Độ dài tối đa một video'>
                                             {minuteList.map((minute, index) => (
@@ -287,12 +292,17 @@ const Storage = ({ id, name, channel }) => {
                                             ))}
                                         </CustomTextField>
                                     </Box>
+                                </Grid> */}
+
+                                <Grid item xs={3} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end' }}>
+                                    <Button variant='contained' onClick={() => fetchDateList()}>Tìm kiếm</Button>
                                 </Grid>
                             </Grid>
                         }
                     />
                     <CardContent>
-                        {camera.id !== '' &&
+                        {loading && <Typography>Loading...</Typography>}
+                        {dataList.length > 0 &&
                             <Timeline data={dataList} minuteType={minuteType} startDate={startDate} endDate={endDate} callback={handleSetTimeSelected} />
                         }
                     </CardContent>

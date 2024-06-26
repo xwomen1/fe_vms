@@ -977,24 +977,25 @@ const EventConfig = () => {
               >
                 <Box
                   sx={{
-                    width: ' 100%',
-                    height: '100%',
+                    width: 700,
+                    height: 600,
                     background: 'none',
                     borderRadius: 2
                   }}
                 >
                   <div>
-                    <Review key={idCameraSelect} id={idCameraSelect} name={nameCameraSelect} channel={'Sub'} />
+                    {idCameraSelect !== null &&
+                      <Review key={idCameraSelect} id={idCameraSelect} name={nameCameraSelect} channel={'Sub'} />}
                   </div>
                   <canvas
                     ref={canvasRef}
+                    width={700}
+                    height={400}
                     style={{
-                      minHeight: 426,
-                      minWidth: 600,
                       background: 'none',
                       position: 'absolute',
                       opacity: 0.5,
-                      top: 10
+                      top: 30
                     }}
                     id='cameraEdit'
                   />
