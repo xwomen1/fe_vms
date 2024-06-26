@@ -304,19 +304,18 @@ const OrganizationalStructure = () => {
                 />
               </Box>
               <Box onClick={() => handleOpenPopupDetail(currentTabInfra.id)}>
-              <CustomTextField
-                label='Mã'
-                type='text'
-                value={currentTabInfra.code}
-                fullWidth
-                style={{ marginBottom: '16px' }}
-              />
+                <CustomTextField
+                  label='Mã'
+                  type='text'
+                  value={currentTabInfra.code}
+                  fullWidth
+                  style={{ marginBottom: '16px' }}
+                />
               </Box>
 
               <Box onClick={() => handleOpenPopupDetail(currentTabInfra.id)}>
-              <CustomTextField label='Ghi chú' type='text' value={currentTabInfra.detail} fullWidth />
+                <CustomTextField label='Ghi chú' type='text' value={currentTabInfra.detail} fullWidth />
               </Box>
-
             </Paper>
             <Paper elevation={3} style={{ padding: '16px', flexGrow: 1 }}>
               <TableContainer component={Paper}>
@@ -324,8 +323,8 @@ const OrganizationalStructure = () => {
                   <TableHead>
                     <TableRow>
                       <TableCell>STT</TableCell>
-                      <TableCell>Tên địa phương</TableCell>
-                      <TableCell>Mã địa phương</TableCell>
+                      <TableCell>Tên</TableCell>
+                      <TableCell>Mã</TableCell>
                       <TableCell>Thao tác</TableCell>
                     </TableRow>
                   </TableHead>
