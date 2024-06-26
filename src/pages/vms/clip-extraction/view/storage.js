@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react'
 
-import { Box, Button, CardHeader, DialogActions, Grid, MenuItem, Typography } from '@mui/material'
+import { Box, Button, CardHeader, DialogActions, Grid, Typography } from '@mui/material'
 
 import IconButton from '@mui/material/IconButton'
 import Icon from 'src/@core/components/icon'
 
 import { Card, CardContent } from "@mui/material"
-import CustomTextField from 'src/@core/components/mui/text-field'
 import { callApi } from 'src/@core/utils/requestUltils'
 import Timeline from '../mocdata/timeline'
 import axios from 'axios'
@@ -15,15 +14,6 @@ import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import DatePicker from 'react-datepicker'
 import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
 import ViewCameraPause from 'src/@core/components/camera/playbackpause'
-
-const minuteList = [
-    {
-        id: 1,
-        name: '10minute',
-        value: '10 phút'
-    },
-]
-
 
 const convertDateToString1 = (date) => {
     const pad = (num) => String(num).padStart(2, '0');
@@ -69,23 +59,6 @@ const Storage = ({ id, name, channel }) => {
 
         return today;
     });
-
-
-    function formatTime(timeInSeconds) {
-        const result = new Date(timeInSeconds * 1000).toTimeString().substr(0, 8)
-
-        return result
-    }
-
-    const msToTime = duration => {
-
-        const seconds = Math.floor((duration / 1000) % 60)
-        const minutes = Math.floor((duration / (1000 * 60)) % 60)
-        const hours = Math.floor((duration / (1000 * 60 * 60)) % 24)
-        const count = seconds + minutes * 60 + hours * 3600
-
-        return count
-    }
 
     const [currentTime, setCurrentTime] = useState(0)
 
@@ -194,7 +167,6 @@ const Storage = ({ id, name, channel }) => {
         }
     };
 
-
     const handleExportLinkDownload = async (linkDownload) => {
         const axiosInstance = axios.create();
         try {
@@ -218,14 +190,6 @@ const Storage = ({ id, name, channel }) => {
 
     const handSetChanel = (id, channel) => {
         setCamera({ id: id, name: name, channel: channel })
-    }
-
-    const handleSetTime = (type) => {
-        setTimeType(type)
-    }
-
-    const handleSetMinuteType = (type) => {
-        setMinuteType(type)
     }
 
     const handleSetTimeSelected = (data) => {
@@ -278,16 +242,6 @@ const Storage = ({ id, name, channel }) => {
                                         </Box>
                                     </DatePickerWrapper>
                                 </Grid>
-
-                                {/* <Grid item xs={3}>
-                                    <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
-                                        <CustomTextField select fullWidth id='form-layouts-separator-select' defaultValue='10minute' label='Độ dài tối đa một video'>
-                                            {minuteList.map((minute, index) => (
-                                                <MenuItem key={minute.id} value={minute.name} onClick={() => handleSetMinuteType(minute.name)}>{minute.value}</MenuItem>
-                                            ))}
-                                        </CustomTextField>
-                                    </Box>
-                                </Grid> */}
 
                                 <Grid item xs={3} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end' }}>
                                     <Button variant='contained' onClick={() => fetchDateList()}>Tìm kiếm</Button>
