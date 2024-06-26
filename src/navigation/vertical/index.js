@@ -55,6 +55,55 @@ const navigation = () => {
       ]
     },
     {
+      path: '/',
+      title: 'Quản lý hiệu suất',
+      icon: 'tabler:lock-access',
+      children: [
+        {
+          title: 'Thiết lập bộ KPI',
+          path: '/kpi',
+          icon: 'tabler:calendar-event'
+        },
+        {
+          title: 'Thiết bị',
+          path: '/device-management',
+          icon: 'tabler:accessible'
+        },
+        {
+          path: '/pages/access-rights/list',
+          title: 'Quyền truy cập',
+          icon: 'tabler:calendar-month'
+        },
+
+        {
+          title: 'Chấm công',
+          path: '/access-control/time-keeping',
+          icon: 'tabler:lock-access'
+        },
+        {
+          path: '/pages/report-month/list',
+          title: 'Báo cáo tháng',
+          icon: 'tabler:id'
+        }
+
+        // {
+        //   path: '/pages/access-rights/list',
+        //   title: 'Quyền truy cập',
+        //   icon: 'tabler:shield'
+        // },
+        // {
+        //   path: '/pages/access-rights/list',
+        //   title: 'Thống kê',
+        //   icon: 'tabler:statistics/time?tab=%2Fstatistics%2Ftime'
+        // },
+        // {
+        //   path: '/pages/access-rights/list',
+        //   title: 'Hẹn lịch',
+        //   icon: 'tabler:guest-registrations'
+        // }
+      ]
+    },
+    {
       path: '/asset',
       title: 'Hệ thống VMS',
       icon: 'tabler:camera',
@@ -250,6 +299,12 @@ const navigation = () => {
           title: 'Người dùng',
           icon: 'tabler:user',
           path: '/apps/user/list'
+        },
+
+        {
+          title: 'Hồ sơ ứng tuyển',
+          icon: 'tabler:building',
+          path: '/cv'
         },
         {
           title: 'Cơ cấu tổ chức',
