@@ -36,22 +36,6 @@ const columns = [
         field: 'modelName',
         label: 'Tên Model AI'
     },
-    {
-        id: 2,
-        flex: 0.25,
-        minWidth: 50,
-        align: 'right',
-        field: 'characteristicName',
-        label: 'Đối tượng'
-    },
-    {
-        id: 3,
-        flex: 0.15,
-        minWidth: 120,
-        align: 'right',
-        field: 'characteristicValue',
-        label: 'Độ nhạy'
-    },
 ]
 
 const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => {
@@ -103,8 +87,13 @@ const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => 
             setDataList(res.data)
             setTotal(res.data.size)
         } catch (error) {
-            console.error('Error fetching data:', error)
-            toast.error(error)
+            if (error && error?.response?.data) {
+                console.error('error', error)
+                toast.error(error?.response?.data?.message)
+            } else {
+                console.error('Error fetching data:', error)
+                toast.error(error)
+            }
         } finally {
             setLoading(false)
         }
@@ -165,8 +154,13 @@ const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => 
                 toast.success(res.message)
             })
             .catch((error) => {
-                console.error('Lỗi khi lấy dữ liệu: ', error)
-                setMessage(error)
+                if (error && error?.response?.data) {
+                    console.error('error', error)
+                    toast.error(error?.response?.data?.message)
+                } else {
+                    console.error('Error fetching data:', error)
+                    toast.error(error)
+                }
             })
             .finally(() => {
                 setLoading(false)
@@ -196,8 +190,13 @@ const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => 
                 toast.success(res.message)
             })
             .catch((error) => {
-                console.error('Lỗi khi lấy dữ liệu: ', error)
-                setMessage(error)
+                if (error && error?.response?.data) {
+                    console.error('error', error)
+                    toast.error(error?.response?.data?.message)
+                } else {
+                    console.error('Error fetching data:', error)
+                    toast.error(error)
+                }
             })
             .finally(() => {
                 setLoading(false)
@@ -242,7 +241,7 @@ const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => 
                                                     {column.label}
                                                 </TableCell>
                                             ))}
-                                            <TableCell>Tồn tại</TableCell>
+                                            <TableCell align="right">Tồn tại</TableCell>
                                             <TableCell align='right'>Thao tác</TableCell>
                                         </TableRow>
                                     </TableHead>
@@ -260,25 +259,23 @@ const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => 
                                                             </TableCell>
                                                         )
                                                     })}
-                                                    <TableCell>
+                                                    <TableCell align="right">
                                                         <Typography color={alertIdList.some(alert => alert === row.id) ? '#28C76F' : 'primary'}>
                                                             {alertIdList.some(alert => alert === row.id) ? 'Đã thêm' : 'Chưa thêm'}
                                                         </Typography>
                                                     </TableCell>
 
-                                                    <TableCell>
-                                                        <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center' }}>
-                                                            <IconButton
-                                                                size='small'
-                                                                sx={{ color: 'text.secondary' }}
-                                                                onClick={() => {
-                                                                    handleSubmit(row)
-                                                                }}
-                                                                disabled={alertIdList.some(alert => alert === row.id) ? true : false}
-                                                            >
-                                                                <Icon icon="tabler:square-rounded-plus" />
-                                                            </IconButton>
-                                                        </Grid>
+                                                    <TableCell align='right'>
+                                                        <IconButton
+                                                            size='small'
+                                                            sx={{ color: 'text.secondary' }}
+                                                            onClick={() => {
+                                                                handleSubmit(row)
+                                                            }}
+                                                            disabled={alertIdList.some(alert => alert === row.id) ? true : false}
+                                                        >
+                                                            <Icon icon="tabler:square-rounded-plus" />
+                                                        </IconButton>
                                                     </TableCell>
                                                 </TableRow>
                                             ))

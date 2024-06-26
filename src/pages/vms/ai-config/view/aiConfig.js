@@ -28,6 +28,7 @@ const AIConfig = () => {
   const [keyword, setKeyword] = useState('')
   const [cameraGroup, setCameraGroup] = useState([])
   const [alertAIList, setAlertAIList] = useState([])
+  const [modelAIList, setModelAIList] = useState([])
   const [dataList, setDataList] = useState([])
   const [reload, setReload] = useState(0)
   const [switchStates, setSwitchStates] = useState({})
@@ -89,7 +90,7 @@ const AIConfig = () => {
       renderCell: row => (
         <Switch
           checked={switchStates[row.id]?.face || false}
-          onChange={e => handleSwitchChange(e, row.id, 'face_recognition', row.alert_id)}
+          onChange={e => handleSwitchChange(e, row.id, 'face_recognition', row.alert_id, row.isExistFace)}
         />
       )
     },
@@ -103,7 +104,7 @@ const AIConfig = () => {
       renderCell: row => (
         <Switch
           checked={switchStates[row.id]?.licensePlate || false}
-          onChange={e => handleSwitchChange(e, row.id, 'license_plate_recognition', row.alert_id)}
+          onChange={e => handleSwitchChange(e, row.id, 'license_plate_recognition', row.alert_id, row.isExistLicensePlate)}
         />
       )
     }
@@ -111,6 +112,7 @@ const AIConfig = () => {
 
   useEffect(() => {
     fetchCameraGroup()
+    handleGetModelAI()
   }, [reload])
 
   const fetchCameraGroup = async () => {
@@ -122,6 +124,37 @@ const AIConfig = () => {
       setCameraGroup(res.data)
     } catch (error) {
       console.error('Error fetching data: ', error)
+    }
+  }
+
+  const handleGetModelAI = async () => {
+    setLoading(true)
+
+    const params = {
+      ...config,
+      params: {
+        sort: '+created_at',
+      }
+    }
+
+    try {
+      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/camera-model-ai`, params)
+      const list = []
+      const face = res.data?.find((item) => item.type === 'face_recognition')
+      const licensePlate = res.data?.find((item) => item.type === 'license_plate_recognition')
+      list.push(face)
+      list.push(licensePlate)
+      setModelAIList(list)
+    } catch (error) {
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -150,7 +183,6 @@ const AIConfig = () => {
     fetchModelAICameras(cameraGroup)
   }, [cameraGroup, reload])
 
-
   useEffect(() => {
     if (!Array.isArray(alertAIList) || !Array.isArray(cameraGroup)) return;
 
@@ -164,7 +196,9 @@ const AIConfig = () => {
       const alert = {
         alert_id: item?.id || null,
         face: face?.isactive ? item?.id : null,
+        isExistFace: face !== undefined ? true : false,
         licensePlate: licensePlate?.isactive ? item?.id : null,
+        isExistLicensePlate: licensePlate !== undefined ? true : false
       };
 
       return { ...camera, ...alert };
@@ -184,7 +218,7 @@ const AIConfig = () => {
   }, [alertAIList, cameraGroup]);
 
 
-  const handleSwitchChange = (event, cameraId, type, cameraAIPropertyId) => {
+  const handleSwitchChange = (event, cameraId, type, cameraAIPropertyId, isModelExist) => {
     setSwitchStates(prevState => ({
       ...prevState,
       [cameraId]: {
@@ -193,7 +227,119 @@ const AIConfig = () => {
       }
     }))
 
-    handleUpdateAlertIsActive(cameraAIPropertyId, type)
+    if (cameraAIPropertyId && isModelExist === true) {
+      handleUpdateAlertIsActive(cameraAIPropertyId, type)
+    }
+
+    if (cameraAIPropertyId && isModelExist === false) {
+      handleGetModelAIByCamera(cameraId, cameraAIPropertyId, type)
+    }
+
+    if (cameraAIPropertyId === undefined) {
+      handleAddAlertIsActive(cameraId, type)
+    }
+
+  }
+
+  const handleAddAlertIsActive = async (cameraId, type) => {
+
+    const values = modelAIList.find((model) => model.type === type)
+
+    const params = {
+      camera_id: cameraId,
+      cameraaiproperty: [
+        {
+          cameraModelAI: { ...values },
+          cameraAiZone: {
+            vfences: [],
+            vzone: {}
+          },
+          calendarDays: [],
+          isactive: true
+        }
+      ]
+    }
+
+    try {
+      await axios.post(
+        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties`,
+        { ...params },
+        config
+      )
+      setReload(reload + 1)
+      toast.success('Thao tác thành công')
+    } catch (error) {
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleGetModelAIByCamera = async (cameraId, cameraAIPropertyId, type) => {
+    try {
+      const res = await axios.get(
+        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties/camera/${cameraId}`,
+        config
+      )
+      const data = res.data[0].cameraaiproperty
+      if (data !== undefined) {
+        handleUpdateAlertIsActive2(cameraAIPropertyId, data, type)
+      }
+
+    } catch (error) {
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
+    }
+  }
+
+  const handleUpdateAlertIsActive2 = async (cameraAIPropertyId, data, type) => {
+    const values = modelAIList.find((model) => model.type === type)
+
+    const params = {
+      cameraaiproperty: [
+        ...data,
+        {
+          cameraModelAI: { ...values },
+          cameraAiZone: {
+            vfences: [],
+            vzone: {}
+          },
+          calendarDays: [],
+          isactive: true
+        }
+      ]
+    }
+
+    try {
+      await axios.put(
+        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties/${cameraAIPropertyId}`,
+        { ...params },
+        config
+      )
+      setReload(reload + 1)
+      toast.success('Thao tác thành công')
+    } catch (error) {
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleUpdateAlertIsActive = async (alertId, type) => {
@@ -216,8 +362,13 @@ const AIConfig = () => {
       setReload(reload + 1)
       toast.success('Thao tác thành công')
     } catch (error) {
-      console.error('Error fetching data: ', error)
-      toast.error(error)
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
     } finally {
       setLoading(false)
     }
@@ -275,7 +426,6 @@ const AIConfig = () => {
                         )
                       })}
                       <TableCell align='right'>
-                        {/* {row.status.name} */}
                         <CustomChip
                           rounded
                           size='small'

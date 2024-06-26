@@ -94,115 +94,116 @@ function ReportMonth({ history }) {
       setLoading(false)
     }
   }
-  useEffect(() => {
-    if (selectedGroupId !== null) {
-      setValueFilter({ ...valueFilter, page: 1 })
-      setDataResource([])
-      fetchDataSource()
-    }
-  }, [selectedGroupId])
 
-  useEffect(() => {
-    const fetchGroupData = async () => {
-      try {
-        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+  // useEffect(() => {
+  //   if (selectedGroupId !== null) {
+  //     setValueFilter({ ...valueFilter, page: 1 })
+  //     setDataResource([])
+  //     fetchDataSource()
+  //   }
+  // }, [selectedGroupId])
 
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          params: {
-            keyword: valueGroup
-          }
-        }
-        const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search', config)
-        const dataWithChildren = addChildrenField(response.data)
-        const rootGroups = findRootGroups(dataWithChildren)
-        setGroups(rootGroups)
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
-    }
+  // useEffect(() => {
+  //   const fetchGroupData = async () => {
+  //     try {
+  //       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
-    fetchGroupData()
-  }, [])
+  //       const config = {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`
+  //         },
+  //         params: {
+  //           keyword: valueGroup
+  //         }
+  //       }
+  //       const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search', config)
+  //       const dataWithChildren = addChildrenField(response.data)
+  //       const rootGroups = findRootGroups(dataWithChildren)
+  //       setGroups(rootGroups)
+  //     } catch (error) {
+  //       console.error('Error fetching data:', error)
+  //     }
+  //   }
 
-  const addChildrenField = (data, parentId = null) => {
-    return data.map(group => {
-      const children = data.filter(child => child.parentId === group.groupId)
-      if (children.length > 0) {
-        group.children = children
-      }
+  //   fetchGroupData()
+  // }, [])
 
-      return group
-    })
-  }
+  // const addChildrenField = (data, parentId = null) => {
+  //   return data.map(group => {
+  //     const children = data.filter(child => child.parentId === group.groupId)
+  //     if (children.length > 0) {
+  //       group.children = children
+  //     }
 
-  const findRootGroups = data => {
-    const rootGroups = []
-    data.forEach(group => {
-      if (!data.some(item => item.groupId === group.parentId)) {
-        rootGroups.push(group)
-      }
-    })
+  //     return group
+  //   })
+  // }
 
-    return rootGroups
-  }
+  // const findRootGroups = data => {
+  //   const rootGroups = []
+  //   data.forEach(group => {
+  //     if (!data.some(item => item.groupId === group.parentId)) {
+  //       rootGroups.push(group)
+  //     }
+  //   })
 
-  const handleGroupCheckboxChange = (groupId, checked) => {
-    if (checked) {
-      setSelectedGroups(prevGroups => [...prevGroups, { groupId }])
-      setSelectedGroupId({ groupId }) // Cập nhật groupId khi chọn
-    } else {
-      setSelectedGroups(prevGroups => prevGroups.filter(g => g.groupId !== groupId))
-      if (selectedGroups.length === 1 && selectedGroups[0].groupId === groupId) {
-        setSelectedGroupId('') // Đặt selectedGroupId thành null nếu không còn nhóm nào được chọn
-      } else {
-        setSelectedGroupId(prevGroups => {
-          if (prevGroups?.length === 0) return ''
+  //   return rootGroups
+  // }
 
-          return prevGroups[prevGroups?.length - 1]
-        })
-      }
-    }
-  }
+  // const handleGroupCheckboxChange = (groupId, checked) => {
+  //   if (checked) {
+  //     setSelectedGroups(prevGroups => [...prevGroups, { groupId }])
+  //     setSelectedGroupId({ groupId }) // Cập nhật groupId khi chọn
+  //   } else {
+  //     setSelectedGroups(prevGroups => prevGroups.filter(g => g.groupId !== groupId))
+  //     if (selectedGroups.length === 1 && selectedGroups[0].groupId === groupId) {
+  //       setSelectedGroupId('') // Đặt selectedGroupId thành null nếu không còn nhóm nào được chọn
+  //     } else {
+  //       setSelectedGroupId(prevGroups => {
+  //         if (prevGroups?.length === 0) return ''
 
-  const GroupCheckbox = ({ group, checked, onChange }) => {
-    return (
-      <div>
-        <input
-          type='checkbox'
-          id={`group-${group.groupId}`}
-          checked={checked}
-          onChange={e => onChange(group.groupId, e.target.checked)}
-        />
-        <label htmlFor={`group-${group.groupId}`}>{group.groupName}</label>
-      </div>
-    )
-  }
+  //         return prevGroups[prevGroups?.length - 1]
+  //       })
+  //     }
+  //   }
+  // }
 
-  const handleLabelClick = group => {
-    const isChecked = selectedGroups.some(g => g.groupId === group.groupId)
-    handleGroupCheckboxChange(group.groupId, !isChecked)
-  }
+  // const GroupCheckbox = ({ group, checked, onChange }) => {
+  //   return (
+  //     <div>
+  //       <input
+  //         type='checkbox'
+  //         id={`group-${group.groupId}`}
+  //         checked={checked}
+  //         onChange={e => onChange(group.groupId, e.target.checked)}
+  //       />
+  //       <label htmlFor={`group-${group.groupId}`}>{group.groupName}</label>
+  //     </div>
+  //   )
+  // }
 
-  const renderGroup = group => (
-    <TreeItem
-      key={group.groupId}
-      nodeId={group.groupId}
-      label={
-        <div onClick={() => handleLabelClick(group)}>
-          <GroupCheckbox
-            group={group}
-            checked={selectedGroups.some(g => g.groupId === group.groupId)}
-            onChange={handleGroupCheckboxChange}
-          />
-        </div>
-      }
-    >
-      {group.children && group.children.map(childGroup => renderGroup(childGroup))}
-    </TreeItem>
-  )
+  // const handleLabelClick = group => {
+  //   const isChecked = selectedGroups.some(g => g.groupId === group.groupId)
+  //   handleGroupCheckboxChange(group.groupId, !isChecked)
+  // }
+
+  // const renderGroup = group => (
+  //   <TreeItem
+  //     key={group.groupId}
+  //     nodeId={group.groupId}
+  //     label={
+  //       <div onClick={() => handleLabelClick(group)}>
+  //         <GroupCheckbox
+  //           group={group}
+  //           checked={selectedGroups.some(g => g.groupId === group.groupId)}
+  //           onChange={handleGroupCheckboxChange}
+  //         />
+  //       </div>
+  //     }
+  //   >
+  //     {group.children && group.children.map(childGroup => renderGroup(childGroup))}
+  //   </TreeItem>
+  // )
 
   useEffect(() => {
     const today = new Date()
@@ -341,7 +342,7 @@ function ReportMonth({ history }) {
       <CardContent>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={4}>
-            <Autocomplete
+            {/* <Autocomplete
               disablePortal
               id='treeview-autocomplete'
               options={groups || ''}
@@ -364,7 +365,7 @@ function ReportMonth({ history }) {
                 setSelectedGroupId(value ? { groupId: value.groupId } : '')
               }}
               value={selectedGroupId ? groups.find(g => g.groupId === selectedGroupId.groupId) : null}
-            />
+            /> */}
           </Grid>
           <Grid item xs={12} sm={3}>
             <DatePickerWrapper>

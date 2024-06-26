@@ -941,7 +941,7 @@ const Add = ({ apiData }) => {
                 )}
               </Grid>
               <Grid item xs={12}>
-                {selectedValue === 'hikivision' && (
+                {selectedValue === 'hikvision' && (
                   <Grid
                     container
                     item

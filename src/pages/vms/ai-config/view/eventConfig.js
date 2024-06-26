@@ -4,7 +4,6 @@ import { TreeItem, TreeView } from "@mui/lab"
 import Icon from 'src/@core/components/icon'
 import { Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Typography, styled, CardActions, Dialog, DialogContent, DialogActions } from "@mui/material"
 import authConfig from 'src/configs/auth'
-import ViewCamera from "./viewCamera"
 import { format } from "date-fns"
 import CustomTextField from "src/@core/components/mui/text-field"
 import Schedule from "../popups/schedule"
@@ -252,7 +251,13 @@ const EventConfig = () => {
       )
       setCameraGroup(res.data)
     } catch (error) {
-      console.error('Error fetching data: ', error)
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
     }
   }
 
@@ -272,8 +277,13 @@ const EventConfig = () => {
       )
       setAlertAIList(res.data)
     } catch (error) {
-      console.error('Error fetching data: ', error)
-      toast(error)
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
     }
   }
 
@@ -521,8 +531,13 @@ const EventConfig = () => {
       setReload(reload + 1)
       toast.success('Thao tác thành công')
     } catch (error) {
-      console.error('Error fetching data: ', error)
-      toast.error(error)
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
     } finally {
       setLoading(false)
     }
@@ -962,24 +977,25 @@ const EventConfig = () => {
               >
                 <Box
                   sx={{
-                    width: ' 100%',
-                    height: '100%',
+                    width: 700,
+                    height: 600,
                     background: 'none',
                     borderRadius: 2
                   }}
                 >
                   <div>
-                    <Review key={idCameraSelect} id={idCameraSelect} name={nameCameraSelect} channel={'Sub'} />
+                    {idCameraSelect !== null &&
+                      <Review key={idCameraSelect} id={idCameraSelect} name={nameCameraSelect} channel={'Sub'} />}
                   </div>
                   <canvas
                     ref={canvasRef}
+                    width={700}
+                    height={400}
                     style={{
-                      minHeight: 426,
-                      minWidth: 600,
                       background: 'none',
                       position: 'absolute',
                       opacity: 0.5,
-                      top: 10
+                      top: 30
                     }}
                     id='cameraEdit'
                   />
