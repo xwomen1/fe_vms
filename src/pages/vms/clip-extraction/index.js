@@ -249,7 +249,7 @@ const ClipExtraction = () => {
                         <TabList onChange={handleChange} aria-label='customized tabs example'>
                             <Tab value='1' label='Trực tiếp' key={1} />
                             <Tab value='2' label='Xem lại' key={2} />
-                            <Tab value='3' label='Lưu trữ' key={3} />
+                            <Tab value='3' label='Trích clip' key={3} />
                         </TabList>
                     </Grid>
                     <Grid item xs={12} sm={4} lg={2}>
