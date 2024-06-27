@@ -242,7 +242,9 @@ const Caller = () => {
   }
 
   return (
-    <DivStyle>
+    <DivStyle
+      style={{ backgroundColor: 'black', width: '100%', minHeight: '100vh', color: 'white', position: 'relative' }}
+    >
       <Grid container spacing={0}>
         {cameraGroup.length > 0 &&
           cameraGroup.map((camera, index) => (
@@ -274,7 +276,7 @@ const Caller = () => {
           >
             <div className='bottom-controls'>
               <div className='left-controls'>
-                <Box className='w-100' sx={{ px: 2 }}>
+                {/* <Box className='w-100' sx={{ px: 2 }}>
                   <Slider
                     defaultValue={1}
                     min={0.5}
@@ -316,7 +318,7 @@ const Caller = () => {
                       }
                     }}
                   />
-                </Box>
+                </Box> */}
                 <div className='w-100' style={{ display: 'flex', justifyContent: 'space-between' }}>
                   {timeFilter && (
                     <IconButton
@@ -449,8 +451,8 @@ const Caller = () => {
                         border: 'none'
                       },
                       '& .MuiSlider-thumb': {
-                        width: 20,
-                        height: 20,
+                        width: 10,
+                        height: 10,
                         backgroundColor: '#fff',
                         '&::before': {
                           boxShadow: '0 4px 8px rgba(0,0,0,0.4)'

@@ -13,7 +13,7 @@ import authConfig from 'src/configs/auth'
 import Table from '@mui/material/Table'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
-import { Autocomplete, Button, CircularProgress, IconButton, Paper } from '@mui/material'
+import { Autocomplete, Button, CircularProgress, IconButton, Paper, Box } from '@mui/material'
 import Swal from 'sweetalert2'
 import { fetchData } from 'src/store/apps/user'
 import { useRouter } from 'next/router'
@@ -25,9 +25,10 @@ import ChangePassWords from './popups/ChangePassword'
 import Passwords from './popups/PassWord'
 import PopupScanDungIP from './popups/AddDungIP'
 import PopupScanOnvif from './popups/AddOnvif'
+import PopupScanHik from './popups/AddHik'
 import PopupScan from './popups/Add'
 import { Radio, RadioGroup, FormControlLabel } from '@mui/material'
-
+import ImportPopup from './popups/ImportPopup'
 import Network from './popups/Network'
 import Video from './popups/video'
 import Images from './popups/Image'
@@ -45,6 +46,7 @@ const UserList = ({ apiData }) => {
   const [idNVR, setId] = useState([])
   const [nameNVR, setNameNvr] = useState(null)
   const [IPNVR, setIPNVR] = useState(null)
+  const [openPopupImport, setOpenImportPopup] = useState(false)
   const [openPopup, setOpenPopup] = useState(false)
   const [openPopupP, setOpenPopupP] = useState(false)
 
@@ -86,6 +88,7 @@ const UserList = ({ apiData }) => {
   const [selectNVR, setSelectedNVR] = useState('')
   const [openPopupResponse, setOpenPopupResponse] = useState(false)
   const [openPopupResponseDungIP, setOpenPopupResponseDungIP] = useState(false)
+  const [openPopupResponseHik, setOpenPopupResponseHik] = useState(false)
   const [openPopupResponseOnvif, setOpenPopupResponseOnvif] = useState(false)
   const [popupMessage, setPopupMessage] = useState('')
   const [isError, setIsError] = useState(false)
@@ -143,6 +146,60 @@ const UserList = ({ apiData }) => {
       setLoading(false)
     }
   }
+
+  const handleScanHik = async () => {
+    setOpenPopupResponseHik(true)
+    setLoading(true)
+    setPopupMessage('') // Reset thông điệp khi bắt đầu scan
+    setIsError(false) // Reset trạng thái lỗi khi bắt đầu scan
+    try {
+      const payload = {
+        idBox: selectNVR?.value,
+        userName,
+        passWord,
+        protocol: '1'
+
+      }
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.post(
+        'https://sbs.basesystem.one/ivis/vms/api/v0/device/onvif/devicescanhikivision',
+        payload,
+        config
+      )
+
+      setResponse(response.data)
+      setLoading(false)
+
+      toast.success('Thành công')
+
+      setPopupMessage('Quét thành công')
+      setIsError(false) // Không phải lỗi
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message === 'No response from the server device, timeout: scan_device'
+      ) {
+        setPopupMessage('Thiết bị chưa phản hồi')
+      } else {
+        setPopupMessage(`${error.response.data.message}`)
+      }
+
+      setIsError(true) // Đánh dấu là lỗi
+      setLoading(false)
+    }
+  }
+
+  const handleFilter = useCallback(val => {
+    setValue(val)
+  }, [])
 
   const handleScanDaiIP = async () => {
     setOpenPopupResponse(true)
@@ -205,7 +262,9 @@ const UserList = ({ apiData }) => {
       const payload = {
         idBox: selectNVR?.value,
         userName,
-        passWord
+        passWord,
+        protocol: '0'
+
       }
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -265,6 +324,10 @@ const UserList = ({ apiData }) => {
 
   const handleClosePopup = () => {
     setOpenPopup(false) // Đóng Popup khi cần thiết
+  }
+
+  const handleClosePopupImport = () => {
+    setOpenImportPopup(false) // Đóng Popup khi cần thiết
   }
 
   const handleAddPClick = selectedNvrId => {
@@ -424,7 +487,7 @@ const UserList = ({ apiData }) => {
           setStatus1(response.data.isOfflineSetting || false)
           setNvr(response.data[0].id)
           setAssetType(response.data)
-          setTotal(response.data.page || 0)
+          setTotal(response.data.page)
           console.log(response.data[0].id)
         } else {
           setStatus1(false)
@@ -480,6 +543,11 @@ const UserList = ({ apiData }) => {
     setSelectedNVR(newValue)
     setIdBox(newValue.value)
   }
+
+  const handleOpenPopup = () => {
+    setOpenImportPopup(true)
+  }
+
   useEffect(() => {
     setSelectedNVR({
       label: defaultValue,
@@ -487,29 +555,75 @@ const UserList = ({ apiData }) => {
     })
   }, [defaultValue])
 
+  const top100Films = [{ title: 'Onvif' }, { title: 'Hikvision' }]
+
   return (
     <Grid container spacing={6.5}>
       <Grid item xs={12}>
         <Card>
-          <Grid container spacing={2}>
-            <Grid item xs={0.1}></Grid>
-
-            <Grid item xs={12}>
-              <div></div>
-              <div>
-                <RadioGroup value={selectedValue} onChange={handleRadioChange} style={{ marginLeft: 50 }}>
-                  <Grid container spacing={2}>
-                    <Grid item>
-                      <FormControlLabel value='dungIp' control={<Radio />} label='Dùng IP' />
+          <Grid container spacing={0} style={{ marginTop: '1%' }}>
+            <Grid container spacing={0}>
+              <Grid item xs={8}>
+                <div>
+                  <RadioGroup value={selectedValue} onChange={handleRadioChange} style={{ marginLeft: 50 }}>
+                    <Grid container spacing={2}>
+                      <Grid item>
+                        <FormControlLabel value='dungIp' control={<Radio />} label='Dùng IP' />
+                      </Grid>
+                      <Grid item>
+                        <FormControlLabel value='daiIp' control={<Radio />} label='Dải IP' />
+                      </Grid>
+                      <Grid item xs={3}>
+                        <Autocomplete
+                          fullWidth
+                          options={top100Films}
+                          id='autocomplete-custom'
+                          getOptionLabel={option => option.title || ''}
+                          renderInput={params => <CustomTextField placeholder='Khác' {...params} />}
+                          onChange={(event, value) => setSelectedValue(value ? value.title.toLowerCase() : '')}
+                        />
+                      </Grid>
                     </Grid>
-                    <Grid item>
-                      <FormControlLabel value='daiIp' control={<Radio />} label='Dải IP' />
-                    </Grid>
-                    <Grid item>
-                      <FormControlLabel value='onvif' control={<Radio />} label='Onvif' />
-                    </Grid>
-                  </Grid>
-                </RadioGroup>
+                  </RadioGroup>
+                </div>
+              </Grid>
+              <Grid item xs={4} style={{ display: 'flex' }}>
+                <Grid item style={{ marginRight: '4%' }}>
+                  <Button variant='contained' onClick={handleOpenPopup}>
+                    <Icon icon='tabler:file-import' />
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <CustomTextField
+                    value={value}
+                    onChange={e => handleFilter(e.target.value)}
+                    placeholder='Search…'
+                    InputProps={{
+                      startAdornment: (
+                        <Box sx={{ mr: 2, display: 'flex' }}>
+                          <Icon fontSize='1.25rem' icon='tabler:search' />
+                        </Box>
+                      ),
+                      endAdornment: (
+                        <IconButton size='small' title='Clear' aria-label='Clear'>
+                          <Icon fontSize='1.25rem' icon='tabler:x' />
+                        </IconButton>
+                      )
+                    }}
+                    sx={{
+                      width: {
+                        xs: 1,
+                        sm: 'auto'
+                      },
+                      '& .MuiInputBase-root > svg': {
+                        mr: 2
+                      }
+                    }}
+                  />
+                </Grid>
+              </Grid>
+              <Grid item xs={12}>
+                {' '}
                 {selectedValue === 'dungIp' && (
                   <Grid
                     container
@@ -767,7 +881,72 @@ const UserList = ({ apiData }) => {
                     />{' '}
                   </>
                 )}
-              </div>
+                {selectedValue === 'hikvision' && (
+                  <Grid
+                    container
+                    item
+                    component={Paper}
+                    style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
+                  >
+                    <Grid item xs={1.8}>
+                      <Autocomplete
+                        value={selectNVR}
+                        onChange={handleDDNSChange}
+                        options={nvrs}
+                        getOptionLabel={option => option.label}
+                        renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
+                        onFocus={handleComboboxFocus}
+
+                        // loading={loading}
+                      />{' '}
+                    </Grid>
+                    <Grid item xs={0.1}></Grid>
+
+                    <Grid item xs={2}>
+                      <CustomTextField
+                        value={userName}
+                        onChange={e => setUsername(e.target.value)}
+                        label='Đăng nhập'
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={0.4}></Grid>
+                    <Grid item xs={2}>
+                      <CustomTextField
+                        value={passWord}
+                        onChange={e => setPassWord(e.target.value)}
+                        label='Mật khẩu'
+                        type='password'
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={0.2}></Grid>
+
+                    <Grid item xs={4} style={{ marginTop: '1%' }}>
+                      <Button>Cancel</Button>
+                      <Button variant='contained' onClick={handleScanHik}>
+                        Quét
+                      </Button>
+                    </Grid>
+                  </Grid>
+                )}
+                {openPopupResponseHik && (
+                  <>
+                    <PopupScanHik
+                      open={openPopupResponseHik}
+                      userName={userName}
+                      setReload={() => setReload(reload + 1)}
+                      passWord={passWord}
+                      isError={isError}
+                      idBox={idBox}
+                      popupMessage={popupMessage}
+                      response={response}
+                      loadingOnvif={loading}
+                      onClose={() => setOpenPopupResponseHik(false)}
+                    />{' '}
+                  </>
+                )}
+              </Grid>
               <Table>
                 <TableHead>
                   <TableRow>
@@ -897,6 +1076,7 @@ const UserList = ({ apiData }) => {
           nvr={selectedIds}
         />
       </Grid>
+      <ImportPopup open={openPopupImport} handleClose={handleClosePopupImport} />
     </Grid>
   )
 }

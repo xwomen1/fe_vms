@@ -1,88 +1,83 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 
-import { Button, CardHeader, DialogActions, Grid, MenuItem, Typography } from '@mui/material'
+import { Box, Button, CardHeader, DialogActions, Grid, MenuItem, Typography } from '@mui/material'
 
 import IconButton from '@mui/material/IconButton'
 import Icon from 'src/@core/components/icon'
-import useDebounce from './useDebounce'
-import Slider from '@mui/material/Slider'
-import Box from '@mui/material/Box'
-import { Stack } from '@mui/material'
-
-// ** Third Party Imports
-
-import DatePicker from 'react-datepicker'
-
-// ** Styled Component
-import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
-
-// ** Custom Component Imports
-import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
-import { formatTimeShow, formatDate } from 'src/@core/utils/format'
 
 import { Card, CardContent } from "@mui/material"
-import ViewCamera from "src/@core/components/camera/playback"
-import Daily from '../mocdata/daily'
 import CustomTextField from 'src/@core/components/mui/text-field'
-
-
-const valueFilterInit = {
-    page: 1,
-    limit: 50,
-    deviceTypes: 'NVR'
-}
-
-const dateList = [
-    {
-        id: 1,
-        name: 'day',
-        value: '1 ngày'
-    },
-    {
-        id: 2,
-        name: 'week',
-        value: '7 ngày'
-    },
-    {
-        id: 3,
-        name: 'month',
-        value: '30 ngày'
-    },
-]
+import { callApi } from 'src/@core/utils/requestUltils'
+import Timeline from '../mocdata/timeline'
+import axios from 'axios'
+import toast from 'react-hot-toast'
+import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
+import DatePicker from 'react-datepicker'
+import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
+import ViewCameraPause from 'src/@core/components/camera/playbackpause'
 
 const minuteList = [
     {
         id: 1,
-        name: '1minute',
-        value: '1 phút'
-    },
-    {
-        id: 2,
-        name: '2minute',
-        value: '2 phút'
-    },
-    {
-        id: 3,
-        name: '5minute',
-        value: '5 phút'
+        name: '10minute',
+        value: '10 phút'
     },
 ]
 
-const dataDailyDefault = [
-    {
-        label: '',
-        value: 1,
-    }
-]
+
+const convertDateToString1 = (date) => {
+    const pad = (num) => String(num).padStart(2, '0');
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1);
+    const day = pad(date.getDate());
+    const hours = pad(date.getHours());
+    const minutes = pad(date.getMinutes());
+    const seconds = pad(date.getSeconds());
+
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`;
+}
 
 const Storage = ({ id, name, channel }) => {
-    const [camera, setCamera] = useState({ id: id, name: name, channel: channel })
-    const [channelCurrent, setChannelCurrent] = useState(null)
+    const [loading, setLoading] = useState(false)
+    const [camera, setCamera] = useState({ id: '', name: '', channel: '' })
+    const [reload, setReload] = useState(0)
+    const [duration, setDuration] = useState(0)
+    const [volume, setVolume] = useState(30)
 
-    const [dataDaily, setDataDaily] = useState([])
-    const [timeType, setTimeType] = useState(null)
     const [minuteType, setMinuteType] = useState(null)
-    const [dataDailyState, setDataDailyState] = useState(dataDailyDefault)
+
+    const [startTime, setStartTime] = useState(
+        new Date().getTime() - 60 * 60 * 1000
+    )
+
+    const [endTime, setEndTime] = useState(
+        new Date().getTime()
+    )
+
+    // const [startDate, setStartDate] = useState(() => {
+    //     const today = new Date();
+    //     const yesterday = new Date(today);
+    //     yesterday.setDate(today.getDate() - 2);
+
+    //     return yesterday;
+    // });
+    // const [endDate, setEndDate] = useState(new Date())
+
+    const [startDate, setStartDate] = useState(() => {
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+        yesterday.setHours(0, 0, 0, 0); // Thiết lập thời gian về 00:00:00
+
+        return yesterday;
+    });
+
+    const [endDate, setEndDate] = useState(() => {
+        const today = new Date();
+        today.setHours(23, 59, 59, 999); // Thiết lập thời gian về 23:59:59
+
+        return today;
+    });
 
 
     function formatTime(timeInSeconds) {
@@ -101,90 +96,130 @@ const Storage = ({ id, name, channel }) => {
         return count
     }
 
-    const time_start = new Date().getTime() - 60 * 60 * 1000
-    const time_end = new Date().getTime()
-
-    const [time, setTime] = useState(new Date())
-    const [dateTime, setDateTime] = useState(new Date())
-
-    const [timeFilter, setTimeFilter] = useState({
-        start_time: time_start,
-        end_time: time_end
-    })
-
-    const [timePlay, setTimePlay] = useState(time_start)
     const [currentTime, setCurrentTime] = useState(0)
 
-    const datePickerRef = useRef(null)
+    const [play, setPlay] = useState(false)
+    const [dataList, setDataList] = useState([])
 
+    useEffect(() => {
+        if (id) {
+            setCamera({ id: id, name: name, channel: channel })
+        }
+    }, [id])
 
-    const [play, setPlay] = useState(true)
-    const [valueRange, setValueRange] = useState(60 * 60 * 1000)
-    const debouncedSearch = useDebounce(valueRange, 700)
+    const fetchDateList = async () => {
+        if (camera.id !== '') {
+            setLoading(true)
 
-    const onClickPlay = v => {
-        setPlay(v)
+            const params = {
+                startTime: convertDateToString1(startDate),
+                endTime: convertDateToString1(endDate)
+            }
 
-        // if (videoId) {
-        //   if (!v) {
-        //     videoId.pause();
-        //     if (stopAndStartRecord) {
-        //       onClickCut('pause');
-        //     }
-        //   } else {
-        //     if (isScreen && isScreen === 'detail' && onChangeCurTimePlayback) {
-        //       const acb = timeFilter.start_time + parseInt(valueRange) - 6000;
-        //       onChangeCurTimePlayback(acb);
-        //     }
-        //     videoId.play();
-        //   }
-        // }
-    }
+            try {
+                const res = await callApi(`https://sbs.basesystem.one/ivis/vms/api/v0/playback/camera/${camera.id}?startTime=${params.startTime}&endTime=${params.endTime}`)
 
-    function timeDisplay(time) {
-        if (time < 10)
-
-            return '0' + time
-
-        return time
-    }
-    function valuetext(value) {
-
-        const timeCurrent = new Date(timeFilter.start_time + value)
-
-        return `${timeCurrent.getFullYear() +
-            '/' +
-            timeDisplay(timeCurrent.getMonth() + 1) +
-            '/' +
-            timeCurrent.getDate() +
-            ' ' +
-            timeDisplay(timeCurrent.getHours()) +
-            ':' +
-            timeDisplay(timeCurrent.getMinutes())
-            }`
-    }
-
-    const handleIconClick = () => {
-        if (datePickerRef.current) {
-            datePickerRef.current.setOpen(true)
+                const data = res.data.MatchList.map((item, index) => {
+                    return item.TimeSpan
+                })
+                setDataList(data)
+            } catch (error) {
+                if (error && error.response && error.response.data) {
+                    console.error('error', error);
+                    toast.error(error.response.data.message, { duration: 6000 });
+                } else {
+                    console.error('Error fetching data:', error);
+                    toast.error(error.message || 'An error occurred while fetching data.', { duration: 6000 });
+                }
+            } finally {
+                setLoading(false)
+            }
         }
     }
 
-    const renderMarks = () => {
-        const marks = []
-        const part = 10
-        for (let i = 0; i <= part; i++) {
-            let step = Math.floor(valueRange / part)
-            let timeCurrent = new Date(timeFilter.start_time + step * i)
-            marks.push({
-                value: step * i,
-                label: timeCurrent.getHours() + ':' + timeCurrent.getMinutes()
-            })
+    const handleDownloadFile = async () => {
+        setLoading(true);
+
+        const timeDistance = endTime - startTime;
+
+        if (timeDistance <= 30 * 60 * 1000) {
+            const params = [];
+            let length = 0;
+            if (timeDistance <= 10 * 60 * 1000) {
+                length += 1;
+            } else if (timeDistance <= 20 * 60 * 1000) {
+                length += 2;
+            } else if (timeDistance <= 30 * 60 * 1000) {
+                length += 3;
+            }
+
+
+            for (let i = 0; i < length; i++) {
+                const start = startTime + i * 10 * 60 * 1000;
+                const end = startTime + (i + 1) * 10 * 60 * 1000;
+
+                params.push({
+                    start: convertDateToString1(new Date(start)),
+                    end: convertDateToString1(new Date(end))
+                });
+            }
+
+            if (camera.id !== '') {
+                try {
+                    const requests = params.map(async (time) => {
+                        try {
+                            const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/video/download?idCamera=${camera.id}&startTime=${time.start}&endTime=${time.end}`);
+                            if (res.data && res.data[0] && res.data[0].videoDownLoad && res.data[0].videoDownLoad[0] && res.data[0].videoDownLoad[0].video) {
+                                const videoDownloadUrl = res.data[0].videoDownLoad[0].video;
+                                await handleExportLinkDownload(videoDownloadUrl);
+                            } else {
+                                toast.error('Không tìm thấy URL tải về video', { duration: 6000 });
+                            }
+                        } catch (error) {
+                            if (error && error.response && error.response.data) {
+                                console.error('error', error);
+                                toast.error(error.response.data.message, { duration: 6000 });
+                            } else {
+                                console.error('Error fetching data:', error);
+                                toast.error(error.message || 'An error occurred while fetching data.', { duration: 6000 });
+                            }
+                        }
+                    });
+
+                    await Promise.all(requests);
+                } catch (error) {
+                    console.error('Unexpected error:', error);
+                    toast.error('An unexpected error occurred while downloading videos.', { duration: 6000 });
+                }
+            }
+
+            setLoading(false);
+        } else {
+            toast.error('Tổng thời gian không được vượt quá 30 phút', { duration: 6000 });
         }
+    };
 
 
-        return marks
-    }
+    const handleExportLinkDownload = async (linkDownload) => {
+        const axiosInstance = axios.create();
+        try {
+            const response = await axiosInstance.get(linkDownload, {
+                responseType: 'blob',
+            });
+
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'clip.mp4');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            toast.error(error.message || 'An error occurred while downloading the file.');
+        }
+    };
+
 
     const handSetChanel = (id, channel) => {
         setCamera({ id: id, name: name, channel: channel })
@@ -198,66 +233,112 @@ const Storage = ({ id, name, channel }) => {
         setMinuteType(type)
     }
 
+    const handleSetTimeSelected = (data) => {
+        setCurrentTime(0)
+        setPlay(!play)
+        setStartTime(data?.startTime?.getTime())
+        setEndTime(data?.endTime?.getTime())
+    }
+
+    const onClickPlay = v => {
+        setPlay(v)
+    }
+
     return (
         <Grid container spacing={2}>
-            <Grid item xs={12} sm={8}>
+            <Grid item xs={12} sm={9}>
                 <Card>
                     <CardHeader
                         title='Trích clip'
                         action={
                             <Grid container spacing={2}>
+                                <Grid item xs={3}></Grid>
+                                <Grid item xs={3}>
+                                    <DatePickerWrapper>
+                                        <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                                            <div>
+                                                <DatePicker
+                                                    selected={startDate}
+                                                    id='basic-input'
+                                                    maxDate={endDate}
+                                                    onChange={date => setStartDate(date)}
+                                                    customInput={<CustomInput label='Ngày bắt đầu' />}
+                                                />
+                                            </div>
+                                        </Box>
+                                    </DatePickerWrapper>
+                                </Grid>
+                                <Grid item xs={3}>
+                                    <DatePickerWrapper>
+                                        <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                                            <div>
+                                                <DatePicker
+                                                    selected={endDate}
+                                                    id='basic-input'
+                                                    maxDate={new Date()}
+                                                    onChange={date => setEndDate(date)}
+                                                    customInput={<CustomInput label='Ngày kết thúc' />}
+                                                />
+                                            </div>
+                                        </Box>
+                                    </DatePickerWrapper>
+                                </Grid>
 
-                                <Grid item xs={12}>
-                                    <CustomTextField select fullWidth id='form-layouts-separator-select' defaultValue='5minute'>
-                                        {minuteList.map((date, index) => (
-                                            <MenuItem key={date.id} value={date.name} onClick={() => handleSetMinuteType(date.name)}>{date.value}</MenuItem>
-                                        ))}
-                                    </CustomTextField>
+                                {/* <Grid item xs={3}>
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                                        <CustomTextField select fullWidth id='form-layouts-separator-select' defaultValue='10minute' label='Độ dài tối đa một video'>
+                                            {minuteList.map((minute, index) => (
+                                                <MenuItem key={minute.id} value={minute.name} onClick={() => handleSetMinuteType(minute.name)}>{minute.value}</MenuItem>
+                                            ))}
+                                        </CustomTextField>
+                                    </Box>
+                                </Grid> */}
+
+                                <Grid item xs={3} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end' }}>
+                                    <Button variant='contained' onClick={() => fetchDateList()}>Tìm kiếm</Button>
                                 </Grid>
                             </Grid>
                         }
                     />
                     <CardContent>
-                        <Daily
-                            callbackOfDaily={(v) => {
-                                setDataDaily(v)
-                                setDataDailyState(v)
-                            }}
-
-                            // dataDailyProps={dataDailyState}
-
-                            dateType={timeType}
-                            minuteType={minuteType}
-                            aria-describedby='validation-basic-last-name'
-                        />
+                        {loading && <Typography>Loading...</Typography>}
+                        {dataList.length > 0 &&
+                            <Timeline data={dataList} minuteType={minuteType} startDate={startDate} endDate={endDate} callback={handleSetTimeSelected} />
+                        }
                     </CardContent>
                 </Card>
             </Grid>
-            <Grid item xs={12} sm={4}>
+            <Grid item xs={12} sm={3}>
                 <Card>
                     <Grid container spacing={2} sx={{ marginBottom: 5 }}>
                         <Grid item xs={12}>
-                            {id === '' &&
+                            {(camera.id === '' || play === false) &&
                                 <div style={{ height: '30vh', background: '#000', display: 'flex', justifyContent: 'center' }}>
                                     <IconButton disabled>
                                         <Icon icon="tabler:player-play-filled" width='48' height='48' style={{ color: '#FF9F43' }} />
                                     </IconButton>
                                 </div>}
-                            {id !== '' && channel !== '' &&
-                                <ViewCamera
+                            {camera.id !== '' && play &&
+                                <ViewCameraPause
                                     name={camera.name}
                                     id={camera.id}
                                     channel={camera.channel}
                                     play={play}
-                                    startTime={timePlay || time_start}
-                                    endTime={timeFilter?.end_time || time_end}
+                                    startTime={startTime}
+                                    endTime={endTime}
+                                    duration={duration}
+                                    onChangeDuration={setDuration}
                                     onChangeCurrentTime={time => {
                                         setCurrentTime(1000 * time)
                                     }}
                                     sizeScreen={'1x1.8'}
                                     handSetChanel={handSetChanel}
+                                    volume={volume}
                                 />
                             }
+                        </Grid>
+                        <Grid item xs={12}>
+
                         </Grid>
                     </Grid>
                     <DialogActions
@@ -267,7 +348,14 @@ const Storage = ({ id, name, channel }) => {
                             pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
                         }}
                     >
-                        <Button type='submit' variant='contained'>
+                        <IconButton onClick={() => onClickPlay(!play)} style={{ padding: 5, margin: '0 8px 0 8px' }}>
+                            {play === false ? (
+                                <Icon icon='ph:play-light' size='1.2em' color='#000' />
+                            ) : (
+                                <Icon icon='ic:twotone-pause' size='1.2em' color='#000' />
+                            )}
+                        </IconButton>
+                        <Button type='submit' variant='contained' onClick={() => handleDownloadFile()}>
                             Xuất file
                         </Button>
                     </DialogActions>

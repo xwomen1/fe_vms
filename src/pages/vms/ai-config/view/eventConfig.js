@@ -2,16 +2,15 @@ import { useEffect, useRef, useState } from "react"
 import axios from "axios"
 import { TreeItem, TreeView } from "@mui/lab"
 import Icon from 'src/@core/components/icon'
-import { Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Slider, Tooltip, Typography, styled, CircularProgress, CardActions } from "@mui/material"
+import { Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Typography, styled, CardActions, Dialog, DialogContent, DialogActions } from "@mui/material"
 import authConfig from 'src/configs/auth'
-import ViewCamera from "./viewCamera"
-import { AddBox, CameraAlt, FastForward, FastRewind, IndeterminateCheckBox, Pause, PlayArrow, SkipNext, SkipPrevious } from "@mui/icons-material"
 import { format } from "date-fns"
 import CustomTextField from "src/@core/components/mui/text-field"
 import Schedule from "../popups/schedule"
 import CustomAutocomplete from "src/@core/components/mui/autocomplete"
 import toast from "react-hot-toast"
 import AddAlertAI from "../popups/addAlertAI"
+import Review from "./viewCamera"
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   '&:hover > .MuiTreeItem-content:not(.Mui-selected)': {
@@ -118,6 +117,7 @@ const EventConfig = () => {
   const [nameCameraSelect, setNameCameraSelect] = useState(null)
   const [alertAIList, setAlertAIList] = useState([])
   const [alertList, setAlertList] = useState([])
+  const [alert, setAlert] = useState(null)
   const [cameraAIPropertyId, setCameraAIPropertyId] = useState(null)
   const [calendar, setCalendar] = useState(null)
 
@@ -144,6 +144,7 @@ const EventConfig = () => {
 
   const [isOpenModelAI, setIsOpenModelAI] = useState(false)
   const [isOpenModelAIType, setIsOpenModelAIType] = useState(null)
+  const [isOpenDel, setIsOpenDel] = useState(false)
 
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -250,7 +251,13 @@ const EventConfig = () => {
       )
       setCameraGroup(res.data)
     } catch (error) {
-      console.error('Error fetching data: ', error)
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
     }
   }
 
@@ -259,6 +266,7 @@ const EventConfig = () => {
       fetchModelAICamera()
       setEventSelect(null)
     }
+    setAlert(null)
   }, [idCameraSelect, reload])
 
   const fetchModelAICamera = async () => {
@@ -269,8 +277,13 @@ const EventConfig = () => {
       )
       setAlertAIList(res.data)
     } catch (error) {
-      console.error('Error fetching data: ', error)
-      toast(error)
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
     }
   }
 
@@ -518,8 +531,13 @@ const EventConfig = () => {
       setReload(reload + 1)
       toast.success('Thao tác thành công')
     } catch (error) {
-      console.error('Error fetching data: ', error)
-      toast.error(error)
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
     } finally {
       setLoading(false)
     }
@@ -586,11 +604,71 @@ const EventConfig = () => {
     await updateAlertList(changedAlerts)
   }
 
+  const handleDeleteAlert = async () => {
+
+    if (alert !== null) {
+      const changedAlerts = alertList.filter(item => item?.cameraModelAI?.id !== alert?.cameraModelAI?.id)
+
+      await updateAlertList(changedAlerts)
+    }
+    setAlert(null)
+  }
+
+  const DeleteView = () => (
+    <Dialog
+      open={isOpenDel}
+      maxWidth='sm'
+      scroll='body'
+      onClose={() => setIsOpenDel(false)}
+      onBackdropClick={() => setIsOpenDel(false)}
+    >
+      <DialogContent
+        sx={{
+          pb: theme => `${theme.spacing(8)} !important`,
+          px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
+          pt: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
+        }}
+      >
+        <Box sx={{ mb: 4, textAlign: 'center' }}>
+          <Typography variant='h3' sx={{ mb: 3 }}>
+            Xác nhận
+          </Typography>
+          <Typography sx={{ color: 'text.secondary' }}>
+            Bạn có chắc chắn muốn xóa <strong style={{ fontStyle: 'italic', color: '#FF9F43' }}>{eventSelect}</strong> không ?
+          </Typography>
+        </Box>
+      </DialogContent>
+      <DialogActions
+        sx={{
+          justifyContent: 'center',
+          px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
+          pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
+        }}
+      >
+        <Button
+          variant='contained'
+          onClick={() => {
+            handleDeleteAlert()
+            setIsOpenDel(false)
+          }}>
+          Đồng ý
+        </Button>
+        <Button variant='tonal' color='secondary'
+          sx={{ mr: 1 }} onClick={() => setIsOpenDel(false)}>
+          Hủy
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
+
   const alertAIListView = () => {
     return alertList.map((alert, index) => (
       <>
         <Card
           onClick={() => {
+
+            setAlert(alert)
+
             if (alert.isactive == true) {
               setEventSelect(alert?.cameraModelAI?.modelName)
 
@@ -721,30 +799,48 @@ const EventConfig = () => {
             <Grid item xs={12}>
               <Card>
                 <CardHeader title='Cảnh báo AI' />
-                <CardContent sx={{ height: '60vh', overflow: 'auto' }}>
+                <CardContent sx={{ height: '60vh', overflow: 'auto' }} >
                   {alertAIListView()}
                 </CardContent>
                 <CardActions>
-
                   <Grid container spacing={0}>
                     <Grid item xs={12}>
-                      <Button
-                        variant='contained'
-                        style={{
-                          width: '100%',
-                          marginTop: '10px'
-                        }}
-                        onClick={() => {
-                          setIsOpenModelAI(true)
-                          if (alertList.length > 0) {
-                            setIsOpenModelAIType('update')
-                          } else {
-                            setIsOpenModelAIType('add')
-                          }
-                        }}
-                      >
-                        Thêm mới cảnh báo
-                      </Button>
+                      <Grid container spacing={2}>
+                        <Grid item xs={6}>
+                          <Button
+                            variant='contained'
+                            style={{
+                              width: '100%',
+                              marginTop: '10px'
+                            }}
+                            onClick={() => {
+                              setIsOpenModelAI(true)
+                              if (alertList.length > 0) {
+                                setIsOpenModelAIType('update')
+                              } else {
+                                setIsOpenModelAIType('add')
+                              }
+                            }}
+                          >
+                            Thêm mới cảnh báo
+                          </Button>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Button
+                            variant='contained'
+                            style={{
+                              width: '100%',
+                              marginTop: '10px'
+                            }}
+                            disabled={alert !== null ? false : true}
+                            onClick={() => {
+                              setIsOpenDel(true)
+                            }}
+                          >
+                            Xóa cảnh báo
+                          </Button>
+                        </Grid>
+                      </Grid>
                     </Grid>
                     <Grid item xs={12}>
                       <Box sx={{ marginTop: 5 }}>
@@ -872,7 +968,6 @@ const EventConfig = () => {
               <Box
                 sx={{
                   width: '100%',
-                  height: '70vh',
                   position: 'relative',
                   display: 'flex',
                   flexDirection: 'column',
@@ -882,116 +977,29 @@ const EventConfig = () => {
               >
                 <Box
                   sx={{
-                    width: 640,
-                    height: 360,
-                    background: '#ccc',
+                    width: 700,
+                    height: 600,
+                    background: 'none',
                     borderRadius: 2
                   }}
                 >
-                  {idCameraSelect != null && <ViewCamera key={idCameraSelect} id={idCameraSelect} channel={'Sub'} />}
+                  <div>
+                    {idCameraSelect !== null &&
+                      <Review key={idCameraSelect} id={idCameraSelect} name={nameCameraSelect} channel={'Sub'} />}
+                  </div>
                   <canvas
                     ref={canvasRef}
-                    width='640'
-                    height='360'
+                    width={700}
+                    height={400}
                     style={{
                       background: 'none',
                       position: 'absolute',
                       opacity: 0.5,
-                      top: 21
+                      top: 30
                     }}
                     id='cameraEdit'
                   />
                 </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Typography variant='h5'>{nameCameraSelect}</Typography>
-                </Box>
-
-                <div style={{ width: '100%', marginTop: 20, padding: 5 }}>
-                  <Box display='flex' flexDirection='column' position='relative'>
-                    <div style={{ position: 'absolute', top: -30, right: -30 }}>
-                      <Tooltip title='Thu nhỏ'>
-                        <IconButton
-                          disabled={zoom < 50}
-                          onClick={() => {
-                            setZoom(zoom - 60)
-                          }}
-                        >
-                          <IndeterminateCheckBox />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title='Phóng to'>
-                        <IconButton
-                          disabled={zoom > 1440}
-                          onClick={() => {
-                            setZoom(zoom + 60)
-                          }}
-                        >
-                          <AddBox />
-                        </IconButton>
-                      </Tooltip>
-                    </div>
-                    <div className='' style={{ background: '#000', height: 25, display: 'flex', marginTop: 5 }}>
-                      <div
-                        style={{ background: '#F85B3B', width: 2, height: '100%', marginRight: 20, marginLeft: 100 }}
-                      ></div>
-                      <div style={{ background: 'green', width: 2, height: '100%', marginRight: 100 }}></div>
-                      <div style={{ background: 'blue', width: 2, height: '100%' }}></div>
-                      <div
-                        style={{ background: '#F85B3B', width: 2, height: '100%', marginRight: 20, marginLeft: 100 }}
-                      ></div>
-                      <div style={{ background: 'green', width: 2, height: '100%', marginRight: 100 }}></div>
-                      <div style={{ background: 'blue', width: 2, height: '100%' }}></div>
-                      <div
-                        style={{ background: '#F85B3B', width: 2, height: '100%', marginRight: 20, marginLeft: 100 }}
-                      ></div>
-                      <div style={{ background: 'green', width: 2, height: '100%', marginRight: 100 }}></div>
-                      <div style={{ background: 'blue', width: 2, height: '100%' }}></div>
-                    </div>
-                    <Slider
-                      style={{
-                        position: 'absolute',
-                        top: 15
-                      }}
-                      value={progress}
-                      onChange={handleSliderChange}
-                      step={0.1}
-                      min={0}
-                      max={100}
-                      marks={marks}
-                      size='small'
-                      defaultValue={70}
-                      aria-label='Small'
-                      valueLabelDisplay='off'
-                      ValueLabelComponent={({ children, value }) => (
-                        <Tooltip open={false} title={valueLabelFormat(value)}>
-                          {children}
-                        </Tooltip>
-                      )}
-                    />
-                  </Box>
-                </div>
-                <div style={{ width: '100%', height: 50, marginTop: 30 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
-                    <IconButton color='primary'>
-                      <CameraAlt />
-                    </IconButton>
-                    <IconButton color='primary'>
-                      <SkipPrevious />
-                    </IconButton>
-                    <IconButton color='primary'>
-                      <FastRewind />
-                    </IconButton>
-                    <IconButton color='primary' onClick={handlePlayClick} aria-label={isPlaying ? 'pause' : 'play'}>
-                      {isPlaying ? <Pause /> : <PlayArrow />}
-                    </IconButton>
-                    <IconButton color='primary'>
-                      <FastForward />
-                    </IconButton>
-                    <IconButton color='primary'>
-                      <SkipNext />
-                    </IconButton>
-                  </Box>
-                </div>
               </Box>
             </CardContent>
           </Card>
@@ -1015,6 +1023,8 @@ const EventConfig = () => {
           setReload={() => setReload(reload + 1)}
         />
       }
+
+      {isOpenDel && DeleteView()}
     </>
   )
 }

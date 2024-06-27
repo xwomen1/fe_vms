@@ -21,12 +21,14 @@ import {
 import { useEffect, useState } from 'react'
 import Icon from 'src/@core/components/icon'
 import toast from 'react-hot-toast'
+import CustomChip from 'src/@core/components/mui/chip'
 
 const AIConfig = () => {
   const [loading, setLoading] = useState(false)
   const [keyword, setKeyword] = useState('')
   const [cameraGroup, setCameraGroup] = useState([])
   const [alertAIList, setAlertAIList] = useState([])
+  const [modelAIList, setModelAIList] = useState([])
   const [dataList, setDataList] = useState([])
   const [reload, setReload] = useState(0)
   const [switchStates, setSwitchStates] = useState({})
@@ -86,7 +88,10 @@ const AIConfig = () => {
       field: 'face',
       label: 'Nhận diện khuôn mặt',
       renderCell: row => (
-        <Switch checked={switchStates[row.id]?.face || false} onChange={e => handleSwitchChange(e, row.id, 'face_recognition', row.alert_id)} />
+        <Switch
+          checked={switchStates[row.id]?.face || false}
+          onChange={e => handleSwitchChange(e, row.id, 'face_recognition', row.alert_id, row.isExistFace)}
+        />
       )
     },
     {
@@ -99,7 +104,7 @@ const AIConfig = () => {
       renderCell: row => (
         <Switch
           checked={switchStates[row.id]?.licensePlate || false}
-          onChange={e => handleSwitchChange(e, row.id, 'license_plate_recognition', row.alert_id)}
+          onChange={e => handleSwitchChange(e, row.id, 'license_plate_recognition', row.alert_id, row.isExistLicensePlate)}
         />
       )
     }
@@ -107,6 +112,7 @@ const AIConfig = () => {
 
   useEffect(() => {
     fetchCameraGroup()
+    handleGetModelAI()
   }, [reload])
 
   const fetchCameraGroup = async () => {
@@ -118,6 +124,37 @@ const AIConfig = () => {
       setCameraGroup(res.data)
     } catch (error) {
       console.error('Error fetching data: ', error)
+    }
+  }
+
+  const handleGetModelAI = async () => {
+    setLoading(true)
+
+    const params = {
+      ...config,
+      params: {
+        sort: '+created_at',
+      }
+    }
+
+    try {
+      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/camera-model-ai`, params)
+      const list = []
+      const face = res.data?.find((item) => item.type === 'face_recognition')
+      const licensePlate = res.data?.find((item) => item.type === 'license_plate_recognition')
+      list.push(face)
+      list.push(licensePlate)
+      setModelAIList(list)
+    } catch (error) {
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -146,40 +183,42 @@ const AIConfig = () => {
     fetchModelAICameras(cameraGroup)
   }, [cameraGroup, reload])
 
-
   useEffect(() => {
-    if (!alertAIList || !cameraGroup) return;
+    if (!Array.isArray(alertAIList) || !Array.isArray(cameraGroup)) return;
 
-    const data = cameraGroup.map((camera, index) => {
-      const item = alertAIList.find((alert) => alert.camera_id === camera.id)
-      const licensePlate = item?.cameraaiproperty.find((a) => (a.cameraModelAI.type === 'license_plate_recognition'))
-      const face = item?.cameraaiproperty.find((b) => (b.cameraModelAI.type === 'face_recognition'))
+    const data = cameraGroup.map((camera) => {
+      const item = alertAIList.find((alert) => alert?.camera_id === camera?.id);
+      if (!item) return camera;
+
+      const licensePlate = item.cameraaiproperty.find((a) => a?.cameraModelAI?.type === 'license_plate_recognition');
+      const face = item.cameraaiproperty.find((b) => b?.cameraModelAI?.type === 'face_recognition');
 
       const alert = {
-        alert_id: item?.id,
-        face: face?.isactive,
-        licensePlate: licensePlate?.isactive
-      }
+        alert_id: item?.id || null,
+        face: face?.isactive ? item?.id : null,
+        isExistFace: face !== undefined ? true : false,
+        licensePlate: licensePlate?.isactive ? item?.id : null,
+        isExistLicensePlate: licensePlate !== undefined ? true : false
+      };
 
-      return alert ? { ...camera, ...alert } : camera
-    })
-    setDataList(data)
+      return { ...camera, ...alert };
+    });
 
-    const initialSwitchStates = {}
+    setDataList(data);
+
+    const initialSwitchStates = {};
     data.forEach((item) => {
-      initialSwitchStates[item.id] = {
-        face: item.face || false,
-        licensePlate: item.licensePlate || false
-      }
-    })
-    setSwitchStates(initialSwitchStates)
-  }, [alertAIList, cameraGroup])
+      initialSwitchStates[item?.id] = {
+        face: Boolean(item?.face),
+        licensePlate: Boolean(item?.licensePlate),
+      };
+    });
 
-  useEffect(() => {
+    setSwitchStates(initialSwitchStates);
+  }, [alertAIList, cameraGroup]);
 
-  }, [dataList, switchStates])
 
-  const handleSwitchChange = (event, cameraId, type, cameraAIPropertyId) => {
+  const handleSwitchChange = (event, cameraId, type, cameraAIPropertyId, isModelExist) => {
     setSwitchStates(prevState => ({
       ...prevState,
       [cameraId]: {
@@ -188,14 +227,126 @@ const AIConfig = () => {
       }
     }))
 
-    handleUpdateAlertIsActive(cameraAIPropertyId, type)
+    if (cameraAIPropertyId && isModelExist === true) {
+      handleUpdateAlertIsActive(cameraAIPropertyId, type)
+    }
+
+    if (cameraAIPropertyId && isModelExist === false) {
+      handleGetModelAIByCamera(cameraId, cameraAIPropertyId, type)
+    }
+
+    if (cameraAIPropertyId === undefined) {
+      handleAddAlertIsActive(cameraId, type)
+    }
+
+  }
+
+  const handleAddAlertIsActive = async (cameraId, type) => {
+
+    const values = modelAIList.find((model) => model.type === type)
+
+    const params = {
+      camera_id: cameraId,
+      cameraaiproperty: [
+        {
+          cameraModelAI: { ...values },
+          cameraAiZone: {
+            vfences: [],
+            vzone: {}
+          },
+          calendarDays: [],
+          isactive: true
+        }
+      ]
+    }
+
+    try {
+      await axios.post(
+        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties`,
+        { ...params },
+        config
+      )
+      setReload(reload + 1)
+      toast.success('Thao tác thành công')
+    } catch (error) {
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleGetModelAIByCamera = async (cameraId, cameraAIPropertyId, type) => {
+    try {
+      const res = await axios.get(
+        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties/camera/${cameraId}`,
+        config
+      )
+      const data = res.data[0].cameraaiproperty
+      if (data !== undefined) {
+        handleUpdateAlertIsActive2(cameraAIPropertyId, data, type)
+      }
+
+    } catch (error) {
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
+    }
+  }
+
+  const handleUpdateAlertIsActive2 = async (cameraAIPropertyId, data, type) => {
+    const values = modelAIList.find((model) => model.type === type)
+
+    const params = {
+      cameraaiproperty: [
+        ...data,
+        {
+          cameraModelAI: { ...values },
+          cameraAiZone: {
+            vfences: [],
+            vzone: {}
+          },
+          calendarDays: [],
+          isactive: true
+        }
+      ]
+    }
+
+    try {
+      await axios.put(
+        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties/${cameraAIPropertyId}`,
+        { ...params },
+        config
+      )
+      setReload(reload + 1)
+      toast.success('Thao tác thành công')
+    } catch (error) {
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleUpdateAlertIsActive = async (alertId, type) => {
-    const alert = alertAIList.find((alert) => alert.id === alertId)
+    const alert = alertAIList.find((alert) => alert?.id === alertId)
 
-    const changedAlerts = alert.cameraaiproperty.map(alert => {
-      return alert.cameraModelAI.type === type ? { ...alert, isactive: !alert.isactive } : alert
+    const changedAlerts = alert?.cameraaiproperty?.map(alert => {
+      return alert?.cameraModelAI?.type === type ? { ...alert, isactive: !alert.isactive } : alert
     })
 
     const params = {
@@ -211,8 +362,13 @@ const AIConfig = () => {
       setReload(reload + 1)
       toast.success('Thao tác thành công')
     } catch (error) {
-      console.error('Error fetching data: ', error)
-      toast.error(error)
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
     } finally {
       setLoading(false)
     }
@@ -269,7 +425,16 @@ const AIConfig = () => {
                           </TableCell>
                         )
                       })}
-                      <TableCell align='right'>{row.status.name}</TableCell>
+                      <TableCell align='right'>
+                        <CustomChip
+                          rounded
+                          size='small'
+                          skin='light'
+                          sx={{ lineHeight: 1 }}
+                          color={row.status.name === 'Không hoạt động' ? 'primary' : 'success'}
+                          label={row.status.name}
+                        />
+                      </TableCell>
                     </TableRow>
                   )
                 })}

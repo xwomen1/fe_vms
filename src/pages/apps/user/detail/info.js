@@ -32,8 +32,7 @@ import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import DatePicker from 'react-datepicker'
 import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
-import RolePopup from './popup/AddGroup'
-import PolicyPopup from './popup/AddPolicy'
+
 import Swal from 'sweetalert2'
 
 const UserDetails = () => {
@@ -66,12 +65,12 @@ const UserDetails = () => {
   const [filteredRegionOptions, setFilteredRegionOptions] = useState(user?.level)
   const [filteredContractOptions, setFilteredContractOptions] = useState(user?.contractType)
 
-  const [timeEndMorning, setTimeEndMorning] = useState('')
-  const [timeStartAfternoon, setTimeStartAfternoon] = useState('')
-  const [timeEndAfternoon, setTimeEndAfternoon] = useState('')
+  const [timeEndMorning, setTimeEndMorning] = useState(new Date())
+  const [timeStartAfternoon, setTimeStartAfternoon] = useState(new Date())
+  const [timeEndAfternoon, setTimeEndAfternoon] = useState(new Date())
   const [showPlusColumn, setShowPlusColumn] = useState(true)
 
-  const [dateTime, setDateTime] = useState('')
+  const [dateTime, setDateTime] = useState(new Date())
   const [startDate, setStartDate] = useState(new Date())
   const [fullNameValue, setFullNameValue] = useState('')
   const [email, setEmail] = useState('')
@@ -83,6 +82,8 @@ const UserDetails = () => {
   const [contractOptions, setContractOptions] = useState([])
 
   const [regionOptions, setRegionOptions] = useState([])
+  const [regionName, setRegionName] = useState([])
+
   const [userCode, setUserCode] = useState('')
   const [syncCode, setSyncCode] = useState('')
 
@@ -124,7 +125,7 @@ const UserDetails = () => {
     const fetchRegions = async () => {
       try {
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=953a140f-76e4-4841-9871-b9f30b3a37a7'
+          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/parentsID?parentID=953a140f-76e4-4841-9871-b9f30b3a37a7'
         )
 
         const regions = response.data.map(region => ({
@@ -146,7 +147,7 @@ const UserDetails = () => {
     const fetchRegions = async () => {
       try {
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=17a24f4a-4402-4a3f-b341-2afa8e67fba6'
+          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/parentsID?parentID=17a24f4a-4402-4a3f-b341-2afa8e67fba6'
         )
 
         const regions = response.data.map(region => ({
@@ -261,7 +262,7 @@ const UserDetails = () => {
   }
 
   const handleAddRow = () => {
-    const newRow = { groupName: '', groupCode: '', id: '' } // Thêm groupId vào đây
+    const newRow = { groupName: '', groupCode: '', id: '', parentId: '' } // Thêm groupId vào đây
     setGroup([...groups, newRow])
   }
 
@@ -463,8 +464,8 @@ const UserDetails = () => {
           timeStartAfternoon: convertStringToTimeArray(timeStartAfternoon),
           timeStartMorning: convertStringToTimeArray(dateTime),
           timeEndMorning: convertStringToTimeArray(timeEndMorning),
-          availableAt: ava1 || isoToEpoch(new Date()),
-          expiredAt: ava2 || isoToEpoch(new Date()),
+          availableAt: ava1 || availableAt,
+          expiredAt: ava2 || expiredAt,
           level: filteredRegionOptions || selectedRegion.id,
           contractType: filteredContractOptions || selectContract.id,
           note: note
@@ -668,6 +669,14 @@ const UserDetails = () => {
           config
         )
 
+        const regions = response.data.map(region => ({
+          value: region.name,
+          label: region.name,
+          id: region.id,
+          parentId: region.parentID // Lưu lại parentID của regions
+        }))
+        setRegionName(regions)
+
         setGroupOptions(response.data)
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -782,6 +791,14 @@ const UserDetails = () => {
     option => !policies || !policies.some(policies => policies.policyName === option.policyName)
   )
   console.log(policyOption)
+  useEffect(() => {
+    if (timeValidity === 'Undefined') {
+      setAvailableAt(null)
+      setAva1(null)
+      setExpiredAt(null)
+      setAva2(null)
+    }
+  }, [timeValidity])
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -906,6 +923,10 @@ const UserDetails = () => {
                 </>
 
                 {/* )} */}
+              </Grid>
+
+              <Grid item xs={12} style={{ height: 10 }}>
+                {' '}
               </Grid>
               <Grid container spacing={2}>
                 <Grid item xs={4}>
@@ -1107,7 +1128,7 @@ const UserDetails = () => {
                                 <DatePicker
                                   selected={availableAt}
                                   onChange={handleStartDateChange}
-                                  dateFormat='MM/dd/yyyy'
+                                  dateFormat='dd/MM/yyyy'
                                   customInput={<CustomInput label='Ngày bắt đầu' />}
                                 />
                               </div>
@@ -1115,15 +1136,15 @@ const UserDetails = () => {
                           </DatePickerWrapper>
                         </Grid>
                         {user.expiredAt && (
-                          <Grid item xs={4}>
+                          <Grid item xs={8}>
                             <DatePickerWrapper>
                               <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
                                 <div>
                                   <DatePicker
                                     selected={expiredAt}
                                     onChange={handleEndDateChange}
-                                    dateFormat='MM/dd/yyyy'
-                                    customInput={<CustomInput label='Ngày bắt đầu' />}
+                                    dateFormat='dd/MM/yyyy'
+                                    customInput={<CustomInput label='Ngày kết thúc' />}
                                   />
                                 </div>
                               </Box>
@@ -1215,14 +1236,22 @@ const UserDetails = () => {
                                     ? groupOptions.find(option => option.name === group.groupName)
                                     : { name: group.groupName }
                                 }
-                                onChange={(event, newValue) => {
+                                onChange={async (event, newValue) => {
                                   const updatedRows = [...groups]
                                   updatedRows[index].groupName = newValue?.name || ''
                                   updatedRows[index].groupCode = newValue?.code || ''
+                                  updatedRows[index].parentId = newValue?.parentID || ''
 
                                   console.log('Updated group name:', newValue?.name)
+                                  console.log('Updated group name:', newValue?.name)
+                                  console.log('Parent ID:', newValue?.parentID) // Log ra parentId
 
+                                  const parentName = await fetchRegionName(newValue?.parentID)
+                                  updatedRows[index].parentName = parentName || ''
+
+                                  console.log('Parent name:', parentName) // Log ra tên của parentId
                                   setGroup(updatedRows)
+                                  console.log(updatedRows, 'hihih')
                                 }}
                                 renderInput={params => <TextField {...params} label='Đơn vị' />}
                               />
@@ -1350,7 +1379,7 @@ const UserDetails = () => {
                                   // updatedRows[index].id = newValue.id
                                   setPolicies(updatedRows)
                                 }}
-                                renderInput={params => <TextField {...params} label='Đơn vị' />}
+                                renderInput={params => <TextField {...params} label='Vai trò' />}
                               />
                             </TableCell>
                             <TableCell>{policy.policyCode}</TableCell>

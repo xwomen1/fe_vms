@@ -190,8 +190,12 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
     <div className='portlet portlet-video live' style={{ width: '100%' }}>
       <div className='portlet-title'>
         <div className='caption'>
-          <span className='label label-sm bg-red'> {status ? status.toUpperCase() : 'LIVE'}</span>
-          <span className='caption-subject font-dark sbold uppercase'>{name}</span>
+        <span className='label label-sm' 
+        style={{ backgroundColor: status === 'connected' ? 'green' : 'red', color: 'white' }}>
+          {status ? status.toUpperCase() : 'LIVE'}
+        </span>
+       
+        <span className='caption-subject font-dark sbold uppercase'>{name}</span>
         </div>
         <div className='media-top-controls'>
           <div className='btn-group'>

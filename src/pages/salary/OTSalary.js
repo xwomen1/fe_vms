@@ -14,7 +14,7 @@ import Table from '@mui/material/Table'
 import Paper from '@mui/material/Paper'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
-import { IconButton } from '@mui/material'
+import { IconButton, TableContainer } from '@mui/material'
 import Swal from 'sweetalert2'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchData } from 'src/store/apps/user'
@@ -25,11 +25,14 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 import Link from 'next/link'
 import { fetchChatsContacts } from 'src/store/apps/chat'
 import SalaryRulePage from '../salaryRule/salaryRule'
+import toast from 'react-hot-toast'
+import httpStatusMessages from 'src/message'
 
 const UserList = ({ apiData }) => {
   const [value, setValue] = useState('')
   const [valueGroup, setValueGroup] = useState('')
-
+  const [OT, setOT] = useState('')
+  const [business, setBussiness] = useState('')
   const [addUserOpen, setAddUserOpen] = useState(false)
   const [userData, setUserData] = useState([])
   const [total, setTotal] = useState([1])
@@ -41,8 +44,12 @@ const UserList = ({ apiData }) => {
   const [anchorEl, setAnchorEl] = useState(null)
   const router = useRouter()
   const [salary, setSalary] = useState('')
+  const [editedTimeHourDay, setEditedTimeHourDay] = useState('')
+  const [editedTimeDayMonth, setEditedTimeDayMonth] = useState('')
   const [contractTypes, setContractTypes] = useState({})
   const [isSalaryRuleOpen, setIsSalaryRuleOpen] = useState(false)
+  const [editRow, setEditRow] = useState(null) // New state for edit mode
+  const [editData, setEditData] = useState({}) // State for holding row data being edited
 
   const toggleSalaryRule = () => {
     setIsSalaryRuleOpen(!isSalaryRuleOpen)
@@ -89,6 +96,27 @@ const UserList = ({ apiData }) => {
     setPage(1)
     handleCloseMenu()
   }
+  useEffect(() => {
+    const fetchSalaryData = async () => {
+      try {
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+
+        const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/salary/regulation/', config)
+        setOT(response.data.othour)
+        setBussiness(response.data.businessDay)
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+
+    fetchSalaryData()
+  }, [])
 
   const fetchRegionName = async regionId => {
     try {
@@ -105,9 +133,9 @@ const UserList = ({ apiData }) => {
     const fetchAllRegionNames = async () => {
       const newContractTypes = {}
       for (const user of userData) {
-        if (user.contractType && !newContractTypes[user.contractType]) {
-          const regionName = await fetchRegionName(user.contractType)
-          newContractTypes[user.contractType] = regionName
+        if (contractTypes) {
+          const regionName = await fetchRegionName(contractTypes)
+          newContractTypes[contractTypes] = regionName
         }
       }
       setContractTypes(newContractTypes)
@@ -175,7 +203,9 @@ const UserList = ({ apiData }) => {
         }
         const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/salary/regulation/', config)
 
-        setSalary(response.data)
+        setSalary(response.data.salary)
+        setEditedTimeHourDay(response.data.timeHourDay)
+        setEditedTimeDayMonth(response.data.timeDayMonth)
         console.log(response.data.othour)
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -234,6 +264,42 @@ const UserList = ({ apiData }) => {
 
   console.log(total, 'totalpage')
 
+  const handleEdit = user => {
+    setEditRow(user.userId)
+    setEditData(user)
+  }
+
+  const getHttpStatusMessage = statusCode => {
+    return httpStatusMessages[statusCode] || 'Unknown Status' // Default to 'Unknown Status' if code not found
+  }
+
+  const handleSave = async userId => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+      console.log(editData)
+      const response = await axios.put(`https://dev-ivi.basesystem.one/smc/iam/api/v0/users`, editData, config)
+      fetchFilteredOrAllUsers()
+
+      const statusMessage = getHttpStatusMessage(response.status)
+
+      toast.success('Sửa thành công')
+
+      // Refresh user data
+    } catch (error) {
+      console.error('Error updating user:', error)
+      toast.error(error.message)
+    } finally {
+      setEditRow(null)
+      setEditData({})
+    }
+  }
+
   const handleDelete = idDelete => {
     showAlertConfirm({
       text: 'Bạn có chắc chắn muốn xóa?'
@@ -256,6 +322,7 @@ const UserList = ({ apiData }) => {
             Swal.fire('Xóa thành công', '', 'success')
             const updatedData = userData.filter(user => user.userId !== idDelete)
             setUserData(updatedData)
+
             fetchData()
           })
           .catch(err => {
@@ -265,6 +332,50 @@ const UserList = ({ apiData }) => {
     })
   }
 
+  const handleChange = (field, value) => {
+    setEditData(prevEditData => ({
+      ...prevEditData,
+      salary: {
+        ...prevEditData.salary,
+
+        ...prevEditData.ot,
+        ...prevEditData.goOnBusiness,
+
+        [field]: value
+      }
+    }))
+  }
+
+  const fetchFilteredOrAllUsers = async () => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        params: {
+          limit: pageSize,
+          page: page,
+          keyword: value
+        }
+      }
+      let url
+      if (selectedGroups.length > 0) {
+        url = `https://dev-ivi.basesystem.one/smc/iam/api/v0/users/search?groupIds=${selectedGroups
+          .map(g => g.groupId)
+          .join(',')}`
+      } else {
+        url = 'https://dev-ivi.basesystem.one/smc/iam/api/v0/users/search'
+      }
+      const response = await axios.get(url, config)
+      setUserData(response.data.rows)
+      setTotal(response.data.totalPage)
+      setContractTypes(response.data.contractType)
+    } catch (error) {
+      console.error('Error fetching users:', error)
+    }
+  }
   const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen)
   useEffect(() => {
     const fetchFilteredOrAllUsers = async () => {
@@ -292,6 +403,7 @@ const UserList = ({ apiData }) => {
         const response = await axios.get(url, config)
         setUserData(response.data.rows)
         setTotal(response.data.totalPage)
+        setContractTypes(response.data.contractType)
       } catch (error) {
         console.error('Error fetching users:', error)
       }
@@ -327,36 +439,73 @@ const UserList = ({ apiData }) => {
           </Grid>
           <Grid item xs={9.8}>
             <Paper elevation={3}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Mã định danh</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Full Name</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Đơn vị</TableCell>
-
-                    <TableCell sx={{ padding: '16px' }}>Số giờ OT</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Số ngày công tác</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Phụ cấp</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Tổng thực lĩnh</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {userData.map((user, index) => (
-                    <TableRow key={user.userId}>
-                      <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user.accessCode}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user.fullName}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user.userGroup[0]?.groupName}</TableCell>
-
-                      <TableCell sx={{ padding: '16px' }}>{user?.salary?.ot || '0'}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user?.salary?.goOnBusiness || '0'}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user?.salary?.ot || '0'}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{user?.salary?.ot || '0'}</TableCell>
+              <TableContainer component={Paper} style={{ maxWidth: '100%', overflowX: 'auto' }}>
+                <Table stickyHeader aria-label='sticky table'>
+                  {' '}
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ padding: '16px' }}>STT</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Mã định danh</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Full Name</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Đơn vị</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Số giờ OT</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Phụ cấp OT</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Số ngày công tác</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Phụ cấp công tác</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Hành động</TableCell> {/* Add this line */}
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHead>
+                  <TableBody>
+                    {userData.map((user, index) => (
+                      <TableRow key={user.userId}>
+                        <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{user.accessCode}</TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{user.fullName}</TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{user.userGroup[0]?.groupName}</TableCell>
+
+                        <TableCell sx={{ padding: '16px' }}>
+                          {editRow === user.userId ? (
+                            <CustomTextField
+                              value={editData.salary?.ot}
+                              onChange={e => handleChange('ot', e.target.value)}
+                            />
+                          ) : (
+                            user?.salary?.ot || '0'
+                          )}
+                        </TableCell>
+                        <TableCell sx={{ padding: '16px' }}>
+                          {((salary * user?.salary?.salaryLevel) / (editedTimeHourDay * editedTimeDayMonth)) *
+                            (OT / 100) *
+                            user?.salary?.ot || '0'}
+                        </TableCell>
+
+                        <TableCell sx={{ padding: '16px' }}>
+                          {editRow === user.userId ? (
+                            <CustomTextField
+                              value={editData.salary?.goOnBusiness}
+                              onChange={e => handleChange('goOnBusiness', e.target.value)}
+                            />
+                          ) : (
+                            user?.salary?.goOnBusiness || '0'
+                          )}
+                        </TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{user?.salary?.goOnBusiness * business || '0'}</TableCell>
+                        <TableCell sx={{ padding: '16px' }}>
+                          {editRow === user.userId ? (
+                            <IconButton onClick={() => handleSave(user.userId)}>
+                              <Icon icon='tabler:check' />
+                            </IconButton>
+                          ) : (
+                            <IconButton onClick={() => handleEdit(user)}>
+                              <Icon icon='tabler:pencil' />
+                            </IconButton>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
             </Paper>
 
             <br></br>

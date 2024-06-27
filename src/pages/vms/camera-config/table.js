@@ -7,11 +7,12 @@ import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
+import CustomTextField from 'src/@core/components/mui/text-field'
 import authConfig from 'src/configs/auth'
 import Table from '@mui/material/Table'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
-import { IconButton } from '@mui/material'
+import { IconButton, Box } from '@mui/material'
 import Swal from 'sweetalert2'
 import { fetchData } from 'src/store/apps/user'
 import axios from 'axios'
@@ -152,6 +153,10 @@ const Camera = ({ apiData }) => {
     }
   }
 
+  const handleFilter = useCallback(val => {
+    setValue(val)
+  }, [])
+
   const handleClosePPopup = () => {
     setOpenPopupP(false)
     fetchFilteredOrAllUsers()
@@ -159,7 +164,7 @@ const Camera = ({ apiData }) => {
 
   useEffect(() => {
     fetchFilteredOrAllUsers()
-  }, [])
+  }, [value])
 
   const handleAddNetworkClick = () => {
     setOpenPopupNetwork(true)
@@ -304,18 +309,52 @@ const Camera = ({ apiData }) => {
     <Grid container spacing={6.5}>
       <Grid item xs={12}>
         <Card>
-          {selectedIds === null ? (
-            <TableHeader />
-          ) : (
-            <TableHeader
-              value={value}
-              passwords={handleAddRoleClick}
-              networks={handleAddNetworkClick}
-              images={handleAddImageClick}
-              videos={handleAddVideoClick}
-              cloud={handleAddCloudClick}
-            />
-          )}
+          <Grid container spacing={1}>
+            <Grid item xs={9}>
+              {selectedIds === null ? (
+                <TableHeader />
+              ) : (
+                <TableHeader
+                  value={value}
+                  passwords={handleAddRoleClick}
+                  networks={handleAddNetworkClick}
+                  images={handleAddImageClick}
+                  videos={handleAddVideoClick}
+                  cloud={handleAddCloudClick}
+                />
+              )}
+            </Grid>
+            <Grid item xs={3} style={{ marginTop: '1%' }}>
+              <CustomTextField
+                value={value}
+                autoComplete='off'
+                onChange={e => handleFilter(e.target.value)}
+                placeholder='Search…'
+                InputProps={{
+                  startAdornment: (
+                    <Box sx={{ mr: 2, display: 'flex' }}>
+                      <Icon fontSize='1.25rem' icon='tabler:search' />
+                    </Box>
+                  ),
+                  endAdornment: (
+                    <IconButton size='small' title='Clear' aria-label='Clear'>
+                      <Icon fontSize='1.25rem' icon='tabler:x' />
+                    </IconButton>
+                  )
+                }}
+                sx={{
+                  width: {
+                    xs: 1,
+                    sm: 'auto'
+                  },
+                  '& .MuiInputBase-root > svg': {
+                    mr: 2
+                  }
+                }}
+              />
+            </Grid>
+          </Grid>
+
           <Grid container spacing={2}>
             <Grid item xs={0.1}></Grid>
 

@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import {
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Grid
-} from '@mui/material'
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Grid } from '@mui/material'
 import axios from 'axios'
 import authConfig from 'src/configs/auth'
 import Swal from 'sweetalert2'
@@ -20,7 +13,6 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
   const [typeError, setTypeError] = useState('')
   const [detailError, setDetailError] = useState('')
 
-
   useEffect(() => {
     const fetchFiltered = async () => {
       try {
@@ -32,9 +24,9 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
           }
         }
         const response = await axios.get(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${id}`, config)
-        setName(response.data.name)
-        setType(response.data.type)
-        setDetail(response.data.detail)
+        setName(response.data.name || '')
+        setType(response.data.type || '')
+        setDetail(response.data.detail || '')
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -61,11 +53,7 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
         detail: detail
       }
 
-      await axios.put(
-        `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${id}`,
-        payload,
-        config
-      )
+      await axios.put(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${id}`, payload, config)
       Swal.fire('Sửa thành công', '', 'success')
       onSuccess()
       onClose()
@@ -107,12 +95,12 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth='xl' style={{ maxWidth: '50%', margin: 'auto' }}>
-      <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Cập nhật thông tin địa phương</DialogTitle>
+      <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Cập nhật thông tin</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} alignItems='center'>
           <Grid item xs={6}>
             <CustomTextField
-              label='Tên địa phương'
+              label='Tên'
               value={name}
               onChange={e => setName(e.target.value)}
               fullWidth
@@ -122,7 +110,7 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
           </Grid>
           <Grid item xs={6}>
             <CustomTextField
-              label='Mã địa phương'
+              label='Mã'
               value={type}
               onChange={e => setType(e.target.value)}
               fullWidth
@@ -144,9 +132,7 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Hủy</Button>
-        <Button onClick={handleUpdate}>
-          Cập nhật
-        </Button>
+        <Button onClick={handleUpdate}>Cập nhật</Button>
       </DialogActions>
     </Dialog>
   )

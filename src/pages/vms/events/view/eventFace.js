@@ -30,6 +30,7 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 import Filter from '../popups/filter'
 import View from '../popups/view'
 import Add from '../popups/add'
+import EventDetails from '../popups/eventDetails'
 
 const initValueFilter = {
   location: null,
@@ -41,7 +42,7 @@ const initValueFilter = {
   page: 1
 }
 
-const EventList = () => {
+const EventList = ({ eventData }) => {
   const [keyword, setKeyword] = useState('')
   const [valueFilter, setValueFilter] = useState(initValueFilter)
   const [loading, setLoading] = useState(false)
@@ -53,13 +54,9 @@ const EventList = () => {
   const [idDelete, setIdDelete] = useState(null)
   const [deviceList, setDeviceList] = useState(null)
   const [reload, setReload] = useState(0)
-  const [eventsData, setEventData] = useState('')
-  const defaultCameraID = '0eb23593-a9b1-4278-9fb1-4d18f30ed6ff'
   const [count, setCount] = useState('')
-  const [websocket, setWebsocket] = useState(null)
-  const [rtcPeerConnection, setRtcPeerConnection] = useState(null)
 
-  const [total, setTotal] = useState(1)
+  const [total, setTotalPage] = useState(0)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
   const pageSizeOptions = [25, 50, 100]
@@ -73,20 +70,6 @@ const EventList = () => {
     }
   }
 
-  const config = {
-    bundlePolicy: 'max-bundle',
-    iceServers: [
-      {
-        urls: 'stun:dev-ivis-camera-api.basesystem.one:3478'
-      },
-      {
-        urls: 'turn:dev-ivis-camera-api.basesystem.one:3478',
-        username: 'demo',
-        credential: 'demo'
-      }
-    ]
-  }
-
   const eventTypeColors = {
     'Phát hiện sự kiện AI': 'success',
     'Phát hiện đối tượng nguy hiểm': 'error',
@@ -98,21 +81,21 @@ const EventList = () => {
     {
       id: 1,
       flex: 0.25,
-      minWidth: 50,
-      align: 'right',
+      maxWidth: 70,
+      align: 'center',
       field: 'imageObject',
       label: 'Hình ảnh',
       renderCell: value => (
-        <Box>
-          <img src={value} alt='' width={50} height={50} style={{ objectFit: 'contain' }} />
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          <img src={value} alt='' style={{ maxWidth: '40%', height: 'auto', objectFit: 'contain' }} />
         </Box>
       )
     },
     {
       id: 2,
       flex: 0.15,
-      minWidth: 150,
-      align: 'right',
+      maxWidth: 180,
+      align: 'center',
       label: 'Sự kiện',
       field: 'eventTypeString',
       renderCell: value => <Chip label={value} color={eventTypeColors[value]} />
@@ -120,16 +103,16 @@ const EventList = () => {
     {
       id: 3,
       flex: 0.15,
-      minWidth: 230,
-      align: 'right',
+      maxWidth: 70,
+      align: 'center',
       field: 'description',
       label: 'Tên đối tượng'
     },
     {
       id: 4,
       flex: 0.15,
-      minWidth: 230,
-      align: 'right',
+      maxWidth: 50,
+      align: 'center',
       field: 'timestamp',
       label: 'Thời gian',
       renderCell: value => new Date(value).toLocaleString()
@@ -137,111 +120,37 @@ const EventList = () => {
     {
       id: 5,
       flex: 0.25,
-      minWidth: 50,
-      align: 'right',
+      maxWidth: 50,
+      align: 'center',
       field: 'camName',
       label: 'Camera'
     },
     {
       id: 6,
       flex: 0.25,
-      minWidth: 50,
-      align: 'right',
+      maxWidth: 50,
+      align: 'center',
       field: 'location',
       label: 'Khu vực'
     }
   ]
 
   useEffect(() => {
-    // create WebSocket connection
-
-    const ws = new WebSocket(
-      `wss://sbs.basesystem.one/ivis/cmsgo/api/v0/websocket/topic/list_ai_event/be571c00-41cf-4878-a1de-b782625da62a`
-    )
-
-    setWebsocket(ws)
-
-    // create RTCPeerConnection
-
-    const pc = new RTCPeerConnection(config)
-    setRtcPeerConnection(pc)
-
-    // listen for remote tracks and add them to remote stream
-
-    pc.ontrack = event => {
-      const stream = event.streams[0]
-      if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {
-        setRemoteStream(stream)
-        remoteVideoRef.current.srcObject = stream
-      }
-    }
-
-    // close WebSocket and RTCPeerConnection on component unmount
-
-    return () => {
-      if (websocket) {
-        websocket.close()
-      }
-      if (rtcPeerConnection) {
-        rtcPeerConnection.close()
-      }
-    }
-  }, [])
-
-  const handleMessage = async event => {
-    const message = JSON.parse(event.data)
-    const newMessage = JSON.parse(message?.data)
-    setEventData(newMessage)
-  }
-
-  useEffect(() => {
-    if (websocket) {
-      websocket.addEventListener('open', () => {
-        websocket.send(
-          JSON.stringify({
-            id: defaultCameraID,
-            type: 'request'
-          })
-        )
-      })
-      websocket.addEventListener('message', handleMessage)
-
-      websocket.addEventListener('error', error => {
-        console.error('WebSocket error:', error)
-      })
-
-      websocket.addEventListener('close', handleClose)
-    }
-  }, [websocket])
-
-  const handleClose = async event => {
-    if (websocket) {
-      websocket.close()
-    }
-  }
-
-  useEffect(() => {
     const newList = []
 
-    deviceList?.rows.map((item, index) => {
+    deviceList?.map((item, index) => {
       if (index === 0) {
-        newList.push(eventsData)
+        newList.push(eventData)
         newList.push(item)
         setCount(count + 1)
-        deviceList?.rows.pop()
+        deviceList?.pop()
       } else {
         newList.push(item)
       }
     })
 
-    // setDeviceList({ rows: [...newList] })
-  }, [eventsData])
-
-  useEffect(() => {
-    if (rtcPeerConnection) {
-      rtcPeerConnection.addEventListener('connectionstatechange', () => {})
-    }
-  }, [rtcPeerConnection])
+    setDeviceList([...newList])
+  }, [eventData])
 
   useEffect(() => {
     fetchDataList()
@@ -259,21 +168,22 @@ const EventList = () => {
     const params = {
       ...config1,
       params: {
-        keyword: keyword || '',
+        camName: keyword || '',
         limit: pageSize,
-        page: page,
+        page: parseInt(page),
         location: valueFilter?.location || '',
         cameraName: valueFilter?.cameraName || '',
         startTime: valueFilter?.startTime || '',
-        endTime: valueFilter?.endTime || ''
+        endTime: valueFilter?.endTime || '',
+        eventType: 'AI_EVENT_BLACKLIST_FACE_RECOGNITION'
       }
     }
     setLoading(true)
     try {
-      const res = await axios.get(`https://sbs.basesystem.one/ivis/cmsgo/api/v0/aievents`, params)
-      setDeviceList(res.data.data) // lỗi
-      setCount(res.data.count)
-      setTotal(res.data.totalPage)
+      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/genimage?`, params)
+      setDeviceList(res.data)
+      setCount(res.count)
+      setTotalPage(Math.ceil(res.count / pageSize))
     } catch (error) {
       console.error('Error fetching data:', error)
       toast.error(error)
@@ -282,7 +192,7 @@ const EventList = () => {
     }
   }
 
-  const handlePageChange = newPage => {
+  const handlePageChange = (event, newPage) => {
     setPage(newPage)
   }
 
@@ -371,7 +281,7 @@ const EventList = () => {
       }
 
       axios
-        .delete(`https://sbs.basesystem.one/ivis/cmsgo/api/v0/aievents/delete/${idDelete}`, config)
+        .delete(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/delete/${idDelete}`, config)
         .then(() => {
           toast.success('Xóa thành công')
           setIdDelete(null)
@@ -391,7 +301,7 @@ const EventList = () => {
     <>
       <Card>
         <CardHeader
-          title='Khuôn mặt'
+          title='Danh sách sự kiện AI'
           titleTypographyProps={{ sx: { mb: [2, 0] } }}
           sx={{
             py: 4,
@@ -446,30 +356,34 @@ const EventList = () => {
           }
         />
         <Grid container spacing={0}>
-          <TableContainer component={Paper} sx={{ maxHeight: 600 }}>
+          <TableContainer component={Paper} sx={{ maxHeight: 1000 }}>
             <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
               <TableHead>
                 <TableRow>
-                  <TableCell>STT</TableCell>
-                  {columns.map(column => (
-                    <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
-                      {column.label}
+                  <TableCell style={{ width: '20px' }}>STT</TableCell>
+                  {columns.map(({ id, label, field, renderCell, align, maxWidth }) => (
+                    <TableCell key={id} align={align} sx={{ maxWidth }}>
+                      {label}
                     </TableCell>
                   ))}
-                  <TableCell>Thao tác</TableCell>
+                  <TableCell style={{ width: '30px' }}>Thao tác</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {deviceList ? (
-                  deviceList.rows.slice(0, pageSize).map((row, index) => (
+                {deviceList?.slice(0, pageSize).map((row, index) => {
+                  return (
                     <TableRow hover tabIndex={-1} key={index}>
                       <TableCell>{index + 1}</TableCell>
-                      {columns.map(column => {
-                        const value = row[column.field]
+                      {columns.map(({ field, renderCell, align, maxWidth }) => {
+                        const value = row[field]
 
                         return (
-                          <TableCell key={column.id} align={column.align}>
-                            {column.renderCell ? column.renderCell(value) : value}
+                          <TableCell
+                            key={field}
+                            align={align}
+                            sx={{ maxWidth, wordBreak: 'break-word', flexWrap: 'wrap' }}
+                          >
+                            {renderCell ? renderCell(value) : value}
                           </TableCell>
                         )
                       })}
@@ -506,20 +420,14 @@ const EventList = () => {
                         </Grid>
                       </TableCell>
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={columns.length + 1} align='center'>
-                      Không có dữ liệu
-                    </TableCell>
-                  </TableRow>
-                )}
+                  )
+                })}
               </TableBody>
             </Table>
           </TableContainer>
         </Grid>
         <br />
-        {/* <Grid container spacing={2} style={{ padding: 10 }}>
+        <Grid container spacing={2} style={{ padding: 10 }}>
           <Grid item xs={3}></Grid>
           <Grid item xs={1}>
             <span style={{ fontSize: 15 }}> dòng/trang</span>
@@ -539,9 +447,9 @@ const EventList = () => {
             </Box>
           </Grid>
           <Grid item xs={6}>
-            <Pagination count={total} page={page} color='primary' onChange={(event, page) => handlePageChange(page)} />
+            <Pagination count={total} page={page} color='primary' onChange={handlePageChange} />
           </Grid>
-        </Grid> */}
+        </Grid>
       </Card>
 
       {isOpenFilter && (
@@ -549,7 +457,7 @@ const EventList = () => {
       )}
 
       {isOpenView && (
-        <View
+        <EventDetails
           show={isOpenView}
           onClose={() => setIsOpenView(false)}
           data={eventDetail}
