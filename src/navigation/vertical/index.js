@@ -32,11 +32,12 @@ const navigation = () => {
       title: 'Báo cáo tháng',
       icon: 'tabler:id'
     },
-    {
-      path: '/pages/report-month/list',
-      title: 'Sự cố hệ thống ',
-      icon: 'tabler:id'
-    },
+
+    // {
+    //   path: '/pages/report-month/list',
+    //   title: 'Sự cố hệ thống ',
+    //   icon: 'tabler:id'
+    // },
 
     // {
     //   path: '/pages/access-rights/list',
