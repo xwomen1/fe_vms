@@ -515,15 +515,6 @@ const UserDetails = () => {
                   <Grid item xs={3}>
                     <h2 style={{ color: 'black', marginLeft: '1%' }}> Thông tin định danh khuôn mặt</h2>
                   </Grid>
-                  <Grid item xs={3} style={{ marginTop: '1.1%' }}>
-                    <Switch
-                      checked={status1 === true}
-                      onChange={handleStatusChange}
-                      color='primary'
-                      label='Trạng thái'
-                      disabled={readOnly}
-                    />
-                  </Grid>
                   <Grid container spacing={2}>
                     <div style={{ width: '80%' }}></div>
                     {editing ? (
@@ -561,6 +552,15 @@ const UserDetails = () => {
                       value={statusText}
                       InputProps={{ readOnly: readOnly }}
                       fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={3} style={{ marginTop: '1.1%' }}>
+                    <Switch
+                      checked={status1 === true}
+                      onChange={handleStatusChange}
+                      color='primary'
+                      label='Trạng thái'
+                      disabled={readOnly}
                     />
                   </Grid>
                   <Grid item xs={4}></Grid>
