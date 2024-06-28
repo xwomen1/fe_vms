@@ -170,10 +170,7 @@ const Car_management = () => {
         }
       }
 
-      const response = await axios.get(
-        'https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates?sort=%2Bcreated_at&page=1',
-        config
-      )
+      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates', config)
 
       const data = response.data.map(item => ({
         mainImageId: item.mainImageId,
@@ -441,7 +438,11 @@ const Car_management = () => {
                       <TableCell sx={{ padding: '16px' }}>STT</TableCell>
                       <TableCell sx={{ padding: '16px' }}>Ảnh xe</TableCell>
                       <TableCell sx={{ padding: '16px' }}>Biển số xe</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Loại xe</TableCell>
+
                       <TableCell sx={{ padding: '16px' }}>Lần cuối xuất hiện</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Trạng thái</TableCell>
+
                       <TableCell sx={{ padding: '16px' }}>Chi tiết</TableCell>
                       <TableCell sx={{ padding: '16px' }}>Xóa</TableCell>
                     </TableRow>
@@ -473,7 +474,11 @@ const Car_management = () => {
                             )}
                           </TableCell>
                           <TableCell>{user.name}</TableCell>
+                          <TableCell>{user.note}</TableCell>
+
                           <TableCell>{user.lastAppearance}</TableCell>
+                          <TableCell>{user.status}</TableCell>
+
                           <TableCell>
                             <Button
                               size='small'

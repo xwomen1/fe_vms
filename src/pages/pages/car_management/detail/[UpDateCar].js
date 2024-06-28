@@ -53,8 +53,11 @@ const UpDateCar = () => {
   const [fileAvatarImg, setFileAvatarImg] = useState(null)
   const [showCropper, setShowCopper] = useState(false)
   const [fileAvatarId, setFileAvatarId] = useState(null)
-  const [name, setName] = useState(null)
-  const [note, setNote] = useState(null)
+  const [name, setName] = useState('')
+  const [note, setNote] = useState('')
+  const [type, setType] = useState('')
+  const [status, setStatus] = useState('')
+
   const fileUploader1 = useRef(null)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [dialogTitle, setDialogTitle] = useState('')
@@ -234,8 +237,11 @@ const UpDateCar = () => {
         setImg2(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[2]?.id}`))
         setImg3(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[3]?.id}`))
         setImg4(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[4]?.id}`))
-        setName(response.data.name)
-        setNote(response.data.note)
+        setName(response.data.name || '')
+        setNote(response.data.note || '')
+        setStatus(response.data.status || '')
+
+        setType(response.data.type || '')
       }
     } catch (error) {
       console.error('Error fetching data:', error)
@@ -293,8 +299,10 @@ const UpDateCar = () => {
           setImg2(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[2]?.id}`))
           setImg3(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[3]?.id}`))
           setImg4(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[4]?.id}`))
-          setName(response.data.name)
-          setNote(response.data.note)
+          setName(response.data.name || '')
+          setNote(response.data.note || '')
+          setType(response.data.type || '')
+          setStatus(response.data.status || '')
         }
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -325,6 +333,8 @@ const UpDateCar = () => {
       const params = {
         name: name,
         note: note,
+        status: status,
+        type: type,
         mainImageId: fileAvatarId,
         imgs: listFileId.map((id, index) => ({
           id: id,
@@ -332,18 +342,16 @@ const UpDateCar = () => {
         }))
       }
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates/${id}`, params, config)
-      setDialogTitle('Sửa thông tin thành công')
-      setIsSuccess(true)
+      toast.success('Thay đổi thành công')
       fetchFilteredOrAllUserss()
     } catch (error) {
-      setDialogTitle('Sửa thông tin không thành công')
-      setDialogMessage(error.response.data.message || 'Sửa không thành công')
-      setIsSuccess(false)
-      fetchFilteredOrAllUserss()
+      onClose()
+
+      toast.error(err?.response?.statusText)
+
       console.error('Error adding member to group:', error)
     } finally {
       setLoading(false)
-      setDialogOpen(true)
     }
   }
   console.log(avatarImage, 'avatarImage')
@@ -487,6 +495,52 @@ const UpDateCar = () => {
                       marginTop: '-265px'
                     }}
                   >
+                    <p
+                      style={{
+                        fontSize: '18px',
+                        lineHeight: '22px',
+                        margin: '0px'
+                      }}
+                    >
+                      Loại xe
+                    </p>
+                    <TextField
+                      variant='standard'
+                      style={{
+                        border: '1px solid rgba(0, 0, 0, 0.12)',
+                        borderRadius: '10px',
+                        width: '100%'
+                      }}
+                      defaultValue=''
+                      placeholder='  Nhập Loại xe ...!'
+                      value={`${type}` || ''}
+                      onInput={e => {
+                        setType(e.target.value)
+                      }}
+                    />
+                    <p
+                      style={{
+                        fontSize: '18px',
+                        lineHeight: '22px',
+                        margin: '0px'
+                      }}
+                    >
+                      Trạng thái
+                    </p>
+                    <TextField
+                      variant='standard'
+                      style={{
+                        border: '1px solid rgba(0, 0, 0, 0.12)',
+                        borderRadius: '10px',
+                        width: '100%'
+                      }}
+                      defaultValue=''
+                      placeholder='  Trạng thái xe ...!'
+                      value={`${status}` || ''}
+                      onInput={e => {
+                        setStatus(e.target.value)
+                      }}
+                    />
                     <p
                       style={{
                         fontSize: '18px',
