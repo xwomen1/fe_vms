@@ -146,8 +146,7 @@ const UserList = ({ apiData }) => {
       laConGiaDinhCS: 'Không',
       soCMND: '123456789',
       ngayCap: '01/01/2000',
-      soBHXH: '987654321',
-      hanhDong: 'Xem chi tiết'
+      soBHXH: '987654321'
     },
     {
       id: 2,
@@ -197,8 +196,7 @@ const UserList = ({ apiData }) => {
       laConGiaDinhCS: 'Không',
       soCMND: '234567890',
       ngayCap: '02/02/2002',
-      soBHXH: '876543210',
-      hanhDong: 'Xem chi tiết'
+      soBHXH: '876543210'
     },
     {
       id: 3,
@@ -248,8 +246,7 @@ const UserList = ({ apiData }) => {
       laConGiaDinhCS: 'Không',
       soCMND: '234567890',
       ngayCap: '02/02/2002',
-      soBHXH: '876543210',
-      hanhDong: 'Xem chi tiết'
+      soBHXH: '876543210'
     },
     {
       id: 4,
@@ -299,8 +296,7 @@ const UserList = ({ apiData }) => {
       laConGiaDinhCS: 'Không',
       soCMND: '234567890',
       ngayCap: '02/02/2002',
-      soBHXH: '876543210',
-      hanhDong: 'Xem chi tiết'
+      soBHXH: '876543210'
     },
     {
       id: 5,
@@ -350,8 +346,7 @@ const UserList = ({ apiData }) => {
       laConGiaDinhCS: 'Không',
       soCMND: '123456789',
       ngayCap: '01/01/1995',
-      soBHXH: '987654321',
-      hanhDong: 'Xem chi tiết'
+      soBHXH: '987654321'
     },
     {
       id: 6,
@@ -401,8 +396,7 @@ const UserList = ({ apiData }) => {
       laConGiaDinhCS: 'Không',
       soCMND: '234567890',
       ngayCap: '03/03/2003',
-      soBHXH: '876543210',
-      hanhDong: 'Xem chi tiết'
+      soBHXH: '876543210'
     },
     {
       id: 7,
@@ -452,8 +446,7 @@ const UserList = ({ apiData }) => {
       laConGiaDinhCS: 'Không',
       soCMND: '345678901',
       ngayCap: '05/05/2005',
-      soBHXH: '765432109',
-      hanhDong: 'Xem chi tiết'
+      soBHXH: '765432109'
     },
     {
       id: 8,
@@ -503,8 +496,7 @@ const UserList = ({ apiData }) => {
       laConGiaDinhCS: 'Không',
       soCMND: '234567890',
       ngayCap: '02/02/2002',
-      soBHXH: '876543210',
-      hanhDong: 'Xem chi tiết'
+      soBHXH: '876543210'
     }
 
     // Add 6 more similar entries here
@@ -767,7 +759,6 @@ const UserList = ({ apiData }) => {
                         <TableCell sx={{ whiteSpace: 'nowrap' }}>Số CMND</TableCell>
                         <TableCell sx={{ whiteSpace: 'nowrap' }}>Ngày cấp</TableCell>
                         <TableCell sx={{ whiteSpace: 'nowrap' }}>Số BHXH</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Hành động</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -821,12 +812,6 @@ const UserList = ({ apiData }) => {
                           <TableCell style={{ textAlign: 'center' }}>{user.soCMND}</TableCell>
                           <TableCell style={{ textAlign: 'center' }}>{user.ngayCap}</TableCell>
                           <TableCell style={{ textAlign: 'center' }}>{user.soBHXH}</TableCell>
-                          <TableCell style={{ textAlign: 'center' }}>{user.hanhDong}</TableCell>
-                          <TableCell>
-                            <IconButton size='small' onClick={() => handleViewDetails(user.id)}>
-                              <Icon icon='mdi:eye-outline' />
-                            </IconButton>
-                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>

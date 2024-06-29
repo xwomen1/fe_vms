@@ -61,7 +61,6 @@ const KPI = () => {
   return (
     <Card>
       <CardHeader
-        title='Danh mục chỉ tiêu KPIs'
         action={
           <Box>
             <Button variant='contained' color='primary' style={{ marginRight: '10px' }}>

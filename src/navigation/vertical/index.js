@@ -12,6 +12,16 @@ const navigation = () => {
       icon: 'tabler:calendar-event'
     },
     {
+      title: 'KPI',
+      path: '/kpi',
+      icon: 'tabler:calendar-event'
+    },
+    {
+      title: 'Danh sách hồ sơ',
+      path: '/cv',
+      icon: 'tabler:calendar-event'
+    },
+    {
       title: 'Thiết bị',
       path: '/device-management',
       icon: 'tabler:accessible'
