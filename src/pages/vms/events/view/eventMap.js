@@ -309,6 +309,8 @@ const EventMap = () => {
     }))
 
   const handleDeleteList = () => {
+    const updatedRows = rows.filter(row => !selectedCameraIds.includes(row.id))
+    setRows(updatedRows)
     setSelectedCameraIds([])
     setSelectedPoints([])
     setSelectedTimes([])
