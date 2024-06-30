@@ -34,6 +34,7 @@ import toast from 'react-hot-toast'
 import * as XLSX from 'xlsx'
 import Checkbox from '@mui/material/Checkbox'
 import Link from 'next/link'
+import { format } from 'date-fns'
 
 const FaceManagement = () => {
   const [value, setValue] = useState('')
@@ -347,6 +348,12 @@ const FaceManagement = () => {
     )
   })
 
+  const formatDate = dateString => {
+    const date = new Date(dateString)
+
+    return format(date, 'hh:mm:ss dd/MM/yyyy')
+  }
+
   return (
     <>
       <Grid container spacing={6.5}>
@@ -441,6 +448,7 @@ const FaceManagement = () => {
                     <TableCell sx={{ padding: '16px' }}>Ảnh đối tượng</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Tên Đối tượng</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Lần cuối xuất hiện</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Trạng thái hoạt động </TableCell>
                     <TableCell sx={{ padding: '16px' }}>Chi tiết</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Xóa</TableCell>
                   </TableRow>
@@ -448,44 +456,56 @@ const FaceManagement = () => {
                 <TableBody>
                   {loading && <CircularProgress />}
                   {Array.isArray(userData) && userData.length > 0 ? (
-                    userData.map((user, index) => (
-                      <TableRow key={user.id}>
-                        <TableCell>
-                          <Checkbox
-                            onChange={event => handleCheckboxChange(event, user.id)}
-                            checked={selectedIds.includes(user.id)}
-                          />
-                        </TableCell>
-                        <TableCell>{index + 1}</TableCell>
-                        <TableCell>
-                          <Img
-                            src={buildUrlWithToken(
-                              `https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${user.mainImageId}`
-                            )}
-                            style={{ maxWidth: '91px', height: '56px', minWidth: '56px' }}
-                          />
-                        </TableCell>
-                        <TableCell>{user.name}</TableCell>
-                        <TableCell>{user.lastAppearance}</TableCell>
-                        <TableCell>
-                          <Button
-                            size='small'
-                            component={Link}
-                            href={`/pages/face_management/detail/${user.id}`}
-                            sx={{ color: 'blue', right: '10px' }}
-                          >
-                            Xem chi tiết
-                          </Button>
-                        </TableCell>
-                        <TableCell sx={{ padding: '16px' }}>
-                          <Grid container spacing={2}>
-                            <IconButton onClick={() => handleDelete(user.id)}>
-                              <Icon icon='tabler:trash' />
-                            </IconButton>
-                          </Grid>
-                        </TableCell>
-                      </TableRow>
-                    ))
+                    userData.map(
+                      (user, index) => (
+                        console.log(user.status),
+                        (
+                          <TableRow key={user.id}>
+                            <TableCell>
+                              <Checkbox
+                                onChange={event => handleCheckboxChange(event, user.id)}
+                                checked={selectedIds.includes(user.id)}
+                              />
+                            </TableCell>
+                            <TableCell>{index + 1}</TableCell>
+                            <TableCell>
+                              <Img
+                                src={buildUrlWithToken(
+                                  `https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${user.mainImageId}`
+                                )}
+                                style={{ maxWidth: '91px', height: '56px', minWidth: '56px' }}
+                              />
+                            </TableCell>
+                            <TableCell>{user.name}</TableCell>
+                            <TableCell>{formatDate(user.lastAppearance)}</TableCell>
+                            <TableCell
+                              style={{
+                                color: user.status ? 'green' : 'red'
+                              }}
+                            >
+                              {user.status ? 'hoạt động' : 'không hoạt động'}
+                            </TableCell>
+                            <TableCell>
+                              <Button
+                                size='small'
+                                component={Link}
+                                href={`/pages/face_management/detail/${user.id}`}
+                                sx={{ color: 'blue', right: '10px' }}
+                              >
+                                Xem chi tiết
+                              </Button>
+                            </TableCell>
+                            <TableCell sx={{ padding: '16px' }}>
+                              <Grid container spacing={2}>
+                                <IconButton onClick={() => handleDelete(user.id)}>
+                                  <Icon icon='tabler:trash' />
+                                </IconButton>
+                              </Grid>
+                            </TableCell>
+                          </TableRow>
+                        )
+                      )
+                    )
                   ) : (
                     <TableRow>
                       <TableCell colSpan={7} align='center'>

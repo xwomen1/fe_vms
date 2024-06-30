@@ -265,7 +265,7 @@ const AddFaceManagement = () => {
 
       const response = await axios.post(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist`, params, config)
       const newId = response.data.id
-      setDialogTitle('Thêm khuân mặt thành công')
+      setDialogTitle('Thêm khuôn mặt thành công')
       setIsSuccess(true)
       setRedirectUrl(`/pages/face_management/detail/${newId}`)
     } catch (error) {
