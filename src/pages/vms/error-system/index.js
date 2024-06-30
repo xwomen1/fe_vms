@@ -94,7 +94,8 @@ const EventList = () => {
           page: page,
           limit: pageSize,
           type: valueFilter.type,
-          device_type: valueFilter.device_type
+          device_type: valueFilter.device_type,
+          sort: '+status'
         }
       }
 

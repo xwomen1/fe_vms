@@ -64,6 +64,7 @@ const Add = ({ apiData }) => {
   const pageSizeOptions = [25, 50, 100]
   const [anchorEl, setAnchorEl] = useState(null)
   const [selectedValue, setSelectedValue] = useState('')
+  const [selectedAuto, setSelectedAuto] = useState('')
   const [startHost, setStartHost] = useState('')
   const [endHost, setEndHost] = useState('')
   const [openPopupResponseDungIP, setOpenPopupResponseDungIP] = useState(false)
@@ -208,6 +209,7 @@ const Add = ({ apiData }) => {
 
   const handleRadioChange = event => {
     setSelectedValue(event.target.value)
+    setSelectedAuto(event.target.value)
     console.log(selectedValue)
   }
 
@@ -625,6 +627,7 @@ const Add = ({ apiData }) => {
                       <Grid item>
                         <FormControlLabel value='daiIp' control={<Radio />} label='Dải IP' />
                       </Grid>
+                      <p>Loại giao thức :</p>
                       <Grid item xs={3}>
                         <Autocomplete
                           fullWidth
@@ -632,7 +635,7 @@ const Add = ({ apiData }) => {
                           id='autocomplete-custom'
                           getOptionLabel={option => option.title || ''}
                           renderInput={params => <CustomTextField placeholder='Khác' {...params} />}
-                          onChange={(event, value) => setSelectedValue(value ? value.title.toLowerCase() : '')}
+                          onChange={(event, value) => setSelectedAuto(value ? value.title.toLowerCase() : '')}
                         />
                       </Grid>
                     </Grid>
@@ -874,7 +877,7 @@ const Add = ({ apiData }) => {
                 )}
               </Grid>
               <Grid item xs={12}>
-                {selectedValue === 'onvif' && (
+                {selectedAuto === 'onvif' && (
                   <Grid
                     container
                     item
@@ -941,7 +944,7 @@ const Add = ({ apiData }) => {
                 )}
               </Grid>
               <Grid item xs={12}>
-                {selectedValue === 'hikvision' && (
+                {selectedAuto === 'hikvision' && (
                   <Grid
                     container
                     item
