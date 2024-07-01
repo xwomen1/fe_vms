@@ -113,7 +113,7 @@ const EventList = ({ eventData }) => {
     }
     setLoading(true)
     try {
-      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/genimage?`, params)
+      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/routine`, params)
       setDeviceList(res.data)
       setCount(res.count)
       setTotalPage(Math.ceil(res.count / pageSize))
@@ -222,7 +222,7 @@ const EventList = ({ eventData }) => {
         })
         .catch(error => {
           console.error('Error fetching data:', error)
-          toast.error(error)
+          toast.error(error.response.data)
         })
         .finally(() => {
           setLoading(false)
@@ -300,7 +300,7 @@ const EventList = ({ eventData }) => {
                       borderWidth: 1,
                       borderRadius: '10px',
                       borderStyle: 'solid',
-                      borderColor: '#ccc',
+                      borderColor: '#ccc'
                     }}
                   >
                     <CardContent>
@@ -320,7 +320,7 @@ const EventList = ({ eventData }) => {
                           src={item?.imageObject}
                           style={{
                             objectFit: 'contain',
-                            cursor: 'pointer',
+                            cursor: 'pointer'
                           }}
                           onClick={() => {
                             setIsOpenView(true)
@@ -328,7 +328,9 @@ const EventList = ({ eventData }) => {
                           }}
                         />
                       </Box>
-                      <Typography sx={{ marginTop: '10px' }}>{item?.timestamp ? new Date(item?.timestamp).toLocaleString() : 'Thời gian'}</Typography>
+                      <Typography sx={{ marginTop: '10px' }}>
+                        {item?.timestamp ? new Date(item?.timestamp).toLocaleString() : 'Thời gian'}
+                      </Typography>
                       <Typography sx={{ marginTop: '10px' }}>{item?.location ? item?.location : 'Vị trí'}</Typography>
                       <Typography
                         sx={{
@@ -336,12 +338,39 @@ const EventList = ({ eventData }) => {
                           fontWeight: 600,
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
-                          textOverflow: 'ellipsis',
+                          textOverflow: 'ellipsis'
                         }}
                       >
                         {item?.description ? item?.description : 'Tên đối tượng'}
-
                       </Typography>
+                      <IconButton
+                        size='small'
+                        sx={{ color: 'text.secondary' }}
+                        onClick={() => {
+                          setIsOpenView(true)
+                          setEventDetail(item)
+                        }}
+                      >
+                        <Icon icon='tabler:info-circle' />
+                      </IconButton>
+                      <IconButton
+                        size='small'
+                        sx={{ color: 'text.secondary' }}
+                        onClick={() => {
+                          setIsOpenEdit(true)
+                          setEventDetail(item)
+                        }}
+                      >
+                        <Icon icon='tabler:edit' />
+                      </IconButton>
+                      <IconButton
+                        onClick={() => {
+                          setIdDelete(item.id)
+                          setIsOpenDel(true)
+                        }}
+                      >
+                        <Icon icon='tabler:trash' />
+                      </IconButton>
                     </CardContent>
                   </Card>
                 </Grid>
