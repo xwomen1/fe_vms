@@ -94,6 +94,7 @@ const UserList = ({ apiData }) => {
   const [isError, setIsError] = useState(false)
   const [idBox, setIdBox] = useState(null)
   const [idBoxs, setIdBoxs] = useState(selectNVR?.value)
+  const [selectedAuto, setSelectedAuto] = useState('')
 
   const handlePageChange = newPage => {
     setPage(newPage)
@@ -158,7 +159,6 @@ const UserList = ({ apiData }) => {
         userName,
         passWord,
         protocol: '1'
-
       }
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -264,7 +264,6 @@ const UserList = ({ apiData }) => {
         userName,
         passWord,
         protocol: '0'
-
       }
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -448,13 +447,35 @@ const UserList = ({ apiData }) => {
         axios
           .delete(urlDelete, config)
           .then(() => {
-            Swal.fire('Xóa thành công', '', 'success')
+            Swal.fire({
+              title: 'Thành công!',
+              text: 'Xóa thành công',
+              icon: 'success',
+              willOpen: () => {
+                const confirmButton = Swal.getConfirmButton()
+                if (confirmButton) {
+                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.color = 'white'
+                }
+              }
+            })
             const updatedData = assettype.filter(assettype => assettype.id !== idDelete)
             setAssetType(updatedData)
             fetchData()
           })
           .catch(err => {
-            Swal.fire('Đã xảy ra lỗi', err.message, 'error')
+            Swal.fire({
+              title: 'Error!',
+              text: err.response?.data?.message || err.message,
+              icon: 'error',
+              willOpen: () => {
+                const confirmButton = Swal.getConfirmButton()
+                if (confirmButton) {
+                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.color = 'white'
+                }
+              }
+            })
           })
       }
     })
@@ -463,6 +484,7 @@ const UserList = ({ apiData }) => {
   const handleRadioChange = event => {
     setSelectedValue(event.target.value)
     console.log(selectedValue)
+    setSelectedAuto(event.target.value)
   }
 
   const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen)
@@ -573,6 +595,7 @@ const UserList = ({ apiData }) => {
                       <Grid item>
                         <FormControlLabel value='daiIp' control={<Radio />} label='Dải IP' />
                       </Grid>
+                      <p>Loại giao thức :</p>
                       <Grid item xs={3}>
                         <Autocomplete
                           fullWidth
@@ -580,7 +603,7 @@ const UserList = ({ apiData }) => {
                           id='autocomplete-custom'
                           getOptionLabel={option => option.title || ''}
                           renderInput={params => <CustomTextField placeholder='Khác' {...params} />}
-                          onChange={(event, value) => setSelectedValue(value ? value.title.toLowerCase() : '')}
+                          onChange={(event, value) => setSelectedAuto(value ? value.title.toLowerCase() : '')}
                         />
                       </Grid>
                     </Grid>
@@ -816,7 +839,7 @@ const UserList = ({ apiData }) => {
                     />{' '}
                   </>
                 )}
-                {selectedValue === 'onvif' && (
+                {selectedAuto === 'onvif' && (
                   <Grid
                     container
                     item
@@ -881,7 +904,7 @@ const UserList = ({ apiData }) => {
                     />{' '}
                   </>
                 )}
-                {selectedValue === 'hikvision' && (
+                {selectedAuto === 'hikvision' && (
                   <Grid
                     container
                     item

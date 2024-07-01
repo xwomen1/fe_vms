@@ -57,12 +57,12 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
           const cameraPromises = cameraIds.map(async cameraId => {
             try {
               const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${cameraId}`, config)
-              
-return response.data
+
+              return response.data
             } catch (error) {
               console.error(`Error fetching camera ${cameraId}:`, error)
-              
-return null
+
+              return null
             }
           })
 
@@ -141,8 +141,8 @@ return null
     }
     if (!validateInputs()) {
       console.log('Dữ liệu không hợp lệ')
-      
-return
+
+      return
     }
 
     try {
@@ -161,7 +161,18 @@ return
         config
       )
       onClose()
-      Swal.fire('Thêm thành công', '', 'success')
+      Swal.fire({
+        title: 'Thành công!',
+        text: 'Dữ liệu đã được Thêm thành công.',
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
       onSuccess()
     } catch (error) {
       console.error('Lỗi khi tạo nhóm mới:', error)
@@ -244,7 +255,7 @@ return
                 </TableBody>
               </Table>
               {errorMessage && (
-                <Typography color='error' variant='body2' align='center' style={{marginTop: '2%', fontSize: '16px'}}>
+                <Typography color='error' variant='body2' align='center' style={{ marginTop: '2%', fontSize: '16px' }}>
                   {errorMessage}
                 </Typography>
               )}

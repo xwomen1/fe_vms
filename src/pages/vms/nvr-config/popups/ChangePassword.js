@@ -94,7 +94,18 @@ const PassWord = ({ onClose, nvr }) => {
   const saveChange = async () => {
     setLoading(true)
     if (password !== confirmPassword) {
-      Swal.fire('Lỗi!', 'Mật khẩu và xác nhận mật khẩu không khớp nhau.', 'error')
+      Swal.fire({
+        title: 'Lỗi!',
+        text: 'Mật khẩu và xác nhận mật khẩu không khớp nhau.',
+        icon: 'error',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
       setLoading(false)
 
       return
@@ -119,10 +130,32 @@ const PassWord = ({ onClose, nvr }) => {
         },
         config
       )
-      Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
+      Swal.fire({
+        title: 'Thành công!',
+        text: 'Dữ liệu đã được cập nhật thành công.',
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
     } catch (error) {
       console.error('Error updating user details:', error)
-      Swal.fire('Error!', error.response?.data?.message, 'error')
+      Swal.fire({
+        title: 'Error!',
+        text: error.response?.data?.message,
+        icon: 'error',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
     } finally {
       setLoading(false)
       onClose()
@@ -151,6 +184,8 @@ const PassWord = ({ onClose, nvr }) => {
           <Grid container item style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
             <Grid item xs={12}>
               <CustomTextField
+                autoComplete='new-password' // Thay đổi giá trị thành 'new-password'
+                form='off' // Thêm thuộc tính form với giá trị 'off'
                 label='Mật khẩu cũ'
                 type={showPassword ? 'text' : 'password'}
                 onChange={handlePasswordOldChange}
@@ -204,8 +239,12 @@ const PassWord = ({ onClose, nvr }) => {
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={saveChange}>OK</Button>
+        <Button onClick={onClose} variant='contained'>
+          Cancel
+        </Button>
+        <Button onClick={saveChange} variant='contained'>
+          OK
+        </Button>
       </DialogActions>
     </Dialog>
   )
