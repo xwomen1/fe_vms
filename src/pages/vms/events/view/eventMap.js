@@ -422,12 +422,6 @@ const EventMap = () => {
         onViewportChange={newViewport => setViewport(newViewport)}
         goongApiAccessToken={GOONG_MAP_KEY}
       >
-        <Button onClick={handleZoomIn} variant='contained'>
-          +
-        </Button>
-        <Button onClick={handleZoomOut} variant='contained'>
-          -
-        </Button>
         {selectedPoints.map((point, index) => (
           <Marker
             key={index}

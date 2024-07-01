@@ -255,7 +255,7 @@ const EventList = () => {
       }
     }
     try {
-      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/genimage?`, params)
+      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/routine`, params)
       setDeviceList(res.data)
       setCount(res.count)
       setTotalPage(Math.ceil(res.count / 5))
@@ -428,7 +428,7 @@ const EventList = () => {
         <Grid container spacing={2}>
           <Grid item xs={8}>
             <Grid>
-              <p style={{marginLeft:'3%', fontSize: '20px'}}>Top 5 sự cố hệ thống</p>
+              <p style={{ marginLeft: '3%', fontSize: '20px' }}>Top 5 sự cố hệ thống</p>
             </Grid>
             <Card>
               <Grid container spacing={0}>
@@ -475,11 +475,11 @@ const EventList = () => {
           </Grid>
           <Grid item xs={4}>
             <Grid>
-              <p style={{marginLeft:'3%', fontSize: '20px'}}>Danh sách camera</p>
+              <p style={{ marginLeft: '3%', fontSize: '20px' }}>Danh sách camera</p>
             </Grid>
             <Card>
               {/* Add Pie Chart here */}
-              <ApexCharts  options={pieChartOptions} series={pieChartData} type='pie' width={380} />
+              <ApexCharts options={pieChartOptions} series={pieChartData} type='pie' width={380} />
             </Card>
           </Grid>
         </Grid>
