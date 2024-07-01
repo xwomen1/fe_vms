@@ -151,6 +151,8 @@ const PassWord = ({ onClose, nvr }) => {
           <Grid container item style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
             <Grid item xs={12}>
               <CustomTextField
+                autoComplete='new-password' // Thay đổi giá trị thành 'new-password'
+                form='off' // Thêm thuộc tính form với giá trị 'off'
                 label='Mật khẩu cũ'
                 type={showPassword ? 'text' : 'password'}
                 onChange={handlePasswordOldChange}
@@ -204,8 +206,12 @@ const PassWord = ({ onClose, nvr }) => {
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={saveChange}>OK</Button>
+        <Button onClick={onClose} variant='contained'>
+          Cancel
+        </Button>
+        <Button onClick={saveChange} variant='contained'>
+          OK
+        </Button>
       </DialogActions>
     </Dialog>
   )

@@ -264,7 +264,11 @@ const EventList = () => {
       setError(null)
     } catch (error) {
       console.error('Error fetching data:', error)
-      setError('Hệ thống đang gặp sự cố ')
+      if (error.response && error.response.status === 404) {
+        setError('Không tìm thấy trong hệ thống')
+      } else {
+        setError(error.response?.data?.message || 'Đang gặp sự cố')
+      }
       setDeviceList([])
       toast.error('Đang gặp sự cố')
     }

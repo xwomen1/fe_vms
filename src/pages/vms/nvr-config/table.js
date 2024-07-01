@@ -282,6 +282,8 @@ const UserList = ({ apiData }) => {
             <Grid item xs={3} style={{ marginTop: '1%' }}>
               <CustomTextField
                 value={value}
+                autoComplete='new-password' // Thay đổi giá trị thành 'new-password'
+                form='off' // Thêm thuộc tính form với giá trị 'off'
                 onChange={e => handleFilter(e.target.value)}
                 placeholder='Search…'
                 InputProps={{

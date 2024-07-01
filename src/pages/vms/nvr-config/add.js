@@ -94,6 +94,7 @@ const UserList = ({ apiData }) => {
   const [isError, setIsError] = useState(false)
   const [idBox, setIdBox] = useState(null)
   const [idBoxs, setIdBoxs] = useState(selectNVR?.value)
+  const [selectedAuto, setSelectedAuto] = useState('')
 
   const handlePageChange = newPage => {
     setPage(newPage)
@@ -158,7 +159,6 @@ const UserList = ({ apiData }) => {
         userName,
         passWord,
         protocol: '1'
-
       }
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -264,7 +264,6 @@ const UserList = ({ apiData }) => {
         userName,
         passWord,
         protocol: '0'
-
       }
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -463,6 +462,7 @@ const UserList = ({ apiData }) => {
   const handleRadioChange = event => {
     setSelectedValue(event.target.value)
     console.log(selectedValue)
+    setSelectedAuto(event.target.value)
   }
 
   const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen)
@@ -573,6 +573,7 @@ const UserList = ({ apiData }) => {
                       <Grid item>
                         <FormControlLabel value='daiIp' control={<Radio />} label='Dải IP' />
                       </Grid>
+                      <p>Loại giao thức :</p>
                       <Grid item xs={3}>
                         <Autocomplete
                           fullWidth
@@ -580,7 +581,7 @@ const UserList = ({ apiData }) => {
                           id='autocomplete-custom'
                           getOptionLabel={option => option.title || ''}
                           renderInput={params => <CustomTextField placeholder='Khác' {...params} />}
-                          onChange={(event, value) => setSelectedValue(value ? value.title.toLowerCase() : '')}
+                          onChange={(event, value) => setSelectedAuto(value ? value.title.toLowerCase() : '')}
                         />
                       </Grid>
                     </Grid>
@@ -816,7 +817,7 @@ const UserList = ({ apiData }) => {
                     />{' '}
                   </>
                 )}
-                {selectedValue === 'onvif' && (
+                {selectedAuto === 'onvif' && (
                   <Grid
                     container
                     item
@@ -881,7 +882,7 @@ const UserList = ({ apiData }) => {
                     />{' '}
                   </>
                 )}
-                {selectedValue === 'hikvision' && (
+                {selectedAuto === 'hikvision' && (
                   <Grid
                     container
                     item
