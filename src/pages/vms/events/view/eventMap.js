@@ -52,11 +52,7 @@ const columns = [
     label: 'Hình ảnh',
     renderCell: value => (
       <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-        <img
-          src={value}
-          alt=''
-          style={{ maxWidth: '60%', height: 'auto', objectFit: 'contain' }}
-        />
+        <img src={value} alt='' style={{ maxWidth: '60%', height: 'auto', objectFit: 'contain' }} />
       </Box>
     )
   },
@@ -312,6 +308,14 @@ const EventMap = () => {
       timestamp: convertTimestampToDateTimeString(row.timestamp)
     }))
 
+  const handleDeleteList = () => {
+    const updatedRows = rows.filter(row => !selectedCameraIds.includes(row.id))
+    setRows(updatedRows)
+    setSelectedCameraIds([])
+    setSelectedPoints([])
+    setSelectedTimes([])
+  }
+
   const handleSelectAllClick = event => {
     if (event.target.checked) {
       const newSelected = rows.map(n => n.id)
@@ -519,9 +523,9 @@ const EventMap = () => {
 
   const viewTable = () => (
     <TableContainer component={Paper} sx={{ height: '100%', minHeight: 'calc(60vh - 200px)' }}>
-      <Table stickyHeader className='sticky table' sx={{ overflow: 'auto' }} style={{width:'750px'}}>
-        <TableHead >
-          <TableRow >
+      <Table stickyHeader className='sticky table' sx={{ overflow: 'auto' }} style={{ width: '750px' }}>
+        <TableHead>
+          <TableRow>
             <TableCell padding='checkbox' sx={{ width: 20 }}>
               <Checkbox
                 onChange={handleSelectAllClick}
@@ -530,11 +534,11 @@ const EventMap = () => {
                 indeterminate={selectedCameraIds.length > 0 && selectedCameraIds.length < rows.length}
               />
             </TableCell>
-                 {columns.map(({ id, label, field, align, maxWidth, renderCell }) => (
-                  <TableCell key={id} align={align} sx={{ maxWidth }}>
-                    {label}
-                  </TableCell>
-                ))}
+            {columns.map(({ id, label, field, align, maxWidth, renderCell }) => (
+              <TableCell key={id} align={align} sx={{ maxWidth }}>
+                {label}
+              </TableCell>
+            ))}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -560,11 +564,15 @@ const EventMap = () => {
                     inputProps={{ 'aria-labelledby': labelId }}
                   />
                 </TableCell>
-                {columns.map(({ field, renderCell, align, width, maxWidth}) => {
-                      const value = row[field]
+                {columns.map(({ field, renderCell, align, width, maxWidth }) => {
+                  const value = row[field]
 
                   return (
-                    <TableCell key={field} align={align}  sx={{ width, maxWidth, wordBreak: 'break-word', flexWrap: 'wrap' }}>
+                    <TableCell
+                      key={field}
+                      align={align}
+                      sx={{ width, maxWidth, wordBreak: 'break-word', flexWrap: 'wrap' }}
+                    >
                       {/* {columns.format && typeof value === 'number' ? columns.format(value) : value} */}
                       {renderCell ? renderCell(value) : value}
                     </TableCell>
@@ -673,7 +681,9 @@ const EventMap = () => {
               <CardActions sx={{ justifyContent: 'space-around' }}>
                 <Grid container spacing={2}>
                   <Grid item xs={5}>
-                    <Button variant='contained'>Xóa danh sách</Button>
+                    <Button variant='contained' onClick={handleDeleteList}>
+                      Xóa danh sách
+                    </Button>
                   </Grid>
                   <Grid item xs={5}>
                     <Button

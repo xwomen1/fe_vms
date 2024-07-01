@@ -28,7 +28,7 @@ const TableHeader = props => {
       }}
     >
       <Box>
-        <Grid style={{ fontSize: 30, color: 'black' }}>Danh sách người dùng</Grid>
+        <Grid style={{ fontSize: 30, color: 'black' }}></Grid>
       </Box>
       <Box sx={{ rowGap: 2, display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
         <CustomTextField

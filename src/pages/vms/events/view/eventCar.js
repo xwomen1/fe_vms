@@ -397,7 +397,7 @@ const EventList = ({ eventData }) => {
                               setEventDetail(row)
                             }}
                           >
-                            <Icon icon='tabler:eye' />
+                            <Icon icon='tabler:info-circle' />
                           </IconButton>
                           <IconButton
                             size='small'

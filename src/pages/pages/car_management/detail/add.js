@@ -398,6 +398,7 @@ const AddFaceManagement = () => {
                         onChange={handleInputChange}
                       />
                     </div>
+
                     <div
                       style={{
                         marginLeft: '300px',
