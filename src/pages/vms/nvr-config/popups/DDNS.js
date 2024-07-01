@@ -175,7 +175,18 @@ const TCP = ({ onClose, mtu, nvr }) => {
       setLoading(true)
       if (password !== confirmPassword) {
         onClose()
-        Swal.fire('Lỗi!', 'Mật khẩu và xác nhận mật khẩu không khớp nhau.', 'error')
+        Swal.fire({
+          title: 'Lỗi!',
+          text: 'Mật khẩu và xác nhận mật khẩu không khớp nhau.',
+          icon: 'error',
+          willOpen: () => {
+            const confirmButton = Swal.getConfirmButton()
+            if (confirmButton) {
+              confirmButton.style.backgroundColor = '#FF9F43'
+              confirmButton.style.color = 'white'
+            }
+          }
+        })
         setLoading(false)
 
         return
@@ -212,13 +223,35 @@ const TCP = ({ onClose, mtu, nvr }) => {
       setLoading(false)
       onClose()
 
-      Swal.fire('Lưu thành công!', '', 'success')
+      Swal.fire({
+        title: 'Thành công!',
+        text: 'Dữ liệu đã được Lưu thành công.',
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
     } catch (error) {
       console.error(error)
       setLoading(false)
       onClose()
 
-      Swal.fire(error.message, error.response?.data?.message)
+      Swal.fire({
+        title: 'Error!',
+        text: error.response?.data?.message || error.message,
+        icon: 'error',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
       console.log(error.response?.data?.message)
     } finally {
       setLoading(false)

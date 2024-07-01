@@ -61,13 +61,10 @@ const Timeline = ({ data, minuteType, callback, startDate, endDate }) => {
     }, [minutesType]);
 
     useEffect(() => {
-        const datesInRange = handleUpdateListDate(startDate, endDate)
-        const dateOfList = datesInRange.map(date => date.toISOString().split('T')[0])
-        setDateList(dateOfList)
-    }, [startDate, endDate]);
-
-    useEffect(() => {
         if (data) {
+            const datesInRange = handleUpdateListDate(startDate, endDate)
+            const dateOfList = datesInRange.map(date => date)
+            setDateList(dateOfList)
             const newData = splitDataByDay(data);
             setDateData(newData);
         }
@@ -116,11 +113,15 @@ const Timeline = ({ data, minuteType, callback, startDate, endDate }) => {
 
     const handleUpdateListDate = (start, end) => {
         const dates = []
-        const date = new Date(start?.getTime())
 
-        while (date <= end) {
-            dates.push(new Date(date))
-            date.setDate(date.getDate() + 1)
+        if (start?.getDate() <= end?.getDate()) {
+            const gap = end?.getDate() - start?.getDate()
+            const currentDate = new Date(start.getTime())
+            for (let i = 0; i <= gap; i++) {
+                const dateString = convertDateToString1(currentDate).split('T')[0]
+                dates.push(dateString)
+                currentDate.setDate(currentDate.getDate() + 1)
+            }
         }
 
         return dates
@@ -164,7 +165,7 @@ const Timeline = ({ data, minuteType, callback, startDate, endDate }) => {
             // Kiểm tra nếu ngày bắt đầu và kết thúc của mục là khác nhau
             if (startTime.toDateString() !== endTime.toDateString()) {
                 const endOfDay = new Date(startTime);
-                endOfDay.setHours(23, 59, 59, 999); // Set giờ cuối cùng của ngày
+                endOfDay.setHours(24, 0, 0, 0); // Set giờ cuối cùng của ngày
 
                 const startOfNextDay = new Date(startTime);
                 startOfNextDay.setDate(startOfNextDay.getDate() + 1);
@@ -223,7 +224,7 @@ const Timeline = ({ data, minuteType, callback, startDate, endDate }) => {
             }
         }
 
-        // Thêm khoảng trống từ thời gian cuối cùng đến thời gian hiện tại
+        //Thêm khoảng trống từ thời gian cuối cùng đến thời gian hiện tại
         if (data.length > 0) {
             const lastEnd = new Date(data[data.length - 1].EndTime);
             dataDate.push({

@@ -64,33 +64,13 @@ const navigation = () => {
           path: '/kpi',
           icon: 'tabler:calendar-event'
         },
-        {
-          title: 'Thiết bị',
-          path: '/device-management',
-          icon: 'tabler:accessible'
-        },
-        {
-          path: '/pages/access-rights/list',
-          title: 'Quyền truy cập',
-          icon: 'tabler:calendar-month'
-        },
 
         {
-          title: 'Chấm công',
-          path: '/access-control/time-keeping',
-          icon: 'tabler:lock-access'
-        },
-        {
-          path: '/pages/report-month/list',
-          title: 'Báo cáo tháng',
-          icon: 'tabler:id'
+          path: '/mappingACToInf',
+          title: 'Cài đặt nâng cao',
+          icon: 'tabler:shield'
         }
 
-        // {
-        //   path: '/pages/access-rights/list',
-        //   title: 'Quyền truy cập',
-        //   icon: 'tabler:shield'
-        // },
         // {
         //   path: '/pages/access-rights/list',
         //   title: 'Thống kê',
@@ -325,33 +305,6 @@ const navigation = () => {
           title: 'Quy định về lương',
           icon: 'tabler:moneybag',
           path: '/salaryRule'
-        }
-      ]
-    },
-    {
-      title: 'Cài đặt nâng cao',
-      path: '/alert-management',
-      icon: 'tabler:settings-automation',
-      children: [
-        {
-          title: 'Quản lý nhóm quyền truy cập',
-          path: '/mappingACToInf',
-          icon: 'tabler:devices'
-        },
-        {
-          title: 'Cảnh báo hệ thống',
-          path: '/alert-management',
-          icon: 'tabler:zoom-exclamation'
-        },
-        {
-          title: 'OTA',
-          path: '/ota',
-          icon: 'tabler:download'
-        },
-        {
-          title: 'Logs',
-          path: '/logs',
-          icon: 'tabler:article'
         }
       ]
     }

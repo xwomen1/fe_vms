@@ -211,13 +211,35 @@ const UserList = ({ apiData }) => {
         axios
           .delete(urlDelete, config)
           .then(() => {
-            Swal.fire('Xóa thành công', '', 'success')
+            Swal.fire({
+              title: 'Thành công!',
+              text: 'Xóa thành công',
+              icon: 'success',
+              willOpen: () => {
+                const confirmButton = Swal.getConfirmButton()
+                if (confirmButton) {
+                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.color = 'white'
+                }
+              }
+            })
             const updatedData = assettype.filter(assettype => assettype.id !== idDelete)
             setAssetType(updatedData)
             fetchData()
           })
           .catch(err => {
-            Swal.fire('Đã xảy ra lỗi', err.message, 'error')
+            Swal.fire({
+              title: 'Error!',
+              text: err.response?.data?.message || err.message,
+              icon: 'error',
+              willOpen: () => {
+                const confirmButton = Swal.getConfirmButton()
+                if (confirmButton) {
+                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.color = 'white'
+                }
+              }
+            })
           })
       }
     })

@@ -121,6 +121,9 @@ const CameraGroup = ({ apiData }) => {
 
   return (
     <Grid container spacing={6.5}>
+      <Grid item xs={7} style={{ color: 'orange', marginLeft: '2%' }}>
+        <Button variant='contained'> Danh sách nhóm Camera</Button>
+      </Grid>
       <Grid item xs={12}>
         <Card>
           <div></div>
@@ -129,18 +132,13 @@ const CameraGroup = ({ apiData }) => {
 
             <Grid container item xs={12} alignItems='center'>
               <Grid container spacing={2}>
-                <Grid item xs={7} style={{ color: 'orange', marginLeft: '2%' }}>
-                  <h3>Danh sách nhóm Camera</h3>
-                </Grid>
-                <Grid item xs={2} style={{ marginTop: '1%', marginLeft: '4%', fontSize: '14px' }}>
-                  <Button 
-                  variant='contained'
-                  onClick={() => handleOpenPopupAdd()}>
+                <Grid item xs={7} style={{ color: 'orange', marginLeft: '2%' }}></Grid>
+                <Grid item xs={4} style={{ marginTop: '1%' }}>
+                  <Button variant='contained' onClick={() => handleOpenPopupAdd()} style={{ marginRight: '5%' }}>
                     <Icon icon='tabler:plus' />
                     Thêm nhóm
                   </Button>
-                </Grid>
-                <Grid item xs={2} style={{ marginTop: '1%' }}>
+
                   <CustomTextField
                     value={value}
                     placeholder='Search Group'
@@ -161,7 +159,7 @@ const CameraGroup = ({ apiData }) => {
                 </TableHead>
                 <TableBody>
                   {console.log(cameras)}
-                  {cameras.length >0 &&
+                  {cameras.length > 0 &&
                     cameras.map((camera, index) => (
                       <TableRow key={camera.id}>
                         <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>

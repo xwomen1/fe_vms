@@ -326,6 +326,8 @@ const UserList = ({ apiData }) => {
 
           <Grid item xs={3} component={Paper}>
             <div>
+              <h2>Nhóm quyền truy cập</h2>
+
               <CustomTextField
                 value={valueGroup}
                 sx={{ mr: 4 }}
@@ -344,6 +346,8 @@ const UserList = ({ apiData }) => {
           <Grid item xs={1}></Grid>
           <Grid item xs={3} component={Paper}>
             <div>
+              <h2>Nhóm cơ cấu tổ chức</h2>
+
               <CustomTextField
                 value={valueGroupIn}
                 sx={{ mr: 4 }}

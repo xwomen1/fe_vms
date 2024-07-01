@@ -1,6 +1,4 @@
 import { useState, forwardRef, useEffect } from 'react'
-import CustomTextField from 'src/@core/components/mui/text-field'
-import Icon from 'src/@core/components/icon'
 import {
   Box,
   Button,
@@ -12,15 +10,17 @@ import {
   FormControl,
   Grid,
   IconButton,
+  Input,
   InputLabel,
   MenuItem,
   Select,
   Typography,
   styled
 } from '@mui/material'
+import Icon from 'src/@core/components/icon'
 import authConfig from 'src/configs/auth'
 import axios from 'axios'
-import { Controller, useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import DatePicker from 'react-datepicker'
 import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
@@ -49,9 +49,9 @@ const initValueFilter = {
   cameraName: null,
   startTime: null,
   endTime: null,
-  keyword: '',
-  limit: 25,
-  page: 1
+  title: 'Họ tên', // Default value for title
+  operator: 'Is Equal to', // Default value for operator
+  enterValue: '' // Default value for enterValue
 }
 
 const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
@@ -61,6 +61,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
   const [locations, setLocations] = useState([])
   const [cameras, setCameras] = useState([])
+  const [rules, setRules] = useState([initValueFilter])
 
   const config = {
     headers: {
@@ -72,13 +73,12 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
   const fetchLocations = async () => {
     try {
       const res = await axios.get(
-        `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=7cac40af-6b9e-47e6-9aba-8d458722d5a4
-            `,
+        `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=7cac40af-6b9e-47e6-9aba-8d458722d5a4`,
         config
       )
       setLocations(res.data)
     } catch (error) {
-      console.error('Error fetching data: ', error)
+      console.error('Error fetching locations: ', error)
     }
   }
 
@@ -87,14 +87,15 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
       const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras`, config)
       setCameras(res.data)
     } catch (error) {
-      console.error('Error fetching data: ', error)
+      console.error('Error fetching cameras: ', error)
     }
   }
 
   const {
     control,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
+    reset
   } = useForm({ defaultValues: initValueFilter })
 
   useEffect(() => {
@@ -102,23 +103,23 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
     fetchCameras()
   }, [])
 
-  const onReset = values => {
-    var detail = {
-      location: '',
-      cameraName: '',
-      startTime: null,
-      endTime: null
+  const onReset = () => {
+    reset(initValueFilter) // Reset to initial values
+    onClose()
+  }
+
+  const onSubmit = data => {
+    const detail = {
+      ...data,
+      startTime: startTime.getTime(),
+      endTime: endTime.getTime()
     }
     callback(detail)
     onClose()
   }
 
-  const onSubmit = values => {
-    var detail = { ...values }
-    detail['startTime'] = startTime.getTime()
-    detail['endTime'] = endTime.getTime()
-    callback(detail)
-    onClose()
+  const addRule = () => {
+    setRules([...rules, initValueFilter])
   }
 
   return (
@@ -146,42 +147,114 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
               Bộ lọc
             </Typography>
           </Box>
-          <form>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <InputLabel id='time-validity-label'>Loại hợp đồng</InputLabel>
-                  <Select labelId='time-validity-label' id='time-validity-select'>
-                    <MenuItem value='Custom'>10 năm</MenuItem>
-                    <MenuItem value='Undefine'>5 năm</MenuItem>
-                    <MenuItem value='Undefined'>3 tháng</MenuItem>
-                    <MenuItem value='Undefineds'>6 tháng</MenuItem>
-
-                    <MenuItem value='Undefiness'>Không thời hạn</MenuItem>
-                  </Select>
-                </FormControl>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            {rules.map((rule, index) => (
+              <Grid container spacing={2} key={index} sx={{ mt: index !== 0 ? 2 : 0 }}>
+                <Grid item xs={4}>
+                  <FormControl fullWidth>
+                    <InputLabel id='filter-title-label'>Title</InputLabel>
+                    <Controller
+                      name={`rules[${index}].title`}
+                      control={control}
+                      render={({ field }) => (
+                        <Select {...field} labelId='filter-title-label' id={`filter-title-select-${index}`}>
+                          <MenuItem value='Họ tên'>Họ tên</MenuItem>
+                          <MenuItem value='Tên gọi khác'>Tên gọi khác</MenuItem>
+                          <MenuItem value='Ngày sinh'>Ngày sinh</MenuItem>
+                          <MenuItem value='Nơi sinh'>Nơi sinh</MenuItem>
+                          <MenuItem value='Quê quán'>Quê quán</MenuItem>
+                          <MenuItem value='Giới tính'>Giới tính</MenuItem>
+                          <MenuItem value='Dân tộc'>Dân tộc</MenuItem>
+                          <MenuItem value='Tôn giáo'>Tôn giáo</MenuItem>
+                          <MenuItem value='Nghề nghiệp'>Nghề nghiệp</MenuItem>
+                          <MenuItem value='Đăng ký hộ khẩu thường chú'>Đăng ký hộ khẩu thường chú</MenuItem>
+                          <MenuItem value='Nơi ở hiện nay'>Nơi ở hiện nay</MenuItem>
+                          <MenuItem value='Ngày tuyển dụng'>Ngày tuyển dụng</MenuItem>
+                          <MenuItem value='Cơ quan tuyển dụng'>Cơ quan tuyển dụng</MenuItem>
+                          <MenuItem value='Chức vụ'>Chức vụ</MenuItem>
+                          <MenuItem value='Công việc được giao'>Công việc được giao</MenuItem>
+                          <MenuItem value='Ngạch công chức'>Ngạch công chức</MenuItem>
+                          <MenuItem value='Mã ngách'>Mã ngách</MenuItem>
+                          <MenuItem value='Bậc lương'>Bậc lương</MenuItem>
+                          <MenuItem value='Hệ số'>Hệ số</MenuItem>
+                          <MenuItem value='Ngày hưởng'>Ngày hưởng</MenuItem>
+                          <MenuItem value='Phụ cấp chức vụ'>Phụ cấp chức vụ</MenuItem>
+                          <MenuItem value='Phụ cấp khác'>Phụ cấp khác</MenuItem>
+                          <MenuItem value='Trình độ giáo dục phổ thông'>Trình độ giáo dục phổ thông</MenuItem>
+                          <MenuItem value='Trình độ chuyên môn cao nhất'>Trình độ chuyên môn cao nhất</MenuItem>
+                          <MenuItem value='Lý luận chính trị'>Lý luận chính trị</MenuItem>
+                          <MenuItem value='Quản lý nhà nước'>Quản lý nhà nước</MenuItem>
+                          <MenuItem value='Ngoại ngữ'>Ngoại ngữ</MenuItem>
+                          <MenuItem value='Tin học'>Tin học</MenuItem>
+                          <MenuItem value='Ngày vào Đảng'>Ngày vào Đảng</MenuItem>
+                          <MenuItem value='Ngày chính thức'>Ngày chính thức</MenuItem>
+                          <MenuItem value='Ngày tham gia tổ chức chính trị - xã hội'>
+                            Ngày tham gia tổ chức chính trị - xã hội
+                          </MenuItem>
+                          <MenuItem value='Ngày nhập ngũ'>Ngày nhập ngũ</MenuItem>
+                          <MenuItem value='Ngày xuất ngũ'>Ngày xuất ngũ</MenuItem>
+                          <MenuItem value='Quân hàm cao nhất'>Quân hàm cao nhất</MenuItem>
+                          <MenuItem value='Danh hiệu được phân cao nhất'>Danh hiệu được phân cao nhất</MenuItem>
+                          <MenuItem value='Sức khỏe'>Sức khỏe</MenuItem>
+                          <MenuItem value='Chiều cao'>Chiều cao</MenuItem>
+                          <MenuItem value='Cân nặng'>Cân nặng</MenuItem>
+                          <MenuItem value='Nhóm máu'>Nhóm máu</MenuItem>
+                          <MenuItem value='Thương binh loại'>Thương binh loại</MenuItem>
+                          <MenuItem value='Gia đình chính sách'>Gia đình chính sách</MenuItem>
+                          <MenuItem value='Sở trường công tác'>Sở trường công tác</MenuItem>
+                          <MenuItem value='Khen thưởng'>Khen thưởng</MenuItem>
+                          <MenuItem value='Kỷ luật'>Kỷ luật</MenuItem>
+                          <MenuItem value='Lịch sử bản thân'>Lịch sử bản thân</MenuItem>
+                          <MenuItem value='Đặc điểm lịch sử bản thân'>Đặc điểm lịch sử bản thân</MenuItem>
+                          <MenuItem value='Quan hệ gia đình'>Quan hệ gia đình</MenuItem>
+                          <MenuItem value='Đặc điểm kinh tế gia đình'>Đặc điểm kinh tế gia đình</MenuItem>
+                        </Select>
+                      )}
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid item xs={4}>
+                  <FormControl fullWidth>
+                    <InputLabel id={`operator-label-${index}`}>Operator</InputLabel>
+                    <Controller
+                      name={`rules[${index}].operator`}
+                      control={control}
+                      render={({ field }) => (
+                        <Select {...field} labelId={`operator-label-${index}`} id={`operator-select-${index}`}>
+                          <MenuItem value='Is Equal to'>Is Equal to</MenuItem>
+                          <MenuItem value='Contains'>Contains</MenuItem>
+                          <MenuItem value='Greater Than'>Greater Than</MenuItem>
+                          <MenuItem value='Less Than'>Less Than</MenuItem>
+                        </Select>
+                      )}
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid item xs={4}>
+                  <FormControl fullWidth>
+                    <InputLabel id={`enter-value-label-${index}`}>Enter Value</InputLabel>
+                    <Controller
+                      name={`rules[${index}].enterValue`}
+                      control={control}
+                      render={({ field }) => <Input {...field} id={`enter-value-input-${index}`} />}
+                    />
+                  </FormControl>
+                </Grid>
               </Grid>
-
-              <Grid item xs={12}>
-                <DialogActions
-                  sx={{
-                    justifyContent: 'center',
-                    px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
-                    pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
-                  }}
-                >
-                  <Button type='submit' variant='contained' onClick={handleSubmit(onSubmit)}>
-                    Lọc
-                  </Button>
-                  <Button variant='tonal' onClick={handleSubmit(onReset)}>
-                    Mặc định
-                  </Button>
-                  <Button variant='tonal' color='secondary' onClick={onClose}>
-                    Hủy
-                  </Button>
-                </DialogActions>
-              </Grid>
-            </Grid>
+            ))}
+            <Box sx={{ mt: 2 }}>
+              <Button onClick={addRule} variant='outlined' color='primary'>
+                Add Rule
+              </Button>
+            </Box>
+            <Box sx={{ marginLeft: '40%' }}>
+              <Button onClick={onReset} variant='contained' color='secondary' style={{ marginRight: '5%' }}>
+                Hủy
+              </Button>
+              <Button onClick={onReset} variant='contained' color='primary'>
+                Lọc
+              </Button>
+            </Box>
           </form>
         </DialogContent>
       </Dialog>

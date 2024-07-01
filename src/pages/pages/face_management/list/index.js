@@ -356,11 +356,14 @@ const FaceManagement = () => {
 
   return (
     <>
+      <Grid style={{ marginBottom: '1%' }}>
+        <Button variant='contained'> Danh sách khuôn mặt</Button>
+      </Grid>
+      <Grid></Grid>
       <Grid container spacing={6.5}>
         <Grid item xs={12}>
           <Card>
             <CardHeader
-              title='Quản lý khuôn mặt'
               titleTypographyProps={{ sx: { mb: [2, 0] } }}
               action={
                 <Grid container spacing={2}>

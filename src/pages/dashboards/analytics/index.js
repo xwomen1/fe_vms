@@ -257,11 +257,10 @@ const EventList = () => {
       }
     }
     try {
-      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/genimage`, params)
-      setDeviceList(res?.data)
-      setCount(res?.count)
-      setTotalPage(Math.ceil(res?.count / 5))
-      setError(null)
+      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/routine`, params)
+      setDeviceList(res.data)
+      setCount(res.count)
+      setTotalPage(Math.ceil(res.count / 5))
     } catch (error) {
       console.error('Error fetching data:', error)
       if (error.response && error.response.status === 404) {

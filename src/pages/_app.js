@@ -101,7 +101,7 @@ const App = props => {
     <Provider store={store}>
       <CacheProvider value={emotionCache}>
         <Head>
-          <title>{`Camnet Smart Parking`}</title>
+          <title>{`Camnet Access Control`}</title>
           <meta
             name='description'
             content={`${themeConfig.templateName} – Material Design React Admin Dashboard Template – is the most developer friendly & highly customizable Admin Dashboard Template based on MUI v5.`}
