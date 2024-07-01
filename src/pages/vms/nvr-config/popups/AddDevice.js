@@ -447,7 +447,7 @@ const AddDevice = ({ show, onClose, camera }) => {
             ...values
         }
 
-        axios.post(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras`, params, config)
+        axios.post(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs`, params, config)
             .then((res) => {
                 setReload()
                 toast.success(res.message)
@@ -462,8 +462,8 @@ const AddDevice = ({ show, onClose, camera }) => {
                 }
             })
             .finally(() => {
-                setLoading(false)
                 onClose()
+                setLoading(false)
             })
     }
 
@@ -523,9 +523,9 @@ const AddDevice = ({ show, onClose, camera }) => {
                                                             <CustomTextField
                                                                 fullWidth
                                                                 value={value}
+                                                                type={item?.name === 'password' ? 'password' : ''}
                                                                 label={item.label}
                                                                 onChange={e => onChange(e.target.value)}
-                                                                type={item?.name === 'password' ? 'password' : ''}
                                                                 placeholder={item.placeholder}
                                                                 error={Boolean(errors[item.name])}
                                                                 aria-describedby='validation-basic-last-name'

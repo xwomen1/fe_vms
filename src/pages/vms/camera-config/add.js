@@ -210,7 +210,6 @@ const Add = ({ apiData }) => {
 
   const handleRadioChange = event => {
     setSelectedValue(event.target.value)
-    // console.log(selectedValue)
   }
 
   const handlePageChange = newPage => {
@@ -253,7 +252,6 @@ const Add = ({ apiData }) => {
       setStatus1(response.data.isOfflineSetting)
       setAssetType(response.data)
       setTotal(response.data.page)
-      // console.log(response.data[0].id)
     } catch (error) {
       console.error('Error fetching users:', error)
     }
@@ -578,7 +576,6 @@ const Add = ({ apiData }) => {
     },
     [assettype]
   )
-  // console.log(total, 'totalpage')
 
   const statusText = status1 ? 'Đang hoạt động' : 'Không hoạt động'
 
@@ -601,7 +598,6 @@ const Add = ({ apiData }) => {
         setStatus1(response.data.isOfflineSetting)
         setAssetType(response.data)
         setTotal(response.data.page)
-        // console.log(response.data[0].id)
       } catch (error) {
         console.error('Error fetching users:', error)
       }
