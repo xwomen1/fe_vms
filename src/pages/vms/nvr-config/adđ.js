@@ -157,7 +157,8 @@ const UserList = ({ apiData }) => {
       customClass: {
         content: 'content-class',
         confirmButton: 'swal-btn-confirm'
-      }
+      },
+      confirmButtonColor: '#FF9F43'
     }
 
     return Swal.fire({ ...defaultProps, ...options })
