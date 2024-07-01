@@ -265,17 +265,37 @@ const AddFaceManagement = () => {
 
       const response = await axios.post(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist`, params, config)
       const newId = response.data.id
-      setDialogTitle('Thêm khuôn mặt thành công')
-      setIsSuccess(true)
+      Swal.fire(
+        Swal.fire({
+          title: 'Thành công!',
+          text: 'Dữ liệu đã được Thêm thành công.',
+          icon: 'success',
+          willOpen: () => {
+            const confirmButton = Swal.getConfirmButton()
+            if (confirmButton) {
+              confirmButton.style.backgroundColor = '#FF9F43'
+              confirmButton.style.color = 'white'
+            }
+          }
+        })
+      )
       setRedirectUrl(`/pages/face_management/detail/${newId}`)
     } catch (error) {
-      setDialogTitle('Thêm mặt không thành công')
-      setDialogMessage(error.response.data.message || 'Thêm không thành công')
-      setIsSuccess(false)
+      Swal.fire({
+        title: 'Error!',
+        text: error.response?.data?.message || error.message,
+        icon: 'error',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
       console.error('Error adding member to group:', error)
     } finally {
       setLoading(false)
-      setDialogOpen(true)
     }
   }
 

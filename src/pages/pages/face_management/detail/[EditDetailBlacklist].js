@@ -232,18 +232,36 @@ const EditFaceManagement = () => {
       }
 
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${id}`, params, config)
-      setDialogTitle('Sửa thông tin thành công')
-      setIsSuccess(true)
+      Swal.fire({
+        title: 'Thành công!',
+        text: 'Dữ liệu đã được cập nhật thành công.',
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
       fetchFilteredOrAllUserss()
     } catch (error) {
-      setDialogTitle('Sửa thông tin không thành công')
-      setDialogMessage(error.response.data.message || 'Sửa không thành công')
-      setIsSuccess(false)
+      Swal.fire({
+        title: 'Error!',
+        text: error.response?.data?.message || error.message,
+        icon: 'error',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
       fetchFilteredOrAllUserss()
       console.error('Error adding member to group:', error)
     } finally {
       setLoading(false)
-      setDialogOpen(true)
     }
   }
 

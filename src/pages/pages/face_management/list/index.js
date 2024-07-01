@@ -288,19 +288,37 @@ const FaceManagement = () => {
         axios
           .delete(urlDelete, config)
           .then(() => {
-            setDialogTitle('Xóa khuân mặt thành công')
-            setIsSuccess(true)
+            Swal.fire({
+              title: 'Thành công!',
+              text: 'Xóa dữ liệu thành công',
+              icon: 'success',
+              willOpen: () => {
+                const confirmButton = Swal.getConfirmButton()
+                if (confirmButton) {
+                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.color = 'white'
+                }
+              }
+            })
             const updatedData = userData.filter(user => user.id !== idDelete)
             setUserData(updatedData)
           })
           .catch(err => {
-            setDialogTitle('xóa không thành công')
-            setDialogMessage(err.message || 'xóa không thành công')
-            setIsSuccess(false)
+            Swal.fire({
+              title: 'Error!',
+              text: err.response?.data?.message || err.message,
+              icon: 'error',
+              willOpen: () => {
+                const confirmButton = Swal.getConfirmButton()
+                if (confirmButton) {
+                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.color = 'white'
+                }
+              }
+            })
           })
           .finally(() => {
             setLoading(false)
-            setDialogOpen(true)
           })
       }
     })

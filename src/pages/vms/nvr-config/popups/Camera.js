@@ -26,44 +26,44 @@ import Daily from 'src/pages/pages/access-rights/mocdata/daily'
 
 const dataDailyDefault = [
   {
-      label: '',
-      value: 1,
+    label: '',
+    value: 1
   },
   {
-      label: 'Thứ 2',
-      dayOfWeek: 'MONDAY',
-      value: 2,
+    label: 'Thứ 2',
+    dayOfWeek: 'MONDAY',
+    value: 2
   },
   {
-      label: 'Thứ 3',
-      dayOfWeek: 'TUESDAY',
-      value: 3,
+    label: 'Thứ 3',
+    dayOfWeek: 'TUESDAY',
+    value: 3
   },
   {
-      label: 'Thứ 4',
-      dayOfWeek: 'WEDNESDAY',
-      value: 4,
+    label: 'Thứ 4',
+    dayOfWeek: 'WEDNESDAY',
+    value: 4
   },
   {
-      label: 'Thứ 5',
-      dayOfWeek: 'THURSDAY',
-      value: 5,
+    label: 'Thứ 5',
+    dayOfWeek: 'THURSDAY',
+    value: 5
   },
   {
-      label: 'Thứ 6',
-      dayOfWeek: 'FRIDAY',
-      value: 6,
+    label: 'Thứ 6',
+    dayOfWeek: 'FRIDAY',
+    value: 6
   },
   {
-      label: 'Thứ 7',
-      dayOfWeek: 'SATURDAY',
-      value: 7,
+    label: 'Thứ 7',
+    dayOfWeek: 'SATURDAY',
+    value: 7
   },
   {
-      label: 'CN',
-      dayOfWeek: 'SUNDAY',
-      value: 8,
-  },
+    label: 'CN',
+    dayOfWeek: 'SUNDAY',
+    value: 8
+  }
 ]
 
 const UserList = ({ apiData }) => {
@@ -98,63 +98,51 @@ const UserList = ({ apiData }) => {
       customClass: {
         content: 'content-class',
         confirmButton: 'swal-btn-confirm'
-      }
+      },
+      confirmButtonColor: '#FF9F43'
     }
 
     return Swal.fire({ ...defaultProps, ...options })
   }
-  
+
   const createData = (name, ch1, ch2) => {
     return { name, ch1, ch2 }
   }
- 
- 
 
   const handleCloseMenu = () => {
     setAnchorEl(null)
   }
 
-
   return (
-    <Grid container spacing={2} style={{minWidth: 500}}>
-        <Grid container item  style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
-<Grid item xs = {5.8}>
-        <FormControl fullWidth>
-    <InputLabel id='time-validity-label'>Camera</InputLabel>
-    <Select
-      labelId='time-validity-label'
-      id='time-validity-select'
-     
-    >
-      <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
-      <MenuItem value='Undefined'>Không xác định</MenuItem>
-    </Select>
-  </FormControl>
-      </Grid>
-      <Grid item xs = {0.4}></Grid>
-      <Grid item xs={5.8}>
-        <FormControl fullWidth>
-    <InputLabel id='time-validity-label'>Kenh</InputLabel>
-    <Select
-      labelId='time-validity-label'
-      id='time-validity-select'
-     
-    >
-      <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
-      <MenuItem value='Undefined'>Không xác định</MenuItem>
-    </Select>
-  </FormControl>
-      </Grid>
-      <Grid>
-      Bảng cấu hình thời gian
-      </Grid>
-      <Daily
-                        callbackOfDaily={(v) => {
-                            setDataDaily(v);
-                            setDataDailyState(v);
-                        }}
-                        dataDailyProps={dataDailyState}
-                    />
+    <Grid container spacing={2} style={{ minWidth: 500 }}>
+      <Grid container item style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
+        <Grid item xs={5.8}>
+          <FormControl fullWidth>
+            <InputLabel id='time-validity-label'>Camera</InputLabel>
+            <Select labelId='time-validity-label' id='time-validity-select'>
+              <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
+              <MenuItem value='Undefined'>Không xác định</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xs={0.4}></Grid>
+        <Grid item xs={5.8}>
+          <FormControl fullWidth>
+            <InputLabel id='time-validity-label'>Kenh</InputLabel>
+            <Select labelId='time-validity-label' id='time-validity-select'>
+              <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
+              <MenuItem value='Undefined'>Không xác định</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid>Bảng cấu hình thời gian</Grid>
+        <Daily
+          callbackOfDaily={v => {
+            setDataDaily(v)
+            setDataDailyState(v)
+          }}
+          dataDailyProps={dataDailyState}
+        />
       </Grid>
     </Grid>
   )

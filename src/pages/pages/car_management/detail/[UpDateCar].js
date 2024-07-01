@@ -319,6 +319,41 @@ const UpDateCar = () => {
     setDialogOpen(false)
   }
 
+  // const handleUpdate = async () => {
+  //   setLoading(true)
+  //   try {
+  //     const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+  //     const config = {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`
+  //       }
+  //     }
+
+  //     const params = {
+  //       name: name,
+  //       note: note,
+  //       status: status,
+  //       type: type,
+  //       mainImageId: fileAvatarId,
+  //       imgs: listFileId.map((id, index) => ({
+  //         id: id,
+  //         urlImage: listFileUrl[id]
+  //       }))
+  //     }
+  //     await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates/${id}`, params, config)
+  //     toast.success('Thay đổi thành công')
+  //     fetchFilteredOrAllUserss()
+  //   } catch (error) {
+  //     toast.error(error?.response?.statusText)
+
+  //     console.error('Error adding member to group:', error)
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
+  // console.log(avatarImage, 'avatarImage')
+
   const handleUpdate = async () => {
     setLoading(true)
     try {
@@ -336,25 +371,45 @@ const UpDateCar = () => {
         status: status,
         type: type,
         mainImageId: fileAvatarId,
-        imgs: listFileId.map((id, index) => ({
+        imgs: listFileId.map(id => ({
           id: id,
           urlImage: listFileUrl[id]
         }))
       }
+
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates/${id}`, params, config)
-      toast.success('Thay đổi thành công')
+      Swal.fire({
+        title: 'Thành công!',
+        text: 'Dữ liệu đã được cập nhật thành công.',
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
       fetchFilteredOrAllUserss()
     } catch (error) {
-      onClose()
-
-      toast.error(err?.response?.statusText)
-
+      Swal.fire({
+        title: 'Error!',
+        text: error.response?.data?.message || error.message,
+        icon: 'error',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
+      fetchFilteredOrAllUserss()
       console.error('Error adding member to group:', error)
     } finally {
       setLoading(false)
     }
   }
-  console.log(avatarImage, 'avatarImage')
 
   return (
     <>
