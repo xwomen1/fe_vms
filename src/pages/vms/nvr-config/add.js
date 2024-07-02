@@ -1065,7 +1065,7 @@ const UserList = ({ apiData }) => {
           </>
         )}
         {isOpenAddDevice &&
-          <AddDevice show={isOpenAddDevice} onClose={() => setIsOpenAddDevice(false)} />
+          <AddDevice show={isOpenAddDevice} setReload={() => setReload(reload + 1)} onClose={() => setIsOpenAddDevice(false)} />
         }
         {/* <Passwords open={openPopupP} onClose={handleClosePPopup} nvr={selectedIds} /> */}
         <ConnectCamera

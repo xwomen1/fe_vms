@@ -79,7 +79,6 @@ const initValues = {
     streams: [],
 };
 
-
 const format_form = [
     {
         name: 'name',
@@ -135,6 +134,7 @@ const format_form = [
         require: false,
         width: 2,
     },
+
     // {
     //     name: 'cameraGroup',
     //     label: 'Nhóm cam',
@@ -215,8 +215,6 @@ const format_form = [
         width: 12,
     }
 ];
-
-
 
 const AddDevice = ({ show, setReload, onClose, camera }) => {
     const token = localStorage.getItem(authConfig.storageTokenKeyName);
