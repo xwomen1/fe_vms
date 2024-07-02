@@ -41,7 +41,7 @@ const EventList = () => {
   const [websocket, setWebsocket] = useState(null)
   const [rtcPeerConnection, setRtcPeerConnection] = useState(null)
   const [status1, setStatus1] = useState([]) // Changed to an array to hold status data
-
+  const [error, setError] = useState(null)
   const [total, setTotalPage] = useState(0)
   const [total1, setTotalPage1] = useState(0)
 
@@ -193,23 +193,6 @@ const EventList = () => {
 
   const COLORS = ['#0088FE', '#FF8042']
 
-  useEffect(() => {
-    const newList = []
-
-    deviceList?.map((item, index) => {
-      if (index === 0) {
-        newList.push(eventsData)
-        newList.push(item)
-        setCount(count + 1)
-        deviceList?.pop()
-      } else {
-        newList.push(item)
-      }
-    })
-
-    setDeviceList([...newList])
-  }, [eventsData])
-
   const fetchFilteredOrAllUsers = async () => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -246,6 +229,25 @@ const EventList = () => {
     fetchDataList()
   }, [page, pageSize])
 
+  useEffect(() => {
+    if (eventsData) {
+      const newList = []
+
+      deviceList?.map((item, index) => {
+        if (index === 0) {
+          newList.push(eventsData)
+          newList.push(item)
+          setCount(count + 1)
+          deviceList?.pop()
+        } else {
+          newList.push(item)
+        }
+      })
+
+      setDeviceList([...newList])
+    }
+  }, [eventsData, deviceList])
+
   const fetchDataList = async () => {
     const params = {
       ...config1,
@@ -255,14 +257,19 @@ const EventList = () => {
       }
     }
     try {
-      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/genimage?`, params)
+      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/routine`, params)
       setDeviceList(res.data)
       setCount(res.count)
       setTotalPage(Math.ceil(res.count / 5))
     } catch (error) {
       console.error('Error fetching data:', error)
-      toast.error(error)
-    } finally {
+      if (error.response && error.response.status === 404) {
+        setError('Không tìm thấy trong hệ thống')
+      } else {
+        setError(error.response?.data?.message || 'Đang gặp sự cố')
+      }
+      setDeviceList([])
+      toast.error('Đang gặp sự cố')
     }
   }
 
@@ -381,8 +388,14 @@ const EventList = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {deviceList?.slice(0, pageSize).map((row, index) => {
-                    return (
+                  {error ? (
+                    <TableRow>
+                      <TableCell colSpan={columns.length + 1} align='center' style={{ color: 'red' }}>
+                        {error}
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    deviceList?.slice(0, pageSize).map((row, index) => (
                       <TableRow hover tabIndex={-1} key={index}>
                         <TableCell>{index + 1}</TableCell>
                         {columns.map(({ field, renderCell, align, maxWidth }) => {
@@ -399,8 +412,8 @@ const EventList = () => {
                           )
                         })}
                       </TableRow>
-                    )
-                  })}
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </TableContainer>
@@ -428,7 +441,7 @@ const EventList = () => {
         <Grid container spacing={2}>
           <Grid item xs={8}>
             <Grid>
-              <p style={{marginLeft:'3%', fontSize: '20px'}}>Top 5 sự cố hệ thống</p>
+              <p style={{ marginLeft: '3%', fontSize: '20px' }}>Top 5 sự cố hệ thống</p>
             </Grid>
             <Card>
               <Grid container spacing={0}>
@@ -475,11 +488,11 @@ const EventList = () => {
           </Grid>
           <Grid item xs={4}>
             <Grid>
-              <p style={{marginLeft:'3%', fontSize: '20px'}}>Danh sách camera</p>
+              <p style={{ marginLeft: '3%', fontSize: '20px' }}>Danh sách camera</p>
             </Grid>
             <Card>
               {/* Add Pie Chart here */}
-              <ApexCharts  options={pieChartOptions} series={pieChartData} type='pie' width={380} />
+              <ApexCharts options={pieChartOptions} series={pieChartData} type='pie' width={380} />
             </Card>
           </Grid>
         </Grid>

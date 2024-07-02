@@ -76,7 +76,7 @@ function ReportMonth({ history }) {
           Authorization: `Bearer ${token}`
         },
         params: {
-          groupId: selectedGroupId?.groupId || '',
+          groupId: selectedGroupId?.id || '',
           page: parseInt(valueFilter.page),
           limit: parseInt(valueFilter.limit)
         }
@@ -95,115 +95,97 @@ function ReportMonth({ history }) {
     }
   }
 
-  // useEffect(() => {
-  //   if (selectedGroupId !== null) {
-  //     setValueFilter({ ...valueFilter, page: 1 })
-  //     setDataResource([])
-  //     fetchDataSource()
-  //   }
-  // }, [selectedGroupId])
+  useEffect(() => {
+    if (selectedGroupId !== null) {
+      setValueFilter({ ...valueFilter, page: 1 })
+      setDataResource([])
+      fetchDataSource()
+    }
+  }, [selectedGroupId])
 
-  // useEffect(() => {
-  //   const fetchGroupData = async () => {
-  //     try {
-  //       const token = localStorage.getItem(authConfig.storageTokenKeyName)
+  useEffect(() => {
+    const fetchGroupData = async () => {
+      try {
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
-  //       const config = {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`
-  //         },
-  //         params: {
-  //           keyword: valueGroup
-  //         }
-  //       }
-  //       const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search', config)
-  //       const dataWithChildren = addChildrenField(response.data)
-  //       const rootGroups = findRootGroups(dataWithChildren)
-  //       setGroups(rootGroups)
-  //     } catch (error) {
-  //       console.error('Error fetching data:', error)
-  //     }
-  //   }
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          params: {
+            keyword: valueGroup
+          }
+        }
+        const response = await axios.get('https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups', config)
+        const dataWithChildren = addChildrenField(response.data?.rows)
 
-  //   fetchGroupData()
-  // }, [])
+        setGroups(dataWithChildren)
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
 
-  // const addChildrenField = (data, parentId = null) => {
-  //   return data.map(group => {
-  //     const children = data.filter(child => child.parentId === group.groupId)
-  //     if (children.length > 0) {
-  //       group.children = children
-  //     }
+    fetchGroupData()
+  }, [])
 
-  //     return group
-  //   })
-  // }
+  const addChildrenField = (data, parentId = null) => {
+    return data?.map(group => {
+      const children = data?.filter(child => child.parentId === group.id)
+      console.log(children, 'chinder')
+      if (children.length > 0) {
+        group.children = children
+      }
 
-  // const findRootGroups = data => {
-  //   const rootGroups = []
-  //   data.forEach(group => {
-  //     if (!data.some(item => item.groupId === group.parentId)) {
-  //       rootGroups.push(group)
-  //     }
-  //   })
+      return group
+    })
+  }
 
-  //   return rootGroups
-  // }
+  const handleGroupCheckboxChange = (id, checked) => {
+    if (checked) {
+      setSelectedGroups([{ id }])
+      setSelectedGroupId({ id })
+    } else {
+      setSelectedGroups([])
+      setSelectedGroupId('')
+    }
+  }
 
-  // const handleGroupCheckboxChange = (groupId, checked) => {
-  //   if (checked) {
-  //     setSelectedGroups(prevGroups => [...prevGroups, { groupId }])
-  //     setSelectedGroupId({ groupId }) // Cập nhật groupId khi chọn
-  //   } else {
-  //     setSelectedGroups(prevGroups => prevGroups.filter(g => g.groupId !== groupId))
-  //     if (selectedGroups.length === 1 && selectedGroups[0].groupId === groupId) {
-  //       setSelectedGroupId('') // Đặt selectedGroupId thành null nếu không còn nhóm nào được chọn
-  //     } else {
-  //       setSelectedGroupId(prevGroups => {
-  //         if (prevGroups?.length === 0) return ''
+  const GroupCheckbox = ({ group, checked, onChange }) => {
+    return (
+      <div>
+        <input
+          type='checkbox'
+          id={`group-${group.id}`}
+          checked={checked}
+          onChange={e => onChange(group.id, e.target.checked)}
+        />
+        <label htmlFor={`group-${group.id}`}>{group.name}</label>
+      </div>
+    )
+  }
 
-  //         return prevGroups[prevGroups?.length - 1]
-  //       })
-  //     }
-  //   }
-  // }
+  const handleLabelClick = group => {
+    const isChecked = selectedGroups.some(g => g.id === group.id)
+    handleGroupCheckboxChange(group.id, !isChecked)
+  }
 
-  // const GroupCheckbox = ({ group, checked, onChange }) => {
-  //   return (
-  //     <div>
-  //       <input
-  //         type='checkbox'
-  //         id={`group-${group.groupId}`}
-  //         checked={checked}
-  //         onChange={e => onChange(group.groupId, e.target.checked)}
-  //       />
-  //       <label htmlFor={`group-${group.groupId}`}>{group.groupName}</label>
-  //     </div>
-  //   )
-  // }
-
-  // const handleLabelClick = group => {
-  //   const isChecked = selectedGroups.some(g => g.groupId === group.groupId)
-  //   handleGroupCheckboxChange(group.groupId, !isChecked)
-  // }
-
-  // const renderGroup = group => (
-  //   <TreeItem
-  //     key={group.groupId}
-  //     nodeId={group.groupId}
-  //     label={
-  //       <div onClick={() => handleLabelClick(group)}>
-  //         <GroupCheckbox
-  //           group={group}
-  //           checked={selectedGroups.some(g => g.groupId === group.groupId)}
-  //           onChange={handleGroupCheckboxChange}
-  //         />
-  //       </div>
-  //     }
-  //   >
-  //     {group.children && group.children.map(childGroup => renderGroup(childGroup))}
-  //   </TreeItem>
-  // )
+  const renderGroup = group => (
+    <TreeItem
+      key={group.id}
+      nodeId={group.id}
+      label={
+        <div onClick={() => handleLabelClick(group)}>
+          <GroupCheckbox
+            group={group}
+            checked={selectedGroups.some(g => g.id === group.id)}
+            onChange={handleGroupCheckboxChange}
+          />
+        </div>
+      }
+    >
+      {group.children && group.children.map(childGroup => renderGroup(childGroup))}
+    </TreeItem>
+  )
 
   useEffect(() => {
     const today = new Date()
@@ -212,9 +194,24 @@ function ReportMonth({ history }) {
 
     setStart(startDate)
     setEnd(endDate)
+    calculateDaysInRange(startDate, endDate)
+    fetchDataSource()
   }, [])
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   if (start && end && start instanceof Date && end instanceof Date) {
+  //     const days = []
+  //     let currentDay = new Date(start)
+
+  //     while (currentDay <= end) {
+  //       days.push(format(currentDay, 'dd/MM/yyyy'))
+  //       currentDay.setDate(currentDay.getDate() + 1)
+  //     }
+  //     setDaysInRange(days)
+  //   }
+  // }, [])
+
+  const calculateDaysInRange = (start, end) => {
     if (start && end && start instanceof Date && end instanceof Date) {
       const days = []
       let currentDay = new Date(start)
@@ -225,7 +222,12 @@ function ReportMonth({ history }) {
       }
       setDaysInRange(days)
     }
-  }, [start, end])
+  }
+
+  const handleSearch = () => {
+    calculateDaysInRange(start, end)
+    fetchDataSource()
+  }
 
   const exportToExcel = () => {
     // Tạo một workbook mới
@@ -341,33 +343,32 @@ function ReportMonth({ history }) {
       <CardHeader title='BẢNG CHẤM CÔNG' />
       <CardContent>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={4}>
-            {/* <Autocomplete
+          <Grid item xs={12} sm={2}>
+            <Autocomplete
               disablePortal
               id='treeview-autocomplete'
               options={groups || ''}
-              style={{ width: '60%', marginLeft: 50 }}
               autoHighlight
-              getOptionLabel={option => option.groupName}
+              getOptionLabel={option => option.name}
               renderInput={params => <CustomTextField placeholder='Phòng ban' {...params} label='Phòng ban' />}
               renderOption={(props, option) => (
                 <div {...props}>
-                  <TreeView
-                    style={{ width: '100%' }}
-                    defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
-                    defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
-                  >
-                    {renderGroup(option)}
-                  </TreeView>
+                  <TreeView style={{ width: '100%' }}>{renderGroup(option)}</TreeView>
                 </div>
               )}
               onChange={(e, value) => {
-                setSelectedGroupId(value ? { groupId: value.groupId } : '')
+                if (value) {
+                  setSelectedGroupId({ id: value.id })
+                  setSelectedGroups([{ id: value.id }])
+                } else {
+                  setSelectedGroupId('')
+                  setSelectedGroups([])
+                }
               }}
-              value={selectedGroupId ? groups.find(g => g.groupId === selectedGroupId.groupId) : null}
-            /> */}
+              value={selectedGroupId ? groups.find(g => g.id === selectedGroupId.id) : null}
+            />
           </Grid>
-          <Grid item xs={12} sm={3}>
+          <Grid item xs={12} sm={1}>
             <DatePickerWrapper>
               <div>
                 <DatePicker
@@ -380,7 +381,7 @@ function ReportMonth({ history }) {
               </div>
             </DatePickerWrapper>
           </Grid>
-          <Grid item xs={12} sm={3}>
+          <Grid item xs={12} sm={1}>
             <DatePickerWrapper>
               <div>
                 <DatePicker
@@ -394,7 +395,12 @@ function ReportMonth({ history }) {
               </div>
             </DatePickerWrapper>
           </Grid>
-          <Grid item xs={12} sm={2}>
+          <Grid item xs={12} sm={7}>
+            <Button onClick={handleSearch} style={{ marginTop: 20 }} variant='contained'>
+              Tìm kiếm
+            </Button>
+          </Grid>
+          <Grid item xs={12} sm={1}>
             <Button
               style={{ marginTop: 20 }}
               variant='outlined'

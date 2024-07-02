@@ -74,7 +74,7 @@ const Add = () => {
   const [filteredRegionOptions, setFilteredRegionOptions] = useState(user?.level)
   const [filteredContractOptions, setFilteredContractOptions] = useState(user?.contractType)
   const [gender, setGender] = useState('')
-
+  let groupACId
   const [regionOptions, setRegionOptions] = useState([])
 
   const handleAddRow = () => {
@@ -237,7 +237,11 @@ const Add = () => {
 
       return
     }
+    if (!syncCode) {
+      Swal.fire('Lỗi!', 'Mã đồng bộ không được để trống', 'error')
 
+      return
+    }
     if (!account) {
       Swal.fire('Lỗi!', 'Tên tài khoản không được để trống', 'error')
 
@@ -298,8 +302,15 @@ const Add = () => {
           phoneNumber: phoneNumber,
           identityNumber: identityNumber,
           userCode: userCode,
+          syncCode: syncCode,
           userStatus: status1,
-
+          timeEndAfternoon: convertStringToTimeArray(timeEndAfternoon),
+          timeStartAfternoon: convertStringToTimeArray(timeStartAfternoon),
+          timeStartMorning: convertStringToTimeArray(dateTime),
+          timeEndMorning: convertStringToTimeArray(timeEndMorning),
+          availableAt: ava1 || null,
+          expiredAt: ava2 || null,
+          gender: gender,
           note: note,
           policyIds: policyList,
           level: filteredRegionOptions || selectedRegion.id,
@@ -313,50 +324,17 @@ const Add = () => {
         },
         config
       )
-      const newUserId = response.data.userId
-      setUserId(newUserId)
 
-      for (const row of rows) {
-        console.log(row.name, 'rows')
-        const groupId = await searchGroupIdAccess(row.name)
-        console.log(groupId, 'gourpID fetch')
-        if (groupId) {
-          await addMemberToGroup(groupId, newUserId)
-        }
+      if (groupACId) {
+        await addMemberToGroup(groupACId, response.data.userId)
       }
+
       Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
 
       router.push(`/apps/user/detail/${response.data.userId}`)
     } catch (error) {
       console.error('Error updating user details:', error)
       Swal.fire('Lỗi!', error?.response?.data?.message, 'error')
-    }
-  }
-
-  const searchGroupId = async (groupName, groupCode) => {
-    try {
-      const token = localStorage.getItem(authConfig.storageTokenKeyName)
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-
-      const response = await axios.get(
-        `https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search?keyword=${groupName}`,
-        config
-      )
-
-      if (response.data.length > 0) {
-        return response.data[0].groupId // Trả về groupId nếu tìm thấy
-      } else {
-        const newGroupId = await createNewGroup(groupName, groupCode)
-
-        return newGroupId
-      }
-    } catch (error) {
-      throw error
     }
   }
 
@@ -379,64 +357,9 @@ const Add = () => {
         },
         config
       )
+      groupACId = response.data.groupACId
 
       return response.data.groupId
-    } catch (error) {
-      throw error
-    }
-  }
-
-  const createNewGroupAccess = async (groupName, groupCode) => {
-    try {
-      const token = localStorage.getItem(authConfig.storageTokenKeyName)
-      const groupId = await searchGroupId(groupName, groupCode)
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-
-      const response = await axios.post(
-        'https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups',
-        {
-          name: groupName,
-          type: 'USER',
-          id: groupId
-        },
-        config
-      )
-
-      return response.data.id
-    } catch (error) {
-      throw error
-    }
-  }
-
-  const searchGroupIdAccess = async (groupName, groupCode) => {
-    try {
-      const token = localStorage.getItem(authConfig.storageTokenKeyName)
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-
-      const response = await axios.get(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups?keyword=${groupName}`,
-        config
-      )
-
-      if (response.data.rows[0].id) {
-        console.log(response.data.rows[0].id, 'groupid')
-
-        return response.data.rows[0].id
-      } else {
-        const newGroupId = await createNewGroupAccess(groupName, groupCode)
-
-        return newGroupId
-      }
     } catch (error) {
       throw error
     }
@@ -453,8 +376,8 @@ const Add = () => {
       }
 
       const response = await axios.post(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups/${groupId}/add-member`,
-        { userIds: [userId] },
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-access`,
+        { userGroupIds: [groupId], userId: userId },
         config
       )
 
@@ -469,7 +392,7 @@ const Add = () => {
     try {
       const processedGroups = []
       for (const row of rows) {
-        const groupId = await searchGroupId(row.name, row.code)
+        const groupId = await createNewGroup(row.name, row.code)
 
         const userGroup = {
           groupId: groupId,
@@ -665,12 +588,177 @@ const Add = () => {
             <Grid item xs={4}>
               <TextField label='Số giấy tờ' onChange={handleIdentityNumberChange} fullWidth />
             </Grid>
-
+            <Grid item xs={3.8}>
+              <TextField label='Mã người dùng' onChange={handleUserCodeChange} fullWidth />
+            </Grid>
+            <Grid item xs={4}>
+              <TextField label='Mã đồng bộ' onChange={handleSyncCodeChange} fullWidth />
+            </Grid>
+            <Grid item xs={4}>
+              <FormControl fullWidth>
+                <InputLabel id='region-label'>Cấp bậc</InputLabel>
+                <Select
+                  labelId='region-label'
+                  id='region-select'
+                  value={selectedRegion ? selectedRegion.id : ''}
+                  onChange={e => handleRegionChange(regionOptions.find(opt => opt.id === e.target.value))}
+                >
+                  {regionOptions.map(option => (
+                    <MenuItem key={option.id} value={option.id}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={3.8}>
+              <FormControl fullWidth>
+                <InputLabel id='region-label'>Loại hợp đồng</InputLabel>
+                <Select
+                  labelId='region-label'
+                  id='region-select'
+                  value={selectContract ? selectContract.id : ''}
+                  onChange={e => handleContractChange(contractOptions.find(opt => opt.id === e.target.value))}
+                >
+                  {contractOptions.map(option => (
+                    <MenuItem key={option.id} value={option.id}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>{' '}
+            </Grid>
             <Grid item xs={2} style={{ marginTop: '1.1%' }}>
               Trạng thái
               <Switch checked={status1 === 'ACTIVE'} onChange={handleStatusChange} color='primary' label='Trạng thái' />
             </Grid>
+            <Grid item xs={1} style={{ marginTop: '2%' }}>
+              Ca sáng:
+            </Grid>
 
+            <Grid item xs={1}>
+              <DatePickerWrapper>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                  <div>
+                    <DatePicker
+                      showTimeSelect
+                      selected={dateTime}
+                      timeIntervals={15}
+                      showTimeSelectOnly
+                      dateFormat='h:mm '
+                      id='time-only-picker'
+                      onChange={date => handleTimeChange(date)}
+                      customInput={<CustomInput />}
+                    />
+                  </div>
+                </Box>
+              </DatePickerWrapper>
+            </Grid>
+            <Grid item xs={1}>
+              <DatePickerWrapper>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                  <div>
+                    <DatePicker
+                      showTimeSelect
+                      selected={timeEndMorning}
+                      timeIntervals={15}
+                      showTimeSelectOnly
+                      dateFormat='h:mm '
+                      id='time-only-picker'
+                      onChange={date => handleTimeEndMorningChange(date)}
+                      customInput={<CustomInput />}
+                    />
+                  </div>
+                </Box>
+              </DatePickerWrapper>
+            </Grid>
+            <Grid item xs={1} style={{ marginTop: '2%' }}>
+              Ca chiều:
+            </Grid>
+            <Grid item xs={1}>
+              <DatePickerWrapper>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                  <div>
+                    <DatePicker
+                      showTimeSelect
+                      selected={timeStartAfternoon}
+                      timeIntervals={15}
+                      showTimeSelectOnly
+                      dateFormat='h:mm '
+                      id='time-only-picker'
+                      onChange={date => handleTimeStartAfetrnoonChange(date)}
+                      customInput={<CustomInput />}
+                    />
+                  </div>
+                </Box>
+              </DatePickerWrapper>
+            </Grid>
+            <Grid item xs={1}>
+              <DatePickerWrapper>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                  <div>
+                    <DatePicker
+                      showTimeSelect
+                      selected={timeEndAfternoon}
+                      timeIntervals={15}
+                      showTimeSelectOnly
+                      dateFormat='h:mm '
+                      id='time-only-picker'
+                      onChange={date => handleTimeEndAfternoonChange(date)}
+                      customInput={<CustomInput />}
+                    />
+                  </div>
+                </Box>
+              </DatePickerWrapper>
+            </Grid>
+            <Grid item xs={3.8}>
+              <FormControl fullWidth>
+                <InputLabel id='time-validity-label'>Thời gian hiệu lực</InputLabel>
+                <Select
+                  labelId='time-validity-label'
+                  id='time-validity-select'
+                  value={timeValidity}
+                  onChange={handleTimeValidityChange}
+                >
+                  <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
+                  <MenuItem value='Undefined'>Không xác định</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={8}>
+              {timeValidity === 'Custom' && (
+                <Grid container spacing={2}>
+                  <Grid item xs={4}>
+                    <DatePickerWrapper>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                        <div>
+                          <DatePicker
+                            selected={availableAt}
+                            onChange={handleStartDateChange}
+                            dateFormat='MM/dd/yyyy'
+                            customInput={<CustomInput label='Ngày bắt đầu' />}
+                          />
+                        </div>
+                      </Box>
+                    </DatePickerWrapper>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <DatePickerWrapper>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                        <div>
+                          <DatePicker
+                            selected={expiredAt}
+                            onChange={handleEndDateChange}
+                            dateFormat='MM/dd/yyyy'
+                            customInput={<CustomInput label='Ngày kết thúc' />}
+                          />
+                        </div>
+                      </Box>
+                    </DatePickerWrapper>
+                  </Grid>
+                </Grid>
+              )}
+            </Grid>
             <Grid item xs={11.8}>
               <TextField rows={4} multiline label='Ghi chú' onChange={handleNoteChange} fullWidth />
             </Grid>

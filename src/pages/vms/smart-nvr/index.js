@@ -1,58 +1,60 @@
-import { Card, CardContent, CardHeader, Grid } from "@mui/material"
+import { Grid } from '@mui/material'
 
-const SmartNVR = () => {
-    return (
-        <Grid container spacing={2}>
-            <Grid item xs={12}>
-                <Card>
-                    <CardHeader
-                        title="Smart NVR"
-                        titleTypographyProps={{ sx: { mb: [2, 0] } }}
-                        sx={{
-                            py: 4,
-                            flexDirection: ['column', 'row'],
-                            '& .MuiCardHeader-action': { m: 0 },
-                            alignItems: ['flex-start', 'center']
-                        }}
+import TableStickyHeader from './table'
+import Tab from '@mui/material/Tab'
+import TabPanel from '@mui/lab/TabPanel'
+import { styled } from '@mui/material/styles'
+import MuiTabList from '@mui/lab/TabList'
+import TabContext from '@mui/lab/TabContext'
+import { useState } from 'react'
+import Add from './add'
 
-                    />
-                </Card>
-            </Grid>
-            <Grid item xs={4}>
-                <Card>
-                    <CardHeader
-                        title="Danh sách thiết bị"
-                        titleTypographyProps={{ sx: { mb: [2, 0] } }}
-                        sx={{
-                            py: 4,
-                            flexDirection: ['column', 'row'],
-                            '& .MuiCardHeader-action': { m: 0 },
-                            alignItems: ['flex-start', 'center']
-                        }}
+const TabList = styled(MuiTabList)(({ theme }) => ({
+  borderBottom: '0 !important',
+  '&, & .MuiTabs-scroller': {
+    boxSizing: 'content-box',
+    padding: theme.spacing(1.25, 1.25, 2),
+    margin: `${theme.spacing(-1.25, -1.25, -2)} !important`
+  },
+  '& .MuiTabs-indicator': {
+    display: 'none'
+  },
+  '& .Mui-selected': {
+    boxShadow: theme.shadows[2],
+    backgroundColor: theme.palette.primary.main,
+    color: `${theme.palette.common.white} !important`
+  },
+  '& .MuiTab-root': {
+    lineHeight: 1,
+    borderRadius: theme.shape.borderRadius,
+    '&:hover': {
+      color: theme.palette.primary.main
+    }
+  }
+}))
 
-                    />
-                    <CardContent sx={{ height: '75vh' }}></CardContent>
-                </Card>
-            </Grid>
-            <Grid item xs={8}>
-                <Card>
-                    <CardHeader
-                        title="Thiết bị"
-                        titleTypographyProps={{ sx: { mb: [2, 0] } }}
-                        sx={{
-                            py: 4,
-                            flexDirection: ['column', 'row'],
-                            '& .MuiCardHeader-action': { m: 0 },
-                            alignItems: ['flex-start', 'center']
-                        }}
+const Caller = () => {
+  const [value, setValue] = useState('1')
 
-                    />
-                    <CardContent sx={{ height: '75vh' }}></CardContent>
-                </Card>
-            </Grid>
+  const handleChange = (event, newValue) => {
+    setValue(newValue)
+  }
+
+  return (
+    <Grid style={{ minWidth: '1000px' }}>
+      <TabContext value={value}>
+        <Grid>
+          {' '}
+          <TabList onChange={handleChange} aria-label='customized tabs example'>
+            <Tab value='1' label='Cấu hình Smart NVR' />
+          </TabList>
         </Grid>
-    )
-
+        <TabPanel value='1'>
+          <TableStickyHeader />
+        </TabPanel>
+      </TabContext>
+    </Grid>
+  )
 }
 
-export default SmartNVR
+export default Caller

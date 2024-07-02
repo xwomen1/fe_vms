@@ -59,7 +59,45 @@ const AccessRight = () => {
         MQH: 'Cha',
         HVT: 'Ngyễn Ngọc Tú',
         NS: '2001',
-        CV: 'Chức vụ 1'
+        CV: 'Chức vụ 1',
+        fullName: 'nguyễn minh anh',
+        Date: '12/02/2001',
+        GioiTinh: 'Nam',
+        Noisinh: 'Xã Hương Sơn -Huyện Mỹ Đức -TP Hà Nội',
+        QueQuan: 'Xã Hương Sơn -Huyện Mỹ Đức -TP Hà Nội',
+        DanToc: 'Kinh',
+        TonGiao: 'Không',
+        NDKTC: ' Xã Hương Sơn -Huyện Mỹ Đức -TP Hà Nội',
+        NOHN: ' Xã Hương Sơn -Huyện Mỹ Đức -TP Hà Nội',
+        NNKDTD: 'IT',
+        NgayTD: '20/10/2024',
+        NgachCongChuc: 'Công chức 1',
+        MaNgach: '00231',
+        BacLuong: 'A',
+        HeSo: '1',
+        PhuCapChucVu: 'Không có',
+        TrinhdoGiaoDuc: 'tốt nghiệp đại học',
+        TrinhDoCaoNhat: 'Đại học',
+        LyLuanChinhTri: 'Cao Cấp',
+        QuanLyNhaNuoc: 'Chuyên viên Cao Cấp',
+        Ngoaingu: 'Tiếng anh B1',
+        TinHoc: 'A',
+        NgayVaoDangCongSan: '09/08/2019',
+        NgayXuatNgu: '09/08/2023',
+        QuanHamCaoNhat: 'Trung úy',
+        DanhHieuPhongTangCaoNhat: 'Anh hùng Lực lượng vũ trang',
+        SoCongTac: 'Cơ sở 1',
+        KhenThuong: 'Chưa có',
+        KyLuat: 'Chưa có',
+        SK: 'tốt',
+        Cao: '1m69',
+        Nang: '60kg',
+        NhomMau: 'A',
+        ThuongBinhHang: 'Chưa có',
+        LaConGiaDinhChinhSach: 'Chưa có',
+        CMND: '001201029034',
+        NgayCap: '19/9/2018',
+        BHXH: '00192834'
       }
     ]
   }
@@ -248,151 +286,142 @@ const AccessRight = () => {
                   style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                 />
               </Box>
+              <div style={{ textAlign: 'center', marginTop: '-4%', marginBottom: '3%' }}>Ảnh đại diện</div>
             </Grid>
             <Grid item xs={3}>
-              <TextField label='Họ Tên' fullWidth />
+              <CustomTextField label='Họ Tên' value={row.data[0].fullName} fullWidth />
             </Grid>
             <Grid item xs={3}>
-              <TextField label='Tên gọi Khác' fullWidth />
+              <CustomTextField label='Tên gọi Khác' value={row.data[0].fullName} fullWidth />
             </Grid>
             <Grid item xs={3}>
               <DatePickerWrapper>
                 <DatePicker
+                  value={row.data[0].Date}
                   selected={birthDate}
                   onChange={date => setBirthDate(date)}
-                  customInput={<TextField label='Ngày sinh' fullWidth />}
+                  customInput={<CustomTextField label='Ngày sinh' fullWidth />}
                 />
               </DatePickerWrapper>
             </Grid>
             <Grid item xs={3}>
-              <TextField label='Nơi sinh' fullWidth />
+              <CustomTextField label='Nơi sinh' value={row.data[0].Noisinh} fullWidth />
             </Grid>
 
             <Grid item xs={3}>
-              <TextField label='Quê quán' fullWidth />
+              <CustomTextField label='Quê quán' value={row.data[0].QueQuan} fullWidth />
             </Grid>
 
             <Grid item xs={3}>
-              <TextField label='Giới tính' fullWidth />
+              <CustomTextField label='Giới tính' value={row.data[0].GioiTinh} fullWidth />
             </Grid>
 
             <Grid item xs={3}>
-              <TextField label='Dân tộc' fullWidth />
+              <CustomTextField label='Dân tộc' value={row.data[0].DanToc} fullWidth />
             </Grid>
             <Grid item xs={3}>
-              <TextField label='Tôn giáo' fullWidth />
+              <CustomTextField label='Tôn giáo' value={row.data[0].TonGiao} fullWidth />
             </Grid>
             <Grid item xs={3}>
-              <TextField label='Nghề nghiệp' fullWidth />
-            </Grid>
-
-            <Grid item xs={3}>
-              <TextField label='Đăng ký hộ khẩu thường chú' fullWidth />
+              <CustomTextField label='Nghề nghiệp' value={row.data[0].NNKDTD} fullWidth />
             </Grid>
 
             <Grid item xs={3}>
-              <TextField label='Nơi ở hiện nay' fullWidth />
+              <CustomTextField label='Đăng ký hộ khẩu thường chú' value={row.data[0].NDKTC} fullWidth />
+            </Grid>
+
+            <Grid item xs={3}>
+              <CustomTextField label='Nơi ở hiện nay' value={row.data[0].NOHN} fullWidth />
             </Grid>
             <Grid item xs={3}>
               <DatePickerWrapper>
                 <DatePicker
                   selected={birthDate}
+                  value={row.data[0].NgayTD}
                   onChange={date => setBirthDate(date)}
-                  customInput={<TextField label='Ngày tuyển dụng' fullWidth />}
+                  customInput={<CustomTextField label='Ngày tuyển dụng' fullWidth />}
                 />
               </DatePickerWrapper>
             </Grid>
             <Grid item xs={3}>
-              <TextField label='Cơ quan tuyển dụng' fullWidth />
+              <CustomTextField label='Cơ quan tuyển dụng' value={row.data[0].NNKDTD} fullWidth />
             </Grid>
 
             <Grid item xs={3}>
-              <TextField label='Chức vụ' fullWidth />
+              <CustomTextField label='Chức vụ' value={row.data[0].CV} fullWidth />
             </Grid>
             <Grid item xs={3}>
-              <TextField label='Công việc được giao' fullWidth />
+              <CustomTextField label='Công việc được giao' value={row.data[0].NNKDTD} fullWidth />
             </Grid>
             <Grid item xs={3}>
-              <TextField label='Ngạch công chức' fullWidth />
+              <CustomTextField label='Ngạch công chức' value={row.data[0].NgachCongChuc} fullWidth />
             </Grid>
             <Grid item xs={3}>
-              <TextField label='Mã ngách' fullWidth />
+              <CustomTextField label='Mã ngách' value={row.data[0].MaNgach} fullWidth />
             </Grid>
 
             <Grid item xs={3}>
-              <TextField label='Bậc lương' fullWidth />
+              <CustomTextField label='Bậc lương' value={row.data[0].BacLuong} fullWidth />
             </Grid>
             <Grid item xs={3}>
-              <TextField label='Hệ số' fullWidth />
+              <CustomTextField label='Hệ số' value={row.data[0].HeSo} fullWidth />
             </Grid>
             <Grid item xs={3}>
               <DatePickerWrapper>
                 <DatePicker
                   selected={birthDate}
+                  value={row.data[0].Ngay}
                   onChange={date => setBirthDate(date)}
-                  customInput={<TextField label='Ngày Hưởng' fullWidth />}
+                  customInput={<CustomTextField label='Ngày Hưởng' fullWidth />}
+                  placeholderText='mm/dd/yyyy'
                 />
               </DatePickerWrapper>
             </Grid>
             <Grid item xs={3}>
-              <TextField label='Phụ cấp chức vụ' fullWidth />
+              <CustomTextField label='Phụ cấp chức vụ' value={row.data[0].PhuCapChucVu} fullWidth />
             </Grid>
 
             <Grid item xs={3}>
-              <TextField label='Phụ cấp khác' fullWidth />
+              <CustomTextField label='Phụ cấp khác' value={row.data[0].PhuCapChucVu} fullWidth />
             </Grid>
             <Grid item xs={3}>
-              <TextField label='Trình độ giáo dục phổ thông' fullWidth />
+              <CustomTextField label='Trình độ giáo dục phổ thông' value={row.data[0].TrinhdoGiaoDuc} fullWidth />
             </Grid>
             <Grid item xs={3}>
-              <TextField label='Trình độ chuyên môn cao nhất' fullWidth />
+              <CustomTextField label='Trình độ chuyên môn cao nhất' value={row.data[0].TrinhDoCaoNhat} fullWidth />
             </Grid>
             <Grid item xs={3}>
-              <TextField label='Lý luận chính trị' fullWidth />
+              <CustomTextField label='Lý luận chính trị' value={row.data[0].LyLuanChinhTri} fullWidth />
             </Grid>
 
             <Grid item xs={3}>
-              <TextField label='Quản lý nhà nước' fullWidth />
+              <CustomTextField label='Quản lý nhà nước' value={row.data[0].QuanLyNhaNuoc} fullWidth />
             </Grid>
             <Grid item xs={3}>
-              <TextField label='Ngoại ngữ' fullWidth />
+              <CustomTextField label='Ngoại ngữ' value={row.data[0].Ngoaingu} fullWidth />
             </Grid>
             <Grid item xs={3}>
-              <TextField label='Tin học' fullWidth />
-            </Grid>
-            <Grid item xs={3}>
-              <DatePickerWrapper>
-                <DatePicker
-                  selected={birthDate}
-                  onChange={date => setBirthDate(date)}
-                  customInput={<TextField label='Ngày vào đảng' fullWidth />}
-                />
-              </DatePickerWrapper>
+              <CustomTextField label='Tin học' value={row.data[0].TinHoc} fullWidth />
             </Grid>
             <Grid item xs={3}>
               <DatePickerWrapper>
                 <DatePicker
+                  value={row.data[0].NgayVaoDangCongSan}
                   selected={birthDate}
                   onChange={date => setBirthDate(date)}
-                  customInput={<TextField label='Ngày chính thức' fullWidth />}
-                />
-              </DatePickerWrapper>
-            </Grid>
-            <Grid item xs={3}>
-              <DatePickerWrapper>
-                <DatePicker
-                  selected={birthDate}
-                  onChange={date => setBirthDate(date)}
-                  customInput={<TextField label='Ngày tham gia tổ chức chính trị- xã hội' fullWidth />}
+                  customInput={<CustomTextField label='Ngày vào đảng' fullWidth />}
+                  placeholderText='mm/dd/yyyy'
                 />
               </DatePickerWrapper>
             </Grid>
             <Grid item xs={3}>
               <DatePickerWrapper>
                 <DatePicker
+                  value={row.data[0].NgayVaoDangCongSan}
                   selected={birthDate}
                   onChange={date => setBirthDate(date)}
-                  customInput={<TextField label='Ngày nhập ngữ' fullWidth />}
+                  customInput={<CustomTextField label='Ngày chính thức' fullWidth />}
+                  placeholderText='mm/dd/yyyy'
                 />
               </DatePickerWrapper>
             </Grid>
@@ -400,61 +429,91 @@ const AccessRight = () => {
               <DatePickerWrapper>
                 <DatePicker
                   selected={birthDate}
+                  value={row.data[0].NgayVaoDangCongSan}
                   onChange={date => setBirthDate(date)}
-                  customInput={<TextField label='Ngày xuất ngũ' fullWidth />}
+                  customInput={<CustomTextField label='Ngày tham gia tổ chức chính trị- xã hội' fullWidth />}
+                  placeholderText='mm/dd/yyyy'
                 />
               </DatePickerWrapper>
             </Grid>
             <Grid item xs={3}>
-              <TextField label='Quân hàm cao nhất' fullWidth />
+              <DatePickerWrapper>
+                <DatePicker
+                  selected={birthDate}
+                  value={row.data[0].NgayVaoDangCongSan}
+                  onChange={date => setBirthDate(date)}
+                  customInput={<CustomTextField label='Ngày nhập ngũ' fullWidth />}
+                  placeholderText='mm/dd/yyyy'
+                />
+              </DatePickerWrapper>
+            </Grid>
+            <Grid item xs={3}>
+              <DatePickerWrapper>
+                <DatePicker
+                  selected={birthDate}
+                  value={row.data[0].NgayXuatNgu}
+                  onChange={date => setBirthDate(date)}
+                  customInput={<CustomTextField label='Ngày xuất ngũ' fullWidth />}
+                  placeholderText='mm/dd/yyyy'
+                />
+              </DatePickerWrapper>
+            </Grid>
+            <Grid item xs={3}>
+              <CustomTextField label='Quân hàm cao nhất' value={row.data[0].QuanHamCaoNhat} fullWidth />
             </Grid>
 
             <Grid item xs={3}>
-              <TextField label='Danh hiệu được phân cao nhất' fullWidth />
+              <CustomTextField
+                label='Danh hiệu được phân cao nhất'
+                value={row.data[0].DanhHieuPhongTangCaoNhat}
+                fullWidth
+              />
             </Grid>
             <Grid item xs={3}>
-              <TextField label='Sở trưởng công tác' fullWidth />
+              <CustomTextField label='Sở trưởng công tác' value={row.data[0].SoCongTac} fullWidth />
             </Grid>
             <Grid item xs={3}>
-              <TextField label='Khen thưởng' fullWidth />
+              <CustomTextField label='Khen thưởng' value={row.data[0].KhenThuong} fullWidth />
             </Grid>
             <Grid item xs={3}>
-              <TextField label='Kỷ luật' fullWidth />
-            </Grid>
-
-            <Grid item xs={3}>
-              <TextField label='Tình trạng sức khỏe' fullWidth />
-            </Grid>
-            <Grid item xs={3}>
-              <TextField label='Chiều cao' fullWidth />
-            </Grid>
-            <Grid item xs={3}>
-              <TextField label='Cân năng' fullWidth />
-            </Grid>
-            <Grid item xs={3}>
-              <TextField label='Nhóm máu' fullWidth />
+              <CustomTextField label='Kỷ luật' value={row.data[0].KyLuat} fullWidth />
             </Grid>
 
             <Grid item xs={3}>
-              <TextField label='Là thương binh hạng' fullWidth />
+              <CustomTextField label='Tình trạng sức khỏe' value={row.data[0].SK} fullWidth />
             </Grid>
             <Grid item xs={3}>
-              <TextField label='Là con gia đình chính sách' fullWidth />
+              <CustomTextField label='Chiều cao' value={row.data[0].Cao} fullWidth />
             </Grid>
             <Grid item xs={3}>
-              <TextField label='Số chứng minh nhân dân' fullWidth />
+              <CustomTextField label='Cân năng' value={row.data[0].Nang} fullWidth />
+            </Grid>
+            <Grid item xs={3}>
+              <CustomTextField label='Nhóm máu' value={row.data[0].NhomMau} fullWidth />
+            </Grid>
+
+            <Grid item xs={3}>
+              <CustomTextField label='Là thương binh hạng' value={row.data[0].ThuongBinhHang} fullWidth />
+            </Grid>
+            <Grid item xs={3}>
+              <CustomTextField label='Là con gia đình chính sách' value={row.data[0].LaConGiaDinhChinhSach} fullWidth />
+            </Grid>
+            <Grid item xs={3}>
+              <CustomTextField label='Số chứng minh nhân dân' value={row.data[0].CMND} fullWidth />
             </Grid>
             <Grid item xs={3}>
               <DatePickerWrapper>
                 <DatePicker
                   selected={birthDate}
                   onChange={date => setBirthDate(date)}
-                  customInput={<TextField label='Ngày Cấp' fullWidth />}
+                  value={row.data[0].NgayCap}
+                  customInput={<CustomTextField label='Ngày Cấp' fullWidth />}
+                  placeholderText='mm/dd/yyyy'
                 />
               </DatePickerWrapper>
             </Grid>
             <Grid item xs={3}>
-              <TextField label='Số sổ BHXH' fullWidth />
+              <CustomTextField label='Số sổ BHXH' value={row.data[0].BHXH} fullWidth />
             </Grid>
             <Grid item xs={12}>
               <div>* Đào tạo, bồi dưỡng về chuyên môn, nghiệp vụ, lý luận chính trị, ngoại ngữ, tin học</div>
@@ -618,7 +677,7 @@ const AccessRight = () => {
                 </Table>
               </TableContainer>
               <Grid item xs={12} style={{ marginTop: '2%' }}>
-                <TextField
+                <CustomTextField
                   label='... Nhận xét, đánh giá của cơ quan, đơn vị quản lý và sử dụng cán bộ, công chức .!'
                   fullWidth
                 />

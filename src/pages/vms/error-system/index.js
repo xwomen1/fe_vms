@@ -94,7 +94,8 @@ const EventList = () => {
           page: page,
           limit: pageSize,
           type: valueFilter.type,
-          device_type: valueFilter.device_type
+          device_type: valueFilter.device_type,
+          sort: '+status'
         }
       }
 
@@ -123,7 +124,8 @@ const EventList = () => {
       customClass: {
         content: 'content-class',
         confirmButton: 'swal-btn-confirm'
-      }
+      },
+      confirmButtonColor: '#FF9F43'
     }
 
     return Swal.fire({ ...defaultProps, ...options })
@@ -148,13 +150,35 @@ const EventList = () => {
         axios
           .delete(urlDelete, config)
           .then(() => {
-            Swal.fire('Xóa thành công', '', 'success')
+            Swal.fire({
+              title: 'Thành công!',
+              text: 'Xóa thành công',
+              icon: 'success',
+              willOpen: () => {
+                const confirmButton = Swal.getConfirmButton()
+                if (confirmButton) {
+                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.color = 'white'
+                }
+              }
+            })
             const updatedData = devices.filter(devices => devices.id !== id)
             setDevices(updatedData)
             setReload()
           })
           .catch(err => {
-            Swal.fire('Đã xảy ra lỗi', err.message, 'error')
+            Swal.fire({
+              title: 'Error!',
+              text: err.response?.data?.message || err.message,
+              icon: 'error',
+              willOpen: () => {
+                const confirmButton = Swal.getConfirmButton()
+                if (confirmButton) {
+                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.color = 'white'
+                }
+              }
+            })
           })
       }
     })
@@ -175,10 +199,32 @@ const EventList = () => {
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/incidents/logs/status/${id}`, config)
       setLoading()
       fetchDataList()
-      Swal.fire('Thay đổi trạng thái thành công', '', 'success')
+      Swal.fire({
+        title: 'Thành công!',
+        text: 'Thay đổi trạng thái thành công',
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
     } catch (error) {
       console.error('Error status:', error)
-      Swal.fire(error.message, 'error')
+      Swal.fire({
+        title: 'Error!',
+        text: error.response?.data?.message || error.message,
+        icon: 'error',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
     } finally {
       setLoading(false)
     }

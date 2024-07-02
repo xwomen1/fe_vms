@@ -123,12 +123,35 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
         payload,
         config
       )
-      Swal.fire('Sửa thành công', '', 'success')
+      Swal.fire({
+        title: 'Thành công!',
+        text: 'Dữ liệu đã được cập nhật thành công.',
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
       onSuccess()
 
       console.log('Camera group updated successfully')
     } catch (error) {
-      console.error('Error updating camera group:', error)
+      console.error('Error updating user details:', error)
+      Swal.fire({
+        title: 'Error!',
+        text: error.response?.data?.message || error,
+        icon: 'error',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
     }
   }
 
