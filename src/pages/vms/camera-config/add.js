@@ -35,7 +35,6 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Edit from './popups/Edit'
 import CustomDialog from '../../pages/face_management/CustomDialog/CustomDialog'
 import ImportPopup from './popups/ImportPopup'
-import AddDevice from './popups/AddDevice'
 
 const Add = ({ apiData }) => {
   const [value, setValue] = useState('')
@@ -65,6 +64,7 @@ const Add = ({ apiData }) => {
   const pageSizeOptions = [25, 50, 100]
   const [anchorEl, setAnchorEl] = useState(null)
   const [selectedValue, setSelectedValue] = useState('')
+  const [selectedAuto, setSelectedAuto] = useState('')
   const [startHost, setStartHost] = useState('')
   const [endHost, setEndHost] = useState('')
   const [openPopupResponseDungIP, setOpenPopupResponseDungIP] = useState(false)
@@ -88,7 +88,6 @@ const Add = ({ apiData }) => {
   const [dialogTitle, setDialogTitle] = useState('')
   const [dialogMessage, setDialogMessage] = useState('')
   const [isSuccess, setIsSuccess] = useState(false)
-  const [isOpenAddDevice, setIsOpenAddDevice] = useState(false)
 
   function showAlertConfirm(options, intl) {
     const defaultProps = {
@@ -118,7 +117,7 @@ const Add = ({ apiData }) => {
     return Swal.fire({ ...defaultProps, ...options })
   }
 
-  // console.log(idBox, 'idbox')
+  console.log(idBox, 'idbox')
 
   const handleDialogClose = () => {
     setDialogOpen(false)
@@ -206,10 +205,12 @@ const Add = ({ apiData }) => {
     }
   }
 
-  // console.log(selectNVR)
+  console.log(selectNVR)
 
   const handleRadioChange = event => {
     setSelectedValue(event.target.value)
+    setSelectedAuto(event.target.value)
+    console.log(selectedValue)
   }
 
   const handlePageChange = newPage => {
@@ -252,6 +253,7 @@ const Add = ({ apiData }) => {
       setStatus1(response.data.isOfflineSetting)
       setAssetType(response.data)
       setTotal(response.data.page)
+      console.log(response.data[0].id)
     } catch (error) {
       console.error('Error fetching users:', error)
     }
@@ -516,7 +518,7 @@ const Add = ({ apiData }) => {
     }
   }
 
-  // console.log(selectNVR, 'selectNVR', nvrs, 'nvrs')
+  console.log(selectNVR, 'selectNVR', nvrs, 'nvrs')
 
   const passwords = useCallback(val => {
     setValue(val)
@@ -557,9 +559,9 @@ const Add = ({ apiData }) => {
           const newAssetType = prevAssetType.map(camera => {
             if (camera.id === entry1.id) {
               if (camera.status.name !== entry1.status) {
-                // console.log('AssetType with ID', entry1.id, 'has changed status.')
-                // console.log('Previous status:', camera.status.name)
-                // console.log('New status:', entry1.status)
+                console.log('AssetType with ID', entry1.id, 'has changed status.')
+                console.log('Previous status:', camera.status.name)
+                console.log('New status:', entry1.status)
               }
 
               return { ...camera, status: { name: entry1.status } }
@@ -576,6 +578,7 @@ const Add = ({ apiData }) => {
     },
     [assettype]
   )
+  console.log(total, 'totalpage')
 
   const statusText = status1 ? 'Đang hoạt động' : 'Không hoạt động'
 
@@ -598,6 +601,7 @@ const Add = ({ apiData }) => {
         setStatus1(response.data.isOfflineSetting)
         setAssetType(response.data)
         setTotal(response.data.page)
+        console.log(response.data[0].id)
       } catch (error) {
         console.error('Error fetching users:', error)
       }
@@ -623,6 +627,7 @@ const Add = ({ apiData }) => {
                       <Grid item>
                         <FormControlLabel value='daiIp' control={<Radio />} label='Dải IP' />
                       </Grid>
+                      <p>Loại giao thức :</p>
                       <Grid item xs={3}>
                         <Autocomplete
                           fullWidth
@@ -630,7 +635,7 @@ const Add = ({ apiData }) => {
                           id='autocomplete-custom'
                           getOptionLabel={option => option.title || ''}
                           renderInput={params => <CustomTextField placeholder='Khác' {...params} />}
-                          onChange={(event, value) => setSelectedValue(value ? value.title.toLowerCase() : '')}
+                          onChange={(event, value) => setSelectedAuto(value ? value.title.toLowerCase() : '')}
                         />
                       </Grid>
                     </Grid>
@@ -638,45 +643,39 @@ const Add = ({ apiData }) => {
                 </div>
               </Grid>
               <Grid item xs={4} style={{ display: 'flex' }}>
-                <Grid container spacing={2}>
-                  <Grid item>
-                    <Button variant='contained' onClick={handleOpenPopup}>
-                      <Icon icon='tabler:file-import' />
-                    </Button>
-                  </Grid>
-                  <Grid item>
-                    <Button variant='contained' onClick={() => setIsOpenAddDevice(true)} >
-                      <Icon icon="tabler:square-rounded-plus" />
-                    </Button>
-                  </Grid>
-                  <Grid item>
-                    <CustomTextField
-                      value={value}
-                      onChange={e => handleFilter(e.target.value)}
-                      placeholder='Search…'
-                      InputProps={{
-                        startAdornment: (
-                          <Box sx={{ mr: 2, display: 'flex' }}>
-                            <Icon fontSize='1.25rem' icon='tabler:search' />
-                          </Box>
-                        ),
-                        endAdornment: (
-                          <IconButton size='small' title='Clear' aria-label='Clear'>
-                            <Icon fontSize='1.25rem' icon='tabler:x' />
-                          </IconButton>
-                        )
-                      }}
-                      sx={{
-                        width: {
-                          xs: 1,
-                          sm: 'auto'
-                        },
-                        '& .MuiInputBase-root > svg': {
-                          mr: 2
-                        }
-                      }}
-                    />
-                  </Grid>
+                <Grid item>
+                  <Button variant='contained' onClick={handleOpenPopup}>
+                    <Icon icon='tabler:file-import' />
+                  </Button>
+                </Grid>
+                <Grid item xs={1}></Grid>
+                <Grid item>
+                  <CustomTextField
+                    value={value}
+                    onChange={e => handleFilter(e.target.value)}
+                    placeholder='Search…'
+                    InputProps={{
+                      startAdornment: (
+                        <Box sx={{ mr: 2, display: 'flex' }}>
+                          <Icon fontSize='1.25rem' icon='tabler:search' />
+                        </Box>
+                      ),
+                      endAdornment: (
+                        <IconButton size='small' title='Clear' aria-label='Clear'>
+                          <Icon fontSize='1.25rem' icon='tabler:x' />
+                        </IconButton>
+                      )
+                    }}
+                    sx={{
+                      width: {
+                        xs: 1,
+                        sm: 'auto'
+                      },
+                      '& .MuiInputBase-root > svg': {
+                        mr: 2
+                      }
+                    }}
+                  />
                 </Grid>
               </Grid>
               <Grid item xs={12}>
@@ -878,7 +877,7 @@ const Add = ({ apiData }) => {
                 )}
               </Grid>
               <Grid item xs={12}>
-                {selectedValue === 'onvif' && (
+                {selectedAuto === 'onvif' && (
                   <Grid
                     container
                     item
@@ -945,7 +944,7 @@ const Add = ({ apiData }) => {
                 )}
               </Grid>
               <Grid item xs={12}>
-                {selectedValue === 'hikvision' && (
+                {selectedAuto === 'hikvision' && (
                   <Grid
                     container
                     item
@@ -1117,9 +1116,6 @@ const Add = ({ apiData }) => {
             <Edit open={openPopupP} onClose={handleClosePPopup} camera={selectedNvrId} />
           </>
         )}
-        {isOpenAddDevice &&
-          <AddDevice show={isOpenAddDevice} setReload={() => setReload(reload + 1)} onClose={() => setIsOpenAddDevice(false)} />
-        }
       </Grid>
       <ImportPopup open={openPopup} handleClose={handleClosePopup} />
       <CustomDialog
