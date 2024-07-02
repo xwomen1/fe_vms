@@ -5,84 +5,7 @@ const navigation = () => {
       icon: 'tabler:smart-home',
       path: '/dashboards/analytics'
     },
-    {
-      path: '/',
-      title: 'Kiểm soát vào ra',
-      icon: 'tabler:lock-access',
-      children: [
-        {
-          title: 'Sự kiện',
-          path: '/access-control/event-management',
-          icon: 'tabler:calendar-event'
-        },
-        {
-          title: 'Thiết bị',
-          path: '/device-management',
-          icon: 'tabler:accessible'
-        },
-        {
-          path: '/pages/access-rights/list',
-          title: 'Quyền truy cập',
-          icon: 'tabler:calendar-month'
-        },
 
-        {
-          title: 'Chấm công',
-          path: '/access-control/time-keeping',
-          icon: 'tabler:lock-access'
-        },
-        {
-          path: '/pages/report-month/list',
-          title: 'Báo cáo tháng',
-          icon: 'tabler:id'
-        }
-
-        // {
-        //   path: '/pages/access-rights/list',
-        //   title: 'Quyền truy cập',
-        //   icon: 'tabler:shield'
-        // },
-        // {
-        //   path: '/pages/access-rights/list',
-        //   title: 'Thống kê',
-        //   icon: 'tabler:statistics/time?tab=%2Fstatistics%2Ftime'
-        // },
-        // {
-        //   path: '/pages/access-rights/list',
-        //   title: 'Hẹn lịch',
-        //   icon: 'tabler:guest-registrations'
-        // }
-      ]
-    },
-    {
-      path: '/',
-      title: 'Quản lý hiệu suất',
-      icon: 'tabler:lock-access',
-      children: [
-        {
-          title: 'Thiết lập bộ KPI',
-          path: '/kpi',
-          icon: 'tabler:calendar-event'
-        },
-
-        {
-          path: '/mappingACToInf',
-          title: 'Cài đặt nâng cao',
-          icon: 'tabler:shield'
-        }
-
-        // {
-        //   path: '/pages/access-rights/list',
-        //   title: 'Thống kê',
-        //   icon: 'tabler:statistics/time?tab=%2Fstatistics%2Ftime'
-        // },
-        // {
-        //   path: '/pages/access-rights/list',
-        //   title: 'Hẹn lịch',
-        //   icon: 'tabler:guest-registrations'
-        // }
-      ]
-    },
     {
       path: '/asset',
       title: 'Hệ thống VMS',
@@ -139,11 +62,6 @@ const navigation = () => {
           icon: 'tabler:server-2'
         },
         {
-          title: 'Smart NVR',
-          path: '/vms/smart-nvr',
-          icon: 'tabler:accessible'
-        },
-        {
           path: '/pages/face_management/list',
           title: 'Quản lý khuôn mặt',
           icon: 'tabler:face-id'
@@ -154,6 +72,10 @@ const navigation = () => {
           icon: 'tabler:id-badge-2'
         }
 
+        // {
+        //   title: 'Quản lý lưu trữ',
+        //   path: '/vms/stores'
+        // },
         // {
         //   title: 'Thư viện media',
         //   path: '/vms/library'
@@ -271,6 +193,7 @@ const navigation = () => {
     //     }
     //   ]
     // },
+
     {
       title: 'User',
       icon: 'tabler:user',
@@ -279,12 +202,6 @@ const navigation = () => {
           title: 'Người dùng',
           icon: 'tabler:user',
           path: '/apps/user/list'
-        },
-
-        {
-          title: 'Hồ sơ ứng tuyển',
-          icon: 'tabler:building',
-          path: '/cv'
         },
         {
           title: 'Cơ cấu tổ chức',
@@ -295,16 +212,6 @@ const navigation = () => {
           title: 'Vai Trò',
           icon: 'tabler:users',
           path: '/apps/roles'
-        },
-        {
-          title: 'Bảng lương',
-          icon: 'tabler:coin-pound',
-          path: '/salary'
-        },
-        {
-          title: 'Quy định về lương',
-          icon: 'tabler:moneybag',
-          path: '/salaryRule'
         }
       ]
     }
