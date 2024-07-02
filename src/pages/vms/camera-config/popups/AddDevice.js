@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useState } from 'react'
+import React, { forwardRef, use, useEffect, useState } from 'react'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import {
     Autocomplete,
@@ -126,7 +126,15 @@ const format_form = [
         require: false,
         width: 2,
     },
-
+    {
+        name: 'onvifPort',
+        label: 'Cổng onvif',
+        placeholder: 'Cổng onvif',
+        type: 'TextField',
+        data: [],
+        require: false,
+        width: 2,
+    },
     // {
     //     name: 'cameraGroup',
     //     label: 'Nhóm cam',
@@ -134,56 +142,37 @@ const format_form = [
     //     type: 'VAutocomplete',
     //     data: [],
     //     option: {
-    //       key: 'id',
-    //       value: 'name',
+    //         key: 'id',
+    //         value: 'name',
     //     },
     //     require: false,
     //     width: 4,
-    //   },
-    // {
-    //     name: 'protocol',
-    //     label: 'Giao thức',
-    //     placeholder: 'Giao thức',
-    //     type: 'VAutocomplete',
-    //     data: [],
-    //     option: {
-    //       key: 'id',
-    //       value: 'name',
-    //     },
-    //     require: true,
-    //     width: 3,
-    //   },
-    //   {
-    //     name: 'siteInfo',
-    //     label: 'Vùng',
-    //     placeholder: 'Vùng',
-    //     type: 'TreeSelect',
-    //     data: [],
-    //     option: {
-    //       key: 'id',
-    //       value: 'name',
-    //     },
-    //     require: true,
-    //     width: 3,
-    //   },
-
+    // },
     {
-        name: 'latitude',
-        label: 'latitude',
-        placeholder: 'latitude',
-        type: 'TextField',
+        name: 'protocol',
+        label: 'Giao thức',
+        placeholder: 'Giao thức',
+        type: 'VAutocomplete',
         data: [],
-        require: false,
-        width: 3,
+        option: {
+            key: 'id',
+            value: 'name',
+        },
+        require: true,
+        width: 4,
     },
     {
-        name: 'longitude',
-        label: 'longitude',
-        placeholder: 'longitude',
-        type: 'TextField',
+        name: 'siteInfo',
+        label: 'Vùng',
+        placeholder: 'Vùng',
+        type: 'VAutocomplete',
         data: [],
-        require: false,
-        width: 3,
+        option: {
+            key: 'id',
+            value: 'name',
+        },
+        require: true,
+        width: 4,
     },
     {
         name: 'box',
@@ -195,6 +184,24 @@ const format_form = [
             key: 'id',
             value: 'name',
         },
+        require: false,
+        width: 4,
+    },
+    {
+        name: 'latitude',
+        label: 'latitude',
+        placeholder: 'latitude',
+        type: 'TextField',
+        data: [],
+        require: false,
+        width: 4,
+    },
+    {
+        name: 'longitude',
+        label: 'longitude',
+        placeholder: 'longitude',
+        type: 'TextField',
+        data: [],
         require: false,
         width: 4,
     },
@@ -211,7 +218,7 @@ const format_form = [
 
 
 
-const AddDevice = ({ show, onClose, camera }) => {
+const AddDevice = ({ show, setReload, onClose, camera }) => {
     const token = localStorage.getItem(authConfig.storageTokenKeyName);
 
     const config = {
@@ -227,18 +234,9 @@ const AddDevice = ({ show, onClose, camera }) => {
     const [regionsSelect, setRegionsSelect] = useState('')
     const [regions, setRegions] = useState([])
     const [box, setBox] = useState([])
-    const [isOfflineSetting, setIsOfflineSetting] = useState(false)
+    const [isOfflineSetting, setIsOfflineSetting] = useState(true)
 
-    const [protocols, setProtocols] = useState([
-        { label: 'ONVIF', value: 'ONVIF', id: 'ONVIF', name: 'ONVIF' },
-        { label: 'IVI', value: 'IVI', id: 'IVI', name: 'IVI' },
-        { label: 'HIKVISION', value: 'HIKVISION', id: 'HIKVISION', name: 'HIKVISION' },
-        { label: 'DAHUA', label: 'DAHUA', id: 'DAHUA', name: 'DAHUA' },
-        { label: 'AXIS', value: 'AXIS', id: 'AXIS', name: 'AXIS' },
-        { label: 'BOSCH', value: 'BOSCH', id: 'BOSCH', name: 'BOSCH' },
-        { label: 'HANWHA', value: 'HANWHA', id: 'HANWHA', name: 'HANWHA' },
-        { label: 'PANASONIC', value: 'PANASONIC', id: 'PANASONIC', name: 'PANASONIC' }
-    ])
+    const [protocols, setProtocols] = useState([])
 
     const [selectedProtocol, setSelectedProtocol] = useState(null)
     const [rows, setRows] = useState([])
@@ -285,6 +283,12 @@ const AddDevice = ({ show, onClose, camera }) => {
     const handleComboBoxFocusBox = () => {
         if (box.length === 0) {
             fetchNvrAIBox()
+        }
+    }
+
+    const handleComboBoxFocusProtocol = () => {
+        if (protocols.length === 0) {
+            fetchProtocol()
         }
     }
 
@@ -338,7 +342,7 @@ const AddDevice = ({ show, onClose, camera }) => {
                 toast.error(error)
             }
         } finally {
-            // setLoading(false)
+            setLoading(false)
         }
     }
 
@@ -361,6 +365,36 @@ const AddDevice = ({ show, onClose, camera }) => {
             if (nicTypes.length > 0) {
                 setRegionsSelect(nicTypes[0].value)
             }
+        } catch (error) {
+            if (error && error?.response?.data) {
+                console.error('error', error)
+                toast.error(error?.response?.data?.message)
+            } else {
+                console.error('Error fetching data:', error)
+                toast.error(error)
+            }
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const fetchProtocol = async () => {
+        try {
+            setLoading(true)
+
+            const response = await axios.get(
+                'https://sbs.basesystem.one/ivis/vms/api/v0/cameras/options/protocol-types',
+                config
+            )
+
+            const protocols = response.data.map(item => ({
+                id: item.id,
+                name: item.name,
+                label: item.name,
+                value: item.id
+            }))
+
+            setProtocols(protocols)
         } catch (error) {
             if (error && error?.response?.data) {
                 console.error('error', error)
@@ -421,6 +455,10 @@ const AddDevice = ({ show, onClose, camera }) => {
         setRows(updatedRows)
     }
 
+    const handleCheckboxChange = () => {
+        setIsOfflineSetting(isOfflineSetting === true ? false : true)
+    }
+
     const onSubmit = values => {
         const detail = {
             name: values?.name,
@@ -428,11 +466,19 @@ const AddDevice = ({ show, onClose, camera }) => {
             password: values?.password,
             ipAddress: values?.ipAddress,
             httpPort: values?.httpPort,
+            onvifPort: values?.onvifPort,
+            protocol: {
+                id: values?.protocol?.id,
+            },
             latitude: lat.toString(),
             longitude: lng.toString(),
             isOfflineSetting: isOfflineSetting,
+            siteInfo: {
+                id: values?.siteInfo?.id,
+                name: values?.siteInfo?.name
+            },
             box: {
-                id: values?.box.value,
+                id: values?.box?.value,
             },
             streams: [...rows]
         }
@@ -449,7 +495,6 @@ const AddDevice = ({ show, onClose, camera }) => {
 
         axios.post(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras`, params, config)
             .then((res) => {
-                setReload()
                 toast.success(res.message)
             })
             .catch((error) => {
@@ -464,6 +509,7 @@ const AddDevice = ({ show, onClose, camera }) => {
             .finally(() => {
                 setLoading(false)
                 onClose()
+                setReload()
             })
     }
 
@@ -548,7 +594,7 @@ const AddDevice = ({ show, onClose, camera }) => {
                                                                 case 'cameraGroup':
                                                                     return (
                                                                         <Autocomplete
-                                                                            value={value || null}
+                                                                            value={value || ''}
                                                                             onChange={(event, newValue) => onChange(newValue)}
                                                                             options={cameraGroup}
                                                                             getOptionLabel={(option) => option.label}
@@ -561,19 +607,20 @@ const AddDevice = ({ show, onClose, camera }) => {
                                                                 case 'protocol':
                                                                     return (
                                                                         <Autocomplete
-                                                                            value={value || null}
+                                                                            value={value || ''}
                                                                             onChange={(event, newValue) => onChange(newValue)}
                                                                             options={protocols}
-                                                                            getOptionLabel={(option) => option.label}
+                                                                            getOptionLabel={(option) => option.label || ''}
                                                                             renderInput={(params) => (
                                                                                 <CustomTextField {...params} label={item?.label} fullWidth />
                                                                             )}
+                                                                            onFocus={handleComboBoxFocusProtocol}
                                                                         />
                                                                     );
                                                                 case 'siteInfo':
                                                                     return (
                                                                         <Autocomplete
-                                                                            value={value || null}
+                                                                            value={value || ''}
                                                                             onChange={(event, newValue) => onChange(newValue)}
                                                                             options={regions}
                                                                             getOptionLabel={(option) => option.label || ''}
@@ -584,7 +631,7 @@ const AddDevice = ({ show, onClose, camera }) => {
                                                                 case 'box':
                                                                     return (
                                                                         <Autocomplete
-                                                                            value={value || null}
+                                                                            value={value || ''}
                                                                             onChange={(event, newValue) => onChange(newValue)}
                                                                             options={box}
                                                                             getOptionLabel={(option) => option.label || ''}
@@ -603,26 +650,9 @@ const AddDevice = ({ show, onClose, camera }) => {
                                         if (item.type === 'Checkbox') {
                                             return (
                                                 <Grid item xs={item.width} key={index}>
-                                                    <Controller
-                                                        control={control}
-                                                        name={item.name}
-                                                        rules={{ required: true }}
-                                                        render={({ field: { onChange, value } }) => (
-                                                            <FormControlLabel
-                                                                control={
-                                                                    <Checkbox
-                                                                        style={{ marginLeft: '5px' }}
-                                                                        checked={value}
-                                                                        color="primary"
-                                                                        onChange={(e) => {
-                                                                            onChange(e.target.checked);
-                                                                        }}
-                                                                    />
-                                                                }
-                                                                label={item.label}
-                                                            />
-                                                        )}
-                                                    />
+                                                    <Checkbox checked={isOfflineSetting} onChange={e => {
+                                                        handleCheckboxChange(e.target.checked)
+                                                    }} />
                                                 </Grid>
                                             );
                                         }
