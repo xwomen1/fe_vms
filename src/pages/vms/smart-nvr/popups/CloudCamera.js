@@ -1,13 +1,12 @@
+import { useState } from 'react'
 import { Grid } from '@mui/material'
-
-import TableStickyHeader from './table'
 import Tab from '@mui/material/Tab'
 import TabPanel from '@mui/lab/TabPanel'
+import TabContext from '@mui/lab/TabContext'
 import { styled } from '@mui/material/styles'
 import MuiTabList from '@mui/lab/TabList'
-import TabContext from '@mui/lab/TabContext'
-import { useState } from 'react'
-import Add from './add'
+import Camera from './Camera'
+import Channel from './Channel'
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   borderBottom: '0 !important',
@@ -33,7 +32,7 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
   }
 }))
 
-const Caller = () => {
+const RolePopup = ({ onClose }) => {
   const [value, setValue] = useState('1')
 
   const handleChange = (event, newValue) => {
@@ -41,20 +40,22 @@ const Caller = () => {
   }
 
   return (
-    <Grid style={{ minWidth: '1000px' }}>
-      <TabContext value={value}>
-        <Grid>
-          {' '}
-          <TabList onChange={handleChange} aria-label='customized tabs example'>
-            <Tab value='1' label='Cấu hình Smart NVR' />
-          </TabList>
-        </Grid>
-        <TabPanel value='1'>
-          <TableStickyHeader />
-        </TabPanel>
-      </TabContext>
-    </Grid>
+    <TabContext value={value}>
+      <Grid>
+        {' '}
+        <TabList onChange={handleChange} aria-label='customized tabs example'>
+          <Tab value='1' label='Lich ghi' />
+          <Tab value='2' label='Chat luong ghi' />
+        </TabList>
+      </Grid>
+      <TabPanel value='1'>
+        <Camera />
+      </TabPanel>
+      <TabPanel value='2'>
+        <Channel />
+      </TabPanel>
+    </TabContext>
   )
 }
 
-export default Caller
+export default RolePopup
