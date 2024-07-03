@@ -67,7 +67,7 @@ const UserList = ({ apiData }) => {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
   const [status1, setStatus1] = useState(25)
-
+  const [protocol, setProtocol] = useState([])
   const pageSizeOptions = [25, 50, 100]
   const [anchorEl, setAnchorEl] = useState(null)
   const [selectedValue, setSelectedValue] = useState('')
@@ -113,7 +113,8 @@ const UserList = ({ apiData }) => {
         idBox: selectNVR?.value,
         host,
         userName,
-        passWord
+        passWord,
+        protocol: 'ONVIF'
       }
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -150,19 +151,17 @@ const UserList = ({ apiData }) => {
     }
   }
 
-  const handleScanHik = async () => {
+  const handleScanLGT = async () => {
     setOpenPopupResponseHik(true)
     setLoading(true)
-    setPopupMessage('') // Reset thông điệp khi bắt đầu scan
-    setIsError(false) // Reset trạng thái lỗi khi bắt đầu scan
+    setPopupMessage('')
+    setIsError(false)
     try {
-      const deviceType = selectedTitle === 'Onvif' ? 'ONVIF' : selectedTitle === 'Hikvision' ? 'HIKVISION' : ''
-
       const payload = {
         idBox: selectNVR?.value,
         userName,
         passWord,
-        protocol: deviceType
+        protocol: selectedTitle
       }
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -218,7 +217,8 @@ const UserList = ({ apiData }) => {
         startURL,
         endURL,
         userName,
-        passWord
+        passWord,
+        protocol: 'ONVIF'
       }
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -472,6 +472,32 @@ const UserList = ({ apiData }) => {
     fetchFilteredOrAllUsers()
   }, [page, pageSize, total, value, reload])
 
+  useEffect(() => {
+    const ApiProtocol = async () => {
+      try {
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          params: {
+            limit: '',
+            page: ''
+          }
+        }
+        const response = await axios.get(
+          'https://sbs.basesystem.one/ivis/vms/api/v0/cameras/options/protocol-types',
+          config
+        )
+        setProtocol(response.data)
+      } catch (error) {
+        console.error('Error fetching users:', error)
+      }
+    }
+    ApiProtocol()
+  }, [])
+
   const fetchNicTypes = async () => {
     try {
       // setLoading(true)
@@ -522,8 +548,6 @@ const UserList = ({ apiData }) => {
     })
   }, [defaultValue])
 
-  const top100Films = [{ title: 'Onvif' }, { title: 'Hikvision' }]
-
   const handleRadioChange = event => {
     const { value } = event.target
     setSelectedValue(value)
@@ -536,7 +560,7 @@ const UserList = ({ apiData }) => {
   }
 
   const handleDDNSChangeTitle = (event, newValue) => {
-    setSelectedTitle(newValue.title)
+    setSelectedTitle(newValue.name)
   }
 
   return (
@@ -561,9 +585,9 @@ const UserList = ({ apiData }) => {
                       <Grid item xs={3}>
                         <Autocomplete
                           fullWidth
-                          options={top100Films}
+                          options={protocol}
                           id='autocomplete-custom'
-                          getOptionLabel={option => option.title || ''}
+                          getOptionLabel={option => option.name || ''}
                           renderInput={params => <CustomTextField placeholder='Khác' {...params} />}
                           onChange={handleDDNSChangeTitle}
                           disabled={!protocolSelected}
@@ -852,7 +876,7 @@ const UserList = ({ apiData }) => {
 
                     <Grid item xs={4} style={{ marginTop: '1%' }}>
                       <Button>Cancel</Button>
-                      <Button variant='contained' onClick={handleScanHik}>
+                      <Button variant='contained' onClick={handleScanLGT}>
                         Quét
                       </Button>
                     </Grid>
