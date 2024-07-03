@@ -66,6 +66,7 @@ const AccessControlDevice = () => {
 
       const promises = children.map(async child => {
         const subChildren = await fetchChildren(child.id)
+
         return { ...child, children: subChildren }
       })
 
@@ -73,6 +74,7 @@ const AccessControlDevice = () => {
     } catch (error) {
       console.error('Error fetching children data:', error)
       toast.error(error.message)
+
       return []
     }
   }
@@ -91,6 +93,7 @@ const AccessControlDevice = () => {
 
       const promises = parentData.map(async parent => {
         const children = await fetchChildren(parent.id)
+
         return { ...parent, children }
       })
 
@@ -151,17 +154,20 @@ const AccessControlDevice = () => {
     if (!newName.trim()) {
       setNameNull(true)
       setName50(false)
+
       return
     }
 
     if (newName.length > 50) {
       setNameNull(false)
       setName50(true)
+
       return
     }
     if (!newName || !selectedNode) {
       console.log(selectedNode, 'selectedNode')
       toast.error('Vui lòng nhập tên và chọn một node hợp lệ.')
+
       return
     }
 
@@ -183,6 +189,7 @@ const AccessControlDevice = () => {
       handleClose()
     }
   }
+
   const handleDeleteOnclick = async () => {
     try {
       const response = await axios.delete(

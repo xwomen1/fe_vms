@@ -607,6 +607,7 @@ const Add = ({ apiData }) => {
     setSelectedNVR(newValue)
     setIdBox(newValue.value)
   }
+
   const handleDDNSChangeTitle = (event, newValue) => {
     setSelectedTitle(newValue.title)
   }

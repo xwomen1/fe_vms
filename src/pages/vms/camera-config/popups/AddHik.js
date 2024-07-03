@@ -39,7 +39,6 @@ const Add = ({
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState({ text: popupMessage, type: 'general', error: isError })
 
-  console.log(selectedTitle, 'selectedTitle')
   const fetchGroupDataCamera = async () => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
