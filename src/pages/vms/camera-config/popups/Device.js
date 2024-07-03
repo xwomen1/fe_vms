@@ -94,6 +94,8 @@ const Device = ({ onClose, camera }) => {
     zoom: 14
   })
 
+  console.log(camera, 'camera')
+
   const handleLatitudeChange = event => {
     setLat(event.target.value)
   }
@@ -509,6 +511,7 @@ const Device = ({ onClose, camera }) => {
 
           <Grid item xs={0.1}></Grid>
           <Grid item xs={4}>
+            {console.log(regionsSelect)}
             <Autocomplete
               value={regionsSelect}
               onChange={handleRegionsChange}

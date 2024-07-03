@@ -156,10 +156,13 @@ const UserList = ({ apiData }) => {
     setPopupMessage('') // Reset thông điệp khi bắt đầu scan
     setIsError(false) // Reset trạng thái lỗi khi bắt đầu scan
     try {
+      const deviceType = selectedTitle === 'Onvif' ? 'ONVIF' : selectedTitle === 'Hikvision' ? 'HIKVISION' : ''
+
       const payload = {
         idBox: selectNVR?.value,
         userName,
-        passWord
+        passWord,
+        protocol: deviceType
       }
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
