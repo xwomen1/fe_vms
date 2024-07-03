@@ -271,7 +271,7 @@ const Camera = ({ apiData }) => {
           .catch(err => {
             Swal.fire({
               title: 'Error!',
-              text: error.response?.data?.message,
+              text: err.response?.data?.message,
               icon: 'error',
               willOpen: () => {
                 const confirmButton = Swal.getConfirmButton()

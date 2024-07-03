@@ -21,6 +21,7 @@ import Icon from 'src/@core/components/icon'
 import TableBody from '@mui/material/TableBody'
 
 const Add = ({
+  selectedTitle,
   open,
   response,
   onClose,
@@ -37,6 +38,7 @@ const Add = ({
   const [selectedIds, setSelectedIds] = useState([])
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState({ text: popupMessage, type: 'general', error: isError })
+  console.log(selectedTitle)
 
   const fetchGroupDataNVR = async () => {
     try {
@@ -88,6 +90,7 @@ const Add = ({
           name: nvr.name,
           ipAddress: nvr.url,
           macAddress: nvr.macAddress,
+          protocol: selectedTitle,
           passWord: passWord,
           userName: userName,
           httpPort: nvr.host
@@ -131,9 +134,20 @@ const Add = ({
     }
   }
 
+  const resetState = () => {
+    setSelectedIds([])
+    setLoading(false)
+    setMessage({ text: '', type: 'general', error: false })
+  }
+
+  const handleClose = () => {
+    resetState()
+    onClose()
+  }
+
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth='xl' style={{ maxWidth: '80%', margin: 'auto' }}>
-      <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Quét NVR</DialogTitle>
+    <Dialog open={open} onClose={handleClose} fullWidth maxWidth='xl' style={{ maxWidth: '80%', margin: 'auto' }}>
+      <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Quét NVR - {selectedTitle}</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} alignItems='center'>
           {loadingOnvif && <CircularProgress style={{ marginLeft: '50%' }} />}
@@ -208,7 +222,7 @@ const Add = ({
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} variant='contained'>
+        <Button onClick={handleClose} variant='contained'>
           Hủy
         </Button>
       </DialogActions>
