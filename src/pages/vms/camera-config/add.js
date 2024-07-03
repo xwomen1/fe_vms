@@ -802,7 +802,7 @@ const Add = ({ apiData }) => {
                     <Grid item xs={0.2}></Grid>
 
                     <Grid item xs={0.4} style={{ marginTop: '2%' }}>
-                      ----
+                      ---
                     </Grid>
                     <Grid item xs={2}>
                       <CustomTextField
