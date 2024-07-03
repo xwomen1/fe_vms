@@ -162,7 +162,8 @@ const Add = ({ apiData }) => {
         idBox: selectNVR?.value,
         host,
         userName,
-        passWord
+        passWord,
+        protocol: 'ONVIF'
       }
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -358,19 +359,18 @@ const Add = ({ apiData }) => {
     setPage(1)
     handleCloseMenu()
   }
-  console.log(selectedTitle, 'se')
 
   const handleScanLGT = async () => {
     setOpenPopupResponseHik(true)
     setLoading(true)
-    setPopupMessage('') // Reset thông điệp khi bắt đầu scan
-    setIsError(false) // Reset trạng thái lỗi khi bắt đầu scan
+    setPopupMessage('')
+    setIsError(false)
     try {
       const payload = {
         idBox: selectNVR?.value,
         userName,
         passWord,
-        protocol: protocol.name
+        protocol: selectedTitle
       }
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -412,8 +412,8 @@ const Add = ({ apiData }) => {
   const handleScanDaiIP = async () => {
     setOpenPopupResponse(true)
     setLoading(true)
-    setPopupMessage('') // Reset thông điệp khi bắt đầu scan
-    setIsError(false) // Reset trạng thái lỗi khi bắt đầu scan
+    setPopupMessage('')
+    setIsError(false)
     try {
       const payload = {
         idBox: selectNVR?.value,
@@ -422,7 +422,8 @@ const Add = ({ apiData }) => {
         startURL,
         endURL,
         userName,
-        passWord
+        passWord,
+        protocol: 'ONVIF'
       }
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
