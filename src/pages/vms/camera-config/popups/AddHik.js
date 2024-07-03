@@ -81,6 +81,8 @@ const Add = ({
         return
       }
 
+      const protocol = selectedTitle === 'Onvif' ? 'ONVIF' : selectedTitle === 'Hikvision' ? 'HIKVISION' : ''
+
       const config = {
         headers: {
           Authorization: `Bearer ${token}`
@@ -96,7 +98,7 @@ const Add = ({
           location: camera.location,
           name: camera.name,
           ipAddress: camera.url,
-          protocol: selectedTitle,
+          protocol: protocol,
           macAddress: camera.macAddress,
           passWord: passWord,
           userName: userName,
