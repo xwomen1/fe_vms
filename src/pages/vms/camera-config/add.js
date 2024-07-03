@@ -563,6 +563,7 @@ const Add = ({ apiData }) => {
             page: ''
           }
         }
+
         const response = await axios.get(
           'https://sbs.basesystem.one/ivis/vms/api/v0/cameras/options/protocol-types',
           config
