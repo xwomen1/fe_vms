@@ -381,8 +381,23 @@ const UserList = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{assetType.ipAddress}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.macAddress}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.location}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>
-                        {assetType.status?.name ? assetType.status.name : statusText}
+                      <TableCell sx={{ padding: '16px', textAlign: 'center' }}>
+                        {assetType.status && assetType.status.name ? (
+                          <div
+                            style={{
+                              backgroundColor: assetType.status.name === 'Hoạt động' ? 'lightgreen' : 'orange',
+                              borderRadius: '10px',
+                              padding: '5px 10px',
+                              width: '70%',
+                              display: 'inline-block',
+                              marginRight: '50%'
+                            }}
+                          >
+                            {assetType.status.name}
+                          </div>
+                        ) : (
+                          assetType.status.name
+                        )}
                       </TableCell>
 
                       <TableCell sx={{ padding: '16px' }}>

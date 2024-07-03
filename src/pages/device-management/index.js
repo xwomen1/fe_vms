@@ -15,6 +15,7 @@ import {
   CardHeader,
   Chip,
   Dialog,
+  DialogTitle,
   DialogActions,
   DialogContent,
   Grid,
@@ -34,8 +35,15 @@ import {
 
 const AccessControlDevice = () => {
   const [loading, setLoading] = useState(false)
-  const [treeData, setTreeData] = useState([]) // State để lưu trữ dữ liệu cây
+  const [treeData, setTreeData] = useState([])
   const [deviceData, setDeviceData] = useState([])
+  const [open, setOpen] = useState(false)
+  const [openDelete, setOpenDelete] = useState(false)
+  const [newName, setNewName] = useState('')
+  const [nameNull, setNameNull] = useState('')
+  const [name50, setName50] = useState('')
+  const [selectedNode, setSelectedNode] = useState(null)
+  const [rootParentId, setRootParentId] = useState(null)
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
   const config = {
@@ -48,39 +56,50 @@ const AccessControlDevice = () => {
     fetchDataList()
   }, [])
 
+  const fetchChildren = async parentId => {
+    try {
+      const response = await axios.get(
+        `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/device-groups/children-lv1?parentId=${parentId}`,
+        config
+      )
+      const children = response.data
+
+      const promises = children.map(async child => {
+        const subChildren = await fetchChildren(child.id)
+
+        return { ...child, children: subChildren }
+      })
+
+      return await Promise.all(promises)
+    } catch (error) {
+      console.error('Error fetching children data:', error)
+      toast.error(error.message)
+
+      return []
+    }
+  }
+
   const fetchDataList = async () => {
     setLoading(true)
     try {
-      // Lấy dữ liệu thằng cha từ API
       const response = await axios.get(
-        `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/device-groups/children-lv1`,
+        'https://dev-ivi.basesystem.one/vf/ac-adapters/v1/device-groups/children-lv1',
         config
       )
       const parentData = response.data
 
-      // Lấy dữ liệu thằng con tương ứng với mỗi thằng cha
+      const largestParentId = parentData.length > 0 ? parentData[0].id : null
+      setRootParentId(largestParentId)
+
       const promises = parentData.map(async parent => {
-        const response = await axios.get(
-          `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/device-groups/children-lv1?parentId=${parent.id}`,
-          config
-        )
-        const children = response.data
+        const children = await fetchChildren(parent.id)
 
-        // Lưu trữ ID của thằng cha trong mỗi thiết bị
-        const devicesWithParentId = parent.devices.map(device => ({
-          ...device,
-          parentId: parent.id
-        }))
-
-        return { ...parent, children, devices: devicesWithParentId }
+        return { ...parent, children }
       })
 
-      // Đợi cho tất cả các promises hoàn thành
-      const childrenData = await Promise.all(promises)
-
-      // Cập nhật state treeData với dữ liệu thằng cha và thằng con
-      setTreeData(childrenData)
-      setDeviceData(childrenData.flatMap(parent => parent.devices)) // Gộp tất cả thiết bị vào một mảng
+      const data = await Promise.all(promises)
+      setTreeData(data)
+      setDeviceData(data.flatMap(parent => parent.devices))
     } catch (error) {
       console.error('Error fetching data:', error)
       toast.error(error.message)
@@ -94,17 +113,14 @@ const AccessControlDevice = () => {
       try {
         const url = `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices/?deviceGroupId=${nodeId}`
 
-        // Gọi API
         const response = await axios.get(url, config)
 
-        // Lưu trữ dữ liệu thiết bị vào state
         const devicesWithParentId = response.data.results.map(device => ({
           ...device,
           parentId: nodeId
         }))
         setDeviceData(devicesWithParentId)
 
-        // Xử lý dữ liệu từ response nếu cần
         console.log(response.data)
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -112,6 +128,113 @@ const AccessControlDevice = () => {
       }
     }
   }
+
+  const handlePlusClick = node => {
+    setSelectedNode(node.id)
+    setOpen(true)
+  }
+
+  const handleClose = () => {
+    setOpen(false)
+    setNewName('')
+    setName50('')
+    setNameNull('')
+  }
+
+  const handleDelete = node => {
+    setSelectedNode(node.id)
+    setOpenDelete(true)
+  }
+
+  const handleCloseDelete = () => {
+    setOpenDelete(false)
+  }
+
+  const handleSave = async () => {
+    if (!newName.trim()) {
+      setNameNull(true)
+      setName50(false)
+
+      return
+    }
+
+    if (newName.length > 50) {
+      setNameNull(false)
+      setName50(true)
+
+      return
+    }
+    if (!newName || !selectedNode) {
+      console.log(selectedNode, 'selectedNode')
+      toast.error('Vui lòng nhập tên và chọn một node hợp lệ.')
+
+      return
+    }
+
+    try {
+      const response = await axios.post(
+        'https://dev-ivi.basesystem.one/vf/ac-adapters/v1/device-groups',
+        {
+          name: newName,
+          parentId: selectedNode
+        },
+        config
+      )
+      toast.success('Thêm mới thành công')
+      fetchDataList() // Làm mới dữ liệu sau khi thêm mới
+    } catch (error) {
+      console.error('Error saving data:', error)
+      toast.error('Có lỗi xảy ra khi thêm mới.')
+    } finally {
+      handleClose()
+    }
+  }
+
+  const handleDeleteOnclick = async () => {
+    try {
+      const response = await axios.delete(
+        ` https://dev-ivi.basesystem.one/vf/ac-adapters/v1/device-groups/${selectedNode}`,
+
+        config
+      )
+      toast.success('Xóa thành công')
+      fetchDataList() // Làm mới dữ liệu sau khi thêm mới
+    } catch (error) {
+      console.error('Error saving data:', error)
+      toast.error('Error', error.message)
+    } finally {
+      handleCloseDelete()
+    }
+  }
+
+  const renderTree = nodes => (
+    <TreeItem
+      key={nodes.id}
+      nodeId={nodes.id}
+      label={
+        <div style={{ display: 'flex', alignItems: 'center', height: '40px' }}>
+          <span style={{ flexGrow: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>{nodes.name}</span>
+
+          {!rootParentId || rootParentId !== nodes.id ? (
+            <>
+              <IconButton style={{ width: '35px', height: '35px' }}>
+                <Icon icon='tabler:plus' onClick={() => handlePlusClick(nodes)} />
+              </IconButton>
+              <IconButton style={{ width: '35px', height: '35px' }}>
+                <Icon icon='tabler:trash' onClick={() => handleDelete(nodes)} />
+              </IconButton>
+            </>
+          ) : (
+            <IconButton style={{ width: '35px', height: '35px' }}>
+              <Icon icon='tabler:plus' onClick={() => handlePlusClick(nodes)} />
+            </IconButton>
+          )}
+        </div>
+      }
+    >
+      {Array.isArray(nodes.children) ? nodes.children.map(node => renderTree(node)) : null}
+    </TreeItem>
+  )
 
   return (
     <>
@@ -176,16 +299,12 @@ const AccessControlDevice = () => {
         <Grid item xs={2.5} style={{ display: 'flex', flexDirection: 'column' }}>
           <Paper elevation={3} style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
             <TreeView
+              style={{ width: '100%' }}
               defaultCollapseIcon={<Icon icon='bi:chevron-down' />}
               defaultExpandIcon={<Icon icon='bi:chevron-right' />}
               onNodeSelect={handleNodeSelect}
             >
-              {treeData.map(parent => (
-                <TreeItem key={parent.id} nodeId={parent.id} label={parent.name}>
-                  {parent.children &&
-                    parent.children.map(child => <TreeItem key={child.id} nodeId={child.id} label={child.name} />)}
-                </TreeItem>
-              ))}
+              {treeData.map(parent => renderTree(parent))}
             </TreeView>
           </Paper>
         </Grid>
@@ -237,6 +356,51 @@ const AccessControlDevice = () => {
           </Paper>
         </Grid>
       </Grid>
+
+      <Dialog open={open} onClose={handleClose} fullWidth>
+        <DialogTitle>Tạo nhóm thiết bị</DialogTitle>
+        <DialogContent>
+          <CustomTextField
+            autoFocus
+            margin='dense'
+            label='Tên nhóm '
+            fullWidth
+            value={newName}
+            onChange={e => setNewName(e.target.value)}
+          />
+          <div>
+            {' '}
+            <p style={{ color: 'red', textAlign: 'center', display: nameNull ? 'block' : 'none' }}>
+              Vui lòng nhập tên nhóm.
+            </p>
+            <p style={{ color: 'red', textAlign: 'center', display: name50 ? 'block' : 'none' }}>
+              Tên nhóm không được vượt quá 50 ký tự.
+            </p>
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} variant='contained'>
+            Hủy
+          </Button>
+          <Button onClick={handleSave} variant='contained'>
+            Tạo
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={openDelete} onClose={handleCloseDelete} fullWidth>
+        <DialogTitle style={{ fontSize: '20px' }}>Xóa nhóm thiết bị</DialogTitle>
+        <DialogContent>
+          Cần thực hiện việc xoá toàn bộ thiết bị trong thư mục mới có thể tiến hành việc xoá thư mục này
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDelete} variant='contained'>
+            Hủy
+          </Button>
+          <Button onClick={handleDeleteOnclick} variant='contained'>
+            Đồng ý
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   )
 }

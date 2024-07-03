@@ -198,14 +198,14 @@ export const ViewCameraPause = ({
         break
     }
     setText(message?.content)
-    console.log('message', message)
+
+    // console.log('message', message)
   }
 
   // set up WebSocket event listeners
   useEffect(() => {
     if (websocket) {
       setLoading(true)
-      console.log('startTime', convertDateToString(startTime))
       websocket.addEventListener('open', () => {
         websocket.send(
           JSON.stringify({
@@ -231,11 +231,11 @@ export const ViewCameraPause = ({
     <div className='portlet portlet-video live' style={{ width: '100%' }}>
       <div className='portlet-title'>
         <div className='caption'>
-        <span className='label label-sm' 
-          style={{ backgroundColor: status === 'connected' ? 'green' : 'red', color: 'white' }}>
-          {status ? status.toUpperCase() : 'PLAYBACK'}
-        </span>          
-        <span className='caption-subject font-dark sbold uppercase'>{name}</span>
+          <span className='label label-sm'
+            style={{ backgroundColor: status === 'connected' ? 'green' : 'red', color: 'white' }}>
+            {status ? status.toUpperCase() : 'PLAYBACK'}
+          </span>
+          <span className='caption-subject font-dark sbold uppercase'>{name}</span>
         </div>
         <div className='media-top-controls'>
           <div className='btn-group'>

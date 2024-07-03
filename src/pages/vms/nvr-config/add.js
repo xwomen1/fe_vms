@@ -39,6 +39,7 @@ import VideoConnectCamera from './popups/VideoConnectCamera'
 import { Password } from '@mui/icons-material'
 import Edit from './popups/Edit'
 import toast from 'react-hot-toast'
+import AddDevice from './popups/AddDevice'
 
 const UserList = ({ apiData }) => {
   const [value, setValue] = useState('')
@@ -49,7 +50,7 @@ const UserList = ({ apiData }) => {
   const [openPopupImport, setOpenImportPopup] = useState(false)
   const [openPopup, setOpenPopup] = useState(false)
   const [openPopupP, setOpenPopupP] = useState(false)
-
+  const [protocolSelected, setProtocolSelected] = useState(false)
   const [openPopupNetwork, setOpenPopupNetwork] = useState(false)
   const [openPopupVideo, setOpenPopupVideo] = useState(false)
   const [openPopupImage, setOpenPopupImage] = useState(false)
@@ -61,7 +62,7 @@ const UserList = ({ apiData }) => {
   const [addUserOpen, setAddUserOpen] = useState(false)
   const [assettype, setAssetType] = useState([])
   const [nvr, setNvr] = useState([1])
-
+  const [selectedTitle, setSelectedTitle] = useState('')
   const [total, setTotal] = useState([1])
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
@@ -70,7 +71,7 @@ const UserList = ({ apiData }) => {
   const pageSizeOptions = [25, 50, 100]
   const [anchorEl, setAnchorEl] = useState(null)
   const [selectedValue, setSelectedValue] = useState('')
-
+  const [Checkboxx, setChechBox] = useState(false)
   const [loading, setLoading] = useState(false)
   const [idNvr, setIdnvr] = useState(null)
   const [reload, setReload] = useState(0)
@@ -95,6 +96,7 @@ const UserList = ({ apiData }) => {
   const [idBox, setIdBox] = useState(null)
   const [idBoxs, setIdBoxs] = useState(selectNVR?.value)
   const [selectedAuto, setSelectedAuto] = useState('')
+  const [isOpenAddDevice, setIsOpenAddDevice] = useState(false)
 
   const handlePageChange = newPage => {
     setPage(newPage)
@@ -157,8 +159,7 @@ const UserList = ({ apiData }) => {
       const payload = {
         idBox: selectNVR?.value,
         userName,
-        passWord,
-        protocol: '1'
+        passWord
       }
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -242,55 +243,6 @@ const UserList = ({ apiData }) => {
         error.response &&
         error.response.data &&
         error.response.data.message === 'No response from the server device, timeout: scan_device_ip'
-      ) {
-        setPopupMessage('Thiết bị chưa phản hồi')
-      } else {
-        setPopupMessage(`${error.response.data.message}`)
-      }
-
-      setIsError(true) // Đánh dấu là lỗi
-      setLoading(false)
-    }
-  }
-
-  const handleScanOnvif = async () => {
-    setOpenPopupResponseOnvif(true)
-    setLoading(true)
-    setPopupMessage('') // Reset thông điệp khi bắt đầu scan
-    setIsError(false) // Reset trạng thái lỗi khi bắt đầu scan
-    try {
-      const payload = {
-        idBox: selectNVR?.value,
-        userName,
-        passWord,
-        protocol: '0'
-      }
-      const token = localStorage.getItem(authConfig.storageTokenKeyName)
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-
-      const response = await axios.post(
-        'https://sbs.basesystem.one/ivis/vms/api/v0/device/onvif/scandevice',
-        payload,
-        config
-      )
-
-      setResponse(response.data)
-      setLoading(false)
-
-      toast.success('Thành công')
-
-      setPopupMessage('Quét thành công')
-      setIsError(false) // Không phải lỗi
-    } catch (error) {
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message === 'No response from the server device, timeout: scan_device'
       ) {
         setPopupMessage('Thiết bị chưa phản hồi')
       } else {
@@ -425,8 +377,6 @@ const UserList = ({ apiData }) => {
     setValue(val)
   }, [])
 
-  console.log(total, 'totalpage')
-
   const statusText = status1 ? 'Đang hoạt động' : 'Không hoạt động'
 
   const handleDelete = idDelete => {
@@ -482,12 +432,6 @@ const UserList = ({ apiData }) => {
     })
   }
 
-  const handleRadioChange = event => {
-    setSelectedValue(event.target.value)
-    console.log(selectedValue)
-    setSelectedAuto(event.target.value)
-  }
-
   const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen)
   useEffect(() => {
     const fetchFilteredOrAllUsers = async () => {
@@ -511,7 +455,6 @@ const UserList = ({ apiData }) => {
           setNvr(response.data[0].id)
           setAssetType(response.data)
           setTotal(response.data.page)
-          console.log(response.data[0].id)
         } else {
           setStatus1(false)
           setNvr(null)
@@ -556,8 +499,6 @@ const UserList = ({ apiData }) => {
     }
   }
 
-  console.log(idBox, 'idBoxs')
-
   const handleComboboxFocus = () => {
     fetchNicTypes()
   }
@@ -580,6 +521,21 @@ const UserList = ({ apiData }) => {
 
   const top100Films = [{ title: 'Onvif' }, { title: 'Hikvision' }]
 
+  const handleRadioChange = event => {
+    const { value } = event.target
+    setSelectedValue(value)
+    if (event.target.value === 'LoaiGT') {
+      setProtocolSelected(true)
+    } else {
+      setProtocolSelected(false)
+    }
+    console.log(selectedValue)
+  }
+
+  const handleDDNSChangeTitle = (event, newValue) => {
+    setSelectedTitle(newValue.title)
+  }
+
   return (
     <Grid container spacing={6.5}>
       <Grid item xs={12}>
@@ -596,7 +552,9 @@ const UserList = ({ apiData }) => {
                       <Grid item>
                         <FormControlLabel value='daiIp' control={<Radio />} label='Dải IP' />
                       </Grid>
-                      <p>Loại giao thức :</p>
+                      <Grid item>
+                        <FormControlLabel value='LoaiGT' control={<Radio />} label='Loại giao thức' />
+                      </Grid>
                       <Grid item xs={3}>
                         <Autocomplete
                           fullWidth
@@ -604,7 +562,8 @@ const UserList = ({ apiData }) => {
                           id='autocomplete-custom'
                           getOptionLabel={option => option.title || ''}
                           renderInput={params => <CustomTextField placeholder='Khác' {...params} />}
-                          onChange={(event, value) => setSelectedAuto(value ? value.title.toLowerCase() : '')}
+                          onChange={handleDDNSChangeTitle}
+                          disabled={!protocolSelected}
                         />
                       </Grid>
                     </Grid>
@@ -612,43 +571,50 @@ const UserList = ({ apiData }) => {
                 </div>
               </Grid>
               <Grid item xs={4} style={{ display: 'flex' }}>
-                <Grid item style={{ marginRight: '4%' }}>
-                  <Button variant='contained' onClick={handleOpenPopup}>
-                    <Icon icon='tabler:file-import' />
-                  </Button>
-                </Grid>
-                <Grid item>
-                  <CustomTextField
-                    value={value}
-                    onChange={e => handleFilter(e.target.value)}
-                    placeholder='Search…'
-                    InputProps={{
-                      startAdornment: (
-                        <Box sx={{ mr: 2, display: 'flex' }}>
-                          <Icon fontSize='1.25rem' icon='tabler:search' />
-                        </Box>
-                      ),
-                      endAdornment: (
-                        <IconButton size='small' title='Clear' aria-label='Clear'>
-                          <Icon fontSize='1.25rem' icon='tabler:x' />
-                        </IconButton>
-                      )
-                    }}
-                    sx={{
-                      width: {
-                        xs: 1,
-                        sm: 'auto'
-                      },
-                      '& .MuiInputBase-root > svg': {
-                        mr: 2
-                      }
-                    }}
-                  />
+                <Grid container spacing={2}>
+                  <Grid item>
+                    <Button variant='contained' onClick={handleOpenPopup}>
+                      <Icon icon='tabler:file-import' />
+                    </Button>
+                  </Grid>
+                  <Grid item>
+                    <Button variant='contained' onClick={() => setIsOpenAddDevice(true)}>
+                      <Icon icon='tabler:square-rounded-plus' />
+                    </Button>
+                  </Grid>
+                  <Grid item>
+                    <CustomTextField
+                      value={value}
+                      onChange={e => handleFilter(e.target.value)}
+                      placeholder='Search…'
+                      InputProps={{
+                        startAdornment: (
+                          <Box sx={{ mr: 2, display: 'flex' }}>
+                            <Icon fontSize='1.25rem' icon='tabler:search' />
+                          </Box>
+                        ),
+                        endAdornment: (
+                          <IconButton size='small' title='Clear' aria-label='Clear'>
+                            <Icon fontSize='1.25rem' icon='tabler:x' />
+                          </IconButton>
+                        )
+                      }}
+                      sx={{
+                        width: {
+                          xs: 1,
+                          sm: 'auto'
+                        },
+                        '& .MuiInputBase-root > svg': {
+                          mr: 2
+                        }
+                      }}
+                    />
+                  </Grid>
                 </Grid>
               </Grid>
               <Grid item xs={12}>
                 {' '}
-                {selectedValue === 'dungIp' && (
+                {selectedValue === 'dungIp' && selectedAuto !== 'onvif' && selectedAuto !== 'hikvision' && (
                   <Grid
                     container
                     item
@@ -728,7 +694,7 @@ const UserList = ({ apiData }) => {
                     />{' '}
                   </>
                 )}
-                {selectedValue === 'daiIp' && (
+                {selectedValue === 'daiIp' && selectedAuto !== 'onvif' && selectedAuto !== 'hikvision' && (
                   <Grid
                     container
                     item
@@ -840,72 +806,7 @@ const UserList = ({ apiData }) => {
                     />{' '}
                   </>
                 )}
-                {selectedAuto === 'onvif' && (
-                  <Grid
-                    container
-                    item
-                    component={Paper}
-                    style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
-                  >
-                    <Grid item xs={1.8}>
-                      <Autocomplete
-                        value={selectNVR}
-                        onChange={handleDDNSChange}
-                        options={nvrs}
-                        getOptionLabel={option => option.label}
-                        renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
-                        onFocus={handleComboboxFocus}
-
-                        // loading={loading}
-                      />{' '}
-                    </Grid>
-
-                    <Grid item xs={0.4}></Grid>
-                    <Grid item xs={2}>
-                      <CustomTextField
-                        value={userName}
-                        onChange={e => setUsername(e.target.value)}
-                        label='Đăng nhập'
-                        fullWidth
-                      />
-                    </Grid>
-                    <Grid item xs={0.4}></Grid>
-                    <Grid item xs={2}>
-                      <CustomTextField
-                        value={passWord}
-                        onChange={e => setPassWord(e.target.value)}
-                        label='Mật khẩu'
-                        type='password'
-                        fullWidth
-                      />
-                    </Grid>
-                    <Grid item xs={0.2}></Grid>
-
-                    <Grid item xs={4} style={{ marginTop: '1%' }}>
-                      <Button>Cancel</Button>
-                      <Button variant='contained' onClick={handleScanOnvif}>
-                        Quét
-                      </Button>
-                    </Grid>
-                  </Grid>
-                )}
-                {openPopupResponseOnvif && (
-                  <>
-                    <PopupScanOnvif
-                      open={openPopupResponseOnvif}
-                      userName={userName}
-                      setReload={() => setReload(reload + 1)}
-                      passWord={passWord}
-                      isError={isError}
-                      idBox={idBox}
-                      popupMessage={popupMessage}
-                      response={response}
-                      loadingOnvif={loading}
-                      onClose={() => setOpenPopupResponseOnvif(false)}
-                    />{' '}
-                  </>
-                )}
-                {selectedAuto === 'hikvision' && (
+                {selectedValue === 'LoaiGT' && (
                   <Grid
                     container
                     item
@@ -962,6 +863,7 @@ const UserList = ({ apiData }) => {
                       setReload={() => setReload(reload + 1)}
                       passWord={passWord}
                       isError={isError}
+                      selectedTitle={selectedTitle}
                       idBox={idBox}
                       popupMessage={popupMessage}
                       response={response}
@@ -1085,6 +987,13 @@ const UserList = ({ apiData }) => {
           <>
             <Edit open={openPopupP} onClose={handleClosePPopup} nvr={selectedNvrId} />
           </>
+        )}
+        {isOpenAddDevice && (
+          <AddDevice
+            show={isOpenAddDevice}
+            setReload={() => setReload(reload + 1)}
+            onClose={() => setIsOpenAddDevice(false)}
+          />
         )}
         {/* <Passwords open={openPopupP} onClose={handleClosePPopup} nvr={selectedIds} /> */}
         <ConnectCamera
