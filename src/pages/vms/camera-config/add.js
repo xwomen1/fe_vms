@@ -45,16 +45,9 @@ const Add = ({ apiData }) => {
   const defaultValue = ''
   const [endURL, setEndUrl] = useState('')
   const defaultCameraID = '0eb23593-a9b1-4278-9fb1-4d18f30ed6ff'
-
-  const [openPopupNetwork, setOpenPopupNetwork] = useState(false)
-  const [openPopupVideo, setOpenPopupVideo] = useState(false)
-  const [openPopupImage, setOpenPopupImage] = useState(false)
-  const [openPopupCloud, setOpenPopupCloud] = useState(false)
-  const [openPopupConnectCamera, setOpenPopupConnectCamera] = useState(false)
-  const [openPopupVideoConnectCamera, setOpenPopupVideoConnectCamera] = useState(false)
   const [assettype, setAssetType] = useState([])
   const [nvrs, setNVR] = useState([])
-
+  const [protocolSelected, setProtocolSelected] = useState(false)
   const [total, setTotal] = useState([1])
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
@@ -79,7 +72,7 @@ const Add = ({ apiData }) => {
   const [selectedNvrId, setSelectedNvrId] = useState(null)
   const [idBox, setIdBox] = useState(null)
   const [idBoxs, setIdBoxs] = useState(selectNVR?.value)
-
+  const [selectedTitle, setSelectedTitle] = useState('')
   const [popupMessage, setPopupMessage] = useState('')
   const [isError, setIsError] = useState(false)
   const [openPopupResponseOnvif, setOpenPopupResponseOnvif] = useState(false)
@@ -209,7 +202,11 @@ const Add = ({ apiData }) => {
 
   const handleRadioChange = event => {
     setSelectedValue(event.target.value)
-    setSelectedAuto(event.target.value)
+    if (event.target.value === 'LoaiGT') {
+      setProtocolSelected(true)
+    } else {
+      setProtocolSelected(false)
+    }
     console.log(selectedValue)
   }
 
@@ -351,10 +348,6 @@ const Add = ({ apiData }) => {
     setAnchorEl(null)
   }
 
-  const handleDDNSChange = (event, newValue) => {
-    setSelectedNVR(newValue)
-    setIdBox(newValue.value)
-  }
   useEffect(() => {
     setSelectedNVR({
       label: defaultValue,
@@ -426,8 +419,7 @@ const Add = ({ apiData }) => {
       const payload = {
         idBox: selectNVR?.value,
         userName,
-        passWord,
-        protocol: '1'
+        passWord
       }
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -458,7 +450,7 @@ const Add = ({ apiData }) => {
       ) {
         setPopupMessage('Thiết bị chưa phản hồi')
       } else {
-        setPopupMessage(`${error.message}`)
+        setPopupMessage(`${error.response.data.message}`)
       }
 
       setIsError(true) // Đánh dấu là lỗi
@@ -611,6 +603,15 @@ const Add = ({ apiData }) => {
 
   const top100Films = [{ title: 'Onvif' }, { title: 'Hikvision' }]
 
+  const handleDDNSChange = (event, newValue) => {
+    setSelectedNVR(newValue)
+    setIdBox(newValue.value)
+  }
+  const handleDDNSChangeTitle = (event, newValue) => {
+    setSelectedTitle(newValue.title)
+  }
+  console.log(selectedTitle, 'selectedTitle1')
+
   return (
     <>
       <Grid container spacing={6.5}>
@@ -627,7 +628,9 @@ const Add = ({ apiData }) => {
                       <Grid item>
                         <FormControlLabel value='daiIp' control={<Radio />} label='Dải IP' />
                       </Grid>
-                      <p>Loại giao thức :</p>
+                      <Grid item>
+                        <FormControlLabel value='LoaiGT' control={<Radio />} label='Loại giao thức' />
+                      </Grid>
                       <Grid item xs={3}>
                         <Autocomplete
                           fullWidth
@@ -635,7 +638,8 @@ const Add = ({ apiData }) => {
                           id='autocomplete-custom'
                           getOptionLabel={option => option.title || ''}
                           renderInput={params => <CustomTextField placeholder='Khác' {...params} />}
-                          onChange={(event, value) => setSelectedAuto(value ? value.title.toLowerCase() : '')}
+                          onChange={handleDDNSChangeTitle}
+                          disabled={!protocolSelected}
                         />
                       </Grid>
                     </Grid>
@@ -876,8 +880,9 @@ const Add = ({ apiData }) => {
                   </>
                 )}
               </Grid>
+
               <Grid item xs={12}>
-                {selectedAuto === 'onvif' && (
+                {selectedValue === 'LoaiGT' && (
                   <Grid
                     container
                     item
@@ -890,74 +895,7 @@ const Add = ({ apiData }) => {
                         onChange={handleDDNSChange}
                         options={nvrs}
                         getOptionLabel={option => option.label}
-                        renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
-                        onFocus={handleComboboxFocus}
-
-                        // loading={loading}
-                      />{' '}
-                    </Grid>
-                    <Grid item xs={0.1}></Grid>
-
-                    <Grid item xs={2}>
-                      <CustomTextField
-                        value={userName}
-                        onChange={e => setUsername(e.target.value)}
-                        label='Đăng nhập'
-                        fullWidth
-                      />
-                    </Grid>
-                    <Grid item xs={0.4}></Grid>
-                    <Grid item xs={2}>
-                      <CustomTextField
-                        value={passWord}
-                        onChange={e => setPassWord(e.target.value)}
-                        label='Mật khẩu'
-                        type='password'
-                        fullWidth
-                      />
-                    </Grid>
-                    <Grid item xs={0.2}></Grid>
-
-                    <Grid item xs={4} style={{ marginTop: '2%' }}>
-                      <Button>Cancel</Button>
-                      <Button variant='contained' onClick={handleScanOnvif}>
-                        Quét
-                      </Button>
-                    </Grid>
-                  </Grid>
-                )}
-                {openPopupResponseOnvif && (
-                  <>
-                    <PopupScanOnvif
-                      open={openPopupResponseOnvif}
-                      userName={userName}
-                      setReload={() => setReload(reload + 1)}
-                      passWord={passWord}
-                      isError={isError}
-                      popupMessage={popupMessage}
-                      idBoxOnvif={idBox}
-                      response={response}
-                      loadingOnvif={loading}
-                      onClose={() => setOpenPopupResponseOnvif(false)}
-                    />{' '}
-                  </>
-                )}
-              </Grid>
-              <Grid item xs={12}>
-                {selectedAuto === 'hikvision' && (
-                  <Grid
-                    container
-                    item
-                    component={Paper}
-                    style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
-                  >
-                    <Grid item xs={1.8}>
-                      <Autocomplete
-                        value={selectNVR}
-                        onChange={handleDDNSChange}
-                        options={nvrs}
-                        getOptionLabel={option => option.label}
-                        renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
+                        renderInput={params => <CustomTextField {...params} label='NVR/ BOX' fullWidth />}
                         onFocus={handleComboboxFocus}
 
                         // loading={loading}
@@ -998,6 +936,7 @@ const Add = ({ apiData }) => {
                     <PopupScanHik
                       open={openPopupResponseHik}
                       userName={userName}
+                      selectedTitle={selectedTitle}
                       setReload={() => setReload(reload + 1)}
                       passWord={passWord}
                       isError={isError}

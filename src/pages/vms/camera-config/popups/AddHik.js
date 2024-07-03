@@ -21,6 +21,7 @@ import Icon from 'src/@core/components/icon'
 import TableBody from '@mui/material/TableBody'
 
 const Add = ({
+  selectedTitle,
   open,
   response,
   onClose,
@@ -38,6 +39,7 @@ const Add = ({
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState({ text: popupMessage, type: 'general', error: isError })
 
+  console.log(selectedTitle, 'selectedTitle')
   const fetchGroupDataCamera = async () => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -73,15 +75,7 @@ const Add = ({
       setMessage({ text: '', type: '', error: false })
 
       // Xác thực các trường đầu vào
-      if (
-        !camera.location ||
-        !camera.name ||
-        !camera.url ||
-        !camera.macAddress ||
-        !camera.host ||
-        !passWord ||
-        !userName
-      ) {
+      if (!camera.macAddress || !passWord || !userName) {
         setMessage({ text: 'Tất cả các trường đều bắt buộc', type: 'create', error: true })
         setLoading(false)
 
@@ -103,6 +97,7 @@ const Add = ({
           location: camera.location,
           name: camera.name,
           ipAddress: camera.url,
+          protocol: selectedTitle,
           macAddress: camera.macAddress,
           passWord: passWord,
           userName: userName,
@@ -149,7 +144,7 @@ const Add = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth='xl' style={{ maxWidth: '80%', margin: 'auto' }}>
-      <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Quét Camera</DialogTitle>
+      <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Quét Camera - {selectedTitle}</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} alignItems='center'>
           {loadingOnvif && <CircularProgress style={{ marginLeft: '50%' }} />}
