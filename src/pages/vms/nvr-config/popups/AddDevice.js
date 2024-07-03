@@ -466,11 +466,9 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
             ipAddress: values?.ipAddress,
             httpPort: values?.httpPort,
             onvifPort: values?.onvifPort,
-            protocol: {
-                id: values?.protocol?.id,
-            },
-            latitude: lat.toString(),
-            longitude: lng.toString(),
+            protocol: values?.protocol?.name,
+            latitude: lat?.toString(),
+            longitude: lng?.toString(),
             isOfflineSetting: isOfflineSetting,
             siteInfo: {
                 id: values?.siteInfo?.id,
