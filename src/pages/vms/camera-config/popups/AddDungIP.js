@@ -131,8 +131,25 @@ const Add = ({
     }
   }
 
+  const resetState = () => {
+    setSelectedIds([])
+    setLoading(false)
+    setMessage({ text: '', type: 'general', error: false })
+  }
+
+  const handleClose = () => {
+    resetState()
+    onClose()
+  }
+
+  useEffect(() => {
+    if (open) {
+      fetchGroupDataCamera()
+    }
+  }, [open])
+
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth='xl' style={{ maxWidth: '80%', margin: 'auto' }}>
+    <Dialog open={open} onClose={handleClose} fullWidth maxWidth='xl' style={{ maxWidth: '80%', margin: 'auto' }}>
       <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Quét Camera</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} alignItems='center'>
@@ -211,7 +228,7 @@ const Add = ({
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} variant='contained'>
+        <Button onClick={handleClose} variant='contained'>
           Hủy
         </Button>
       </DialogActions>
