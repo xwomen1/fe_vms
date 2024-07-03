@@ -47,6 +47,7 @@ const Add = ({ apiData }) => {
   const [endURL, setEndUrl] = useState('')
   const defaultCameraID = '0eb23593-a9b1-4278-9fb1-4d18f30ed6ff'
   const [assettype, setAssetType] = useState([])
+  const [protocol, setProtocol] = useState([])
   const [nvrs, setNVR] = useState([])
   const [protocolSelected, setProtocolSelected] = useState(false)
   const [total, setTotal] = useState([1])
@@ -365,13 +366,11 @@ const Add = ({ apiData }) => {
     setPopupMessage('') // Reset thông điệp khi bắt đầu scan
     setIsError(false) // Reset trạng thái lỗi khi bắt đầu scan
     try {
-      const deviceType = selectedTitle === 'Onvif' ? 'ONVIF' : selectedTitle === 'Hikvision' ? 'HIKVISION' : ''
-
       const payload = {
         idBox: selectNVR?.value,
         userName,
         passWord,
-        protocol: deviceType
+        protocol: protocol.name
       }
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -549,6 +548,32 @@ const Add = ({ apiData }) => {
     fetchFilteredOrAllUsers()
   }, [page, pageSize, total, value, reload])
 
+  useEffect(() => {
+    const ApiProtocol = async () => {
+      try {
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          params: {
+            limit: '',
+            page: ''
+          }
+        }
+        const response = await axios.get(
+          'https://sbs.basesystem.one/ivis/vms/api/v0/cameras/options/protocol-types',
+          config
+        )
+        setProtocol(response.data)
+      } catch (error) {
+        console.error('Error fetching users:', error)
+      }
+    }
+    ApiProtocol()
+  }, [])
+
   const top100Films = [{ title: 'Onvif' }, { title: 'Hikvision' }]
 
   const handleDDNSChange = (event, newValue) => {
@@ -557,7 +582,7 @@ const Add = ({ apiData }) => {
   }
 
   const handleDDNSChangeTitle = (event, newValue) => {
-    setSelectedTitle(newValue.title)
+    setSelectedTitle(newValue.name)
   }
   console.log(selectedTitle, 'selectedTitle1')
 
@@ -583,9 +608,9 @@ const Add = ({ apiData }) => {
                       <Grid item xs={3}>
                         <Autocomplete
                           fullWidth
-                          options={top100Films}
+                          options={protocol}
                           id='autocomplete-custom'
-                          getOptionLabel={option => option.title || ''}
+                          getOptionLabel={option => option.name || ''}
                           renderInput={params => <CustomTextField placeholder='Khác' {...params} />}
                           onChange={handleDDNSChangeTitle}
                           disabled={!protocolSelected}
