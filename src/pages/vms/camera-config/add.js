@@ -67,6 +67,7 @@ const Add = ({ apiData }) => {
   const [userName, setUsername] = useState('')
   const [passWord, setPassWord] = useState('')
   const [response, setResponse] = useState('')
+  const [response1, setResponse1] = useState('')
   const [openPopupResponse, setOpenPopupResponse] = useState(false)
   const [loading, setLoading] = useState(false)
   const [selectedNvrId, setSelectedNvrId] = useState(null)
@@ -176,7 +177,7 @@ const Add = ({ apiData }) => {
         config
       )
 
-      setResponse(response.data)
+      setResponse1(response.data)
       setLoading(false)
       setPopupMessage('Quét thành công')
       setIsError(false) // Không phải lỗi
@@ -356,66 +357,21 @@ const Add = ({ apiData }) => {
     setPage(1)
     handleCloseMenu()
   }
+  console.log(selectedTitle, 'se')
 
-  const handleScanOnvif = async () => {
-    setOpenPopupResponseOnvif(true)
-    setLoading(true)
-    setPopupMessage('') // Reset thông điệp khi bắt đầu scan
-    setIsError(false) // Reset trạng thái lỗi khi bắt đầu scan
-    try {
-      const payload = {
-        idBox: selectNVR?.value,
-        userName,
-        passWord,
-        protocol: '0'
-      }
-      const token = localStorage.getItem(authConfig.storageTokenKeyName)
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-
-      const response = await axios.post(
-        'https://sbs.basesystem.one/ivis/vms/api/v0/device/onvif/scandevice',
-        payload,
-        config
-      )
-
-      setResponse(response.data)
-      setLoading(false)
-
-      toast.success('Thành công')
-
-      setPopupMessage('Quét thành công')
-      setIsError(false) // Không phải lỗi
-    } catch (error) {
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message === 'No response from the server device, timeout: scan_device'
-      ) {
-        setPopupMessage('Thiết bị chưa phản hồi')
-      } else {
-        setPopupMessage(`${error.message}`)
-      }
-
-      setIsError(true) // Đánh dấu là lỗi
-      setLoading(false)
-    }
-  }
-
-  const handleScanHik = async () => {
+  const handleScanLGT = async () => {
     setOpenPopupResponseHik(true)
     setLoading(true)
     setPopupMessage('') // Reset thông điệp khi bắt đầu scan
     setIsError(false) // Reset trạng thái lỗi khi bắt đầu scan
     try {
+      const deviceType = selectedTitle === 'Onvif' ? 'ONVIF' : selectedTitle === 'Hikvision' ? 'HIKVISION' : ''
+
       const payload = {
         idBox: selectNVR?.value,
         userName,
-        passWord
+        passWord,
+        protocol: deviceType
       }
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -872,14 +828,13 @@ const Add = ({ apiData }) => {
                       idBoxDaiIP={idBox}
                       popupMessage={popupMessage}
                       passWord={passWord}
-                      response={response}
+                      response={response1}
                       loadingDaiIP={loading}
                       onClose={() => setOpenPopupResponse(false)}
                     />{' '}
                   </>
                 )}
               </Grid>
-
               <Grid item xs={12}>
                 {selectedValue === 'LoaiGT' && (
                   <Grid
@@ -922,76 +877,9 @@ const Add = ({ apiData }) => {
                     </Grid>
                     <Grid item xs={0.2}></Grid>
 
-                    <Grid item xs={4} style={{ marginTop: '2%' }}>
-                      <Button>Cancel</Button>
-                      <Button variant='contained' onClick={handleScanOnvif}>
-                        Quét
-                      </Button>
-                    </Grid>
-                  </Grid>
-                )}
-                {openPopupResponseOnvif && (
-                  <>
-                    <PopupScanOnvif
-                      open={openPopupResponseOnvif}
-                      userName={userName}
-                      setReload={() => setReload(reload + 1)}
-                      passWord={passWord}
-                      isError={isError}
-                      popupMessage={popupMessage}
-                      idBoxOnvif={idBox}
-                      response={response}
-                      loadingOnvif={loading}
-                      onClose={() => setOpenPopupResponseOnvif(false)}
-                    />{' '}
-                  </>
-                )}
-              </Grid>
-              <Grid item xs={12}>
-                {selectedAuto === 'hikvision' && (
-                  <Grid
-                    container
-                    item
-                    component={Paper}
-                    style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
-                  >
-                    <Grid item xs={1.8}>
-                      <Autocomplete
-                        value={selectNVR}
-                        onChange={handleDDNSChange}
-                        options={nvrs}
-                        getOptionLabel={option => option.label}
-                        renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
-                        onFocus={handleComboboxFocus}
-
-                        // loading={loading}
-                      />{' '}
-                    </Grid>
-                    <Grid item xs={0.1}></Grid>
-
-                    <Grid item xs={2}>
-                      <CustomTextField
-                        value={userName}
-                        onChange={e => setUsername(e.target.value)}
-                        label='Đăng nhập'
-                        fullWidth
-                      />
-                    </Grid>
-                    <Grid item xs={0.4}></Grid>
-                    <Grid item xs={2}>
-                      <CustomTextField
-                        value={passWord}
-                        onChange={e => setPassWord(e.target.value)}
-                        label='Mật khẩu'
-                        type='password'
-                        fullWidth
-                      />
-                    </Grid>
-                    <Grid item xs={0.2}></Grid>
-
                     <Grid item xs={4} style={{ marginTop: '1%' }}>
                       <Button>Cancel</Button>
-                      <Button variant='contained' onClick={handleScanHik}>
+                      <Button variant='contained' onClick={handleScanLGT}>
                         Quét
                       </Button>
                     </Grid>
