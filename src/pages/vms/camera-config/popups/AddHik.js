@@ -151,9 +151,12 @@ const Add = ({
     resetState()
     onClose()
   }
+  console.log(response)
 
   useEffect(() => {
     if (open) {
+      response == ''
+      resetState()
       fetchGroupDataCamera()
     }
   }, [open])

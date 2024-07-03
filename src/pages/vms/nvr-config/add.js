@@ -39,6 +39,7 @@ import VideoConnectCamera from './popups/VideoConnectCamera'
 import { Password } from '@mui/icons-material'
 import Edit from './popups/Edit'
 import toast from 'react-hot-toast'
+import AddDevice from './popups/AddDevice'
 
 const UserList = ({ apiData }) => {
   const [value, setValue] = useState('')
@@ -95,6 +96,7 @@ const UserList = ({ apiData }) => {
   const [idBox, setIdBox] = useState(null)
   const [idBoxs, setIdBoxs] = useState(selectNVR?.value)
   const [selectedAuto, setSelectedAuto] = useState('')
+  const [isOpenAddDevice, setIsOpenAddDevice] = useState(false)
 
   const handlePageChange = newPage => {
     setPage(newPage)
@@ -375,8 +377,6 @@ const UserList = ({ apiData }) => {
     setValue(val)
   }, [])
 
-  console.log(total, 'totalpage')
-
   const statusText = status1 ? 'Đang hoạt động' : 'Không hoạt động'
 
   const handleDelete = idDelete => {
@@ -455,7 +455,6 @@ const UserList = ({ apiData }) => {
           setNvr(response.data[0].id)
           setAssetType(response.data)
           setTotal(response.data.page)
-          console.log(response.data[0].id)
         } else {
           setStatus1(false)
           setNvr(null)
@@ -499,8 +498,6 @@ const UserList = ({ apiData }) => {
       // setLoading(false)
     }
   }
-
-  console.log(idBox, 'idBoxs')
 
   const handleComboboxFocus = () => {
     fetchNicTypes()
@@ -574,38 +571,45 @@ const UserList = ({ apiData }) => {
                 </div>
               </Grid>
               <Grid item xs={4} style={{ display: 'flex' }}>
-                <Grid item style={{ marginRight: '4%' }}>
-                  <Button variant='contained' onClick={handleOpenPopup}>
-                    <Icon icon='tabler:file-import' />
-                  </Button>
-                </Grid>
-                <Grid item>
-                  <CustomTextField
-                    value={value}
-                    onChange={e => handleFilter(e.target.value)}
-                    placeholder='Search…'
-                    InputProps={{
-                      startAdornment: (
-                        <Box sx={{ mr: 2, display: 'flex' }}>
-                          <Icon fontSize='1.25rem' icon='tabler:search' />
-                        </Box>
-                      ),
-                      endAdornment: (
-                        <IconButton size='small' title='Clear' aria-label='Clear'>
-                          <Icon fontSize='1.25rem' icon='tabler:x' />
-                        </IconButton>
-                      )
-                    }}
-                    sx={{
-                      width: {
-                        xs: 1,
-                        sm: 'auto'
-                      },
-                      '& .MuiInputBase-root > svg': {
-                        mr: 2
-                      }
-                    }}
-                  />
+                <Grid container spacing={2}>
+                  <Grid item>
+                    <Button variant='contained' onClick={handleOpenPopup}>
+                      <Icon icon='tabler:file-import' />
+                    </Button>
+                  </Grid>
+                  <Grid item>
+                    <Button variant='contained' onClick={() => setIsOpenAddDevice(true)}>
+                      <Icon icon='tabler:square-rounded-plus' />
+                    </Button>
+                  </Grid>
+                  <Grid item>
+                    <CustomTextField
+                      value={value}
+                      onChange={e => handleFilter(e.target.value)}
+                      placeholder='Search…'
+                      InputProps={{
+                        startAdornment: (
+                          <Box sx={{ mr: 2, display: 'flex' }}>
+                            <Icon fontSize='1.25rem' icon='tabler:search' />
+                          </Box>
+                        ),
+                        endAdornment: (
+                          <IconButton size='small' title='Clear' aria-label='Clear'>
+                            <Icon fontSize='1.25rem' icon='tabler:x' />
+                          </IconButton>
+                        )
+                      }}
+                      sx={{
+                        width: {
+                          xs: 1,
+                          sm: 'auto'
+                        },
+                        '& .MuiInputBase-root > svg': {
+                          mr: 2
+                        }
+                      }}
+                    />
+                  </Grid>
                 </Grid>
               </Grid>
               <Grid item xs={12}>
@@ -983,6 +987,13 @@ const UserList = ({ apiData }) => {
           <>
             <Edit open={openPopupP} onClose={handleClosePPopup} nvr={selectedNvrId} />
           </>
+        )}
+        {isOpenAddDevice && (
+          <AddDevice
+            show={isOpenAddDevice}
+            setReload={() => setReload(reload + 1)}
+            onClose={() => setIsOpenAddDevice(false)}
+          />
         )}
         {/* <Passwords open={openPopupP} onClose={handleClosePPopup} nvr={selectedIds} /> */}
         <ConnectCamera
