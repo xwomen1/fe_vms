@@ -214,7 +214,7 @@ const EventList = ({ eventData }) => {
       }
 
       axios
-        .delete(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/delete/${idDelete}`, config)
+        .delete(`https://sbs.basesystem.one/ivis/vms/api/v0/ai-events/${idDelete}`, config)
         .then(() => {
           toast.success('Xóa thành công')
           setIdDelete(null)

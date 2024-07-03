@@ -26,11 +26,33 @@ const CameraPopup = ({ open, id, onClose, onSuccess }) => {
       .delete(urlDelete, config)
       .then(() => {
         onClose()
-        Swal.fire('Xóa thành công', '', 'success')
+        Swal.fire({
+          title: 'Thành công!',
+          text: 'Xóa Thành công',
+          icon: 'success',
+          willOpen: () => {
+            const confirmButton = Swal.getConfirmButton()
+            if (confirmButton) {
+              confirmButton.style.backgroundColor = '#FF9F43'
+              confirmButton.style.color = 'white'
+            }
+          }
+        })
         onSuccess()
       })
       .catch(error => {
-        Swal.fire('Đã xảy ra lỗi', error.message, 'error')
+        Swal.fire({
+          title: 'Error!',
+          text: error.response?.data?.message || error.message,
+          icon: 'error',
+          willOpen: () => {
+            const confirmButton = Swal.getConfirmButton()
+            if (confirmButton) {
+              confirmButton.style.backgroundColor = '#FF9F43'
+              confirmButton.style.color = 'white'
+            }
+          }
+        })
       })
   }
 
