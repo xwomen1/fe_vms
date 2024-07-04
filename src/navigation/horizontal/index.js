@@ -52,13 +52,18 @@ const navigation = () => {
           icon: 'tabler:id-badge-off'
         },
         {
-          title: 'Danh sách camera',
+          title: 'Danh sách Camera',
           path: '/vms/camera-config',
           icon: 'tabler:device-cctv'
         },
         {
-          title: 'Danh sách nvr',
+          title: 'Danh sách NVR',
           path: '/vms/nvr-config',
+          icon: 'tabler:server-2'
+        },
+        {
+          title: 'Smart NVR',
+          path: '/vms/smart-nvr',
           icon: 'tabler:server-2'
         },
         {
