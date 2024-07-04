@@ -68,7 +68,6 @@ const Add = ({ apiData }) => {
   const [userName, setUsername] = useState('')
   const [passWord, setPassWord] = useState('')
   const [response, setResponse] = useState('')
-  const [response1, setResponse1] = useState('')
   const [openPopupResponse, setOpenPopupResponse] = useState(false)
   const [loading, setLoading] = useState(false)
   const [selectedNvrId, setSelectedNvrId] = useState(null)
@@ -179,7 +178,7 @@ const Add = ({ apiData }) => {
         config
       )
 
-      setResponse1(response.data)
+      setResponse(response.data)
       setLoading(false)
       setPopupMessage('Quét thành công')
       setIsError(false) // Không phải lỗi
@@ -361,6 +360,22 @@ const Add = ({ apiData }) => {
   }
 
   const handleScanLGT = async () => {
+    if (!selectedTitle) {
+      Swal.fire({
+        title: 'Error',
+        text: 'Hãy chọn loại giao thức',
+        icon: 'error',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
+
+      return
+    }
     setOpenPopupResponseHik(true)
     setLoading(true)
     setPopupMessage('')
@@ -576,8 +591,6 @@ const Add = ({ apiData }) => {
     ApiProtocol()
   }, [])
 
-  const top100Films = [{ title: 'Onvif' }, { title: 'Hikvision' }]
-
   const handleDDNSChange = (event, newValue) => {
     setSelectedNVR(newValue)
     setIdBox(newValue.value)
@@ -586,7 +599,13 @@ const Add = ({ apiData }) => {
   const handleDDNSChangeTitle = (event, newValue) => {
     setSelectedTitle(newValue.name)
   }
-  console.log(selectedTitle, 'selectedTitle1')
+
+  const resetPopupState = () => {
+    setResponse(null)
+    setIsError(false)
+    setPopupMessage('')
+    setLoading(false)
+  }
 
   return (
     <>
@@ -742,7 +761,10 @@ const Add = ({ apiData }) => {
                       passWord={passWord}
                       response={response}
                       loadings={loading}
-                      onClose={() => setOpenPopupResponseDungIP(false)}
+                      onClose={() => {
+                        setOpenPopupResponseDungIP(false)
+                        resetPopupState()
+                      }}
                     />{' '}
                   </>
                 )}
@@ -855,9 +877,12 @@ const Add = ({ apiData }) => {
                       idBoxDaiIP={idBox}
                       popupMessage={popupMessage}
                       passWord={passWord}
-                      response={response1}
+                      response={response}
                       loadingDaiIP={loading}
-                      onClose={() => setOpenPopupResponse(false)}
+                      onClose={() => {
+                        setOpenPopupResponse(false)
+                        resetPopupState()
+                      }}
                     />{' '}
                   </>
                 )}
@@ -886,6 +911,8 @@ const Add = ({ apiData }) => {
 
                     <Grid item xs={2}>
                       <CustomTextField
+                        autoComplete='new-password' // Thay đổi giá trị thành 'new-password'
+                        form='off'
                         value={userName}
                         onChange={e => setUsername(e.target.value)}
                         label='Đăng nhập'
@@ -896,6 +923,8 @@ const Add = ({ apiData }) => {
                     <Grid item xs={2}>
                       <CustomTextField
                         value={passWord}
+                        autoComplete='new-password' // Thay đổi giá trị thành 'new-password'
+                        form='off'
                         onChange={e => setPassWord(e.target.value)}
                         label='Mật khẩu'
                         type='password'
@@ -925,7 +954,10 @@ const Add = ({ apiData }) => {
                       idBoxOnvif={idBox}
                       response={response}
                       loadingOnvif={loading}
-                      onClose={() => setOpenPopupResponseHik(false)}
+                      onClose={() => {
+                        setOpenPopupResponseHik(false)
+                        resetPopupState()
+                      }}
                     />{' '}
                   </>
                 )}

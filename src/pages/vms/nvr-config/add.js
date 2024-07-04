@@ -152,6 +152,22 @@ const UserList = ({ apiData }) => {
   }
 
   const handleScanLGT = async () => {
+    if (!selectedTitle) {
+      Swal.fire({
+        title: 'Error',
+        text: 'Hãy chọn loại giao thức',
+        icon: 'error',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
+
+      return
+    }
     setOpenPopupResponseHik(true)
     setLoading(true)
     setPopupMessage('')
@@ -488,7 +504,7 @@ const UserList = ({ apiData }) => {
         }
 
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/vms/api/v0/cameras/options/protocol-types',
+          'https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/options/protocol-types',
           config
         )
         setProtocol(response.data)
@@ -562,6 +578,13 @@ const UserList = ({ apiData }) => {
 
   const handleDDNSChangeTitle = (event, newValue) => {
     setSelectedTitle(newValue.name)
+  }
+
+  const resetPopupState = () => {
+    setResponse(null)
+    setIsError(false)
+    setPopupMessage('')
+    setLoading(false)
   }
 
   return (
@@ -718,7 +741,10 @@ const UserList = ({ apiData }) => {
                       passWord={passWord}
                       response={response}
                       loadingDungIp={loading}
-                      onClose={() => setOpenPopupResponseDungIP(false)}
+                      onClose={() => {
+                        setOpenPopupResponseDungIP(false)
+                        resetPopupState()
+                      }}
                     />{' '}
                   </>
                 )}
@@ -830,7 +856,10 @@ const UserList = ({ apiData }) => {
                       passWord={passWord}
                       response={response}
                       loadingDaiIP={loading}
-                      onClose={() => setOpenPopupResponse(false)}
+                      onClose={() => {
+                        setOpenPopupResponse(false)
+                        resetPopupState()
+                      }}
                     />{' '}
                   </>
                 )}
@@ -896,7 +925,10 @@ const UserList = ({ apiData }) => {
                       popupMessage={popupMessage}
                       response={response}
                       loadingOnvif={loading}
-                      onClose={() => setOpenPopupResponseHik(false)}
+                      onClose={() => {
+                        setOpenPopupResponseHik(false)
+                        resetPopupState()
+                      }}
                     />{' '}
                   </>
                 )}

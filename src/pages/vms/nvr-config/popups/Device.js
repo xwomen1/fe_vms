@@ -34,21 +34,24 @@ const Device = ({ onClose, nvr }) => {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [rows, setRows] = useState([])
-  const [channel, setChannel] = useState([])
   const [cameraGroup, setCameraGroup] = useState([])
   const [regions, setRegions] = useState([])
 
   const [cameras, setCamera] = useState(null)
+  const [selectedProtocol, setSelectedProtocol] = useState(null)
 
   const [cameraGroupSelect, setCameraGroupSelect] = useState({
     label: cameras?.cameraGroup?.name || '',
     value: cameras?.cameraGroup?.name || ''
   })
 
+  const [protocol, setProtocol] = useState()
+
   const [regionsSelect, setRegionsSelect] = useState({
     label: cameras?.regions?.name || '',
     value: cameras?.regions?.name || ''
   })
+
   const [isOfflineSetting, setisOfflineSetting] = useState(false)
   const [lat, setLat] = useState(null)
   const [lng, setLng] = useState(null)
@@ -70,6 +73,10 @@ const Device = ({ onClose, nvr }) => {
 
   const handleLongitudeChange = event => {
     setLng(event.target.value)
+  }
+
+  const handleProtocolChange = (event, newValue) => {
+    setSelectedProtocol(newValue)
   }
 
   const handleHttpChange = event => {
@@ -134,6 +141,9 @@ const Device = ({ onClose, nvr }) => {
           setUserName(response.data.username)
           setPassword(response.data.password)
           setIpAddress(response.data.ipAddress)
+          setSelectedProtocol({
+            name: response.data.protocol || ''
+          })
           setHttp(response.data.httpPort)
           setOnvif(response.data.onvif)
           console.log(nvr)
@@ -148,6 +158,8 @@ const Device = ({ onClose, nvr }) => {
 
     fetchGroupData()
   }, [nvr])
+
+  console.log(selectedProtocol, 'selectprotocol')
 
   const handleSaveClick = async () => {
     handleSave() // Gọi hàm handleSave truyền từ props
@@ -172,7 +184,7 @@ const Device = ({ onClose, nvr }) => {
         ipAddress: ipAddress,
         http: http,
         onvif: onvif,
-
+        protocol: selectedProtocol.name || '',
         isOfflineSetting: isOfflineSetting
       }
 
@@ -223,17 +235,6 @@ const Device = ({ onClose, nvr }) => {
   }
   const formatDDNS = ddns => <Checkbox checked={ddns} onChange={handleCheckboxChange} />
 
-  const channelOptions = [
-    { channel: 'ONVIF' },
-    { channel: 'IVI' },
-    { channel: 'HIKVISION' },
-    { channel: 'DAHUA' },
-    { channel: 'AXIS' },
-    { channel: 'BOSCH' },
-    { channel: 'HANWHA' },
-    { channel: 'PANASONIC' }
-  ]
-
   const fetchRegions = async () => {
     try {
       setLoading(true)
@@ -268,13 +269,36 @@ const Device = ({ onClose, nvr }) => {
     }
   }
 
-  const handleCameraGroupChange = (event, newValue) => {
-    setCameraGroupSelect(newValue)
-  }
-
   const handleRegionsChange = (event, newValue) => {
     setRegionsSelect(newValue)
   }
+
+  useEffect(() => {
+    const ApiProtocol = async () => {
+      try {
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          params: {
+            limit: '',
+            page: ''
+          }
+        }
+
+        const response = await axios.get(
+          'https://sbs.basesystem.one/ivis/vms/api/v0/cameras/options/protocol-types',
+          config
+        )
+        setProtocol(response.data)
+      } catch (error) {
+        console.error('Error fetching users:', error)
+      }
+    }
+    ApiProtocol()
+  }, [])
 
   return (
     <div style={{ width: '100%' }}>
@@ -326,8 +350,10 @@ const Device = ({ onClose, nvr }) => {
           </Grid>
           <Grid item xs={3.9}>
             <Autocomplete
-              options={channelOptions}
-              getOptionLabel={option => option.channel}
+              value={selectedProtocol}
+              onChange={handleProtocolChange}
+              options={protocol}
+              getOptionLabel={option => option.name}
               renderInput={params => <CustomTextField {...params} label='Giao thức' fullWidth />}
             />
           </Grid>
