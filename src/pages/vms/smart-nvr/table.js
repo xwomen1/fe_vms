@@ -439,6 +439,11 @@ const UserList = ({ apiData }) => {
         )}  */}
 
         {/* <Passwords open={openPopupP} onClose={handleClosePPopup} nvr={selectedIds} /> */}
+        {openPopupP && (
+          <>
+            <Edit open={openPopupP} onClose={handleClosePPopup} nvr={selectedNvrId} />
+          </>
+        )}
         <ConnectCamera
           open={openPopupConnectCamera}
           onClose={handleCloseConnectCameraPopup}

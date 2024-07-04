@@ -58,6 +58,7 @@ const Device = ({ onClose, nvr }) => {
   const [http, setHttp] = useState(null)
   const [onvif, setOnvif] = useState(null)
   const [appVersion, setAppVersion] = useState(null)
+  const [hardwareVersion, setHardWareVersion] = useState(null)
 
   const [viewport, setViewport] = React.useState({
     longitude: 105.83416,
@@ -83,6 +84,10 @@ const Device = ({ onClose, nvr }) => {
 
   const handleVersionChange = event => {
     setAppVersion(event.target.value)
+  }
+
+  const handleHardWareVersionChange = event => {
+    setHardWareVersion(event.target.value)
   }
 
   const handleMapClick = location => {
@@ -133,16 +138,16 @@ const Device = ({ onClose, nvr }) => {
             }
           }
 
-          const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/device/hik?idNVR=${nvr}`, config)
+          const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/device/search/${nvr}`, config)
           setCamera(response.data)
-          setCameraName(response.data.name)
-          setUserName(response.data.username)
-          setPassword(response.data.password)
+          setCameraName(response.data.nameDevice)
+          setUserName(response.data.mqttAccount.username)
+          setPassword(response.data.mqttAccount.password)
           setIpAddress(response.data.ipAddress)
           setHttp(response.data.httpPort)
-          setOnvif(response.data.onvif)
-          setAppVersion(response.data.version)
-
+          setOnvif(response.data.onvifPort)
+          setAppVersion(response.data.appVersion)
+          setHardWareVersion(response.data.hardwareVersion)
           console.log(nvr)
           setLat(response.data.lat)
           setLng(response.data.long)
@@ -173,13 +178,14 @@ const Device = ({ onClose, nvr }) => {
       }
 
       const data = {
-        name: cameraName,
+        nameDevice: cameraName,
         userName: userName,
         password: password,
         ipAddress: ipAddress,
-        http: http,
-        onvif: onvif,
-        version: appVersion,
+        httpPort: http,
+        onvifPort: onvif,
+        appVersion: appVersion,
+        hardwareVersion: hardwareVersion,
         isOfflineSetting: isOfflineSetting
       }
 
@@ -358,8 +364,8 @@ const Device = ({ onClose, nvr }) => {
             <CustomTextField
               label='Hardware Version'
               type='text'
-              value={appVersion}
-              onChange={handleVersionChange}
+              value={hardwareVersion}
+              onChange={handleHardWareVersionChange}
               fullWidth
             />
           </Grid>
