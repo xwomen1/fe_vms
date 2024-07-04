@@ -81,8 +81,6 @@ const Add = ({
         return
       }
 
-      const protocol = selectedTitle === 'Onvif' ? 'ONVIF' : selectedTitle === 'Hikvision' ? 'HIKVISION' : ''
-
       const config = {
         headers: {
           Authorization: `Bearer ${token}`
@@ -98,7 +96,11 @@ const Add = ({
           location: camera.location,
           name: camera.name,
           ipAddress: camera.url,
-          protocol: protocol,
+          type: {
+            id: '',
+            name: camera.type
+          },
+          protocol: selectedTitle,
           macAddress: camera.macAddress,
           passWord: passWord,
           userName: userName,
@@ -142,29 +144,10 @@ const Add = ({
       setLoading(false)
     }
   }
-
-  const resetState = () => {
-    setSelectedIds([])
-    setLoading(false)
-    setMessage({ text: '', type: 'general', error: false })
-  }
-
-  const handleClose = () => {
-    resetState()
-    onClose()
-  }
-  console.log(response)
-
-  useEffect(() => {
-    if (open) {
-      response == ''
-      resetState()
-      fetchGroupDataCamera()
-    }
-  }, [open])
+  console.log(response, 'responese')
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth='xl' style={{ maxWidth: '80%', margin: 'auto' }}>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth='xl' style={{ maxWidth: '80%', margin: 'auto' }}>
       <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Quét Camera - {selectedTitle}</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} alignItems='center'>
@@ -241,7 +224,7 @@ const Add = ({
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} variant='contained'>
+        <Button onClick={onClose} variant='contained'>
           Hủy
         </Button>
       </DialogActions>

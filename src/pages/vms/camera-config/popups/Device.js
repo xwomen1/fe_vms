@@ -56,16 +56,7 @@ const Device = ({ onClose, camera }) => {
   const [cameras, setCamera] = useState(null)
   const [selectedProtocol, setSelectedProtocol] = useState(null)
 
-  const [protocols, setProtocols] = useState([
-    { label: 'ONVIF', value: 'ONVIF', id: 'ONVIF', name: 'ONVIF' },
-    { label: 'IVI', value: 'IVI', id: 'IVI', name: 'IVI' },
-    { label: 'HIKVISION', value: 'HIKVISION', id: 'HIKVISION', name: 'HIKVISION' },
-    { label: 'DAHUA', label: 'DAHUA', id: 'DAHUA', name: 'DAHUA' },
-    { label: 'AXIS', value: 'AXIS', id: 'AXIS', name: 'AXIS' },
-    { label: 'BOSCH', value: 'BOSCH', id: 'BOSCH', name: 'BOSCH' },
-    { label: 'HANWHA', value: 'HANWHA', id: 'HANWHA', name: 'HANWHA' },
-    { label: 'PANASONIC', value: 'PANASONIC', id: 'PANASONIC', name: 'PANASONIC' }
-  ])
+  const [protocol, setProtocol] = useState()
   const defaultValue = cameras?.type?.name || ''
 
   const [cameraGroupSelect, setCameraGroupSelect] = useState({
@@ -208,8 +199,7 @@ const Device = ({ onClose, camera }) => {
             value: response.data.type.name || ''
           })
           setSelectedProtocol({
-            label: response.data.protocol.name || '',
-            value: response.data.protocol.name || ''
+            name: response.data.protocol || ''
           })
           setRegionsSelect({
             label: response.data.location || '',
@@ -224,6 +214,7 @@ const Device = ({ onClose, camera }) => {
 
     fetchGroupData()
   }, [camera])
+  console.log(selectedProtocol, 'selectprotocol')
   useEffect(() => {
     const fetchGroupData = async () => {
       try {
@@ -292,10 +283,7 @@ const Device = ({ onClose, camera }) => {
           id: cameraGroupSelect.id || cameras.type.id,
           name: cameraGroupSelect.name || cameras.type.name
         },
-        protocol: {
-          id: selectedProtocol.id || cameras.protocol.id,
-          name: selectedProtocol.name || cameras.protocol.name
-        },
+        protocol: selectedProtocol.name || '',
         location: regionsSelect.name
       }
 
@@ -340,7 +328,7 @@ const Device = ({ onClose, camera }) => {
   }
 
   const handleComboboxFocusRegions = () => {
-    if (regions.length === 0) {
+    if (regions?.length === 0) {
       fetchRegions()
     }
   }
@@ -384,7 +372,7 @@ const Device = ({ onClose, camera }) => {
       }))
       setCameraGroup(cameraGroup)
       console.log(cameraGroup)
-      if (cameraGroup.length > 0) {
+      if (cameraGroup?.length > 0) {
         setCameraGroupSelect(cameraGroup[0].value)
       }
     } catch (error) {
@@ -424,7 +412,7 @@ const Device = ({ onClose, camera }) => {
       }))
       setRegions(nicTypes)
       console.log(nicTypes)
-      if (nicTypes.length > 0) {
+      if (nicTypes?.length > 0) {
         setRegionsSelect(nicTypes[0].value)
       }
     } catch (error) {
@@ -441,6 +429,33 @@ const Device = ({ onClose, camera }) => {
   const handleRegionsChange = (event, newValue) => {
     setRegionsSelect(newValue)
   }
+
+  useEffect(() => {
+    const ApiProtocol = async () => {
+      try {
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          params: {
+            limit: '',
+            page: ''
+          }
+        }
+
+        const response = await axios.get(
+          'https://sbs.basesystem.one/ivis/vms/api/v0/cameras/options/protocol-types',
+          config
+        )
+        setProtocol(response.data)
+      } catch (error) {
+        console.error('Error fetching users:', error)
+      }
+    }
+    ApiProtocol()
+  }, [])
 
   return (
     <div style={{ width: '100%' }}>
@@ -503,8 +518,8 @@ const Device = ({ onClose, camera }) => {
             <Autocomplete
               value={selectedProtocol}
               onChange={handleProtocolChange}
-              options={protocols}
-              getOptionLabel={option => option.label}
+              options={protocol}
+              getOptionLabel={option => option.name}
               renderInput={params => <CustomTextField {...params} label='Giao thức' fullWidth />}
             />
           </Grid>
