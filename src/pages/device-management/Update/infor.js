@@ -178,7 +178,18 @@ const InforAll = ({ idInfor }) => {
       )
 
       setLoading(false)
-      Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
+      Swal.fire({
+        title: 'Thành công!',
+        text: 'Dữ liệu đã được cập nhật thành công.',
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       // Fetch regions and set Autocomplete value if doorName matches any region name
       await fetchRegions() // Ensure fetchRegions updates regions before proceeding
@@ -194,7 +205,18 @@ const InforAll = ({ idInfor }) => {
       console.error('Error updating user details:', error)
       setLoading(false)
 
-      Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi cập nhật dữ liệu.', 'error')
+      Swal.fire({
+        title: 'Error!',
+        text: error.response?.data?.message || error.message,
+        icon: 'error',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
     }
   }
 
