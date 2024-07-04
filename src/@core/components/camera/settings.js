@@ -30,6 +30,7 @@ import Icon from 'src/@core/components/icon'
 import { useSettings } from 'src/@core/hooks/useSettings'
 import select from 'src/@core/theme/overrides/select'
 import { shouldForwardProp } from '@mui/system'
+import { Button, Grid } from '@mui/material'
 
 const Toggler = styled(Box)(({ theme }) => ({
   right: 0,
@@ -95,6 +96,10 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
   const { settings, saveSettings } = useSettings()
   const [expanded, setExpanded] = useState(['0'])
   const [totalPage, setTotalPage] = useState(1)
+  const [totalPage1, setTotalPage1] = useState(1)
+  const [pageList, setPageList] = useState([])
+  const [page1, setPage1] = useState(0)
+  const [selectedButton, setSelectedButton] = useState(0)
   useEffect(() => {
     if (cameraList[selectIndex]?.cameras?.length > 0) {
       setTotalPage(
@@ -142,17 +147,37 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
       />
     )
   }
-  console.log(onSetPage, 'onSetPage')
 
   const handleNodeToggle = (event, nodeIds) => {
     onSetSelectIndex(nodeIds[0])
     setExpanded([nodeIds[0]])
-    onSetPage(1)
+
+    // onSetPage(1)
   }
 
+  // useEffect(() => {
+  //   onSetPage(1)
+  // }, [totalPage])
+
   useEffect(() => {
-    onSetPage(1)
+    const list = []
+    for (let i = 1; i < totalPage + 1; i++) {
+      list.push(i)
+    }
+    setTotalPage1(Math.ceil(list?.length / 9))
+    setPageList(list)
   }, [totalPage])
+
+  const onSetPage1 = newPage => {
+    setPage1(newPage)
+    setSelectedButton(0)
+  }
+
+  const handleButtonClick = (index, page) => {
+    onSetPage(page)
+    setSelectedButton(index)
+    console.log('index', index)
+  }
 
   return (
     <div className='customizer'>
@@ -258,12 +283,42 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
           <CustomizerSpacing>
             <Box sx={{ mb: 5 }}>
               <Typography>Trang </Typography>
+              <Grid container spacing={2} sx={{ marginTop: '5px' }}>
+                {page1 > 1
+                  ? pageList?.slice((page1 - 1) * 9, page1 * 9).map((page, index) => (
+                      <Grid item xs={4} key={index}>
+                        <Button
+                          variant='contained'
+                          onClick={() => handleButtonClick(index, page)}
+                          sx={{
+                            backgroundColor: selectedButton === index ? 'success.main' : 'primary.main'
+                          }}
+                        >
+                          {page}
+                        </Button>
+                      </Grid>
+                    ))
+                  : pageList?.slice(0, 9).map((page, index) => (
+                      <Grid item xs={4} key={index}>
+                        <Button
+                          variant='contained'
+                          onClick={() => handleButtonClick(index, page)}
+                          sx={{
+                            backgroundColor: selectedButton === index ? 'success.main' : 'primary.main'
+                          }}
+                        >
+                          {page}
+                        </Button>
+                      </Grid>
+                    ))}
+              </Grid>
+
               <Pagination
-                count={totalPage}
-                page={page}
-                onChange={(event, page) => onSetPage(page)}
+                count={totalPage1}
+                page={page1}
+                onChange={(event, page) => onSetPage1(page)}
                 color='primary'
-                sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}
+                sx={{ mt: 5, display: 'flex', justifyContent: 'center' }}
               />
             </Box>
           </CustomizerSpacing>

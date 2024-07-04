@@ -121,7 +121,10 @@ const AddCamera = ({ nvr, onClose }) => {
             id: id,
             name: name
           }
-        ]
+        ],
+        box: {
+          id: nvr
+        }
       }
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/camera/${nvr}`, params, config)
       setNotification({ message: 'Thêm thành công', type: 'success' })
@@ -144,9 +147,7 @@ const AddCamera = ({ nvr, onClose }) => {
                 <TableRow>
                   <TableCell sx={{ padding: '16px' }}>STT</TableCell>
                   <TableCell sx={{ padding: '16px' }}>Tên camera</TableCell>
-                  <TableCell sx={{ padding: '16px' }}>Loại</TableCell>
                   <TableCell sx={{ padding: '16px' }}>Địa chỉ IP</TableCell>
-                  <TableCell sx={{ padding: '16px' }}>Kết nối NVR/AI Box</TableCell>
                   <TableCell sx={{ padding: '16px' }}>Địa chỉ Mac</TableCell>
                   <TableCell sx={{ padding: '16px' }}>Vị trí</TableCell>
                   <TableCell sx={{ padding: '16px' }}>Trạng thái</TableCell>
@@ -159,9 +160,7 @@ const AddCamera = ({ nvr, onClose }) => {
                     <TableRow key={camera.id}>
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{camera.name}</TableCell>
-                      <TableCell></TableCell>
                       <TableCell>{camera.ipAddress}</TableCell>
-                      <TableCell></TableCell>
                       <TableCell></TableCell>
                       <TableCell>{camera.location}</TableCell>
                       <TableCell>{camera.status.name}</TableCell>
