@@ -75,7 +75,7 @@ const Caller = () => {
           }
         })
       }
-      console.log(listCamera)
+      console.log('listCamera', listCamera)
       setCameraGroup(listCamera)
     } catch (error) {
       console.error('Error fetching data: ', error)
