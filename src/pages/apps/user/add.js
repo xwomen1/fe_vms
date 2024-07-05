@@ -74,7 +74,7 @@ const Add = () => {
   const [filteredRegionOptions, setFilteredRegionOptions] = useState(user?.level)
   const [filteredContractOptions, setFilteredContractOptions] = useState(user?.contractType)
   const [gender, setGender] = useState('')
-  let groupACId
+  let groupACIds = []
   const [regionOptions, setRegionOptions] = useState([])
 
   const handleAddRow = () => {
@@ -325,8 +325,10 @@ const Add = () => {
         config
       )
 
-      if (groupACId) {
-        await addMemberToGroup(groupACId, response.data.userId)
+      if (groupACIds.length > 0) {
+        await addMemberToGroup(groupACIds, response.data.userId)
+      } else {
+        console.error('Không có groupACId nào trong mảng')
       }
 
       Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
@@ -357,7 +359,11 @@ const Add = () => {
         },
         config
       )
-      groupACId = response.data.groupACId
+      if (response.data && response.data.groupACId) {
+        groupACIds.push(response.data.groupACId)
+      } else {
+        throw new Error('Không lấy được groupACId từ API')
+      }
 
       return response.data.groupId
     } catch (error) {
@@ -377,7 +383,7 @@ const Add = () => {
 
       const response = await axios.post(
         `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-access`,
-        { userGroupIds: [groupId], userId: userId },
+        { userGroupIds: groupId, userId: userId },
         config
       )
 
