@@ -222,11 +222,10 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
     setLoading(true)
     try {
       const res = await axios.get(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/calendar/configuration/`,
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/calendar/configuration/find/${id}`,
         config
       )
-      const setData = res.data.rows.filter(x => x.id == id)
-      setDetail(setData[0])
+      setDetail(res?.data)
     } catch (error) {
       console.error('Error fetching data: ', error)
       toast.error(error)
@@ -249,14 +248,26 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
   }
 
   const fetchUserGroups = async () => {
+    let allUserGroups = []
+    let currentPage = 1
+    let totalPages = 1
+
     try {
-      const response = await axios.get('https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups', config)
-      setUserGroups(response.data.rows)
+      while (currentPage <= totalPages) {
+        const response = await axios.get(
+          `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups?page=${currentPage}&limit=50`,
+          config
+        )
+        const data = response.data
+        allUserGroups = [...allUserGroups, ...data.rows]
+        totalPages = data.totalPage
+        currentPage += 1
+      }
+      setUserGroups(allUserGroups)
     } catch (error) {
       console.error('Error fetching user groups: ', error)
     }
   }
-  console.log(detail?.id, 'detail')
 
   const ViewContent = () => {
     const transformCalendarDays = calendarDays => {
