@@ -98,8 +98,9 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
   const [totalPage, setTotalPage] = useState(1)
   const [totalPage1, setTotalPage1] = useState(1)
   const [pageList, setPageList] = useState([])
-  const [page1, setPage1] = useState(0)
+  const [page1, setPage1] = useState(1)
   const [selectedButton, setSelectedButton] = useState(0)
+
   useEffect(() => {
     if (cameraList[selectIndex]?.cameras?.length > 0) {
       setTotalPage(
@@ -151,13 +152,11 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
   const handleNodeToggle = (event, nodeIds) => {
     onSetSelectIndex(nodeIds[0])
     setExpanded([nodeIds[0]])
-
-    // onSetPage(1)
   }
 
-  // useEffect(() => {
-  //   onSetPage(1)
-  // }, [totalPage])
+  useEffect(() => {
+    handleButtonClick(0, 1)
+  }, [sizeScreen])
 
   useEffect(() => {
     const list = []
@@ -176,7 +175,6 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
   const handleButtonClick = (index, page) => {
     onSetPage(page)
     setSelectedButton(index)
-    console.log('index', index)
   }
 
   return (
@@ -257,21 +255,19 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
                       >
                         {group.cameras && group.cameras?.length > 0
                           ? group.cameras.map((camera, idx) => {
-                              // const matchedEvent = eventsData.find(event => event.id === camera.id)
-                              // const status = matchedEvent?.status
+                            // const matchedEvent = eventsData.find(event => event.id === camera.id)
+                            // const status = matchedEvent?.status
 
-                              return (
-                                <StyledTreeItem
-                                  disabled={true}
-                                  key={camera?.id}
-                                  nodeId={camera?.id}
-                                  labelText={camera?.deviceName}
-                                  labelIcon='tabler:camera'
-
-                                  // onClick={() => handleItemClick(camera.id, camera.deviceName)}
-                                />
-                              )
-                            })
+                            return (
+                              <StyledTreeItem
+                                disabled={true}
+                                key={camera?.id}
+                                nodeId={camera?.id}
+                                labelText={camera?.deviceName}
+                                labelIcon='tabler:camera'
+                              />
+                            )
+                          })
                           : null}
                       </StyledTreeItem>
                     )
@@ -286,31 +282,31 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
               <Grid container spacing={2} sx={{ marginTop: '5px' }}>
                 {page1 > 1
                   ? pageList?.slice((page1 - 1) * 9, page1 * 9).map((page, index) => (
-                      <Grid item xs={4} key={index}>
-                        <Button
-                          variant='contained'
-                          onClick={() => handleButtonClick(index, page)}
-                          sx={{
-                            backgroundColor: selectedButton === index ? 'success.main' : 'primary.main'
-                          }}
-                        >
-                          {page}
-                        </Button>
-                      </Grid>
-                    ))
+                    <Grid item xs={4} key={index}>
+                      <Button
+                        variant='contained'
+                        onClick={() => handleButtonClick(index, page)}
+                        sx={{
+                          backgroundColor: selectedButton === index ? 'success.main' : 'primary.main'
+                        }}
+                      >
+                        {page}
+                      </Button>
+                    </Grid>
+                  ))
                   : pageList?.slice(0, 9).map((page, index) => (
-                      <Grid item xs={4} key={index}>
-                        <Button
-                          variant='contained'
-                          onClick={() => handleButtonClick(index, page)}
-                          sx={{
-                            backgroundColor: selectedButton === index ? 'success.main' : 'primary.main'
-                          }}
-                        >
-                          {page}
-                        </Button>
-                      </Grid>
-                    ))}
+                    <Grid item xs={4} key={index}>
+                      <Button
+                        variant='contained'
+                        onClick={() => handleButtonClick(index, page)}
+                        sx={{
+                          backgroundColor: selectedButton === index ? 'success.main' : 'primary.main'
+                        }}
+                      >
+                        {page}
+                      </Button>
+                    </Grid>
+                  ))}
               </Grid>
 
               <Pagination
