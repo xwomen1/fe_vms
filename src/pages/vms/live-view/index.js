@@ -75,7 +75,6 @@ const Caller = () => {
           }
         })
       }
-      console.log('listCamera', listCamera)
       setCameraGroup(listCamera)
     } catch (error) {
       console.error('Error fetching data: ', error)
@@ -84,7 +83,7 @@ const Caller = () => {
 
   useEffect(() => {
     fetchCameraGroup()
-  }, [reload, page, selectIndex])
+  }, [reload, page, selectIndex, sizeScreen])
 
   const handSetChanel = (id, channel) => {
     let newCamera = cameraGroup.map(item => {
