@@ -1,6 +1,7 @@
 import { useState, forwardRef, useEffect } from 'react'
 import authConfig from 'src/configs/auth'
 import axios from 'axios'
+import PropTypes from 'prop-types'
 import { Controller, useForm } from 'react-hook-form'
 import {
   Box,
@@ -18,7 +19,6 @@ import {
   Typography,
   styled
 } from '@mui/material'
-import Swal from 'sweetalert2'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import Icon from 'src/@core/components/icon'
 import DatePicker from 'react-datepicker'
@@ -101,15 +101,14 @@ const defaultValues = {
   calendarDays: []
 }
 
-const Add = ({ show, onClose, id, setReload, filter }) => {
+const Add = ({ show, onClose, setReload }) => {
   const [loading, setLoading] = useState(false)
+  const [dataDaily, setDataDaily] = useState([])
   const [start, setStart] = useState(null)
   const [end, setEnd] = useState(null)
   const [doorList, setDoorList] = useState([])
   const [groupName, setGroupName] = useState([])
   const [errorMessages, setErrorMessages] = useState([])
-  const [dataDaily, setDataDaily] = useState([])
-  const [userGroupId, setUserGroupId] = useState(null)
   const [isCheckboxChecked, setIsCheckboxChecked] = useState(false)
   const [dataDailyState, setDataDailyState] = useState(dataDailyDefault)
   const [selectedGroupId, setSelectedGroupId] = useState('')
@@ -125,10 +124,6 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
   const {
     handleSubmit,
     control,
-    setError,
-    setValue,
-    reset,
-    clearErrors,
     formState: { errors }
   } = useForm({
     defaultValues
@@ -149,8 +144,6 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
 
   const API_REGIONS = `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/`
 
-  const API_POST_URL = `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups`
-
   const fetchDepartment = async () => {
     setLoading(true)
     try {
@@ -159,7 +152,7 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
 
       groupName.push(...res.data)
       setGroupName(group)
-      group.map((item, index) => {
+      group.map(item => {
         if (item.isParent == true) {
           fetchDepartmentChildren(item.id)
         }
@@ -198,17 +191,28 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
         type: 'USER'
       }
 
-      const response = await axios.post(API_POST_URL, postData)
+      const response = await axios.post(
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups`,
+        postData
+      )
 
       console.log('POST request successful:', response.data)
     } catch (error) {
       if (error.response && error.response.status === 400) {
-        const selectedGroup = groupName.find(group => group.id === selectedValue)
-
         try {
           const selectedGroup = groupName.find(group => group.id === selectedValue)
-          const res = await axios.get(API_POST_URL, config)
 
+          const params = {
+            params: {
+              keyword: selectedGroup.name
+            }
+          }
+
+          const res = await axios.get(
+            `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups/`,
+            params,
+            config
+          )
           const userGroups = res.data.rows
           const matchedGroup = userGroups.find(group => group.name === selectedGroup.name)
           if (matchedGroup) {
@@ -481,7 +485,7 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
                 <Controller
                   name='calendarDays'
                   control={control}
-                  render={({ field: { value, onChange } }) => (
+                  render={({ field: { onChange } }) => (
                     <Daily
                       callbackOfDaily={v => {
                         onChange(v)
@@ -524,6 +528,14 @@ const Add = ({ show, onClose, id, setReload, filter }) => {
       </form>
     </Card>
   )
+}
+
+Add.propTypes = {
+  show: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  id: PropTypes.string.isRequired,
+  setReload: PropTypes.func.isRequired,
+  filter: PropTypes.string
 }
 
 export default Add

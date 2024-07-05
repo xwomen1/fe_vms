@@ -210,11 +210,10 @@ const View = ({ show, onClose, id, setReload, filter }) => {
     setLoading(true)
     try {
       const res = await axios.get(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/calendar/configuration/`,
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/calendar/configuration/find/${id}`,
         config
       )
-      const setData = res.data.rows.filter(x => x.id == id)
-      setDetail(setData[0])
+      setDetail(res.data)
     } catch (error) {
       console.error('Error fetching data: ', error)
       toast.error(error)
