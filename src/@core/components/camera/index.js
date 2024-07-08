@@ -92,14 +92,24 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
       setRtcPeerConnection(null) // Clear rtcPeerConnection reference
     }
   }
+
   useEffect(() => {
     if (websocket && channel) {
+      // Close the existing WebSocket and RTCPeerConnection
       if (rtcPeerConnection) {
-        rtcPeerConnection.close()
-        setRtcPeerConnection(null) // Clear rtcPeerConnection reference
+        rtcPeerConnection.close();
+        setRtcPeerConnection(null);
       }
+      if (websocket) {
+        websocket.close();
+        setWebsocket(null);
+      }
+
+      // Create a new WebSocket and RTCPeerConnection
+      createWsConnection();
     }
-  }, [id, channel])
+  }, [id, channel]);
+
 
   useEffect(() => {
     connectWebSocket()
@@ -190,12 +200,12 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
     <div className='portlet portlet-video live' style={{ width: '100%' }}>
       <div className='portlet-title'>
         <div className='caption'>
-        <span className='label label-sm' 
-        style={{ backgroundColor: status === 'connected' ? 'green' : 'red', color: 'white' }}>
-          {status ? status.toUpperCase() : 'LIVE'}
-        </span>
-       
-        <span className='caption-subject font-dark sbold uppercase'>{name}</span>
+          <span className='label label-sm'
+            style={{ backgroundColor: status === 'connected' ? 'green' : 'red', color: 'white' }}>
+            {status ? status.toUpperCase() : 'LIVE'}
+          </span>
+
+          <span className='caption-subject font-dark sbold uppercase'>{name}</span>
         </div>
         <div className='media-top-controls'>
           <div className='btn-group'>
