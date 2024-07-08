@@ -51,6 +51,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
 
   const createWsConnection = () => {
     const ws = new WebSocket(`${SOCKET_LIVE_VIEW}/ivis/vms/api/v0/ws/signaling/${randomId(10)}`)
+
     // console.log('createWsConnection', ws)
     setWebsocket(ws)
     const pc = new RTCPeerConnection(config)
