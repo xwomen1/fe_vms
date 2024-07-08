@@ -82,6 +82,7 @@ const AddCamera = ({ nvr, onClose }) => {
     if (!token) {
       return
     }
+    setLoading(true)
 
     const config = {
       headers: {
@@ -95,9 +96,11 @@ const AddCamera = ({ nvr, onClose }) => {
         const updatedData = camera.filter(cam => cam.id !== idDelete)
         setCamera(updatedData)
         setNotification({ message: 'Xoá thành công', type: 'success' })
+        setLoading(false)
       })
       .catch(err => {
         setNotification({ message: `Xoá thất bại: ${err.message}`, type: 'error' })
+        setLoading(false)
       })
   }
 
