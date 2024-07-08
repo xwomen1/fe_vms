@@ -51,7 +51,8 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
 
   const createWsConnection = () => {
     const ws = new WebSocket(`${SOCKET_LIVE_VIEW}/ivis/vms/api/v0/ws/signaling/${randomId(10)}`)
-    console.log('createWsConnection', ws)
+
+    // console.log('createWsConnection', ws)
     setWebsocket(ws)
     const pc = new RTCPeerConnection(config)
     setRtcPeerConnection(pc)
@@ -70,7 +71,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
       }
     }
     pc.oniceconnectionstatechange = event => {
-      console.log('ICE connection state change:', pc.iceConnectionState)
+      // console.log('ICE connection state change:', pc.iceConnectionState)
       if (pc.iceConnectionState === 'closed' || pc.iceConnectionState === 'failed') {
         // Handle connection closed or failed
       }
@@ -92,14 +93,25 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
       setRtcPeerConnection(null) // Clear rtcPeerConnection reference
     }
   }
+
   useEffect(() => {
     if (websocket && channel) {
+      // Close the existing WebSocket and RTCPeerConnection
       if (rtcPeerConnection) {
-        rtcPeerConnection.close()
-        setRtcPeerConnection(null) // Clear rtcPeerConnection reference
+        rtcPeerConnection.close();
+        setRtcPeerConnection(null);
       }
+      if (websocket) {
+        websocket.close();
+        setWebsocket(null);
+      }
+
+      // Create a new WebSocket and RTCPeerConnection
+      createWsConnection();
     }
-  }, [id, channel])
+    console.log('remoteVideoRef', remoteVideoRef);
+  }, [id, channel]);
+
 
   useEffect(() => {
     connectWebSocket()
@@ -162,7 +174,8 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
         websocket.send(
           JSON.stringify({
             id: id,
-            type: 'request'
+            type: 'request',
+            channel: channel,
           })
         )
       })
@@ -180,7 +193,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
   useEffect(() => {
     if (rtcPeerConnection) {
       rtcPeerConnection.addEventListener('connectionstatechange', () => {
-        console.log('RTCPeerConnection state:', rtcPeerConnection.connectionState)
+        // console.log('RTCPeerConnection state:', rtcPeerConnection.connectionState)
         setStatus(rtcPeerConnection.connectionState)
       })
     }
@@ -190,12 +203,12 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
     <div className='portlet portlet-video live' style={{ width: '100%' }}>
       <div className='portlet-title'>
         <div className='caption'>
-        <span className='label label-sm' 
-        style={{ backgroundColor: status === 'connected' ? 'green' : 'red', color: 'white' }}>
-          {status ? status.toUpperCase() : 'LIVE'}
-        </span>
-       
-        <span className='caption-subject font-dark sbold uppercase'>{name}</span>
+          <span className='label label-sm'
+            style={{ backgroundColor: status === 'connected' ? 'green' : 'red', color: 'white' }}>
+            {status ? status.toUpperCase() : 'LIVE'}
+          </span>
+
+          <span className='caption-subject font-dark sbold uppercase'>{name}</span>
         </div>
         <div className='media-top-controls'>
           <div className='btn-group'>
