@@ -51,7 +51,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
 
   const createWsConnection = () => {
     const ws = new WebSocket(`${SOCKET_LIVE_VIEW}/ivis/vms/api/v0/ws/signaling/${randomId(10)}`)
-    console.log('createWsConnection', ws)
+    // console.log('createWsConnection', ws)
     setWebsocket(ws)
     const pc = new RTCPeerConnection(config)
     setRtcPeerConnection(pc)
@@ -70,7 +70,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
       }
     }
     pc.oniceconnectionstatechange = event => {
-      console.log('ICE connection state change:', pc.iceConnectionState)
+      // console.log('ICE connection state change:', pc.iceConnectionState)
       if (pc.iceConnectionState === 'closed' || pc.iceConnectionState === 'failed') {
         // Handle connection closed or failed
       }
@@ -108,6 +108,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
       // Create a new WebSocket and RTCPeerConnection
       createWsConnection();
     }
+    console.log('remoteVideoRef', remoteVideoRef);
   }, [id, channel]);
 
 
@@ -172,7 +173,8 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
         websocket.send(
           JSON.stringify({
             id: id,
-            type: 'request'
+            type: 'request',
+            channel: channel,
           })
         )
       })
@@ -190,7 +192,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
   useEffect(() => {
     if (rtcPeerConnection) {
       rtcPeerConnection.addEventListener('connectionstatechange', () => {
-        console.log('RTCPeerConnection state:', rtcPeerConnection.connectionState)
+        // console.log('RTCPeerConnection state:', rtcPeerConnection.connectionState)
         setStatus(rtcPeerConnection.connectionState)
       })
     }

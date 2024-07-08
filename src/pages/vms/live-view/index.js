@@ -96,7 +96,6 @@ const Caller = () => {
 
       return item
     })
-    console.log('newCamera', newCamera);
     setCameraGroup(newCamera)
   }
 
