@@ -93,7 +93,7 @@ const UserDetails = () => {
   const [ava1, setAva1] = useState(null)
   const [ava2, setAva2] = useState(null)
   const [data, setData] = useState(null)
-  let groupACId
+  let groupACIds = []
 
   const handleAddRoleClickPolicy = () => {
     setOpenPopupPolicy(true)
@@ -309,7 +309,7 @@ const UserDetails = () => {
 
       const response = await axios.post(
         `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-access`,
-        { userGroupIds: [groupId], userId: userId },
+        { userGroupIds: groupId, userId: userId },
         config
       )
 
@@ -389,7 +389,7 @@ const UserDetails = () => {
         // Perform any further actions here, such as fetching data based on selected region ID
       }
 
-      await axios.put(
+      const response = await axios.put(
         `https://dev-ivi.basesystem.one/smc/iam/api/v0/users`,
         {
           ...params,
@@ -415,8 +415,12 @@ const UserDetails = () => {
         },
         config
       )
-      console.log(groupACId, 'grgoupAC')
-      await addMemberToGroup(groupACId, userId)
+      if (groupACIds.length > 0) {
+        await addMemberToGroup(groupACIds, userId)
+      } else {
+        console.error('Không có groupACId nào trong mảng')
+      }
+
       Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
     } catch (error) {
       console.error('Error updating user details:', error)
@@ -664,14 +668,18 @@ const UserDetails = () => {
         },
         config
       )
-      console.log(response.data.groupACId, 'groupAC')
-      groupACId = response.data.groupACId
+      if (response.data && response.data.groupACId) {
+        groupACIds.push(response.data.groupACId)
+      } else {
+        throw new Error('Không lấy được groupACId từ API')
+      }
 
       return response.data.groupId
     } catch (error) {
       throw error
     }
   }
+  console.log(groupACIds, 'groupACs')
 
   const userGroups = async rows => {
     try {
@@ -1073,7 +1081,7 @@ const UserDetails = () => {
                               <DatePicker
                                 selected={availableAt}
                                 onChange={handleStartDateChange}
-                                dateFormat='MM/dd/yyyy'
+                                dateFormat='dd/MM/yyyy'
                                 customInput={<CustomInput label='Ngày bắt đầu' />}
                               />
                             </div>
@@ -1087,7 +1095,7 @@ const UserDetails = () => {
                               <DatePicker
                                 selected={expiredAt}
                                 onChange={handleEndDateChange}
-                                dateFormat='MM/dd/yyyy'
+                                dateFormat='dd/MM/yyyy'
                                 customInput={<CustomInput label='Ngày kết thúc' />}
                               />
                             </div>
