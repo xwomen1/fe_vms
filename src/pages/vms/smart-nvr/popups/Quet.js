@@ -82,6 +82,7 @@ const AddCamera = ({ nvr, onClose }) => {
     if (!token) {
       return
     }
+    setLoading(true)
 
     const config = {
       headers: {
@@ -92,11 +93,15 @@ const AddCamera = ({ nvr, onClose }) => {
     axios
       .delete(urlDelete, config)
       .then(() => {
-        const updatedData = userData.filter(user => user.userId !== idDelete)
-        setUserData(updatedData)
-        fetchData()
+        const updatedData = camera.filter(cam => cam.id !== idDelete)
+        setCamera(updatedData)
+        setNotification({ message: 'Xoá thành công', type: 'success' })
+        setLoading(false)
       })
-      .catch(err => {})
+      .catch(err => {
+        setNotification({ message: `Xoá thất bại: ${err.message}`, type: 'error' })
+        setLoading(false)
+      })
   }
 
   const handleUpdate = async (id, name) => {
@@ -176,14 +181,15 @@ const AddCamera = ({ nvr, onClose }) => {
                 )}
               </TableBody>
             </Table>
-            {notification.message && (
-              <div style={{ color: notification.type === 'success' ? '#ff9f43' : 'red', textAlign: 'center' }}>
-                {notification.message}
-              </div>
-            )}
           </Grid>
         </Card>
       </Grid>
+
+      {notification.message && (
+        <Box mt={2} textAlign='center' style={{ color: notification.type === 'success' ? '#ff9f43' : 'red' }}>
+          {notification.message}
+        </Box>
+      )}
     </div>
   )
 }
