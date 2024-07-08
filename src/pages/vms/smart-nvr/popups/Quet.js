@@ -22,6 +22,7 @@ import Swal from 'sweetalert2'
 import { useRouter } from 'next/router'
 import CircularProgress from '@mui/material/CircularProgress'
 import axios from 'axios'
+import toast from 'react-hot-toast'
 
 const AddCamera = ({ nvr, onClose }) => {
   const classes = useStyles()
@@ -46,7 +47,7 @@ const AddCamera = ({ nvr, onClose }) => {
         }
 
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/vms/api/v0/cameras?sort=%2Bcreated_at&page=1',
+          `https://sbs.basesystem.one/ivis/vms/api/v0/device/${nvr}/cameras?sort=-created_at`,
           config
         )
         setCamera(response.data)
@@ -76,31 +77,26 @@ const AddCamera = ({ nvr, onClose }) => {
     fetchGroupDataNVR()
   }, [nvr, notification])
 
-  const handleDelete = async id => {
-    setLoading(true)
-    try {
-      const token = localStorage.getItem(authConfig.storageTokenKeyName)
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-
-      const nvrResponse = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${nvr}`, config)
-      const nvrCameras = nvrResponse.data.cameras
-
-      const updatedCameras = nvrCameras.filter(camera => camera.id !== id)
-
-      await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${nvr}`, { cameras: updatedCameras }, config)
-
-      setNotification({ message: 'Xóa camera thành công', type: 'success' })
-    } catch (error) {
-      setNotification({ message: `Đã xảy ra lỗi: ${error.message}`, type: 'error' })
-      console.error('Error deleting camera:', error)
-    } finally {
-      setLoading(false)
+  const handleDelete = idDelete => {
+    const token = localStorage.getItem(authConfig.storageTokenKeyName)
+    if (!token) {
+      return
     }
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+    let urlDelete = `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${idDelete}`
+    axios
+      .delete(urlDelete, config)
+      .then(() => {
+        const updatedData = userData.filter(user => user.userId !== idDelete)
+        setUserData(updatedData)
+        fetchData()
+      })
+      .catch(err => {})
   }
 
   const handleUpdate = async (id, name) => {
@@ -165,23 +161,9 @@ const AddCamera = ({ nvr, onClose }) => {
                       <TableCell>{camera.location}</TableCell>
                       <TableCell>{camera.status.name}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>
-                        <Grid container spacing={2}>
-                          {Array.isArray(nvrCameraList) && nvrCameraList.length > 0 ? (
-                            nvrCameraList.some(nvrCamera => nvrCamera.id === camera.id) ? (
-                              <IconButton disabled={loading} onClick={() => handleDelete(camera.id)}>
-                                <Icon icon='tabler:minus' />
-                              </IconButton>
-                            ) : (
-                              <IconButton disabled={loading} onClick={() => handleUpdate(camera.id, camera.name)}>
-                                <Icon icon='tabler:plus' />
-                              </IconButton>
-                            )
-                          ) : (
-                            <IconButton disabled={loading} onClick={() => handleUpdate(camera.id, camera.name)}>
-                              <Icon icon='tabler:plus' />
-                            </IconButton>
-                          )}
-                        </Grid>
+                        <IconButton disabled={loading} onClick={() => handleDelete(camera.id)}>
+                          <Icon icon='tabler:trash' />
+                        </IconButton>
                       </TableCell>
                     </TableRow>
                   ))

@@ -1081,7 +1081,7 @@ const UserDetails = () => {
                               <DatePicker
                                 selected={availableAt}
                                 onChange={handleStartDateChange}
-                                dateFormat='MM/dd/yyyy'
+                                dateFormat='dd/MM/yyyy'
                                 customInput={<CustomInput label='Ngày bắt đầu' />}
                               />
                             </div>
@@ -1095,7 +1095,7 @@ const UserDetails = () => {
                               <DatePicker
                                 selected={expiredAt}
                                 onChange={handleEndDateChange}
-                                dateFormat='MM/dd/yyyy'
+                                dateFormat='dd/MM/yyyy'
                                 customInput={<CustomInput label='Ngày kết thúc' />}
                               />
                             </div>
