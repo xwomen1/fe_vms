@@ -93,6 +93,7 @@ const UserDetails = () => {
   const [ava1, setAva1] = useState(null)
   const [ava2, setAva2] = useState(null)
   const [data, setData] = useState(null)
+  let groupACIds = []
 
   const handleAddRoleClickPolicy = () => {
     setOpenPopupPolicy(true)
@@ -296,35 +297,6 @@ const UserDetails = () => {
   }
   console.log(groups)
 
-  const searchGroupIdAccess = async (groupName, groupCode) => {
-    try {
-      const token = localStorage.getItem(authConfig.storageTokenKeyName)
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-
-      const response = await axios.get(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups?keyword=${groupName}`,
-        config
-      )
-
-      if (response?.data?.rows[0]?.id) {
-        console.log(response.data.rows[0].id, 'groupid')
-
-        return response.data.rows[0].id
-      } else {
-        const newGroupId = await createNewGroupAccess(groupName, groupCode)
-
-        return newGroupId
-      }
-    } catch (error) {
-      throw error
-    }
-  }
-
   const addMemberToGroup = async (groupId, userId) => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -336,41 +308,14 @@ const UserDetails = () => {
       }
 
       const response = await axios.post(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups/${groupId}/add-member`,
-        { userIds: [userId] },
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-access`,
+        { userGroupIds: groupId, userId: userId },
         config
       )
 
       return response.data
     } catch (error) {
       console.error('Error adding member to group:', error)
-      throw error
-    }
-  }
-
-  const createNewGroupAccess = async (groupName, groupCode) => {
-    try {
-      const token = localStorage.getItem(authConfig.storageTokenKeyName)
-      const groupId = await searchGroupId(groupName, groupCode)
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-
-      const response = await axios.post(
-        'https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups',
-        {
-          name: groupName,
-          type: 'USER',
-          id: groupId
-        },
-        config
-      )
-
-      return response.data.id
-    } catch (error) {
       throw error
     }
   }
@@ -443,9 +388,8 @@ const UserDetails = () => {
 
         // Perform any further actions here, such as fetching data based on selected region ID
       }
-      const selectedRegionId = selectedRegion.value
 
-      await axios.put(
+      const response = await axios.put(
         `https://dev-ivi.basesystem.one/smc/iam/api/v0/users`,
         {
           ...params,
@@ -471,14 +415,12 @@ const UserDetails = () => {
         },
         config
       )
-      for (const row of groups) {
-        console.log(row.groupName, 'rows')
-        const groupId = await searchGroupIdAccess(row.groupName)
-        console.log(groupId, 'gourpID fetch')
-        if (groupId) {
-          await addMemberToGroup(groupId, userId)
-        }
+      if (groupACIds.length > 0) {
+        await addMemberToGroup(groupACIds, userId)
+      } else {
+        console.error('Không có groupACId nào trong mảng')
       }
+
       Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
     } catch (error) {
       console.error('Error updating user details:', error)
@@ -707,34 +649,6 @@ const UserDetails = () => {
     fetchGroupData()
   }, [])
 
-  const searchGroupId = async (groupName, groupCode) => {
-    try {
-      const token = localStorage.getItem(authConfig.storageTokenKeyName)
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-
-      const response = await axios.get(
-        `https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search?keyword=${groupName}`,
-        config
-      )
-
-      if (response.data.length > 0) {
-        return response.data[0].groupId // Trả về groupId nếu tìm thấy
-      } else {
-        // Nếu không tìm thấy, tạo nhóm mới và trả về groupId của nhóm mới đó
-        const newGroupId = await createNewGroup(groupName, groupCode)
-
-        return newGroupId
-      }
-    } catch (error) {
-      throw error
-    }
-  }
-
   const createNewGroup = async (groupName, groupCode) => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -754,18 +668,24 @@ const UserDetails = () => {
         },
         config
       )
+      if (response.data && response.data.groupACId) {
+        groupACIds.push(response.data.groupACId)
+      } else {
+        throw new Error('Không lấy được groupACId từ API')
+      }
 
       return response.data.groupId
     } catch (error) {
       throw error
     }
   }
+  console.log(groupACIds, 'groupACs')
 
   const userGroups = async rows => {
     try {
       const processedGroups = []
       for (const row of rows) {
-        const groupId = await searchGroupId(row.groupName, row.groupCode)
+        const groupId = await createNewGroup(row.groupName, row.groupCode)
 
         const userGroup = {
           groupId: groupId,
@@ -789,7 +709,6 @@ const UserDetails = () => {
   const filteredPolicyOptions = policyOption.filter(
     option => !policies || !policies.some(policies => policies.policyName === option.policyName)
   )
-  console.log(policyOption)
   useEffect(() => {
     if (timeValidity === 'Undefined') {
       setAvailableAt(null)

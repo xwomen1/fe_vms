@@ -47,13 +47,8 @@ const defaultValues = {
 }
 
 const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
-  const [loading, setLoading] = useState(false)
-  const API_ENDPOINT = 'https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups'
-  const API_POST_URL = `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups`
-  const ExpandIcon = direction === 'rtl' ? 'tabler:chevron-left' : 'tabler:chevron-right'
   const [doorList, setDoorList] = useState([])
   const [selectedGroupId, setSelectedGroupId] = useState('')
-  const [selectedGroupName, setSelectedGroupName] = useState('')
   const [groupName, setGroupName] = useState([])
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -84,38 +79,25 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
     }
   }
 
-  const fetchDepartment = async () => {
-    setLoading(true)
+  const fetchUserGroups = async () => {
+    let allUserGroups = []
+    let currentPage = 1
+    let totalPages = 1
+
     try {
-      const res = await axios.get(API_ENDPOINT)
-      const group = res.data.rows
-      setGroupName(group)
-
-      // Loop through each group and fetch its children if it's a parent
-
-      group.forEach(item => {
-        if (item.type === 'USER') {
-          fetchDepartmentChildren(item.id)
-        }
-      })
+      while (currentPage <= totalPages) {
+        const response = await axios.get(
+          `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups?page=${currentPage}&limit=50`,
+          config
+        )
+        const data = response.data
+        allUserGroups = [...allUserGroups, ...data.rows]
+        totalPages = data.totalPage
+        currentPage += 1
+      }
+      setGroupName(allUserGroups)
     } catch (error) {
-      console.error('Error fetching data: ', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const fetchDepartmentChildren = async idParent => {
-    try {
-      const res = await axios.get(API_ENDPOINT, {
-        params: {
-          parentId: idParent
-        }
-      })
-      const groupChildren = res.data.rows
-      setGroupName(prevState => [...prevState, ...groupChildren])
-    } catch (error) {
-      console.error('Error fetching data: ', error)
+      console.error('Error fetching user groups: ', error)
     }
   }
 
@@ -125,7 +107,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
 
   useEffect(() => {
     fetchDoorList()
-    fetchDepartment()
+    fetchUserGroups()
   }, [])
 
   const onReset = values => {
@@ -187,53 +169,47 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                   name='groupId'
                   control={control}
                   render={({ field: { value, onChange } }) => (
-                    console.log(value),
-                    (
-                      <Box position='relative'>
-                        <CustomTextField
-                          select
-                          fullWidth
-                          defaultValue=''
-                          label='Công ty'
-                          SelectProps={{
-                            value: value,
-                            onChange: e => {
-                              onChange(e)
-                              setSelectedGroupId(e.target.value)
-                            },
-                            MenuProps: {
-                              PaperProps: {
-                                style: {
-                                  maxHeight: 200 // Đặt chiều cao tối đa của menu
-                                }
+                    <Box position='relative'>
+                      <CustomTextField
+                        select
+                        fullWidth
+                        label='Công ty'
+                        SelectProps={{
+                          value: value || '',
+                          onChange: e => onChange(e.target.value),
+                          MenuProps: {
+                            PaperProps: {
+                              style: {
+                                maxHeight: 200 // Đặt chiều cao tối đa của menu
                               }
                             }
-                          }}
-                          id='validation-basic-select'
-                          error={Boolean(errors.groupId)}
-                          aria-describedby='validation-basic-select'
-                          {...(errors.groupId && { helperText: 'This field is required' })}
+                          }
+                        }}
+                        id='validation-basic-select'
+                        error={Boolean(errors.groupId)}
+                        aria-describedby='validation-basic-select'
+                        helperText={errors.groupId ? 'This field is required' : ''}
+                      >
+                        {groupName.map(item => (
+                          <MenuItem key={item.id} value={item.id}>
+                            {item.name}
+                          </MenuItem>
+                        ))}
+                      </CustomTextField>
+                      {value && (
+                        <IconButton
+                          size='small'
+                          style={{ position: 'absolute', right: 25, top: 25 }}
+                          onClick={() => handleClear(onChange, 'groupId')}
                         >
-                          {groupName.map(item => (
-                            <MenuItem key={item.id} value={item.id}>
-                              {item.name}
-                            </MenuItem>
-                          ))}
-                        </CustomTextField>
-                        {value && (
-                          <IconButton
-                            size='small'
-                            style={{ position: 'absolute', right: 25, top: 25 }}
-                            onClick={() => handleClear(onChange, 'groupId')}
-                          >
-                            <Icon icon='tabler:x' fontSize='1rem' />
-                          </IconButton>
-                        )}
-                      </Box>
-                    )
+                          <Icon icon='tabler:x' fontSize='1rem' />
+                        </IconButton>
+                      )}
+                    </Box>
                   )}
                 />
               </Grid>
+
               <Grid item xs={12} sm={4}>
                 <Controller
                   name='doorInId'

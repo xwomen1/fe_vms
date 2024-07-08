@@ -47,6 +47,7 @@ const AccessRight = () => {
   const [isOpenUpdate, setIsOpenUpdate] = useState(false)
   const [dataList, setDataList] = useState([])
   const [dataList1, setDataList1] = useState([])
+  const [page1, setPage1] = useState(1)
   const [errorMessage, setErrorMessage] = useState('')
   const [idDelete, setIdDelete] = useState(null)
   const [scheduleId, setScheduleId] = useState(null)
@@ -260,6 +261,10 @@ const AccessRight = () => {
     setRows(modifiedData)
   }
 
+  useEffect(() => {
+    fetchDataList1(page1, pageSize)
+  }, [page1, pageSize])
+
   const fetchDataList1 = async () => {
     setLoading(true)
     setErrorMessage('')
@@ -270,8 +275,8 @@ const AccessRight = () => {
         },
         params: {
           nameCalendar: value,
-          page: valueFilter?.page,
-          limit: valueFilter.limit,
+          page: page1,
+          limit: pageSize,
           doorInId: valueFilter.doorInId || '',
           doorOutId: valueFilter.doorOutId || '',
           groupId: valueFilter.groupId || ''
@@ -292,6 +297,16 @@ const AccessRight = () => {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleSelectPageSize1 = size => {
+    setPageSize(size)
+    setPage1(1)
+    handleCloseMenu()
+  }
+
+  const handlePageChange1 = (event, newPage) => {
+    setPage1(newPage)
   }
 
   useEffect(() => {
@@ -455,6 +470,7 @@ const AccessRight = () => {
         })
     }
   }
+  console.log(page1)
 
   return (
     <>
@@ -755,7 +771,7 @@ const AccessRight = () => {
                     </Button>
                     <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
                       {pageSizeOptions.map(size => (
-                        <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
+                        <MenuItem key={size} onClick={() => handleSelectPageSize1(size)}>
                           {size}
                         </MenuItem>
                       ))}
@@ -763,7 +779,7 @@ const AccessRight = () => {
                   </Box>
                 </Grid>
                 <Grid item xs={6}>
-                  <Pagination count={total} color='primary' onChange={(event, page) => handlePageChange(page)} />
+                  <Pagination count={total} color='primary' page={page1} onChange={handlePageChange1} />
                 </Grid>
               </Grid>
             </TabPanel>

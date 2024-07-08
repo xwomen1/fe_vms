@@ -154,22 +154,7 @@ const HorizontalLayout = props => {
               }}
             >
               <Box sx={{ pl: 4, display: 'flex' }}>
-                <Box sx={{ mr: 2 }}>
-                  <IconButton
-                    disableRipple
-                    disableFocusRipple
-                    onClick={() => {
-                      saveSettings({
-                        ...settings,
-                        layout: 'vertical',
-                        lastLayout: 'vertical'
-                      })
-                    }}
-                    sx={{ p: 0, color: 'text.secondary', backgroundColor: 'transparent !important' }}
-                  >
-                    <Icon icon='tabler:menu-2' fontSize='1.25rem' />
-                  </IconButton>
-                </Box>
+                <Box sx={{ mr: 2 }}></Box>
                 <UserDropdown settings={settings} />
 
                 <LinkStyled href='/'>

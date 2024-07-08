@@ -74,7 +74,7 @@ const Add = () => {
   const [filteredRegionOptions, setFilteredRegionOptions] = useState(user?.level)
   const [filteredContractOptions, setFilteredContractOptions] = useState(user?.contractType)
   const [gender, setGender] = useState('')
-  let groupACId
+  let groupACIds = []
   const [regionOptions, setRegionOptions] = useState([])
 
   const handleAddRow = () => {
@@ -325,8 +325,10 @@ const Add = () => {
         config
       )
 
-      if (groupACId) {
-        await addMemberToGroup(groupACId, response.data.userId)
+      if (groupACIds.length > 0) {
+        await addMemberToGroup(groupACIds, response.data.userId)
+      } else {
+        console.error('Không có groupACId nào trong mảng')
       }
 
       Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
@@ -357,7 +359,11 @@ const Add = () => {
         },
         config
       )
-      groupACId = response.data.groupACId
+      if (response.data && response.data.groupACId) {
+        groupACIds.push(response.data.groupACId)
+      } else {
+        throw new Error('Không lấy được groupACId từ API')
+      }
 
       return response.data.groupId
     } catch (error) {
@@ -377,7 +383,7 @@ const Add = () => {
 
       const response = await axios.post(
         `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-access`,
-        { userGroupIds: [groupId], userId: userId },
+        { userGroupIds: groupId, userId: userId },
         config
       )
 
@@ -588,177 +594,12 @@ const Add = () => {
             <Grid item xs={4}>
               <TextField label='Số giấy tờ' onChange={handleIdentityNumberChange} fullWidth />
             </Grid>
-            <Grid item xs={3.8}>
-              <TextField label='Mã người dùng' onChange={handleUserCodeChange} fullWidth />
-            </Grid>
-            <Grid item xs={4}>
-              <TextField label='Mã đồng bộ' onChange={handleSyncCodeChange} fullWidth />
-            </Grid>
-            <Grid item xs={4}>
-              <FormControl fullWidth>
-                <InputLabel id='region-label'>Cấp bậc</InputLabel>
-                <Select
-                  labelId='region-label'
-                  id='region-select'
-                  value={selectedRegion ? selectedRegion.id : ''}
-                  onChange={e => handleRegionChange(regionOptions.find(opt => opt.id === e.target.value))}
-                >
-                  {regionOptions.map(option => (
-                    <MenuItem key={option.id} value={option.id}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={3.8}>
-              <FormControl fullWidth>
-                <InputLabel id='region-label'>Loại hợp đồng</InputLabel>
-                <Select
-                  labelId='region-label'
-                  id='region-select'
-                  value={selectContract ? selectContract.id : ''}
-                  onChange={e => handleContractChange(contractOptions.find(opt => opt.id === e.target.value))}
-                >
-                  {contractOptions.map(option => (
-                    <MenuItem key={option.id} value={option.id}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>{' '}
-            </Grid>
+
             <Grid item xs={2} style={{ marginTop: '1.1%' }}>
               Trạng thái
               <Switch checked={status1 === 'ACTIVE'} onChange={handleStatusChange} color='primary' label='Trạng thái' />
             </Grid>
-            <Grid item xs={1} style={{ marginTop: '2%' }}>
-              Ca sáng:
-            </Grid>
 
-            <Grid item xs={1}>
-              <DatePickerWrapper>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
-                  <div>
-                    <DatePicker
-                      showTimeSelect
-                      selected={dateTime}
-                      timeIntervals={15}
-                      showTimeSelectOnly
-                      dateFormat='h:mm '
-                      id='time-only-picker'
-                      onChange={date => handleTimeChange(date)}
-                      customInput={<CustomInput />}
-                    />
-                  </div>
-                </Box>
-              </DatePickerWrapper>
-            </Grid>
-            <Grid item xs={1}>
-              <DatePickerWrapper>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
-                  <div>
-                    <DatePicker
-                      showTimeSelect
-                      selected={timeEndMorning}
-                      timeIntervals={15}
-                      showTimeSelectOnly
-                      dateFormat='h:mm '
-                      id='time-only-picker'
-                      onChange={date => handleTimeEndMorningChange(date)}
-                      customInput={<CustomInput />}
-                    />
-                  </div>
-                </Box>
-              </DatePickerWrapper>
-            </Grid>
-            <Grid item xs={1} style={{ marginTop: '2%' }}>
-              Ca chiều:
-            </Grid>
-            <Grid item xs={1}>
-              <DatePickerWrapper>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
-                  <div>
-                    <DatePicker
-                      showTimeSelect
-                      selected={timeStartAfternoon}
-                      timeIntervals={15}
-                      showTimeSelectOnly
-                      dateFormat='h:mm '
-                      id='time-only-picker'
-                      onChange={date => handleTimeStartAfetrnoonChange(date)}
-                      customInput={<CustomInput />}
-                    />
-                  </div>
-                </Box>
-              </DatePickerWrapper>
-            </Grid>
-            <Grid item xs={1}>
-              <DatePickerWrapper>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
-                  <div>
-                    <DatePicker
-                      showTimeSelect
-                      selected={timeEndAfternoon}
-                      timeIntervals={15}
-                      showTimeSelectOnly
-                      dateFormat='h:mm '
-                      id='time-only-picker'
-                      onChange={date => handleTimeEndAfternoonChange(date)}
-                      customInput={<CustomInput />}
-                    />
-                  </div>
-                </Box>
-              </DatePickerWrapper>
-            </Grid>
-            <Grid item xs={3.8}>
-              <FormControl fullWidth>
-                <InputLabel id='time-validity-label'>Thời gian hiệu lực</InputLabel>
-                <Select
-                  labelId='time-validity-label'
-                  id='time-validity-select'
-                  value={timeValidity}
-                  onChange={handleTimeValidityChange}
-                >
-                  <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
-                  <MenuItem value='Undefined'>Không xác định</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={8}>
-              {timeValidity === 'Custom' && (
-                <Grid container spacing={2}>
-                  <Grid item xs={4}>
-                    <DatePickerWrapper>
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
-                        <div>
-                          <DatePicker
-                            selected={availableAt}
-                            onChange={handleStartDateChange}
-                            dateFormat='MM/dd/yyyy'
-                            customInput={<CustomInput label='Ngày bắt đầu' />}
-                          />
-                        </div>
-                      </Box>
-                    </DatePickerWrapper>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <DatePickerWrapper>
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
-                        <div>
-                          <DatePicker
-                            selected={expiredAt}
-                            onChange={handleEndDateChange}
-                            dateFormat='MM/dd/yyyy'
-                            customInput={<CustomInput label='Ngày kết thúc' />}
-                          />
-                        </div>
-                      </Box>
-                    </DatePickerWrapper>
-                  </Grid>
-                </Grid>
-              )}
-            </Grid>
             <Grid item xs={11.8}>
               <TextField rows={4} multiline label='Ghi chú' onChange={handleNoteChange} fullWidth />
             </Grid>
