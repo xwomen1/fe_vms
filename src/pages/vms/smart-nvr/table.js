@@ -262,11 +262,7 @@ const UserList = ({ apiData }) => {
             keyword: value
           }
         }
-
-        const response = await axios.get(
-          'https://dev-ivi.basesystem.one/smc/access-control/api/v0/calendar/configuration/find/863ca505-9cd1-485a-b20d-86c627a7f2e6',
-          config
-        )
+        const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/device', config)
         if (response.data && Array.isArray(response.data) && response.data.length > 0) {
           setStatus1(response.data.isOfflineSetting || false)
           setNvr(response.data[0].id)
@@ -281,7 +277,7 @@ const UserList = ({ apiData }) => {
           console.warn('Response data is empty or invalid')
         }
       } catch (error) {
-        console.error('Error fetching nvr:', error)
+        console.error('Error fetching users:', error)
       }
     }
     fetchFilteredOrAllUsers()
@@ -374,8 +370,22 @@ const UserList = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{assetType?.ipAddress}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType?.macAddress}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType?.location}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>
-                        {assetType.status?.name ? assetType.status.name : statusText}
+                      <TableCell
+                        sx={{
+                          padding: '16px'
+                        }}
+                      >
+                        <span
+                          style={{
+                            borderRadius: '10px',
+                            padding: '5px 10px',
+                            width: '70%',
+                            display: 'inline-block',
+                            backgroundColor: assetType.status === 'connect' ? 'green' : 'orange'
+                          }}
+                        >
+                          {assetType.status === 'connect' ? 'Đang hoạt động' : 'Không hoạt động'}
+                        </span>
                       </TableCell>
 
                       <TableCell sx={{ padding: '16px' }}>
