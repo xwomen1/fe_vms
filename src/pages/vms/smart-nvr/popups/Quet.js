@@ -32,6 +32,7 @@ const AddCamera = ({ nvr, onClose }) => {
   const [camera, setCamera] = useState([])
   const [nvrCameraList, setNVRCameraList] = useState([])
   const [notification, setNotification] = useState({ message: '', type: '' })
+  const [status1, setStatus1] = useState(25)
 
   console.log(nvr, 'nvr')
 
@@ -51,6 +52,7 @@ const AddCamera = ({ nvr, onClose }) => {
           config
         )
         setCamera(response.data)
+        setStatus1(response.data.status.name || '')
       } catch (error) {
         console.error('Error fetching camera data:', error)
       }
@@ -103,6 +105,7 @@ const AddCamera = ({ nvr, onClose }) => {
         setLoading(false)
       })
   }
+  const statusText = status1 ? 'Đang hoạt động' : 'Không hoạt động'
 
   const handleUpdate = async (id, name) => {
     setLoading(true)
@@ -164,7 +167,23 @@ const AddCamera = ({ nvr, onClose }) => {
                       <TableCell>{camera.ipAddress}</TableCell>
                       <TableCell></TableCell>
                       <TableCell>{camera.location}</TableCell>
-                      <TableCell>{camera.status.name}</TableCell>
+                      <TableCell
+                        sx={{
+                          padding: '16px'
+                        }}
+                      >
+                        <span
+                          style={{
+                            borderRadius: '10px',
+                            padding: '5px 10px',
+                            width: '70%',
+                            display: 'inline-block',
+                            backgroundColor: camera.status === 'connect' ? 'green' : 'orange'
+                          }}
+                        >
+                          {camera.status === 'connect' ? 'Đang hoạt động' : 'Không hoạt động'}
+                        </span>
+                      </TableCell>
                       <TableCell sx={{ padding: '16px' }}>
                         <IconButton disabled={loading} onClick={() => handleDelete(camera.id)}>
                           <Icon icon='tabler:trash' />

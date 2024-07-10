@@ -26,6 +26,17 @@ const navigation = () => {
           icon: 'tabler:calendar-month'
         },
 
+        // {
+        //   path: '/pages/door-access/list',
+        //   title: 'Quyền truy cập cửa',
+        //   icon: 'tabler:door-enter'
+        // },
+        {
+          path: '/pages/schedule-access/list',
+          title: 'Quản lý lịch',
+          icon: 'tabler:calendar-due'
+        },
+
         {
           title: 'Chấm công',
           path: '/access-control/time-keeping',

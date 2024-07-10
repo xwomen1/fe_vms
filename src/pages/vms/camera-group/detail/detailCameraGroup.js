@@ -208,6 +208,7 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
 
     fetchGroupData()
   }, [])
+  const filteredPolicyOptions = groupOptions.filter(option => !rows || !rows.some(group => group.name === option.name))
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth='x1' style={{ maxWidth: '80%', margin: 'auto' }}>
@@ -257,7 +258,7 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
                     <TableRow key={index}>
                       <TableCell>
                         <Autocomplete
-                          options={groupOptions}
+                          options={filteredPolicyOptions}
                           getOptionLabel={option => option?.name}
                           value={row}
                           onChange={(event, newValue) => {

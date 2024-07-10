@@ -25,10 +25,8 @@ import Images from './popups/Image'
 import Checkbox from '@mui/material/Checkbox'
 import Cloud from './popups/Cloud'
 
-const Camera = ({ apiData }) => {
+const Camera = ({ apiData, assettypeStatus }) => {
   const [value, setValue] = useState('')
-
-  const defaultCameraID = '0eb23593-a9b1-4278-9fb1-4d18f30ed6ff'
 
   const [selectedIds, setSelectedIds] = useState([])
   const [openPopup, setOpenPopup] = useState(false)
@@ -46,6 +44,7 @@ const Camera = ({ apiData }) => {
   const pageSizeOptions = [25, 50, 100]
   const [anchorEl, setAnchorEl] = useState(null)
   const [prevCameraStatus, setPrevCameraStatus] = useState([])
+  console.log(assettypeStatus, 'assettypeStatus')
 
   const handlePageChange = newPage => {
     setPage(newPage)
@@ -74,61 +73,6 @@ const Camera = ({ apiData }) => {
     setOpenPopupP(true)
     setSelectedNvrId(cameraId)
   }
-  useEffect(() => {
-    const ws = new WebSocket(`wss://sbs.basesystem.one/ivis/vms/api/v0/websocket/topic/cameraStatus/${defaultCameraID}`)
-
-    ws.onmessage = event => {
-      const { dataType, data } = JSON.parse(event.data)
-      if (dataType === 'cameraStatus') {
-        const cameraStatusUpdates = JSON.parse(data)
-        updateCameraStatus(cameraStatusUpdates)
-      }
-    }
-
-    return () => {
-      ws.close()
-    }
-  }, [])
-
-  const updateCameraStatus = useCallback(
-    cameraStatusUpdates => {
-      const cameraStatusMap = new Map(
-        cameraStatusUpdates.map(status => [status.id, status.statusValue.name, status.ip])
-      )
-
-      // Lặp qua các mục trong Map sử dụng for...of
-      for (const entry of cameraStatusMap.entries()) {
-        const [id, status, ip] = entry
-
-        const entry1 = {
-          id: id,
-          status: status,
-          ip: ip
-        }
-
-        setAssetType(prevAssetType => {
-          const newAssetType = prevAssetType.map(camera => {
-            if (camera.id === entry1.id) {
-              if (camera.status.name !== entry1.status) {
-                console.log('AssetType with ID', entry1.id, 'has changed status.')
-                console.log('Previous status:', camera.status.name)
-                console.log('New status:', entry1.status)
-              }
-
-              return { ...camera, status: { name: entry1.status } }
-            }
-
-            return camera
-          })
-
-          // console.log('New Asset Type:', newAssetType) // Log updated asset type
-
-          return newAssetType
-        })
-      }
-    },
-    [assettype]
-  )
 
   const fetchFilteredOrAllUsers = async () => {
     try {
@@ -286,47 +230,11 @@ const Camera = ({ apiData }) => {
     })
   }
 
-  // WebSocket connection
-  // Trong useEffect của bạn
-  // Trong useEffect của bạn
-  // useEffect(() => {
-  //   // WebSocket connection
-  //   const defaultCameraID = '0eb23593-a9b1-4278-9fb1-4d18f30ed6ff'
-  //   const ws = new WebSocket(`wss://sbs.basesystem.one/ivis/vms/api/v0/websocket/topic/cameraStatus/${defaultCameraID}`)
-
-  //   ws.onmessage = event => {
-  //     console.log('Received data from WebSocket:', event.data)
-  //     const { dataType, data } = JSON.parse(event.data)
-
-  //     if (dataType === 'cameraStatus') {
-  //       const cameraStatusUpdates = JSON.parse(data)
-  //       setAssetType(prevAssetType =>
-  //         prevAssetType.map(camera => {
-  //           const updatedStatus = cameraStatusUpdates.find(status => status.id === camera.id)
-  //           console.log(updatedStatus, 'updta')
-  //           if (updatedStatus) {
-  //             // Cập nhật trạng thái của camera
-  //             return {
-  //               ...camera,
-  //               status: {
-  //                 name: updatedStatus.statusValue.name
-  //               }
-  //             }
-  //           }
-  //           console.log(JSON.stringify(camera) + 'camm') // Log thông tin chi tiết về đối tượng camera
-
-  //           return camera
-  //         })
-  //       )
-  //     }
-  //   }
-
-  //   return () => {
-  //     ws.close()
-  //   }
-  // }, [])
-
-  const statusText = cameraStatus => (cameraStatus.name === 'Hoạt động' ? 'Đang hoạt động' : 'Không hoạt động')
+  useEffect(() => {
+    if (assettypeStatus.length) {
+      setAssetType(assettypeStatus)
+    }
+  }, [assettypeStatus])
 
   return (
     <Grid container spacing={6.5}>
@@ -430,14 +338,24 @@ const Camera = ({ apiData }) => {
                         {assetType.status && assetType.status.name ? (
                           <div
                             style={{
-                              backgroundColor: assetType.status.name === 'Hoạt động' ? 'lightgreen' : 'orange',
+                              backgroundColor:
+                                assetType.status.name === 'connected'
+                                  ? 'lightgreen'
+                                  : assetType.status.name === 'disconnected'
+                                  ? 'red'
+                                  : 'orange',
                               borderRadius: '10px',
                               padding: '5px 10px',
                               width: '70%',
-                              display: 'inline-block'
+                              display: 'inline-block',
+                              color: 'white'
                             }}
                           >
-                            {assetType.status.name}
+                            {assetType.status.name === 'connected'
+                              ? 'Đã kết nối'
+                              : assetType.status.name === 'disconnected'
+                              ? 'Mất kết nối'
+                              : assetType.status.name}
                           </div>
                         ) : (
                           assetType.status.name
