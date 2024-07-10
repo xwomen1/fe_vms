@@ -550,7 +550,7 @@ const Add = ({ apiData, assettypeStatus }) => {
   }
 
   useEffect(() => {
-    if (assettypeStatus.length) {
+    if (assettypeStatus?.length) {
       setAssetType(assettypeStatus)
     }
   }, [assettypeStatus])
