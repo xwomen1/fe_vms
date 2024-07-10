@@ -71,14 +71,12 @@ const ImportPopup = ({ open, handleClose }) => {
   const handleImport = async () => {
     if (!files.length || !selectNVR) {
       console.error('No file selected or NVR not selected')
-
       return
     }
 
     const file = files[0]
     const formData = new FormData()
     formData.append('file', file)
-    formData.append('id', selectNVR.value)
 
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -91,18 +89,22 @@ const ImportPopup = ({ open, handleClose }) => {
         }
       }
 
-      const response = await axios.post('https://sbs.basesystem.one/ivis/vms/api/v0/cameras/import', formData, config)
+      const response = await axios.post(
+        `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/import?idbox=${selectNVR.value}`,
+        formData,
+        config
+      )
 
       console.log('Import successful')
       if (response.data && response.data.length > 0) {
-        setResponseData(response.data) // Cập nhật trạng thái với dữ liệu phản hồi
+        setResponseData(response.data)
         setStatusMessage('')
       } else {
         setResponseData([])
         setStatusMessage(response.data.message)
       }
     } catch (error) {
-      console.error('Error importing cameras:', error)
+      console.error('Error importing nvrs:', error)
     } finally {
       setLoading(false)
     }
