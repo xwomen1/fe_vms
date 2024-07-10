@@ -17,8 +17,9 @@ import { TreeItem, TreeView } from '@mui/lab'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import authConfig from 'src/configs/auth'
 import axios from 'axios'
-import ViewCamera from 'src/@core/components/camera/playbackpause'
+import PlaybackView from 'src/@core/components/camera/playback'
 import _ from 'lodash'
+import ViewCamera from 'src/@core/components/camera'
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     '&:hover > .MuiTreeItem-content:not(.Mui-selected)': {
@@ -348,6 +349,12 @@ const Review = () => {
         )
     }
 
+    useEffect(() => {
+        console.log('timePlay', convertDateToString(timePlay));
+        console.log('timeFilter', timeFilter.end_time);
+        console.log('time_end', time_end);
+    }, [timePlay])
+
     return (
         <Grid container spacing={2}>
             <Grid item xs={12} sm={4} lg={2}>
@@ -412,8 +419,16 @@ const Review = () => {
                                     </IconButton>
                                 </div>
                             }
-                            {camera.id !== '' &&
+                            {camera.id !== '' && (timeFilter.end_time > time_end ?
                                 <ViewCamera
+                                    name={camera.name}
+                                    id={camera.id}
+                                    channel={camera.channel}
+
+                                    // status={status}
+                                    sizeScreen={'1x1.2'}
+                                    handSetChanel={handSetChanel}
+                                /> : <PlaybackView
                                     id={camera.id}
                                     name={camera.name}
                                     channel={camera.channel}
@@ -429,55 +444,12 @@ const Review = () => {
                                     volume={volume}
                                     handSetChanel={handSetChanel}
                                 />
-                            }
+                            )}
                         </Grid>
                         <Grid item xs={12}>
 
                             <div className='bottom-controls' style={{ background: '#000' }}>
                                 <div className='left-controls'>
-                                    {/* <Box className='w-100' sx={{ px: 2 }}>
-                                    <Slider
-                                        defaultValue={1}
-                                        min={0.5}
-                                        max={2}
-                                        step={0.25}
-                                        marks={renderMarksSpeed()}
-                                        value={speed}
-                                        onChange={(event, newValue) => {
-                                            setSpeed(newValue)
-                                        }}
-                                        valueLabelDisplay='auto'
-                                        color='secondary'
-                                        sx={{
-                                            '& .MuiSlider-thumb': {
-                                                width: 8,
-                                                height: 8,
-                                                transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
-                                                '&::before': {
-                                                    boxShadow: '0 2px 12px 0 rgba(0,0,0,0.4)'
-                                                },
-                                                '&:hover, &.Mui-focusVisible': {
-                                                    boxShadow: `0px 0px 0px 8px ${'rgb(0 0 0 / 16%)'}`
-                                                },
-                                                '&.Mui-active': {
-                                                    width: 20,
-                                                    height: 20
-                                                }
-                                            },
-                                            '& .MuiSlider-track': {
-                                                backgroundColor: '#fff',
-                                                opacity: 0
-                                            },
-                                            '& .MuiSlider-rail': {
-                                                opacity: 0.28,
-                                                backgroundColor: '#fff'
-                                            },
-                                            '& .MuiSlider-markLabel': {
-                                                color: '#fff'
-                                            }
-                                        }}
-                                    />
-                                </Box> */}
                                     <div className='w-100' style={{ display: 'flex', justifyContent: 'space-between' }}>
                                         {timeFilter && (
                                             <IconButton
