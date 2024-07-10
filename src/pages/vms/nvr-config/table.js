@@ -34,7 +34,7 @@ import VideoConnectCamera from './popups/VideoConnectCamera'
 import { Password } from '@mui/icons-material'
 import Edit from './popups/Edit'
 
-const UserList = ({ apiData }) => {
+const UserList = ({ apiData, assettypeStatus }) => {
   const [value, setValue] = useState('')
   const [selectedIds, setSelectedIds] = useState([])
   const [idNVR, setId] = useState([])
@@ -283,6 +283,12 @@ const UserList = ({ apiData }) => {
     fetchFilteredOrAllUsers()
   }, [page, pageSize, total, value])
 
+  useEffect(() => {
+    if (assettypeStatus.length) {
+      setAssetType(assettypeStatus)
+    }
+  }, [assettypeStatus])
+
   return (
     <Grid container spacing={6.5}>
       <Grid item xs={12}>
@@ -385,15 +391,24 @@ const UserList = ({ apiData }) => {
                         {assetType.status && assetType.status.name ? (
                           <div
                             style={{
-                              backgroundColor: assetType.status.name === 'Hoạt động' ? 'lightgreen' : 'orange',
+                              backgroundColor:
+                                assetType.status.name === 'connected'
+                                  ? 'lightgreen'
+                                  : assetType.status.name === 'disconnected'
+                                  ? 'red'
+                                  : 'orange',
                               borderRadius: '10px',
                               padding: '5px 10px',
                               width: '70%',
                               display: 'inline-block',
-                              marginRight: '50%'
+                              color: 'white'
                             }}
                           >
-                            {assetType.status.name}
+                            {assetType.status.name === 'connected'
+                              ? 'Đã kết nối'
+                              : assetType.status.name === 'disconnected'
+                              ? 'Mất kết nối'
+                              : assetType.status.name}
                           </div>
                         ) : (
                           assetType.status.name

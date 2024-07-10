@@ -41,7 +41,7 @@ import Edit from './popups/Edit'
 import toast from 'react-hot-toast'
 import AddDevice from './popups/AddDevice'
 
-const UserList = ({ apiData }) => {
+const UserList = ({ apiData, assettypeStatus }) => {
   const [value, setValue] = useState('')
   const [selectedIds, setSelectedIds] = useState([])
   const [idNVR, setId] = useState([])
@@ -587,6 +587,12 @@ const UserList = ({ apiData }) => {
     setLoading(false)
   }
 
+  useEffect(() => {
+    if (assettypeStatus.length) {
+      setAssetType(assettypeStatus)
+    }
+  }, [assettypeStatus])
+
   return (
     <Grid container spacing={6.5}>
       <Grid item xs={12}>
@@ -943,7 +949,6 @@ const UserList = ({ apiData }) => {
                     <TableCell sx={{ padding: '16px' }}>Địa chỉ Mac</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Vị trí</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Trạng thái</TableCell>
-
                     <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
                   </TableRow>
                 </TableHead>
@@ -956,8 +961,32 @@ const UserList = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{assetType.ipAddress}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.macAddress}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.location}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>
-                        {assetType.status?.name ? assetType.status.name : statusText}
+                      <TableCell sx={{ padding: '16px', textAlign: 'center' }}>
+                        {assetType.status && assetType.status.name ? (
+                          <div
+                            style={{
+                              backgroundColor:
+                                assetType.status.name === 'connected'
+                                  ? 'lightgreen'
+                                  : assetType.status.name === 'disconnected'
+                                  ? 'red'
+                                  : 'orange',
+                              borderRadius: '10px',
+                              padding: '5px 10px',
+                              width: '70%',
+                              display: 'inline-block',
+                              color: 'white'
+                            }}
+                          >
+                            {assetType.status.name === 'connected'
+                              ? 'Đã kết nối'
+                              : assetType.status.name === 'disconnected'
+                              ? 'Mất kết nối'
+                              : assetType.status.name}
+                          </div>
+                        ) : (
+                          assetType.status.name
+                        )}
                       </TableCell>
 
                       <TableCell sx={{ padding: '16px' }}>
