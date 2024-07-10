@@ -5,7 +5,6 @@ import Link from 'next/link'
 import IconButton from '@mui/material/IconButton'
 import Icon from 'src/@core/components/icon'
 import { convertDateToString } from 'src/@core/utils/format'
-import { PlayArrow } from '@material-ui/icons'
 
 const config = {
   bundlePolicy: 'max-bundle',
@@ -119,12 +118,12 @@ export const ViewCameraPause = ({
     }
   }, [rtcPeerConnection])
 
-  // useEffect(() => {
-  //   if (websocket) {
-  //     websocket.close()
-  //     createWsConnection()
-  //   }
-  // }, [startTime])
+  useEffect(() => {
+    if (websocket) {
+      websocket.close()
+      createWsConnection()
+    }
+  }, [startTime])
 
   useEffect(() => {
     createWsConnection()
