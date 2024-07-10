@@ -44,6 +44,7 @@ export const ViewCameraPause = ({
   const [heightDiv, setHeightDiv] = useState(100)
   const [status, setStatus] = useState('')
   const [reload, setReload] = useState(0)
+  const [selectedChannel, setSelectedChannel] = useState('Sub')
 
   useEffect(() => {
     const heightCaculator = Math.floor((window.innerHeight - 192) / sizeScreen.split('x')[1])
@@ -238,11 +239,20 @@ export const ViewCameraPause = ({
           <span className='caption-subject font-dark sbold uppercase'>{name}</span>
         </div>
         <div className='media-top-controls'>
-          <div className='btn-group'>
+          <div>
             <Button
-              className={`sd_btn btn btn-default btn-xs ${channel === 'Sub' ? 'active' : ''}`}
-              onClick={() => {
+              sx={{
+                backgroundColor: selectedChannel === 'Sub' ? '#fff' : 'default',
+                height: '20px',
+                color: selectedChannel === 'Sub' ? '#FF2C00' : 'default',
+                '&:hover': {
+                  backgroundColor: '#fff',
+                  color: '#FF2C00'
+                }
+              }}
+             onClick={() => {
                 handSetChanel(id, 'Sub')
+                setSelectedChannel('Sub')
 
                 // createWsConnection()
               }}
@@ -250,9 +260,18 @@ export const ViewCameraPause = ({
               SD
             </Button>
             <Button
-              className={`hd_btn btn btn-default btn-xs ${channel === 'Main' ? 'active' : ''}`}
+              sx={{
+                backgroundColor: selectedChannel === 'Main' ? '#fff' : 'default',
+                height: '15px',
+                color: selectedChannel === 'Main' ? '#FF2C00' : 'default',
+                '&:hover': {
+                  backgroundColor: '#fff',
+                  color: '#FF2C00'
+                }
+              }}
               onClick={() => {
                 handSetChanel(id, 'Main')
+                setSelectedChannel('Main')
 
                 // createWsConnection()
               }}
