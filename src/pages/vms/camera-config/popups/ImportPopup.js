@@ -78,7 +78,6 @@ const ImportPopup = ({ open, handleClose }) => {
     const file = files[0]
     const formData = new FormData()
     formData.append('file', file)
-    formData.append('id', selectNVR.value)
 
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -91,11 +90,15 @@ const ImportPopup = ({ open, handleClose }) => {
         }
       }
 
-      const response = await axios.post('https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/import', formData, config)
+      const response = await axios.post(
+        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/import?idbox=${selectNVR.value}`,
+        formData,
+        config
+      )
 
       console.log('Import successful')
       if (response.data && response.data.length > 0) {
-        setResponseData(response.data) // Cập nhật trạng thái với dữ liệu phản hồi
+        setResponseData(response.data)
         setStatusMessage('')
       } else {
         setResponseData([])

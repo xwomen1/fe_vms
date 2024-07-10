@@ -37,7 +37,7 @@ import CustomDialog from '../../pages/face_management/CustomDialog/CustomDialog'
 import ImportPopup from './popups/ImportPopup'
 import AddDevice from './popups/AddDevice'
 
-const Add = ({ apiData }) => {
+const Add = ({ apiData, assettypeStatus }) => {
   const [value, setValue] = useState('')
   const [selectedIds, setSelectedIds] = useState([])
   const [openPopup, setOpenPopup] = useState(false)
@@ -45,7 +45,6 @@ const Add = ({ apiData }) => {
   const [selectNVR, setSelectedNVR] = useState('')
   const defaultValue = ''
   const [endURL, setEndUrl] = useState('')
-  const defaultCameraID = '0eb23593-a9b1-4278-9fb1-4d18f30ed6ff'
   const [assettype, setAssetType] = useState([])
   const [protocol, setProtocol] = useState([])
   const [nvrs, setNVR] = useState([])
@@ -480,63 +479,6 @@ const Add = ({ apiData }) => {
   const passwords = useCallback(val => {
     setValue(val)
   }, [])
-  useEffect(() => {
-    const ws = new WebSocket(`wss://sbs.basesystem.one/ivis/vms/api/v0/websocket/topic/cameraStatus/${defaultCameraID}`)
-
-    ws.onmessage = event => {
-      const { dataType, data } = JSON.parse(event.data)
-      if (dataType === 'cameraStatus') {
-        const cameraStatusUpdates = JSON.parse(data)
-        updateCameraStatus(cameraStatusUpdates)
-      }
-    }
-
-    return () => {
-      ws.close()
-    }
-  }, [])
-
-  const updateCameraStatus = useCallback(
-    cameraStatusUpdates => {
-      const cameraStatusMap = new Map(
-        cameraStatusUpdates.map(status => [status.id, status.statusValue.name, status.ip])
-      )
-
-      // Lặp qua các mục trong Map sử dụng for...of
-      for (const entry of cameraStatusMap.entries()) {
-        const [id, status, ip] = entry
-
-        const entry1 = {
-          id: id,
-          status: status,
-          ip: ip
-        }
-
-        setAssetType(prevAssetType => {
-          const newAssetType = prevAssetType.map(camera => {
-            if (camera.id === entry1.id) {
-              if (camera.status.name !== entry1.status) {
-                // console.log('AssetType with ID', entry1.id, 'has changed status.')
-                // console.log('Previous status:', camera.status.name)
-                // console.log('New status:', entry1.status)
-              }
-
-              return { ...camera, status: { name: entry1.status } }
-            }
-
-            return camera
-          })
-
-          // console.log('New Asset Type:', newAssetType) // Log updated asset type
-
-          return newAssetType
-        })
-      }
-    },
-    [assettype]
-  )
-
-  const statusText = status1 ? 'Đang hoạt động' : 'Không hoạt động'
 
   useEffect(() => {
     const fetchFilteredOrAllUsers = async () => {
@@ -606,6 +548,12 @@ const Add = ({ apiData }) => {
     setPopupMessage('')
     setLoading(false)
   }
+
+  useEffect(() => {
+    if (assettypeStatus.length) {
+      setAssetType(assettypeStatus)
+    }
+  }, [assettypeStatus])
 
   return (
     <>
@@ -1013,14 +961,24 @@ const Add = ({ apiData }) => {
                           {assetType.status && assetType.status.name ? (
                             <div
                               style={{
-                                backgroundColor: assetType.status.name === 'Hoạt động' ? 'lightgreen' : 'orange',
+                                backgroundColor:
+                                  assetType.status.name === 'connected'
+                                    ? 'lightgreen'
+                                    : assetType.status.name === 'disconnected'
+                                    ? 'red'
+                                    : 'orange',
                                 borderRadius: '10px',
                                 padding: '5px 10px',
                                 width: '70%',
-                                display: 'inline-block'
+                                display: 'inline-block',
+                                color: 'white'
                               }}
                             >
-                              {assetType.status.name}
+                              {assetType.status.name === 'connected'
+                                ? 'Đã kết nối'
+                                : assetType.status.name === 'disconnected'
+                                ? 'Mất kết nối'
+                                : assetType.status.name}
                             </div>
                           ) : (
                             assetType.status.name
