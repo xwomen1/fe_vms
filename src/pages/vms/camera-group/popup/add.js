@@ -21,7 +21,6 @@ import axios from 'axios'
 import authConfig from 'src/configs/auth'
 import Swal from 'sweetalert2'
 import { router } from 'websocket'
-import { useRouter } from 'next/router'
 import Grid from '@mui/system/Unstable_Grid/Grid'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import Icon from 'src/@core/components/icon'
@@ -76,6 +75,8 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
     }
     fetchFilterCameras()
   }, [cameraGroup])
+
+  const filteredPolicyOptions = groupOptions.filter(option => !rows || !rows.some(group => group.name === option.name))
 
   const handleAddRow = () => {
     const newRow = { name: '', location: '', ipAddress: '', id: '' }
@@ -227,7 +228,7 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
                     <TableRow key={index}>
                       <TableCell>
                         <Autocomplete
-                          options={groupOptions}
+                          options={filteredPolicyOptions}
                           getOptionLabel={option => option?.name}
                           value={row}
                           onChange={(event, newValue) => {

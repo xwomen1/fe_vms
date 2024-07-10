@@ -22,6 +22,7 @@ import Swal from 'sweetalert2'
 import { useRouter } from 'next/router'
 import CircularProgress from '@mui/material/CircularProgress'
 import axios from 'axios'
+import toast from 'react-hot-toast'
 
 const AddCamera = ({ nvr, onClose }) => {
   const classes = useStyles()
@@ -31,6 +32,7 @@ const AddCamera = ({ nvr, onClose }) => {
   const [camera, setCamera] = useState([])
   const [nvrCameraList, setNVRCameraList] = useState([])
   const [notification, setNotification] = useState({ message: '', type: '' })
+  const [status1, setStatus1] = useState(25)
 
   console.log(nvr, 'nvr')
 
@@ -46,10 +48,11 @@ const AddCamera = ({ nvr, onClose }) => {
         }
 
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/vms/api/v0/cameras?sort=%2Bcreated_at&page=1',
+          `https://sbs.basesystem.one/ivis/vms/api/v0/device/${nvr}/cameras?sort=-created_at`,
           config
         )
         setCamera(response.data)
+        setStatus1(response.data.status.name || '')
       } catch (error) {
         console.error('Error fetching camera data:', error)
       }
@@ -76,32 +79,33 @@ const AddCamera = ({ nvr, onClose }) => {
     fetchGroupDataNVR()
   }, [nvr, notification])
 
-  const handleDelete = async id => {
-    setLoading(true)
-    try {
-      const token = localStorage.getItem(authConfig.storageTokenKeyName)
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-
-      const nvrResponse = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${nvr}`, config)
-      const nvrCameras = nvrResponse.data.cameras
-
-      const updatedCameras = nvrCameras.filter(camera => camera.id !== id)
-
-      await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${nvr}`, { cameras: updatedCameras }, config)
-
-      setNotification({ message: 'Xóa camera thành công', type: 'success' })
-    } catch (error) {
-      setNotification({ message: `Đã xảy ra lỗi: ${error.message}`, type: 'error' })
-      console.error('Error deleting camera:', error)
-    } finally {
-      setLoading(false)
+  const handleDelete = idDelete => {
+    const token = localStorage.getItem(authConfig.storageTokenKeyName)
+    if (!token) {
+      return
     }
+    setLoading(true)
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+    let urlDelete = `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${idDelete}`
+    axios
+      .delete(urlDelete, config)
+      .then(() => {
+        const updatedData = camera.filter(cam => cam.id !== idDelete)
+        setCamera(updatedData)
+        setNotification({ message: 'Xoá thành công', type: 'success' })
+        setLoading(false)
+      })
+      .catch(err => {
+        setNotification({ message: `Xoá thất bại: ${err.message}`, type: 'error' })
+        setLoading(false)
+      })
   }
+  const statusText = status1 ? 'Đang hoạt động' : 'Không hoạt động'
 
   const handleUpdate = async (id, name) => {
     setLoading(true)
@@ -163,25 +167,27 @@ const AddCamera = ({ nvr, onClose }) => {
                       <TableCell>{camera.ipAddress}</TableCell>
                       <TableCell></TableCell>
                       <TableCell>{camera.location}</TableCell>
-                      <TableCell>{camera.status.name}</TableCell>
+                      <TableCell
+                        sx={{
+                          padding: '16px'
+                        }}
+                      >
+                        <span
+                          style={{
+                            borderRadius: '10px',
+                            padding: '5px 10px',
+                            width: '70%',
+                            display: 'inline-block',
+                            backgroundColor: camera.status === 'connect' ? 'green' : 'orange'
+                          }}
+                        >
+                          {camera.status === 'connect' ? 'Đang hoạt động' : 'Không hoạt động'}
+                        </span>
+                      </TableCell>
                       <TableCell sx={{ padding: '16px' }}>
-                        <Grid container spacing={2}>
-                          {Array.isArray(nvrCameraList) && nvrCameraList.length > 0 ? (
-                            nvrCameraList.some(nvrCamera => nvrCamera.id === camera.id) ? (
-                              <IconButton disabled={loading} onClick={() => handleDelete(camera.id)}>
-                                <Icon icon='tabler:minus' />
-                              </IconButton>
-                            ) : (
-                              <IconButton disabled={loading} onClick={() => handleUpdate(camera.id, camera.name)}>
-                                <Icon icon='tabler:plus' />
-                              </IconButton>
-                            )
-                          ) : (
-                            <IconButton disabled={loading} onClick={() => handleUpdate(camera.id, camera.name)}>
-                              <Icon icon='tabler:plus' />
-                            </IconButton>
-                          )}
-                        </Grid>
+                        <IconButton disabled={loading} onClick={() => handleDelete(camera.id)}>
+                          <Icon icon='tabler:trash' />
+                        </IconButton>
                       </TableCell>
                     </TableRow>
                   ))
@@ -194,14 +200,15 @@ const AddCamera = ({ nvr, onClose }) => {
                 )}
               </TableBody>
             </Table>
-            {notification.message && (
-              <div style={{ color: notification.type === 'success' ? '#ff9f43' : 'red', textAlign: 'center' }}>
-                {notification.message}
-              </div>
-            )}
           </Grid>
         </Card>
       </Grid>
+
+      {notification.message && (
+        <Box mt={2} textAlign='center' style={{ color: notification.type === 'success' ? '#ff9f43' : 'red' }}>
+          {notification.message}
+        </Box>
+      )}
     </div>
   )
 }

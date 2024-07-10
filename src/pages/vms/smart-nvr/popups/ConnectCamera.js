@@ -82,13 +82,6 @@ const RolePopup = ({ open, onClose, onSelect, nvr, name, ip }) => {
         </TabContext>
       </DialogContent>
       <DialogActions>
-        <Button
-          variant='contained'
-
-          // onClick={}
-        >
-          Quét
-        </Button>
         <Button variant='contained' onClick={onClose}>
           OK
         </Button>

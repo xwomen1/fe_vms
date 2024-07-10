@@ -57,6 +57,11 @@ const Caller = () => {
               label='Danh mục chỉ tiêu KPIs
 '
             />
+            <Tab
+              value='3'
+              label='Giao KPI
+'
+            />
           </TabList>
         </Grid>
         <TabPanel value='1'>
