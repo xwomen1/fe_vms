@@ -75,11 +75,13 @@ const DoorAccessUpdate = ({ show, onClose, id }) => {
     const fetchParentData = async () => {
       try {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
         const config = {
           headers: {
             Authorization: `Bearer ${token}`
           }
         }
+
         const response = await axios.get(
           'https://dev-ivi.basesystem.one/smc/access-control/api/v0/door-groups/children-lv1?',
           config
@@ -99,6 +101,7 @@ const DoorAccessUpdate = ({ show, onClose, id }) => {
               childGroup.children = await fetchChildGroups(childGroup.id)
             }
           }
+
           return childGroups
         }
 
@@ -123,8 +126,10 @@ const DoorAccessUpdate = ({ show, onClose, id }) => {
   }, [])
 
   // Function to flatten nested groups
+
   const flattenNestedGroups = groups => {
     const flattenedGroups = []
+
     const flattenRecursive = group => {
       flattenedGroups.push(group)
       if (group.children) {
@@ -136,8 +141,10 @@ const DoorAccessUpdate = ({ show, onClose, id }) => {
     for (let group of groups) {
       flattenRecursive(group)
     }
+
     return flattenedGroups
   }
+
   const handleAutocompleteChange = async (newValue, rowIndex) => {
     setDoor(prevDoor => {
       const updatedPolicies = [...prevDoor.policies]
@@ -145,12 +152,14 @@ const DoorAccessUpdate = ({ show, onClose, id }) => {
         ...updatedPolicies[rowIndex],
         doorGroupId: newValue ? newValue.id : null
       }
+
       return {
         ...prevDoor,
         policies: updatedPolicies
       }
     })
   }
+
   return (
     <>
       <Card>

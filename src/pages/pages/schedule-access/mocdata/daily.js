@@ -4,6 +4,7 @@ import Icon from 'src/@core/components/icon'
 
 const convertTimeToMinute = time => {
   const res = (time / 1440) * 100
+
   return res
 }
 

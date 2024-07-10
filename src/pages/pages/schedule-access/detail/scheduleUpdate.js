@@ -72,6 +72,7 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
 
       const transformedData = dataDailyDefault.map(day => {
         const foundDay = listScheduleWeekly.find(item => item.dayOfWeek === day.dayOfWeek)
+
         return {
           ...day,
           times: foundDay ? foundDay.times : []
@@ -154,6 +155,7 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
   const handleSave = async () => {
     try {
       setLoading(true)
+
       const config = {
         headers: {
           Authorization: `Bearer ${token}`
@@ -161,6 +163,7 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
       }
 
       // Chuyển đổi dataDailyState thành định dạng yêu cầu
+
       const scheduleWeeklyRequest = dataDailyState.map(day => ({
         dayOfWeek: day.dayOfWeek,
         times:

@@ -121,6 +121,7 @@ const Caller = () => {
   )
 
   console.log(assettypeStatus)
+
   const handleChange = (event, newValue) => {
     setValue(newValue)
   }

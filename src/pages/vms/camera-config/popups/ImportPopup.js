@@ -71,6 +71,7 @@ const ImportPopup = ({ open, handleClose }) => {
   const handleImport = async () => {
     if (!files.length || !selectNVR) {
       console.error('No file selected or NVR not selected')
+
       return
     }
 
