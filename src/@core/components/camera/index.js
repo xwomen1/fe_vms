@@ -63,7 +63,6 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
 
     // listen for remote tracks and add them to remote stream
     pc.ontrack = event => {
-      console.log("Changing stream", event)
       setLoading(false)
       const stream = event.streams[0]
       try {
@@ -87,7 +86,6 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
     }
     pc.onconnectionstatechange = event => {
       setStatus(pc.connectionState)
-      console.log('RTC connection state change:', pc.connectionState)
     }
     setRtcPeerConnection(pc)
     const ws = new WebSocket(`${SOCKET_LIVE_VIEW}/ivis/vms/api/v0/ws/signaling/${randomId(10)}`)
@@ -100,7 +98,6 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
     // pc.close()
   }
   useEffect(() => {
-    console.log("Websocket status changing ", websocketStatus)
     if (!websocketStatus) {
       setWebsocket(null)
       setRtcPeerConnection(null)
@@ -110,7 +107,6 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
 
   }, [websocketStatus])
   useEffect(() => {
-    console.log("Created RTC Peer Connection ", rtcPeerConnection, websocketStatus, websocket)
     if ((rtcPeerConnection != null) && (websocketStatus) && (websocket != null)) {
       websocket.send(
         JSON.stringify({
@@ -123,7 +119,6 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
   }, [rtcPeerConnection, websocketStatus, websocket])
 
   useEffect(() => {
-    console.log("Websocket status is changing", websocket, websocketStatus)
     if (websocket != null) {
 
 
@@ -194,7 +189,6 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
     setWebsocketStatus(false)
 
     // console.log('remoteVideoRef', remoteVideoRef);
-    console.log('channel', channel);
   }, [id, channel]);
 
 
@@ -217,7 +211,6 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
     switch (message.type) {
       // handle offer message
       case 'offer':
-        console.log("")
         rtcPeerConnection.setRemoteDescription(message).then(async () => {
           rtcPeerConnection.setLocalDescription(rtcPeerConnection.createAnswer())
 
