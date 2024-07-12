@@ -36,6 +36,7 @@ import Edit from './popups/Edit'
 import CustomDialog from '../../pages/face_management/CustomDialog/CustomDialog'
 import ImportPopup from './popups/ImportPopup'
 import AddDevice from './popups/AddDevice'
+import LiveView from './popups/LiveView'
 
 const Add = ({ apiData, assettypeStatus }) => {
   const [value, setValue] = useState('')
@@ -82,6 +83,8 @@ const Add = ({ apiData, assettypeStatus }) => {
   const [dialogMessage, setDialogMessage] = useState('')
   const [isSuccess, setIsSuccess] = useState(false)
   const [isOpenAddDevice, setIsOpenAddDevice] = useState(false)
+  const [isOpenLiveView, setIsOpenLiveView] = useState(false)
+  const [camera, setCamera] = useState(null)
 
   function showAlertConfirm(options, intl) {
     const defaultProps = {
@@ -205,7 +208,6 @@ const Add = ({ apiData, assettypeStatus }) => {
     } else {
       setProtocolSelected(false)
     }
-    console.log(selectedValue)
   }
 
   const handlePageChange = newPage => {
@@ -299,6 +301,11 @@ const Add = ({ apiData, assettypeStatus }) => {
     setOpenPopupP(true)
     setIdBox(cameraId)
     setSelectedNvrId(cameraId)
+  }
+
+  const handleOpenLiveView = camera => {
+    setIsOpenLiveView(true)
+    setCamera(camera)
   }
 
   const handleClosePPopup = () => {
@@ -648,7 +655,7 @@ const Add = ({ apiData, assettypeStatus }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                        // loading={loading}
+                      // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.1}></Grid>
@@ -734,7 +741,7 @@ const Add = ({ apiData, assettypeStatus }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                        // loading={loading}
+                      // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.4}></Grid>
@@ -852,7 +859,7 @@ const Add = ({ apiData, assettypeStatus }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                        // loading={loading}
+                      // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.1}></Grid>
@@ -965,8 +972,8 @@ const Add = ({ apiData, assettypeStatus }) => {
                                   assetType.status.name === 'connected'
                                     ? 'lightgreen'
                                     : assetType.status.name === 'disconnected'
-                                    ? 'red'
-                                    : 'orange',
+                                      ? 'red'
+                                      : 'orange',
                                 borderRadius: '10px',
                                 padding: '5px 10px',
                                 width: '70%',
@@ -977,8 +984,8 @@ const Add = ({ apiData, assettypeStatus }) => {
                               {assetType.status.name === 'connected'
                                 ? 'Đã kết nối'
                                 : assetType.status.name === 'disconnected'
-                                ? 'Mất kết nối'
-                                : assetType.status.name}
+                                  ? 'Mất kết nối'
+                                  : assetType.status.name}
                             </div>
                           ) : (
                             assetType.status.name
@@ -986,6 +993,9 @@ const Add = ({ apiData, assettypeStatus }) => {
                         </TableCell>
 
                         <TableCell sx={{ padding: '16px' }}>
+                          <IconButton onClick={() => handleOpenLiveView(assetType)}>
+                            <Icon icon='tabler:video' />
+                          </IconButton>
                           <IconButton size='small' onClick={() => handleAddPClick(assetType.id)}>
                             <Icon icon='tabler:edit' />
                           </IconButton>
@@ -1032,6 +1042,9 @@ const Add = ({ apiData, assettypeStatus }) => {
             setReload={() => setReload(reload + 1)}
             onClose={() => setIsOpenAddDevice(false)}
           />
+        )}
+        {isOpenLiveView && (
+          <LiveView show={isOpenLiveView} onClose={() => setIsOpenLiveView(false)} data={camera} />
         )}
       </Grid>
       <ImportPopup open={openPopup} handleClose={handleClosePopup} />

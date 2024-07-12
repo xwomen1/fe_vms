@@ -24,6 +24,7 @@ import Video from './popups/video'
 import Images from './popups/Image'
 import Checkbox from '@mui/material/Checkbox'
 import Cloud from './popups/Cloud'
+import LiveView from './popups/LiveView'
 
 const Camera = ({ apiData, assettypeStatus }) => {
   const [value, setValue] = useState('')
@@ -44,7 +45,8 @@ const Camera = ({ apiData, assettypeStatus }) => {
   const pageSizeOptions = [25, 50, 100]
   const [anchorEl, setAnchorEl] = useState(null)
   const [prevCameraStatus, setPrevCameraStatus] = useState([])
-  console.log(assettypeStatus, 'assettypeStatus')
+  const [isOpenLiveView, setIsOpenLiveView] = useState(false)
+  const [camera, setCamera] = useState(null)
 
   const handlePageChange = newPage => {
     setPage(newPage)
@@ -72,6 +74,11 @@ const Camera = ({ apiData, assettypeStatus }) => {
   const handleAddPClick = cameraId => {
     setOpenPopupP(true)
     setSelectedNvrId(cameraId)
+  }
+
+  const handleOpenLiveView = camera => {
+    setIsOpenLiveView(true)
+    setCamera(camera)
   }
 
   const fetchFilteredOrAllUsers = async () => {
@@ -342,8 +349,8 @@ const Camera = ({ apiData, assettypeStatus }) => {
                                 assetType.status.name === 'connected'
                                   ? 'lightgreen'
                                   : assetType.status.name === 'disconnected'
-                                  ? 'red'
-                                  : 'orange',
+                                    ? 'red'
+                                    : 'orange',
                               borderRadius: '10px',
                               padding: '5px 10px',
                               width: '70%',
@@ -354,8 +361,8 @@ const Camera = ({ apiData, assettypeStatus }) => {
                             {assetType.status.name === 'connected'
                               ? 'Đã kết nối'
                               : assetType.status.name === 'disconnected'
-                              ? 'Mất kết nối'
-                              : assetType.status.name}
+                                ? 'Mất kết nối'
+                                : assetType.status.name}
                           </div>
                         ) : (
                           assetType.status.name
@@ -363,6 +370,9 @@ const Camera = ({ apiData, assettypeStatus }) => {
                       </TableCell>
 
                       <TableCell sx={{ padding: '16px' }}>
+                        <IconButton onClick={() => handleOpenLiveView(assetType)}>
+                          <Icon icon='tabler:video' />
+                        </IconButton>
                         <IconButton size='small' onClick={() => handleAddPClick(assetType.id)}>
                           <Icon icon='tabler:edit' />
                         </IconButton>
@@ -426,6 +436,9 @@ const Camera = ({ apiData, assettypeStatus }) => {
           <>
             <Edit open={openPopupP} onClose={handleClosePPopup} camera={selectedNvrId} />
           </>
+        )}
+        {isOpenLiveView && (
+          <LiveView show={isOpenLiveView} onClose={() => setIsOpenLiveView(false)} data={camera} />
         )}
       </Grid>
     </Grid>

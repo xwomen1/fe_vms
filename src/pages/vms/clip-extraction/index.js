@@ -94,20 +94,20 @@ const ClipExtraction = () => {
         <TabContext value={value}>
           <Grid item xs={12} sx={{ mb: 5 }}>
             <TabList onChange={handleChange} aria-label='customized tabs example'>
-              <Tab value='1' label='Trực tiếp' key={1} />
+              <Tab value='1' label='Trích clip' key={1} />
               <Tab value='2' label='Xem lại' key={2} />
-              <Tab value='3' label='Trích clip' key={3} />
+              <Tab value='3' label='Trực tiếp' key={3} />
             </TabList>
           </Grid>
           <Grid item xs={12} sm={12} lg={12}>
             <TabPanel value='1' sx={{ paddingTop: '0' }}>
-              <LiveView />
+              <Storage />
             </TabPanel>
             <TabPanel value='2' sx={{ paddingTop: '0' }}>
               <Review />
             </TabPanel>
             <TabPanel value='3' sx={{ paddingTop: '0' }}>
-              <Storage />
+              <LiveView />
             </TabPanel>
           </Grid>
         </TabContext>
