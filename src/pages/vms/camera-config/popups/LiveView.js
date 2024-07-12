@@ -64,6 +64,7 @@ const LiveView = ({ show, onClose, data }) => {
                             name={camera.name}
                             id={camera.id}
                             channel={camera.channel}
+
                             // status={status}
                             sizeScreen={'1x1.3'}
                             handSetChanel={handSetChanel}
