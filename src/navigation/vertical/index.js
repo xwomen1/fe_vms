@@ -32,12 +32,13 @@ const navigation = () => {
         //   icon: 'tabler:door-enter'
         // },
         {
-          path: '/pages/schedule/list',
-          title: 'Quyền truy cập cửa',
+          path: '/pages/schedule-access/list',
+          title: 'Quản lý lịch',
           icon: 'tabler:calendar-due'
         },
+
         {
-          title: 'Chấm côngd',
+          title: 'Chấm công',
           path: '/access-control/time-keeping',
           icon: 'tabler:lock-access'
         },
@@ -74,7 +75,16 @@ const navigation = () => {
           path: '/kpi',
           icon: 'tabler:calendar-event'
         },
-
+        {
+          title: 'Giao KPI',
+          path: '/kpi/assign-kpi',
+          icon: 'tabler:calendar-event'
+        },
+        {
+          title: 'Đánh giá KPI',
+          path: '/kpi/assess-kpi',
+          icon: 'tabler:calendar-event'
+        },
         {
           path: '/mappingACToInf',
           title: 'Cài đặt nâng cao',
