@@ -81,6 +81,11 @@ const navigation = () => {
           icon: 'tabler:calendar-event'
         },
         {
+          title: 'Đánh giá KPI',
+          path: '/kpi/assess-kpi',
+          icon: 'tabler:calendar-event'
+        },
+        {
           path: '/mappingACToInf',
           title: 'Cài đặt nâng cao',
           icon: 'tabler:shield'
