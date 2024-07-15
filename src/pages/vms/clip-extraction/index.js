@@ -91,6 +91,7 @@ const ClipExtraction = () => {
   const [value, setValue] = useState('1')
   const [keyword, setKeyword] = useState('')
   const [cameraList, setCameraList] = useState([])
+  const [dataList, setDataList] = useState([])
   const [idCameraSelected, setIdCameraSelected] = useState(null)
   const [camera, setCamera] = useState({ id: '', name: '', channel: '' })
 
@@ -192,6 +193,65 @@ const ClipExtraction = () => {
     fetchCameraList()
   }, [keyword])
 
+  useEffect(() => {
+
+    const addStatusToCameras = (data) => {
+
+      return data.map(group => {
+        if (group?.cameras && group?.cameras.length > 0) {
+
+          return {
+            ...group,
+            cameras: group?.cameras.map(camera => {
+              const matchedEvent = eventsData.find(event => event.id === camera.id)
+
+              return {
+                ...camera,
+                status: matchedEvent?.status ? matchedEvent?.status : false
+              }
+            }
+            )
+          }
+        }
+        return group;
+      })
+    }
+    const data = addStatusToCameras(cameraList)
+    setDataList(data)
+  }, [cameraList]);
+
+
+  useEffect(() => {
+    const addStatus = (data) => {
+
+      return data.map(group => {
+        if (group?.cameras && group?.cameras.length > 0) {
+
+          return {
+            ...group,
+            cameras: group?.cameras.map(camera => {
+              const matchedEvent = eventsData.find(event => event.id === camera.id)
+              const status = matchedEvent?.status
+
+              return {
+                ...camera,
+                status:
+                  matchedEvent?.status === camera?.status && matchedEvent?.status !== undefined ? camera?.status
+                    : matchedEvent?.status !== camera?.status && matchedEvent?.status !== undefined ? matchedEvent?.status
+                      : matchedEvent?.status !== camera?.status && matchedEvent?.status === undefined ? camera?.status
+                        : false
+              }
+            }
+            )
+          }
+        }
+        return group;
+      })
+    }
+    const data = addStatus(dataList)
+    setDataList(data)
+  }, [eventsData]);
+
   const fetchCameraList = async () => {
     try {
       const res = await axios.get(
@@ -209,6 +269,26 @@ const ClipExtraction = () => {
     }
   }
 
+  const addStatusToCameras = (data) => {
+    return data.map(group => {
+      if (group?.cameras && group?.cameras.length > 0) {
+        return {
+          ...group,
+          cameras: group?.cameras.map(camera => {
+            const matchedEvent = eventsData.find(event => event.id === camera.id)
+
+            return {
+              ...camera,
+              status: matchedEvent?.status ? matchedEvent?.status : false
+            }
+          }
+          )
+        }
+      }
+      return group;
+    })
+  }
+
   const handleChange = (event, newValue) => {
     setValue(newValue)
   }
@@ -222,24 +302,17 @@ const ClipExtraction = () => {
     setIdCameraSelected(camera.id)
   }
 
-  useEffect(() => {
-    console.log('camera', camera);
-    console.log('id camera selected: ', idCameraSelected);
-  }, [camera])
-
   const renderTree = group => {
     return (
       <StyledTreeItem key={group.id} nodeId={group.id} labelText={group.name} labelIcon='tabler:folder'>
         {group.cameras && group.cameras.length > 0
           ? group.cameras.map(camera => {
-            const matchedEvent = eventsData.find(event => event.id === camera.id)
-            const status = matchedEvent?.status
 
             return (
               <StyledTreeItem
                 key={camera.id}
                 nodeId={camera.id}
-                color={status == true ? '#28c76f' : ''}
+                color={camera?.status == true ? '#28c76f' : ''}
                 textDirection={camera.id === idCameraSelected ? 'underline' : ''}
                 labelText={camera.deviceName}
                 labelIcon='tabler:camera'
@@ -308,7 +381,7 @@ const ClipExtraction = () => {
                     defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
                     defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
                   >
-                    {cameraList.map(group => renderTree(group))}
+                    {dataList.map(group => renderTree(group))}
                   </TreeView>
                 </Box>
               </CardContent>

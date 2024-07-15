@@ -37,7 +37,7 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
 
 const StyledTreeItem = props => {
   // ** Props
-  const { labelText, labelIcon, labelInfo, color, ...other } = props
+  const { labelText, labelIcon, labelInfo, color, textDirection, ...other } = props
 
   return (
     <StyledTreeItemRoot
@@ -46,7 +46,7 @@ const StyledTreeItem = props => {
         <Box
           sx={{ py: 1, display: 'flex', alignItems: 'center', '& svg': { mr: 1 } }}>
           <Icon icon={labelIcon} color={color} />
-          <Typography variant='body2' sx={{ flexGrow: 1, fontWeight: 500 }}>
+          <Typography variant='body2' sx={{ flexGrow: 1, fontWeight: 500, textDecoration: textDirection }}>
             {labelText}
           </Typography>
           {labelInfo ? (
@@ -109,6 +109,7 @@ const EventConfig = () => {
   const [loading, setLoading] = useState(false)
   const [keyword, setKeyword] = useState('')
   const [cameraGroup, setCameraGroup] = useState([])
+  const [dataList, setDataList] = useState([])
   const [isOpenSchedule, setIsOpenSchedule] = useState(false)
   const [reload, setReload] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -216,6 +217,68 @@ const EventConfig = () => {
   }
 
   useEffect(() => {
+
+    const addStatusToCameras = (data) => {
+
+      return data.map(group => {
+        if (group?.cameras && group?.cameras.length > 0) {
+
+          return {
+            ...group,
+            cameras: group?.cameras.map(camera => {
+              const matchedEvent = eventsData.find(event => event.id === camera.id)
+
+              return {
+                ...camera,
+                status: matchedEvent?.status ? matchedEvent?.status : false
+              }
+            }
+            )
+          }
+        }
+        return group;
+      })
+    }
+    const data = addStatusToCameras(cameraGroup)
+    setDataList(data)
+  }, [cameraGroup]);
+
+  useEffect(() => {
+    const addStatus = (data) => {
+
+      return data.map(group => {
+        if (group?.cameras && group?.cameras.length > 0) {
+
+          return {
+            ...group,
+            cameras: group?.cameras.map(camera => {
+              const matchedEvent = eventsData.find(event => event.id === camera.id)
+              const status = matchedEvent?.status
+
+              return {
+                ...camera,
+                status:
+                  matchedEvent?.status === camera?.status && matchedEvent?.status !== undefined ? camera?.status
+                    : matchedEvent?.status !== camera?.status && matchedEvent?.status !== undefined ? matchedEvent?.status
+                      : matchedEvent?.status !== camera?.status && matchedEvent?.status === undefined ? camera?.status
+                        : false
+              }
+            }
+            )
+          }
+        }
+        return group;
+      })
+    }
+    const data = addStatus(dataList)
+    setDataList(data)
+  }, [eventsData]);
+
+  useEffect(() => {
+    console.log('dataList', dataList);
+  }, [dataList])
+
+  useEffect(() => {
     const cleanup = createWsConnection()
 
     return cleanup
@@ -234,10 +297,6 @@ const EventConfig = () => {
       websocket.addEventListener('close', handleClose)
     }
   }, [websocket])
-
-  useEffect(() => {
-    setReload(reload + 1)
-  }, [eventsData])
 
   useEffect(() => {
     fetchCameraGroup()
@@ -726,14 +785,13 @@ const EventConfig = () => {
       <StyledTreeItem key={group.id} nodeId={group.id} labelText={group.name} labelIcon='tabler:folder'>
         {group.cameras && group.cameras.length > 0
           ? group.cameras.map(camera => {
-            const matchedEvent = eventsData.find(event => event.id === camera.id)
-            const status = matchedEvent?.status
 
             return (
               <StyledTreeItem
                 key={camera.id}
                 nodeId={camera.id}
-                color={status == true ? '#28c76f' : ''}
+                color={camera?.status == true ? '#28c76f' : ''}
+                textDirection={camera.id === idCameraSelect ? 'underline' : ''}
                 labelText={camera.deviceName}
                 labelIcon='tabler:camera'
                 onClick={() => handleItemClick(camera.id, camera.deviceName)}
@@ -788,7 +846,7 @@ const EventConfig = () => {
                   defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
                   defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
                 >
-                  {cameraGroup.map(group => renderTree(group))}
+                  {dataList.map(group => renderTree(group))}
                 </TreeView>
               </Box>
             </CardContent>
