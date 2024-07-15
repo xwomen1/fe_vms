@@ -236,6 +236,7 @@ const EventConfig = () => {
             )
           }
         }
+
         return group;
       })
     }
@@ -267,6 +268,7 @@ const EventConfig = () => {
             )
           }
         }
+
         return group;
       })
     }

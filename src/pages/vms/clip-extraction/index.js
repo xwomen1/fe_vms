@@ -213,9 +213,11 @@ const ClipExtraction = () => {
             )
           }
         }
+
         return group;
       })
     }
+
     const data = addStatusToCameras(cameraList)
     setDataList(data)
   }, [cameraList]);
@@ -245,6 +247,7 @@ const ClipExtraction = () => {
             )
           }
         }
+
         return group;
       })
     }
@@ -269,26 +272,6 @@ const ClipExtraction = () => {
     }
   }
 
-  const addStatusToCameras = (data) => {
-    return data.map(group => {
-      if (group?.cameras && group?.cameras.length > 0) {
-        return {
-          ...group,
-          cameras: group?.cameras.map(camera => {
-            const matchedEvent = eventsData.find(event => event.id === camera.id)
-
-            return {
-              ...camera,
-              status: matchedEvent?.status ? matchedEvent?.status : false
-            }
-          }
-          )
-        }
-      }
-      return group;
-    })
-  }
-
   const handleChange = (event, newValue) => {
     setValue(newValue)
   }
@@ -303,6 +286,7 @@ const ClipExtraction = () => {
   }
 
   const renderTree = group => {
+
     return (
       <StyledTreeItem key={group.id} nodeId={group.id} labelText={group.name} labelIcon='tabler:folder'>
         {group.cameras && group.cameras.length > 0
