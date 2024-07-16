@@ -839,9 +839,6 @@ const EventConfig = () => {
                 }}
               />
               <Box sx={{ height: '60vh', overflow: 'auto' }}>
-                <Typography variant='h5' sx={{ mb: 2, mt: 2 }}>
-                  CAM Tầng 1
-                </Typography>
                 <TreeView
                   sx={{ minHeight: 240 }}
                   defaultExpanded={['root']}
