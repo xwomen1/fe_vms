@@ -36,6 +36,7 @@ const DoorAccessUpdate = ({ show, onClose, id }) => {
   const fetchDataList = async () => {
     try {
       setLoading(true)
+
       const config = {
         headers: {
           Authorization: `Bearer ${token}`
@@ -85,6 +86,7 @@ const DoorAccessUpdate = ({ show, onClose, id }) => {
   const fetchAllSchedules = async () => {
     try {
       setLoading(true)
+
       const config = {
         headers: {
           Authorization: `Bearer ${token}`
@@ -265,6 +267,7 @@ const DoorAccessUpdate = ({ show, onClose, id }) => {
   const handleSave = async () => {
     try {
       setLoading(true)
+
       const config = {
         headers: {
           Authorization: `Bearer ${token}`

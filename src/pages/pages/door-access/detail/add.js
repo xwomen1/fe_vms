@@ -36,6 +36,7 @@ const DoorAccessUpdate = ({ show, onClose, setReload }) => {
   const fetchAllSchedules = async () => {
     try {
       setLoading(true)
+
       const config = {
         headers: {
           Authorization: `Bearer ${token}`
@@ -149,6 +150,7 @@ const DoorAccessUpdate = ({ show, onClose, setReload }) => {
           setDoorOptions(prevDoorOptions => {
             const newDoorOptions = [...prevDoorOptions]
             newDoorOptions[rowIndex] = response.data.rows
+
             return newDoorOptions
           })
         } catch (error) {
@@ -199,12 +201,14 @@ const DoorAccessUpdate = ({ show, onClose, setReload }) => {
       setDoorGroupIds(prevDoorGroupIds => {
         const newDoorGroupIds = [...prevDoorGroupIds]
         newDoorGroupIds[rowIndex] = value.id
+
         return newDoorGroupIds
       })
     } else {
       setDoorGroupIds(prevDoorGroupIds => {
         const newDoorGroupIds = [...prevDoorGroupIds]
         newDoorGroupIds[rowIndex] = null
+
         return newDoorGroupIds
       })
     }
@@ -237,6 +241,7 @@ const DoorAccessUpdate = ({ show, onClose, setReload }) => {
           Authorization: `Bearer ${token}`
         }
       }
+
       const response = await axios.post(
         'https://dev-ivi.basesystem.one/smc/access-control/api/v0/door-accesses',
         payload,

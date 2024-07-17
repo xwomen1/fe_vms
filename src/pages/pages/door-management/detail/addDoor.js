@@ -110,6 +110,7 @@ const AddDoor = () => {
         const childGroupsWithParentInfo = await Promise.all(
           childGroups.map(async child => {
             const subChildGroups = await fetchChildGroups(child)
+
             return {
               ...child,
               children: subChildGroups,
@@ -131,6 +132,7 @@ const AddDoor = () => {
       const allGroups = await Promise.all(
         parentGroups.map(async parentGroup => {
           const childGroups = await fetchChildGroups(parentGroup)
+
           return {
             ...parentGroup,
             children: childGroups
@@ -155,6 +157,7 @@ const AddDoor = () => {
         flattened = flattened.concat(flattenGroups(group.children))
       }
     })
+
     return flattened
   }
 
@@ -323,4 +326,5 @@ const AddDoor = () => {
     </>
   )
 }
+
 export default AddDoor

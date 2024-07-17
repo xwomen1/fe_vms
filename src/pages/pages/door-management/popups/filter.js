@@ -43,6 +43,7 @@ const defaultValues = {
 
 const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
   const doorStatuses = [
     { name: 'Hoạt động', id: 'ACTIVE' },
     { name: 'Đang xả', id: 'FREE' },

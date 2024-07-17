@@ -60,6 +60,7 @@ const Device = ({ onClose, camera }) => {
   const [protocol, setProtocol] = useState()
   const defaultValue = cameras?.type?.name || ''
   const [idBox, setIdBox] = useState(null)
+
   const [cameraGroupSelect, setCameraGroupSelect] = useState({
     label: cameras?.type?.name || '',
     value: cameras?.type?.name || ''
@@ -564,7 +565,6 @@ const Device = ({ onClose, camera }) => {
           <Grid item xs={0.1}></Grid>
           <Grid item xs={3.9}>
             <Autocomplete
-              // value={selectNVR}
               onChange={handleDDNSChange}
               options={nvrs}
               getOptionLabel={option => option.label}

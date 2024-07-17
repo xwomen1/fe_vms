@@ -12,11 +12,13 @@ const InforDoor = ({ idSetting }) => {
   const [selectedGroup, setSelectedGroup] = useState(null)
   const [deviceGroups, setDeviceGroups] = useState([])
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
   const deviceTypeOptions = [
     { label: 'ACCESS CONTROL', value: 'ACCESS_CONTROL' },
     { label: 'ENROLL', value: 'ENROLL' },
     { label: 'BUS', value: 'BUS' }
   ]
+
   const config = {
     headers: {
       Authorization: `Bearer ${token}`

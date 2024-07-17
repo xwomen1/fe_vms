@@ -68,6 +68,7 @@ const InforDoor = ({ idInfor }) => {
         const childGroupsWithParentInfo = await Promise.all(
           childGroups.map(async child => {
             const subChildGroups = await fetchChildGroups(child)
+
             return {
               ...child,
               children: subChildGroups,
@@ -89,6 +90,7 @@ const InforDoor = ({ idInfor }) => {
       const allGroups = await Promise.all(
         parentGroups.map(async parentGroup => {
           const childGroups = await fetchChildGroups(parentGroup)
+
           return {
             ...parentGroup,
             children: childGroups
@@ -113,6 +115,7 @@ const InforDoor = ({ idInfor }) => {
         flattened = flattened.concat(flattenGroups(group.children))
       }
     })
+
     return flattened
   }
 
@@ -130,6 +133,7 @@ const InforDoor = ({ idInfor }) => {
     const day = date.getDate().toString().padStart(2, '0')
     const month = (date.getMonth() + 1).toString().padStart(2, '0')
     const year = date.getFullYear()
+
     return `${day}/${month}/${year}`
   }
 

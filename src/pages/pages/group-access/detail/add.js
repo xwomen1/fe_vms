@@ -38,6 +38,7 @@ const AddGroupAccess = () => {
   const [deviceGroups1, setDeviceGroups1] = useState([])
   const [deviceGroups2, setDeviceGroups2] = useState([])
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
   const config = {
     headers: {
       Authorization: `Bearer ${token}`
@@ -92,6 +93,7 @@ const AddGroupAccess = () => {
         const childGroupsWithParentInfo = await Promise.all(
           childGroups.map(async child => {
             const subChildGroups = await fetchChildGroups(child)
+
             return {
               ...child,
               children: subChildGroups,
@@ -113,6 +115,7 @@ const AddGroupAccess = () => {
       const allGroups = await Promise.all(
         parentGroups.map(async parentGroup => {
           const childGroups = await fetchChildGroups(parentGroup)
+
           return {
             ...parentGroup,
             children: childGroups
@@ -137,6 +140,7 @@ const AddGroupAccess = () => {
         flattened = flattened.concat(flattenGroups(group.children))
       }
     })
+
     return flattened
   }
 
@@ -249,6 +253,7 @@ const AddGroupAccess = () => {
                   console.log(newValue.map(item => item.id))
                   handleInputChange(
                     'doorAccessIds'
+
                     // newValue.map(item => item.id)
                   )
                 }}

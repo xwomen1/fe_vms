@@ -67,4 +67,5 @@ const AddDoorSetting = () => {
     </>
   )
 }
+
 export default AddDoorSetting
