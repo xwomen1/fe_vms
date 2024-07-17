@@ -349,8 +349,8 @@ const Camera = ({ apiData, assettypeStatus }) => {
                                 assetType.status.name === 'connected'
                                   ? 'lightgreen'
                                   : assetType.status.name === 'disconnected'
-                                    ? 'red'
-                                    : 'orange',
+                                  ? '#FF9F43'
+                                  : 'orange',
                               borderRadius: '10px',
                               padding: '5px 10px',
                               width: '70%',
@@ -361,8 +361,8 @@ const Camera = ({ apiData, assettypeStatus }) => {
                             {assetType.status.name === 'connected'
                               ? 'Đã kết nối'
                               : assetType.status.name === 'disconnected'
-                                ? 'Mất kết nối'
-                                : assetType.status.name}
+                              ? 'Mất kết nối'
+                              : assetType.status.name}
                           </div>
                         ) : (
                           assetType.status.name
@@ -437,9 +437,7 @@ const Camera = ({ apiData, assettypeStatus }) => {
             <Edit open={openPopupP} onClose={handleClosePPopup} camera={selectedNvrId} />
           </>
         )}
-        {isOpenLiveView && (
-          <LiveView show={isOpenLiveView} onClose={() => setIsOpenLiveView(false)} data={camera} />
-        )}
+        {isOpenLiveView && <LiveView show={isOpenLiveView} onClose={() => setIsOpenLiveView(false)} data={camera} />}
       </Grid>
     </Grid>
   )

@@ -655,7 +655,7 @@ const Add = ({ apiData, assettypeStatus }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                      // loading={loading}
+                        // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.1}></Grid>
@@ -741,7 +741,7 @@ const Add = ({ apiData, assettypeStatus }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                      // loading={loading}
+                        // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.4}></Grid>
@@ -859,7 +859,7 @@ const Add = ({ apiData, assettypeStatus }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                      // loading={loading}
+                        // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.1}></Grid>
@@ -972,8 +972,8 @@ const Add = ({ apiData, assettypeStatus }) => {
                                   assetType.status.name === 'connected'
                                     ? 'lightgreen'
                                     : assetType.status.name === 'disconnected'
-                                      ? 'red'
-                                      : 'orange',
+                                    ? '#FF9F43'
+                                    : 'orange',
                                 borderRadius: '10px',
                                 padding: '5px 10px',
                                 width: '70%',
@@ -984,8 +984,8 @@ const Add = ({ apiData, assettypeStatus }) => {
                               {assetType.status.name === 'connected'
                                 ? 'Đã kết nối'
                                 : assetType.status.name === 'disconnected'
-                                  ? 'Mất kết nối'
-                                  : assetType.status.name}
+                                ? 'Mất kết nối'
+                                : assetType.status.name}
                             </div>
                           ) : (
                             assetType.status.name
@@ -1043,9 +1043,7 @@ const Add = ({ apiData, assettypeStatus }) => {
             onClose={() => setIsOpenAddDevice(false)}
           />
         )}
-        {isOpenLiveView && (
-          <LiveView show={isOpenLiveView} onClose={() => setIsOpenLiveView(false)} data={camera} />
-        )}
+        {isOpenLiveView && <LiveView show={isOpenLiveView} onClose={() => setIsOpenLiveView(false)} data={camera} />}
       </Grid>
       <ImportPopup open={openPopup} handleClose={handleClosePopup} />
       <CustomDialog

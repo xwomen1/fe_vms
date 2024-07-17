@@ -31,12 +31,14 @@ import {
 import CustomTextField from 'src/@core/components/mui/text-field'
 import { format } from 'date-fns'
 import UpdateDoor from '../detail/DoorAccessUpdate'
+import Add from '../detail/add'
 
 const DoorAccess = () => {
   const [reload, setReload] = useState(0)
   const [loading, setLoading] = useState(false)
   const [dataList, setDataList] = useState([])
   const [isOpenUpdate, setIsOpenUpdate] = useState(false)
+  const [isOpenAdd, setIsOpenAdd] = useState(false)
   const [idUpdate, setIdUpdate] = useState(null)
   const [pageSize, setPageSize] = useState(25)
   const [anchorEl, setAnchorEl] = useState(null)
@@ -47,7 +49,11 @@ const DoorAccess = () => {
 
   useEffect(() => {
     fetchDataList()
-  }, [reload])
+  }, [reload, page, pageSize])
+
+  const handlePageChange = (event, newPage) => {
+    setPage(newPage)
+  }
 
   const handleOpenMenu = event => {
     setAnchorEl(event.currentTarget)
@@ -71,8 +77,8 @@ const DoorAccess = () => {
           Authorization: `Bearer ${token}`
         },
         params: {
-          page: 1,
-          limit: 25
+          page: page,
+          limit: pageSize
         }
       }
 
@@ -87,6 +93,7 @@ const DoorAccess = () => {
           doorGroupName: item.policies.map(policy => policy.doorGroupName).join(', ') // Lấy tất cả doorGroupName và nối thành chuỗi
         }))
       )
+      setTotal(response.data.totalPage)
     } catch (error) {
       toast.error(error.message)
     } finally {
@@ -97,7 +104,7 @@ const DoorAccess = () => {
   return (
     <>
       <Grid>
-        <Button variant='contained'> Lịch hoạt động</Button>
+        <Button variant='contained'> Danh sách quản lý truy cập cửa</Button>
       </Grid>
       <br></br>
       <Card>
@@ -113,7 +120,13 @@ const DoorAccess = () => {
             <Grid container spacing={2}>
               <Grid item>
                 <Box sx={{ float: 'right' }}>
-                  <Button aria-label='Thêm mới' variant='contained'>
+                  <Button
+                    onClick={() => {
+                      setIsOpenAdd(true)
+                    }}
+                    aria-label='Thêm mới'
+                    variant='contained'
+                  >
                     thêm mới
                     <Icon icon='tabler:plus' />
                   </Button>
@@ -132,6 +145,7 @@ const DoorAccess = () => {
                 <TableCell sx={{ padding: '16px' }}>Cửa</TableCell>
                 <TableCell sx={{ padding: '16px' }}>Lịch</TableCell>
                 <TableCell sx={{ padding: '16px' }}>Người cập nhật</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Thao tác</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -155,6 +169,19 @@ const DoorAccess = () => {
                     <TableCell>{user.doorGroupName}</TableCell>
                     <TableCell>{user.description}</TableCell>
                     <TableCell>{user.lastUpdatedByUser?.fullName}</TableCell>
+                    <TableCell>
+                      {' '}
+                      <Box>
+                        <Button
+                          onClick={() => {
+                            setIdUpdate(user.id)
+                            setIsOpenUpdate(true)
+                          }}
+                        >
+                          <Icon icon='tabler:edit' />
+                        </Button>
+                      </Box>
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (
@@ -183,7 +210,12 @@ const DoorAccess = () => {
               </Menu>
             </Grid>
             <Grid item xs={6}>
-              <Pagination count={total} color='primary' onChange={(event, page) => handlePageChange(page)} />
+              <Pagination
+                count={total}
+                color='primary'
+                page={page}
+                onChange={(event, newPage) => handlePageChange(event, newPage)}
+              />
             </Grid>
           </Grid>
         </Grid>
@@ -195,6 +227,9 @@ const DoorAccess = () => {
           id={idUpdate}
           setReload={() => setReload(reload + 1)}
         />
+      )}
+      {isOpenAdd && (
+        <Add show={isOpenAdd} onClose={() => setIsOpenAdd(false)} setReload={() => setReload(reload + 1)} />
       )}
     </>
   )

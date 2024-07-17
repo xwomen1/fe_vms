@@ -26,15 +26,26 @@ const navigation = () => {
           icon: 'tabler:calendar-month'
         },
 
-        // {
-        //   path: '/pages/door-access/list',
-        //   title: 'Quyền truy cập cửa',
-        //   icon: 'tabler:door-enter'
-        // },
+        {
+          path: '/pages/door-access/list',
+          title: 'Quyền truy cập cửa',
+          icon: 'tabler:door-enter'
+        },
         {
           path: '/pages/schedule-access/list',
           title: 'Quản lý lịch',
           icon: 'tabler:calendar-due'
+        },
+
+        {
+          path: '/pages/door-management/list',
+          title: 'Quản lý cửa',
+          icon: 'tabler:door'
+        },
+        {
+          path: '/pages/group-access/list',
+          title: 'Nhóm quyền truy cập',
+          icon: 'tabler:mood-check'
         },
 
         {
