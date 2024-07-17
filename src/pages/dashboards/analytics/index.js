@@ -32,6 +32,7 @@ import Icon from 'src/@core/components/icon'
 import { Cell, Pie, PieChart } from 'recharts'
 import { Legend } from 'chart.js'
 import dynamic from 'next/dynamic'
+import EventDetails from './popups/eventDetails'
 
 const EventList = () => {
   const [deviceList, setDeviceList] = useState(null)
@@ -44,6 +45,8 @@ const EventList = () => {
   const [error, setError] = useState(null)
   const [total, setTotalPage] = useState(0)
   const [total1, setTotalPage1] = useState(0)
+  const [eventDetail, setEventDetail] = useState(null)
+  const [isOpenView, setIsOpenView] = useState(false)
 
   const [page, setPage] = useState(1)
   const [page1, setPage1] = useState(1)
@@ -375,45 +378,50 @@ const EventList = () => {
             }}
           />
           <Grid container spacing={0}>
-            <TableContainer sx={{ maxHeight: 400 }}>
+            <TableContainer component={Paper} sx={{ maxHeight: 600 }}>
               <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
                 <TableHead>
                   <TableRow>
-                    <TableCell style={{ width: '20px' }}>STT</TableCell>
-                    {columns.map(({ id, label, field, renderCell, align, maxWidth }) => (
-                      <TableCell key={id} align={align} sx={{ maxWidth }}>
-                        {label}
+                    <TableCell>STT</TableCell>
+                    {columns.map(column => (
+                      <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
+                        {column.label}
                       </TableCell>
                     ))}
+                    <TableCell>Thao tác</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {error ? (
-                    <TableRow>
-                      <TableCell colSpan={columns.length + 1} align='center' style={{ color: 'red' }}>
-                        {error}
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    deviceList?.slice(0, pageSize).map((row, index) => (
+                  {deviceList?.slice(0, pageSize).map((row, index) => {
+                    return (
                       <TableRow hover tabIndex={-1} key={index}>
                         <TableCell>{index + 1}</TableCell>
-                        {columns.map(({ field, renderCell, align, maxWidth }) => {
-                          const value = row[field]
+                        {columns.map(column => {
+                          const value = row[column.field]
 
                           return (
-                            <TableCell
-                              key={field}
-                              align={align}
-                              sx={{ maxWidth, wordBreak: 'break-word', flexWrap: 'wrap' }}
-                            >
-                              {renderCell ? renderCell(value) : value}
+                            <TableCell key={column.id} align={column.align}>
+                              {column.renderCell ? column.renderCell(value) : value}
                             </TableCell>
                           )
                         })}
+                        <TableCell>
+                          <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center' }}>
+                            <IconButton
+                              size='small'
+                              sx={{ color: 'text.secondary' }}
+                              onClick={() => {
+                                setIsOpenView(true)
+                                setEventDetail(row)
+                              }}
+                            >
+                              <Icon icon='tabler:eye' />
+                            </IconButton>
+                          </Grid>
+                        </TableCell>
                       </TableRow>
-                    ))
-                  )}
+                    )
+                  })}
                 </TableBody>
               </Table>
             </TableContainer>
@@ -496,6 +504,14 @@ const EventList = () => {
             </Card>
           </Grid>
         </Grid>
+        {isOpenView && (
+          <EventDetails
+            show={isOpenView}
+            onClose={() => setIsOpenView(false)}
+            data={eventDetail}
+            setReload={() => setReload(reload + 1)}
+          />
+        )}
       </Grid>
     </>
   )
