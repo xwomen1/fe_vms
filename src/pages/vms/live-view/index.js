@@ -65,15 +65,10 @@ const Caller = () => {
       )
       let listCamera = []
       setCameraList(res?.data)
-      if (res.data.length > 0) {
-        res.data[selectIndex]?.cameras.map((camera, index) => {
-          if (index < page * numberShow && index >= (page - 1) * numberShow) {
-            listCamera.push({
-              ...camera,
-              channel: 'Sub'
-            })
-          }
-        })
+      if (res.data.length > 0 && res.data[selectIndex]?.cameras) {
+        res.data[selectIndex].cameras.slice((page - 1) * numberShow, page * numberShow).forEach(camera => {
+          listCamera.push({ ...camera, channel: 'Sub' });
+        });
       }
       setCameraGroup(listCamera)
     } catch (error) {
@@ -96,6 +91,7 @@ const Caller = () => {
 
       return item
     })
+    console.log('newCamera', newCamera);
     setCameraGroup(newCamera)
   }
 

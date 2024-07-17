@@ -27,6 +27,9 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
   const [remoteStream, setRemoteStream] = useState(null)
   const [loading, setLoading] = useState(false)
   const remoteVideoRef = useRef(null)
+  const [websocketStatus, setWebsocketStatus] = useState(true)
+  const [rtcPeerStatus, setRtcPeerStatus] = useState(false)
+
   const [heightDiv, setHeightDiv] = useState(100)
   const [status, setStatus] = useState('')
   const [reload, setReload] = useState(0)
@@ -48,24 +51,27 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
     return [...Array(length)].map(pickRandom).join('')
   }
   const SOCKET_LIVE_VIEW = process.env.NEXT_PUBLIC_SOCKET_CCTT
+  function delay(milliseconds) {
+    return new Promise(resolve => {
+      setTimeout(resolve, milliseconds);
+    })
+  }
 
-  const createWsConnection = () => {
-    const ws = new WebSocket(`${SOCKET_LIVE_VIEW}/ivis/vms/api/v0/ws/signaling/${randomId(10)}`)
+  const createWsConnection = async () => {
 
-    // console.log('createWsConnection', ws)
-    setWebsocket(ws)
     const pc = new RTCPeerConnection(config)
-    setRtcPeerConnection(pc)
 
     // listen for remote tracks and add them to remote stream
     pc.ontrack = event => {
       setLoading(false)
       const stream = event.streams[0]
       try {
-        if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {
-          setRemoteStream(stream)
-          remoteVideoRef.current.srcObject = stream
-        }
+        // if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {
+        //   setRemoteStream(stream)
+        //   remoteVideoRef.current.srcObject = stream
+        // }
+        setRemoteStream(stream)
+        remoteVideoRef.current.srcObject = stream
       } catch (err) {
         console.log(err)
       }
@@ -74,48 +80,121 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
       // console.log('ICE connection state change:', pc.iceConnectionState)
       if (pc.iceConnectionState === 'closed' || pc.iceConnectionState === 'failed') {
         // Handle connection closed or failed
+
       }
+
     }
+    pc.onconnectionstatechange = event => {
+      setStatus(pc.connectionState)
+    }
+    setRtcPeerConnection(pc)
+    const ws = new WebSocket(`${SOCKET_LIVE_VIEW}/ivis/vms/api/v0/ws/signaling/${randomId(10)}`)
+
+    // console.log('createWsConnection', ws)
+    setWebsocket(ws)
+    await delay(500)
 
     // Close the RTCPeerConnection
     // pc.close()
   }
+  useEffect(() => {
+    if (!websocketStatus) {
+      setWebsocket(null)
+      setRtcPeerConnection(null)
+      createWsConnection()
+    }
+
+
+  }, [websocketStatus])
+  useEffect(() => {
+    if ((rtcPeerConnection != null) && (websocketStatus) && (websocket != null)) {
+      websocket.send(
+        JSON.stringify({
+          id: id,
+          type: 'request',
+          channel: channel,
+        })
+      )
+    }
+  }, [rtcPeerConnection, websocketStatus, websocket])
+
+  useEffect(() => {
+    if (websocket != null) {
+
+
+      websocket.addEventListener('open', () => {
+        setWebsocketStatus(true)
+
+        // console.log('WebSocket connection established')
+
+      })
+      websocket.addEventListener('message', handleMessage)
+      websocket.addEventListener('close', () => {
+        // console.log('WebSocket connection closed')
+        //clear old websocket
+        setWebsocketStatus(false)
+
+      })
+      websocket.addEventListener('error', error => {
+        console.error('WebSocket error:', error)
+      })
+    }
+  }, [websocket])
 
   const connectWebSocket = () => {
-    createWsConnection()
+    if (websocketStatus) {
+      //already have websocket => close it
+      if (websocket) {
+        websocket.close()
 
-    if (websocket) {
-      websocket.close()
-      setWebsocket(null) // Clear websocket reference
+        //setWebsocket(null) // Clear websocket reference
+      }
+      if (rtcPeerConnection) {
+        rtcPeerConnection.close()
+
+        //setRtcPeerConnection(null) // Clear rtcPeerConnection reference
+      }
+    } else {
+      //websocket already close not not available 
+      createWsConnection()
     }
-    if (rtcPeerConnection) {
-      rtcPeerConnection.close()
-      setRtcPeerConnection(null) // Clear rtcPeerConnection reference
-    }
+
+
+
   }
 
   useEffect(() => {
-    if (websocket && channel) {
-      // Close the existing WebSocket and RTCPeerConnection
-      if (rtcPeerConnection) {
-        rtcPeerConnection.close();
-        setRtcPeerConnection(null);
-      }
-      if (websocket) {
-        websocket.close();
-        setWebsocket(null);
-      }
+    // if (websocket && channel) {
+    //   // Close the existing WebSocket and RTCPeerConnection
+    //   if (rtcPeerConnection) {
+    //     rtcPeerConnection.close();
+    //     setRtcPeerConnection(null);
+    //   }
+    //   if (websocket) {
+    //     websocket.close();
+    //     setWebsocket(null);
+    //   }
 
-      // Create a new WebSocket and RTCPeerConnection
-      createWsConnection();
-    }
-    console.log('remoteVideoRef', remoteVideoRef);
+    //   // Create a new WebSocket and RTCPeerConnection
+    //   createWsConnection();
+    // }
+    // if (websocketStatus == true) {
+    //   if (websocket == null) {
+    //     setWebsocketStatus(false)
+    //   }else {
+
+    //   }
+    //   //connectWebSocket()
+    // }
+    setWebsocketStatus(false)
+
+    // console.log('remoteVideoRef', remoteVideoRef);
   }, [id, channel]);
 
 
-  useEffect(() => {
-    connectWebSocket()
-  }, [])
+  // useEffect(() => {
+  //   connectWebSocket()
+  // }, [])
 
   // send message to WebSocket server
   const sendMessage = message => {
@@ -166,38 +245,38 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
   }
 
   // set up WebSocket event listeners
-  useEffect(() => {
-    if (websocket) {
-      setLoading(true)
-      websocket.addEventListener('open', () => {
-        // console.log('WebSocket connection established')
-        websocket.send(
-          JSON.stringify({
-            id: id,
-            type: 'request',
-            channel: channel,
-          })
-        )
-      })
-      websocket.addEventListener('message', handleMessage)
-      websocket.addEventListener('close', () => {
-        // console.log('WebSocket connection closed')
-      })
-      websocket.addEventListener('error', error => {
-        console.error('WebSocket error:', error)
-      })
-    }
-  }, [websocket, channel])
+  // useEffect(() => {
+  //   if (websocket) {
+  //     setLoading(true)
+  //     websocket.addEventListener('open', () => {
+  //       // console.log('WebSocket connection established')
+  //       websocket.send(
+  //         JSON.stringify({
+  //           id: id,
+  //           type: 'request',
+  //           channel: channel,
+  //         })
+  //       )
+  //     })
+  //     websocket.addEventListener('message', handleMessage)
+  //     websocket.addEventListener('close', () => {
+  //       // console.log('WebSocket connection closed')
+  //     })
+  //     websocket.addEventListener('error', error => {
+  //       console.error('WebSocket error:', error)
+  //     })
+  //   }
+  // }, [websocket, channel])
 
   // set up RTCPeerConnection event listeners
-  useEffect(() => {
-    if (rtcPeerConnection) {
-      rtcPeerConnection.addEventListener('connectionstatechange', () => {
-        // console.log('RTCPeerConnection state:', rtcPeerConnection.connectionState)
-        setStatus(rtcPeerConnection.connectionState)
-      })
-    }
-  }, [rtcPeerConnection])
+  // useEffect(() => {
+  //   if (rtcPeerConnection) {
+  //     rtcPeerConnection.addEventListener('connectionstatechange', () => {
+  //       // console.log('RTCPeerConnection state:', rtcPeerConnection.connectionState)
+  //       setStatus(rtcPeerConnection.connectionState)
+  //     })
+  //   }
+  // }, [rtcPeerConnection])
 
   return (
     <div className='portlet portlet-video live' style={{ width: '100%' }}>

@@ -100,9 +100,9 @@ const Caller = () => {
           const newAssetType = prevAssetType.map(camera => {
             if (camera.id === entry1.id) {
               if (camera.status.name !== entry1.status) {
-                console.log('AssetType with ID', entry1.id, 'has changed status.')
-                console.log('Previous status:', camera.status.name)
-                console.log('New status:', entry1.status)
+                // console.log('AssetType with ID', entry1.id, 'has changed status.')
+                // console.log('Previous status:', camera.status.name)
+                // console.log('New status:', entry1.status)
               }
 
               return { ...camera, status: { name: entry1.status } }
@@ -119,8 +119,6 @@ const Caller = () => {
     },
     [assettypeStatus]
   )
-
-  console.log(assettypeStatus)
 
   const handleChange = (event, newValue) => {
     setValue(newValue)

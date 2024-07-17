@@ -27,7 +27,7 @@ import Icon from 'src/@core/components/icon'
 // ** Custom Component Imports
 import CustomTextField from 'src/@core/components/mui/text-field'
 import CustomAutocomplete from 'src/@core/components/mui/autocomplete'
-import AddPopup from './popup/addAssign'
+import AddPopup from './../popup/addAssign'
 
 const sleep = (delay = 0) => {
   return new Promise(resolve => {
@@ -258,7 +258,7 @@ const AutocompleteAsynchronousRequest = () => {
                           sx={{ maxWidth, wordBreak: 'break-word', flexWrap: 'wrap' }}
                         >
                           {field === 'name' ? (
-                            <a component={Link} href={`/kpi/assignkpi-info`}>
+                            <a component={Link} href={`/kpi/assign-kpi/assign`}>
                               {value}
                             </a>
                           ) : renderCell ? (
