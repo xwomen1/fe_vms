@@ -242,12 +242,12 @@ const Caller = () => {
 
   return (
     <DivStyle
-      style={{ backgroundColor: 'black', width: '100%', minHeight: '100vh', color: 'white', position: 'relative' }}
+      style={{ backgroundColor: 'black', width: '100%', minHeight: '90vh', color: 'white', position: 'relative' }}
     >
       <Grid container spacing={0}>
         {cameraGroup.length > 0 &&
           cameraGroup.map((camera, index) => (
-            <Grid item xs={Math.floor(12 / sizeScreen.split('x')[0])} key={index}>
+            <Grid item xs={Math.floor(12 / sizeScreen.split('x')[0])} key={index} >
               <ViewCamera
                 name={camera?.deviceName}
                 id={camera.id}
@@ -267,7 +267,7 @@ const Caller = () => {
               />
             </Grid>
           ))}
-        <div className='video-controls'>
+        <div className='video-controls' >
           <div
             style={{
               width: '100%'

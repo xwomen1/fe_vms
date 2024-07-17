@@ -27,7 +27,7 @@ import Icon from 'src/@core/components/icon'
 // ** Custom Component Imports
 import CustomTextField from 'src/@core/components/mui/text-field'
 import CustomAutocomplete from 'src/@core/components/mui/autocomplete'
-import AddPopup from './popup/addAssign'
+import AddPopup from './../popup/addAssign'
 
 const sleep = (delay = 0) => {
   return new Promise(resolve => {
@@ -162,6 +162,7 @@ const AutocompleteAsynchronousRequest = () => {
   const handleCloseAdd = () => {
     setOpenPopupAdd(false)
   }
+
   useEffect(() => {
     // Gán dữ liệu giả khi component được mount
     setFakeData(generateFakeData())
@@ -171,6 +172,7 @@ const AutocompleteAsynchronousRequest = () => {
     setKpiData([...kpiData, { ...newKpi, stt: kpiData.length + 1 }])
     handleCloseAdd()
   }
+
   useEffect(() => {
     let active = true
     if (!loading) {
@@ -206,10 +208,11 @@ const AutocompleteAsynchronousRequest = () => {
           py: 4,
           flexDirection: ['column', 'row'],
           '& .MuiCardHeader-action': { m: 0 },
-          alignItems: ['flex-start', 'center']
+          alignItems: ['flex-start', 'center'],
+          justifyContent: 'space-between'
         }}
         action={
-          <Grid item xs={8} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+          <Grid item xs={8} sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
             <CustomTextField
               sx={{ mr: 2 }}
               placeholder='Tìm kiếm'
@@ -258,7 +261,7 @@ const AutocompleteAsynchronousRequest = () => {
                           sx={{ maxWidth, wordBreak: 'break-word', flexWrap: 'wrap' }}
                         >
                           {field === 'name' ? (
-                            <a component={Link} href={`/kpi/assignkpi-info`}>
+                            <a component={Link} href={`/kpi/assess-kpi/assess-info`}>
                               {value}
                             </a>
                           ) : renderCell ? (

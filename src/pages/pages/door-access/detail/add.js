@@ -24,64 +24,14 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 import { Autocomplete } from '@mui/material'
 import CircularProgress from '@mui/material/CircularProgress'
 
-const DoorAccessUpdate = ({ show, onClose, id }) => {
+const DoorAccessUpdate = ({ show, onClose, setReload }) => {
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
-  const [door, setDoor] = useState(null)
+  const [door, setDoor] = useState({ name: '', description: '' })
   const [groupOptions, setGroupOptions] = useState([])
-  const [doorOptions, setDoorOptions] = useState({})
+  const [doorOptions, setDoorOptions] = useState([]) // doorOptions là mảng chứa các lựa chọn cửa cho từng hàng
   const [scheduleOptions, setScheduleOptions] = useState([])
   const [loading, setLoading] = useState(false)
-  const [policyCount, setPolicyCount] = useState(0)
-
-  const fetchDataList = async () => {
-    try {
-      setLoading(true)
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-
-      const response = await axios.get(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/door-accesses/${id}`,
-        config
-      )
-      setDoor(response.data)
-
-      const doorGroupIds = response.data.policies.map(policy => policy.doorGroupId).filter(Boolean)
-      await Promise.all(doorGroupIds.map(fetchDoorOptions))
-
-      setLoading(false)
-    } catch (error) {
-      console.error('Error fetching data:', error)
-      toast.error(error.message)
-      setLoading(false)
-    }
-  }
-
-  const fetchDoorOptions = async doorGroupId => {
-    try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-
-      const response = await axios.get(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/doors?keyword=&limit=50&page=1&doorGroupIds=${doorGroupId}`,
-        config
-      )
-
-      setDoorOptions(prevState => ({
-        ...prevState,
-        [doorGroupId]: response.data.rows
-      }))
-    } catch (error) {
-      console.error('Error fetching door options:', error)
-      toast.error(error.message)
-    }
-  }
+  const [doorGroupIds, setDoorGroupIds] = useState([]) // doorGroupIds là mảng chứa các doorGroupId cho từng hàng
 
   const fetchAllSchedules = async () => {
     try {
@@ -122,7 +72,6 @@ const DoorAccessUpdate = ({ show, onClose, id }) => {
 
   useEffect(() => {
     if (show) {
-      fetchDataList()
       fetchAllSchedules()
     }
   }, [show])
@@ -145,7 +94,6 @@ const DoorAccessUpdate = ({ show, onClose, id }) => {
           )
           const parentGroups = response.data
 
-          // Function to recursively fetch child groups
           const fetchChildGroups = async parentId => {
             const childResponse = await axios.get(
               `https://dev-ivi.basesystem.one/smc/access-control/api/v0/door-groups/children-lv1?parentId=${parentId}`,
@@ -154,7 +102,6 @@ const DoorAccessUpdate = ({ show, onClose, id }) => {
             const childGroups = childResponse.data
             for (let childGroup of childGroups) {
               if (childGroup.isParent) {
-                // Recursively fetch child groups if it's a parent
                 childGroup.children = await fetchChildGroups(childGroup.id)
               }
             }
@@ -162,7 +109,6 @@ const DoorAccessUpdate = ({ show, onClose, id }) => {
             return childGroups
           }
 
-          // Process each parent group to fetch its children recursively
           const processedGroups = []
           for (let parentGroup of parentGroups) {
             if (parentGroup.isParent) {
@@ -171,7 +117,6 @@ const DoorAccessUpdate = ({ show, onClose, id }) => {
             processedGroups.push(parentGroup)
           }
 
-          // Flatten nested structure for Autocomplete options
           const flattenGroups = flattenNestedGroups(processedGroups)
           setGroupOptions(flattenGroups)
         } catch (error) {
@@ -184,6 +129,43 @@ const DoorAccessUpdate = ({ show, onClose, id }) => {
       fetchParentData()
     }
   }, [show])
+
+  useEffect(() => {
+    const fetchDoorsByGroupId = async (doorGroupId, rowIndex) => {
+      if (doorGroupId) {
+        try {
+          setLoading(true)
+
+          const config = {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+
+          const response = await axios.get(
+            `https://dev-ivi.basesystem.one/smc/access-control/api/v0/doors?keyword=&limit=50&page=1&doorGroupIds=${doorGroupId}`,
+            config
+          )
+
+          setDoorOptions(prevDoorOptions => {
+            const newDoorOptions = [...prevDoorOptions]
+            newDoorOptions[rowIndex] = response.data.rows
+
+            return newDoorOptions
+          })
+        } catch (error) {
+          console.error('Error fetching doors by group ID:', error)
+          toast.error(error.message)
+        } finally {
+          setLoading(false)
+        }
+      }
+    }
+
+    doorGroupIds.forEach((doorGroupId, index) => {
+      fetchDoorsByGroupId(doorGroupId, index)
+    })
+  }, [doorGroupIds, token])
 
   const flattenNestedGroups = groups => {
     const flattenedGroups = []
@@ -203,58 +185,8 @@ const DoorAccessUpdate = ({ show, onClose, id }) => {
     return flattenedGroups
   }
 
-  const handleAutocompleteChange = (newValue, rowIndex, field) => {
-    setDoor(prevDoor => {
-      const updatedPolicies = [...prevDoor.policies]
-      const updatedPolicy = { ...updatedPolicies[rowIndex] }
-
-      if (field === 'doorGroupId') {
-        updatedPolicy.doorGroupId = newValue ? newValue.id : null
-        updatedPolicy.doorId = null
-      } else if (field === 'doorId') {
-        updatedPolicy.doorId = newValue ? newValue.id : null
-      } else if (field === 'schedule') {
-        updatedPolicy.schedule = newValue || null
-      }
-
-      updatedPolicies[rowIndex] = updatedPolicy
-
-      return {
-        ...prevDoor,
-        policies: updatedPolicies
-      }
-    })
-
-    if (field === 'doorGroupId' && newValue) {
-      fetchDoorOptions(newValue.id)
-    }
-  }
-
   const handleClose = () => {
-    setDoor(null)
     onClose()
-  }
-
-  const handleAddPolicy = () => {
-    setDoor(prevDoor => ({
-      ...prevDoor,
-      policies: [
-        ...prevDoor.policies,
-        {
-          doorId: null,
-          schedule: null,
-          applyMode: 'CUSTOMIZE'
-        }
-      ]
-    }))
-    setPolicyCount(policyCount + 1) // Increment policyCount to create a new ID for the next policy
-  }
-
-  const handleDeletePolicy = index => {
-    setDoor(prevDoor => ({
-      ...prevDoor,
-      policies: prevDoor.policies.filter((_, i) => i !== index)
-    }))
   }
 
   const handleInputChange = (field, value) => {
@@ -264,43 +196,66 @@ const DoorAccessUpdate = ({ show, onClose, id }) => {
     }))
   }
 
-  const handleSave = async () => {
-    try {
-      setLoading(true)
+  const handleGroupChange = (event, value, rowIndex) => {
+    if (value) {
+      setDoorGroupIds(prevDoorGroupIds => {
+        const newDoorGroupIds = [...prevDoorGroupIds]
+        newDoorGroupIds[rowIndex] = value.id
 
+        return newDoorGroupIds
+      })
+    } else {
+      setDoorGroupIds(prevDoorGroupIds => {
+        const newDoorGroupIds = [...prevDoorGroupIds]
+        newDoorGroupIds[rowIndex] = null
+
+        return newDoorGroupIds
+      })
+    }
+  }
+
+  const handleAddRow = () => {
+    setDoorGroupIds(prevDoorGroupIds => [...prevDoorGroupIds, null])
+    setDoorOptions(prevDoorOptions => [...prevDoorOptions, []])
+  }
+
+  const handleDeleteRow = rowIndex => {
+    setDoorGroupIds(prevDoorGroupIds => prevDoorGroupIds.filter((_, index) => index !== rowIndex))
+    setDoorOptions(prevDoorOptions => prevDoorOptions.filter((_, index) => index !== rowIndex))
+  }
+
+  const handleSave = async () => {
+    const payload = {
+      description: door.description,
+      name: door.name,
+      policies: doorGroupIds.map((doorGroupId, index) => ({
+        applyMode: 'CUSTOMIZE',
+        doorId: doorOptions[index]?.[0]?.id || '', // Lấy doorId của cửa đầu tiên trong danh sách cho hàng đó
+        scheduleId: scheduleOptions[index]?.id || ''
+      }))
+    }
+
+    try {
       const config = {
         headers: {
           Authorization: `Bearer ${token}`
         }
       }
 
-      // Ensure to retrieve doorId, applyMode, and scheduleId from the original policies array
-      const updatedPolicies = door.policies.map(policy => ({
-        doorId: policy.doorId,
-        applyMode: policy.applyMode,
-        scheduleId: policy.schedule?.id || null
-      }))
-
-      const updatedDoor = {
-        name: door.name,
-        description: door.description,
-        policies: updatedPolicies
-      }
-
-      const response = await axios.put(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/door-accesses/${id}`,
-        updatedDoor,
+      const response = await axios.post(
+        'https://dev-ivi.basesystem.one/smc/access-control/api/v0/door-accesses',
+        payload,
         config
       )
-
-      // Handle successful response
-      toast.success('Cập nhật thành công')
-      handleClose()
+      toast.success('Lưu thành công!')
+      setReload()
     } catch (error) {
-      console.error('Error updating door access:', error)
-      toast.error(error.message)
+      console.error('Error saving data:', error)
+      toast.error(error.response?.data?.message || error.message)
     } finally {
       setLoading(false)
+      setReload()
+      onClose()
     }
   }
 
@@ -319,7 +274,6 @@ const DoorAccessUpdate = ({ show, onClose, id }) => {
               <CustomTextField
                 onChange={e => handleInputChange('name', e.target.value)}
                 label='Tên cấp truy cập'
-                value={door ? door.name : ''}
                 fullWidth
               />
             </Grid>
@@ -327,7 +281,6 @@ const DoorAccessUpdate = ({ show, onClose, id }) => {
               <CustomTextField
                 label='Mô tả'
                 onChange={e => handleInputChange('description', e.target.value)}
-                value={door ? door.description : ''}
                 fullWidth
               />
             </Grid>
@@ -340,44 +293,39 @@ const DoorAccessUpdate = ({ show, onClose, id }) => {
                       <TableCell>Cửa</TableCell>
                       <TableCell>Lịch hoạt động</TableCell>
                       <TableCell align='center'>
-                        <IconButton size='small' onClick={handleAddPolicy}>
+                        <IconButton size='small' onClick={handleAddRow}>
                           <Icon icon='bi:plus' />
                         </IconButton>
                       </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {door?.policies.map((policy, index) => (
+                    {doorGroupIds.map((doorGroupId, index) => (
                       <TableRow key={index}>
                         <TableCell>
                           <Autocomplete
-                            value={groupOptions.find(option => option.id === policy.doorGroupId) || null}
                             options={groupOptions}
                             getOptionLabel={option => option.name}
-                            onChange={(event, newValue) => handleAutocompleteChange(newValue, index, 'doorGroupId')}
+                            onChange={(event, value) => handleGroupChange(event, value, index)}
                             renderInput={params => <CustomTextField {...params} />}
                           />
                         </TableCell>
                         <TableCell>
                           <Autocomplete
-                            value={doorOptions[policy.doorGroupId]?.find(option => option.id === policy.doorId) || null}
-                            options={doorOptions[policy.doorGroupId] || []}
+                            options={doorOptions[index] || []}
                             getOptionLabel={option => option.name}
-                            onChange={(event, newValue) => handleAutocompleteChange(newValue, index, 'doorId')}
                             renderInput={params => <CustomTextField {...params} />}
                           />
                         </TableCell>
                         <TableCell>
                           <Autocomplete
-                            value={scheduleOptions.find(option => option.id === policy.schedule?.id) || null}
                             options={scheduleOptions}
                             getOptionLabel={option => option.name}
-                            onChange={(event, newValue) => handleAutocompleteChange(newValue, index, 'schedule')}
                             renderInput={params => <CustomTextField {...params} />}
                           />
                         </TableCell>
                         <TableCell align='center'>
-                          <IconButton size='small' onClick={() => handleDeletePolicy(index)}>
+                          <IconButton size='small' onClick={() => handleDeleteRow(index)}>
                             <Icon icon='bi:trash' />
                           </IconButton>
                         </TableCell>
@@ -385,33 +333,15 @@ const DoorAccessUpdate = ({ show, onClose, id }) => {
                     ))}
                   </TableBody>
                 </Table>
-                {loading && (
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      transform: 'translate(-50%, -50%)'
-                    }}
-                  >
-                    <CircularProgress />
-                  </Box>
-                )}
               </TableContainer>
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions
-          sx={{
-            justifyContent: 'flex-end',
-            px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
-            pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
-          }}
-        >
+        <DialogActions sx={{ pr: 4, pb: 8 }}>
           <Button onClick={onClose} variant='contained' color='primary'>
             Hủy
           </Button>
-          <Button variant='contained' color='primary' onClick={handleSave}>
+          <Button onClick={handleSave} variant='contained' color='primary'>
             Lưu
           </Button>
         </DialogActions>

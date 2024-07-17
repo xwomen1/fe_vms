@@ -47,8 +47,8 @@ const EventDetails = ({ show, onClose, data, setReload }) => {
     const [endTime, setEndTime] = useState(new Date().getTime())
 
     useEffect(() => {
-        setStartTime(timestamp - 5 * 60 * 1000)
-        setEndTime(timestamp + 5 * 60 * 1000)
+        setStartTime(timestamp - 15 * 1000)
+        setEndTime(timestamp + 15 * 1000)
     }, [timestamp])
 
     useEffect(() => {
@@ -69,10 +69,8 @@ const EventDetails = ({ show, onClose, data, setReload }) => {
                 endTime: convertDateToString(new Date(endTime))
             }
 
-            console.log('params: ', params);
-
             try {
-                const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/video/download?idCamera=${camera}&startTime=${params.startTime}&endTime=${params.endTime}`)
+                const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/video/downloadchoice?idCamera=${camera}&startTime=${params.startTime}&endTime=${params.endTime}`)
                 const videoDownloadUrl = res.data[0].videoDownLoad[0].video
 
                 if (videoDownloadUrl) {
@@ -171,7 +169,7 @@ const EventDetails = ({ show, onClose, data, setReload }) => {
                     }}
                 >
                     {
-                        value === '2' &&
+                        value === '1' &&
                         <Button type='submit' variant='contained' onClick={() => handleDownloadFile()}>
                             Xuất file
                         </Button>

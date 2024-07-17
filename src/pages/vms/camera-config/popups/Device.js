@@ -55,9 +55,11 @@ const Device = ({ onClose, camera }) => {
   const [disable, setDisable] = useState(true)
   const [cameras, setCamera] = useState(null)
   const [selectedProtocol, setSelectedProtocol] = useState(null)
-
+  const [selectNVR, setSelectedNVR] = useState('')
+  const [nvrs, setNVR] = useState([])
   const [protocol, setProtocol] = useState()
   const defaultValue = cameras?.type?.name || ''
+  const [idBox, setIdBox] = useState(null)
 
   const [cameraGroupSelect, setCameraGroupSelect] = useState({
     label: cameras?.type?.name || '',
@@ -85,7 +87,44 @@ const Device = ({ onClose, camera }) => {
     zoom: 14
   })
 
-  console.log(camera, 'camera')
+  const fetchNicTypesDevice = async () => {
+    try {
+      // setLoading(true)
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/device', config)
+
+      const nicTypes = response.data.map(item => ({
+        label: item.nameDevice,
+        value: item.id
+      }))
+      setNVR(nicTypes)
+
+      // Set selectedNicType here based on your business logic
+      if (nicTypes.length > 0) {
+        setSelectedNVR(nicTypes[0].id) // Set it to the first value in the array, or adjust as needed
+      }
+    } catch (error) {
+      console.error('Error fetching NIC types:', error)
+    } finally {
+      // setLoading(false)
+    }
+  }
+
+  const handleComboboxFocusDevice = () => {
+    fetchNicTypesDevice()
+  }
+
+  const handleDDNSChange = (event, newValue) => {
+    setSelectedNVR(newValue)
+    setIdBox(newValue.value)
+  }
 
   const handleLatitudeChange = event => {
     setLat(event.target.value)
@@ -522,6 +561,18 @@ const Device = ({ onClose, camera }) => {
               getOptionLabel={option => option.name}
               renderInput={params => <CustomTextField {...params} label='Giao thức' fullWidth />}
             />
+          </Grid>
+          <Grid item xs={0.1}></Grid>
+          <Grid item xs={3.9}>
+            <Autocomplete
+              onChange={handleDDNSChange}
+              options={nvrs}
+              getOptionLabel={option => option.label}
+              renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
+              onFocus={handleComboboxFocusDevice}
+
+              // loading={loading}
+            />{' '}
           </Grid>
 
           <Grid item xs={0.1}></Grid>

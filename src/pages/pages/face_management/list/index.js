@@ -469,6 +469,7 @@ const FaceManagement = () => {
                     <TableCell sx={{ padding: '16px' }}>Ảnh đối tượng</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Tên Đối tượng</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Lần cuối xuất hiện</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Loại đối tượng</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Trạng thái hoạt động </TableCell>
                     <TableCell sx={{ padding: '16px' }}>Chi tiết</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Xóa</TableCell>
@@ -499,6 +500,7 @@ const FaceManagement = () => {
                             </TableCell>
                             <TableCell>{user.name}</TableCell>
                             <TableCell>{formatDate(user.lastAppearance)}</TableCell>
+                            <TableCell>Nhân viên</TableCell>
                             <TableCell
                               style={{
                                 color: user.status ? 'green' : 'red'

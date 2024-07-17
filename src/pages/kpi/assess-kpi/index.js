@@ -1,14 +1,12 @@
 import { Button, Grid, Icon } from '@mui/material'
 
-import ListUser from './kpi-config'
+import ListUser from './assess'
 import Tab from '@mui/material/Tab'
 import TabPanel from '@mui/lab/TabPanel'
 import { styled } from '@mui/material/styles'
 import MuiTabList from '@mui/lab/TabList'
 import TabContext from '@mui/lab/TabContext'
 import { useState } from 'react'
-import TreeViewGroup from './kpi'
-import AssignKPI from './assignkpi'
 
 import Link from 'next/link'
 
@@ -51,21 +49,13 @@ const Caller = () => {
           <TabList onChange={handleChange} aria-label='customized tabs example'>
             <Tab
               value='1'
-              label='Thiết lập bộ KPI
-'
-            />
-            <Tab
-              value='2'
-              label='Danh mục chỉ tiêu KPIs
+              label='Đánh giá KPI
 '
             />
           </TabList>
         </Grid>
         <TabPanel value='1'>
           <ListUser />
-        </TabPanel>
-        <TabPanel value='2'>
-          <TreeViewGroup />
         </TabPanel>
       </TabContext>
     </Grid>
