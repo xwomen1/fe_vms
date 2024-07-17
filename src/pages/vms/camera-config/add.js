@@ -965,7 +965,7 @@ const Add = ({ apiData, assettypeStatus }) => {
                                   assetType.status.name === 'connected'
                                     ? 'lightgreen'
                                     : assetType.status.name === 'disconnected'
-                                    ? 'red'
+                                    ? '#FF9F43'
                                     : 'orange',
                                 borderRadius: '10px',
                                 padding: '5px 10px',

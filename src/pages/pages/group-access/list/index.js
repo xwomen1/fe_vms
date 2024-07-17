@@ -1,38 +1,35 @@
-import React, { useEffect, useState } from 'react'
-import authConfig from 'src/configs/auth'
+import React, { useState, useEffect, useCallback } from 'react'
+import TreeView from '@mui/lab/TreeView'
+import TreeItem from '@mui/lab/TreeItem'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import Swal from 'sweetalert2'
 import Icon from 'src/@core/components/icon'
-import Link from 'next/link'
+import CustomTextField from 'src/@core/components/mui/text-field'
+import authConfig from 'src/configs/auth'
+import Checkbox from '@mui/material/Checkbox'
+import Update from '../popups/Update'
 import {
   Box,
   Button,
   Card,
   CardHeader,
-  Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
   Grid,
   IconButton,
+  Paper,
   Menu,
   MenuItem,
   Pagination,
-  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
-  TableRow,
-  Typography
+  TableRow
 } from '@mui/material'
-import CustomTextField from 'src/@core/components/mui/text-field'
-import UpdateSchedule from '../detail/scheduleUpdate'
-import Add from '../detail/add'
+import Link from 'next/link'
 
-const ScheduleAccess = () => {
+const GroupAccess = () => {
   const [reload, setReload] = useState(0)
   const [loading, setLoading] = useState(false)
   const [dataList, setDataList] = useState([])
@@ -41,22 +38,16 @@ const ScheduleAccess = () => {
   const [pageSize, setPageSize] = useState(25)
   const [anchorEl, setAnchorEl] = useState(null)
   const pageSizeOptions = [25, 50, 100]
-  const [total, setTotal] = useState(1) // Khởi tạo giá trị total
-  const [isOpenAdd, setIsOpenAdd] = useState(false)
-  const [page, setPage] = useState(1) // Khởi tạo giá trị page
-
+  const [total, setTotal] = useState([1])
+  const [page, setPage] = useState(1)
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
-
-  useEffect(() => {
-    fetchDataList()
-  }, [reload])
-
-  const handlePageChange = (event, newPage) => {
-    setPage(newPage)
-  }
 
   const handleOpenMenu = event => {
     setAnchorEl(event.currentTarget)
+  }
+
+  const handlePageChange = (event, newPage) => {
+    setPage(newPage)
   }
 
   const handleCloseMenu = () => {
@@ -70,7 +61,7 @@ const ScheduleAccess = () => {
   }
 
   useEffect(() => {
-    fetchDataList() // Fetch lại dữ liệu khi page hoặc pageSize thay đổi
+    fetchDataList()
   }, [page, pageSize])
 
   const fetchDataList = async () => {
@@ -86,7 +77,10 @@ const ScheduleAccess = () => {
         }
       }
 
-      const response = await axios.get(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/schedules?`, config)
+      const response = await axios.get(
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/access-groups?`,
+        config
+      )
 
       setDataList(response.data.rows)
       setTotal(response.data.totalPage)
@@ -100,7 +94,7 @@ const ScheduleAccess = () => {
   return (
     <>
       <Grid>
-        <Button variant='contained'> Lịch hoạt động</Button>
+        <Button variant='contained'> Danh sách quản lý nhóm quyền truy cập</Button>
       </Grid>
       <br></br>
       <Card>
@@ -116,13 +110,7 @@ const ScheduleAccess = () => {
             <Grid container spacing={2}>
               <Grid item>
                 <Box sx={{ float: 'right' }}>
-                  <Button
-                    aria-label='Thêm mới'
-                    variant='contained'
-                    onClick={() => {
-                      setIsOpenAdd(true)
-                    }}
-                  >
+                  <Button variant='contained' component={Link} href={`/pages/group-access/detail/add`}>
                     thêm mới
                     <Icon icon='tabler:plus' />
                   </Button>
@@ -131,6 +119,7 @@ const ScheduleAccess = () => {
             </Grid>
           }
         />
+        <Grid item xs={12}></Grid>
         <Grid item xs={12}>
           <Table>
             <TableHead>
@@ -138,6 +127,9 @@ const ScheduleAccess = () => {
                 <TableCell sx={{ padding: '16px' }}>STT</TableCell>
                 <TableCell sx={{ padding: '16px' }}>Tên</TableCell>
                 <TableCell sx={{ padding: '16px' }}>Mô tả</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Cấp truy cập cửa</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Nhóm người</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Người </TableCell>
                 <TableCell sx={{ padding: '16px' }}>Người tạo</TableCell>
                 <TableCell sx={{ padding: '16px' }}>Thao tác</TableCell>
               </TableRow>
@@ -160,12 +152,22 @@ const ScheduleAccess = () => {
                       </Button>
                     </TableCell>
                     <TableCell>{user.description}</TableCell>
-                    <TableCell>{user.createdByUser?.fullName}</TableCell>
+                    <TableCell>
+                      {user.doorAccesses && user.doorAccesses.length > 0
+                        ? user.doorAccesses.map(door => door.objectName).join(', ')
+                        : 'Không có tên'}
+                    </TableCell>
+                    <TableCell>
+                      {user.userGroups && user.userGroups.length > 0
+                        ? user.userGroups.map(door => door.objectName).join(', ')
+                        : 'Không có tên'}
+                    </TableCell>
+                    <TableCell>{user.users}</TableCell>
+                    <TableCell>{user.createdByUser}</TableCell>
                     <TableCell>
                       {' '}
                       <Box>
                         <Button
-                          aria-label='Thêm mới'
                           onClick={() => {
                             setIdUpdate(user.id)
                             setIsOpenUpdate(true)
@@ -214,18 +216,15 @@ const ScheduleAccess = () => {
         </Grid>
       </Card>
       {isOpenUpdate && (
-        <UpdateSchedule
+        <Update
           show={isOpenUpdate}
           onClose={() => setIsOpenUpdate(false)}
           id={idUpdate}
           setReload={() => setReload(reload + 1)}
         />
       )}
-      {isOpenAdd && (
-        <Add show={isOpenAdd} onClose={() => setIsOpenAdd(false)} setReload={() => setReload(reload + 1)} />
-      )}
     </>
   )
 }
 
-export default ScheduleAccess
+export default GroupAccess
