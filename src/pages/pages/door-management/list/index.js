@@ -42,7 +42,6 @@ const DoorManagement = () => {
   const [total, setTotal] = useState(1)
   const [page, setPage] = useState(1)
   const [value, setValue] = useState('')
-
   const initValueFilter = {
     limit: 25,
     page: 1,
@@ -95,7 +94,6 @@ const DoorManagement = () => {
       const treeWithChildren = await Promise.all(
         parentData.map(async parent => {
           const children = await fetchChildren(parent.id)
-
           return { ...parent, children }
         })
       )
@@ -124,7 +122,6 @@ const DoorManagement = () => {
 
       const promises = children.map(async child => {
         const subChildren = await fetchChildren(child.id)
-
         return { ...child, children: subChildren }
       })
 
@@ -227,7 +224,6 @@ const DoorManagement = () => {
   }
 
   useEffect(() => {
-    // Check if all rows are selected
     const allIds = deviceData.map(device => device.id)
     const isAllSelected = allIds.length > 0 && selectedIds.length === allIds.length
     setSelectAll(isAllSelected)
@@ -386,7 +382,6 @@ const DoorManagement = () => {
       }
     }
   }
-
   const SetUp = async () => {
     const confirmResult = await Swal.fire({
       title: 'Xác nhận',
@@ -431,7 +426,6 @@ const DoorManagement = () => {
   const handleExport = () => {
     if (deviceData.length === 0) {
       console.error('No data available to export')
-
       return
     }
 
@@ -440,7 +434,6 @@ const DoorManagement = () => {
       if (typeof value === 'string') {
         return `"${value.replace(/"/g, '')}"`
       }
-
       return value.toString()
     }
 

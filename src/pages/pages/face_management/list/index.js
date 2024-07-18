@@ -249,17 +249,17 @@ const FaceManagement = () => {
         'https://sbs.basesystem.one/ivis/vms/api/v0/blacklist?sort=%2Bcreated_at&page=1',
         config
       )
-      if (response.data && response.data.length > 0) {
-        setUserData(response.data)
-        const imageFaces = response.data[0].mainImageUrl
+      if (response?.data && response?.data.length > 0) {
+        setUserData(response?.data)
+        const imageFaces = response?.data[0].mainImageUrl
         setListImage(imageFaces)
       } else {
         setUserData([])
         setListImage(null)
       }
     } catch (error) {
-      console.error('Error fetching data:', error)
-      toast.error(error)
+      console.error('Error fetching datas:', error)
+      toast.error(error.message)
     } finally {
       setLoading(false)
     }

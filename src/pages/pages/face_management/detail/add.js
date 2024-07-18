@@ -8,24 +8,16 @@ import {
   Grid,
   IconButton,
   Tab,
+  Input,
   TableContainer,
   Paper,
   Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Pagination,
-  Menu,
-  MenuItem,
-  Dialog,
-  DialogContent,
-  DialogActions,
-  Typography,
+  Autocomplete,
   TextField,
-  Input
+  Switch
 } from '@mui/material'
-import { Fragment, useState, useEffect, useRef } from 'react'
+import CustomTextField from 'src/@core/components/mui/text-field'
+import { Fragment, useState, useEffect, useRef, useCallback } from 'react'
 import axios from 'axios'
 import { makeStyles } from '@material-ui/core/styles'
 import authConfig from 'src/configs/auth'
@@ -40,6 +32,7 @@ import CustomDialog from '../CustomDialog/CustomDialog'
 
 const AddFaceManagement = () => {
   const classes = useStyles()
+  const [person, setPerson] = useState([])
   const [loading, setLoading] = useState(false)
   const [showLoading, setShowLoading] = useState(false)
   const [modalImage, setModalImage] = useState(null)
@@ -61,6 +54,7 @@ const AddFaceManagement = () => {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [dialogTitle, setDialogTitle] = useState('')
   const [dialogMessage, setDialogMessage] = useState('')
+  const [status1, setStatus1] = useState('')
   const [isSuccess, setIsSuccess] = useState(false)
   const [redirectUrl, setRedirectUrl] = useState('')
 
@@ -299,6 +293,75 @@ const AddFaceManagement = () => {
     }
   }
 
+  const fetchChildData = useCallback(async parentId => {
+    try {
+      const response = await axios.get(
+        `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`
+      )
+      return response.data
+    } catch (error) {
+      console.error('Error fetching child data:', error)
+      return []
+    }
+  }, [])
+
+  const fetchAllChildData = useCallback(
+    async (parentId, level = 0) => {
+      let result = []
+      setLoading(true)
+
+      const recurseFetch = async (parentId, level) => {
+        const childData = await fetchChildData(parentId)
+        for (const child of childData) {
+          result.push({ label: child.name, id: child.id, level })
+          if (child.isParent) {
+            await recurseFetch(child.id, level + 1)
+          }
+        }
+      }
+
+      try {
+        await recurseFetch(parentId, level)
+      } catch (error) {
+        console.error('Error fetching all child data:', error)
+      } finally {
+        setLoading(false)
+      }
+
+      return result
+    },
+    [fetchChildData]
+  )
+
+  const fetchInitialData = useCallback(async () => {
+    try {
+      const response = await axios.get(
+        'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/code?Code=person_specify&sort=%2Bcreated_at&page=1'
+      )
+      const parentData = response.data[0]
+      if (parentData.isParent) {
+        const allChildData = await fetchAllChildData(parentData.id, 0)
+        setPerson(allChildData)
+      }
+    } catch (error) {
+      console.error('Error fetching initial data:', error)
+    }
+  }, [fetchAllChildData])
+
+  useEffect(() => {
+    fetchInitialData()
+  }, [fetchInitialData])
+
+  const renderOption = (props, option) => (
+    <li {...props} style={{ paddingLeft: `${option.level * 20}px` }}>
+      {option.label}
+    </li>
+  )
+
+  const handleStatusChange = () => {
+    setStatus1(status1 === 'true' ? 'false' : 'true')
+  }
+
   return (
     <>
       <div className={classes.loadingContainer}>
@@ -435,7 +498,6 @@ const AddFaceManagement = () => {
                       >
                         Ghi chú
                       </p>
-
                       <TextField
                         rows={4}
                         multiline
@@ -452,6 +514,25 @@ const AddFaceManagement = () => {
                         }}
                         id='textarea-standard-static'
                       />
+                      <div>
+                        <p
+                          style={{
+                            fontSize: '18px',
+                            lineHeight: '22px',
+                            margin: '0px'
+                          }}
+                        >
+                          Trạng thái hoạt động
+                        </p>
+                        <Switch checked={status1 === 'true'} onChange={handleStatusChange} />
+                      </div>
+                      <Autocomplete
+                        options={person}
+                        getOptionLabel={option => option.label}
+                        renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
+                        renderOption={renderOption}
+                        loading={loading}
+                      />{' '}
                     </div>
 
                     <div

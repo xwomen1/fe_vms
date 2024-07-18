@@ -38,7 +38,7 @@ const initValueFilter = {
 const EventList = () => {
   const [anchorEl, setAnchorEl] = useState(null)
   const [totalPage, setTotalPage] = useState(0)
-  const [value, setValue] = useState('')
+  const [searchKeyword, setSearchKeyword] = useState('')
   const [page, setPage] = useState(1)
   const [devices, setDevices] = useState([])
   const [pageSize, setPageSize] = useState(25)
@@ -48,19 +48,16 @@ const EventList = () => {
 
   const formatDateTime = dateTime => {
     const date = typeof dateTime === 'number' ? new Date(dateTime) : new Date(dateTime)
-
     return format(date, 'HH:mm:ss dd/MM/yyyy')
   }
 
   const formatTime = dateTime => {
     const date = typeof dateTime === 'number' ? new Date(dateTime) : new Date(dateTime)
-
     return format(date, 'dd/MM/yyyy HH:mm:ss')
   }
 
   const formatDate = dateTime => {
     const date = typeof dateTime === 'number' ? new Date(dateTime) : new Date(dateTime)
-
     return format(date, 'dd/MM/yyyy')
   }
 
@@ -70,8 +67,6 @@ const EventList = () => {
     const diff = end - start // milliseconds
     const hours = Math.floor(diff / (1000 * 60 * 60))
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000)
-
     return `${hours} giờ ${minutes} phút `
   }
 
@@ -92,9 +87,8 @@ const EventList = () => {
     setPage(1)
     handleCloseMenu()
   }
-
-  const handleFilter = useCallback(val => {
-    setValue(val)
+  useEffect(() => {
+    fetchDataList()
   }, [])
 
   const fetchDataList = useCallback(async () => {
@@ -105,7 +99,7 @@ const EventList = () => {
           Authorization: `Bearer ${token}`
         },
         params: {
-          keyword: value,
+          keyword: searchKeyword,
           page: page,
           limit: pageSize
         }
@@ -123,11 +117,12 @@ const EventList = () => {
     } finally {
       setLoading(false)
     }
-  }, [token, value, page, pageSize])
+  }, [token, page, pageSize, searchKeyword])
 
-  useEffect(() => {
+  const handleSearch = () => {
+    setPage(1)
     fetchDataList()
-  }, [fetchDataList])
+  }
 
   const columns = [
     { id: 1, flex: 0.25, minWidth: 50, align: 'left', field: 'userName', label: 'Họ và tên' },
@@ -152,32 +147,23 @@ const EventList = () => {
         }}
         action={
           <Grid container spacing={2}>
-            <Grid item>
-              {/* <Box sx={{ float: 'right' }}>
-                <Button
-                  aria-label='Bộ lọc'
-                  onClick={() => {
-                    setIsOpenFilter(true)
-                  }}
-                  variant='contained'
-                >
-                  <Icon icon='tabler:filter' />
-                </Button>
-              </Box> */}
-            </Grid>
+            <Grid item></Grid>
             <Grid item>
               <CustomTextField
-                value={value}
-                onChange={e => handleFilter(e.target.value)}
-                placeholder='Tìm kiếm sự kiện '
+                placeholder='Nhập tên sự kiện ...! '
+                value={searchKeyword}
+                onChange={e => setSearchKeyword(e.target.value)}
                 InputProps={{
-                  startAdornment: (
-                    <Box sx={{ mr: 2, display: 'flex' }}>
-                      <Icon fontSize='1.25rem' icon='tabler:search' />
-                    </Box>
-                  ),
                   endAdornment: (
-                    <IconButton size='small' title='Clear' aria-label='Clear' onClick={() => setValue('')}>
+                    <IconButton
+                      size='small'
+                      title='Clear'
+                      aria-label='Clear'
+                      onClick={() => {
+                        setSearchKeyword('')
+                        fetchDataList()
+                      }}
+                    >
                       <Icon fontSize='1.25rem' icon='tabler:x' />
                     </IconButton>
                   )
@@ -192,6 +178,9 @@ const EventList = () => {
                   }
                 }}
               />
+              <Button variant='contained' style={{ margin: '0px 2px' }} onClick={handleSearch}>
+                Tìm kiếm <Icon fontSize='1.25rem' icon='tabler:search' />
+              </Button>
             </Grid>
           </Grid>
         }
@@ -216,7 +205,6 @@ const EventList = () => {
                     <TableCell>{(page - 1) * pageSize + index + 1}</TableCell>
                     {columns.map(column => {
                       const value = row[column.field]
-
                       return (
                         <TableCell key={column.id} align={column.align}>
                           {column.field === 'timeMin' || column.field === 'timeMax'

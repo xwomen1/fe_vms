@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { Fragment, useState, useEffect, useRef } from 'react'
+import { Fragment, useState, useEffect, useRef, useCallback } from 'react'
 import axios from 'axios'
 import { makeStyles } from '@material-ui/core/styles'
 import authConfig from 'src/configs/auth'
@@ -19,22 +19,7 @@ import {
   CardHeader,
   Grid,
   Switch,
-  IconButton,
-  Tab,
-  TableContainer,
-  Paper,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Pagination,
-  Menu,
-  MenuItem,
-  Dialog,
-  DialogContent,
-  DialogActions,
-  Typography,
+  Autocomplete,
   TextField,
   Input,
   CircularProgress
@@ -49,6 +34,7 @@ const EditFaceManagement = () => {
   const [listFileId, setListFileId] = useState([])
   const [listImage, setListImage] = useState([])
   const listFileUrl = []
+  const [person, setPerson] = useState([])
   const [listFileUpload, setListFileUpload] = useState([])
   const [fileAvatarImg, setFileAvatarImg] = useState(null)
   const [fileAvatarId, setFileAvatarId] = useState(null)
@@ -358,6 +344,71 @@ const EditFaceManagement = () => {
     })
   }
 
+  const fetchChildData = useCallback(async parentId => {
+    try {
+      const response = await axios.get(
+        `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`
+      )
+      return response.data
+    } catch (error) {
+      console.error('Error fetching child data:', error)
+      return []
+    }
+  }, [])
+
+  const fetchAllChildData = useCallback(
+    async (parentId, level = 0) => {
+      let result = []
+      setLoading(true)
+
+      const recurseFetch = async (parentId, level) => {
+        const childData = await fetchChildData(parentId)
+        for (const child of childData) {
+          result.push({ label: child.name, id: child.id, level })
+          if (child.isParent) {
+            await recurseFetch(child.id, level + 1)
+          }
+        }
+      }
+
+      try {
+        await recurseFetch(parentId, level)
+      } catch (error) {
+        console.error('Error fetching all child data:', error)
+      } finally {
+        setLoading(false)
+      }
+
+      return result
+    },
+    [fetchChildData]
+  )
+
+  const fetchInitialData = useCallback(async () => {
+    try {
+      const response = await axios.get(
+        'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/code?Code=person_specify&sort=%2Bcreated_at&page=1'
+      )
+      const parentData = response.data[0]
+      if (parentData.isParent) {
+        const allChildData = await fetchAllChildData(parentData.id, 0)
+        setPerson(allChildData)
+      }
+    } catch (error) {
+      console.error('Error fetching initial data:', error)
+    }
+  }, [fetchAllChildData])
+
+  useEffect(() => {
+    fetchInitialData()
+  }, [fetchInitialData])
+
+  const renderOption = (props, option) => (
+    <li {...props} style={{ paddingLeft: `${option.level * 20}px` }}>
+      {option.label}
+    </li>
+  )
+
   return (
     <>
       <Grid container spacing={6.5}>
@@ -494,7 +545,6 @@ const EditFaceManagement = () => {
                   >
                     Ghi chú
                   </p>
-
                   <TextField
                     disabled={loading == true}
                     rows={4}
@@ -525,6 +575,13 @@ const EditFaceManagement = () => {
                     </p>
                     <Switch checked={status1 === 'true'} onChange={handleStatusChange} />
                   </div>
+                  <Autocomplete
+                    options={person}
+                    getOptionLabel={option => option.label}
+                    renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
+                    renderOption={renderOption}
+                    loading={loading}
+                  />{' '}
                 </div>
 
                 {listFileUpload.length === 0 && (
