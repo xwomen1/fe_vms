@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import TreeView from '@mui/lab/TreeView'
 import TreeItem from '@mui/lab/TreeItem'
 import axios from 'axios'
@@ -6,6 +6,7 @@ import toast from 'react-hot-toast'
 import Icon from 'src/@core/components/icon'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import authConfig from 'src/configs/auth'
+import * as XLSX from 'xlsx'
 import Link from 'next/link'
 import Checkbox from '@mui/material/Checkbox'
 import {
@@ -35,6 +36,7 @@ import {
 
 const AccessControlDevice = () => {
   const [loading, setLoading] = useState(false)
+  const [value, setValue] = useState('')
   const [treeData, setTreeData] = useState([])
   const [deviceData, setDeviceData] = useState([])
   const [open, setOpen] = useState(false)
@@ -110,10 +112,17 @@ const AccessControlDevice = () => {
 
   const handleNodeSelect = async (event, nodeId) => {
     if (nodeId) {
+      const params = {
+        keyword: value
+      }
+
       try {
         const url = `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices/?deviceGroupId=${nodeId}`
 
-        const response = await axios.get(url, config)
+        const response = await axios.get(url, {
+          params: params, // Đặt params ở đây
+          ...config // Bao gồm các cài đặt khác từ config của bạn
+        })
 
         const devicesWithParentId = response.data.results.map(device => ({
           ...device,
@@ -236,6 +245,30 @@ const AccessControlDevice = () => {
     </TreeItem>
   )
 
+  const exportToExcel = () => {
+    const data = deviceData.map(device => ({
+      Name: device.name,
+      Position: device.doorName,
+      'Device Group': device.deviceGroup,
+      'Device Type': device.deviceType,
+      'IP Address': device.ipAddress,
+      Status: device.status,
+      Firmware: device.firmware
+    }))
+
+    const workbook = XLSX.utils.book_new()
+
+    const worksheet = XLSX.utils.json_to_sheet(data)
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Device Data')
+
+    XLSX.writeFile(workbook, 'device_data.xlsx')
+  }
+
+  const handleFilter = useCallback(val => {
+    setValue(val)
+  }, [])
+
   return (
     <>
       <Card>
@@ -252,43 +285,17 @@ const AccessControlDevice = () => {
             <Grid container spacing={2}>
               <Grid item>
                 <Box sx={{ float: 'right' }}>
-                  <Button variant='contained'>
+                  <Button variant='contained' onClick={exportToExcel}>
                     <Icon icon='tabler:file-export' />
                   </Button>
                 </Box>
               </Grid>
               <Grid item>
                 <Box sx={{ float: 'right' }}>
-                  <Button variant='contained'>
+                  <Button variant='contained' disabled>
                     <Icon icon='tabler:trash' />
                   </Button>
                 </Box>
-              </Grid>
-              <Grid item>
-                <CustomTextField
-                  placeholder='Tìm kiếm sự kiện '
-                  InputProps={{
-                    startAdornment: (
-                      <Box sx={{ mr: 2, display: 'flex' }}>
-                        <Icon fontSize='1.25rem' icon='tabler:search' />
-                      </Box>
-                    ),
-                    endAdornment: (
-                      <IconButton size='small' title='Clear' aria-label='Clear' onClick={() => setKeyword('')}>
-                        <Icon fontSize='1.25rem' icon='tabler:x' />
-                      </IconButton>
-                    )
-                  }}
-                  sx={{
-                    width: {
-                      xs: 1,
-                      sm: 'auto'
-                    },
-                    '& .MuiInputBase-root > svg': {
-                      mr: 2
-                    }
-                  }}
-                />
               </Grid>
             </Grid>
           }

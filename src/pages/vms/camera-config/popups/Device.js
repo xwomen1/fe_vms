@@ -72,11 +72,6 @@ const Device = ({ onClose, camera }) => {
   const [lng, setLng] = useState(null)
   const [cameraName, setCameraName] = useState(null)
   const [userName, setUserName] = useState(null)
-  const [nameChannel, setNameChannel] = useState(null)
-  const [proxied, setProxied] = useState(null)
-  const [channelUrl, setChannelUrl] = useState(null)
-  const [streamType, setStreamType] = useState(null)
-
   const [ipAddress, setIpAddress] = useState(null)
   const [http, setHttp] = useState(null)
   const [onvif, setOnvif] = useState(null)
@@ -98,7 +93,10 @@ const Device = ({ onClose, camera }) => {
         }
       }
 
-      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/device', config)
+      const response = await axios.get(
+        'https://sbs.basesystem.one/ivis/vms/api/v0/device/active?status=connected',
+        config
+      )
 
       const nicTypes = response.data.map(item => ({
         label: item.nameDevice,
@@ -123,7 +121,7 @@ const Device = ({ onClose, camera }) => {
 
   const handleDDNSChange = (event, newValue) => {
     setSelectedNVR(newValue)
-    setIdBox(newValue.value)
+    setIdBox(newValue)
   }
 
   const handleLatitudeChange = event => {
@@ -205,14 +203,12 @@ const Device = ({ onClose, camera }) => {
     setRows([...rows, newRow])
   }
 
-  console.log(camera)
   useEffect(() => {
     const fetchGroupData = async () => {
       try {
         if (camera != null) {
           // Kiểm tra xem popup Network đã mở chưa
           const token = localStorage.getItem(authConfig.storageTokenKeyName)
-          console.log('token', token)
 
           const config = {
             headers: {
@@ -229,7 +225,7 @@ const Device = ({ onClose, camera }) => {
           setHttp(response.data.httpPort)
           setRows(response.data.streams || [])
           setOnvif(response.data.onvif)
-          console.log(response.data)
+
           setLat(response.data.lat)
           setLng(response.data.long)
           setisOfflineSetting(response.data.isOfflineSetting)
@@ -240,11 +236,14 @@ const Device = ({ onClose, camera }) => {
           setSelectedProtocol({
             name: response.data.protocol || ''
           })
+          setSelectedNVR({
+            value: response.data.box?.id || '',
+            label: response.data.box?.name || ''
+          })
           setRegionsSelect({
             label: response.data.location || '',
             value: response.data.location || ''
           })
-          console.log(response.data.regions, 'regions')
         }
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -253,14 +252,12 @@ const Device = ({ onClose, camera }) => {
 
     fetchGroupData()
   }, [camera])
-  console.log(selectedProtocol, 'selectprotocol')
+
   useEffect(() => {
     const fetchGroupData = async () => {
       try {
         if (camera != null) {
-          // Kiểm tra xem popup Network đã mở chưa
           const token = localStorage.getItem(authConfig.storageTokenKeyName)
-          console.log('token', token)
 
           const config = {
             headers: {
@@ -274,7 +271,6 @@ const Device = ({ onClose, camera }) => {
           )
 
           setDns(response.data.ddns)
-          console.log(response.data.ddns)
         }
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -318,6 +314,10 @@ const Device = ({ onClose, camera }) => {
         long: lng.toString(),
         isOfflineSetting: isOfflineSetting,
         streams: rows,
+        box: {
+          id: idBox.value,
+          name: idBox.label
+        },
         type: {
           id: cameraGroupSelect.id || cameras.type.id,
           name: cameraGroupSelect.name || cameras.type.name
@@ -343,7 +343,6 @@ const Device = ({ onClose, camera }) => {
 
       onClose()
     } catch (error) {
-      // console.error(error)
       setLoading(false)
       onClose()
 
@@ -359,7 +358,6 @@ const Device = ({ onClose, camera }) => {
           }
         }
       })
-      console.log(error.response?.data?.message)
     } finally {
       setLoading(false)
       onClose()
@@ -410,7 +408,7 @@ const Device = ({ onClose, camera }) => {
         value: item.value
       }))
       setCameraGroup(cameraGroup)
-      console.log(cameraGroup)
+
       if (cameraGroup?.length > 0) {
         setCameraGroupSelect(cameraGroup[0].value)
       }
@@ -423,9 +421,7 @@ const Device = ({ onClose, camera }) => {
 
   const handleComboboxFocus = () => {
     fetchNicTypes()
-    console.log('Fetching NIC types...') // Add this line
   }
-  console.log(regions, 'vùng')
 
   const fetchRegions = async () => {
     try {
@@ -450,7 +446,7 @@ const Device = ({ onClose, camera }) => {
         value: item.value
       }))
       setRegions(nicTypes)
-      console.log(nicTypes)
+
       if (nicTypes?.length > 0) {
         setRegionsSelect(nicTypes[0].value)
       }
@@ -529,7 +525,7 @@ const Device = ({ onClose, camera }) => {
             <Autocomplete
               value={cameraGroupSelect}
               onChange={handleCameraGroupChange}
-              options={cameraGroup}
+              options={cameraGroup || []}
               getOptionLabel={option => option.label}
               renderInput={params => <CustomTextField {...params} label='Nhóm Camera' fullWidth />}
               onFocus={handleComboboxFocus}
@@ -557,41 +553,40 @@ const Device = ({ onClose, camera }) => {
             <Autocomplete
               value={selectedProtocol}
               onChange={handleProtocolChange}
-              options={protocol}
+              options={protocol || []}
               getOptionLabel={option => option.name}
               renderInput={params => <CustomTextField {...params} label='Giao thức' fullWidth />}
             />
           </Grid>
           <Grid item xs={0.1}></Grid>
-          <Grid item xs={3.9}>
+          <Grid item xs={4}>
             <Autocomplete
+              value={selectNVR}
               onChange={handleDDNSChange}
-              options={nvrs}
+              options={nvrs || []}
               getOptionLabel={option => option.label}
-              renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
+              renderInput={params => <CustomTextField {...params} label='Smart NVR' fullWidth />}
               onFocus={handleComboboxFocusDevice}
 
               // loading={loading}
             />{' '}
           </Grid>
-
-          <Grid item xs={0.1}></Grid>
-          <Grid item xs={4}>
-            {console.log(regionsSelect)}
+          <Grid item xs={3.9}>
             <Autocomplete
               value={regionsSelect}
               onChange={handleRegionsChange}
-              options={regions}
+              options={regions || []}
               getOptionLabel={option => option.label}
               renderInput={params => <CustomTextField {...params} label='Vùng' fullWidth />}
               onFocus={handleComboboxFocusRegions}
             />{' '}
           </Grid>
+          <Grid item xs={0.1}></Grid>
           <Grid item xs={3.9}>
             <CustomTextField label='Latitude' type='text' value={lat || ''} onChange={handleLatitudeChange} fullWidth />
           </Grid>
           <Grid item xs={0.1}></Grid>
-          <Grid item xs={3.9}>
+          <Grid item xs={4}>
             <CustomTextField
               label='Longtitude'
               type='text'
