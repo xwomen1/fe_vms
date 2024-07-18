@@ -44,20 +44,24 @@ const EventList = () => {
   const [pageSize, setPageSize] = useState(25)
   const [loading, setLoading] = useState(false)
   const pageSizeOptions = [25, 50, 100]
+
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
   const formatDateTime = dateTime => {
     const date = typeof dateTime === 'number' ? new Date(dateTime) : new Date(dateTime)
+
     return format(date, 'HH:mm:ss dd/MM/yyyy')
   }
 
   const formatTime = dateTime => {
     const date = typeof dateTime === 'number' ? new Date(dateTime) : new Date(dateTime)
+
     return format(date, 'dd/MM/yyyy HH:mm:ss')
   }
 
   const formatDate = dateTime => {
     const date = typeof dateTime === 'number' ? new Date(dateTime) : new Date(dateTime)
+
     return format(date, 'dd/MM/yyyy')
   }
 
@@ -67,6 +71,7 @@ const EventList = () => {
     const diff = end - start // milliseconds
     const hours = Math.floor(diff / (1000 * 60 * 60))
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+
     return `${hours} giờ ${minutes} phút `
   }
 
@@ -205,6 +210,7 @@ const EventList = () => {
                     <TableCell>{(page - 1) * pageSize + index + 1}</TableCell>
                     {columns.map(column => {
                       const value = row[column.field]
+
                       return (
                         <TableCell key={column.id} align={column.align}>
                           {column.field === 'timeMin' || column.field === 'timeMax'

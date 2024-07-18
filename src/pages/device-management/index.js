@@ -124,7 +124,6 @@ const AccessControlDevice = () => {
           ...config // Bao gồm các cài đặt khác từ config của bạn
         })
 
-        console.log(response, 'ress')
         const devicesWithParentId = response.data.results.map(device => ({
           ...device,
           parentId: nodeId
@@ -245,7 +244,7 @@ const AccessControlDevice = () => {
       {Array.isArray(nodes.children) ? nodes.children.map(node => renderTree(node)) : null}
     </TreeItem>
   )
-  console.log(deviceData, 'deviceData')
+
   const exportToExcel = () => {
     const data = deviceData.map(device => ({
       Name: device.name,

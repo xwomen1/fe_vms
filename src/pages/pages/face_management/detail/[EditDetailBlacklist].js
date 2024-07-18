@@ -349,9 +349,11 @@ const EditFaceManagement = () => {
       const response = await axios.get(
         `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`
       )
+
       return response.data
     } catch (error) {
       console.error('Error fetching child data:', error)
+
       return []
     }
   }, [])

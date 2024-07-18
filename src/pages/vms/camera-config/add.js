@@ -133,6 +133,7 @@ const Add = ({ apiData, assettypeStatus }) => {
         'https://sbs.basesystem.one/ivis/vms/api/v0/device/active?status=connected',
         config
       )
+
       const nicTypes = response.data.map(item => ({
         label: item.nameDevice,
         value: item.id
