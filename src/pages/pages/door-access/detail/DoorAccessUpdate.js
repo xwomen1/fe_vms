@@ -24,7 +24,7 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 import { Autocomplete } from '@mui/material'
 import CircularProgress from '@mui/material/CircularProgress'
 
-const DoorAccessUpdate = ({ show, onClose, id }) => {
+const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
   const [door, setDoor] = useState(null)
   const [groupOptions, setGroupOptions] = useState([])
@@ -295,12 +295,15 @@ const DoorAccessUpdate = ({ show, onClose, id }) => {
 
       // Handle successful response
       toast.success('Cập nhật thành công')
+      setReload()
       handleClose()
     } catch (error) {
       console.error('Error updating door access:', error)
       toast.error(error.message)
     } finally {
       setLoading(false)
+      setReload()
+      onClose()
     }
   }
 
