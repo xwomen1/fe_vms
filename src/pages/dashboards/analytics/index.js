@@ -89,7 +89,7 @@ const EventList = () => {
       label: 'Hình ảnh',
       renderCell: value => (
         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-          <img src={value} alt='' style={{ maxWidth: '30%', height: 'auto', objectFit: 'contain' }} />
+          <img src={value} alt='' style={{ width: '100px', height: '100px', objectFit: 'contain' }} />
         </Box>
       )
     },
