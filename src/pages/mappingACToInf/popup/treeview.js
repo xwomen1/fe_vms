@@ -14,7 +14,7 @@ import axios from 'axios'
 import TableHeader from 'src/views/apps/user/list/index'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import { IconButton, Typography, Box } from '@mui/material'
-import Edit from '../detail/popup/editGroup'
+import Edit from '../popup/editGroup'
 
 const UserList = ({ apiData }) => {
   const [valueGroup, setValueGroup] = useState('')

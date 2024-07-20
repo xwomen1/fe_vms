@@ -227,7 +227,6 @@ const DoorManagement = () => {
   }
 
   useEffect(() => {
-    // Check if all rows are selected
     const allIds = deviceData.map(device => device.id)
     const isAllSelected = allIds.length > 0 && selectedIds.length === allIds.length
     setSelectAll(isAllSelected)

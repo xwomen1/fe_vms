@@ -129,7 +129,10 @@ const Add = ({ apiData, assettypeStatus }) => {
         }
       }
 
-      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/device', config)
+      const response = await axios.get(
+        'https://sbs.basesystem.one/ivis/vms/api/v0/device/active?status=connected',
+        config
+      )
 
       const nicTypes = response.data.map(item => ({
         label: item.nameDevice,
