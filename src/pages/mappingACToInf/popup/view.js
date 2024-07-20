@@ -20,8 +20,7 @@ import {
 } from '@mui/material'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import Icon from 'src/@core/components/icon'
-import DatePicker from 'react-datepicker'
-import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
+
 import 'react-datepicker/dist/react-datepicker.css'
 import 'react-perfect-scrollbar/dist/css/styles.css'
 import Daily from '../mocdata/daily'
