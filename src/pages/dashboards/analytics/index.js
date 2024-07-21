@@ -189,13 +189,6 @@ const EventList = () => {
     }
   }
 
-  const pieData = [
-    { name: 'Hoạt động', value: status1.filter(status => status === 'Hoạt động').length },
-    { name: 'Không hoạt động', value: status1.filter(status => status === 'Không hoạt động').length }
-  ]
-
-  const COLORS = ['#0088FE', '#FF8042']
-
   const fetchFilteredOrAllUsers = async () => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -310,12 +303,22 @@ const EventList = () => {
         }
       }
     ],
-    colors: ['#FF9933', '#0099FF']
+    colors: ['#FF9933', '#0099FF'],
+    dataLabels: {
+      enabled: true,
+      formatter: (val, opts) => opts.w.config.series[opts.seriesIndex]
+    },
+    tooltip: {
+      enabled: true,
+      y: {
+        formatter: val => val
+      }
+    }
   }
 
   const pieChartData = [
-    status1.filter(status => status === 'Hoạt động').length,
-    status1.filter(status => status === 'Không hoạt động').length
+    status1.filter(status => status === 'connected').length,
+    status1.filter(status => status === 'disconnected').length
   ]
 
   const handlePageChange1 = (event, newPage) => {

@@ -39,7 +39,7 @@ const initValueFilter = {
 
 function ReportMonth({ history }) {
   const [loading, setLoading] = useState(false)
-  const [valueFilter, setValueFilter, incrementPage] = useUrlState(initValueFilter)
+  const [valueFilter, setValueFilter] = useUrlState(initValueFilter)
   const [start, setStart] = useState(null)
   const [users, setUsers] = useState([])
   const [end, setEnd] = useState(null)
@@ -63,8 +63,30 @@ function ReportMonth({ history }) {
   })
 
   useEffect(() => {
+    const fetchData = async () => {
+      await fetchGroupData()
+      const today = new Date()
+      const startDate = new Date(today.getFullYear(), today.getMonth(), 1)
+      const endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+
+      setStart(startDate)
+      setEnd(endDate)
+      calculateDaysInRange(startDate, endDate)
+    }
+
+    fetchData()
+  }, [])
+
+  useEffect(() => {
+    if (selectedGroupId !== null) {
+      setValueFilter({ ...valueFilter, page: 1 })
+      setDataResource([])
+    }
+  }, [selectedGroupId])
+
+  useEffect(() => {
     fetchDataSource()
-  }, [valueFilter.page])
+  }, [valueFilter.page, valueFilter.groupId])
 
   const fetchDataSource = async () => {
     setLoading(true)
@@ -83,7 +105,7 @@ function ReportMonth({ history }) {
       }
 
       const response = await axios.get(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/event/user/inout`,
+        'https://dev-ivi.basesystem.one/smc/access-control/api/v0/event/user/inout',
         config
       )
       setUsers(response.data)
@@ -95,43 +117,30 @@ function ReportMonth({ history }) {
     }
   }
 
-  useEffect(() => {
-    if (selectedGroupId !== null) {
-      setValueFilter({ ...valueFilter, page: 1 })
-      setDataResource([])
-      fetchDataSource()
-    }
-  }, [selectedGroupId])
+  const fetchGroupData = async () => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
-  useEffect(() => {
-    const fetchGroupData = async () => {
-      try {
-        const token = localStorage.getItem(authConfig.storageTokenKeyName)
-
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          params: {
-            keyword: valueGroup
-          }
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        params: {
+          keyword: valueGroup
         }
-        const response = await axios.get('https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups', config)
-        const dataWithChildren = addChildrenField(response.data?.rows)
-
-        setGroups(dataWithChildren)
-      } catch (error) {
-        console.error('Error fetching data:', error)
       }
-    }
+      const response = await axios.get('https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups', config)
+      const dataWithChildren = addChildrenField(response.data?.rows)
 
-    fetchGroupData()
-  }, [])
+      setGroups(dataWithChildren)
+    } catch (error) {
+      console.error('Error fetching data:', error)
+    }
+  }
 
   const addChildrenField = (data, parentId = null) => {
     return data?.map(group => {
       const children = data?.filter(child => child.parentId === group.id)
-      console.log(children, 'chinder')
       if (children.length > 0) {
         group.children = children
       }
@@ -186,30 +195,6 @@ function ReportMonth({ history }) {
       {group.children && group.children.map(childGroup => renderGroup(childGroup))}
     </TreeItem>
   )
-
-  useEffect(() => {
-    const today = new Date()
-    const startDate = new Date(today.getFullYear(), today.getMonth(), 1)
-    const endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0)
-
-    setStart(startDate)
-    setEnd(endDate)
-    calculateDaysInRange(startDate, endDate)
-    fetchDataSource()
-  }, [])
-
-  // useEffect(() => {
-  //   if (start && end && start instanceof Date && end instanceof Date) {
-  //     const days = []
-  //     let currentDay = new Date(start)
-
-  //     while (currentDay <= end) {
-  //       days.push(format(currentDay, 'dd/MM/yyyy'))
-  //       currentDay.setDate(currentDay.getDate() + 1)
-  //     }
-  //     setDaysInRange(days)
-  //   }
-  // }, [])
 
   const calculateDaysInRange = (start, end) => {
     if (start && end && start instanceof Date && end instanceof Date) {

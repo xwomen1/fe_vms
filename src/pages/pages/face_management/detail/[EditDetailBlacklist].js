@@ -9,7 +9,6 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 import FileUploader from 'devextreme-react/file-uploader'
 import Icon from 'src/@core/components/icon'
 import ModalImage from '../ModalImage'
-import CustomDialog from '../CustomDialog/CustomDialog'
 import Link from 'next/link'
 import {
   Box,
@@ -49,11 +48,7 @@ const EditFaceManagement = () => {
   const [img2, setImg2] = useState(null)
   const [img3, setImg3] = useState(null)
   const [img4, setImg4] = useState(null)
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [dialogTitle, setDialogTitle] = useState('')
-  const [dialogMessage, setDialogMessage] = useState('')
-  const [isSuccess, setIsSuccess] = useState(false)
-  const imageTypes = ['BOTTOM', 'LEFT', 'RIGHT', 'CENTER', 'ABOVE']
+  const [title, setTitle] = useState('')
 
   const buildUrlWithToken = url => {
     const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -76,7 +71,7 @@ const EditFaceManagement = () => {
   }, [listFileId])
 
   const handleStatusChange = () => {
-    setStatus1(status1 === 'true' ? 'false' : 'true')
+    setStatus1(status1 === true ? false : true)
   }
 
   const fetchFilteredOrAllUserss = async () => {
@@ -155,6 +150,7 @@ const EditFaceManagement = () => {
           const imgs = [...response.data.imgs]
           console.log(response, 'respon')
           setStatus1(response.data.status)
+          setTitle(response.data.type)
           setFileAvatarId(response.data.mainImageId)
           setListFileUpload(
             imgs.map(img =>
@@ -191,10 +187,6 @@ const EditFaceManagement = () => {
     fetchFilteredOrAllUsers()
   }, [id])
 
-  const handleDialogClose = () => {
-    setDialogOpen(false)
-  }
-
   const handleUpdate = async () => {
     setLoading(true)
     try {
@@ -214,7 +206,11 @@ const EditFaceManagement = () => {
         imgs: listFileId.map(id => ({
           id: id,
           urlImage: listFileUrl[id]
-        }))
+        })),
+        type: {
+          id: title.id,
+          name: title.name
+        }
       }
 
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${id}`, params, config)
@@ -366,7 +362,7 @@ const EditFaceManagement = () => {
       const recurseFetch = async (parentId, level) => {
         const childData = await fetchChildData(parentId)
         for (const child of childData) {
-          result.push({ label: child.name, id: child.id, level })
+          result.push({ name: child.name, id: child.id, level })
           if (child.isParent) {
             await recurseFetch(child.id, level + 1)
           }
@@ -407,9 +403,14 @@ const EditFaceManagement = () => {
 
   const renderOption = (props, option) => (
     <li {...props} style={{ paddingLeft: `${option.level * 20}px` }}>
-      {option.label}
+      {option.name}
     </li>
   )
+
+  const handleOptionChange = (event, newValue) => {
+    console.log(newValue, 'newvalue')
+    setTitle(newValue)
+  }
 
   return (
     <>
@@ -455,13 +456,7 @@ const EditFaceManagement = () => {
                 alignItems: ['flex-start', 'center']
               }}
             />
-            <CustomDialog
-              open={dialogOpen}
-              handleClose={handleDialogClose}
-              title={dialogTitle}
-              message={dialogMessage}
-              isSuccess={isSuccess}
-            />
+
             <Grid item xs={12}>
               {modalImage && (
                 <ModalImage
@@ -575,13 +570,25 @@ const EditFaceManagement = () => {
                     >
                       Trạng thái hoạt động
                     </p>
-                    <Switch checked={status1 === 'true'} onChange={handleStatusChange} />
+                    <Switch checked={status1 === true} onChange={handleStatusChange} />
                   </div>
+                  <p
+                    style={{
+                      fontSize: '18px',
+                      lineHeight: '22px',
+                      margin: '0px'
+                    }}
+                  >
+                    Loại đối tượng
+                  </p>
+                  {console.log(title)}
                   <Autocomplete
+                    value={title} // Đặt giá trị của Autocomplete bằng title
                     options={person}
-                    getOptionLabel={option => option.label}
-                    renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
+                    getOptionLabel={option => option.name}
+                    renderInput={params => <CustomTextField {...params} fullWidth />}
                     renderOption={renderOption}
+                    onChange={handleOptionChange}
                     loading={loading}
                   />{' '}
                 </div>

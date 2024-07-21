@@ -32,7 +32,6 @@ import axios from 'axios'
 import toast from 'react-hot-toast'
 import * as XLSX from 'xlsx'
 import Checkbox from '@mui/material/Checkbox'
-import CustomDialog from '../../face_management/CustomDialog/CustomDialog'
 import Link from 'next/link'
 
 const Car_management = () => {
@@ -495,7 +494,13 @@ const Car_management = () => {
                           <TableCell>{user.note}</TableCell>
 
                           <TableCell>{user.lastAppearance}</TableCell>
-                          <TableCell>{user.status}</TableCell>
+                          <TableCell
+                            style={{
+                              color: user.status ? '#FF9F43' : 'red'
+                            }}
+                          >
+                            {user.status ? 'hoạt động' : 'không hoạt động'}
+                          </TableCell>
 
                           <TableCell>
                             <Button
@@ -550,13 +555,6 @@ const Car_management = () => {
           </Grid>
         </Grid>
       )}
-      <CustomDialog
-        open={dialogOpen}
-        handleClose={handleDialogClose}
-        title={dialogTitle}
-        message={dialogMessage}
-        isSuccess={isSuccess}
-      />
     </>
   )
 }

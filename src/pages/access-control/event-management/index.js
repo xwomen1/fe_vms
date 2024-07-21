@@ -94,7 +94,7 @@ const EventList = () => {
   }
   useEffect(() => {
     fetchDataList()
-  }, [])
+  }, [page, pageSize])
 
   const fetchDataList = useCallback(async () => {
     setLoading(true)
