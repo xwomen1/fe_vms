@@ -25,63 +25,96 @@ import {
 import CustomTextField from 'src/@core/components/mui/text-field'
 import { format } from 'date-fns'
 
+const initValueFilter = {
+  location: null,
+  cameraName: null,
+  startTime: null,
+  endTime: null,
+  keyword: '',
+  limit: 25,
+  page: 1
+}
+
 const EventList = () => {
   const [anchorEl, setAnchorEl] = useState(null)
   const [totalPage, setTotalPage] = useState(0)
   const [searchKeyword, setSearchKeyword] = useState('')
   const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(25)
   const [devices, setDevices] = useState([])
+  const [pageSize, setPageSize] = useState(25)
   const [loading, setLoading] = useState(false)
   const pageSizeOptions = [25, 50, 100]
+
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
-  const formatDateTime = dateTime => format(new Date(dateTime), 'HH:mm:ss dd/MM/yyyy')
-  const formatTime = dateTime => format(new Date(dateTime), 'HH:mm:ss')
-  const formatDate = dateTime => format(new Date(dateTime), 'dd/MM/yyyy')
+  const formatDateTime = dateTime => {
+    const date = typeof dateTime === 'number' ? new Date(dateTime) : new Date(dateTime)
+
+    return format(date, 'HH:mm:ss dd/MM/yyyy')
+  }
+
+  const formatTime = dateTime => {
+    const date = typeof dateTime === 'number' ? new Date(dateTime) : new Date(dateTime)
+
+    return format(date, 'dd/MM/yyyy HH:mm:ss')
+  }
+
+  const formatDate = dateTime => {
+    const date = typeof dateTime === 'number' ? new Date(dateTime) : new Date(dateTime)
+
+    return format(date, 'dd/MM/yyyy')
+  }
 
   const calculateTotalTime = (startTime, endTime) => {
     const start = new Date(startTime)
     const end = new Date(endTime)
-    const diff = end - start
+    const diff = end - start // milliseconds
     const hours = Math.floor(diff / (1000 * 60 * 60))
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
 
-    return `${hours} giờ ${minutes} phút`
+    return `${hours} giờ ${minutes} phút `
   }
 
-  const handlePageChange = (event, newPage) => setPage(newPage)
+  const handlePageChange = (event, newPage) => {
+    setPage(newPage)
+  }
 
-  const handleOpenMenu = event => setAnchorEl(event.currentTarget)
-  const handleCloseMenu = () => setAnchorEl(null)
+  const handleOpenMenu = event => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null)
+  }
 
   const handleSelectPageSize = size => {
     setPageSize(size)
     setPage(1)
     handleCloseMenu()
   }
-
-  const handleSearch = () => {
-    console.log('Searching with keyword:', searchKeyword)
-    setPage(1)
+  useEffect(() => {
     fetchDataList()
-  }
+  }, [])
 
   const fetchDataList = useCallback(async () => {
-    console.log('Fetching data with:', { searchKeyword, page, pageSize })
     setLoading(true)
     try {
       const config = {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        params: {
+          keyword: searchKeyword,
+          page: page,
+          limit: pageSize
+        }
       }
 
-      const response = await axios.post(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/event/search/user?keyword=${searchKeyword}&limit=${pageSize}&page=${page}`,
-
+      const response = await axios.get(
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/event/user/door`,
         config
       )
-      console.log('Response data:', response.data)
-      setDevices(response.data.rows)
+      setDevices(response.data.data)
       setTotalPage(Math.ceil(response.data.count / pageSize))
     } catch (error) {
       console.error('Error fetching data:', error)
@@ -91,16 +124,16 @@ const EventList = () => {
     }
   }, [token, page, pageSize, searchKeyword])
 
-  useEffect(() => {
+  const handleSearch = () => {
+    setPage(1)
     fetchDataList()
-  }, [page, pageSize])
+  }
 
   const columns = [
-    { id: 1, flex: 0.25, minWidth: 50, align: 'left', field: 'fullName', label: 'Họ và tên' },
+    { id: 1, flex: 0.25, minWidth: 50, align: 'left', field: 'userName', label: 'Họ và tên' },
     { id: 2, flex: 0.15, minWidth: 150, align: 'left', field: 'accessCode', label: 'Mã nhân viên' },
-    { id: 3, flex: 0.15, minWidth: 100, align: 'left', field: 'groupName', label: 'Bộ phận' },
-    { id: 4, flex: 0.15, minWidth: 100, align: 'left', field: 'userType', label: 'Chức năng' },
-    { id: 5, flex: 0.25, minWidth: 50, align: 'left', field: 'date', label: 'Ngày' },
+    { id: 3, flex: 0.15, minWidth: 100, align: 'left', field: 'doorIn', label: 'Cửa vào' },
+    { id: 4, flex: 0.15, minWidth: 100, align: 'left', field: 'doorOut', label: 'Cửa ra' },
     { id: 6, flex: 0.25, minWidth: 50, align: 'left', field: 'timeMin', label: 'Thời gian vào' },
     { id: 7, flex: 0.25, minWidth: 50, align: 'left', field: 'timeMax', label: 'Thời gian ra' },
     { id: 8, flex: 0.25, minWidth: 50, align: 'left', field: 'totalTime', label: 'Tổng thời gian' }
@@ -109,11 +142,6 @@ const EventList = () => {
   return (
     <Card>
       <CardHeader
-        title={
-          <>
-            <Button variant='contained'>Danh sách chấm công</Button>
-          </>
-        }
         titleTypographyProps={{ sx: { mb: [2, 0] } }}
         sx={{
           py: 4,
@@ -123,6 +151,7 @@ const EventList = () => {
         }}
         action={
           <Grid container spacing={2}>
+            <Grid item></Grid>
             <Grid item>
               <CustomTextField
                 placeholder='Nhập tên sự kiện ...! '
@@ -205,12 +234,12 @@ const EventList = () => {
         </TableContainer>
       </Grid>
       <br />
-      <Grid container spacing={2} style={{ padding: 10 }}>
+      <Grid container spacing={2}>
         <Grid item xs={3}></Grid>
         <Grid item xs={1}>
           <span style={{ fontSize: 15 }}> dòng/trang</span>
         </Grid>
-        <Grid item xs={1} style={{ padding: 0 }}>
+        <Grid item xs={1}>
           <Box>
             <Button onClick={handleOpenMenu} endIcon={<Icon icon='tabler:selector' />}>
               {pageSize}

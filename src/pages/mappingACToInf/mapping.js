@@ -11,10 +11,10 @@ import Swal from 'sweetalert2'
 import { fetchData } from 'src/store/apps/user'
 import { useRouter } from 'next/router'
 import axios from 'axios'
-import TableHeader from 'src/views/apps/user/list/index'
+import TableHeader from 'src/views/apps/user/list/mappingAC'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import { IconButton, Typography, Box } from '@mui/material'
-import Edit from '../detail/popup/editGroup'
+import Edit from './popup/editGroup'
 
 const UserList = ({ apiData }) => {
   const [valueGroup, setValueGroup] = useState('')
@@ -22,12 +22,12 @@ const UserList = ({ apiData }) => {
 
   const [selectedGroups, setSelectedGroups] = useState([])
   const [selectedGroupsIn, setSelectedGroupsIn] = useState([])
-  const [groupIds, setGroupIds] = useState(null)
 
   const [groups, setGroups] = useState([])
   const [groupsIn, setGroupsIn] = useState([])
-  const [groupName, setGroupName] = useState(false)
   const [openPopupP, setOpenPopupP] = useState(false)
+  const [groupIds, setGroupIds] = useState(null)
+  const [groupName, setGroupName] = useState(false)
 
   const handleAddPClick = (groupIds, groupName) => {
     setOpenPopupP(true)
@@ -74,7 +74,7 @@ const UserList = ({ apiData }) => {
             Authorization: `Bearer ${token}`
           }
         }
-        let urlDelete = `https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/${idDelete}`
+        let urlDelete = `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups/${idDelete}`
         axios
           .delete(urlDelete, config)
           .then(() => {
@@ -93,13 +93,14 @@ const UserList = ({ apiData }) => {
     return (
       <Box display='flex' alignItems='center' justifyContent='space-between' style={{ marginLeft: '5%' }}>
         <Typography>
-          <label htmlFor={`group-${group.groupId}`}>{group.groupName}</label>
-        </Typography>
+          {' '}
+          <label htmlFor={`group-${group.id}`}>{group.name}</label>
+        </Typography>{' '}
         <Box display='flex'>
-          <IconButton size='small' onClick={() => handleAddPClick(group.groupId, group.groupName)}>
+          <IconButton size='small' onClick={() => handleAddPClick(group.id, group.name)}>
             <Icon icon='tabler:edit' />
           </IconButton>
-          <IconButton size='small' onClick={() => handleDelete(group.groupId)}>
+          <IconButton size='small' onClick={() => handleDelete(group.id)}>
             <Icon icon='tabler:trash' />
           </IconButton>
         </Box>
@@ -107,11 +108,11 @@ const UserList = ({ apiData }) => {
     )
   }
 
-  const handleGroupCheckboxChange = (groupId, checked) => {
+  const handleGroupCheckboxChange = (id, checked) => {
     if (checked) {
-      setSelectedGroups(prevGroups => [...prevGroups, { groupId }])
+      setSelectedGroups(prevGroups => [...prevGroups, { id }])
     } else {
-      setSelectedGroups(prevGroups => prevGroups.filter(g => g.groupId !== groupId))
+      setSelectedGroups(prevGroups => prevGroups.filter(g => g.id !== id))
     }
   }
 
@@ -128,14 +129,16 @@ const UserList = ({ apiData }) => {
           keyword: valueGroup
         }
       }
-      const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search', config)
-      const dataWithChildren = addChildrenField(response.data)
+      const response = await axios.get('https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups', config)
+      const dataWithChildren = addChildrenField(response.data.rows)
       const rootGroups = findRootGroups(dataWithChildren)
       setGroups(rootGroups)
+      console.log(rootGroups, 'rooot')
     } catch (error) {
       console.error('Error fetching data:', error)
     }
   }
+
   useEffect(() => {
     const fetchGroupData = async () => {
       try {
@@ -150,10 +153,11 @@ const UserList = ({ apiData }) => {
             keyword: valueGroup
           }
         }
-        const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search', config)
-        const dataWithChildren = addChildrenField(response.data)
+        const response = await axios.get('https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups', config)
+        const dataWithChildren = addChildrenField(response.data.rows)
         const rootGroups = findRootGroups(dataWithChildren)
         setGroups(rootGroups)
+        console.log(rootGroups, 'rooot')
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -164,7 +168,7 @@ const UserList = ({ apiData }) => {
 
   const addChildrenField = (data, parentId = null) => {
     return data.map(group => {
-      const children = data.filter(child => child.parentId === group.groupId)
+      const children = data.filter(child => child.parentId === group.id)
       if (children.length > 0) {
         group.children = children
       }
@@ -175,12 +179,12 @@ const UserList = ({ apiData }) => {
 
   const renderGroup = group => (
     <TreeItem
-      key={group.groupId}
-      nodeId={group.groupId}
+      key={group.id}
+      nodeId={group.id}
       label={
         <GroupCheckbox
           group={group}
-          checked={selectedGroups.some(g => g.groupId === group.groupId)}
+          checked={selectedGroups.some(g => g.id === group.id)}
           onChange={handleGroupCheckboxChange}
         />
       }
@@ -193,7 +197,7 @@ const UserList = ({ apiData }) => {
   const findRootGroups = data => {
     const rootGroups = []
     data.forEach(group => {
-      if (!data.some(item => item.groupId === group.parentId)) {
+      if (!data.some(item => item.id === group.parentId)) {
         rootGroups.push(group)
       }
     })
@@ -358,14 +362,14 @@ const UserList = ({ apiData }) => {
   return (
     <Grid style={{ minWidth: '1000px' }}>
       <Card>
-        <TableHeader />
         <Grid container spacing={2}>
           {/* <Grid item xs={0.1}></Grid> */}
           <Grid item xs={2.5}></Grid>
 
           <Grid item xs={3} component={Paper}>
             <div>
-              <h2>Nhóm người dùng</h2>
+              <h2>Nhóm quyền truy cập</h2>
+
               <CustomTextField
                 value={valueGroup}
                 sx={{ mr: 4 }}

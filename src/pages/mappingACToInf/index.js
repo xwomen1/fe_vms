@@ -1,383 +1,63 @@
-import { useState, useEffect, useCallback } from 'react'
-import Card from '@mui/material/Card'
-import Grid from '@mui/material/Grid'
-import TreeView from '@mui/lab/TreeView'
-import TreeItem from '@mui/lab/TreeItem'
+import { Grid, Paper } from '@mui/material'
 
-import authConfig from 'src/configs/auth'
-import Paper from '@mui/material/Paper'
-import Icon from 'src/@core/components/icon'
-import Swal from 'sweetalert2'
-import { fetchData } from 'src/store/apps/user'
-import { useRouter } from 'next/router'
-import axios from 'axios'
-import TableHeader from 'src/views/apps/user/list/mappingAC'
-import CustomTextField from 'src/@core/components/mui/text-field'
-import { IconButton, Typography, Box } from '@mui/material'
+import TableStickyHeader from './mapping'
+import Tab from '@mui/material/Tab'
+import TabPanel from '@mui/lab/TabPanel'
+import { styled } from '@mui/material/styles'
+import MuiTabList from '@mui/lab/TabList'
+import TabContext from '@mui/lab/TabContext'
+import { useState } from 'react'
 
-const UserList = ({ apiData }) => {
-  const [valueGroup, setValueGroup] = useState('')
-  const [valueGroupIn, setValueGroupIn] = useState('')
-
-  const [selectedGroups, setSelectedGroups] = useState([])
-  const [selectedGroupsIn, setSelectedGroupsIn] = useState([])
-
-  const [groups, setGroups] = useState([])
-  const [groupsIn, setGroupsIn] = useState([])
-
-  function showAlertConfirm(options, intl) {
-    const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
-      imageWidth: 213,
-      showCancelButton: true,
-      showCloseButton: true,
-      showConfirmButton: true,
-      focusCancel: true,
-      reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
-      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
-      customClass: {
-        content: 'content-class',
-        confirmButton: 'swal-btn-confirm'
-      }
-    }
-
-    return Swal.fire({ ...defaultProps, ...options })
-  }
-
-  const handleDelete = idDelete => {
-    showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
-    }).then(({ value }) => {
-      if (value) {
-        const token = localStorage.getItem(authConfig.storageTokenKeyName)
-        if (!token) {
-          return
-        }
-
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-        let urlDelete = `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups/${idDelete}`
-        axios
-          .delete(urlDelete, config)
-          .then(() => {
-            Swal.fire('Xóa thành công', '', 'success')
-            fetchGroupData()
-          })
-          .catch(err => {
-            console.log(err)
-            Swal.fire('Đã xảy ra lỗi', err?.response?.data?.message, 'error')
-          })
-      }
-    })
-  }
-
-  const GroupCheckbox = ({ group, checked, onChange }) => {
-    return (
-      <Box display='flex' alignItems='center' style={{ marginLeft: '5%' }}>
-        <Typography>
-          {' '}
-          <label htmlFor={`group-${group.id}`}>{group.name}</label>
-        </Typography>{' '}
-        <IconButton style={{ marginLeft: 'auto' }} size='small' onClick={() => handleDelete(group.id)}>
-          <Icon icon='tabler:trash' />
-        </IconButton>
-      </Box>
-    )
-  }
-
-  const handleGroupCheckboxChange = (id, checked) => {
-    if (checked) {
-      setSelectedGroups(prevGroups => [...prevGroups, { id }])
-    } else {
-      setSelectedGroups(prevGroups => prevGroups.filter(g => g.id !== id))
+const TabList = styled(MuiTabList)(({ theme }) => ({
+  borderBottom: '0 !important',
+  '&, & .MuiTabs-scroller': {
+    boxSizing: 'content-box',
+    padding: theme.spacing(1.25, 1.25, 2),
+    margin: `${theme.spacing(-1.25, -1.25, -2)} !important`
+  },
+  '& .MuiTabs-indicator': {
+    display: 'none'
+  },
+  '& .Mui-selected': {
+    boxShadow: theme.shadows[2],
+    backgroundColor: theme.palette.primary.main,
+    color: `${theme.palette.common.white} !important`
+  },
+  '& .MuiTab-root': {
+    lineHeight: 1,
+    borderRadius: theme.shape.borderRadius,
+    '&:hover': {
+      color: theme.palette.primary.main
     }
   }
-  useEffect(() => {
-    const fetchGroupData = async () => {
-      try {
-        const token = localStorage.getItem(authConfig.storageTokenKeyName)
-        console.log('token', token)
+}))
 
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          params: {
-            keyword: valueGroup
-          }
-        }
-        const response = await axios.get('https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups', config)
-        const dataWithChildren = addChildrenField(response.data.rows)
-        const rootGroups = findRootGroups(dataWithChildren)
-        setGroups(rootGroups)
-        console.log(rootGroups, 'rooot')
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
-    }
+const Caller = () => {
+  const [value, setValue] = useState('1')
 
-    fetchGroupData()
-  }, [valueGroup])
-
-  const addChildrenField = (data, parentId = null) => {
-    return data.map(group => {
-      const children = data.filter(child => child.parentId === group.id)
-      if (children.length > 0) {
-        group.children = children
-      }
-
-      return group
-    })
-  }
-
-  const renderGroup = group => (
-    <TreeItem
-      key={group.id}
-      nodeId={group.id}
-      label={
-        <GroupCheckbox
-          group={group}
-          checked={selectedGroups.some(g => g.id === group.id)}
-          onChange={handleGroupCheckboxChange}
-        />
-      }
-      style={{ marginTop: '5%' }}
-    >
-      {group.children && group.children.map(childGroup => renderGroup(childGroup))}
-    </TreeItem>
-  )
-
-  const findRootGroups = data => {
-    const rootGroups = []
-    data.forEach(group => {
-      if (!data.some(item => item.id === group.parentId)) {
-        rootGroups.push(group)
-      }
-    })
-
-    return rootGroups
-  }
-
-  const handleFilterGroup = event => {
-    setValueGroup(event)
-  }
-
-  const GroupCheckboxIn = ({ group, checked, onChange }) => {
-    return (
-      <Box display='flex' alignItems='center' style={{ marginLeft: '5%' }}>
-        <Typography>
-          {' '}
-          <label htmlFor={`group-${group.id}`}>{group.name}</label>
-        </Typography>{' '}
-        <IconButton style={{ marginLeft: 'auto' }} size='small' onClick={() => handleDeleteInf(group.id)}>
-          <Icon icon='tabler:trash' />
-        </IconButton>
-      </Box>
-    )
-  }
-
-  const handleGroupCheckboxChangeIn = (id, checked) => {
-    if (checked) {
-      setSelectedGroupsIn(prevGroups => [...prevGroups, { id }])
-    } else {
-      setSelectedGroupsIn(prevGroups => prevGroups.filter(g => g.id !== id))
-    }
-  }
-
-  const fetchGroupDataIn = async () => {
-    try {
-      const token = localStorage.getItem(authConfig.storageTokenKeyName)
-      console.log('token', token)
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        params: {
-          keyword: valueGroup
-        }
-      }
-
-      const response = await axios.get(
-        'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/parentsID?parentID=f963e9d4-3d6b-45df-884d-15f93452f2a2',
-        config
-      )
-      const dataWithChildren = addChildrenFieldIn(response.data)
-      const rootGroups = findRootGroupsIn(dataWithChildren)
-      setGroupsIn(rootGroups)
-    } catch (error) {
-      console.error('Error fetching data:', error)
-    }
-  }
-  useEffect(() => {
-    const fetchGroupData = async () => {
-      try {
-        const token = localStorage.getItem(authConfig.storageTokenKeyName)
-        console.log('token', token)
-
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          params: {
-            keyword: valueGroup
-          }
-        }
-
-        const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/parentsID?parentID=f963e9d4-3d6b-45df-884d-15f93452f2a2',
-          config
-        )
-        const dataWithChildren = addChildrenFieldIn(response.data)
-        const rootGroups = findRootGroupsIn(dataWithChildren)
-        setGroupsIn(rootGroups)
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
-    }
-
-    fetchGroupData()
-  }, [valueGroupIn])
-
-  const addChildrenFieldIn = (data, parentID = null) => {
-    return data.map(group => {
-      const children = data.filter(child => child.parentID === group.id)
-      if (children.length > 0) {
-        group.children = children
-      }
-
-      return group
-    })
-  }
-
-  const handleDeleteInf = id => {
-    showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
-    }).then(({ value }) => {
-      if (value) {
-        const token = localStorage.getItem(authConfig.storageTokenKeyName)
-        if (!token) {
-          return
-        }
-
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-        let urlDelete = `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${id}`
-        axios
-          .delete(urlDelete, config)
-          .then(() => {
-            Swal.fire('Xóa thành công', '', 'success')
-            fetchGroupDataIn()
-          })
-          .catch(err => {
-            console.log(err)
-            Swal.fire('Đã xảy ra lỗi', err?.response?.statusText, 'error')
-          })
-      }
-    })
-  }
-
-  const renderGroupIn = group => (
-    <TreeItem
-      key={group.id}
-      nodeId={group.id}
-      label={
-        <GroupCheckboxIn
-          group={group}
-          checked={selectedGroupsIn.some(g => g.id === group.id)}
-          onChange={handleGroupCheckboxChangeIn}
-        />
-      }
-      style={{ marginTop: '5%' }}
-    >
-      {group.children && group.children.map(childGroup => renderGroupIn(childGroup))}
-    </TreeItem>
-  )
-
-  const findRootGroupsIn = data => {
-    const rootGroups = []
-    data.forEach(group => {
-      if (!data.some(item => item.id === group.parentID)) {
-        rootGroups.push(group)
-      }
-    })
-
-    return rootGroups
-  }
-
-  const handleFilterGroupIn = event => {
-    setValueGroupIn(event)
+  const handleChange = (event, newValue) => {
+    setValue(newValue)
   }
 
   return (
     <Grid style={{ minWidth: '1000px' }}>
-      <Card>
-        <TableHeader />
-        <Grid container spacing={2}>
-          {/* <Grid item xs={0.1}></Grid> */}
-          <Grid item xs={2.5}></Grid>
-
-          <Grid item xs={3} component={Paper}>
-            <div>
-              <h2>Nhóm quyền truy cập</h2>
-
-              <CustomTextField
-                value={valueGroup}
-                sx={{ mr: 4 }}
-                placeholder='Tìm kiếm Phòng ban'
-                onChange={e => handleFilterGroup(e.target.value)}
-              />
-              <TreeView
-                sx={{ minHeight: 240 }}
-                defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
-                defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
-              >
-                {groups.map(rootGroup => renderGroup(rootGroup))}
-              </TreeView>
-            </div>
-          </Grid>
-          <Grid item xs={1}></Grid>
-          <Grid item xs={3} component={Paper}>
-            <div>
-              <h2>Nhóm cơ cấu tổ chức</h2>
-
-              <CustomTextField
-                value={valueGroupIn}
-                sx={{ mr: 4 }}
-                placeholder='Tìm kiếm cơ cấu tổ chức'
-                onChange={e => handleFilterGroupIn(e.target.value)}
-              />
-              <TreeView
-                sx={{ minHeight: 240 }}
-                defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
-                defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
-              >
-                {groupsIn.map(rootGroup => renderGroupIn(rootGroup))}
-              </TreeView>
-            </div>
-          </Grid>
+      <TabContext value={value}>
+        <Grid>
+          {' '}
+          <TabList onChange={handleChange} aria-label='customized tabs example'>
+            <Tab
+              value='1'
+              label='Danh sách nhóm quyền truy cập
+'
+            />
+          </TabList>
         </Grid>
-      </Card>
+        <TabPanel value='1'>
+          <TableStickyHeader />
+        </TabPanel>
+      </TabContext>
     </Grid>
   )
 }
 
-export const getStaticProps = async () => {
-  const res = await axios.get('/cards/statistics')
-  const apiData = res.data
-
-  return {
-    props: {
-      apiData
-    }
-  }
-}
-
-export default UserList
+export default Caller
