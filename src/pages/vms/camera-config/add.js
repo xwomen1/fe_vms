@@ -33,7 +33,6 @@ import PopupScanDungIP from './popups/AddDungIP'
 import PopupScan from './popups/Add'
 import CircularProgress from '@mui/material/CircularProgress'
 import Edit from './popups/Edit'
-import CustomDialog from '../../pages/face_management/CustomDialog/CustomDialog'
 import ImportPopup from './popups/ImportPopup'
 import AddDevice from './popups/AddDevice'
 import LiveView from './popups/LiveView'
@@ -1049,13 +1048,6 @@ const Add = ({ apiData, assettypeStatus }) => {
         {isOpenLiveView && <LiveView show={isOpenLiveView} onClose={() => setIsOpenLiveView(false)} data={camera} />}
       </Grid>
       <ImportPopup open={openPopup} handleClose={handleClosePopup} />
-      <CustomDialog
-        open={dialogOpen}
-        handleClose={handleDialogClose}
-        title={dialogTitle}
-        message={dialogMessage}
-        isSuccess={isSuccess}
-      />
     </>
   )
 }

@@ -25,67 +25,35 @@ import {
 import CustomTextField from 'src/@core/components/mui/text-field'
 import { format } from 'date-fns'
 
-const initValueFilter = {
-  location: null,
-  cameraName: null,
-  startTime: null,
-  endTime: null,
-  keyword: '',
-  limit: 25,
-  page: 1
-}
-
 const EventList = () => {
   const [anchorEl, setAnchorEl] = useState(null)
   const [totalPage, setTotalPage] = useState(0)
-  const [value, setValue] = useState('')
+  const [searchKeyword, setSearchKeyword] = useState('')
   const [page, setPage] = useState(1)
-  const [devices, setDevices] = useState([])
   const [pageSize, setPageSize] = useState(25)
+  const [devices, setDevices] = useState([])
   const [loading, setLoading] = useState(false)
   const pageSizeOptions = [25, 50, 100]
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
-  const formatDateTime = dateTime => {
-    const date = typeof dateTime === 'number' ? new Date(dateTime) : new Date(dateTime)
-
-    return format(date, 'HH:mm:ss dd/MM/yyyy')
-  }
-
-  const formatTime = dateTime => {
-    const date = typeof dateTime === 'number' ? new Date(dateTime) : new Date(dateTime)
-
-    return format(date, 'HH:mm:ss')
-  }
-
-  const formatDate = dateTime => {
-    const date = typeof dateTime === 'number' ? new Date(dateTime) : new Date(dateTime)
-
-    return format(date, 'dd/MM/yyyy')
-  }
+  const formatDateTime = dateTime => format(new Date(dateTime), 'HH:mm:ss dd/MM/yyyy')
+  const formatTime = dateTime => format(new Date(dateTime), 'HH:mm:ss')
+  const formatDate = dateTime => format(new Date(dateTime), 'dd/MM/yyyy')
 
   const calculateTotalTime = (startTime, endTime) => {
     const start = new Date(startTime)
     const end = new Date(endTime)
-    const diff = end - start // milliseconds
+    const diff = end - start
     const hours = Math.floor(diff / (1000 * 60 * 60))
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000)
 
-    return `${hours} giờ ${minutes} phút `
+    return `${hours} giờ ${minutes} phút`
   }
 
-  const handlePageChange = (event, newPage) => {
-    setPage(newPage)
-  }
+  const handlePageChange = (event, newPage) => setPage(newPage)
 
-  const handleOpenMenu = event => {
-    setAnchorEl(event.currentTarget)
-  }
-
-  const handleCloseMenu = () => {
-    setAnchorEl(null)
-  }
+  const handleOpenMenu = event => setAnchorEl(event.currentTarget)
+  const handleCloseMenu = () => setAnchorEl(null)
 
   const handleSelectPageSize = size => {
     setPageSize(size)
@@ -93,28 +61,26 @@ const EventList = () => {
     handleCloseMenu()
   }
 
-  const handleFilter = useCallback(val => {
-    setValue(val)
-  }, [])
+  const handleSearch = () => {
+    console.log('Searching with keyword:', searchKeyword)
+    setPage(1)
+    fetchDataList()
+  }
 
   const fetchDataList = useCallback(async () => {
+    console.log('Fetching data with:', { searchKeyword, page, pageSize })
     setLoading(true)
     try {
       const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        params: {
-          keyword: value,
-          page: page,
-          limit: pageSize
-        }
+        headers: { Authorization: `Bearer ${token}` }
       }
 
       const response = await axios.post(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/event/search/user?keyword=${value}&limit=${pageSize}&page=${page}`,
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/event/search/user?keyword=${searchKeyword}&limit=${pageSize}&page=${page}`,
+
         config
       )
+      console.log('Response data:', response.data)
       setDevices(response.data.rows)
       setTotalPage(Math.ceil(response.data.count / pageSize))
     } catch (error) {
@@ -123,11 +89,11 @@ const EventList = () => {
     } finally {
       setLoading(false)
     }
-  }, [token, value, page, pageSize])
+  }, [token, page, pageSize, searchKeyword])
 
   useEffect(() => {
     fetchDataList()
-  }, [fetchDataList])
+  }, [page, pageSize])
 
   const columns = [
     { id: 1, flex: 0.25, minWidth: 50, align: 'left', field: 'fullName', label: 'Họ và tên' },
@@ -143,6 +109,11 @@ const EventList = () => {
   return (
     <Card>
       <CardHeader
+        title={
+          <>
+            <Button variant='contained'>Danh sách chấm công</Button>
+          </>
+        }
         titleTypographyProps={{ sx: { mb: [2, 0] } }}
         sx={{
           py: 4,
@@ -153,31 +124,21 @@ const EventList = () => {
         action={
           <Grid container spacing={2}>
             <Grid item>
-              {/* <Box sx={{ float: 'right' }}>
-                <Button
-                  aria-label='Bộ lọc'
-                  onClick={() => {
-                    setIsOpenFilter(true)
-                  }}
-                  variant='contained'
-                >
-                  <Icon icon='tabler:filter' />
-                </Button>
-              </Box> */}
-            </Grid>
-            <Grid item>
               <CustomTextField
-                value={value}
-                onChange={e => handleFilter(e.target.value)}
-                placeholder='Tìm kiếm sự kiện '
+                placeholder='Nhập tên sự kiện ...! '
+                value={searchKeyword}
+                onChange={e => setSearchKeyword(e.target.value)}
                 InputProps={{
-                  startAdornment: (
-                    <Box sx={{ mr: 2, display: 'flex' }}>
-                      <Icon fontSize='1.25rem' icon='tabler:search' />
-                    </Box>
-                  ),
                   endAdornment: (
-                    <IconButton size='small' title='Clear' aria-label='Clear' onClick={() => setValue('')}>
+                    <IconButton
+                      size='small'
+                      title='Clear'
+                      aria-label='Clear'
+                      onClick={() => {
+                        setSearchKeyword('')
+                        fetchDataList()
+                      }}
+                    >
                       <Icon fontSize='1.25rem' icon='tabler:x' />
                     </IconButton>
                   )
@@ -192,6 +153,9 @@ const EventList = () => {
                   }
                 }}
               />
+              <Button variant='contained' style={{ margin: '0px 2px' }} onClick={handleSearch}>
+                Tìm kiếm <Icon fontSize='1.25rem' icon='tabler:search' />
+              </Button>
             </Grid>
           </Grid>
         }

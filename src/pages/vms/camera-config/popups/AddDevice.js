@@ -237,7 +237,11 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
   const [protocols, setProtocols] = useState([])
 
   const [selectedProtocol, setSelectedProtocol] = useState(null)
-  const [rows, setRows] = useState([])
+
+  const [rows, setRows] = useState([
+    { name: '', isProxied: false, url: '', type: '' },
+    { name: '', isProxied: false, url: '', type: '' }
+  ])
   const [lat, setLat] = useState(null)
   const [lng, setLng] = useState(null)
 
@@ -664,28 +668,6 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
                 </Grid>
               </Grid>
               <Grid item xs={12} sx={{ marginTop: 5 }}>
-                {viewport && (
-                  <Grid item xs={12}>
-                    <ReactMapGL
-                      {...viewport}
-                      width='100%'
-                      height='30vh'
-                      onViewportChange={setViewport}
-                      goongApiAccessToken={GOONG_MAP_KEY}
-                      onClick={handleMapClick}
-                    >
-                      {lat && lng && (
-                        <Marker latitude={parseFloat(lat)} longitude={parseFloat(lng)} offsetLeft={-20} offsetTop={-20}>
-                          <div>
-                            <CustomMapPin />{' '}
-                          </div>
-                        </Marker>
-                      )}
-                    </ReactMapGL>
-                  </Grid>
-                )}
-              </Grid>
-              <Grid item xs={12} sx={{ marginTop: 5 }}>
                 <Typography variant='h5'>Kênh</Typography>
                 <TableContainer>
                   <Table>
@@ -695,7 +677,6 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
                         <TableCell>Proxied</TableCell>
                         <TableCell align='right'>Channel URL </TableCell>
                         <TableCell align='right'>StreamType </TableCell>
-
                         <TableCell align='center'>
                           <IconButton size='small' onClick={handleAddRow}>
                             <Icon icon='tabler:plus' />
@@ -746,6 +727,28 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
                     </TableBody>
                   </Table>
                 </TableContainer>
+              </Grid>
+              <Grid item xs={12} sx={{ marginTop: 5 }}>
+                {viewport && (
+                  <Grid item xs={12}>
+                    <ReactMapGL
+                      {...viewport}
+                      width='100%'
+                      height='30vh'
+                      onViewportChange={setViewport}
+                      goongApiAccessToken={GOONG_MAP_KEY}
+                      onClick={handleMapClick}
+                    >
+                      {lat && lng && (
+                        <Marker latitude={parseFloat(lat)} longitude={parseFloat(lng)} offsetLeft={-20} offsetTop={-20}>
+                          <div>
+                            <CustomMapPin />{' '}
+                          </div>
+                        </Marker>
+                      )}
+                    </ReactMapGL>
+                  </Grid>
+                )}
               </Grid>
             </Grid>
           </form>

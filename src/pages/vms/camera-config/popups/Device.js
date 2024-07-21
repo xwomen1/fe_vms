@@ -217,6 +217,7 @@ const Device = ({ onClose, camera }) => {
           }
 
           const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${camera}`, config)
+          console.log(response.data.box, 'r')
           setCamera(response.data)
           setCameraName(response.data.name)
           setUserName(response.data.username)
@@ -225,7 +226,10 @@ const Device = ({ onClose, camera }) => {
           setHttp(response.data.httpPort)
           setRows(response.data.streams || [])
           setOnvif(response.data.onvif)
-
+          setIdBox({
+            value: response.data.box?.id || '',
+            label: response.data.box?.name || ''
+          })
           setLat(response.data.lat)
           setLng(response.data.long)
           setisOfflineSetting(response.data.isOfflineSetting)
@@ -527,7 +531,7 @@ const Device = ({ onClose, camera }) => {
               onChange={handleCameraGroupChange}
               options={cameraGroup || []}
               getOptionLabel={option => option.label}
-              renderInput={params => <CustomTextField {...params} label='Nhóm Camera' fullWidth />}
+              renderInput={params => <CustomTextField {...params} label='Loại Camera' fullWidth />}
               onFocus={handleComboboxFocus}
             />{' '}
           </Grid>
@@ -610,8 +614,8 @@ const Device = ({ onClose, camera }) => {
                 <TableRow>
                   <TableCell>Tên Kênh</TableCell>
                   <TableCell>Proxied</TableCell>
-                  <TableCell align='right'>Channel URL </TableCell>
-                  <TableCell align='right'>StreamType </TableCell>
+                  <TableCell align='center'>Channel URL </TableCell>
+                  <TableCell align='center'>StreamType </TableCell>
 
                   <TableCell align='center'>
                     <IconButton size='small' onClick={handleAddRow}>
@@ -624,19 +628,18 @@ const Device = ({ onClose, camera }) => {
                 {rows &&
                   rows.map((row, index) => (
                     <TableRow key={index}>
-                      <TableCell>
+                      <TableCell style={{ width: '30%' }}>
                         <CustomTextField
                           type='text'
                           value={row.name}
                           onChange={event => handleChannelNameChange(index, event)}
-                          fullWidth
                         />{' '}
                       </TableCell>
                       <TableCell>
                         {' '}
                         <Checkbox checked={row.isProxied} onChange={event => handleProxiedChange(index, event)} />
                       </TableCell>
-                      <TableCell align='right'>
+                      <TableCell align='right' style={{ width: '50%' }}>
                         <CustomTextField
                           type='text'
                           value={row.url}
@@ -644,7 +647,7 @@ const Device = ({ onClose, camera }) => {
                           fullWidth
                         />
                       </TableCell>
-                      <TableCell align='right'>
+                      <TableCell align='right' style={{ width: '20%' }}>
                         <CustomTextField
                           type='text'
                           value={row.type}
@@ -652,7 +655,6 @@ const Device = ({ onClose, camera }) => {
                           fullWidth
                         />
                       </TableCell>
-
                       <TableCell align='center'>
                         <IconButton size='small' onClick={() => handleDeleteRow(index)}>
                           <Icon icon='bi:trash' />

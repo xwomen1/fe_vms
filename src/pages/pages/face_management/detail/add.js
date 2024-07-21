@@ -28,7 +28,6 @@ import FileUploader from 'devextreme-react/file-uploader'
 import ModalImage from '../ModalImage'
 import ImageCropper from '../ImageCropperPopup'
 import Link from 'next/link'
-import CustomDialog from '../CustomDialog/CustomDialog'
 
 const AddFaceManagement = () => {
   const classes = useStyles()
@@ -56,6 +55,7 @@ const AddFaceManagement = () => {
   const [dialogMessage, setDialogMessage] = useState('')
   const [status1, setStatus1] = useState('')
   const [isSuccess, setIsSuccess] = useState(false)
+  const [selectedOption, setSelectedOption] = useState('')
   const [redirectUrl, setRedirectUrl] = useState('')
 
   const handleInputChange = e => {
@@ -228,13 +228,6 @@ const AddFaceManagement = () => {
     }
   }
 
-  const handleDialogClose = () => {
-    setDialogOpen(false)
-    if (isSuccess && redirectUrl) {
-      window.location.href = redirectUrl
-    }
-  }
-
   const handleAddBlacklist = async () => {
     setLoading(true)
     setShowLoading(true)
@@ -249,31 +242,37 @@ const AddFaceManagement = () => {
 
       const params = {
         name: name,
+        status: status1,
         mainImageId: fileAvatarId,
         imgs: listFileId.map((id, index) => ({
           id: id,
           urlImage: listFileUrl[id]
         })),
-        note: note
+        note: note,
+        type: {
+          id: selectedOption.id,
+          name: selectedOption.name
+        }
       }
 
       const response = await axios.post(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist`, params, config)
       const newId = response.data.id
-      Swal.fire(
-        Swal.fire({
-          title: 'Thành công!',
-          text: 'Dữ liệu đã được Thêm thành công.',
-          icon: 'success',
-          willOpen: () => {
-            const confirmButton = Swal.getConfirmButton()
-            if (confirmButton) {
-              confirmButton.style.backgroundColor = '#FF9F43'
-              confirmButton.style.color = 'white'
-            }
+      Swal.fire({
+        title: 'Thành công!',
+        text: 'Dữ liệu đã được Thêm thành công.',
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
           }
-        })
-      )
-      setRedirectUrl(`/pages/face_management/detail/${newId}`)
+        }
+      }).then(result => {
+        if (result.isConfirmed) {
+          window.location.href = `/pages/face_management/detail/${newId}`
+        }
+      })
     } catch (error) {
       Swal.fire({
         title: 'Error!',
@@ -315,7 +314,7 @@ const AddFaceManagement = () => {
       const recurseFetch = async (parentId, level) => {
         const childData = await fetchChildData(parentId)
         for (const child of childData) {
-          result.push({ label: child.name, id: child.id, level })
+          result.push({ name: child.name, id: child.id, level })
           if (child.isParent) {
             await recurseFetch(child.id, level + 1)
           }
@@ -356,12 +355,17 @@ const AddFaceManagement = () => {
 
   const renderOption = (props, option) => (
     <li {...props} style={{ paddingLeft: `${option.level * 20}px` }}>
-      {option.label}
+      {option.name}
     </li>
   )
 
   const handleStatusChange = () => {
-    setStatus1(status1 === 'true' ? 'false' : 'true')
+    setStatus1(status1 === true ? false : true)
+  }
+
+  const handleOptionChange = (event, newValue) => {
+    setSelectedOption(newValue)
+    console.log(newValue)
   }
 
   return (
@@ -399,13 +403,6 @@ const AddFaceManagement = () => {
                   '& .MuiCardHeader-action': { m: 0 },
                   alignItems: ['flex-start', 'center']
                 }}
-              />
-              <CustomDialog
-                open={dialogOpen}
-                handleClose={handleDialogClose}
-                title={dialogTitle}
-                message={dialogMessage}
-                isSuccess={isSuccess}
               />
               <Grid item xs={12}>
                 {showLoading || loading}
@@ -526,14 +523,24 @@ const AddFaceManagement = () => {
                         >
                           Trạng thái hoạt động
                         </p>
-                        <Switch checked={status1 === 'true'} onChange={handleStatusChange} />
+                        <Switch checked={status1 === true} onChange={handleStatusChange} />
                       </div>
+                      <p
+                        style={{
+                          fontSize: '18px',
+                          lineHeight: '22px',
+                          margin: '0px'
+                        }}
+                      >
+                        Loại đối tượng
+                      </p>
                       <Autocomplete
                         options={person}
-                        getOptionLabel={option => option.label}
-                        renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
+                        getOptionLabel={option => option.name}
+                        renderInput={params => <CustomTextField {...params} fullWidth />}
                         renderOption={renderOption}
                         loading={loading}
+                        onChange={handleOptionChange}
                       />{' '}
                     </div>
 

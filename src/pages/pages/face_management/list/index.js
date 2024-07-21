@@ -25,10 +25,9 @@ import {
 } from '@mui/material'
 import Icon from 'src/@core/components/icon'
 import Swal from 'sweetalert2'
-import { CircularProgress } from '@material-ui/core'
+import CircularProgress from '@mui/material/CircularProgress'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import authConfig from 'src/configs/auth'
-import CustomDialog from '../CustomDialog/CustomDialog'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import * as XLSX from 'xlsx'
@@ -476,7 +475,7 @@ const FaceManagement = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {loading && <CircularProgress />}
+                  {loading && <CircularProgress style={{ marginLeft: '20%' }} />}
                   {Array.isArray(userData) && userData.length > 0 ? (
                     userData.map(
                       (user, index) => (
@@ -503,7 +502,7 @@ const FaceManagement = () => {
                             <TableCell>Nhân viên</TableCell>
                             <TableCell
                               style={{
-                                color: user.status ? 'green' : 'red'
+                                color: user.status ? '#FF9F43' : 'red'
                               }}
                             >
                               {user.status ? 'hoạt động' : 'không hoạt động'}
@@ -562,13 +561,6 @@ const FaceManagement = () => {
           </Card>
         </Grid>
       </Grid>
-      <CustomDialog
-        open={dialogOpen}
-        handleClose={handleDialogClose}
-        title={dialogTitle}
-        message={dialogMessage}
-        isSuccess={isSuccess}
-      />
     </>
   )
 }
