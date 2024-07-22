@@ -491,7 +491,7 @@ const Car_management = () => {
                             )}
                           </TableCell>
                           <TableCell>{user.name}</TableCell>
-                          <TableCell>{user.note}</TableCell>
+                          <TableCell>{user.vehicleType}</TableCell>
 
                           <TableCell>{user.lastAppearance}</TableCell>
                           <TableCell
