@@ -256,12 +256,9 @@ const EventList = () => {
 
   return (
     <>
-      <Grid>
-        <Button variant='contained'> Danh sách sự cố</Button>
-      </Grid>
-      <br></br>
       <Card>
         <CardHeader
+          title="Danh sách sự cố"
           titleTypographyProps={{ sx: { mb: [2, 0] } }}
           sx={{
             py: 4,
