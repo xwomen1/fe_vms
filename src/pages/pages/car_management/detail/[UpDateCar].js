@@ -245,7 +245,7 @@ const UpDateCar = () => {
         setNote(response.data.note || '')
         setStatus1(response.data.status)
 
-        setType(response.data.type || '')
+        setType(response.data.vehicleType || '')
       }
     } catch (error) {
       console.error('Error fetching data:', error)
@@ -306,7 +306,7 @@ const UpDateCar = () => {
           setImg4(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[4]?.id}`))
           setName(response.data.name || '')
           setNote(response.data.note || '')
-          setType(response.data.type || '')
+          setType(response.data.vehicleType || '')
           setStatus(response.data.status || '')
         }
       } catch (error) {
@@ -339,7 +339,7 @@ const UpDateCar = () => {
         name: name,
         note: note,
         status: status1,
-        type: type,
+        vehicleType: type,
         mainImageId: fileAvatarId,
         imgs: listFileId.map(id => ({
           id: id,

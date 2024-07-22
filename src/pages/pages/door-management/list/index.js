@@ -602,7 +602,7 @@ const DoorManagement = () => {
           <Paper elevation={3} style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
             <TableContainer>
               <Table>
-                <TableHead>
+                <TableHead style={{ background: '#F6F6F7' }}>
                   <TableRow>
                     <TableCell>
                       <Checkbox checked={selectedIds.length > 0} onChange={handleSelectAllChange} />

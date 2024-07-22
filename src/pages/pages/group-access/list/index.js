@@ -93,12 +93,15 @@ const GroupAccess = () => {
 
   return (
     <>
-      <Grid>
-        <Button variant='contained'> Danh sách quản lý nhóm quyền truy cập</Button>
-      </Grid>
-      <br></br>
       <Card>
         <CardHeader
+          title={
+            <>
+              <Grid>
+                <Button variant='contained'> Danh sách quản lý nhóm quyền truy cập</Button>
+              </Grid>
+            </>
+          }
           titleTypographyProps={{ sx: { mb: [2, 0] } }}
           sx={{
             py: 4,
@@ -122,7 +125,7 @@ const GroupAccess = () => {
         <Grid item xs={12}></Grid>
         <Grid item xs={12}>
           <Table>
-            <TableHead>
+            <TableHead style={{ background: '#F6F6F7' }}>
               <TableRow>
                 <TableCell sx={{ padding: '16px' }}>STT</TableCell>
                 <TableCell sx={{ padding: '16px' }}>Tên</TableCell>
