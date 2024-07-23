@@ -65,30 +65,30 @@ const RolePopup = ({ open, onClose, onSelect, nvr, name, ip }) => {
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='md' fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth='lg' fullWidth>
       <DialogTitle>{`${name}-${ip}`}</DialogTitle>
       <DialogContent>
         <TabContext value={value}>
           <TabList onChange={handleChange} aria-label='customized tabs example'>
-            <Tab value='1' label='Quét' />
-            <Tab value='2' label='Nhập' />
+            <Tab value='1' label='Gắn camera' />
+            <Tab value='2' label='Danh sách camera của NVR' />
           </TabList>
           <TabPanel value='1'>
             <Quet nvr={nvr} onClose={onClose} />
           </TabPanel>
           <TabPanel value='2'>
-            <Nhap />
+            <Nhap nvr={nvr} onClose={onClose} />
           </TabPanel>
         </TabContext>
       </DialogContent>
       <DialogActions>
-        <Button
+        {/* <Button
           variant='contained'
 
-          // onClick={}
+        // onClick={}
         >
           Quét
-        </Button>
+        </Button> */}
         <Button variant='contained' onClick={onClose}>
           OK
         </Button>
