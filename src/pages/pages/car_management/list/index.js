@@ -328,6 +328,7 @@ const Car_management = () => {
 
     return url
   }
+
   const handlePageChange = newPage => {
     setPage(newPage)
   }
