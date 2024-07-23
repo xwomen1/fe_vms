@@ -22,6 +22,8 @@ import {
   Pagination,
   Table,
   TableBody,
+  CardContent,
+  CardActions,
   TableCell,
   TableContainer,
   TableHead,
@@ -30,6 +32,7 @@ import {
 import Link from 'next/link'
 
 const GroupAccess = () => {
+  const [searchKeyword, setSearchKeyword] = useState('')
   const [reload, setReload] = useState(0)
   const [loading, setLoading] = useState(false)
   const [dataList, setDataList] = useState([])
@@ -64,7 +67,7 @@ const GroupAccess = () => {
     fetchDataList()
   }, [page, pageSize])
 
-  const fetchDataList = async () => {
+  const fetchDataList = useCallback(async () => {
     setLoading(true)
     try {
       const config = {
@@ -72,6 +75,7 @@ const GroupAccess = () => {
           Authorization: `Bearer ${token}`
         },
         params: {
+          keyword: searchKeyword,
           page: page,
           limit: pageSize
         }
@@ -89,16 +93,23 @@ const GroupAccess = () => {
     } finally {
       setLoading(false)
     }
+  }, [token, page, pageSize, searchKeyword])
+
+  const handleSearch = () => {
+    setPage(1)
+    fetchDataList()
   }
 
   return (
     <>
-      <Card>
+      <Card sx={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
         <CardHeader
           title={
             <>
-              <Grid>
-                <Button variant='contained'> Danh sách quản lý nhóm quyền truy cập</Button>
+              <Grid container spacing={2} alignItems='center'>
+                <Grid item>
+                  <Button variant='contained'>Danh sách quản lý nhóm quyền truy cập</Button>
+                </Grid>
               </Grid>
             </>
           }
@@ -112,7 +123,41 @@ const GroupAccess = () => {
           action={
             <Grid container spacing={2}>
               <Grid item>
-                <Box sx={{ float: 'right' }}>
+                <CustomTextField
+                  placeholder='Nhập tên truy cập cửa ...! '
+                  value={searchKeyword}
+                  onChange={e => setSearchKeyword(e.target.value)}
+                  InputProps={{
+                    endAdornment: (
+                      <IconButton
+                        size='small'
+                        title='Clear'
+                        aria-label='Clear'
+                        onClick={() => {
+                          setSearchKeyword('')
+                          fetchDataList()
+                        }}
+                      >
+                        <Icon fontSize='1.25rem' icon='tabler:x' />
+                      </IconButton>
+                    )
+                  }}
+                  sx={{
+                    width: {
+                      xs: 1,
+                      sm: 'auto'
+                    },
+                    '& .MuiInputBase-root > svg': {
+                      mr: 2
+                    }
+                  }}
+                />
+                <Button variant='contained' sx={{ ml: 2 }} onClick={handleSearch}>
+                  Tìm kiếm <Icon fontSize='1.25rem' icon='tabler:search' />
+                </Button>
+              </Grid>
+              <Grid item>
+                <Box sx={{ textAlign: 'right' }}>
                   <Button variant='contained' component={Link} href={`/pages/group-access/detail/add`}>
                     thêm mới
                     <Icon icon='tabler:plus' />
@@ -122,8 +167,7 @@ const GroupAccess = () => {
             </Grid>
           }
         />
-        <Grid item xs={12}></Grid>
-        <Grid item xs={12}>
+        <CardContent sx={{ flex: 1, overflow: 'auto' }}>
           <Table>
             <TableHead style={{ background: '#F6F6F7' }}>
               <TableRow>
@@ -132,7 +176,7 @@ const GroupAccess = () => {
                 <TableCell sx={{ padding: '16px' }}>Mô tả</TableCell>
                 <TableCell sx={{ padding: '16px' }}>Cấp truy cập cửa</TableCell>
                 <TableCell sx={{ padding: '16px' }}>Nhóm người</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Người </TableCell>
+                <TableCell sx={{ padding: '16px' }}>Người</TableCell>
                 <TableCell sx={{ padding: '16px' }}>Người tạo</TableCell>
                 <TableCell sx={{ padding: '16px' }}>Thao tác</TableCell>
               </TableRow>
@@ -149,7 +193,7 @@ const GroupAccess = () => {
                           setIsOpenUpdate(true)
                         }}
                         size='small'
-                        sx={{ color: 'blue', right: '10px' }}
+                        sx={{ color: 'blue' }}
                       >
                         {user.name}
                       </Button>
@@ -168,33 +212,30 @@ const GroupAccess = () => {
                     <TableCell>{user.users}</TableCell>
                     <TableCell>{user.createdByUser}</TableCell>
                     <TableCell>
-                      {' '}
-                      <Box>
-                        <Button
-                          onClick={() => {
-                            setIdUpdate(user.id)
-                            setIsOpenUpdate(true)
-                          }}
-                        >
-                          <Icon icon='tabler:edit' />
-                        </Button>
-                      </Box>
+                      <Button
+                        onClick={() => {
+                          setIdUpdate(user.id)
+                          setIsOpenUpdate(true)
+                        }}
+                      >
+                        <Icon icon='tabler:edit' />
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={7} align='center'>
+                  <TableCell colSpan={8} align='center'>
                     Không có dữ liệu
                   </TableCell>
                 </TableRow>
               )}
             </TableBody>
           </Table>
-          <br></br>
-          <Grid container spacing={2} style={{ padding: 10 }}>
-            <Grid item xs={3}></Grid>
-            <Grid item xs={1.5} style={{ padding: 0, marginLeft: '12%' }}>
+        </CardContent>
+        <CardActions sx={{ backgroundColor: 'white', padding: '8px' }}>
+          <Grid container spacing={2} alignItems='center'>
+            <Grid item xs={12} sm={6} md={4} sx={{ textAlign: 'right', mb: 1 }}>
               <IconButton onClick={handleOpenMenu}>
                 <Icon icon='tabler:selector' />
                 <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
@@ -207,16 +248,17 @@ const GroupAccess = () => {
                 ))}
               </Menu>
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} sm={6} md={5}>
               <Pagination
                 count={total}
                 color='primary'
                 page={page}
                 onChange={(event, newPage) => handlePageChange(event, newPage)}
+                sx={{ display: 'flex', justifyContent: 'center' }}
               />
             </Grid>
           </Grid>
-        </Grid>
+        </CardActions>
       </Card>
       {isOpenUpdate && (
         <Update

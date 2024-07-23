@@ -11,6 +11,8 @@ import {
   Grid,
   IconButton,
   Menu,
+  CardContent,
+  CardActions,
   MenuItem,
   Pagination,
   Paper,
@@ -94,7 +96,7 @@ const EventList = () => {
   }
   useEffect(() => {
     fetchDataList()
-  }, [])
+  }, [page, pageSize])
 
   const fetchDataList = useCallback(async () => {
     setLoading(true)
@@ -140,7 +142,7 @@ const EventList = () => {
   ]
 
   return (
-    <Card>
+    <Card sx={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
       <CardHeader
         title={
           <>
@@ -194,74 +196,77 @@ const EventList = () => {
           </Grid>
         }
       />
-      <Grid container spacing={0}>
-        <TableContainer component={Paper} sx={{ minHeight: 600, minWidth: 500 }}>
-          <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
-            <TableHead>
-              <TableRow>
-                <TableCell>STT</TableCell>
-                {columns.map(column => (
-                  <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
-                    {column.label}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {Array.isArray(devices) && devices.length > 0 ? (
-                devices.map((row, index) => (
-                  <TableRow hover tabIndex={-1} key={index}>
-                    <TableCell>{(page - 1) * pageSize + index + 1}</TableCell>
-                    {columns.map(column => {
-                      const value = row[column.field]
-
-                      return (
-                        <TableCell key={column.id} align={column.align}>
-                          {column.field === 'timeMin' || column.field === 'timeMax'
-                            ? formatTime(value)
-                            : column.field === 'date'
-                            ? formatDate(row.timeMin)
-                            : column.field === 'totalTime'
-                            ? calculateTotalTime(row.timeMin, row.timeMax)
-                            : value}
-                        </TableCell>
-                      )
-                    })}
-                  </TableRow>
-                ))
-              ) : (
+      <CardContent sx={{ flex: 1, overflow: 'auto' }}>
+        <Grid container spacing={0}>
+          <TableContainer component={Paper} sx={{ maxHeight: '100%', minWidth: '100%', overflow: 'auto' }}>
+            <Table stickyHeader aria-label='sticky table'>
+              <TableHead>
                 <TableRow>
-                  <TableCell colSpan={columns.length + 1}>Không có dữ liệu ...</TableCell>
+                  <TableCell>STT</TableCell>
+                  {columns.map(column => (
+                    <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
+                      {column.label}
+                    </TableCell>
+                  ))}
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Grid>
-      <br />
-      <Grid container spacing={2}>
-        <Grid item xs={3}></Grid>
-        <Grid item xs={1}>
-          <span style={{ fontSize: 15 }}> dòng/trang</span>
+              </TableHead>
+              <TableBody>
+                {Array.isArray(devices) && devices.length > 0 ? (
+                  devices.map((row, index) => (
+                    <TableRow hover tabIndex={-1} key={index}>
+                      <TableCell>{(page - 1) * pageSize + index + 1}</TableCell>
+                      {columns.map(column => {
+                        const value = row[column.field]
+
+                        return (
+                          <TableCell key={column.id} align={column.align}>
+                            {column.field === 'timeMin' || column.field === 'timeMax'
+                              ? formatTime(value)
+                              : column.field === 'date'
+                              ? formatDate(row.timeMin)
+                              : column.field === 'totalTime'
+                              ? calculateTotalTime(row.timeMin, row.timeMax)
+                              : value}
+                          </TableCell>
+                        )
+                      })}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={columns.length + 1}>Không có dữ liệu ...</TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Grid>
-        <Grid item xs={1}>
-          <Box>
-            <Button onClick={handleOpenMenu} endIcon={<Icon icon='tabler:selector' />}>
-              {pageSize}
-            </Button>
-            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
-              {pageSizeOptions.map(size => (
-                <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
-                  {size}
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
+      </CardContent>
+      <CardActions sx={{ backgroundColor: 'white' }}>
+        <Grid container spacing={2}>
+          <Grid item xs={3}></Grid>
+          <Grid item xs={1} sx={{ textAlign: 'center', marginTop: '5px' }}>
+            <span style={{ fontSize: 15 }}> dòng/trang</span>
+          </Grid>
+          <Grid item xs={1}>
+            <Box>
+              <Button onClick={handleOpenMenu} endIcon={<Icon icon='tabler:selector' />}>
+                {pageSize}
+              </Button>
+              <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+                {pageSizeOptions.map(size => (
+                  <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
+                    {size}
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
+          </Grid>
+          <Grid item xs={6}>
+            <Pagination count={totalPage} page={page} color='primary' onChange={handlePageChange} />
+          </Grid>
         </Grid>
-        <Grid item xs={6}>
-          <Pagination count={totalPage} page={page} color='primary' onChange={handlePageChange} />
-        </Grid>
-      </Grid>
+      </CardActions>
     </Card>
   )
 }
