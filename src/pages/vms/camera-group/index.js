@@ -11,7 +11,7 @@ import authConfig from 'src/configs/auth'
 import Table from '@mui/material/Table'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
-import { Button, IconButton } from '@mui/material'
+import { Box, Button, CardContent, CardHeader, IconButton, Paper, TableContainer } from '@mui/material'
 import axios from 'axios'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import DeletePopup from './popup/delete'
@@ -28,13 +28,11 @@ const CameraGroup = ({ apiData }) => {
 
   const [openPopupDetail, setOpenPopupDetail] = useState(false)
 
-  const [addUserOpen, setAddUserOpen] = useState(false)
   const [cameras, setCamera] = useState([])
 
   const [total, setTotal] = useState([1])
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
-  const [status1, setStatus1] = useState(25)
 
   const pageSizeOptions = [25, 50, 100]
   const [anchorEl, setAnchorEl] = useState(null)
@@ -87,8 +85,6 @@ const CameraGroup = ({ apiData }) => {
     handleCloseMenu()
   }
 
-  console.log(total, 'totalpage')
-
   const fetchFilteredOrAllCameraGroup = async () => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -105,7 +101,6 @@ const CameraGroup = ({ apiData }) => {
       }
       const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/camera-groups', config)
       setCamera(response.data)
-      console.log(response.data[0].id)
     } catch (error) {
       console.error('Error fetching users:', error)
     }
@@ -120,94 +115,102 @@ const CameraGroup = ({ apiData }) => {
   }, [])
 
   return (
-    <Grid container spacing={6.5}>
-      <Grid item xs={7} style={{ color: 'orange', marginLeft: '2%' }}>
-        <Button variant='contained'> Danh sách nhóm Camera</Button>
-      </Grid>
-      <Grid item xs={12}>
-        <Card>
-          <div></div>
-          <Grid container spacing={2}>
-            <Grid item xs={0.1}></Grid>
-
-            <Grid container item xs={12} alignItems='center'>
-              <Grid container spacing={2}>
-                <Grid item xs={7} style={{ color: 'orange', marginLeft: '2%' }}></Grid>
-                <Grid item xs={4} style={{ marginTop: '1%' }}>
-                  <Button variant='contained' onClick={() => handleOpenPopupAdd()} style={{ marginRight: '5%' }}>
-                    <Icon icon='tabler:plus' />
-                    Thêm nhóm
-                  </Button>
-
-                  <CustomTextField
-                    value={value}
-                    placeholder='Search Group'
-                    onChange={e => handleFilter(e.target.value)}
-                  />
-                </Grid>
+    <>
+      <Card>
+        <CardHeader
+          title='Danh sách nhóm camera'
+          titleTypographyProps={{ sx: { mb: [2, 0] } }}
+          sx={{
+            py: 4,
+            flexDirection: ['column', 'row'],
+            '& .MuiCardHeader-action': { m: 0 },
+            alignItems: ['flex-start', 'center']
+          }}
+          action={
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <Button variant='contained' onClick={() => handleOpenPopupAdd()}>
+                  <Icon icon='tabler:plus' />
+                  Thêm nhóm
+                </Button>
               </Grid>
+              <Grid item xs={6}>
+                <CustomTextField
+                  value={value}
+                  placeholder='Search Group'
+                  onChange={e => handleFilter(e.target.value)}
+                />
+              </Grid>
+            </Grid>
+          }
+        />
+        <CardContent>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TableContainer component={Paper} sx={{ maxHeight: 1000 }}>
+                <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ padding: '13px' }}>STT</TableCell>
+                      <TableCell sx={{ padding: '13px' }}>Tên nhóm</TableCell>
+                      <TableCell sx={{ padding: '13px' }}>Mô tả</TableCell>
+                      <TableCell sx={{ padding: '13px' }}>Số lượng camera</TableCell>
+                      <TableCell sx={{ padding: '13px' }}>Thao tác</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {cameras.length > 0 &&
+                      cameras.map((camera, index) => (
+                        <TableRow key={camera.id}>
+                          <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
+                          <TableCell sx={{ padding: '16px' }}>{camera.name}</TableCell>
+                          <TableCell sx={{ padding: '16px' }}>{camera.description}</TableCell>
+                          <TableCell sx={{ padding: '16px' }}>{camera.cameras ? camera.cameras.length : 0}</TableCell>
 
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ padding: '13px' }}>STT</TableCell>
-                    <TableCell sx={{ padding: '13px' }}>Tên nhóm</TableCell>
-                    <TableCell sx={{ padding: '13px' }}>Mô tả</TableCell>
-                    <TableCell sx={{ padding: '13px' }}>Số lượng camera</TableCell>
-                    <TableCell sx={{ padding: '13px' }}>Thao tác</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {console.log(cameras)}
-                  {cameras.length > 0 &&
-                    cameras.map((camera, index) => (
-                      <TableRow key={camera.id}>
-                        <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
-                        <TableCell sx={{ padding: '16px' }}>{camera.name}</TableCell>
-                        <TableCell sx={{ padding: '16px' }}>{camera.description}</TableCell>
-                        <TableCell sx={{ padding: '16px' }}>{camera.cameras ? camera.cameras.length : 0}</TableCell>
-
-                        <TableCell sx={{ padding: '16px' }}>
-                          <Grid container spacing={2}>
-                            <IconButton onClick={() => handleOpenPopupDetail(camera.id)}>
-                              <Icon icon='tabler:edit' />
-                            </IconButton>
-                            <IconButton onClick={() => handleOpenPopup(camera.id)}>
-                              {console.log(camera.id)}
-                              <Icon icon='tabler:trash' />
-                            </IconButton>
-                          </Grid>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                </TableBody>
-              </Table>
-              <br></br>
+                          <TableCell sx={{ padding: '16px' }}>
+                            <Grid container spacing={2}>
+                              <IconButton onClick={() => handleOpenPopupDetail(camera.id)}>
+                                <Icon icon='tabler:edit' />
+                              </IconButton>
+                              <IconButton onClick={() => handleOpenPopup(camera.id)}>
+                                <Icon icon='tabler:trash' />
+                              </IconButton>
+                            </Grid>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+            <Grid item xs={12}>
               <Grid container spacing={2} style={{ padding: 10 }}>
                 <Grid item xs={3}></Grid>
-                <Grid item xs={1.5} style={{ padding: 0 }}>
-                  <IconButton onClick={handleOpenMenu}>
-                    <Icon icon='tabler:selector' />
-                    <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
-                  </IconButton>
-                  <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
-                    {pageSizeOptions.map(size => (
-                      <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
-                        {size}
-                      </MenuItem>
-                    ))}
-                  </Menu>
+                <Grid item xs={1}>
+                  <span style={{ fontSize: 15 }}> dòng/trang</span>
+                </Grid>
+                <Grid item xs={1} style={{ padding: 0 }}>
+                  <Box>
+                    <Button onClick={handleOpenMenu} endIcon={<Icon icon='tabler:selector' />}>
+                      {pageSize}
+                    </Button>
+                    <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+                      {pageSizeOptions.map(size => (
+                        <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
+                          {size}
+                        </MenuItem>
+                      ))}
+                    </Menu>
+                  </Box>
                 </Grid>
                 <Grid item xs={6}>
-                  <Pagination count={total} color='primary' onChange={(event, page) => handlePageChange(page)} />
+                  <Pagination count={total} page={page} color='primary' onChange={handlePageChange} />
                 </Grid>
               </Grid>
             </Grid>
           </Grid>
-        </Card>
-      </Grid>
-
-      {console.log(openPopupId)}
+        </CardContent>
+      </Card>
       {openPopup && (
         <DeletePopup
           open={openPopup}
@@ -229,7 +232,7 @@ const CameraGroup = ({ apiData }) => {
       {openPopupAdd && (
         <CameraGroupAdd open={openPopupAdd} onClose={handleCloseAdd} onSuccess={fetchFilteredOrAllCameraGroup} />
       )}
-    </Grid>
+    </>
   )
 }
 

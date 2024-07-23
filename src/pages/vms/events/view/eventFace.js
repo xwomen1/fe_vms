@@ -301,7 +301,7 @@ const EventList = ({ eventData }) => {
     <>
       <Card>
         <CardHeader
-          title='Danh sách sự kiện AI'
+          title='Danh sách khuôn mặt'
           titleTypographyProps={{ sx: { mb: [2, 0] } }}
           sx={{
             py: 4,

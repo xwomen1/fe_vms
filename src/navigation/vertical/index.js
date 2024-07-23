@@ -139,18 +139,49 @@ const navigation = () => {
           icon: 'tabler:file-export'
         },
         {
-          title: 'Nhóm camera',
-          path: '/vms/camera-group',
-          icon: 'tabler:schema'
-        },
-        {
           title: 'Sự kiện AI',
-          path: '/vms/events',
+          path: '/vms/events/view/eventList',
           icon: 'tabler:timeline-event-exclamation'
         },
         {
-          title: 'Cấu hình AI',
-          path: '/vms/ai-config',
+          title: 'Khuôn mặt',
+          path: '/vms/events/view/eventFace',
+          icon: 'tabler:timeline-event-exclamation'
+        }, {
+          title: 'Biển số',
+          path: '/vms/events/view/eventCar',
+          icon: 'tabler:timeline-event-exclamation'
+        },
+
+        // {
+        //   title: 'Phát hiện đám đông',
+        //   path: '/vms/events',
+        //   icon: 'tabler:timeline-event-exclamation'
+        // },
+
+        {
+          title: 'Bản đồ AI',
+          path: '/vms/events/view/eventMap',
+          icon: 'tabler:timeline-event-exclamation'
+        },
+        {
+          title: 'Tổng quan AI',
+          path: '/vms/ai-config/view/eventOverview',
+          icon: 'tabler:settings'
+        },
+        {
+          title: 'Danh sách cấu hình AI',
+          path: '/vms/ai-config/view/aiConfig',
+          icon: 'tabler:settings'
+        },
+        {
+          title: 'Khoang vùng AI',
+          path: '/vms/ai-config/view/eventConfig',
+          icon: 'tabler:settings'
+        },
+        {
+          title: 'Model AI',
+          path: '/vms/ai-config/view/modelAIList',
           icon: 'tabler:settings'
         },
         {
@@ -159,18 +190,33 @@ const navigation = () => {
           icon: 'tabler:id-badge-off'
         },
         {
+          title: 'Nhóm camera',
+          path: '/vms/camera-group',
+          icon: 'tabler:schema'
+        },
+        {
           title: 'Danh sách camera',
-          path: '/vms/camera-config',
+          path: '/vms/camera-config/table',
           icon: 'tabler:device-cctv'
         },
         {
-          title: 'Danh sách nvr',
-          path: '/vms/nvr-config',
+          title: 'Thêm camera',
+          path: '/vms/camera-config/add',
+          icon: 'tabler:device-cctv'
+        },
+        {
+          title: 'Danh sách NVR',
+          path: '/vms/nvr-config/table',
+          icon: 'tabler:server-2'
+        },
+        {
+          title: 'Thêm NVR',
+          path: '/vms/nvr-config/add',
           icon: 'tabler:server-2'
         },
         {
           title: 'Smart NVR',
-          path: '/vms/smart-nvr',
+          path: '/vms/smart-nvr/table',
           icon: 'tabler:accessible'
         },
         {
