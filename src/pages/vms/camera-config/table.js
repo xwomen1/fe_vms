@@ -12,11 +12,10 @@ import authConfig from 'src/configs/auth'
 import Table from '@mui/material/Table'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
-import { IconButton, Box } from '@mui/material'
+import { IconButton, Box, CardHeader, Button, TableContainer, Paper } from '@mui/material'
 import Swal from 'sweetalert2'
 import { fetchData } from 'src/store/apps/user'
 import axios from 'axios'
-import TableHeader from 'src/views/apps/vms/camera-config/TableHeader'
 import ChangePassWords from './popups/ChangePassword'
 import Edit from './popups/Edit'
 import Network from './popups/Network'
@@ -26,7 +25,7 @@ import Checkbox from '@mui/material/Checkbox'
 import Cloud from './popups/Cloud'
 import LiveView from './popups/LiveView'
 
-const Camera = ({ apiData, assettypeStatus }) => {
+const Camera = ({ apiData }) => {
   const [value, setValue] = useState('')
 
   const [selectedIds, setSelectedIds] = useState([])
@@ -47,6 +46,65 @@ const Camera = ({ apiData, assettypeStatus }) => {
   const [prevCameraStatus, setPrevCameraStatus] = useState([])
   const [isOpenLiveView, setIsOpenLiveView] = useState(false)
   const [camera, setCamera] = useState(null)
+
+  const defaultCameraID = '0eb23593-a9b1-4278-9fb1-4d18f30ed6ff'
+  const [assettypeStatus, setAssetTypeStatus] = useState([])
+
+  useEffect(() => {
+    const ws = new WebSocket(`wss://sbs.basesystem.one/ivis/vms/api/v0/websocket/topic/cameraStatus/${defaultCameraID}`)
+
+    ws.onmessage = event => {
+      const { dataType, data } = JSON.parse(event.data)
+      if (dataType === 'cameraStatus') {
+        const cameraStatusUpdates = JSON.parse(data)
+        updateCameraStatus(cameraStatusUpdates)
+      }
+    }
+
+    return () => {
+      ws.close()
+    }
+  }, [])
+
+  const updateCameraStatus = useCallback(
+    cameraStatusUpdates => {
+      const cameraStatusMap = new Map(
+        cameraStatusUpdates.map(status => [status.id, status.statusValue.name, status.ip])
+      )
+
+      // Lặp qua các mục trong Map sử dụng for...of
+      for (const entry of cameraStatusMap.entries()) {
+        const [id, status, ip] = entry
+
+        const entry1 = {
+          id: id,
+          status: status,
+          ip: ip
+        }
+
+        setAssetTypeStatus(prevAssetType => {
+          const newAssetType = prevAssetType.map(camera => {
+            if (camera.id === entry1.id) {
+              if (camera.status.name !== entry1.status) {
+                // console.log('AssetType with ID', entry1.id, 'has changed status.')
+                // console.log('Previous status:', camera.status.name)
+                // console.log('New status:', entry1.status)
+              }
+
+              return { ...camera, status: { name: entry1.status } }
+            }
+
+            return camera
+          })
+
+          // console.log('New Asset Type:', newAssetType) // Log updated asset type
+
+          return newAssetType
+        })
+      }
+    },
+    [assettypeStatus]
+  )
 
   const handlePageChange = newPage => {
     setPage(newPage)
@@ -244,164 +302,176 @@ const Camera = ({ apiData, assettypeStatus }) => {
   }, [assettypeStatus])
 
   return (
-    <Grid container spacing={6.5}>
+    <Grid container spacing={0}>
       <Grid item xs={12}>
         <Card>
-          <Grid container spacing={1}>
-            <Grid item xs={9}>
-              {selectedIds === null ? (
-                <TableHeader />
-              ) : (
-                <TableHeader
-                  value={value}
-                  passwords={handleAddRoleClick}
-                  networks={handleAddNetworkClick}
-                  images={handleAddImageClick}
-                  videos={handleAddVideoClick}
-                  cloud={handleAddCloudClick}
-                />
-              )}
-            </Grid>
-            <Grid item xs={3} style={{ marginTop: '1%' }}>
-              <CustomTextField
-                value={value}
-                autoComplete='off'
-                onChange={e => handleFilter(e.target.value)}
-                placeholder='Search…'
-                InputProps={{
-                  startAdornment: (
-                    <Box sx={{ mr: 2, display: 'flex' }}>
-                      <Icon fontSize='1.25rem' icon='tabler:search' />
+          <CardHeader
+            title='Danh sách camera'
+            titleTypographyProps={{ sx: { mb: [2, 0] } }}
+            sx={{
+              py: 4,
+              flexDirection: ['column', 'row'],
+              '& .MuiCardHeader-action': { m: 0 },
+              alignItems: ['flex-start', 'center']
+            }}
+            action={
+              <Grid container spacing={5}>
+                <Grid item xs={9}>
+                  {selectedIds === null ? (
+                    <Box></Box>
+                  ) : (
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Button variant='contained' color='secondary' onClick={handleAddRoleClick}>Mật khẩu</Button>
+                      <Button variant='contained' color='secondary' onClick={handleAddNetworkClick}>Mạng</Button>
+                      <Button variant='contained' color='secondary' onClick={handleAddVideoClick}>Video</Button>
+                      <Button variant='contained' color='secondary' onClick={handleAddImageClick}>Hình ảnh</Button>
+                      <Button variant='contained' color='secondary' onClick={handleAddCloudClick}>Bộ nhớ</Button>
                     </Box>
-                  ),
-                  endAdornment: (
-                    <IconButton size='small' title='Clear' aria-label='Clear'>
-                      <Icon fontSize='1.25rem' icon='tabler:x' />
-                    </IconButton>
-                  )
-                }}
-                sx={{
-                  width: {
-                    xs: 1,
-                    sm: 'auto'
-                  },
-                  '& .MuiInputBase-root > svg': {
-                    mr: 2
-                  }
-                }}
-              />
-            </Grid>
-          </Grid>
-
+                  )}
+                </Grid>
+                <Grid item xs={3}>
+                  <CustomTextField
+                    value={value}
+                    autoComplete='off'
+                    onChange={e => handleFilter(e.target.value)}
+                    placeholder='Search…'
+                    InputProps={{
+                      startAdornment: (
+                        <Box sx={{ mr: 2, display: 'flex' }}>
+                          <Icon fontSize='1.25rem' icon='tabler:search' />
+                        </Box>
+                      ),
+                      endAdornment: (
+                        <IconButton size='small' title='Clear' aria-label='Clear'>
+                          <Icon fontSize='1.25rem' icon='tabler:x' />
+                        </IconButton>
+                      )
+                    }}
+                    sx={{
+                      width: {
+                        xs: 1,
+                        sm: 'auto'
+                      },
+                      '& .MuiInputBase-root > svg': {
+                        mr: 2
+                      }
+                    }}
+                  />
+                </Grid>
+              </Grid>
+            }
+          />
           <Grid container spacing={2}>
-            <Grid item xs={0.1}></Grid>
-
             <Grid item xs={12}>
-              <div></div>
-
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ padding: '16px' }}>
-                      <Checkbox
-                        checked={selectedIds.length === assettype.length}
-                        onChange={e => {
-                          if (e.target.checked) {
-                            const allIds = assettype.map(assetType => assetType.id)
-                            setSelectedIds(allIds)
-                          } else {
-                            setSelectedIds([])
-                          }
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Tên thiết bị</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Loại</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Địa chỉ IP</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Địa chỉ Mac</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Vị trí</TableCell>
-                    <TableCell sx={{ padding: '16px', textAlign: 'center' }}>Trạng thái</TableCell>
-
-                    <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {assettype.map((assetType, index) => (
-                    <TableRow key={assetType.id}>
+              <TableContainer component={Paper} sx={{ maxHeight: 1000 }}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
                       <TableCell sx={{ padding: '16px' }}>
                         <Checkbox
-                          checked={selectedIds.includes(assetType.id)}
-                          onChange={() => handleCheckboxChange(assetType.id)}
+                          checked={selectedIds.length === assettype.length}
+                          onChange={e => {
+                            if (e.target.checked) {
+                              const allIds = assettype.map(assetType => assetType.id)
+                              setSelectedIds(allIds)
+                            } else {
+                              setSelectedIds([])
+                            }
+                          }}
                         />
                       </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.name}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.type.name}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.ipAddress}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.macAddress}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.location}</TableCell>
-                      <TableCell sx={{ padding: '16px', textAlign: 'center' }}>
-                        {assetType.status && assetType.status.name ? (
-                          <div
-                            style={{
-                              backgroundColor:
-                                assetType.status.name === 'connected'
-                                  ? 'lightgreen'
-                                  : assetType.status.name === 'disconnected'
-                                  ? '#FF9F43'
-                                  : 'orange',
-                              borderRadius: '10px',
-                              padding: '5px 10px',
-                              width: '70%',
-                              display: 'inline-block',
-                              color: 'white'
-                            }}
-                          >
-                            {assetType.status.name === 'connected'
-                              ? 'Đã kết nối'
-                              : assetType.status.name === 'disconnected'
-                              ? 'Mất kết nối'
-                              : assetType.status.name}
-                          </div>
-                        ) : (
-                          assetType.status.name
-                        )}
-                      </TableCell>
+                      <TableCell sx={{ padding: '16px' }}>STT</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Tên thiết bị</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Loại</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Địa chỉ IP</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Địa chỉ Mac</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Vị trí</TableCell>
+                      <TableCell sx={{ padding: '16px', textAlign: 'center' }}>Trạng thái</TableCell>
 
-                      <TableCell sx={{ padding: '16px' }}>
-                        <IconButton onClick={() => handleOpenLiveView(assetType)}>
-                          <Icon icon='tabler:video' />
-                        </IconButton>
-                        <IconButton size='small' onClick={() => handleAddPClick(assetType.id)}>
-                          <Icon icon='tabler:edit' />
-                        </IconButton>
-                        <IconButton onClick={() => handleDelete(assetType.id)}>
-                          <Icon icon='tabler:trash' />
-                        </IconButton>
-                      </TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHead>
+                  <TableBody>
+                    {assettype.map((assetType, index) => (
+                      <TableRow key={assetType.id}>
+                        <TableCell sx={{ padding: '16px' }}>
+                          <Checkbox
+                            checked={selectedIds.includes(assetType.id)}
+                            onChange={() => handleCheckboxChange(assetType.id)}
+                          />
+                        </TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{assetType.name}</TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{assetType.type.name}</TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{assetType.ipAddress}</TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{assetType.macAddress}</TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{assetType.location}</TableCell>
+                        <TableCell sx={{ padding: '16px', textAlign: 'center' }}>
+                          {assetType.status && assetType.status.name ? (
+                            <div
+                              style={{
+                                backgroundColor:
+                                  assetType.status.name === 'connected'
+                                    ? 'lightgreen'
+                                    : assetType.status.name === 'disconnected'
+                                      ? '#FF9F43'
+                                      : 'orange',
+                                borderRadius: '10px',
+                                padding: '5px 10px',
+                                width: '70%',
+                                display: 'inline-block',
+                                color: 'white'
+                              }}
+                            >
+                              {assetType.status.name === 'connected'
+                                ? 'Đã kết nối'
+                                : assetType.status.name === 'disconnected'
+                                  ? 'Mất kết nối'
+                                  : assetType.status.name}
+                            </div>
+                          ) : (
+                            assetType.status.name
+                          )}
+                        </TableCell>
+
+                        <TableCell sx={{ padding: '16px' }}>
+                          <IconButton onClick={() => handleOpenLiveView(assetType)}>
+                            <Icon icon='tabler:video' />
+                          </IconButton>
+                          <IconButton size='small' onClick={() => handleAddPClick(assetType.id)}>
+                            <Icon icon='tabler:edit' />
+                          </IconButton>
+                          <IconButton onClick={() => handleDelete(assetType.id)}>
+                            <Icon icon='tabler:trash' />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
               <br></br>
               <Grid container spacing={2} style={{ padding: 10 }}>
                 <Grid item xs={3}></Grid>
-                <Grid item xs={1.5} style={{ padding: 0 }}>
-                  <IconButton onClick={handleOpenMenu}>
-                    <Icon icon='tabler:selector' />
-                    <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
-                  </IconButton>
-                  <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
-                    {pageSizeOptions.map(size => (
-                      <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
-                        {size}
-                      </MenuItem>
-                    ))}
-                  </Menu>
+                <Grid item xs={1}>
+                  <span style={{ fontSize: 15 }}> dòng/trang</span>
+                </Grid>
+                <Grid item xs={1} style={{ padding: 0 }}>
+                  <Box>
+                    <Button onClick={handleOpenMenu} endIcon={<Icon icon='tabler:selector' />}>
+                      {pageSize}
+                    </Button>
+                    <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+                      {pageSizeOptions.map(size => (
+                        <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
+                          {size}
+                        </MenuItem>
+                      ))}
+                    </Menu>
+                  </Box>
                 </Grid>
                 <Grid item xs={6}>
-                  <Pagination count={total} color='primary' onChange={(event, page) => handlePageChange(page)} />
+                  <Pagination count={total} page={page} color='primary' onChange={handlePageChange} />
                 </Grid>
               </Grid>
             </Grid>

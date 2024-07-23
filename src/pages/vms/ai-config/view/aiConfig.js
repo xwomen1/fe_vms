@@ -394,7 +394,7 @@ const AIConfig = () => {
 
   return (
     <Card>
-      <CardHeader title='Cấu hình AI' />
+      <CardHeader title='Danh sách cấu hình AI' />
 
       <Grid container spacing={2}>
         <Grid item xs={12}>

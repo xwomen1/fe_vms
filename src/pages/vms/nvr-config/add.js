@@ -13,7 +13,7 @@ import authConfig from 'src/configs/auth'
 import Table from '@mui/material/Table'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
-import { Autocomplete, Button, CircularProgress, IconButton, Paper, Box } from '@mui/material'
+import { Autocomplete, Button, CircularProgress, IconButton, Paper, Box, CardHeader, CardContent } from '@mui/material'
 import Swal from 'sweetalert2'
 import { fetchData } from 'src/store/apps/user'
 import { useRouter } from 'next/router'
@@ -41,7 +41,7 @@ import Edit from './popups/Edit'
 import toast from 'react-hot-toast'
 import AddDevice from './popups/AddDevice'
 
-const UserList = ({ apiData, assettypeStatus }) => {
+const UserList = ({ apiData }) => {
   const [value, setValue] = useState('')
   const [selectedIds, setSelectedIds] = useState([])
   const [idNVR, setId] = useState([])
@@ -97,6 +97,65 @@ const UserList = ({ apiData, assettypeStatus }) => {
   const [idBoxs, setIdBoxs] = useState(selectNVR?.value)
   const [selectedAuto, setSelectedAuto] = useState('')
   const [isOpenAddDevice, setIsOpenAddDevice] = useState(false)
+
+  const defaultNvrID = '0eb23593-a9b1-4278-9fb1-4d18f30ed6ff'
+  const [assettypeStatus, setAssetTypeStatus] = useState([])
+
+  useEffect(() => {
+    const ws = new WebSocket(`wss://sbs.basesystem.one/ivis/vms/api/v0/websocket/topic/nvrStatus/${defaultNvrID}`)
+
+    ws.onmessage = event => {
+      const { dataType, data } = JSON.parse(event.data)
+      if (dataType === 'nvrStatus') {
+        const cameraStatusUpdates = JSON.parse(data)
+        updateCameraStatus(cameraStatusUpdates)
+      }
+    }
+
+    return () => {
+      ws.close()
+    }
+  }, [])
+
+  const updateCameraStatus = useCallback(
+    cameraStatusUpdates => {
+      const cameraStatusMap = new Map(
+        cameraStatusUpdates?.map(status => [status.id, status.statusValue.name, status.ip])
+      )
+
+      // Lặp qua các mục trong Map sử dụng for...of
+      for (const entry of cameraStatusMap.entries()) {
+        const [id, status, ip] = entry
+
+        const entry1 = {
+          id: id,
+          status: status,
+          ip: ip
+        }
+
+        setAssetTypeStatus(prevAssetType => {
+          const newAssetType = prevAssetType.map(camera => {
+            if (camera.id === entry1.id) {
+              if (camera.status.name !== entry1.status) {
+                console.log('AssetType with ID', entry1.id, 'has changed status.')
+                console.log('Previous status:', camera.status.name)
+                console.log('New status:', entry1.status)
+              }
+
+              return { ...camera, status: { name: entry1.status } }
+            }
+
+            return camera
+          })
+
+          // console.log('New Asset Type:', newAssetType) // Log updated asset type
+
+          return newAssetType
+        })
+      }
+    },
+    [assettypeStatus]
+  )
 
   const handlePageChange = newPage => {
     setPage(newPage)
@@ -600,8 +659,18 @@ const UserList = ({ apiData, assettypeStatus }) => {
     <Grid container spacing={6.5}>
       <Grid item xs={12}>
         <Card>
-          <Grid container spacing={0} style={{ marginTop: '1%' }}>
-            <Grid container spacing={0}>
+          <CardHeader
+            title='Danh sách NVR'
+            titleTypographyProps={{ sx: { mb: [2, 0] } }}
+            sx={{
+              py: 4,
+              flexDirection: ['column', 'row'],
+              '& .MuiCardHeader-action': { m: 0 },
+              alignItems: ['flex-start', 'center']
+            }}
+          />
+          <CardContent>
+            <Grid container spacing={4}>
               <Grid item xs={8}>
                 <div>
                   <RadioGroup value={selectedValue} onChange={handleRadioChange} style={{ marginLeft: 50 }}>
@@ -690,7 +759,7 @@ const UserList = ({ apiData, assettypeStatus }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                        // loading={loading}
+                      // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.1}></Grid>
@@ -773,7 +842,7 @@ const UserList = ({ apiData, assettypeStatus }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                        // loading={loading}
+                      // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.4}></Grid>
@@ -888,7 +957,7 @@ const UserList = ({ apiData, assettypeStatus }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                        // loading={loading}
+                      // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.1}></Grid>
@@ -972,8 +1041,8 @@ const UserList = ({ apiData, assettypeStatus }) => {
                                 assetType.status.name === 'connected'
                                   ? 'lightgreen'
                                   : assetType.status.name === 'disconnected'
-                                  ? '#FF9F43'
-                                  : 'orange',
+                                    ? '#FF9F43'
+                                    : 'orange',
                               borderRadius: '10px',
                               padding: '5px 10px',
                               width: '70%',
@@ -984,8 +1053,8 @@ const UserList = ({ apiData, assettypeStatus }) => {
                             {assetType.status.name === 'connected'
                               ? 'Đã kết nối'
                               : assetType.status.name === 'disconnected'
-                              ? 'Mất kết nối'
-                              : assetType.status.name}
+                                ? 'Mất kết nối'
+                                : assetType.status.name}
                           </div>
                         ) : (
                           assetType.status.name
@@ -1018,25 +1087,29 @@ const UserList = ({ apiData, assettypeStatus }) => {
               <br></br>
               <Grid container spacing={2} style={{ padding: 10 }}>
                 <Grid item xs={3}></Grid>
-                <Grid item xs={1.5} style={{ padding: 0 }}>
-                  <IconButton onClick={handleOpenMenu}>
-                    <Icon icon='tabler:selector' />
-                    <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
-                  </IconButton>
-                  <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
-                    {pageSizeOptions.map(size => (
-                      <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
-                        {size}
-                      </MenuItem>
-                    ))}
-                  </Menu>
+                <Grid item xs={1}>
+                  <span style={{ fontSize: 15 }}> dòng/trang</span>
+                </Grid>
+                <Grid item xs={1} style={{ padding: 0 }}>
+                  <Box>
+                    <Button onClick={handleOpenMenu} endIcon={<Icon icon='tabler:selector' />}>
+                      {pageSize}
+                    </Button>
+                    <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+                      {pageSizeOptions.map(size => (
+                        <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
+                          {size}
+                        </MenuItem>
+                      ))}
+                    </Menu>
+                  </Box>
                 </Grid>
                 <Grid item xs={6}>
-                  <Pagination count={total} color='primary' onChange={(event, page) => handlePageChange(page)} />
+                  <Pagination count={total} page={page} color='primary' onChange={handlePageChange} />
                 </Grid>
               </Grid>
             </Grid>
-          </Grid>
+          </CardContent>
         </Card>
         {openPopupNetwork && (
           <>
