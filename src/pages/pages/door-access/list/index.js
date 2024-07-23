@@ -14,6 +14,8 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  CardContent,
+  CardActions,
   Grid,
   IconButton,
   Menu,
@@ -34,6 +36,7 @@ import UpdateDoor from '../detail/DoorAccessUpdate'
 import Add from '../detail/add'
 
 const DoorAccess = () => {
+  const [searchKeyword, setSearchKeyword] = useState('')
   const [reload, setReload] = useState(0)
   const [loading, setLoading] = useState(false)
   const [dataList, setDataList] = useState([])
@@ -69,7 +72,7 @@ const DoorAccess = () => {
     handleCloseMenu()
   }
 
-  const fetchDataList = async () => {
+  const fetchDataList = useCallback(async () => {
     setLoading(true)
     try {
       const config = {
@@ -77,6 +80,7 @@ const DoorAccess = () => {
           Authorization: `Bearer ${token}`
         },
         params: {
+          keyword: searchKeyword,
           page: page,
           limit: pageSize
         }
@@ -99,11 +103,16 @@ const DoorAccess = () => {
     } finally {
       setLoading(false)
     }
+  }, [token, page, pageSize, searchKeyword])
+
+  const handleSearch = () => {
+    setPage(1)
+    fetchDataList()
   }
 
   return (
     <>
-      <Card>
+      <Card sx={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
         <CardHeader
           title={
             <>
@@ -120,14 +129,42 @@ const DoorAccess = () => {
           action={
             <Grid container spacing={2}>
               <Grid item>
-                <Box sx={{ float: 'right' }}>
-                  <Button
-                    onClick={() => {
-                      setIsOpenAdd(true)
-                    }}
-                    aria-label='Thêm mới'
-                    variant='contained'
-                  >
+                <CustomTextField
+                  placeholder='Nhập tên truy cập cửa ...! '
+                  value={searchKeyword}
+                  onChange={e => setSearchKeyword(e.target.value)}
+                  InputProps={{
+                    endAdornment: (
+                      <IconButton
+                        size='small'
+                        title='Clear'
+                        aria-label='Clear'
+                        onClick={() => {
+                          setSearchKeyword('')
+                          fetchDataList()
+                        }}
+                      >
+                        <Icon fontSize='1.25rem' icon='tabler:x' />
+                      </IconButton>
+                    )
+                  }}
+                  sx={{
+                    width: {
+                      xs: 1,
+                      sm: 'auto'
+                    },
+                    '& .MuiInputBase-root > svg': {
+                      mr: 2
+                    }
+                  }}
+                />
+                <Button variant='contained' style={{ marginLeft: '10px' }} onClick={handleSearch}>
+                  Tìm kiếm <Icon fontSize='1.25rem' icon='tabler:search' />
+                </Button>
+              </Grid>
+              <Grid item>
+                <Box sx={{ textAlign: 'right' }}>
+                  <Button onClick={() => setIsOpenAdd(true)} aria-label='Thêm mới' variant='contained'>
                     thêm mới
                     <Icon icon='tabler:plus' />
                   </Button>
@@ -136,23 +173,23 @@ const DoorAccess = () => {
             </Grid>
           }
         />
-        <Grid item xs={12}>
+        <CardContent sx={{ flex: 1, overflow: 'auto' }}>
           <Table>
             <TableHead style={{ background: '#F6F6F7' }}>
               <TableRow>
-                <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Tên</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Mô tả</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Cửa</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Lịch</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Người cập nhật</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Thao tác</TableCell>
+                <TableCell>STT</TableCell>
+                <TableCell>Tên</TableCell>
+                <TableCell>Mô tả</TableCell>
+                <TableCell>Cửa</TableCell>
+                <TableCell>Lịch</TableCell>
+                <TableCell>Người cập nhật</TableCell>
+                <TableCell>Thao tác</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {Array.isArray(dataList) && dataList.length > 0 ? (
                 dataList.map((user, index) => (
-                  <TableRow key={user.id}>
+                  <TableRow key={user.id} style={{ height: '20px' }}>
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>
                       <Button
@@ -171,7 +208,6 @@ const DoorAccess = () => {
                     <TableCell>{user.description}</TableCell>
                     <TableCell>{user.lastUpdatedByUser?.fullName}</TableCell>
                     <TableCell>
-                      {' '}
                       <Box>
                         <Button
                           onClick={() => {
@@ -194,10 +230,10 @@ const DoorAccess = () => {
               )}
             </TableBody>
           </Table>
-          <br></br>
-          <Grid container spacing={2} style={{ padding: 10 }}>
-            <Grid item xs={3}></Grid>
-            <Grid item xs={1.5} style={{ padding: 0, marginLeft: '12%' }}>
+        </CardContent>
+        <CardActions sx={{ backgroundColor: 'white', padding: '8px' }}>
+          <Grid container spacing={2} alignItems='center'>
+            <Grid item xs={12} sm={6} md={4} sx={{ textAlign: 'right', marginBottom: '8px' }}>
               <IconButton onClick={handleOpenMenu}>
                 <Icon icon='tabler:selector' />
                 <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
@@ -210,16 +246,17 @@ const DoorAccess = () => {
                 ))}
               </Menu>
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} sm={6} md={5}>
               <Pagination
                 count={total}
                 color='primary'
                 page={page}
                 onChange={(event, newPage) => handlePageChange(event, newPage)}
+                sx={{ display: 'flex', justifyContent: 'center' }}
               />
             </Grid>
           </Grid>
-        </Grid>
+        </CardActions>
       </Card>
       {isOpenUpdate && (
         <UpdateDoor

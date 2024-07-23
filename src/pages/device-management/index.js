@@ -36,17 +36,17 @@ import {
 
 const AccessControlDevice = () => {
   const [loading, setLoading] = useState(false)
-  const [value, setValue] = useState('')
   const [treeData, setTreeData] = useState([])
   const [deviceData, setDeviceData] = useState([])
   const [open, setOpen] = useState(false)
   const [openDelete, setOpenDelete] = useState(false)
   const [newName, setNewName] = useState('')
-  const [nameNull, setNameNull] = useState('')
-  const [name50, setName50] = useState('')
+  const [nameNull, setNameNull] = useState(false)
+  const [name50, setName50] = useState(false)
   const [selectedNode, setSelectedNode] = useState(null)
+  const [searchKeyword, setSearchKeyword] = useState('')
   const [rootParentId, setRootParentId] = useState(null)
-  const token = localStorage.getItem(authConfig.storageTokenKeyName)
+  const token = localStorage.getItem('authToken') // Replace 'authToken' with your actual token key
 
   const config = {
     headers: {
@@ -56,7 +56,10 @@ const AccessControlDevice = () => {
 
   useEffect(() => {
     fetchDataList()
-  }, [])
+    if (!selectedNode) {
+      fetchInitialDeviceData()
+    }
+  }, [selectedNode])
 
   const fetchChildren = async parentId => {
     try {
@@ -101,7 +104,9 @@ const AccessControlDevice = () => {
 
       const data = await Promise.all(promises)
       setTreeData(data)
-      setDeviceData(data.flatMap(parent => parent.devices))
+      if (!selectedNode) {
+        setDeviceData(data.flatMap(parent => parent.devices))
+      }
     } catch (error) {
       console.error('Error fetching data:', error)
       toast.error(error.message)
@@ -110,31 +115,70 @@ const AccessControlDevice = () => {
     }
   }
 
-  const handleNodeSelect = async (event, nodeId) => {
-    if (nodeId) {
+  const fetchInitialDeviceData = useCallback(async () => {
+    if (selectedNode) return
+
+    try {
       const params = {
-        keyword: value
+        keyword: searchKeyword
       }
 
-      try {
-        const url = `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices/?deviceGroupId=${nodeId}`
+      const response = await axios.get(
+        'https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices/?deviceGroupId=643a2358824177002890430a',
+        {
+          ...config,
+          params: params
+        }
+      )
 
-        const response = await axios.get(url, {
-          params: params, // Đặt params ở đây
-          ...config // Bao gồm các cài đặt khác từ config của bạn
-        })
+      const devicesWithParentId = response.data.results.map(device => ({
+        ...device,
+        parentId: '643a2358824177002890430a'
+      }))
+      setDeviceData(devicesWithParentId)
+    } catch (error) {
+      console.error('Error fetching initial device data:', error)
+      toast.error(error.message)
+    }
+  }, [searchKeyword, selectedNode])
 
-        const devicesWithParentId = response.data.results.map(device => ({
-          ...device,
-          parentId: nodeId
-        }))
-        setDeviceData(devicesWithParentId)
+  const handleNodeSelect = useCallback(
+    async (event, nodeId) => {
+      if (nodeId) {
+        setSelectedNode(nodeId)
 
-        console.log(response.data)
-      } catch (error) {
-        console.error('Error fetching data:', error)
-        toast.error(error.message)
+        const params = {
+          keyword: searchKeyword
+        }
+
+        try {
+          const url = `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices/?deviceGroupId=${nodeId}`
+
+          const response = await axios.get(url, {
+            params: params,
+            ...config
+          })
+
+          const devicesWithParentId = response.data.results.map(device => ({
+            ...device,
+            parentId: nodeId
+          }))
+          setDeviceData(devicesWithParentId)
+          console.log(response.data)
+        } catch (error) {
+          console.error('Error fetching data:', error)
+          toast.error(error.message)
+        }
       }
+    },
+    [searchKeyword]
+  )
+
+  const handleSearch = () => {
+    if (!selectedNode) {
+      fetchInitialDeviceData()
+    } else {
+      handleNodeSelect(null, selectedNode)
     }
   }
 
@@ -146,8 +190,8 @@ const AccessControlDevice = () => {
   const handleClose = () => {
     setOpen(false)
     setNewName('')
-    setName50('')
-    setNameNull('')
+    setName50(false)
+    setNameNull(false)
   }
 
   const handleDelete = node => {
@@ -173,8 +217,8 @@ const AccessControlDevice = () => {
 
       return
     }
+
     if (!newName || !selectedNode) {
-      console.log(selectedNode, 'selectedNode')
       toast.error('Vui lòng nhập tên và chọn một node hợp lệ.')
 
       return
@@ -202,15 +246,14 @@ const AccessControlDevice = () => {
   const handleDeleteOnclick = async () => {
     try {
       const response = await axios.delete(
-        ` https://dev-ivi.basesystem.one/vf/ac-adapters/v1/device-groups/${selectedNode}`,
-
+        `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/device-groups/${selectedNode}`,
         config
       )
       toast.success('Xóa thành công')
-      fetchDataList() // Làm mới dữ liệu sau khi thêm mới
+      fetchDataList() // Làm mới dữ liệu sau khi xóa
     } catch (error) {
-      console.error('Error saving data:', error)
-      toast.error('Error', error.message)
+      console.error('Error deleting data:', error)
+      toast.error('Có lỗi xảy ra khi xóa.')
     } finally {
       handleCloseDelete()
     }
@@ -223,7 +266,6 @@ const AccessControlDevice = () => {
       label={
         <div style={{ display: 'flex', alignItems: 'center', height: '40px' }}>
           <span style={{ flexGrow: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>{nodes.name}</span>
-
           {!rootParentId || rootParentId !== nodes.id ? (
             <>
               <IconButton style={{ width: '35px', height: '35px' }}>
@@ -265,10 +307,6 @@ const AccessControlDevice = () => {
     XLSX.writeFile(workbook, 'device_data.xlsx')
   }
 
-  const handleFilter = useCallback(val => {
-    setValue(val)
-  }, [])
-
   return (
     <>
       <Card>
@@ -300,6 +338,40 @@ const AccessControlDevice = () => {
                     <Icon icon='tabler:trash' />
                   </Button>
                 </Box>
+              </Grid>
+              <Grid item>
+                <CustomTextField
+                  placeholder='Nhập tên thiết bị ...! '
+                  value={searchKeyword}
+                  onChange={e => setSearchKeyword(e.target.value)}
+                  InputProps={{
+                    endAdornment: (
+                      <IconButton
+                        size='small'
+                        title='Clear'
+                        aria-label='Clear'
+                        onClick={() => {
+                          setSearchKeyword('')
+                          fetchDataList()
+                        }}
+                      >
+                        <Icon fontSize='1.25rem' icon='tabler:x' />
+                      </IconButton>
+                    )
+                  }}
+                  sx={{
+                    width: {
+                      xs: 1,
+                      sm: 'auto'
+                    },
+                    '& .MuiInputBase-root > svg': {
+                      mr: 2
+                    }
+                  }}
+                />
+                <Button variant='contained' style={{ marginLeft: '10px' }} onClick={handleSearch}>
+                  Tìm kiếm <Icon fontSize='1.25rem' icon='tabler:search' />
+                </Button>
               </Grid>
             </Grid>
           }
