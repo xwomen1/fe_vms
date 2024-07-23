@@ -418,7 +418,7 @@ const EventList = () => {
                                 setEventDetail(row)
                               }}
                             >
-                              <Icon icon='tabler:eye' />
+                              <Icon icon='tabler:info-circle' />
                             </IconButton>
                           </Grid>
                         </TableCell>
