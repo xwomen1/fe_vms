@@ -60,7 +60,6 @@ const format_form = [
 
 const CameraView = ({ show, onClose, data, callback }) => {
     const [loading, setLoading] = useState(false)
-    const [value, setValue] = useState('1')
     const [form, setForm] = useState(format_form)
     const [camera, setCamera] = useState({ id: '', name: '', channel: '' })
 
@@ -79,10 +78,6 @@ const CameraView = ({ show, onClose, data, callback }) => {
         setCamera({ id: data?.id, name: data?.text, channel: 'Sub' })
     }, [data])
 
-    const handleChange = (event, newValue) => {
-        setValue(newValue)
-    }
-
     const onSubmit = values => {
         callback(values)
         onClose()
@@ -93,7 +88,7 @@ const CameraView = ({ show, onClose, data, callback }) => {
             <Dialog
                 fullWidth
                 open={show}
-                maxWidth='xs'
+                maxWidth='sm'
                 scroll='body'
                 TransitionComponent={Transition}
                 sx={{ '& .MuiDialog-paper': { overflow: 'visible' } }}
@@ -113,50 +108,39 @@ const CameraView = ({ show, onClose, data, callback }) => {
                             {data?.text}
                         </Typography>
                     </Box>
-                    <Grid container spacing={0} style={{ marginTop: 10 }}>
-                        <TabContext value={value}>
-                            <Grid item xs={12}>
-                                {' '}
-                                <TabList onChange={handleChange} aria-label='customized tabs example'>
-                                    <Tab value='1' label='Xem trực tiếp' key={1} />
-                                    <Tab value='2' label='Góc quay camera' key={2} />
-                                </TabList>
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TabPanel value='1'>
-                                    <LiveView key={camera?.id} id={camera?.id} name={camera?.name} channel={camera?.channel} />
-                                </TabPanel>
-                                <TabPanel value='2'>
-                                    <Grid container spacing={2}>
-                                        {form.map((item, index) => {
-                                            if (item.type === 'TextField') {
-                                                return (
-                                                    <Grid item xs={item.width} key={index} sx={{ display: 'flex', alignItems: 'center' }}>
-                                                        <Controller
-                                                            name={item.name}
-                                                            control={control}
-                                                            rules={{ required: item.require }}
-                                                            render={({ field: { value, onChange } }) => (
-                                                                <CustomTextField
-                                                                    fullWidth
-                                                                    value={value}
-                                                                    label={item.label}
-                                                                    onChange={onChange}
-                                                                    placeholder={item.placeholder}
-                                                                    error={Boolean(errors[item.name])}
-                                                                    aria-describedby='validation-basic-last-name'
-                                                                    {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
-                                                                />
-                                                            )}
+                    <Grid container spacing={4} style={{ marginTop: 10 }}>
+                        <Grid item xs={8}>
+                            <LiveView key={camera?.id} id={camera?.id} name={camera?.name} channel={camera?.channel} />
+                        </Grid>
+                        <Grid item xs={4}>
+                            <Grid container spacing={2}>
+                                {form.map((item, index) => {
+                                    if (item.type === 'TextField') {
+                                        return (
+                                            <Grid item xs={item.width} key={index} sx={{ display: 'flex', alignItems: 'center' }}>
+                                                <Controller
+                                                    name={item.name}
+                                                    control={control}
+                                                    rules={{ required: item.require }}
+                                                    render={({ field: { value, onChange } }) => (
+                                                        <CustomTextField
+                                                            fullWidth
+                                                            value={value}
+                                                            label={item.label}
+                                                            onChange={onChange}
+                                                            placeholder={item.placeholder}
+                                                            error={Boolean(errors[item.name])}
+                                                            aria-describedby='validation-basic-last-name'
+                                                            {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
                                                         />
-                                                    </Grid>
-                                                )
-                                            }
-                                        })}
-                                    </Grid>
-                                </TabPanel>
+                                                    )}
+                                                />
+                                            </Grid>
+                                        )
+                                    }
+                                })}
                             </Grid>
-                        </TabContext>
+                        </Grid>
                     </Grid>
                 </DialogContent>
                 <DialogActions
@@ -166,11 +150,9 @@ const CameraView = ({ show, onClose, data, callback }) => {
                         pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
                     }}
                 >
-                    {value === '2' &&
-                        <Button type='submit' variant='contained' onClick={handleSubmit(onSubmit)}>
-                            Lưu
-                        </Button>
-                    }
+                    <Button type='submit' variant='contained' onClick={handleSubmit(onSubmit)}>
+                        Lưu
+                    </Button>
                 </DialogActions>
             </Dialog>
         </Card>
