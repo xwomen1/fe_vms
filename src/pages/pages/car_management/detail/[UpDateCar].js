@@ -320,10 +320,6 @@ const UpDateCar = () => {
     fetchFilteredOrAllUsers()
   }, [id])
 
-  const handleDialogClose = () => {
-    setDialogOpen(false)
-  }
-
   const handleUpdate = async () => {
     setLoading(true)
     try {

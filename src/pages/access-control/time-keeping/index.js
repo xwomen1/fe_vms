@@ -12,6 +12,8 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  CardActions,
+  CardContent,
   Pagination,
   Paper,
   Table,
@@ -107,13 +109,9 @@ const EventList = () => {
   ]
 
   return (
-    <Card>
+    <Card sx={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
       <CardHeader
-        title={
-          <>
-            <Button variant='contained'>Danh sách chấm công</Button>
-          </>
-        }
+        title={<Button variant='contained'>Danh sách chấm công</Button>}
         titleTypographyProps={{ sx: { mb: [2, 0] } }}
         sx={{
           py: 4,
@@ -122,7 +120,7 @@ const EventList = () => {
           alignItems: ['flex-start', 'center']
         }}
         action={
-          <Grid container spacing={2}>
+          <Grid container spacing={2} alignItems='center'>
             <Grid item>
               <CustomTextField
                 placeholder='Nhập tên sự kiện ...! '
@@ -153,16 +151,16 @@ const EventList = () => {
                   }
                 }}
               />
-              <Button variant='contained' style={{ margin: '0px 2px' }} onClick={handleSearch}>
+              <Button variant='contained' sx={{ ml: 2 }} onClick={handleSearch}>
                 Tìm kiếm <Icon fontSize='1.25rem' icon='tabler:search' />
               </Button>
             </Grid>
           </Grid>
         }
       />
-      <Grid container spacing={0}>
-        <TableContainer component={Paper} sx={{ minHeight: 600, minWidth: 500 }}>
-          <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
+      <CardContent sx={{ flex: 1, overflow: 'auto' }}>
+        <TableContainer component={Paper} sx={{ minHeight: 400 }}>
+          <Table stickyHeader aria-label='sticky table'>
             <TableHead>
               <TableRow>
                 <TableCell>STT</TableCell>
@@ -197,21 +195,21 @@ const EventList = () => {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={columns.length + 1}>Không có dữ liệu ...</TableCell>
+                  <TableCell colSpan={columns.length + 1} align='center'>
+                    Không có dữ liệu ...
+                  </TableCell>
                 </TableRow>
               )}
             </TableBody>
           </Table>
         </TableContainer>
-      </Grid>
-      <br />
-      <Grid container spacing={2} style={{ padding: 10 }}>
-        <Grid item xs={3}></Grid>
-        <Grid item xs={1}>
-          <span style={{ fontSize: 15 }}> dòng/trang</span>
-        </Grid>
-        <Grid item xs={1} style={{ padding: 0 }}>
-          <Box>
+      </CardContent>
+      <CardActions sx={{ backgroundColor: 'white', padding: 2 }}>
+        <Grid container spacing={2} alignItems='center'>
+          <Grid item xs={12} sm={4} sx={{ textAlign: 'right', mb: 1 }}>
+            <span style={{ fontSize: 15 }}>Dòng/trang</span>
+          </Grid>
+          <Grid item xs={12} sm={1}>
             <Button onClick={handleOpenMenu} endIcon={<Icon icon='tabler:selector' />}>
               {pageSize}
             </Button>
@@ -222,12 +220,12 @@ const EventList = () => {
                 </MenuItem>
               ))}
             </Menu>
-          </Box>
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <Pagination count={totalPage} page={page} color='primary' onChange={handlePageChange} />
+          </Grid>
         </Grid>
-        <Grid item xs={6}>
-          <Pagination count={totalPage} page={page} color='primary' onChange={handlePageChange} />
-        </Grid>
-      </Grid>
+      </CardActions>
     </Card>
   )
 }
