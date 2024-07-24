@@ -382,6 +382,11 @@ const navigation = () => {
           title: 'Quy định về lương',
           icon: 'tabler:moneybag',
           path: '/salaryRule'
+        },
+        {
+          title: 'Bản đồ số',
+          icon: 'tabler:moneybag',
+          path: '/pages/digital-map'
         }
       ]
     }
