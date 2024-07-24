@@ -22,16 +22,16 @@ import { useEffect, useState } from 'react'
 import Icon from 'src/@core/components/icon'
 import toast from 'react-hot-toast'
 import CustomChip from 'src/@core/components/mui/chip'
+import { putApi } from 'src/@core/utils/requestUltils'
 
 const AIConfig = () => {
   const [loading, setLoading] = useState(false)
-  const [keyword, setKeyword] = useState('')
   const [cameraGroup, setCameraGroup] = useState([])
   const [alertAIList, setAlertAIList] = useState([])
   const [modelAIList, setModelAIList] = useState([])
   const [dataList, setDataList] = useState([])
   const [reload, setReload] = useState(0)
-  const [switchStates, setSwitchStates] = useState({})
+  const [switchStates, setSwitchStates] = useState([])
 
   const [total, setTotal] = useState(1)
   const [page, setPage] = useState(1)
@@ -87,12 +87,15 @@ const AIConfig = () => {
       align: 'right',
       field: 'face',
       label: 'Nhận diện khuôn mặt',
-      renderCell: row => (
-        <Switch
-          checked={switchStates[row.id]?.face || false}
-          onChange={e => handleSwitchChange(e, row.id, 'face_recognition', row.alert_id, row.isExistFace)}
-        />
-      )
+      renderCell: row => {
+        const item = switchStates.find(item => item.camera_id === row.id)
+        return (
+          <Switch
+            checked={item?.face_recognition || false}
+            onChange={e => handleSwitchChange(e, row.id, 'face_recognition', row.alert_id, row.isExistFace)}
+          />
+        )
+      }
     },
     {
       id: 6,
@@ -101,12 +104,15 @@ const AIConfig = () => {
       align: 'right',
       field: 'licensePlate',
       label: 'Nhận diện biển số',
-      renderCell: row => (
-        <Switch
-          checked={switchStates[row.id]?.licensePlate || false}
-          onChange={e => handleSwitchChange(e, row.id, 'license_plate_recognition', row.alert_id, row.isExistLicensePlate)}
-        />
-      )
+      renderCell: row => {
+        const item = switchStates.find(item => item.camera_id === row.id)
+        return (
+          <Switch
+            checked={item?.license_plate_recognition || false}
+            onChange={e => handleSwitchChange(e, row.id, 'license_plate_recognition', row.alert_id, row.isExistLicensePlate)}
+          />
+        )
+      }
     }
   ]
 
@@ -196,9 +202,9 @@ const AIConfig = () => {
       const alert = {
         alert_id: item?.id || null,
         face: face?.isactive ? item?.id : null,
-        isExistFace: face !== undefined ? true : false,
+        isExistFace: face !== undefined && face?.isactive === true ? true : false,
         licensePlate: licensePlate?.isactive ? item?.id : null,
-        isExistLicensePlate: licensePlate !== undefined ? true : false
+        isExistLicensePlate: licensePlate !== undefined && licensePlate?.isactive === true ? true : false
       };
 
       return { ...camera, ...alert };
@@ -206,40 +212,103 @@ const AIConfig = () => {
 
     setDataList(data);
 
-    const initialSwitchStates = {};
-    data.forEach((item) => {
-      initialSwitchStates[item?.id] = {
-        face: Boolean(item?.face),
-        licensePlate: Boolean(item?.licensePlate),
-      };
+    const status = data.map((item, index) => {
+      const camera_id = item.id
+      const face = item?.face
+      const face_recognition = Boolean(item?.isExistFace)
+      const licensePlate = item?.licensePlate
+      const license_plate_recognition = Boolean(item?.isExistLicensePlate)
+
+      return { camera_id, face, face_recognition, licensePlate, license_plate_recognition }
     });
 
-    setSwitchStates(initialSwitchStates);
+    setSwitchStates(status);
   }, [alertAIList, cameraGroup]);
 
+  useEffect(() => {
+    console.log('ModelAIList', modelAIList);
+    console.log('dataList', dataList);
+  }, [modelAIList])
 
   const handleSwitchChange = (event, cameraId, type, cameraAIPropertyId, isModelExist) => {
-    setSwitchStates(prevState => ({
-      ...prevState,
-      [cameraId]: {
-        ...prevState[cameraId],
-        [type]: event.target.checked
+    const updatedSwitchStates = switchStates.map((item) => {
+      if (item.camera_id === cameraId) {
+
+        return {
+          ...item,
+          [type]: event.target.checked
+        }
       }
-    }))
 
-    if (cameraAIPropertyId && isModelExist === true) {
-      handleUpdateAlertIsActive(cameraAIPropertyId, type)
-    }
+      return item
+    })
 
-    if (cameraAIPropertyId && isModelExist === false) {
-      handleGetModelAIByCamera(cameraId, cameraAIPropertyId, type)
-    }
-
-    if (cameraAIPropertyId === undefined) {
-      handleAddAlertIsActive(cameraId, type)
-    }
-
+    setSwitchStates(updatedSwitchStates)
   }
+
+  const handleModelAIsCameras = async => {
+
+
+    const params = switchStates?.map((item, index) => {
+      const camera_id = item?.camera_id
+
+      // const values = modelAIList.find((model) => model.type === type)
+
+      // const cameraaiproperty = [
+      //   // ...data,
+      //   {
+      //     cameraModelAI: { ...values },
+      //     cameraAiZone: {
+      //       vfences: [],
+      //       vzone: {}
+      //     },
+      //     calendarDays: [],
+      //     isactive: true
+      //   }
+      // ]
+
+      return { camera_id }
+    })
+
+    console.log('switchStates', switchStates);
+
+    console.log('params', params);
+
+    // const params = {
+    //   cameraaiproperty: [
+    //     ...data,
+    //     {
+    //       cameraModelAI: { ...values },
+    //       cameraAiZone: {
+    //         vfences: [],
+    //         vzone: {}
+    //       },
+    //       calendarDays: [],
+    //       isactive: true
+    //     }
+    //   ]
+    // }
+
+    // try {
+    //   await putApi(
+    //     `https://sbs.basesystem.one/ivis/vms/api/v0/swagger/index.html#/cameras/put_cameras_user_ai_properties_cameras`,
+    //     { ...params },
+    //   )
+    //   setReload(reload + 1)
+    //   toast.success('Thao tác thành công')
+    // } catch (error) {
+    //   if (error && error?.response?.data) {
+    //     console.error('error', error)
+    //     toast.error(error?.response?.data?.message)
+    //   } else {
+    //     console.error('Error fetching data:', error)
+    //     toast.error(error)
+    //   }
+    // } finally {
+    //   setLoading(false)
+    // }
+  }
+
 
   const handleAddAlertIsActive = async (cameraId, type) => {
 
@@ -463,13 +532,27 @@ const AIConfig = () => {
                 </Menu>
               </Box>
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={5}>
               <Pagination
                 count={total}
                 page={page}
                 color='primary'
                 onChange={(event, page) => handlePageChange(page)}
               />
+            </Grid>
+            <Grid item xs={2}>
+              <Box sx={{ float: "right" }}>
+                <Button
+                  variant='contained'
+                  sx={{ marginRight: 2 }}
+                  onClick={() => {
+                    handleModelAIsCameras(switchStates)
+                  }}
+                >
+                  Lưu
+                </Button>
+                <Button variant='contained' color='secondary'>Hủy</Button>
+              </Box>
             </Grid>
           </Grid>
         </Grid>
