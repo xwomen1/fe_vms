@@ -1,527 +1,307 @@
+import React, { Component } from 'react';
+
 const stopThresholdDefault = 0.3;
 const bounceDeceleration = 0.04;
 const bounceAcceleration = 0.11;
 
-// fixes weird safari 10 bug where preventDefault is prevented
-// @see https://github.com/metafizzy/flickity/issues/457#issuecomment-254501356
-window.addEventListener('touchmove', () => { });
+class Impetus extends Component {
+  constructor(props) {
+    super(props);
 
-export default class Impetus {
-  constructor({
-    source: sourceEl = document,
-    update: updateCallback,
-    stop: stopCallback,
-    multiplier = 1,
-    friction = 0.92,
-    initialValues,
-    boundX,
-    boundY,
-    bounce = true
-  }) {
-    let boundXmin;
-    let boundXmax;
-    let boundYmin;
-    let boundYmax;
-    let pointerLastX;
-    let pointerLastY;
-    let pointerCurrentX;
-    let pointerCurrentY;
-    let pointerId;
-    let decVelX;
-    let decVelY;
-    let targetX = 0;
-    let targetY = 0;
-    let stopThreshold = stopThresholdDefault * multiplier;
-    let ticking = false;
-    let pointerActive = false;
-    let paused = false;
-    let decelerating = false;
-    let trackingPoints = [];
-
-    /**
-     * Initialize instance
-     */
-    (function init() {
-      sourceEl = typeof sourceEl === 'string' ? document.querySelector(sourceEl) : sourceEl;
-      if (!sourceEl) {
-        throw new Error('IMPETUS: source not found.');
-      }
-
-      if (!updateCallback) {
-        throw new Error('IMPETUS: update function not defined.');
-      }
-
-      if (initialValues) {
-        if (initialValues[0]) {
-          targetX = initialValues[0];
-        }
-        if (initialValues[1]) {
-          targetY = initialValues[1];
-        }
-        callUpdateCallback();
-      }
-
-      // Initialize bound values
-      if (boundX) {
-        boundXmin = boundX[0];
-        boundXmax = boundX[1];
-      }
-      if (boundY) {
-        boundYmin = boundY[0];
-        boundYmax = boundY[1];
-      }
-
-      sourceEl.addEventListener('touchstart', onDown);
-      sourceEl.addEventListener('mousedown', onDown);
-    }());
-
-    /**
-     * In edge cases where you may need to
-     * reinstanciate Impetus on the same sourceEl
-     * this will remove the previous event listeners
-     */
-    this.destroy = function () {
-      sourceEl.removeEventListener('touchstart', onDown);
-      sourceEl.removeEventListener('mousedown', onDown);
-
-      cleanUpRuntimeEvents();
-
-      // however it won't "destroy" a reference
-      // to instance if you'd like to do that
-      // it returns null as a convinience.
-      // ex: `instance = instance.destroy();`
-      return null;
+    this.state = {
+      targetX: props.initialValues ? props.initialValues[0] : 0,
+      targetY: props.initialValues ? props.initialValues[1] : 0,
     };
 
-    /**
-     * Disable movement processing
-     * @public
-     */
-    this.pause = function () {
-      cleanUpRuntimeEvents();
+    this.multiplier = props.multiplier || 1;
+    this.friction = props.friction || 0.92;
+    this.boundX = props.boundX || [];
+    this.boundY = props.boundY || [];
+    this.bounce = props.bounce !== undefined ? props.bounce : true;
 
-      pointerActive = false;
-      paused = true;
-    };
+    this.stopThreshold = stopThresholdDefault * this.multiplier;
+    this.ticking = false;
+    this.pointerActive = false;
+    this.paused = false;
+    this.decelerating = false;
+    this.trackingPoints = [];
 
-    /**
-     * Enable movement processing
-     * @public
-     */
-    this.resume = function () {
-      paused = false;
-    };
+    this.sourceEl = React.createRef();
 
-    /**
-     * Update the current x and y values
-     * @public
-     * @param {Number} x
-     * @param {Number} y
-     */
-    this.setValues = function (x, y) {
-      if (typeof x === 'number') {
-        targetX = x;
+    this.pointerLastX = 0;
+    this.pointerLastY = 0;
+    this.pointerCurrentX = 0;
+    this.pointerCurrentY = 0;
+    this.pointerId = null;
+    this.decVelX = 0;
+    this.decVelY = 0;
+
+    // Bind event handlers to ensure 'this' context
+    this.onDown = this.onDown.bind(this);
+    this.onMove = this.onMove.bind(this);
+    this.onUp = this.onUp.bind(this);
+    this.stopTracking = this.stopTracking.bind(this);
+  }
+
+  componentDidMount() {
+    const sourceEl = this.sourceEl.current;
+    if (sourceEl) {
+      sourceEl.addEventListener('touchstart', this.onDown);
+      sourceEl.addEventListener('mousedown', this.onDown);
+    }
+  }
+
+  componentWillUnmount() {
+    const sourceEl = this.sourceEl.current;
+    if (sourceEl) {
+      sourceEl.removeEventListener('touchstart', this.onDown);
+      sourceEl.removeEventListener('mousedown', this.onDown);
+    }
+    this.cleanUpRuntimeEvents();
+  }
+
+  cleanUpRuntimeEvents() {
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('touchmove', this.onMove);
+      document.removeEventListener('touchend', this.onUp);
+      document.removeEventListener('touchcancel', this.stopTracking);
+      document.removeEventListener('mousemove', this.onMove);
+      document.removeEventListener('mouseup', this.onUp);
+    }
+  }
+
+  addRuntimeEvents() {
+    this.cleanUpRuntimeEvents();
+    if (typeof document !== 'undefined') {
+      document.addEventListener('touchmove', this.onMove);
+      document.addEventListener('touchend', this.onUp);
+      document.addEventListener('touchcancel', this.stopTracking);
+      document.addEventListener('mousemove', this.onMove);
+      document.addEventListener('mouseup', this.onUp);
+    }
+  }
+
+  normalizeEvent(ev) {
+    if (ev.type === 'touchmove' || ev.type === 'touchstart' || ev.type === 'touchend') {
+      const touch = ev.targetTouches[0] || ev.changedTouches[0];
+
+      return { x: touch.clientX, y: touch.clientY, id: touch.identifier };
+    }
+
+    return { x: ev.clientX, y: ev.clientY, id: null };
+  }
+
+  onDown(ev) {
+    const event = this.normalizeEvent(ev);
+    if (!this.pointerActive && !this.paused) {
+      this.pointerActive = true;
+      this.decelerating = false;
+      this.pointerId = event.id;
+
+      this.pointerLastX = this.pointerCurrentX = event.x;
+      this.pointerLastY = this.pointerCurrentY = event.y;
+      this.trackingPoints = [];
+      this.addTrackingPoint(this.pointerLastX, this.pointerLastY);
+
+      this.addRuntimeEvents();
+    }
+  }
+
+  onMove(ev) {
+    ev.preventDefault();
+    const event = this.normalizeEvent(ev);
+    if (this.pointerActive && event.id === this.pointerId) {
+      this.pointerCurrentX = event.x;
+      this.pointerCurrentY = event.y;
+      this.addTrackingPoint(this.pointerLastX, this.pointerLastY);
+      this.requestTick();
+    }
+  }
+
+  onUp(ev) {
+    const event = this.normalizeEvent(ev);
+    if (this.pointerActive && event.id === this.pointerId) {
+      this.stopTracking();
+    }
+  }
+
+  stopTracking() {
+    this.pointerActive = false;
+    this.addTrackingPoint(this.pointerLastX, this.pointerLastY);
+    this.startDecelAnim();
+    this.cleanUpRuntimeEvents();
+  }
+
+  addTrackingPoint(x, y) {
+    const time = Date.now();
+    while (this.trackingPoints.length > 0) {
+      if (time - this.trackingPoints[0].time <= 100) {
+        break;
       }
-      if (typeof y === 'number') {
-        targetY = y;
-      }
-    };
-
-    /**
-     * Update the multiplier value
-     * @public
-     * @param {Number} val
-     */
-    this.setMultiplier = function (val) {
-      multiplier = val;
-      stopThreshold = stopThresholdDefault * multiplier;
-    };
-
-    /**
-     * Update boundX value
-     * @public
-     * @param {Number[]} boundX
-     */
-    this.setBoundX = function (boundX) {
-      boundXmin = boundX[0];
-      boundXmax = boundX[1];
-    };
-
-    /**
-     * Update boundY value
-     * @public
-     * @param {Number[]} boundY
-     */
-    this.setBoundY = function (boundY) {
-      boundYmin = boundY[0];
-      boundYmax = boundY[1];
-    };
-
-    /**
-     * Removes all events set by this instance during runtime
-     */
-    function cleanUpRuntimeEvents() {
-      // Remove all touch events added during 'onDown' as well.
-      document.removeEventListener(
-        'touchmove',
-        onMove,
-        getPassiveSupported() ? { passive: false } : false
-      );
-      document.removeEventListener('touchend', onUp);
-      document.removeEventListener('touchcancel', stopTracking);
-      document.removeEventListener(
-        'mousemove',
-        onMove,
-        getPassiveSupported() ? { passive: false } : false
-      );
-      document.removeEventListener('mouseup', onUp);
+      this.trackingPoints.shift();
     }
+    this.trackingPoints.push({ x, y, time });
+  }
 
-    /**
-     * Add all required runtime events
-     */
-    function addRuntimeEvents() {
-      cleanUpRuntimeEvents();
+  updateAndRender() {
+    const pointerChangeX = this.pointerCurrentX - this.pointerLastX;
+    const pointerChangeY = this.pointerCurrentY - this.pointerLastY;
 
-      // @see https://developers.google.com/web/updates/2017/01/scrolling-intervention
-      document.addEventListener(
-        'touchmove',
-        onMove,
-        getPassiveSupported() ? { passive: false } : false
-      );
-      document.addEventListener('touchend', onUp);
-      document.addEventListener('touchcancel', stopTracking);
-      document.addEventListener(
-        'mousemove',
-        onMove,
-        getPassiveSupported() ? { passive: false } : false
-      );
-      document.addEventListener('mouseup', onUp);
-    }
-
-    /**
-     * Executes the update function
-     */
-    function callUpdateCallback() {
-      updateCallback.call(sourceEl, targetX, targetY);
-    }
-
-    /**
-     * Creates a custom normalized event object from touch and mouse events
-     * @param  {Event} ev
-     * @returns {Object} with x, y, and id properties
-     */
-    function normalizeEvent(ev) {
-      if (ev.type === 'touchmove' || ev.type === 'touchstart' || ev.type === 'touchend') {
-        const touch = ev.targetTouches[0] || ev.changedTouches[0];
-
-        return {
-          x: touch.clientX,
-          y: touch.clientY,
-          id: touch.identifier
-        };
-      }
-
-      // mouse events
-
-      return {
-        x: ev.clientX,
-        y: ev.clientY,
-        id: null
-      };
-    }
-
-    /**
-     * Initializes movement tracking
-     * @param  {Object} ev Normalized event
-     */
-    function onDown(ev) {
-      const event = normalizeEvent(ev);
-      if (!pointerActive && !paused) {
-        pointerActive = true;
-        decelerating = false;
-        pointerId = event.id;
-
-        pointerLastX = pointerCurrentX = event.x;
-        pointerLastY = pointerCurrentY = event.y;
-        trackingPoints = [];
-        addTrackingPoint(pointerLastX, pointerLastY);
-
-        addRuntimeEvents();
-      }
-    }
-
-    /**
-     * Handles move events
-     * @param  {Object} ev Normalized event
-     */
-    function onMove(ev) {
-      ev.preventDefault();
-      const event = normalizeEvent(ev);
-
-      if (pointerActive && event.id === pointerId) {
-        pointerCurrentX = event.x;
-        pointerCurrentY = event.y;
-        addTrackingPoint(pointerLastX, pointerLastY);
-        requestTick();
-      }
-    }
-
-    /**
-     * Handles up/end events
-     * @param {Object} ev Normalized event
-     */
-    function onUp(ev) {
-      const event = normalizeEvent(ev);
-
-      if (pointerActive && event.id === pointerId) {
-        stopTracking();
-      }
-    }
-
-    /**
-     * Stops movement tracking, starts animation
-     */
-    function stopTracking() {
-      pointerActive = false;
-      addTrackingPoint(pointerLastX, pointerLastY);
-      startDecelAnim();
-
-      cleanUpRuntimeEvents();
-    }
-
-    /**
-     * Records movement for the last 100ms
-     * @param {number} x
-     * @param {number} y [description]
-     */
-    function addTrackingPoint(x, y) {
-      const time = Date.now();
-      while (trackingPoints.length > 0) {
-        if (time - trackingPoints[0].time <= 100) {
-          break;
-        }
-        trackingPoints.shift();
-      }
-
-      trackingPoints.push({ x, y, time });
-    }
-
-    /**
-     * Calculate new values, call update function
-     */
-    function updateAndRender() {
-      const pointerChangeX = pointerCurrentX - pointerLastX;
-      const pointerChangeY = pointerCurrentY - pointerLastY;
-
-      targetX += pointerChangeX * multiplier;
-      targetY += pointerChangeY * multiplier;
-
-      if (bounce) {
-        const diff = checkBounds();
+    this.setState(prevState => ({
+      targetX: prevState.targetX + pointerChangeX * this.multiplier,
+      targetY: prevState.targetY + pointerChangeY * this.multiplier,
+    }), () => {
+      if (this.bounce) {
+        const diff = this.checkBounds();
         if (diff.x !== 0) {
-          targetX -= pointerChangeX * dragOutOfBoundsMultiplier(diff.x) * multiplier;
+          this.setState(prevState => ({
+            targetX: prevState.targetX - pointerChangeX * this.dragOutOfBoundsMultiplier(diff.x) * this.multiplier,
+          }));
         }
         if (diff.y !== 0) {
-          targetY -= pointerChangeY * dragOutOfBoundsMultiplier(diff.y) * multiplier;
+          this.setState(prevState => ({
+            targetY: prevState.targetY - pointerChangeY * this.dragOutOfBoundsMultiplier(diff.y) * this.multiplier,
+          }));
         }
       } else {
-        checkBounds(true);
+        this.checkBounds(true);
       }
+      this.props.update(this.state.targetX, this.state.targetY);
+      this.pointerLastX = this.pointerCurrentX;
+      this.pointerLastY = this.pointerCurrentY;
+      this.ticking = false;
+    });
+  }
 
-      callUpdateCallback();
+  dragOutOfBoundsMultiplier(val) {
+    return 0.000005 * Math.pow(val, 2) + 0.0001 * val + 0.55;
+  }
 
-      pointerLastX = pointerCurrentX;
-      pointerLastY = pointerCurrentY;
-      ticking = false;
+  requestTick() {
+    if (!this.ticking) {
+      requestAnimFrame(this.updateAndRender.bind(this));
+    }
+    this.ticking = true;
+  }
+
+  checkBounds(restrict) {
+    let xDiff = 0;
+    let yDiff = 0;
+    const { targetX, targetY } = this.state;
+
+    if (this.boundX[0] !== undefined && targetX < this.boundX[0]) {
+      xDiff = this.boundX[0] - targetX;
+    } else if (this.boundX[1] !== undefined && targetX > this.boundX[1]) {
+      xDiff = this.boundX[1] - targetX;
     }
 
-    /**
-     * Returns a value from around 0.5 to 1, based on distance
-     * @param {Number} val
-     */
-    function dragOutOfBoundsMultiplier(val) {
-      return 0.000005 * Math.pow(val, 2) + 0.0001 * val + 0.55;
+    if (this.boundY[0] !== undefined && targetY < this.boundY[0]) {
+      yDiff = this.boundY[0] - targetY;
+    } else if (this.boundY[1] !== undefined && targetY > this.boundY[1]) {
+      yDiff = this.boundY[1] - targetY;
     }
 
-    /**
-     * prevents animating faster than current framerate
-     */
-    function requestTick() {
-      if (!ticking) {
-        requestAnimFrame(updateAndRender);
+    if (restrict) {
+      if (xDiff !== 0) {
+        this.setState({ targetX: xDiff > 0 ? this.boundX[0] : this.boundX[1] });
       }
-      ticking = true;
-    }
-
-    /**
-     * Determine position relative to bounds
-     * @param {Boolean} restrict Whether to restrict target to bounds
-     */
-    function checkBounds(restrict) {
-      let xDiff = 0;
-      let yDiff = 0;
-
-      if (boundXmin !== undefined && targetX < boundXmin) {
-        xDiff = boundXmin - targetX;
-      } else if (boundXmax !== undefined && targetX > boundXmax) {
-        xDiff = boundXmax - targetX;
-      }
-
-      if (boundYmin !== undefined && targetY < boundYmin) {
-        yDiff = boundYmin - targetY;
-      } else if (boundYmax !== undefined && targetY > boundYmax) {
-        yDiff = boundYmax - targetY;
-      }
-
-      if (restrict) {
-        if (xDiff !== 0) {
-          targetX = xDiff > 0 ? boundXmin : boundXmax;
-        }
-        if (yDiff !== 0) {
-          targetY = yDiff > 0 ? boundYmin : boundYmax;
-        }
-      }
-
-      return {
-        x: xDiff,
-        y: yDiff,
-        inBounds: xDiff === 0 && yDiff === 0
-      };
-    }
-
-    /**
-     * Initialize animation of values coming to a stop
-     */
-    function startDecelAnim() {
-      const firstPoint = trackingPoints[0];
-      const lastPoint = trackingPoints[trackingPoints.length - 1];
-
-      const xOffset = lastPoint.x - firstPoint.x;
-      const yOffset = lastPoint.y - firstPoint.y;
-      const timeOffset = lastPoint.time - firstPoint.time;
-
-      const D = timeOffset / 15 / multiplier;
-
-      decVelX = xOffset / D || 0; // prevent NaN
-      decVelY = yOffset / D || 0;
-
-      const diff = checkBounds();
-
-      if (Math.abs(decVelX) > 1 || Math.abs(decVelY) > 1 || !diff.inBounds) {
-        decelerating = true;
-        requestAnimFrame(stepDecelAnim);
-      } else if (stopCallback) {
-        stopCallback(sourceEl);
+      if (yDiff !== 0) {
+        this.setState({ targetY: yDiff > 0 ? this.boundY[0] : this.boundY[1] });
       }
     }
 
-    /**
-     * Animates values slowing down
-     */
-    function stepDecelAnim() {
-      if (!decelerating) {
-        return;
-      }
+    return {
+      x: xDiff,
+      y: yDiff,
+      inBounds: xDiff === 0 && yDiff === 0,
+    };
+  }
 
-      decVelX *= friction;
-      decVelY *= friction;
+  startDecelAnim() {
+    const firstPoint = this.trackingPoints[0];
+    const lastPoint = this.trackingPoints[this.trackingPoints.length - 1];
 
-      targetX += decVelX;
-      targetY += decVelY;
+    const xOffset = lastPoint.x - firstPoint.x;
+    const yOffset = lastPoint.y - firstPoint.y;
+    const timeOffset = lastPoint.time - firstPoint.time;
 
-      const diff = checkBounds();
+    const D = timeOffset / 15 / this.multiplier;
+
+    this.decVelX = xOffset / D || 0;
+    this.decVelY = yOffset / D || 0;
+
+    const diff = this.checkBounds();
+
+    if (Math.abs(this.decVelX) > 1 || Math.abs(this.decVelY) > 1 || !diff.inBounds) {
+      this.decelerating = true;
+      requestAnimFrame(this.stepDecelAnim.bind(this));
+    } else if (this.props.stop) {
+      this.props.stop();
+    }
+  }
+
+  stepDecelAnim() {
+    if (!this.decelerating) {
+      return;
+    }
+
+    this.decVelX *= this.friction;
+    this.decVelY *= this.friction;
+
+    this.setState(prevState => ({
+      targetX: prevState.targetX + this.decVelX,
+      targetY: prevState.targetY + this.decVelY,
+    }), () => {
+      const diff = this.checkBounds();
 
       if (
-        Math.abs(decVelX) > stopThreshold
-        || Math.abs(decVelY) > stopThreshold
+        Math.abs(this.decVelX) > this.stopThreshold
+        || Math.abs(this.decVelY) > this.stopThreshold
         || !diff.inBounds
       ) {
-        if (bounce) {
+        if (this.bounce) {
           const reboundAdjust = 2.5;
 
           if (diff.x !== 0) {
-            if (diff.x * decVelX <= 0) {
-              decVelX += diff.x * bounceDeceleration;
+            if (diff.x * this.decVelX <= 0) {
+              this.decVelX += diff.x * bounceDeceleration;
             } else {
               const adjust = diff.x > 0 ? reboundAdjust : -reboundAdjust;
-              decVelX = (diff.x + adjust) * bounceAcceleration;
+              this.decVelX = (diff.x + adjust) * bounceAcceleration;
             }
           }
           if (diff.y !== 0) {
-            if (diff.y * decVelY <= 0) {
-              decVelY += diff.y * bounceDeceleration;
+            if (diff.y * this.decVelY <= 0) {
+              this.decVelY += diff.y * bounceDeceleration;
             } else {
               const adjust = diff.y > 0 ? reboundAdjust : -reboundAdjust;
-              decVelY = (diff.y + adjust) * bounceAcceleration;
+              this.decVelY = (diff.y + adjust) * bounceAcceleration;
             }
           }
         } else {
           if (diff.x !== 0) {
-            if (diff.x > 0) {
-              targetX = boundXmin;
-            } else {
-              targetX = boundXmax;
-            }
-            decVelX = 0;
+            this.setState({ targetX: diff.x > 0 ? this.boundX[0] : this.boundX[1] });
+            this.decVelX = 0;
           }
           if (diff.y !== 0) {
-            if (diff.y > 0) {
-              targetY = boundYmin;
-            } else {
-              targetY = boundYmax;
-            }
-            decVelY = 0;
+            this.setState({ targetY: diff.y > 0 ? this.boundY[0] : this.boundY[1] });
+            this.decVelY = 0;
           }
         }
-
-        callUpdateCallback();
-
-        requestAnimFrame(stepDecelAnim);
+        this.props.update(this.state.targetX, this.state.targetY);
+        requestAnimFrame(this.stepDecelAnim.bind(this));
       } else {
-        decelerating = false;
-        if (stopCallback) {
-          stopCallback(sourceEl);
+        this.decelerating = false;
+        if (this.props.stop) {
+          this.props.stop();
         }
       }
-    }
-  }
-}
-
-/**
- * @see http://www.paulirish.com/2011/requestanimationframe-for-smart-animating/
- */
-const requestAnimFrame = (function () {
-  if (typeof window !== 'undefined') {
-    return (
-      window.requestAnimationFrame
-      || window.webkitRequestAnimationFrame
-      || window.mozRequestAnimationFrame
-      || function (callback) {
-        window.setTimeout(callback, 1000 / 60);
-      }
-    );
-  } else {
-    return function (func) {
-      setTimeout(func, 1000 / 60);
-    };
-  }
-}());
-
-function getPassiveSupported() {
-  let passiveSupported = false;
-
-  try {
-    const options = Object.defineProperty({}, 'passive', {
-      get() {
-        passiveSupported = true;
-      }
     });
+  }
 
-    window.addEventListener('test', null, options);
-  } catch (err) { }
-
-  getPassiveSupported = () => passiveSupported;
-
-  return passiveSupported;
+  render() {
+    return <div ref={this.sourceEl} />;
+  }
 }
+
+export default Impetus;

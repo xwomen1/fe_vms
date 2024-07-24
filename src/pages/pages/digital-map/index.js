@@ -1,3 +1,5 @@
+"use client";
+
 import { TreeItem, TreeView } from "@mui/lab"
 import { Box, Card, CardContent, CardHeader, Grid, IconButton, styled, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
