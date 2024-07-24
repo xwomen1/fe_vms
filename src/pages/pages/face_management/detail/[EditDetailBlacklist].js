@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { Fragment, useState, useEffect, useRef } from 'react'
+import { Fragment, useState, useEffect, useRef, useCallback } from 'react'
 import axios from 'axios'
 import { makeStyles } from '@material-ui/core/styles'
 import authConfig from 'src/configs/auth'
@@ -9,7 +9,6 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 import FileUploader from 'devextreme-react/file-uploader'
 import Icon from 'src/@core/components/icon'
 import ModalImage from '../ModalImage'
-import CustomDialog from '../CustomDialog/CustomDialog'
 import Link from 'next/link'
 import {
   Box,
@@ -19,22 +18,7 @@ import {
   CardHeader,
   Grid,
   Switch,
-  IconButton,
-  Tab,
-  TableContainer,
-  Paper,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Pagination,
-  Menu,
-  MenuItem,
-  Dialog,
-  DialogContent,
-  DialogActions,
-  Typography,
+  Autocomplete,
   TextField,
   Input,
   CircularProgress
@@ -49,6 +33,7 @@ const EditFaceManagement = () => {
   const [listFileId, setListFileId] = useState([])
   const [listImage, setListImage] = useState([])
   const listFileUrl = []
+  const [person, setPerson] = useState([])
   const [listFileUpload, setListFileUpload] = useState([])
   const [fileAvatarImg, setFileAvatarImg] = useState(null)
   const [fileAvatarId, setFileAvatarId] = useState(null)
@@ -63,11 +48,7 @@ const EditFaceManagement = () => {
   const [img2, setImg2] = useState(null)
   const [img3, setImg3] = useState(null)
   const [img4, setImg4] = useState(null)
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [dialogTitle, setDialogTitle] = useState('')
-  const [dialogMessage, setDialogMessage] = useState('')
-  const [isSuccess, setIsSuccess] = useState(false)
-  const imageTypes = ['BOTTOM', 'LEFT', 'RIGHT', 'CENTER', 'ABOVE']
+  const [title, setTitle] = useState('')
 
   const buildUrlWithToken = url => {
     const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -90,7 +71,7 @@ const EditFaceManagement = () => {
   }, [listFileId])
 
   const handleStatusChange = () => {
-    setStatus1(status1 === 'true' ? 'false' : 'true')
+    setStatus1(status1 === true ? false : true)
   }
 
   const fetchFilteredOrAllUserss = async () => {
@@ -169,6 +150,7 @@ const EditFaceManagement = () => {
           const imgs = [...response.data.imgs]
           console.log(response, 'respon')
           setStatus1(response.data.status)
+          setTitle(response.data.type)
           setFileAvatarId(response.data.mainImageId)
           setListFileUpload(
             imgs.map(img =>
@@ -205,10 +187,6 @@ const EditFaceManagement = () => {
     fetchFilteredOrAllUsers()
   }, [id])
 
-  const handleDialogClose = () => {
-    setDialogOpen(false)
-  }
-
   const handleUpdate = async () => {
     setLoading(true)
     try {
@@ -228,7 +206,11 @@ const EditFaceManagement = () => {
         imgs: listFileId.map(id => ({
           id: id,
           urlImage: listFileUrl[id]
-        }))
+        })),
+        type: {
+          id: title.id,
+          name: title.name
+        }
       }
 
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${id}`, params, config)
@@ -358,6 +340,78 @@ const EditFaceManagement = () => {
     })
   }
 
+  const fetchChildData = useCallback(async parentId => {
+    try {
+      const response = await axios.get(
+        `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`
+      )
+
+      return response.data
+    } catch (error) {
+      console.error('Error fetching child data:', error)
+
+      return []
+    }
+  }, [])
+
+  const fetchAllChildData = useCallback(
+    async (parentId, level = 0) => {
+      let result = []
+      setLoading(true)
+
+      const recurseFetch = async (parentId, level) => {
+        const childData = await fetchChildData(parentId)
+        for (const child of childData) {
+          result.push({ name: child.name, id: child.id, level })
+          if (child.isParent) {
+            await recurseFetch(child.id, level + 1)
+          }
+        }
+      }
+
+      try {
+        await recurseFetch(parentId, level)
+      } catch (error) {
+        console.error('Error fetching all child data:', error)
+      } finally {
+        setLoading(false)
+      }
+
+      return result
+    },
+    [fetchChildData]
+  )
+
+  const fetchInitialData = useCallback(async () => {
+    try {
+      const response = await axios.get(
+        'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/code?Code=person_specify&sort=%2Bcreated_at&page=1'
+      )
+      const parentData = response.data[0]
+      if (parentData.isParent) {
+        const allChildData = await fetchAllChildData(parentData.id, 0)
+        setPerson(allChildData)
+      }
+    } catch (error) {
+      console.error('Error fetching initial data:', error)
+    }
+  }, [fetchAllChildData])
+
+  useEffect(() => {
+    fetchInitialData()
+  }, [fetchInitialData])
+
+  const renderOption = (props, option) => (
+    <li {...props} style={{ paddingLeft: `${option.level * 20}px` }}>
+      {option.name}
+    </li>
+  )
+
+  const handleOptionChange = (event, newValue) => {
+    console.log(newValue, 'newvalue')
+    setTitle(newValue)
+  }
+
   return (
     <>
       <Grid container spacing={6.5}>
@@ -402,13 +456,7 @@ const EditFaceManagement = () => {
                 alignItems: ['flex-start', 'center']
               }}
             />
-            <CustomDialog
-              open={dialogOpen}
-              handleClose={handleDialogClose}
-              title={dialogTitle}
-              message={dialogMessage}
-              isSuccess={isSuccess}
-            />
+
             <Grid item xs={12}>
               {modalImage && (
                 <ModalImage
@@ -494,7 +542,6 @@ const EditFaceManagement = () => {
                   >
                     Ghi chú
                   </p>
-
                   <TextField
                     disabled={loading == true}
                     rows={4}
@@ -523,8 +570,27 @@ const EditFaceManagement = () => {
                     >
                       Trạng thái hoạt động
                     </p>
-                    <Switch checked={status1 === 'true'} onChange={handleStatusChange} />
+                    <Switch checked={status1 === true} onChange={handleStatusChange} />
                   </div>
+                  <p
+                    style={{
+                      fontSize: '18px',
+                      lineHeight: '22px',
+                      margin: '0px'
+                    }}
+                  >
+                    Loại đối tượng
+                  </p>
+                  {console.log(title)}
+                  <Autocomplete
+                    value={title} // Đặt giá trị của Autocomplete bằng title
+                    options={person}
+                    getOptionLabel={option => option.name}
+                    renderInput={params => <CustomTextField {...params} fullWidth />}
+                    renderOption={renderOption}
+                    onChange={handleOptionChange}
+                    loading={loading}
+                  />{' '}
                 </div>
 
                 {listFileUpload.length === 0 && (

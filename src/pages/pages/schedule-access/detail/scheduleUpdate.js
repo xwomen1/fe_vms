@@ -283,6 +283,9 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
               pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
             }}
           >
+            <Button onClick={onClose} variant='contained' color='primary'>
+              Hủy
+            </Button>
             <Button onClick={handleSave} variant='contained' color='primary'>
               Lưu
             </Button>

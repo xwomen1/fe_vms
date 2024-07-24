@@ -7,6 +7,8 @@ import { styled } from '@mui/material/styles'
 import MuiTabList from '@mui/lab/TabList'
 import TabContext from '@mui/lab/TabContext'
 import { useState, useEffect, useCallback } from 'react'
+import authConfig from 'src/configs/auth'
+import axios from 'axios'
 import Add from './add'
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
@@ -81,7 +83,7 @@ const Caller = () => {
   const updateCameraStatus = useCallback(
     cameraStatusUpdates => {
       const cameraStatusMap = new Map(
-        cameraStatusUpdates.map(status => [status.id, status.statusValue.name, status.ip])
+        cameraStatusUpdates?.map(status => [status.id, status.statusValue.name, status.ip])
       )
 
       // Lặp qua các mục trong Map sử dụng for...of

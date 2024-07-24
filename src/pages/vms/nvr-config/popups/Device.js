@@ -51,7 +51,8 @@ const Device = ({ onClose, nvr }) => {
     label: cameras?.regions?.name || '',
     value: cameras?.regions?.name || ''
   })
-
+  const [selectNVR, setSelectedNVR] = useState('')
+  const [nvrs, setNVR] = useState([])
   const [isOfflineSetting, setisOfflineSetting] = useState(false)
   const [lat, setLat] = useState(null)
   const [lng, setLng] = useState(null)
@@ -60,6 +61,7 @@ const Device = ({ onClose, nvr }) => {
   const [ipAddress, setIpAddress] = useState(null)
   const [http, setHttp] = useState(null)
   const [onvif, setOnvif] = useState(null)
+  const [idBox, setIdBox] = useState(null)
 
   const [viewport, setViewport] = React.useState({
     longitude: 105.83416,
@@ -121,6 +123,44 @@ const Device = ({ onClose, nvr }) => {
   }
 
   console.log(nvr)
+
+  const fetchNicTypesDevice = async () => {
+    try {
+      // setLoading(true)
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.get(
+        'https://sbs.basesystem.one/ivis/vms/api/v0/device/active?status=connected',
+        config
+      )
+
+      const nicTypes = response.data.map(item => ({
+        label: item.nameDevice,
+        value: item.id
+      }))
+      setNVR(nicTypes)
+
+      // Set selectedNicType here based on your business logic
+      if (nicTypes.length > 0) {
+        setSelectedNVR(nicTypes[0].id) // Set it to the first value in the array, or adjust as needed
+      }
+    } catch (error) {
+      console.error('Error fetching NIC types:', error)
+    } finally {
+      // setLoading(false)
+    }
+  }
+
+  const handleComboboxFocusDevice = () => {
+    fetchNicTypesDevice()
+  }
+
   useEffect(() => {
     const fetchGroupData = async () => {
       try {
@@ -141,8 +181,16 @@ const Device = ({ onClose, nvr }) => {
           setUserName(response.data.username)
           setPassword(response.data.password)
           setIpAddress(response.data.ipAddress)
+          setSelectedNVR({
+            value: response.data.box?.id || '',
+            label: response.data.box?.name || ''
+          })
           setSelectedProtocol({
             name: response.data.protocol || ''
+          })
+          setIdBox({
+            value: response.data.box?.id || '',
+            label: response.data.box?.name || ''
           })
           setHttp(response.data.httpPort)
           setOnvif(response.data.onvif)
@@ -184,6 +232,10 @@ const Device = ({ onClose, nvr }) => {
         ipAddress: ipAddress,
         http: http,
         onvif: onvif,
+        box: {
+          id: idBox.value,
+          name: idBox.label
+        },
         protocol: selectedProtocol.name || '',
         isOfflineSetting: isOfflineSetting
       }
@@ -267,6 +319,11 @@ const Device = ({ onClose, nvr }) => {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleDDNSChange = (event, newValue) => {
+    setSelectedNVR(newValue)
+    setIdBox(newValue)
   }
 
   const handleRegionsChange = (event, newValue) => {
@@ -371,6 +428,18 @@ const Device = ({ onClose, nvr }) => {
           </Grid>
 
           <Grid item xs={0.1}></Grid>
+          <Grid item xs={4}>
+            <Autocomplete
+              value={selectNVR || ''}
+              onChange={handleDDNSChange}
+              options={nvrs || []}
+              getOptionLabel={option => option.label}
+              renderInput={params => <CustomTextField {...params} label='Smart NVR' fullWidth />}
+              onFocus={handleComboboxFocusDevice}
+
+              // loading={loading}
+            />{' '}
+          </Grid>
           <Grid item xs={4}>
             {formatDDNS(isOfflineSetting)} thiết bị đang ngoại tuyến
           </Grid>

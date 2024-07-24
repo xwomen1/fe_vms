@@ -14,6 +14,7 @@ import axios from 'axios'
 import TableHeader from 'src/views/apps/user/list/index'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import { IconButton, Typography, Box } from '@mui/material'
+import Edit from '../detail/popup/editGroup'
 
 const UserList = ({ apiData }) => {
   const [valueGroup, setValueGroup] = useState('')
@@ -21,9 +22,22 @@ const UserList = ({ apiData }) => {
 
   const [selectedGroups, setSelectedGroups] = useState([])
   const [selectedGroupsIn, setSelectedGroupsIn] = useState([])
+  const [groupIds, setGroupIds] = useState(null)
 
   const [groups, setGroups] = useState([])
   const [groupsIn, setGroupsIn] = useState([])
+  const [groupName, setGroupName] = useState(false)
+  const [openPopupP, setOpenPopupP] = useState(false)
+
+  const handleAddPClick = (groupIds, groupName) => {
+    setOpenPopupP(true)
+    setGroupIds(groupIds)
+    setGroupName(groupName)
+  }
+
+  const handleClosePPopup = () => {
+    setOpenPopupP(false) // Đóng Popup khi cần thiết
+  }
 
   function showAlertConfirm(options, intl) {
     const defaultProps = {
@@ -77,14 +91,18 @@ const UserList = ({ apiData }) => {
 
   const GroupCheckbox = ({ group, checked, onChange }) => {
     return (
-      <Box display='flex' alignItems='center' style={{ marginLeft: '5%' }}>
+      <Box display='flex' alignItems='center' justifyContent='space-between' style={{ marginLeft: '5%' }}>
         <Typography>
-          {' '}
           <label htmlFor={`group-${group.groupId}`}>{group.groupName}</label>
-        </Typography>{' '}
-        <IconButton style={{ marginLeft: 'auto' }} size='small' onClick={() => handleDelete(group.groupId)}>
-          <Icon icon='tabler:trash' />
-        </IconButton>
+        </Typography>
+        <Box display='flex'>
+          <IconButton size='small' onClick={() => handleAddPClick(group.groupId, group.groupName)}>
+            <Icon icon='tabler:edit' />
+          </IconButton>
+          <IconButton size='small' onClick={() => handleDelete(group.groupId)}>
+            <Icon icon='tabler:trash' />
+          </IconButton>
+        </Box>
       </Box>
     )
   }
@@ -94,6 +112,28 @@ const UserList = ({ apiData }) => {
       setSelectedGroups(prevGroups => [...prevGroups, { groupId }])
     } else {
       setSelectedGroups(prevGroups => prevGroups.filter(g => g.groupId !== groupId))
+    }
+  }
+
+  const fetchGroupData = async () => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+      console.log('token', token)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        params: {
+          keyword: valueGroup
+        }
+      }
+      const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search', config)
+      const dataWithChildren = addChildrenField(response.data)
+      const rootGroups = findRootGroups(dataWithChildren)
+      setGroups(rootGroups)
+    } catch (error) {
+      console.error('Error fetching data:', error)
     }
   }
   useEffect(() => {
@@ -363,6 +403,17 @@ const UserList = ({ apiData }) => {
           </Grid>
         </Grid>
       </Card>
+      {openPopupP && (
+        <>
+          <Edit
+            open={openPopupP}
+            onClose={handleClosePPopup}
+            groupId={groupIds}
+            groupName={groupName}
+            fetchGroupData={fetchGroupData}
+          />
+        </>
+      )}
     </Grid>
   )
 }

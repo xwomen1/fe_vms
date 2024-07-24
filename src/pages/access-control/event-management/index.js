@@ -11,6 +11,8 @@ import {
   Grid,
   IconButton,
   Menu,
+  CardContent,
+  CardActions,
   MenuItem,
   Pagination,
   Paper,
@@ -38,12 +40,13 @@ const initValueFilter = {
 const EventList = () => {
   const [anchorEl, setAnchorEl] = useState(null)
   const [totalPage, setTotalPage] = useState(0)
-  const [value, setValue] = useState('')
+  const [searchKeyword, setSearchKeyword] = useState('')
   const [page, setPage] = useState(1)
   const [devices, setDevices] = useState([])
   const [pageSize, setPageSize] = useState(25)
   const [loading, setLoading] = useState(false)
   const pageSizeOptions = [25, 50, 100]
+
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
   const formatDateTime = dateTime => {
@@ -70,7 +73,6 @@ const EventList = () => {
     const diff = end - start // milliseconds
     const hours = Math.floor(diff / (1000 * 60 * 60))
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000)
 
     return `${hours} giờ ${minutes} phút `
   }
@@ -92,10 +94,9 @@ const EventList = () => {
     setPage(1)
     handleCloseMenu()
   }
-
-  const handleFilter = useCallback(val => {
-    setValue(val)
-  }, [])
+  useEffect(() => {
+    fetchDataList()
+  }, [page, pageSize])
 
   const fetchDataList = useCallback(async () => {
     setLoading(true)
@@ -105,7 +106,7 @@ const EventList = () => {
           Authorization: `Bearer ${token}`
         },
         params: {
-          keyword: value,
+          keyword: searchKeyword,
           page: page,
           limit: pageSize
         }
@@ -123,11 +124,12 @@ const EventList = () => {
     } finally {
       setLoading(false)
     }
-  }, [token, value, page, pageSize])
+  }, [token, page, pageSize, searchKeyword])
 
-  useEffect(() => {
+  const handleSearch = () => {
+    setPage(1)
     fetchDataList()
-  }, [fetchDataList])
+  }
 
   const columns = [
     { id: 1, flex: 0.25, minWidth: 50, align: 'left', field: 'userName', label: 'Họ và tên' },
@@ -140,9 +142,13 @@ const EventList = () => {
   ]
 
   return (
-    <Card>
+    <Card sx={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
       <CardHeader
-        title='Danh sách sự kiện'
+        title={
+          <>
+            <Button variant='contained'>Danh sách sự kiện</Button>
+          </>
+        }
         titleTypographyProps={{ sx: { mb: [2, 0] } }}
         sx={{
           py: 4,
@@ -152,32 +158,23 @@ const EventList = () => {
         }}
         action={
           <Grid container spacing={2}>
-            <Grid item>
-              {/* <Box sx={{ float: 'right' }}>
-                <Button
-                  aria-label='Bộ lọc'
-                  onClick={() => {
-                    setIsOpenFilter(true)
-                  }}
-                  variant='contained'
-                >
-                  <Icon icon='tabler:filter' />
-                </Button>
-              </Box> */}
-            </Grid>
+            <Grid item></Grid>
             <Grid item>
               <CustomTextField
-                value={value}
-                onChange={e => handleFilter(e.target.value)}
-                placeholder='Tìm kiếm sự kiện '
+                placeholder='Nhập tên sự kiện ...! '
+                value={searchKeyword}
+                onChange={e => setSearchKeyword(e.target.value)}
                 InputProps={{
-                  startAdornment: (
-                    <Box sx={{ mr: 2, display: 'flex' }}>
-                      <Icon fontSize='1.25rem' icon='tabler:search' />
-                    </Box>
-                  ),
                   endAdornment: (
-                    <IconButton size='small' title='Clear' aria-label='Clear' onClick={() => setValue('')}>
+                    <IconButton
+                      size='small'
+                      title='Clear'
+                      aria-label='Clear'
+                      onClick={() => {
+                        setSearchKeyword('')
+                        fetchDataList()
+                      }}
+                    >
                       <Icon fontSize='1.25rem' icon='tabler:x' />
                     </IconButton>
                   )
@@ -192,78 +189,84 @@ const EventList = () => {
                   }
                 }}
               />
+              <Button variant='contained' style={{ margin: '0px 2px' }} onClick={handleSearch}>
+                Tìm kiếm <Icon fontSize='1.25rem' icon='tabler:search' />
+              </Button>
             </Grid>
           </Grid>
         }
       />
-      <Grid container spacing={0}>
-        <TableContainer component={Paper} sx={{ minHeight: 600, minWidth: 500 }}>
-          <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
-            <TableHead>
-              <TableRow>
-                <TableCell>STT</TableCell>
-                {columns.map(column => (
-                  <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
-                    {column.label}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {Array.isArray(devices) && devices.length > 0 ? (
-                devices.map((row, index) => (
-                  <TableRow hover tabIndex={-1} key={index}>
-                    <TableCell>{(page - 1) * pageSize + index + 1}</TableCell>
-                    {columns.map(column => {
-                      const value = row[column.field]
-
-                      return (
-                        <TableCell key={column.id} align={column.align}>
-                          {column.field === 'timeMin' || column.field === 'timeMax'
-                            ? formatTime(value)
-                            : column.field === 'date'
-                            ? formatDate(row.timeMin)
-                            : column.field === 'totalTime'
-                            ? calculateTotalTime(row.timeMin, row.timeMax)
-                            : value}
-                        </TableCell>
-                      )
-                    })}
-                  </TableRow>
-                ))
-              ) : (
+      <CardContent sx={{ flex: 1, overflow: 'auto' }}>
+        <Grid container spacing={0}>
+          <TableContainer component={Paper} sx={{ maxHeight: '100%', minWidth: '100%', overflow: 'auto' }}>
+            <Table stickyHeader aria-label='sticky table'>
+              <TableHead>
                 <TableRow>
-                  <TableCell colSpan={columns.length + 1}>Không có dữ liệu ...</TableCell>
+                  <TableCell>STT</TableCell>
+                  {columns.map(column => (
+                    <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
+                      {column.label}
+                    </TableCell>
+                  ))}
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Grid>
-      <br />
-      <Grid container spacing={2} style={{ padding: 10 }}>
-        <Grid item xs={3}></Grid>
-        <Grid item xs={1}>
-          <span style={{ fontSize: 15 }}> dòng/trang</span>
+              </TableHead>
+              <TableBody>
+                {Array.isArray(devices) && devices.length > 0 ? (
+                  devices.map((row, index) => (
+                    <TableRow hover tabIndex={-1} key={index}>
+                      <TableCell>{(page - 1) * pageSize + index + 1}</TableCell>
+                      {columns.map(column => {
+                        const value = row[column.field]
+
+                        return (
+                          <TableCell key={column.id} align={column.align}>
+                            {column.field === 'timeMin' || column.field === 'timeMax'
+                              ? formatTime(value)
+                              : column.field === 'date'
+                              ? formatDate(row.timeMin)
+                              : column.field === 'totalTime'
+                              ? calculateTotalTime(row.timeMin, row.timeMax)
+                              : value}
+                          </TableCell>
+                        )
+                      })}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={columns.length + 1}>Không có dữ liệu ...</TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Grid>
-        <Grid item xs={1} style={{ padding: 0 }}>
-          <Box>
-            <Button onClick={handleOpenMenu} endIcon={<Icon icon='tabler:selector' />}>
-              {pageSize}
-            </Button>
-            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
-              {pageSizeOptions.map(size => (
-                <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
-                  {size}
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
+      </CardContent>
+      <CardActions sx={{ backgroundColor: 'white' }}>
+        <Grid container spacing={2}>
+          <Grid item xs={3}></Grid>
+          <Grid item xs={1} sx={{ textAlign: 'center', marginTop: '5px' }}>
+            <span style={{ fontSize: 15 }}> dòng/trang</span>
+          </Grid>
+          <Grid item xs={1}>
+            <Box>
+              <Button onClick={handleOpenMenu} endIcon={<Icon icon='tabler:selector' />}>
+                {pageSize}
+              </Button>
+              <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+                {pageSizeOptions.map(size => (
+                  <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
+                    {size}
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
+          </Grid>
+          <Grid item xs={6}>
+            <Pagination count={totalPage} page={page} color='primary' onChange={handlePageChange} />
+          </Grid>
         </Grid>
-        <Grid item xs={6}>
-          <Pagination count={totalPage} page={page} color='primary' onChange={handlePageChange} />
-        </Grid>
-      </Grid>
+      </CardActions>
     </Card>
   )
 }

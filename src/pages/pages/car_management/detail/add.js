@@ -23,6 +23,7 @@ import {
   DialogActions,
   Typography,
   TextField,
+  Switch,
   Input
 } from '@mui/material'
 import { Fragment, useState, useEffect, useRef } from 'react'
@@ -30,7 +31,6 @@ import axios from 'axios'
 import { makeStyles } from '@material-ui/core/styles'
 import authConfig from 'src/configs/auth'
 import Swal from 'sweetalert2'
-import CustomDialog from '../../face_management/CustomDialog/CustomDialog'
 import FileUploader from 'devextreme-react/file-uploader'
 import CircularProgress from '@mui/material/CircularProgress'
 import ModalImage from '../ModalImage'
@@ -50,6 +50,7 @@ const AddFaceManagement = () => {
   const [listFileUpload, setListFileUpload] = useState([])
   const [name, setName] = useState(null)
   const [note, setNote] = useState(null)
+  const [type, setType] = useState('')
   const [showCropper, setShowCopper] = useState(false)
   const [isNameEntered, setIsNameEntered] = useState(false)
   const fileUploader1 = useRef(null)
@@ -63,6 +64,7 @@ const AddFaceManagement = () => {
   const [dialogMessage, setDialogMessage] = useState('')
   const [isSuccess, setIsSuccess] = useState(false)
   const [redirectUrl, setRedirectUrl] = useState('')
+  const [status1, setStatus1] = useState('')
 
   const handleInputChange = e => {
     const value = e.target.value
@@ -234,13 +236,6 @@ const AddFaceManagement = () => {
     }
   }
 
-  const handleDialogClose = () => {
-    setDialogOpen(false)
-    if (isSuccess && redirectUrl) {
-      window.location.href = redirectUrl
-    }
-  }
-
   const handleAddBlacklist = async () => {
     setLoading(true)
     setShowLoading(true)
@@ -255,6 +250,8 @@ const AddFaceManagement = () => {
 
       const params = {
         name: name,
+        vehicleType: type,
+        status: status1,
         mainImageId: fileAvatarId,
         imgs: listFileId.map((id, index) => ({
           id: id,
@@ -262,23 +259,25 @@ const AddFaceManagement = () => {
         })),
         note: note
       }
+
       const response = await axios.post(`https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates`, params, config)
       const newId = response.data.id
-      Swal.fire(
-        Swal.fire({
-          title: 'Thành công!',
-          text: 'Dữ liệu đã được Thêm thành công.',
-          icon: 'success',
-          willOpen: () => {
-            const confirmButton = Swal.getConfirmButton()
-            if (confirmButton) {
-              confirmButton.style.backgroundColor = '#FF9F43'
-              confirmButton.style.color = 'white'
-            }
+      Swal.fire({
+        title: 'Thành công!',
+        text: 'Dữ liệu đã được Thêm thành công.',
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
           }
-        })
-      )
-      setRedirectUrl(`/pages/car_management/detail/${newId}`)
+        }
+      }).then(result => {
+        if (result.isConfirmed) {
+          window.location.href = `/pages/car_management/detail/${newId}`
+        }
+      })
     } catch (error) {
       Swal.fire({
         title: 'Error!',
@@ -295,8 +294,11 @@ const AddFaceManagement = () => {
       console.error('Error adding member to group:', error)
     } finally {
       setLoading(false)
-      setDialogOpen(true)
     }
+  }
+
+  const handleStatusChange = () => {
+    setStatus1(status1 === true ? false : true)
   }
 
   return (
@@ -334,13 +336,6 @@ const AddFaceManagement = () => {
                   '& .MuiCardHeader-action': { m: 0 },
                   alignItems: ['flex-start', 'center']
                 }}
-              />
-              <CustomDialog
-                open={dialogOpen}
-                handleClose={handleDialogClose}
-                title={dialogTitle}
-                message={dialogMessage}
-                isSuccess={isSuccess}
               />
               <Grid item xs={12}>
                 {showLoading || loading}
@@ -434,6 +429,28 @@ const AddFaceManagement = () => {
                           margin: '0px'
                         }}
                       >
+                        Loại xe
+                      </p>
+                      <TextField
+                        variant='standard'
+                        style={{
+                          border: '1px solid rgba(0, 0, 0, 0.12)',
+                          borderRadius: '10px',
+                          width: '100%'
+                        }}
+                        defaultValue=''
+                        placeholder='  Nhập Loại xe ...!'
+                        onInput={e => {
+                          setType(e.target.value)
+                        }}
+                      />
+                      <p
+                        style={{
+                          fontSize: '18px',
+                          lineHeight: '22px',
+                          margin: '0px'
+                        }}
+                      >
                         Ghi chú
                       </p>
 
@@ -453,7 +470,20 @@ const AddFaceManagement = () => {
                         }}
                         id='textarea-standard-static'
                       />
+                      <div>
+                        <p
+                          style={{
+                            fontSize: '18px',
+                            lineHeight: '22px',
+                            margin: '0px'
+                          }}
+                        >
+                          Trạng thái hoạt động
+                        </p>
+                        <Switch checked={status1 === true} onChange={handleStatusChange} />
+                      </div>
                     </div>
+
                     <div
                       style={{
                         color: 'red',

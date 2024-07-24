@@ -432,7 +432,7 @@ const Add = () => {
     const fetchRegions = async () => {
       try {
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/parentsID?parentID=953a140f-76e4-4841-9871-b9f30b3a37a7'
+          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=level'
         )
 
         const regions = response.data.map(region => ({
@@ -454,7 +454,7 @@ const Add = () => {
     const fetchRegions = async () => {
       try {
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/parentsID?parentID=17a24f4a-4402-4a3f-b341-2afa8e67fba6'
+          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=contracttype'
         )
 
         const regions = response.data.map(region => ({
@@ -486,7 +486,7 @@ const Add = () => {
         }
 
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/parentsID?parentID=f963e9d4-3d6b-45df-884d-15f93452f2a2',
+          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=company',
           config
         )
 

@@ -9,13 +9,13 @@ import { CircularProgress } from '@material-ui/core'
 import Icon from 'src/@core/components/icon'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import FileUploader from 'devextreme-react/file-uploader'
-import CustomDialog from '../../face_management/CustomDialog/CustomDialog'
 import ModalImage from '../ModalImage'
 import Link from 'next/link'
 import {
   Box,
   Button,
   Card,
+  Switch,
   CardContent,
   CardHeader,
   Grid,
@@ -57,7 +57,7 @@ const UpDateCar = () => {
   const [note, setNote] = useState('')
   const [type, setType] = useState('')
   const [status, setStatus] = useState('')
-
+  const [status1, setStatus1] = useState('')
   const fileUploader1 = useRef(null)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [dialogTitle, setDialogTitle] = useState('')
@@ -189,6 +189,10 @@ const UpDateCar = () => {
     }
   }
 
+  const handleStatusChange = () => {
+    setStatus1(status1 === true ? false : true)
+  }
+
   const fetchFilteredOrAllUserss = async () => {
     setLoading(true)
     try {
@@ -239,9 +243,9 @@ const UpDateCar = () => {
         setImg4(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[4]?.id}`))
         setName(response.data.name || '')
         setNote(response.data.note || '')
-        setStatus(response.data.status || '')
+        setStatus1(response.data.status)
 
-        setType(response.data.type || '')
+        setType(response.data.vehicleType || '')
       }
     } catch (error) {
       console.error('Error fetching data:', error)
@@ -271,6 +275,7 @@ const UpDateCar = () => {
         if (id) {
           const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates/${id}`, config)
           const imgs = response.data.imgs ? [...response.data.imgs] : [] // Kiểm tra nếu response.data.imgs tồn tại
+          setStatus1(response.data.status)
           setFileAvatarId(response.data.mainImageId)
           setListFileUpload(
             imgs.map(img =>
@@ -301,7 +306,7 @@ const UpDateCar = () => {
           setImg4(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[4]?.id}`))
           setName(response.data.name || '')
           setNote(response.data.note || '')
-          setType(response.data.type || '')
+          setType(response.data.vehicleType || '')
           setStatus(response.data.status || '')
         }
       } catch (error) {
@@ -314,45 +319,6 @@ const UpDateCar = () => {
 
     fetchFilteredOrAllUsers()
   }, [id])
-
-  const handleDialogClose = () => {
-    setDialogOpen(false)
-  }
-
-  // const handleUpdate = async () => {
-  //   setLoading(true)
-  //   try {
-  //     const token = localStorage.getItem(authConfig.storageTokenKeyName)
-
-  //     const config = {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`
-  //       }
-  //     }
-
-  //     const params = {
-  //       name: name,
-  //       note: note,
-  //       status: status,
-  //       type: type,
-  //       mainImageId: fileAvatarId,
-  //       imgs: listFileId.map((id, index) => ({
-  //         id: id,
-  //         urlImage: listFileUrl[id]
-  //       }))
-  //     }
-  //     await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates/${id}`, params, config)
-  //     toast.success('Thay đổi thành công')
-  //     fetchFilteredOrAllUserss()
-  //   } catch (error) {
-  //     toast.error(error?.response?.statusText)
-
-  //     console.error('Error adding member to group:', error)
-  //   } finally {
-  //     setLoading(false)
-  //   }
-  // }
-  // console.log(avatarImage, 'avatarImage')
 
   const handleUpdate = async () => {
     setLoading(true)
@@ -368,8 +334,8 @@ const UpDateCar = () => {
       const params = {
         name: name,
         note: note,
-        status: status,
-        type: type,
+        status: status1,
+        vehicleType: type,
         mainImageId: fileAvatarId,
         imgs: listFileId.map(id => ({
           id: id,
@@ -455,13 +421,7 @@ const UpDateCar = () => {
                 alignItems: ['flex-start', 'center']
               }}
             />
-            <CustomDialog
-              open={dialogOpen}
-              handleClose={handleDialogClose}
-              title={dialogTitle}
-              message={dialogMessage}
-              isSuccess={isSuccess}
-            />
+
             <Grid item xs={12}>
               <TableContainer>
                 {modalImage && (
@@ -573,29 +533,18 @@ const UpDateCar = () => {
                         setType(e.target.value)
                       }}
                     />
-                    <p
-                      style={{
-                        fontSize: '18px',
-                        lineHeight: '22px',
-                        margin: '0px'
-                      }}
-                    >
-                      Trạng thái
-                    </p>
-                    <TextField
-                      variant='standard'
-                      style={{
-                        border: '1px solid rgba(0, 0, 0, 0.12)',
-                        borderRadius: '10px',
-                        width: '100%'
-                      }}
-                      defaultValue=''
-                      placeholder='  Trạng thái xe ...!'
-                      value={`${status}` || ''}
-                      onInput={e => {
-                        setStatus(e.target.value)
-                      }}
-                    />
+                    <div>
+                      <p
+                        style={{
+                          fontSize: '18px',
+                          lineHeight: '22px',
+                          margin: '0px'
+                        }}
+                      >
+                        Trạng thái hoạt động
+                      </p>
+                      <Switch checked={status1 === true} onChange={handleStatusChange} />
+                    </div>
                     <p
                       style={{
                         fontSize: '18px',

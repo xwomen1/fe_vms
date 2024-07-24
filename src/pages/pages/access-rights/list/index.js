@@ -476,7 +476,11 @@ const AccessRight = () => {
     <>
       <Card>
         <CardHeader
-          title='Quyền truy cập'
+          title={
+            <>
+              <Button variant='contained'>Quyền truy cập</Button>
+            </>
+          }
           titleTypographyProps={{ sx: { mb: [2, 0] } }}
           action={
             <Grid container spacing={2}>

@@ -277,10 +277,6 @@ const EventConfig = () => {
   }, [eventsData]);
 
   useEffect(() => {
-    console.log('dataList', dataList);
-  }, [dataList])
-
-  useEffect(() => {
     const cleanup = createWsConnection()
 
     return cleanup

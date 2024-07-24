@@ -13,7 +13,7 @@ import authConfig from 'src/configs/auth'
 import Table from '@mui/material/Table'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
-import { IconButton, Box } from '@mui/material'
+import { IconButton, Box, CardHeader } from '@mui/material'
 import Swal from 'sweetalert2'
 import { fetchData } from 'src/store/apps/user'
 import { useRouter } from 'next/router'
@@ -287,47 +287,56 @@ const UserList = ({ apiData }) => {
     <Grid container spacing={6.5}>
       <Grid item xs={12}>
         <Card>
-          <Grid container spacing={1}>
-            <Grid item xs={9}>
-              {selectedIds === null ? <TableHeader /> : <TableHeader value={value} />}
-            </Grid>
-            <Grid item xs={3} style={{ marginTop: '1%' }}>
-              <CustomTextField
-                value={value}
-                autoComplete='new-password' // Thay đổi giá trị thành 'new-password'
-                form='off' // Thêm thuộc tính form với giá trị 'off'
-                onChange={e => handleFilter(e.target.value)}
-                placeholder='Search…'
-                InputProps={{
-                  startAdornment: (
-                    <Box sx={{ mr: 2, display: 'flex' }}>
-                      <Icon fontSize='1.25rem' icon='tabler:search' />
-                    </Box>
-                  ),
-                  endAdornment: (
-                    <IconButton size='small' title='Clear' aria-label='Clear'>
-                      <Icon fontSize='1.25rem' icon='tabler:x' />
-                    </IconButton>
-                  )
-                }}
-                sx={{
-                  width: {
-                    xs: 1,
-                    sm: 'auto'
-                  },
-                  '& .MuiInputBase-root > svg': {
-                    mr: 2
-                  }
-                }}
-              />
-            </Grid>
-          </Grid>
+          <CardHeader
+            title='Danh sách Smart NVR'
+            titleTypographyProps={{ sx: { mb: [2, 0] } }}
+            sx={{
+              py: 4,
+              flexDirection: ['column', 'row'],
+              '& .MuiCardHeader-action': { m: 0 },
+              alignItems: ['flex-start', 'center']
+            }}
+            action={
+              <Grid container spacing={1}>
+                {/* <Grid item xs={9}>
+                  {selectedIds === null ? <TableHeader /> : <TableHeader value={value} />}
+                </Grid> */}
+                <Grid item xs={12} style={{ marginTop: '1%' }}>
+                  <CustomTextField
+                    value={value}
+                    autoComplete='new-password' // Thay đổi giá trị thành 'new-password'
+                    form='off' // Thêm thuộc tính form với giá trị 'off'
+                    onChange={e => handleFilter(e.target.value)}
+                    placeholder='Search…'
+                    InputProps={{
+                      startAdornment: (
+                        <Box sx={{ mr: 2, display: 'flex' }}>
+                          <Icon fontSize='1.25rem' icon='tabler:search' />
+                        </Box>
+                      ),
+                      endAdornment: (
+                        <IconButton size='small' title='Clear' aria-label='Clear'>
+                          <Icon fontSize='1.25rem' icon='tabler:x' />
+                        </IconButton>
+                      )
+                    }}
+                    sx={{
+                      width: {
+                        xs: 1,
+                        sm: 'auto'
+                      },
+                      '& .MuiInputBase-root > svg': {
+                        mr: 2
+                      }
+                    }}
+                  />
+                </Grid>
+              </Grid>
+            }
+          />
+
           <Grid container spacing={2}>
-            <Grid item xs={0.1}></Grid>
-
             <Grid item xs={12}>
-              <div></div>
-
               <Table>
                 <TableHead>
                   <TableRow>
