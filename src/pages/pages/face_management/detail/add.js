@@ -53,7 +53,7 @@ const AddFaceManagement = () => {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [dialogTitle, setDialogTitle] = useState('')
   const [dialogMessage, setDialogMessage] = useState('')
-  const [status1, setStatus1] = useState('')
+  const [status1, setStatus1] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [selectedOption, setSelectedOption] = useState('')
   const [redirectUrl, setRedirectUrl] = useState('')
