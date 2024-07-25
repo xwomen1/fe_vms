@@ -48,7 +48,7 @@ const EditFaceManagement = () => {
   const [img2, setImg2] = useState(null)
   const [img3, setImg3] = useState(null)
   const [img4, setImg4] = useState(null)
-  const [title, setTitle] = useState('')
+  const [title, setTitle] = useState('d')
 
   const buildUrlWithToken = url => {
     const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -150,7 +150,7 @@ const EditFaceManagement = () => {
           const imgs = [...response.data.imgs]
           console.log(response, 'respon')
           setStatus1(response.data.status)
-          setTitle(response.data.type)
+          setTitle(response.data?.type)
           setFileAvatarId(response.data.mainImageId)
           setListFileUpload(
             imgs.map(img =>
@@ -583,14 +583,21 @@ const EditFaceManagement = () => {
                   </p>
                   {console.log(title)}
                   <Autocomplete
-                    value={title} // Đặt giá trị của Autocomplete bằng title
+                    value={title}
                     options={person}
-                    getOptionLabel={option => option.name}
-                    renderInput={params => <CustomTextField {...params} fullWidth />}
+                    getOptionLabel={option => option.name || 'Không có dữ liệu'}
+                    renderInput={params => (
+                      <CustomTextField
+                        {...params}
+                        fullWidth
+                        placeholder={Object.keys(title).length === 0 ? 'Không có dữ liệu' : ''}
+                      />
+                    )}
                     renderOption={renderOption}
                     onChange={handleOptionChange}
                     loading={loading}
-                  />{' '}
+                    noOptionsText='Không có dữ liệu'
+                  />
                 </div>
 
                 {listFileUpload.length === 0 && (
