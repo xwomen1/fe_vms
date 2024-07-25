@@ -198,8 +198,31 @@ const RolesCards = () => {
       )
       fetchDataPolicies()
       handleClose()
-      Swal.fire('Sửa thành công', '', 'success')
+      Swal.fire({
+        title: 'Thành công!',
+        text: 'Dữ liệu đã được cập nhật thành công.',
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
     } catch (error) {
+      Swal.fire({
+        title: 'Error!',
+        text: error.response?.data?.message || error.message,
+        icon: 'error',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
       console.error('Lỗi khi tạo nhóm mới:', error)
     }
   }
@@ -244,7 +267,6 @@ const RolesCards = () => {
       console.error('Error fetching resources:', error)
     }
 
-    // Cập nhật trạng thái của ô checkbox
     setSelectedCheckbox(prevPermissions => {
       return isChecked ? prevPermissions.filter(item => item !== permission) : [...prevPermissions, permission]
     })
@@ -255,9 +277,7 @@ const RolesCards = () => {
   }, [selectedCheckbox, rolesArr])
 
   useEffect(() => {
-    // Kiểm tra xem policyData có dữ liệu không và trạng thái của nó là gì
     if (policyData) {
-      // Kiểm tra trạng thái của policyData
       const isActive = policyData.status === 'ACTIVE'
       setIsAdminAccessActive(isActive)
     }
@@ -288,8 +308,31 @@ const RolesCards = () => {
       const response = await axios.post(`https://dev-ivi.basesystem.one/smc/iam/api/v0/policies`, params, config)
       fetchDataPolicies()
       handleClose()
-      Swal.fire('Thêm thành công', '', 'success')
+      Swal.fire({
+        title: 'Thành công!',
+        text: 'Dữ liệu đã được thêm thành công.',
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
     } catch (error) {
+      Swal.fire({
+        title: 'Error!',
+        text: error.response?.data?.message || error.message,
+        icon: 'error',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
       console.error('Lỗi khi tạo nhóm mới:', error)
     }
   }
@@ -373,7 +416,7 @@ const RolesCards = () => {
         <Card>
           <CardContent>
             <Box sx={{ mb: 1.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography sx={{ color: 'text.secondary' }}>{`Tổng số users ${
+              <Typography sx={{ color: 'text.secondary' }}>{`Tổng số người dùng ${
                 userCounts[item.policyId] || 0
               } `}</Typography>
               <AvatarGroup
@@ -402,10 +445,13 @@ const RolesCards = () => {
                     handleClickOpen(item.policyId)
                   }}
                 >
-                  Edit Role
+                  <Button variant='contained'>
+                    <Icon icon='tabler:edit' />
+                    Chỉnh sửa
+                  </Button>
                 </Typography>
               </Box>
-              {/* <IconButton
+              <IconButton
                 onClick={() => {
                   setIdDelete(item.policyId)
                   setIsOpenDel(true)
@@ -414,7 +460,7 @@ const RolesCards = () => {
                 sx={{ color: 'text.disabled' }}
               >
                 <Icon icon='tabler:trash' />
-              </IconButton> */}
+              </IconButton>
             </Box>
           </CardContent>
         </Card>
@@ -493,7 +539,7 @@ const RolesCards = () => {
                 />
               </FormControl>
             </Box>
-            <Typography variant='h4'>Role Permissions</Typography>
+            <Typography variant='h4'>Quyền của vai trò</Typography>
             <TableContainer>
               <Table size='small'>
                 <TableHead>
@@ -510,7 +556,7 @@ const RolesCards = () => {
                           fontSize: theme => theme.typography.h6.fontSize
                         }}
                       >
-                        Administrator Access
+                        Quyền truy cập của quản trị viên
                         <Tooltip placement='top' title='Allows a full access to the system'>
                           <Box sx={{ display: 'flex' }}>
                             <Icon icon='tabler:info-circle' fontSize='1.25rem' />
@@ -539,22 +585,26 @@ const RolesCards = () => {
                           >
                             {resource}
                           </TableCell>
-                          {['get', 'list', 'update', 'create', 'delete'].map(scope => (
-                            <TableCell key={scope}>
-                              <FormControlLabel
-                                label={scope.charAt(0).toUpperCase() + scope.slice(1)}
-                                sx={{ '& .MuiTypography-root': { color: 'text.secondary' } }}
-                                control={
-                                  <Checkbox
-                                    size='small'
-                                    id={`${id}-${scope}`}
-                                    onChange={() => togglePermission(resource, scope)}
-                                    checked={resourceScopes.some(s => s.scope === scope)}
-                                  />
-                                }
-                              />
-                            </TableCell>
-                          ))}
+                          {['xem danh sách', 'xem chi tiết', 'cập nhật', 'thêm mới', 'xóa'].map((scope, i) => {
+                            const englishScope = ['get', 'list', 'update', 'create', 'delete'][i]
+
+                            return (
+                              <TableCell key={scope}>
+                                <FormControlLabel
+                                  label={scope.charAt(0).toUpperCase() + scope.slice(1)}
+                                  sx={{ '& .MuiTypography-root': { color: 'text.secondary' } }}
+                                  control={
+                                    <Checkbox
+                                      size='small'
+                                      id={`${id}-${englishScope}`}
+                                      onChange={() => togglePermission(resource, englishScope)}
+                                      checked={resourceScopes.some(s => s.scope === englishScope)}
+                                    />
+                                  }
+                                />
+                              </TableCell>
+                            )
+                          })}
                         </TableRow>
                       )
                     })}
