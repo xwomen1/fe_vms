@@ -17,7 +17,6 @@ import {
   Checkbox,
   IconButton
 } from '@mui/material'
-import CustomTextField from 'src/@core/components/mui/text-field'
 import Icon from 'src/@core/components/icon'
 import axios from 'axios'
 import toast from 'react-hot-toast'
@@ -136,7 +135,7 @@ const UserList = () => {
                 component={Paper}
                 style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}
               >
-                <TableContainer component={Paper} style={{ maxHeight: 'calc(100vh - 200px)', overflow: 'auto' }}>
+                <TableContainer component={Paper} style={{ maxHeight: 'calc(90vh - 200px)', overflow: 'auto' }}>
                   <Table>
                     <TableHead style={{ background: '#F6F6F7', position: 'sticky', top: 0, zIndex: 1 }}>
                       <TableRow>
@@ -162,6 +161,7 @@ const UserList = () => {
                                 sx={{ '& .MuiTypography-root': { color: 'text.secondary' } }}
                                 control={
                                   <Checkbox
+                                    disabled
                                     size='small'
                                     checked={resource.allowScopes?.some(s => s.scope === scope)}
                                     onChange={() => togglePermission(resourceIndex, scope)}

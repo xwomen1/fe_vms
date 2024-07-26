@@ -125,7 +125,7 @@ const UserList = ({ show, onClose, setReload }) => {
   }
 
   return (
-    <Dialog open={show} onClose={onClose} maxWidth='lg' fullWidth>
+    <Dialog open={show} onClose={onClose} maxWidth='xl' fullWidth>
       <DialogTitle>Tạo mới tài nguyên</DialogTitle>
       <DialogContent>
         <Grid container spacing={0}>
@@ -169,16 +169,18 @@ const UserList = ({ show, onClose, setReload }) => {
                           }
                         />
                       </TableCell>
-                      <TableCell>
+                      <TableCell style={{ width: '35%' }}>
                         <CustomTextField
                           placeholder='Nhập Resource code'
                           onChange={e => handleRowChange(rowIndex, 'resourceCode', e.target.value)}
+                          fullWidth
                         />
                       </TableCell>
-                      <TableCell>
+                      <TableCell style={{ width: '35%' }}>
                         <CustomTextField
                           placeholder='Nhập Resource name'
                           onChange={e => handleRowChange(rowIndex, 'resourceName', e.target.value)}
+                          fullWidth
                         />
                       </TableCell>
                       {['get', 'list', 'update', 'create', 'delete'].map(scope => (
