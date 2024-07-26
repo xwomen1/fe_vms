@@ -9,7 +9,7 @@ import { TabContext, TabPanel } from '@mui/lab'
 import { Grid, Tab, styled } from '@mui/material'
 
 // ** Demo Components Imports
-import Table from 'src/views/apps/roles/Table'
+import Table from 'src/views/apps/roles/Resources'
 import RoleCards from 'src/views/apps/roles/RoleCards'
 import { Button } from '@mui/material'
 

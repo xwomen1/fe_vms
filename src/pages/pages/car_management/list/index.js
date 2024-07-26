@@ -329,6 +329,10 @@ const Car_management = () => {
     return url
   }
 
+  const handlePageChange = newPage => {
+    setPage(newPage)
+  }
+
   const Img = React.memo(props => {
     const [loaded, setLoaded] = useState(false)
 
@@ -341,12 +345,12 @@ const Car_management = () => {
             loaded
               ? { display: 'none' }
               : {
-                  width: '100px',
-                  height: '100px',
-                  display: 'grid',
-                  backgroundColor: '#C4C4C4',
-                  placeItems: 'center'
-                }
+                width: '100px',
+                height: '100px',
+                display: 'grid',
+                backgroundColor: '#C4C4C4',
+                placeItems: 'center'
+              }
           }
         >
           <CircularProgress size={20} />
@@ -367,177 +371,177 @@ const Car_management = () => {
       {loading ? (
         <div>Loading...</div>
       ) : (
-        <Grid container spacing={6.5}>
-          <Grid item xs={12}>
-            <Grid style={{ marginBottom: '1%' }}>
-              <Button variant='contained'> Danh sách biển số</Button>
-            </Grid>
-            <Card>
-              <CardHeader
-                titleTypographyProps={{ sx: { mb: [2, 0] } }}
-                action={
-                  <Grid container spacing={2}>
-                    <Grid item>
-                      <Box sx={{ float: 'right' }}>
-                        <Button
-                          aria-label='Xóa'
-                          style={{
-                            background: '#a9a9a9',
-                            color: '#ffffff',
-                            marginRight: '5px'
-                          }}
-                          disabled={isDeleteDisabled}
-                          onClick={handleDeleteSelected}
-                        >
-                          <Icon icon='tabler:trash' />
-                        </Button>
-                        <Button
-                          aria-label='export file'
-                          style={{
-                            background: '#a9a9a9',
-                            color: '#ffffff',
-                            marginRight: '5px'
-                          }}
-                          onClick={exportToExcel}
-                        >
-                          <Icon icon='tabler:file-export' />
-                        </Button>
-                        <Button variant='contained' component={Link} href={`/pages/car_management/detail/add`}>
-                          <Icon icon='tabler:plus' />
-                          Thêm mới
-                        </Button>
-                      </Box>
-                    </Grid>
-                    <Grid item>
-                      <CustomTextField
-                        value={value}
-                        onChange={e => handleFilter(e.target.value)}
-                        placeholder='Search…'
-                        InputProps={{
-                          startAdornment: (
-                            <Box sx={{ mr: 2, display: 'flex' }}>
-                              <Icon fontSize='1.25rem' icon='tabler:search' />
-                            </Box>
-                          ),
-                          endAdornment: (
-                            <IconButton size='small' title='Clear' aria-label='Clear'>
-                              <Icon fontSize='1.25rem' icon='tabler:x' />
-                            </IconButton>
-                          )
-                        }}
-                        sx={{
-                          width: {
-                            xs: 1,
-                            sm: 'auto'
-                          },
-                          '& .MuiInputBase-root > svg': {
-                            mr: 2
-                          }
-                        }}
-                      />
-                    </Grid>
-                  </Grid>
-                }
-                sx={{
-                  py: 4,
-                  flexDirection: ['column', 'row'],
-                  '& .MuiCardHeader-action': { m: 0 },
-                  alignItems: ['flex-start', 'center']
-                }}
-              />
-              <Grid item xs={12}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>
-                        <Checkbox onChange={handleSelectAllChange} checked={selectAll} />
-                      </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>Ảnh xe</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>Biển số xe</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>Loại xe</TableCell>
+        <Card>
+          <CardHeader
+            title="Danh sách biển số xe"
+            titleTypographyProps={{ sx: { mb: [2, 0] } }}
+            action={
+              <Grid container spacing={2}>
+                <Grid item>
+                  <Box sx={{ float: 'right' }}>
+                    <Button
+                      aria-label='Xóa'
+                      style={{
+                        background: '#a9a9a9',
+                        color: '#ffffff',
+                        marginRight: '5px'
+                      }}
+                      disabled={isDeleteDisabled}
+                      onClick={handleDeleteSelected}
+                    >
+                      <Icon icon='tabler:trash' />
+                    </Button>
+                    <Button
+                      aria-label='export file'
+                      style={{
+                        background: '#a9a9a9',
+                        color: '#ffffff',
+                        marginRight: '5px'
+                      }}
+                      onClick={exportToExcel}
+                    >
+                      <Icon icon='tabler:file-export' />
+                    </Button>
+                    <Button variant='contained' component={Link} href={`/pages/car_management/detail/add`}>
+                      <Icon icon='tabler:plus' />
+                      Thêm mới
+                    </Button>
+                  </Box>
+                </Grid>
+                <Grid item>
+                  <CustomTextField
+                    value={value}
+                    onChange={e => handleFilter(e.target.value)}
+                    placeholder='Search…'
+                    InputProps={{
+                      startAdornment: (
+                        <Box sx={{ mr: 2, display: 'flex' }}>
+                          <Icon fontSize='1.25rem' icon='tabler:search' />
+                        </Box>
+                      ),
+                      endAdornment: (
+                        <IconButton size='small' title='Clear' aria-label='Clear'>
+                          <Icon fontSize='1.25rem' icon='tabler:x' />
+                        </IconButton>
+                      )
+                    }}
+                    sx={{
+                      width: {
+                        xs: 1,
+                        sm: 'auto'
+                      },
+                      '& .MuiInputBase-root > svg': {
+                        mr: 2
+                      }
+                    }}
+                  />
+                </Grid>
+              </Grid>
+            }
+            sx={{
+              py: 4,
+              flexDirection: ['column', 'row'],
+              '& .MuiCardHeader-action': { m: 0 },
+              alignItems: ['flex-start', 'center']
+            }}
+          />
+          <CardContent>
+            <Grid item xs={12}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>
+                      <Checkbox onChange={handleSelectAllChange} checked={selectAll} />
+                    </TableCell>
+                    <TableCell sx={{ padding: '16px' }}>STT</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Ảnh xe</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Biển số xe</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Loại xe</TableCell>
 
-                      <TableCell sx={{ padding: '16px' }}>Lần cuối xuất hiện</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>Trạng thái</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Lần cuối xuất hiện</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Trạng thái</TableCell>
 
-                      <TableCell sx={{ padding: '16px' }}>Chi tiết</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>Xóa</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {Array.isArray(userData) && userData.length > 0 ? (
-                      userData.map((user, index) => (
-                        <TableRow key={user.id}>
-                          <TableCell>
-                            <Checkbox
-                              onChange={event => handleCheckboxChange(event, user.id)}
-                              checked={selectedIds.includes(user.id)}
+                    <TableCell sx={{ padding: '16px' }}>Chi tiết</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Xóa</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {Array.isArray(userData) && userData.length > 0 ? (
+                    userData.map((user, index) => (
+                      <TableRow key={user.id}>
+                        <TableCell>
+                          <Checkbox
+                            onChange={event => handleCheckboxChange(event, user.id)}
+                            checked={selectedIds.includes(user.id)}
+                          />
+                        </TableCell>
+                        <TableCell>{index + 1}</TableCell>
+                        <TableCell>
+                          {user && user.mainImageId.length > 0 ? (
+                            <Img
+                              src={buildUrlWithToken(
+                                `https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${user.mainImageId}`
+                              )}
+                              style={{ maxWidth: '91px', height: '56px', minWidth: '56px' }}
                             />
-                          </TableCell>
-                          <TableCell>{index + 1}</TableCell>
-                          <TableCell>
-                            {user && user.mainImageId.length > 0 ? (
-                              <Img
-                                src={buildUrlWithToken(
-                                  `https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${user.mainImageId}`
-                                )}
-                                style={{ maxWidth: '91px', height: '56px', minWidth: '56px' }}
-                              />
-                            ) : (
-                              <Img
-                                src={`data:image/svg+xml;utf8,${encodeURIComponent(MaskGroup)}`}
-                                alt='Placeholder Image'
-                              />
-                            )}
-                          </TableCell>
-                          <TableCell>{user.name}</TableCell>
-                          <TableCell>{user.note}</TableCell>
+                          ) : (
+                            <Img
+                              src={`data:image/svg+xml;utf8,${encodeURIComponent(MaskGroup)}`}
+                              alt='Placeholder Image'
+                            />
+                          )}
+                        </TableCell>
+                        <TableCell>{user.name}</TableCell>
+                        <TableCell>{user.vehicleType}</TableCell>
 
-                          <TableCell>{user.lastAppearance}</TableCell>
-                          <TableCell
-                            style={{
-                              color: user.status ? '#FF9F43' : 'red'
-                            }}
+                        <TableCell>{user.lastAppearance}</TableCell>
+                        <TableCell
+                          style={{
+                            color: user.status ? '#FF9F43' : 'red'
+                          }}
+                        >
+                          {user.status ? 'hoạt động' : 'không hoạt động'}
+                        </TableCell>
+
+                        <TableCell>
+                          <Button
+                            size='small'
+                            component={Link}
+                            href={`/pages/car_management/detail/${user.id}`}
+                            sx={{ color: 'blue', right: '10px' }}
                           >
-                            {user.status ? 'hoạt động' : 'không hoạt động'}
-                          </TableCell>
-
-                          <TableCell>
-                            <Button
-                              size='small'
-                              component={Link}
-                              href={`/pages/car_management/detail/${user.id}`}
-                              sx={{ color: 'blue', right: '10px' }}
-                            >
-                              Xem chi tiết
-                            </Button>
-                          </TableCell>
-                          <TableCell sx={{ padding: '16px' }}>
-                            <Grid container spacing={2}>
-                              <IconButton onClick={() => handleDelete(user.id)}>
-                                <Icon icon='tabler:trash' />
-                              </IconButton>
-                            </Grid>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={7} align='center'>
-                          Không có dữ liệu
+                            Xem chi tiết
+                          </Button>
+                        </TableCell>
+                        <TableCell sx={{ padding: '16px' }}>
+                          <Grid container spacing={2}>
+                            <IconButton onClick={() => handleDelete(user.id)}>
+                              <Icon icon='tabler:trash' />
+                            </IconButton>
+                          </Grid>
                         </TableCell>
                       </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-                <br></br>
-                <Grid container spacing={2} style={{ padding: 10 }}>
-                  <Grid item xs={3}></Grid>
-                  <Grid item xs={1.5} style={{ padding: 0, marginLeft: '12%' }}>
-                    <IconButton onClick={handleOpenMenu}>
-                      <Icon icon='tabler:selector' />
-                      <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
-                    </IconButton>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={7} align='center'>
+                        Không có dữ liệu
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+              <br></br>
+              <Grid container spacing={2} style={{ padding: 10 }}>
+                <Grid item xs={3}></Grid>
+                <Grid item xs={1}>
+                  <span style={{ fontSize: 15 }}> dòng/trang</span>
+                </Grid>
+                <Grid item xs={1} style={{ padding: 0 }}>
+                  <Box>
+                    <Button onClick={handleOpenMenu} endIcon={<Icon icon='tabler:selector' />}>
+                      {pageSize}
+                    </Button>
                     <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
                       {pageSizeOptions.map(size => (
                         <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
@@ -545,15 +549,16 @@ const Car_management = () => {
                         </MenuItem>
                       ))}
                     </Menu>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Pagination count={total} color='primary' onChange={(event, page) => handlePageChange(page)} />
-                  </Grid>
+                  </Box>
+                </Grid>
+                <Grid item xs={6}>
+                  <Pagination count={total} page={page} color='primary' onChange={handlePageChange} />
                 </Grid>
               </Grid>
-            </Card>
-          </Grid>
-        </Grid>
+
+            </Grid>
+          </CardContent>
+        </Card>
       )}
     </>
   )

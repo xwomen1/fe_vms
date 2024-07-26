@@ -50,6 +50,7 @@ const AddFaceManagement = () => {
   const [listFileUpload, setListFileUpload] = useState([])
   const [name, setName] = useState(null)
   const [note, setNote] = useState(null)
+  const [type, setType] = useState('')
   const [showCropper, setShowCopper] = useState(false)
   const [isNameEntered, setIsNameEntered] = useState(false)
   const fileUploader1 = useRef(null)
@@ -249,6 +250,7 @@ const AddFaceManagement = () => {
 
       const params = {
         name: name,
+        vehicleType: type,
         status: status1,
         mainImageId: fileAvatarId,
         imgs: listFileId.map((id, index) => ({
@@ -420,6 +422,28 @@ const AddFaceManagement = () => {
                         marginTop: '-260px'
                       }}
                     >
+                      <p
+                        style={{
+                          fontSize: '18px',
+                          lineHeight: '22px',
+                          margin: '0px'
+                        }}
+                      >
+                        Loại xe
+                      </p>
+                      <TextField
+                        variant='standard'
+                        style={{
+                          border: '1px solid rgba(0, 0, 0, 0.12)',
+                          borderRadius: '10px',
+                          width: '100%'
+                        }}
+                        defaultValue=''
+                        placeholder='  Nhập Loại xe ...!'
+                        onInput={e => {
+                          setType(e.target.value)
+                        }}
+                      />
                       <p
                         style={{
                           fontSize: '18px',
