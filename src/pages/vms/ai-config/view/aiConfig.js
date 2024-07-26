@@ -90,6 +90,7 @@ const AIConfig = () => {
       label: 'Nhận diện khuôn mặt',
       renderCell: row => {
         const item = switchStates.find(item => item.camera_id === row.id)
+
         return (
           <Switch
             checked={item?.face_recognition || false}
@@ -107,6 +108,7 @@ const AIConfig = () => {
       label: 'Nhận diện biển số',
       renderCell: row => {
         const item = switchStates.find(item => item.camera_id === row.id)
+
         return (
           <Switch
             checked={item?.license_plate_recognition || false}
@@ -238,6 +240,7 @@ const AIConfig = () => {
     })
 
     const itemSelected = switchStates.find((item) => item.camera_id === cameraId)
+
     const itemChange = {
       ...itemSelected,
       [type]: event.target.checked,
@@ -255,6 +258,7 @@ const AIConfig = () => {
       const alert = alertAIList.find(alert => alert?.camera_id === camera_id);
       const id = alert?.id ?? '';
       const cameraaiproperties = alert?.cameraaiproperty ?? [];
+
       const cameraaiproperty = cameraaiproperties.map((item) => {
         if (item.cameraModelAI.type === camera?.face) {
           return {
@@ -269,6 +273,7 @@ const AIConfig = () => {
           }
         }
       })
+
       return { camera_id, cameraaiproperty, id };
     });
 
