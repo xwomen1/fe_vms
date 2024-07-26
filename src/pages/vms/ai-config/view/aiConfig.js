@@ -195,8 +195,6 @@ const AIConfig = () => {
 
       const licensePlate = item.cameraaiproperty.find((a) => a?.cameraModelAI?.type === 'license_plate_recognition');
       const face = item.cameraaiproperty.find((b) => b?.cameraModelAI?.type === 'face_recognition');
-      // console.log('licensePlate', licensePlate);
-      // console.log('face', face);
 
       const alert = {
         name: camera.name,
@@ -251,13 +249,8 @@ const AIConfig = () => {
     setSwitchStates(updatedSwitchStates)
   }
 
-  // useEffect(() => {
-  //   console.log('switchStates', switchStates);
-  // }, [switchStates]);
-
   const handleModelAIsCameras = async () => {
     const values = updateCameraList?.map((camera) => {
-      console.log('camera', camera);
       const camera_id = camera?.camera_id;
       const alert = alertAIList.find(alert => alert?.camera_id === camera_id);
       const id = alert?.id ?? '';
@@ -281,8 +274,11 @@ const AIConfig = () => {
 
     const params = Object.values(values);
 
-    // Kiểm tra cấu trúc của params
-    console.log('params', params);
+    // array containing id = ''
+    const params1 = params.filter(item => item.id === '')
+
+    // array does not contain id = ''
+    const params2 = params.filter(item => item.id !== '')
 
     try {
       await putApi(
@@ -303,7 +299,46 @@ const AIConfig = () => {
       setLoading(false);
       setUpdateCameraList([])
     }
-  };
+  }
+
+  const handleAddAlertIsActive = async (cameraId, type) => {
+
+    const values = modelAIList.find((model) => model.type === type)
+
+    const params = {
+      camera_id: cameraId,
+      cameraaiproperty: [
+        {
+          cameraModelAI: { ...values },
+          cameraAiZone: {
+            vfences: [],
+            vzone: {}
+          },
+          calendarDays: [],
+          isactive: true
+        }
+      ]
+    }
+
+    try {
+      await axios.post(
+        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties`,
+        { ...params },
+      )
+      setReload(reload + 1)
+      toast.success('Thao tác thành công')
+    } catch (error) {
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
 
 
   const handlePageChange = newPage => {
