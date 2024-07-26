@@ -72,8 +72,8 @@ const UserList = ({ apiData }) => {
     ws.onmessage = event => {
       const { dataType, data } = JSON.parse(event.data)
       if (dataType === 'nvrStatus') {
-        const cameraStatusUpdates = JSON.parse(data)
-        updateCameraStatus(cameraStatusUpdates)
+        const NVRStatusUpdates = JSON.parse(data)
+        updateNVRStatus(NVRStatusUpdates)
       }
     }
 
@@ -82,45 +82,76 @@ const UserList = ({ apiData }) => {
     }
   }, [])
 
-  const updateCameraStatus = useCallback(
-    cameraStatusUpdates => {
-      const cameraStatusMap = new Map(
-        cameraStatusUpdates?.map(status => [status.id, status.statusValue.name, status.ip])
-      )
+  const updateNVRStatus = useCallback(NVRStatusUpdates => {
+    const NVRStatusMap = new Map(
+      NVRStatusUpdates?.map(status => [status.id, { status: status.statusValue.name, ip: status.ip }])
+    )
 
-      // Lặp qua các mục trong Map sử dụng for...of
-      for (const entry of cameraStatusMap.entries()) {
-        const [id, status, ip] = entry
-
-        const entry1 = {
-          id: id,
-          status: status,
-          ip: ip
+    setAssetTypeStatus(prevStatus => {
+      const newStatus = [...prevStatus]
+      NVRStatusMap.forEach((value, key) => {
+        const index = newStatus.findIndex(item => item.id === key)
+        if (index !== -1) {
+          newStatus[index] = { ...newStatus[index], ...value }
+        } else {
+          newStatus.push({ id: key, ...value })
         }
+      })
 
-        setAssetTypeStatus(prevAssetType => {
-          const newAssetType = prevAssetType.map(camera => {
-            if (camera.id === entry1.id) {
-              if (camera.status.name !== entry1.status) {
-                console.log('AssetType with ID', entry1.id, 'has changed status.')
-                console.log('Previous status:', camera.status.name)
-                console.log('New status:', entry1.status)
-              }
+      return newStatus
+    })
+  }, [])
 
-              return { ...camera, status: { name: entry1.status } }
-            }
+  useEffect(() => {
+    if (assettypeStatus.length) {
+      setAssetType(prevAssettype => {
+        return prevAssettype.map(asset => {
+          const statusUpdate = assettypeStatus.find(status => status.id === asset.id)
+          if (statusUpdate) {
+            return { ...asset, status: { name: statusUpdate.status } }
+          }
 
-            return camera
-          })
-
-          // console.log('New Asset Type:', newAssetType) // Log updated asset type
-
-          return newAssetType
+          return asset
         })
+      })
+    }
+  }, [assettypeStatus])
+
+  useEffect(() => {
+    const fetchFilteredOrAllUsers = async () => {
+      try {
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          params: {
+            limit: pageSize,
+            page: page,
+            keyword: value
+          }
+        }
+        const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/nvrs', config)
+        if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+          setStatus1(response.data.isOfflineSetting || false)
+          setNvr(response.data[0].id)
+          setAssetType(response.data)
+          setTotal(response.data.page)
+          console.log(response.data[0].id)
+        } else {
+          setStatus1(false)
+          setNvr(null)
+          setAssetType([])
+          setTotal(0)
+          console.warn('Response data is empty or invalid')
+        }
+      } catch (error) {
+        console.error('Error fetching users:', error)
       }
-    },
-    [assettypeStatus]
-  )
+    }
+    fetchFilteredOrAllUsers()
+  }, [page, pageSize, total, value])
 
   const handlePageChange = newPage => {
     setPage(newPage)
@@ -306,47 +337,6 @@ const UserList = ({ apiData }) => {
   }
 
   const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen)
-  useEffect(() => {
-    const fetchFilteredOrAllUsers = async () => {
-      try {
-        const token = localStorage.getItem(authConfig.storageTokenKeyName)
-
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          params: {
-            limit: pageSize,
-            page: page,
-            keyword: value
-          }
-        }
-        const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/nvrs', config)
-        if (response.data && Array.isArray(response.data) && response.data.length > 0) {
-          setStatus1(response.data.isOfflineSetting || false)
-          setNvr(response.data[0].id)
-          setAssetType(response.data)
-          setTotal(response.data.page)
-          console.log(response.data[0].id)
-        } else {
-          setStatus1(false)
-          setNvr(null)
-          setAssetType([])
-          setTotal(0)
-          console.warn('Response data is empty or invalid')
-        }
-      } catch (error) {
-        console.error('Error fetching users:', error)
-      }
-    }
-    fetchFilteredOrAllUsers()
-  }, [page, pageSize, total, value])
-
-  useEffect(() => {
-    if (assettypeStatus.length) {
-      setAssetType(assettypeStatus)
-    }
-  }, [assettypeStatus])
 
   return (
     <Grid container spacing={6.5}>
@@ -368,11 +358,21 @@ const UserList = ({ apiData }) => {
                     <Box></Box>
                   ) : (
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Button variant='contained' color='secondary' onClick={handleAddRoleClick}>Mật khẩu</Button>
-                      <Button variant='contained' color='secondary' onClick={handleAddNetworkClick}>Mạng</Button>
-                      <Button variant='contained' color='secondary' onClick={handleAddVideoClick}>Video</Button>
-                      <Button variant='contained' color='secondary' onClick={handleAddImageClick}>Hình ảnh</Button>
-                      <Button variant='contained' color='secondary' onClick={handleAddCloudClick}>Bộ nhớ</Button>
+                      <Button variant='contained' color='secondary' onClick={handleAddRoleClick}>
+                        Mật khẩu
+                      </Button>
+                      <Button variant='contained' color='secondary' onClick={handleAddNetworkClick}>
+                        Mạng
+                      </Button>
+                      <Button variant='contained' color='secondary' onClick={handleAddVideoClick}>
+                        Video
+                      </Button>
+                      <Button variant='contained' color='secondary' onClick={handleAddImageClick}>
+                        Hình ảnh
+                      </Button>
+                      <Button variant='contained' color='secondary' onClick={handleAddCloudClick}>
+                        Bộ nhớ
+                      </Button>
                     </Box>
                   )}
                 </Grid>
@@ -448,7 +448,7 @@ const UserList = ({ apiData }) => {
                       </TableCell>
                       <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.name}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.type.name}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{assetType.type?.name}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.ipAddress}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.macAddress}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.location}</TableCell>
@@ -460,8 +460,8 @@ const UserList = ({ apiData }) => {
                                 assetType.status.name === 'connected'
                                   ? 'lightgreen'
                                   : assetType.status.name === 'disconnected'
-                                    ? '#FF9F43'
-                                    : 'orange',
+                                  ? '#FF9F43'
+                                  : 'orange',
                               borderRadius: '10px',
                               padding: '5px 10px',
                               width: '70%',
@@ -472,8 +472,8 @@ const UserList = ({ apiData }) => {
                             {assetType.status.name === 'connected'
                               ? 'Đã kết nối'
                               : assetType.status.name === 'disconnected'
-                                ? 'Mất kết nối'
-                                : assetType.status.name}
+                              ? 'Mất kết nối'
+                              : assetType.status.name}
                           </div>
                         ) : (
                           assetType.status.name
