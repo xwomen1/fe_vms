@@ -18,7 +18,6 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 import Add from './popup/add'
 import Edit from './popup/edit'
 import toast from 'react-hot-toast'
-import Filter from './popup/filter'
 
 const UserList = ({ apiData }) => {
   const [value, setValue] = useState('')
@@ -31,7 +30,6 @@ const UserList = ({ apiData }) => {
   const [assetId, setAssetId] = useState(null)
   const [openPopupP, setOpenPopupP] = useState(false)
   const [openPopupEdit, setOpenPopupEdit] = useState(false)
-  const [openPopupFilter, setOpenPopupFilter] = useState(false)
 
   const handleAddPClick = (groupIds, groupName) => {
     setOpenPopupP(true)
@@ -39,14 +37,6 @@ const UserList = ({ apiData }) => {
 
   const handleClosePPopup = () => {
     setOpenPopupP(false)
-  }
-
-  const handleAddFilterClick = (groupIds, groupName) => {
-    setOpenPopupFilter(true)
-  }
-
-  const handleCloseFilterPopup = () => {
-    setOpenPopupFilter(false)
   }
 
   const handleEditClick = (id, groupName) => {
@@ -134,58 +124,30 @@ const UserList = ({ apiData }) => {
     })
   }
 
-  const fetchDataAsset = async (filteredParams = null) => {
-    if (filteredParams) {
-      try {
-        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+  const fetchDataAsset = async () => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          params: {
-            ...filteredParams,
-            limit: pageSize,
-            page: page,
-            keyword: value
-          }
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        params: {
+          limit: pageSize,
+          page: page,
+          keyword: value
         }
-
-        const response = await axios.get(
-          `https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/sub/type/`,
-          config
-        )
-
-        setAssetType(response.data.rows)
-        setTotal(response.data.totalPage)
-      } catch (error) {
-        console.error('Error fetching users:', error)
       }
-    } else {
-      try {
-        const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          params: {
-            limit: pageSize,
-            page: page,
-            keyword: value
-          }
-        }
+      const response = await axios.get(
+        'https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/asset/type/',
+        config
+      )
 
-        const response = await axios.get(
-          `https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/sub/type/`,
-          config
-        )
-
-        setAssetType(response.data.rows)
-        setTotal(response.data.totalPage)
-      } catch (error) {
-        console.error('Error fetching users:', error)
-      }
+      setAssetType(response.data.rows)
+      setTotal(response.data.totalPage)
+    } catch (error) {
+      console.error('Error fetching users:', error)
     }
   }
 
@@ -200,7 +162,7 @@ const UserList = ({ apiData }) => {
           <CardHeader
             title={
               <>
-                <Button variant='contained'>Loại thuê bao</Button>
+                <Button variant='contained'>Loại tài sản</Button>
               </>
             }
             titleTypographyProps={{ sx: { mb: [2, 0] } }}
@@ -212,12 +174,6 @@ const UserList = ({ apiData }) => {
             }}
             action={
               <Grid container spacing={2}>
-                <Grid item>
-                  {' '}
-                  <Button variant='contained' style={{ margin: '0px 2px' }} onClick={handleAddFilterClick}>
-                    <Icon fontSize='1.25rem' icon='tabler:filter' />
-                  </Button>
-                </Grid>
                 <Grid item>
                   {' '}
                   <Button variant='contained' style={{ margin: '0px 2px' }} onClick={handleAddPClick}>
@@ -269,11 +225,9 @@ const UserList = ({ apiData }) => {
                 <TableHead>
                   <TableRow>
                     <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Mã loại thuê bao</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Tên loại thuê bao</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Mã loại tài sản</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Tên loại tài sản</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Mô tả</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Trạng thái kích hoạt</TableCell>
-
                     <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
                   </TableRow>
                 </TableHead>
@@ -284,8 +238,6 @@ const UserList = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{assetType.code}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.name}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.detail}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.status}</TableCell>
-
                       <TableCell sx={{ padding: '16px' }}>
                         <Grid container spacing={2}>
                           <IconButton
@@ -336,11 +288,6 @@ const UserList = ({ apiData }) => {
       {openPopupEdit && (
         <>
           <Edit open={openPopupEdit} onClose={handleCloseEditPopup} fetchGroupData={fetchDataAsset} assetId={assetId} />
-        </>
-      )}
-      {openPopupFilter && (
-        <>
-          <Filter open={openPopupFilter} onClose={handleCloseFilterPopup} fetchGroupData={fetchDataAsset} />
         </>
       )}
     </Grid>

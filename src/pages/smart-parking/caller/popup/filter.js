@@ -1,5 +1,18 @@
 import { forwardRef, useState, useEffect } from 'react'
-import { Autocomplete, Button, DialogActions, Fade, Grid, IconButton, TextField, Typography } from '@mui/material'
+import {
+  Autocomplete,
+  Button,
+  DialogActions,
+  Fade,
+  FormControl,
+  Grid,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Typography
+} from '@mui/material'
 import { styled } from '@mui/material/styles'
 import axios from 'axios'
 import toast from 'react-hot-toast'
@@ -27,24 +40,37 @@ const CustomCloseButton = styled(IconButton)(({ theme }) => ({
   }
 }))
 
-const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
+const Filter = ({ open, onClose, fetchGroupData }) => {
   const [groups, setGroups] = useState([])
   const [selectedGroup, setSelectedGroup] = useState(null)
+  const [services, setServices] = useState([])
+  const [selectedService, setSelectedService] = useState(null)
+  const [activationStatus, setActivationStatus] = useState('')
 
   useEffect(() => {
     fetchGroups()
-  }, [groupName])
+    fetchServices()
+  }, [])
 
   const fetchGroups = () => {
     axios
-      .get('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search')
+      .get('https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=dv')
       .then(response => {
-        // Lọc nhóm khác với groupName hiện tại
-        const filteredGroups = response.data.filter(group => group.groupName !== groupName)
-        setGroups(filteredGroups)
+        setGroups(response.data)
       })
       .catch(error => {
         console.error('Error fetching groups:', error)
+      })
+  }
+
+  const fetchServices = () => {
+    axios
+      .get('https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=dichvu')
+      .then(response => {
+        setServices(response.data)
+      })
+      .catch(error => {
+        console.error('Error fetching services:', error)
       })
   }
 
@@ -53,23 +79,16 @@ const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
   }
 
   const handleOk = () => {
-    if (selectedGroup) {
+    if (selectedGroup && selectedService) {
       const params = {
-        groupId: groupId,
-        toGroupId: selectedGroup.groupId // Giả sử ID của group là 'groupId'
+        serviceParkingId: selectedService.id || '',
+        sort: '',
+        status: activationStatus === 'Yes' ? 'YES' : 'NO'
       }
 
-      axios
-        .put('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/move', params)
-        .then(response => {
-          console.log('Group moved successfully:', response.data)
-          toast.success('Chuyển nhóm thành công')
-          onClose()
-          fetchGroupData() // Gọi lại fetch để cập nhật danh sách nhóm
-        })
-        .catch(error => {
-          console.error('Error moving group:', error)
-        })
+      fetchGroupData(params)
+      onClose()
+      toast.success('Lọc thành công')
     }
   }
 
@@ -86,27 +105,45 @@ const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
       <CustomCloseButton onClick={onClose}>
         <Icon icon='tabler:x' fontSize='1.25rem' />
       </CustomCloseButton>
-      <Button>Chuyển Phòng ban vào Phòng ban khác</Button>
+      <Button>Lọc loại thuê bao</Button>
       <DialogContent>
         <Grid container spacing={2} alignItems='center'>
-          <Grid item xs={3}>
-            <Typography>Từ:</Typography>
+          <Grid item xs={6}>
+            <FormControl fullWidth>
+              <InputLabel id='activation-status-label'>Trạng thái kích hoạt</InputLabel>
+              <Select
+                labelId='activation-status-label'
+                id='activation-status-select'
+                value={activationStatus}
+                onChange={event => setActivationStatus(event.target.value)}
+              >
+                <MenuItem value='Yes'>Đã kích hoạt</MenuItem>
+                <MenuItem value='No'>Chưa kích hoạt</MenuItem>
+              </Select>
+            </FormControl>
           </Grid>
-          <Grid item xs={9}>
-            <TextField value={groupName} disabled={true} fullWidth />
-          </Grid>
-          <Grid item xs={3}>
-            <Typography>Đến:</Typography>
-          </Grid>
-          <Grid item xs={9}>
+          <Grid item xs={6}>
             <Autocomplete
               value={selectedGroup}
               onChange={(event, newValue) => {
                 setSelectedGroup(newValue)
               }}
               options={groups}
-              getOptionLabel={option => option.groupName}
-              renderInput={params => <TextField {...params} label='Chọn Group' variant='outlined' fullWidth />}
+              getOptionLabel={option => option.name}
+              renderInput={params => <TextField {...params} label='Đơn vị đang sử dụng' variant='outlined' fullWidth />}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <Autocomplete
+              value={selectedService}
+              onChange={(event, newValue) => {
+                setSelectedService(newValue)
+              }}
+              options={services}
+              getOptionLabel={option => option.name}
+              renderInput={params => (
+                <TextField {...params} label='Dịch vụ đang sử dụng' variant='outlined' fullWidth />
+              )}
             />
           </Grid>
         </Grid>
@@ -115,11 +152,11 @@ const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
       <DialogActions>
         <Button onClick={handleCancel}>Cancel</Button>
         <Button variant='contained' onClick={handleOk}>
-          OK
+          Lọc
         </Button>
       </DialogActions>
     </Dialog>
   )
 }
 
-export default Edit
+export default Filter
