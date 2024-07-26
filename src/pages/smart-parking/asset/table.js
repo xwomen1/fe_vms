@@ -125,7 +125,7 @@ const UserList = ({ apiData }) => {
             keyword: value
           }
         }
-        const response = await axios.get('http://192.168.11.106:8089/smc/smart-parking/api/v0/asset/type/', config)
+        const response = await axios.get('https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/asset/', config)
 
         setAssetType(response.data.rows)
         setTotal(response.data.totalPage)
@@ -169,7 +169,7 @@ const UserList = ({ apiData }) => {
                           <IconButton
                             size='small'
                             component={Link}
-                            href={`/assetType/${assetType.id}`}
+                            href={`/asset/${asset.id}`}
                             sx={{ color: 'text.secondary' }}
                           >
                             <Icon icon='tabler:eye' />
