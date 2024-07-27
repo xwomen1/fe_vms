@@ -385,8 +385,13 @@ const navigation = () => {
         },
         {
           title: 'Bản đồ số',
-          icon: 'tabler:moneybag',
+          icon: 'tabler:map',
           path: '/pages/digital-map'
+        },
+        {
+          title: 'Quản lý danh sách đen',
+          icon: 'tabler:user-off',
+          path: '/pages/blacklist-management'
         }
       ]
     }
