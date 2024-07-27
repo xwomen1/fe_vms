@@ -242,44 +242,6 @@ const navigation = () => {
       ]
     },
 
-    // {
-    //   path: '/caller',
-    //   title: 'Thuê bao',
-    //   icon: 'tabler:phone'
-    // },
-    // {
-    //   path: '/cards',
-    //   title: 'Thẻ',
-    //   icon: 'tabler:cards'
-    // },
-    // {
-    //   path: '/vehicle',
-    //   title: 'Phương tiện',
-    //   icon: 'tabler:car'
-    // },
-    // {
-    //   path: '/service',
-    //   title: 'Dịch vụ',
-    //   icon: 'tabler:zoom-money'
-    // },
-    // {
-    //   path: '/parking',
-    //   title: 'Bãi đỗ xe',
-    //   icon: 'tabler:parking'
-    // },
-    // {
-    //   path: '/asset',
-    //   title: 'Tài sản',
-    //   icon: 'tabler:moneybag',
-    //   children: [
-    //     {
-    //       title: 'Loại tài sản',
-    //       path: '/assetType'
-    //     },
-    //     {
-    //       title: 'Tài sản',
-    //       path: '/asset'
-    //     }
     //   ]
     // },
     // {
@@ -393,6 +355,75 @@ const navigation = () => {
           icon: 'tabler:user-off',
           path: '/pages/blacklist-management'
         }
+      ]
+    },
+    {
+      path: '/',
+      title: 'Smart Parking',
+      icon: 'tabler:lock-access',
+      children: [
+        {
+          path: '/smart-parking/caller',
+          title: 'Thuê bao',
+          icon: 'tabler:phone'
+        },
+        {
+          path: '/smart-parking/cards',
+          title: 'Thẻ',
+          icon: 'tabler:cards'
+        },
+        {
+          path: '/smart-parking/vehicle',
+          title: 'Phương tiện',
+          icon: 'tabler:car'
+        },
+        {
+          path: '/smart-parking/vehicle-type',
+          title: 'Loại phương tiện',
+          icon: 'tabler:parking'
+        },
+        {
+          path: '/smart-parking/service',
+          title: 'Dịch vụ',
+          icon: 'tabler:zoom-money'
+        },
+        {
+          path: '/smart-parking/parking',
+          title: 'Bãi đỗ xe',
+          icon: 'tabler:parking'
+        },
+
+        {
+          path: '/smart-parking/asset',
+          title: 'Tài sản',
+          icon: 'tabler:moneybag',
+          children: [
+            {
+              title: 'Loại tài sản',
+              path: '/smart-parking/assetType'
+            },
+            {
+              title: 'Tài sản',
+              path: '/smart-parking/asset'
+            }
+          ]
+        }
+
+        // {
+        //   path: '/pages/access-rights/list',
+        //   title: 'Quyền truy cập',
+        //   icon: 'tabler:shield'
+        // },
+        // {
+        //   path: '/pages/access-rights/list',
+        //   title: 'Thống kê',
+        //   icon: 'tabler:statistics/time?tab=%2Fstatistics%2Ftime'
+        // },
+        // {
+        //   path: '/pages/access-rights/list',
+        //   title: 'Hẹn lịch',
+        //   icon: 'tabler:guest-registrations'
+        // }
       ]
     }
 

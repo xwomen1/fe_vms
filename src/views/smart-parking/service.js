@@ -1,13 +1,19 @@
-// src/views/apps/user/list/TableHeader.js
-import React from 'react'
+// ** MUI Imports
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import Icon from 'src/@core/components/icon'
+
+// ** Custom Component Import
 import CustomTextField from 'src/@core/components/mui/text-field'
+
+// ** Icon Imports
+import Icon from 'src/@core/components/icon'
 import { Grid } from '@mui/material'
 import Link from 'next/link'
 
-const TableHeader = ({ handleFilter, exportValue, importValue, toggle, value, onFilterClick }) => {
+const TableHeader = props => {
+  // ** Props
+  const { handleFilter, exportValue, importValue, toggle, value } = props
+
   return (
     <Box
       sx={{
@@ -33,35 +39,19 @@ const TableHeader = ({ handleFilter, exportValue, importValue, toggle, value, on
           placeholder='Search User'
           onChange={e => handleFilter(e.target.value)}
         />
-        <Button
-          style={{ backgroundColor: '#A9A9A9' }}
-          onClick={exportValue}
-          variant='contained'
-          sx={{ '& svg': { mr: 1 } }}
-        >
-          <Icon fontSize='1.125rem' icon='tabler:file-export' />
-        </Button>
+
         <hr />
-        <Button
-          style={{ backgroundColor: '#A9A9A9' }}
-          onClick={importValue}
-          variant='contained'
-          sx={{ '& svg': { mr: 1 } }}
-        >
-          <Icon fontSize='1.125rem' icon='tabler:file-upload' />
-        </Button>
-        <hr />
+
         <Button component={Link} href={`/apps/user/add`} variant='contained' sx={{ '& svg': { mr: 2 } }}>
           <Icon fontSize='1.125rem' icon='tabler:plus' />
-          Thêm mới
         </Button>
         <Button
+          style={{ backgroundColor: '#A9A9A9', marginLeft: '16px' }} // Thêm khoảng cách giữa các nút
+          onClick={toggle}
           variant='contained'
-          onClick={onFilterClick} // Gọi hàm lọc từ UserList
-          sx={{ '& svg': { mr: 1 }, backgroundColor: '#A9A9A9' }}
+          sx={{ '& svg': { mr: 1 } }}
         >
           <Icon fontSize='1.125rem' icon='tabler:filter' />
-          Lọc
         </Button>
       </Box>
     </Box>
