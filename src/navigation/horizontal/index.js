@@ -344,6 +344,16 @@ const navigation = () => {
           title: 'Quy định về lương',
           icon: 'tabler:moneybag',
           path: '/salaryRule'
+        },
+        {
+          title: 'Bản đồ số',
+          icon: 'tabler:map',
+          path: '/pages/digital-map'
+        },
+        {
+          title: 'Quản lý danh sách đen',
+          icon: 'tabler:user-off',
+          path: '/pages/blacklist-management'
         }
       ]
     },
