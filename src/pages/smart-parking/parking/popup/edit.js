@@ -29,27 +29,73 @@ const CustomCloseButton = styled(IconButton)(({ theme }) => ({
 }))
 
 const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
-  const [assetType, setAssetType] = useState([])
+  const [assetType, setAssetType] = useState({})
   const [name, setName] = useState(null)
   const [code, setCode] = useState(null)
   const [detail, setDetail] = useState(null)
+  const [groups, setGroups] = useState([])
+  const [selectedGroup, setSelectedGroup] = useState(null)
+  const [donvi, setDonVi] = useState([])
+  const [selectDonvi, setSelectDonvi] = useState(null)
+  const [isDataLoaded, setIsDataLoaded] = useState(false)
 
   useEffect(() => {
-    fetchAssetType()
-  }, [assetId])
+    fetchGroups()
+    fetchUnit()
+  }, [])
 
-  const fetchAssetType = () => {
+  const fetchGroups = () => {
     axios
-      .get(`https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/asset/type/find/${assetId}`)
+      .get('https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=phankhu')
       .then(response => {
-        // Lọc nhóm khác với groupName hiện tại
-        setAssetType(response.data)
-        setName(response.data.name)
-        setCode(response.data.code)
-        setDetail(response.data.detail)
+        setGroups(response.data)
       })
       .catch(error => {
         console.error('Error fetching groups:', error)
+      })
+  }
+
+  const fetchUnit = () => {
+    axios
+      .get('https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=dv')
+      .then(response => {
+        setDonVi(response.data)
+      })
+      .catch(error => {
+        console.error('Error fetching units:', error)
+      })
+  }
+
+  useEffect(() => {
+    if (assetId) {
+      fetchAssetType()
+    }
+  }, [assetId])
+
+  useEffect(() => {
+    if (groups.length > 0 && donvi.length > 0 && assetType.name) {
+      const foundGroup = groups.find(group => group.name === assetType.nameSubdivision)
+      const foundUnit = donvi.find(unit => unit.name === assetType.nameManagementUnit)
+
+      setSelectedGroup(foundGroup || null)
+      setSelectDonvi(foundUnit || null)
+
+      setIsDataLoaded(true)
+    }
+  }, [groups, donvi, assetType])
+
+  const fetchAssetType = () => {
+    axios
+      .get(`https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/parking/find/${assetId}`)
+      .then(response => {
+        const data = response.data
+        setAssetType(data)
+        setName(data.name)
+        setCode(data.codeParking)
+        setDetail(data.detail)
+      })
+      .catch(error => {
+        console.error('Error fetching asset type:', error)
       })
   }
 
@@ -72,23 +118,21 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
   const handleOk = () => {
     const params = {
       detail: detail,
-      name: name
+      name: name,
+      managementUnitId: selectDonvi?.id,
+      subdivisionId: selectedGroup?.id
     }
 
     axios
-      .put(
-        `https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/asset/type/${assetId}
-`,
-        params
-      )
+      .put(`https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/parking/${assetId}`, params)
       .then(response => {
-        console.log(' successfully:', response.data)
-        toast.success('Chuyển nhóm thành công')
+        console.log('Successfully updated:', response.data)
+        toast.success('Cập nhật thành công')
         onClose()
-        fetchGroupData() // Gọi lại fetch để cập nhật danh sách nhóm
+        fetchGroupData()
       })
       .catch(error => {
-        console.error('Error moving group:', error)
+        console.error('Error updating group:', error)
       })
   }
 
@@ -108,11 +152,39 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
       <DialogContent>
         <Grid container spacing={2}>
           <Grid item xs={6}>
-            <CustomTextField label='Tên' value={name} onChange={handleFullNameChange} fullWidth />
+            <CustomTextField label='Tên bãi đỗ xe' value={name} onChange={handleFullNameChange} fullWidth />
           </Grid>
           <Grid item xs={6}>
-            <CustomTextField label='Mã loại tài sản' value={code} onChange={handleCodeChange} fullWidth disabled />
+            <CustomTextField label='Mã bãi đỗ xe' value={code} onChange={handleCodeChange} fullWidth />
           </Grid>
+          {isDataLoaded && (
+            <>
+              <Grid item xs={6}>
+                <Autocomplete
+                  value={selectedGroup}
+                  onChange={(event, newValue) => {
+                    setSelectedGroup(newValue)
+                  }}
+                  options={groups}
+                  getOptionLabel={option => option.name}
+                  renderInput={params => <CustomTextField {...params} label='Phân khu' variant='outlined' fullWidth />}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <Autocomplete
+                  value={selectDonvi}
+                  onChange={(event, newValue) => {
+                    setSelectDonvi(newValue)
+                  }}
+                  options={donvi}
+                  getOptionLabel={option => option.name}
+                  renderInput={params => (
+                    <CustomTextField {...params} label='Đơn vị quản lý' variant='outlined' fullWidth />
+                  )}
+                />
+              </Grid>
+            </>
+          )}
           <Grid item xs={12}>
             <CustomTextField
               rows={4}

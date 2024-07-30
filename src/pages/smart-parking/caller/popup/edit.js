@@ -40,7 +40,7 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
 
   const fetchAssetType = () => {
     axios
-      .get(`https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/asset/type/find/${assetId}`)
+      .get(`https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/sub/type/find/${assetId}`)
       .then(response => {
         // Lọc nhóm khác với groupName hiện tại
         setAssetType(response.data)
@@ -77,7 +77,7 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
 
     axios
       .put(
-        `https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/asset/type/${assetId}
+        `https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/sub/type/${assetId}
 `,
         params
       )
@@ -91,6 +91,8 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
         console.error('Error moving group:', error)
       })
   }
+
+  //todoHue:30/7/2024: api edit error
 
   return (
     <Dialog
@@ -108,16 +110,16 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
       <DialogContent>
         <Grid container spacing={2}>
           <Grid item xs={6}>
-            <CustomTextField label='Tên' value={name} onChange={handleFullNameChange} fullWidth />
+            <CustomTextField label='Mã Loại thuê bao' value={name} onChange={handleFullNameChange} fullWidth />
           </Grid>
           <Grid item xs={6}>
-            <CustomTextField label='Mã loại tài sản' value={code} onChange={handleCodeChange} fullWidth disabled />
+            <CustomTextField label='Tên loại thuê bao' value={code} onChange={handleCodeChange} fullWidth />
           </Grid>
           <Grid item xs={12}>
             <CustomTextField
               rows={4}
               multiline
-              label='Ghi chú'
+              label='Mô tả'
               value={detail}
               onChange={handleDetailChange}
               id='textarea-outlined-static'

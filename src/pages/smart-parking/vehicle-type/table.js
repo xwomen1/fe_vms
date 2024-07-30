@@ -240,7 +240,10 @@ const UserList = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{assetType.code}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.name}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.detail}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.status}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>
+                        {' '}
+                        {assetType.status === 'ACTIVE' ? 'Đã kích hoạt' : 'Chưa kích hoạt'}
+                      </TableCell>
 
                       <TableCell sx={{ padding: '16px' }}>
                         <Grid container spacing={2}>

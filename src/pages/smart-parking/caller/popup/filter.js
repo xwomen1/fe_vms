@@ -79,17 +79,15 @@ const Filter = ({ open, onClose, fetchGroupData }) => {
   }
 
   const handleOk = () => {
-    if (selectedGroup && selectedService) {
-      const params = {
-        serviceParkingId: selectedService.id || '',
-        sort: '',
-        status: activationStatus === 'Yes' ? 'YES' : 'NO'
-      }
-
-      fetchGroupData(params)
-      onClose()
-      toast.success('Lọc thành công')
+    const params = {
+      serviceParkingId: selectedService?.id || '',
+      sort: '',
+      status: activationStatus === 'Yes' ? 'YES' : 'NO'
     }
+
+    fetchGroupData(params)
+    onClose()
+    toast.success('Lọc thành công')
   }
 
   return (

@@ -1,13 +1,32 @@
 import { forwardRef, useState, useEffect } from 'react'
-import { Autocomplete, Button, DialogActions, Fade, Grid, IconButton, TextField, Typography } from '@mui/material'
+import {
+  Autocomplete,
+  Button,
+  DialogActions,
+  Fade,
+  FormControl,
+  Grid,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Typography
+} from '@mui/material'
 import { styled } from '@mui/material/styles'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 
 import Icon from 'src/@core/components/icon'
-
+import TableContainer from '@mui/material/TableContainer'
+import Table from '@mui/material/Table'
+import TableRow from '@mui/material/TableRow'
+import TableHead from '@mui/material/TableHead'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
 import { Dialog, DialogTitle, DialogContent } from '@mui/material'
 import CustomTextField from 'src/@core/components/mui/text-field'
+import authConfig from 'src/configs/auth'
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Fade ref={ref} {...props} />
@@ -33,8 +52,89 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
   const [name, setName] = useState(null)
   const [code, setCode] = useState(null)
   const [detail, setDetail] = useState(null)
-  const [status, setStatus] = useState(null)
+  const [parkingId, setParkingId] = useState(null)
+  const [activationStatus, setActivationStatus] = useState('')
+  const [policies, setPolicies] = useState([])
+  const [policyOption, setPolicyOption] = useState([])
+  const [serviceParkingId, setServiceParkingId] = useState([])
+  const [serviceParkingIdOption, setServiceParkingIdOption] = useState([])
 
+  const handleAddRow1 = () => {
+    const newRow = { name: '', startDate: '', id: '', code: '' } // Thêm groupId vào đây
+    setPolicies([...policies, newRow])
+  }
+
+  const handleDeleteRow1 = index => {
+    const updatedRows = [...policies]
+    updatedRows.splice(index, 1)
+    setPolicies(updatedRows)
+  }
+
+  const handleAddRow2 = () => {
+    const newRow = { name: '', startDate: '', id: '', startDate: '', endDate: '' } // Thêm groupId vào đây
+    setServiceParkingId([...serviceParkingId, newRow])
+  }
+
+  const handleDeleteRow2 = index => {
+    const updatedRows = [...serviceParkingId]
+    updatedRows.splice(index, 1)
+    setServiceParkingId(updatedRows)
+  }
+  useEffect(() => {
+    const fetchGroupData = async () => {
+      try {
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+        console.log('token', token)
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+
+        const response = await axios.get('https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/parking/', config)
+
+        setPolicyOption(response.data.rows)
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+
+    fetchGroupData()
+  }, [])
+
+  const filteredPolicyOptions = policyOption.filter(
+    option => !policies || !policies.some(policies => policies.name === option.name)
+  )
+  useEffect(() => {
+    const fetchGroupData = async () => {
+      try {
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+        console.log('token', token)
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+
+        const response = await axios.get(
+          'https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/service/parking/',
+          config
+        )
+
+        setServiceParkingIdOption(response.data.rows)
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+
+    fetchGroupData()
+  }, [])
+
+  const filteredServiceOptions = serviceParkingIdOption.filter(
+    option => !serviceParkingId || !serviceParkingId.some(serviceParkingId => serviceParkingId.name === option.name)
+  )
   useEffect(() => {
     fetchAssetType()
   }, [assetId])
@@ -48,7 +148,7 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
         setName(response.data.vehicleName)
         setCode(response.data.vehicleCode)
         setDetail(response.data.vehicleDetail)
-        setStatus(response.data.vehicleStatus)
+        setActivationStatus(response.data.vehicleStatus)
       })
       .catch(error => {
         console.error('Error fetching groups:', error)
@@ -74,12 +174,17 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
   const handleOk = () => {
     const params = {
       detail: detail,
-      name: name
+      name: name,
+      status: activationStatus === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE',
+      parkingId: policyOption.map(policy => policy.id),
+      serviceParkingId: serviceParkingIdOption.map(policy => policy.id)
     }
+
+    //TodoHue: 31/7/2024: BE thieu them id bai do
 
     axios
       .put(
-        `https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/asset/type/${assetId}
+        `https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/vehicle/type/${assetId}
 `,
         params
       )
@@ -109,11 +214,28 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
       </CustomCloseButton>
       <DialogContent>
         <Grid container spacing={2}>
-          <Grid item xs={6}>
+          <Grid item xs={4}>
             <CustomTextField label='Tên loại phương tiện' value={name} onChange={handleFullNameChange} fullWidth />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={4}>
             <CustomTextField label='Mã loại phương tiện' value={code} onChange={handleCodeChange} fullWidth />
+          </Grid>
+          <Grid item xs={4}>
+            <FormControl fullWidth>
+              <FormControl fullWidth>
+                <CustomTextField
+                  select
+                  labelId='activation-status-label'
+                  id='activation-status-select'
+                  value={activationStatus}
+                  onChange={event => setActivationStatus(event.target.value)}
+                  label='Trạng thái kích hoạt'
+                >
+                  <MenuItem value='ACTIVE'>Đã kích hoạt</MenuItem>
+                  <MenuItem value='INACTIVE'>Chưa kích hoạt</MenuItem>
+                </CustomTextField>
+              </FormControl>
+            </FormControl>
           </Grid>
           <Grid item xs={12}>
             <CustomTextField
@@ -125,6 +247,119 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
               id='textarea-outlined-static'
               fullWidth
             />
+          </Grid>
+          <Grid>Danh sách bãi đỗ xe áp dụng loại phương tiện này</Grid>
+
+          <Grid item xs={11.8}>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Tên bãi đỗ</TableCell>
+                    <TableCell>Mã bãi đỗ</TableCell>
+                    <TableCell>Phân Khu</TableCell>
+                    {/* {showPlusColumn && ( */}
+                    <TableCell align='center'>
+                      <IconButton onClick={handleAddRow1} size='small' sx={{ marginLeft: '10px' }}>
+                        <Icon icon='bi:plus' />
+                      </IconButton>
+                    </TableCell>
+                    {/* )} */}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {policies.map((policy, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        {' '}
+                        <Autocomplete
+                          options={filteredPolicyOptions}
+                          getOptionLabel={option => option.name}
+                          value={policyOption.find(option => option.name === policy.name) || null}
+                          onChange={(event, newValue) => {
+                            const updatedRows = [...policies]
+                            updatedRows[index].name = newValue.name
+                            updatedRows[index].code = newValue.code
+                            updatedRows[index].startDate = newValue.startDate
+                            updatedRows[index].id = newValue.id
+
+                            setPolicies(updatedRows)
+                          }}
+                          renderInput={params => <TextField {...params} label='Vai trò' />}
+                        />
+                      </TableCell>
+                      <TableCell>{policy.code}</TableCell>
+
+                      <TableCell>{policy.startDate}</TableCell>
+
+                      <TableCell align='center'>
+                        <IconButton onClick={() => handleDeleteRow1(index)}>
+                          <Icon icon='bi:trash' />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid>
+          <Grid>Danh sách dịch vụ áp dụng loại phương tiện này</Grid>
+          <Grid item xs={11.8}>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Tên phương tiện</TableCell>
+                    <TableCell>Mã phương tiện</TableCell>
+                    <TableCell>Ngày áp dụng</TableCell>
+                    {/* {showPlusColumn && ( */}
+                    <TableCell align='center'>
+                      <IconButton onClick={handleAddRow1} size='small' sx={{ marginLeft: '10px' }}>
+                        <Icon icon='bi:plus' />
+                      </IconButton>
+                    </TableCell>
+                    {/* )} */}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {policies.map((policy, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        {' '}
+                        <Autocomplete
+                          options={filteredServiceOptions}
+                          getOptionLabel={option => option.name}
+                          value={serviceParkingIdOption.find(option => option.name === policy.name) || null}
+                          onChange={(event, newValue) => {
+                            const updatedRows = [...serviceParkingId]
+                            updatedRows[index].name = newValue.name
+                            updatedRows[index].code = newValue.code
+                            updatedRows[index].startDate = newValue.startDate
+                            updatedRows[index].endDate = newValue.endDate
+
+                            updatedRows[index].id = newValue.id
+
+                            setPolicies(updatedRows)
+                          }}
+                          renderInput={params => <TextField {...params} label='Vai trò' />}
+                        />
+                      </TableCell>
+                      <TableCell>{policy.code}</TableCell>
+
+                      <TableCell>
+                        {policy.startDate} - {policy.endDate}
+                      </TableCell>
+
+                      <TableCell align='center'>
+                        <IconButton onClick={() => handleDeleteRow1(index)}>
+                          <Icon icon='bi:trash' />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Grid>
         </Grid>
       </DialogContent>
