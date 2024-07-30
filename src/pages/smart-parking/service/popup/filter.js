@@ -21,6 +21,8 @@ import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import { Box } from '@mui/system'
 import DatePicker from 'react-datepicker'
 import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
+import { getApi } from 'src/@core/utils/requestUltils'
+// import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Fade ref={ref} {...props} />
@@ -41,7 +43,44 @@ const CustomCloseButton = styled(IconButton)(({ theme }) => ({
   }
 }))
 
-const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
+const statusGroup = [
+  {
+    id: '1',
+    label: 'Tất cả',
+    name: ''
+  },
+  {
+    id: '2',
+    label: 'YES',
+    name: 'YES'
+  },
+  {
+    id: '3',
+    label: 'NO',
+    name: 'NO'
+  }
+]
+
+const eServiceParking = [
+  {
+    id: '1',
+    label: 'Tất cả',
+    name: ''
+  },
+  {
+    id: '2',
+    label: 'OTO',
+    name: 'OTO'
+  },
+  {
+    id: '3',
+    label: 'MOTORBIKE',
+    name: 'MOTORBIKE'
+  }
+]
+
+const Filter = ({ open, onClose, groupName, fetchGroupData }) => {
+  const [loading, setLoading] = useState(false)
   const [groups, setGroups] = useState([])
   const [selectedGroup, setSelectedGroup] = useState(null)
   const [availableAt, setAvailableAt] = useState('')
@@ -50,9 +89,24 @@ const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
   const [price2, setPrice2] = useState('')
   const [price3, setPrice3] = useState('')
 
+  const [parkingList, setParkingList] = useState([])
+  const [vehicleTypes, setVehicleTypes] = useState([])
+  const [parking, setParking] = useState(null)
+  const [vehicleType, setVehicleType] = useState(null)
+  const [status, setStatus] = useState(null)
+  const [serviceParking, setServiceParking] = useState(null)
+
+  const [startTime, setStartTime] = useState(null)
+  const [endTime, setEndTime] = useState(null)
+  const [startDate, setStartDate] = useState(null)
+  const [endDate, setEndDate] = useState(null)
+
+
   useEffect(() => {
     fetchGroups()
-  }, [groupName])
+    fetchParkings()
+    fetchVehicleType()
+  }, [])
 
   const fetchGroups = () => {
     axios
@@ -67,6 +121,51 @@ const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
       })
   }
 
+  const fetchParkings = async () => {
+    setLoading(true)
+
+    try {
+      const res = await getApi(`https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/parking/`)
+      setParkingList(res.data?.rows)
+    } catch (error) {
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchVehicleType = async () => {
+    setLoading(true)
+
+    try {
+      const res = await getApi(`https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/vehicle/type/`)
+      setVehicleTypes(res.data?.rows)
+    } catch (error) {
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleOnChange = dates => {
+    const [start, end] = dates
+
+    setStartDate(start)
+    setEndDate(end)
+  }
+
   const handleCancel = () => {
     onClose()
   }
@@ -76,24 +175,20 @@ const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
   }
 
   const handleOk = () => {
-    if (selectedGroup) {
-      const params = {
-        groupId: groupId,
-        toGroupId: selectedGroup.groupId // Giả sử ID của group là 'groupId'
-      }
+    const params = {
+      vehicleTypeId: vehicleType?.id,
+      parkingId: parking?.id,
+      status: status?.name,
+      startDate: startDate,
+      endDate: endDate,
+      eServiceParking: serviceParking?.name,
+      startTime: startTime,
+      endTime: endTime,
 
-      axios
-        .put('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/move', params)
-        .then(response => {
-          console.log('Group moved successfully:', response.data)
-          toast.success('Chuyển nhóm thành công')
-          onClose()
-          fetchGroupData() // Gọi lại fetch để cập nhật danh sách nhóm
-        })
-        .catch(error => {
-          console.error('Error moving group:', error)
-        })
+      // toGroupId: selectedGroup.groupId // Giả sử ID của group là 'groupId'
     }
+
+    console.log('params', params);
   }
 
   return (
@@ -115,20 +210,18 @@ const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
           <Grid container spacing={2} alignItems='center'>
             <Grid item xs={12}>
               {' '}
-              Thông tin dịch vụ
+              <Typography variant='h6'>Thông tin dịch vụ</Typography>
             </Grid>
 
             <Grid item xs={4}>
               <Autocomplete
-                value={selectedGroup}
+                value={vehicleType}
                 onChange={(event, newValue) => {
-                  setSelectedGroup(newValue)
+                  setVehicleType(newValue)
                 }}
-                options={groups}
-                getOptionLabel={option => option.groupName}
-                renderInput={params => (
-                  <CustomInput {...params} label='Loại phương tiện' variant='outlined' fullWidth />
-                )}
+                options={vehicleTypes}
+                getOptionLabel={option => option.name}
+                renderInput={params => <CustomInput {...params} label='Loại phương tiện' variant='outlined' fullWidth />}
               />
             </Grid>
             <Grid item xs={4}>
@@ -142,29 +235,19 @@ const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
                 renderInput={params => <CustomInput {...params} label='Loại thuê bao' variant='outlined' fullWidth />}
               />
             </Grid>
-
-            <Grid item xs={4}>
-              <Autocomplete
-                value={selectedGroup}
-                onChange={(event, newValue) => {
-                  setSelectedGroup(newValue)
-                }}
-                options={groups}
-                getOptionLabel={option => option.groupName}
-                renderInput={params => (
-                  <CustomInput {...params} label='Trạng thái kích hoạt' variant='outlined' fullWidth />
-                )}
-              />
-            </Grid>
             <Grid item xs={4}>
               <DatePickerWrapper>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
                   <div>
                     <DatePicker
-                      selected={availableAt}
-                      onChange={handleStartDateChange}
-                      dateFormat='MM/dd/yyyy'
-                      customInput={<CustomInput label='Ngày bắt đầu' />}
+                      selectsRange
+                      endDate={endDate}
+                      selected={startDate}
+                      startDate={startDate}
+                      id='date-range-picker'
+                      onChange={handleOnChange}
+                      shouldCloseOnSelect={false}
+                      customInput={<CustomInput label='Date Range' start={startDate} end={endDate} />}
                     />
                   </div>
                 </Box>
@@ -172,23 +255,36 @@ const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
             </Grid>
             <Grid item xs={4}>
               <Autocomplete
-                value={selectedGroup}
+                value={status}
                 onChange={(event, newValue) => {
-                  setSelectedGroup(newValue)
+                  setStatus(newValue)
                 }}
-                options={groups}
-                getOptionLabel={option => option.groupName}
+                options={statusGroup}
+                getOptionLabel={option => option.label}
+                renderInput={params => (
+                  <CustomInput {...params} label='Trạng thái kích hoạt' variant='outlined' fullWidth />
+                )}
+              />
+            </Grid>
+            <Grid item xs={4}>
+              <Autocomplete
+                value={serviceParking}
+                onChange={(event, newValue) => {
+                  setServiceParking(newValue)
+                }}
+                options={eServiceParking}
+                getOptionLabel={option => option.label}
                 renderInput={params => <CustomInput {...params} label='Nhóm dịch vụ' variant='outlined' fullWidth />}
               />
             </Grid>
             <Grid item xs={4}>
               <Autocomplete
-                value={selectedGroup}
+                value={parking}
                 onChange={(event, newValue) => {
-                  setSelectedGroup(newValue)
+                  setParking(newValue)
                 }}
-                options={groups}
-                getOptionLabel={option => option.groupName}
+                options={parkingList}
+                getOptionLabel={option => option.name}
                 renderInput={params => <CustomInput {...params} label='Bãi đỗ xe' variant='outlined' fullWidth />}
               />
             </Grid>
@@ -204,10 +300,14 @@ const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
                 <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
                   <div>
                     <DatePicker
-                      selected={availableAt}
-                      onChange={handleStartDateChange}
-                      dateFormat='MM/dd/yyyy'
-                      customInput={<CustomInput label='Ngày bắt đầu' />}
+                      showTimeSelect
+                      selected={startTime}
+                      timeIntervals={15}
+                      showTimeSelectOnly
+                      dateFormat='h:mm aa'
+                      id='time-only-picker'
+                      onChange={date => setStartTime(date)}
+                      customInput={<CustomInput label='Time Only' />}
                     />
                   </div>
                 </Box>
@@ -218,10 +318,14 @@ const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
                 <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
                   <div>
                     <DatePicker
-                      selected={availableAt}
-                      onChange={handleStartDateChange}
-                      dateFormat='MM/dd/yyyy'
-                      customInput={<CustomInput label='Ngày kết thúc' />}
+                      showTimeSelect
+                      selected={endTime}
+                      timeIntervals={15}
+                      showTimeSelectOnly
+                      dateFormat='h:mm aa'
+                      id='time-only-picker'
+                      onChange={date => setEndTime(date)}
+                      customInput={<CustomInput label='Time Only' />}
                     />
                   </div>
                 </Box>
@@ -238,6 +342,7 @@ const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
                 onChange={e => setDailyPrice(e.target.value)}
               >
                 <MenuItem value='Tăng'>Lớn hơn </MenuItem>
+                <MenuItem value='Bằng'>Bằng</MenuItem>
                 <MenuItem value='Giảm'>Nhỏ hơn</MenuItem>
               </CustomInput>
             </Grid>
@@ -251,6 +356,7 @@ const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
                 onChange={e => setDailyPrice(e.target.value)}
               >
                 <MenuItem value='Tăng'>Lớn hơn </MenuItem>
+                <MenuItem value='Bằng'>Bằng</MenuItem>
                 <MenuItem value='Giảm'>Nhỏ hơn</MenuItem>
               </CustomInput>
             </Grid>
@@ -264,6 +370,7 @@ const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
                 onChange={e => setDailyPrice(e.target.value)}
               >
                 <MenuItem value='Tăng'>Lớn hơn </MenuItem>
+                <MenuItem value='Bằng'>Bằng</MenuItem>
                 <MenuItem value='Giảm'>Nhỏ hơn</MenuItem>
               </CustomInput>
             </Grid>
@@ -307,4 +414,4 @@ const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
   )
 }
 
-export default Edit
+export default Filter

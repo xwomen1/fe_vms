@@ -246,7 +246,7 @@ const UserList = ({ apiData }) => {
                     <TableCell sx={{ padding: '16px' }}>Loại phương tiện</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Loại thuê bao</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Ngày áp dụng</TableCell>
-
+                    <TableCell sx={{ padding: '16px' }}>Trạng thái kích hoạt</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
                   </TableRow>
                 </TableHead>
@@ -261,7 +261,7 @@ const UserList = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>
                         {service.startDate} - {service.endDate}
                       </TableCell>
-
+                      <TableCell sx={{ padding: '16px' }}>{service.status}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>
                         <Grid container spacing={2}>
                           <IconButton
@@ -278,31 +278,6 @@ const UserList = ({ apiData }) => {
                       </TableCell>
                     </TableRow>
                   ))}
-                </TableBody>
-                <TableBody>
-                  <TableRow>
-                    <TableCell sx={{ padding: '16px' }}>1</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>1</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>1</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>1</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>1</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>1</TableCell>
-
-                    <TableCell sx={{ padding: '16px' }}>
-                      <Grid container spacing={2}>
-                        <IconButton
-                          size='small'
-                          sx={{ color: 'text.secondary' }}
-                          onClick={() => handleEditClick(service.id)}
-                        >
-                          <Icon icon='tabler:edit' />
-                        </IconButton>
-                        <IconButton onClick={() => handleDelete(service.id)}>
-                          <Icon icon='tabler:trash' />
-                        </IconButton>
-                      </Grid>
-                    </TableCell>
-                  </TableRow>
                 </TableBody>
               </Table>
               <br />
