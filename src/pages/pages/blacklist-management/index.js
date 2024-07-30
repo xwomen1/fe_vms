@@ -1,8 +1,23 @@
-import { Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Menu, MenuItem, Pagination, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material"
-import { useState } from "react"
+import { Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Input, Menu, MenuItem, Pagination, Paper, styled, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material"
+import { useEffect, useState } from "react"
 import { useDropzone } from "react-dropzone"
+import { Controller, useForm } from "react-hook-form"
+import toast from "react-hot-toast"
 import Icon from 'src/@core/components/icon'
 import CustomTextField from "src/@core/components/mui/text-field"
+import { postApi } from "src/@core/utils/requestUltils"
+
+const VisuallyHiddenInput = styled('input')({
+    clip: 'rect(0 0 0 0)',
+    clipPath: 'inset(50%)',
+    height: 1,
+    overflow: 'hidden',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    whiteSpace: 'nowrap',
+    width: 1,
+});
 
 const columns = [
     {
@@ -23,29 +38,48 @@ const columns = [
         flex: 0.15,
         maxWidth: 150,
         align: 'center',
-        field: 'quality',
-        label: 'Chất lượng',
+        field: 'member_id',
+        label: 'ID',
     },
     {
         id: 3,
         flex: 0.15,
         maxWidth: 150,
         align: 'center',
-        field: 'threshold',
-        label: 'Ngưỡng'
+        field: 'quality',
+        label: 'Chất lượng',
     },
     {
         id: 4,
         flex: 0.15,
         maxWidth: 150,
         align: 'center',
-        field: 'similarity_level',
+        field: 'distance',
         label: 'Mức độ giống'
     }
 ]
 
+const form_filter = [
+    {
+        name: 'threshold',
+        label: 'Ngưỡng',
+        placeholder: '0.1',
+        type: 'TextField',
+        require: true,
+        width: 6,
+    },
+    {
+        name: 'topk',
+        label: 'Độ giống',
+        placeholder: '5',
+        type: 'TextField',
+        require: true,
+        width: 6,
+    }
+]
+
 const Blacklist = () => {
-    const [keyword, setKeyword] = useState('')
+    const [loading, setLoading] = useState(false)
 
     const [total, setTotalPage] = useState(0)
     const [page, setPage] = useState(1)
@@ -53,21 +87,78 @@ const Blacklist = () => {
     const pageSizeOptions = [25, 50, 100]
     const [anchorEl, setAnchorEl] = useState(null)
 
-    const [dataList, setDataList] = useState([])
-    const [files, setFiles] = useState([])
+    const [blacklist, setBlacklist] = useState([])
+    const [memberList, setMemberList] = useState([])
 
-    const { getRootProps, getInputProps } = useDropzone({
-        multiple: false,
-        accept: {
-            'image/*': ['.png', '.jpg', '.jpeg', '.gif']
-        },
-        onDrop: acceptedFiles => {
-            setFiles(acceptedFiles.map(file => Object.assign(file)))
+
+    const [base64, setBase64] = useState('');
+    const [image, setImage] = useState(null);
+
+    const [keyword, setKeyword] = useState('')
+
+    const [form, setForm] = useState(form_filter)
+
+    const initValueFilter = {
+        threshold: null,
+        topk: null
+    }
+
+    const {
+        control,
+        handleSubmit,
+        formState: { errors }
+    } = useForm({ defaultValues: initValueFilter })
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        setImage(file);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const base64String = reader.result
+            const base64WithoutPrefix = base64String.replace(/^data:image\/[a-z]+;base64,/, '')
+            setBase64(base64WithoutPrefix);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const fetchData = async (values) => {
+        setLoading(false)
+
+        const params = {
+            ...values
         }
-    })
+
+        try {
+            const res = await postApi(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/search`, params)
+            const topBlacklist = res.data?.topk_blacklists
+            const topMember = res.data?.topk_members
+            setBlacklist(topBlacklist)
+            setMemberList(topMember)
+        } catch (error) {
+            if (error && error?.response?.data) {
+                console.error('error', error)
+                toast.error(error?.response?.data?.message)
+            } else {
+                console.error('Error fetching data:', error)
+                toast.error(error)
+            }
+        } finally {
+            setLoading(true)
+        }
+    }
 
     const handleSearch = e => {
         setKeyword(e.target.value)
+    }
+
+    const onSubmit = (values) => {
+        var detail = {
+            image: base64,
+            threshold: parseFloat(values?.threshold),
+            topk: parseInt(values?.topk),
+        }
+
+        fetchData(detail)
     }
 
     const handlePageChange = (event, newPage) => {
@@ -88,36 +179,49 @@ const Blacklist = () => {
         handleCloseMenu()
     }
 
-    const img = files.map(file => (
-        <Button key={file.name} variant="outlined" startIcon={<Icon icon='tabler:file-import' />} >{file.name}</Button>
-    ))
-
     return (
         <div style={{ padding: '30px' }}>
             <Typography variant="h3" sx={{ marginBottom: '30px' }}>Quản lý danh sách đen</Typography>
+
             <Card>
-                <CardHeader
-                    title="Danh sách đen"
-                    action={
+                <CardContent>
+                    <form>
                         <Grid container spacing={5}>
-                            <Grid item container xs={12}>
-                                <Grid item xs={3} sx={{ display: 'flex', alignItems: 'flex-end' }}>
-                                    <Box {...getRootProps({ className: 'dropzone' })}>
-                                        <input {...getInputProps()} />
-                                        {files.length ? (
-                                            img
-                                        ) : (
-                                            <Button variant="outlined" startIcon={<Icon icon='tabler:file-import' />}>
-                                                Import file
-                                            </Button>
-                                        )}
-                                    </Box>
+                            <Grid item container xs={12} spacing={3}>
+                                <Grid item xs={4}>
+                                    <Button variant="outlined" color="secondary" component="label" sx={{ mt: 2 }}>
+                                        <Input
+                                            type="file"
+                                            hidden
+                                            onChange={handleImageChange}
+                                            inputProps={{ accept: 'image/*' }}
+                                        />
+                                    </Button>
                                 </Grid>
-                                <Grid item xs={3} style={{ display: 'flex', alignItems: 'center' }}>
-                                    <CustomTextField label={'Ngưỡng'} />
-                                </Grid>
-                                <Grid item xs={3} style={{ display: 'flex', alignItems: 'center' }}>
-                                    <CustomTextField label={'Độ giống'} />
+                                <Grid item container spacing={3} xs={5} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-evenly' }}>
+                                    {form.map((item, index) => {
+                                        return (
+                                            <Grid item xs={item.width} key={item.name}>
+                                                <Controller
+                                                    name={item.name}
+                                                    control={control}
+                                                    rules={{ required: true }}
+                                                    render={({ field: { value, onChange } }) => (
+                                                        <CustomTextField
+                                                            fullWidth
+                                                            value={value}
+                                                            label={item.label}
+                                                            onChange={onChange}
+                                                            placeholder={item.placeholder}
+                                                            error={Boolean(errors.firstName)}
+                                                            aria-describedby='validation-basic-first-name'
+                                                            {...(errors.firstName && { helperText: 'Trường này bắt buộc' })}
+                                                        />
+                                                    )}
+                                                />
+                                            </Grid>
+                                        )
+                                    })}
                                 </Grid>
                                 <Grid item xs={3}>
                                     <CustomTextField
@@ -150,11 +254,18 @@ const Blacklist = () => {
                                 </Grid>
                             </Grid>
                             <Grid item xs={12}>
-                                <Button variant="contained" sx={{ margin: 2, float: 'right' }}>Xóa toàn bộ</Button>
-                                <Button variant="contained" sx={{ margin: 2, float: 'right' }}>Tìm kiếm</Button>
+                                <Button variant="contained" color="secondary" sx={{ margin: 2, float: 'right' }}>Xóa toàn bộ</Button>
+                                <Button variant="contained" type="submit" sx={{ margin: 2, float: 'right' }} onClick={handleSubmit(onSubmit)}>Tìm kiếm</Button>
                             </Grid>
                         </Grid>
-                    }
+                    </form>
+                </CardContent>
+            </Card>
+
+            <br />
+            <Card>
+                <CardHeader
+                    title="Danh sách đen"
                 />
                 <CardContent>
                     <Grid container spacing={0}>
@@ -172,7 +283,7 @@ const Blacklist = () => {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {dataList?.slice(0, pageSize).map((row, index) => {
+                                    {blacklist?.slice(0, pageSize).map((row, index) => {
                                         return (
                                             <TableRow hover tabIndex={-1} key={index}>
                                                 <TableCell>{index + 1}</TableCell>
@@ -206,29 +317,62 @@ const Blacklist = () => {
                             </Table>
                         </TableContainer>
                     </Grid>
-                    <br />
-                    <Grid container spacing={2} style={{ padding: 10 }}>
-                        <Grid item xs={3}></Grid>
-                        <Grid item xs={1}>
-                            <span style={{ fontSize: 15 }}> dòng/trang</span>
-                        </Grid>
-                        <Grid item xs={1} style={{ padding: 0 }}>
-                            <Box>
-                                <Button onClick={handleOpenMenu} endIcon={<Icon icon='tabler:selector' />}>
-                                    {pageSize}
-                                </Button>
-                                <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
-                                    {pageSizeOptions.map(size => (
-                                        <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
-                                            {size}
-                                        </MenuItem>
-                                    ))}
-                                </Menu>
-                            </Box>
-                        </Grid>
-                        <Grid item xs={6}>
-                            <Pagination count={total} page={page} color='primary' onChange={handlePageChange} />
-                        </Grid>
+                </CardContent>
+            </Card>
+            <br />
+            <Card>
+                <CardHeader
+                    title="Danh sách member"
+                />
+                <CardContent>
+                    <Grid container spacing={0}>
+                        <TableContainer component={Paper} sx={{ maxHeight: 1000 }}>
+                            <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell style={{ width: '20px' }}>STT</TableCell>
+                                        {columns.map(column => (
+                                            <TableCell key={column.id} align={column.align} sx={{ maxWidth: column.maxWidth }}>
+                                                {column.label}
+                                            </TableCell>
+                                        ))}
+                                        <TableCell style={{ maxWidth: '50px' }}>Hành động</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {memberList?.slice(0, pageSize).map((row, index) => {
+                                        return (
+                                            <TableRow hover tabIndex={-1} key={index}>
+                                                <TableCell>{index + 1}</TableCell>
+                                                {columns.map(({ field, renderCell, align, maxWidth }) => {
+                                                    const value = row[field]
+
+                                                    return (
+                                                        <TableCell
+                                                            key={field}
+                                                            align={align}
+                                                            sx={{ maxWidth, wordBreak: 'break-word', flexWrap: 'wrap' }}
+                                                        >
+                                                            {renderCell ? renderCell(value) : value}
+                                                        </TableCell>
+                                                    )
+                                                })}
+                                                <TableCell>
+                                                    <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center' }}>
+                                                        <IconButton
+                                                            onClick={() => {
+                                                            }}
+                                                        >
+                                                            <Icon icon='tabler:trash' />
+                                                        </IconButton>
+                                                    </Grid>
+                                                </TableCell>
+                                            </TableRow>
+                                        )
+                                    })}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
                     </Grid>
                 </CardContent>
             </Card>
