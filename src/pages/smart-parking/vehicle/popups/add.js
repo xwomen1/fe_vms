@@ -51,6 +51,7 @@ const Add = ({ open, setReload, onClose }) => {
   const [formattedOptions, setFormattedOptions] = useState([])
   const [tableError, setTableError] = useState('')
   const [rows, setRows] = useState([])
+
   const statusOptions = [
     { label: 'ACTIVE', value: 'ACTIVE' },
     { label: 'INACTIVE', value: 'INACTIVE' }
@@ -91,9 +92,11 @@ const Add = ({ open, setReload, onClose }) => {
         `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`,
         config
       )
+
       return response.data
     } catch (error) {
       console.error('Error fetching children:', error)
+
       return []
     }
   }
@@ -101,9 +104,11 @@ const Add = ({ open, setReload, onClose }) => {
   const fetchParentData = async parentId => {
     try {
       const response = await axios.get(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${parentId}`, config)
+
       return response.data
     } catch (error) {
       console.error('Error fetching parent data:', error)
+
       return null
     }
   }
@@ -166,10 +171,12 @@ const Add = ({ open, setReload, onClose }) => {
       }
     ])
   }
+
   const handleRowChange = (index, key, value) => {
     setRows(prevRows => {
       const updatedRows = [...prevRows]
       updatedRows[index][key] = value
+
       return updatedRows
     })
   }
@@ -203,15 +210,18 @@ const Add = ({ open, setReload, onClose }) => {
   const handleAdd = async () => {
     if (!dataType.plateNumber || !dataType.brandId || !dataType.status || !dataType.vehicleType) {
       setTableError('Vui lòng điền đầy đủ thông tin ')
+
       return
     }
 
     for (const row of rows) {
       if (!row.id || !row.name || !row.codeParking || !row.subdivisionId || !row.nameSubdivision || !row.detail) {
         setTableError('Vui lòng điền đầy đủ thông tin ')
+
         return
       }
     }
+
     const params = {
       plateNumber: dataType.plateNumber || '',
       brandId: dataType.brandId || null,

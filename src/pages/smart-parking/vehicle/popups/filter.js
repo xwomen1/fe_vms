@@ -44,6 +44,7 @@ const Filter = ({ open, onClose, valueFilter, callback }) => {
   const [vehicleType, setVehicleType] = useState([])
   const [paking, setPaking] = useState([])
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
   const config = {
     headers: {
       Authorization: `Bearer ${token}`

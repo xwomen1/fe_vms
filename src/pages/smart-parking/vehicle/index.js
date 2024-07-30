@@ -44,6 +44,7 @@ const Vehicle = () => {
   const [isOpenAdd, setIsOpenAdd] = useState(false)
   const [assetId, setAssetId] = useState(null)
   const [searchKeyword, setSearchKeyword] = useState('')
+
   const initValueFilter = {
     event_name: searchKeyword,
     page: page,
@@ -132,9 +133,11 @@ const Vehicle = () => {
   const handleCloseEditPopup = () => {
     setIsOpenUpdate(false)
   }
+
   const handleCloseAddPopup = () => {
     setIsOpenAdd(false)
   }
+
   const handleCloseFilterPopup = () => {
     setIsOpenFilter(false)
   }
@@ -160,6 +163,7 @@ const Vehicle = () => {
     }).then(({ value }) => {
       if (value) {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
         const config = {
           headers: {
             Authorization: `Bearer ${token}`
@@ -298,6 +302,7 @@ const Vehicle = () => {
                         const value = column.field
                           .split('.')
                           .reduce((o, i) => (o && o[i] !== undefined ? o[i] : ''), row)
+
                         return (
                           <TableCell key={column.id} align={column.align}>
                             {value}

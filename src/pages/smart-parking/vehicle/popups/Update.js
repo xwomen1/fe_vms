@@ -49,6 +49,7 @@ const Edit = ({ open, onClose, id, setReload }) => {
   const [allOptions, setAllOptions] = useState([])
   const [formattedOptions, setFormattedOptions] = useState([])
   const [rows, setRows] = useState([])
+
   const statusOptions = [
     { label: 'ACTIVE', value: 'ACTIVE' },
     { label: 'INACTIVE', value: 'INACTIVE' }
@@ -74,6 +75,7 @@ const Edit = ({ open, onClose, id, setReload }) => {
       console.error('Error fetching vehicle data:', error)
     }
   }
+
   const fetchDataPaking = async () => {
     try {
       const response = await axios.get(`https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/parking/`, config)
@@ -102,9 +104,11 @@ const Edit = ({ open, onClose, id, setReload }) => {
         `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`,
         config
       )
+
       return response.data
     } catch (error) {
       console.error('Error fetching children:', error)
+
       return []
     }
   }
@@ -112,9 +116,11 @@ const Edit = ({ open, onClose, id, setReload }) => {
   const fetchParentData = async parentId => {
     try {
       const response = await axios.get(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${parentId}`, config)
+
       return response.data
     } catch (error) {
       console.error('Error fetching parent data:', error)
+
       return null
     }
   }
@@ -185,6 +191,7 @@ const Edit = ({ open, onClose, id, setReload }) => {
     setRows(prevRows => {
       const updatedRows = [...prevRows]
       updatedRows[index][key] = value
+
       return updatedRows
     })
   }
@@ -251,6 +258,7 @@ const Edit = ({ open, onClose, id, setReload }) => {
   const getAvailableOptions = selectedIds => {
     return paking.filter(option => !selectedIds.includes(option.id))
   }
+
   return (
     <Dialog
       open={open}
