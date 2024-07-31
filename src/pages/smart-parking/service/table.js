@@ -20,6 +20,12 @@ import Edit from './popup/edit'
 import toast from 'react-hot-toast'
 import Filters from './popup/filter'
 
+const initValueFilter = {
+  keyword: '',
+  limit: 25,
+  page: 1
+}
+
 const UserList = ({ apiData }) => {
   const [value, setValue] = useState('')
   const [service, setservice] = useState([])
@@ -32,6 +38,7 @@ const UserList = ({ apiData }) => {
   const [openPopupP, setOpenPopupP] = useState(false)
   const [openPopupEdit, setOpenPopupEdit] = useState(false)
   const [openPopupFilter, setOpenPopupFilter] = useState(false)
+  const [valueFilter, setValueFilter] = useState(initValueFilter)
 
   const handleAddPClick = (groupIds, groupName) => {
     setOpenPopupP(true)
@@ -52,10 +59,6 @@ const UserList = ({ apiData }) => {
   const handleFilterClick = (id, groupName) => {
     setOpenPopupFilter(true)
     setAssetId(id)
-  }
-
-  const handleCloseFilterPopup = () => {
-    setOpenPopupFilter(false)
   }
 
   const handlePageChange = (event, newPage) => {
@@ -143,6 +146,7 @@ const UserList = ({ apiData }) => {
           Authorization: `Bearer ${token}`
         },
         params: {
+          ...valueFilter,
           limit: pageSize,
           page: page,
           keyword: value
@@ -161,9 +165,17 @@ const UserList = ({ apiData }) => {
     }
   }
 
+  const handleSetFilter = data => {
+    setValueFilter(data)
+  }
+
   useEffect(() => {
     fetchDataAsset()
   }, [page, pageSize])
+
+  useEffect(() => {
+    fetchDataAsset()
+  }, [valueFilter])
 
   return (
     <Grid container spacing={6.5}>
@@ -318,9 +330,9 @@ const UserList = ({ apiData }) => {
         <>
           <Filters
             open={openPopupFilter}
-            onClose={handleCloseFilterPopup}
-            fetchGroupData={fetchDataAsset}
+            onClose={() => setOpenPopupFilter(false)}
             assetId={assetId}
+            callback={handleSetFilter}
           />
         </>
       )}
