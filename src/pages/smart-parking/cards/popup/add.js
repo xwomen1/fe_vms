@@ -34,25 +34,6 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
   const [code, setCode] = useState(null)
   const [detail, setDetail] = useState(null)
 
-  useEffect(() => {
-    fetchAssetType()
-  }, [assetId])
-
-  const fetchAssetType = () => {
-    axios
-      .get(`https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/sub/type/find/${assetId}`)
-      .then(response => {
-        // Lọc nhóm khác với groupName hiện tại
-        setAssetType(response.data)
-        setName(response.data.name)
-        setCode(response.data.code)
-        setDetail(response.data.detail)
-      })
-      .catch(error => {
-        console.error('Error fetching groups:', error)
-      })
-  }
-
   const handleCancel = () => {
     onClose()
   }
@@ -76,23 +57,22 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
     }
 
     axios
-      .put(
-        `https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/sub/type/${assetId}
+      .post(
+        `https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/asset/type/create
 `,
         params
       )
       .then(response => {
         console.log(' successfully:', response.data)
-        toast.success('Sửa thành công')
+        toast.success('Thêm thành công')
         onClose()
         fetchGroupData() // Gọi lại fetch để cập nhật danh sách nhóm
       })
       .catch(error => {
         console.error('Error moving group:', error)
+        toast.error(error?.response?.data || 'Thất bại')
       })
   }
-
-  //todoHue:30/7/2024: api edit error
 
   return (
     <Dialog
@@ -110,11 +90,9 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
       <DialogContent>
         <Grid container spacing={2}>
           <Grid item xs={6}>
-            <CustomTextField label='Mã Loại thuê bao' value={name} onChange={handleFullNameChange} fullWidth />
+            <CustomTextField label='Tên loại tài sản' value={name} onChange={handleFullNameChange} fullWidth />
           </Grid>
-          <Grid item xs={6}>
-            <CustomTextField label='Tên loại thuê bao' value={code} onChange={handleCodeChange} fullWidth />
-          </Grid>
+
           <Grid item xs={12}>
             <CustomTextField
               rows={4}

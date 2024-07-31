@@ -107,7 +107,7 @@ const UserList = ({ apiData }) => {
             Authorization: `Bearer ${token}`
           }
         }
-        let urlDelete = `https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/vehicle/type/delete/${idDelete}`
+        let urlDelete = `https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/asset/type/delete/${idDelete}`
         axios
           .delete(urlDelete)
           .then(() => {
@@ -118,7 +118,7 @@ const UserList = ({ apiData }) => {
           })
           .catch(err => {
             console.error('Error moving group:', err)
-            toast.error(err?.response?.data?.message || 'Thất bại')
+            toast.error(err?.response?.data || 'Thất bại')
           })
       }
     })
@@ -140,7 +140,7 @@ const UserList = ({ apiData }) => {
       }
 
       const response = await axios.get(
-        'https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/vehicle/type/',
+        'https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/asset/type/',
         config
       )
 
@@ -162,7 +162,7 @@ const UserList = ({ apiData }) => {
           <CardHeader
             title={
               <>
-                <Button variant='contained'>Loại phương tiện</Button>
+                <Button variant='contained'>Loại tài sản</Button>
               </>
             }
             titleTypographyProps={{ sx: { mb: [2, 0] } }}
@@ -225,11 +225,9 @@ const UserList = ({ apiData }) => {
                 <TableHead>
                   <TableRow>
                     <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Mã loại phương tiện</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Tên loại phương tiện</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Mã loại tài sản</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Tên loại tài sản</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Mô tả</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Trạng thái kích hoạt</TableCell>
-
                     <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
                   </TableRow>
                 </TableHead>
@@ -240,11 +238,6 @@ const UserList = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{assetType.code}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.name}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.detail}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>
-                        {' '}
-                        {assetType.status === 'ACTIVE' ? 'Đã kích hoạt' : 'Chưa kích hoạt'}
-                      </TableCell>
-
                       <TableCell sx={{ padding: '16px' }}>
                         <Grid container spacing={2}>
                           <IconButton
