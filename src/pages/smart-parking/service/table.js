@@ -286,6 +286,9 @@ const UserList = ({ apiData }) => {
                           <IconButton onClick={() => handleDelete(service.id)}>
                             <Icon icon='tabler:trash' />
                           </IconButton>
+                          <IconButton onClick={() => handleDelete(service.id)}>
+                            <Icon icon="tabler:coin" />
+                          </IconButton>
                         </Grid>
                       </TableCell>
                     </TableRow>
