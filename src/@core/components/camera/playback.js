@@ -93,13 +93,14 @@ export const ViewCameraPause = ({
       const stream = event.streams[0]
       try {
         //if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {
+        // }
+
         setRemoteStream(stream)
         remoteVideoRef.current.srcObject = stream
         remoteVideoRef.current.ontimeupdate = () => {
           if (remoteVideoRef?.current?.currentTime) {
             onChangeCurrentTime(remoteVideoRef?.current?.currentTime)
           }
-          // }
         }
       } catch (err) {
         console.log(err)
