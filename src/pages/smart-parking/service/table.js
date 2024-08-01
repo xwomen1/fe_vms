@@ -39,6 +39,8 @@ const UserList = ({ apiData }) => {
   const [openPopupEdit, setOpenPopupEdit] = useState(false)
   const [openPopupFilter, setOpenPopupFilter] = useState(false)
   const [valueFilter, setValueFilter] = useState(initValueFilter)
+  const [editId, setEditId] = useState(null)
+  const [reload, setReload] = useState(0)
 
   const handleAddPClick = (groupIds, groupName) => {
     setOpenPopupP(true)
@@ -50,6 +52,7 @@ const UserList = ({ apiData }) => {
 
   const handleEditClick = (id, groupName) => {
     setOpenPopupEdit(true)
+    setEditId(id)
   }
 
   const handleCloseEditPopup = () => {
@@ -171,7 +174,7 @@ const UserList = ({ apiData }) => {
 
   useEffect(() => {
     fetchDataAsset()
-  }, [page, pageSize])
+  }, [page, pageSize, reload])
 
   useEffect(() => {
     fetchDataAsset()
@@ -279,16 +282,16 @@ const UserList = ({ apiData }) => {
                           <IconButton
                             size='small'
                             sx={{ color: 'text.secondary' }}
-                            onClick={() => handleEditClick(service.id)}
+                            onClick={() => handleEditClick(service?.id)}
                           >
                             <Icon icon='tabler:edit' />
                           </IconButton>
-                          <IconButton onClick={() => handleDelete(service.id)}>
+                          <IconButton onClick={() => handleDelete(service?.id)}>
                             <Icon icon='tabler:trash' />
                           </IconButton>
-                          <IconButton onClick={() => handleDelete(service.id)}>
+                          {/* <IconButton >
                             <Icon icon="tabler:coin" />
-                          </IconButton>
+                          </IconButton> */}
                         </Grid>
                       </TableCell>
                     </TableRow>
@@ -326,7 +329,7 @@ const UserList = ({ apiData }) => {
       )}
       {openPopupEdit && (
         <>
-          <Edit open={openPopupEdit} onClose={handleCloseEditPopup} fetchGroupData={fetchDataAsset} assetId={assetId} />
+          <Edit open={openPopupEdit} onClose={handleCloseEditPopup} id={editId} setReload={() => setReload(reload + 1)} />
         </>
       )}
       {openPopupFilter && (
