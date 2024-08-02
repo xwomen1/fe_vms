@@ -148,7 +148,8 @@ const navigation = () => {
           title: 'Khuôn mặt',
           path: '/vms/events/view/eventFace',
           icon: 'tabler:timeline-event-exclamation'
-        }, {
+        },
+        {
           title: 'Biển số',
           path: '/vms/events/view/eventCar',
           icon: 'tabler:timeline-event-exclamation'
@@ -365,6 +366,11 @@ const navigation = () => {
         {
           path: '/smart-parking/caller',
           title: 'Thuê bao',
+          icon: 'tabler:phone'
+        },
+        {
+          path: '/smart-parking/caller-type',
+          title: 'Loại thuê bao',
           icon: 'tabler:phone'
         },
         {

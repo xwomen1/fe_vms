@@ -21,11 +21,7 @@ const TableHeader = ({ handleFilter, exportValue, importValue, toggle, value, on
         justifyContent: 'space-between'
       }}
     >
-      <Box>
-        <Button variant='contained' style={{ fontSize: 30 }}>
-          Dịch vụ
-        </Button>
-      </Box>
+      <Box></Box>
       <Box sx={{ rowGap: 2, display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
         <CustomTextField
           value={value}

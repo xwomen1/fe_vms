@@ -177,7 +177,8 @@ const UserList = ({ apiData }) => {
         }
 
         const response = await axios.get(
-          `https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/sub/type/`,
+          ` https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/sub/
+/`,
           config
         )
 
@@ -200,7 +201,7 @@ const UserList = ({ apiData }) => {
           <CardHeader
             title={
               <>
-                <Button variant='contained'>Loại thuê bao</Button>
+                <Button variant='contained'>Danh sách thuê bao</Button>
               </>
             }
             titleTypographyProps={{ sx: { mb: [2, 0] } }}
@@ -269,10 +270,14 @@ const UserList = ({ apiData }) => {
                 <TableHead>
                   <TableRow>
                     <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Mã loại thuê bao</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Tên loại thuê bao</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Mô tả</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Trạng thái kích hoạt</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Mã thuê bao</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Tên thuê bao</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Số điện thoại</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Email</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Loại thuê bao</TableCell>
+
+                    <TableCell sx={{ padding: '16px' }}>Đơn vị</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Hạn sử dụng</TableCell>
 
                     <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
                   </TableRow>
@@ -282,10 +287,13 @@ const UserList = ({ apiData }) => {
                     <TableRow key={assetType.id}>
                       <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.code}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.name}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.detail}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{assetType.nameClient}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{assetType.phoneNumber}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{assetType.email}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{assetType?.subscriptionType?.name}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{assetType.brandName}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>
-                        {assetType.status === 'YES' ? 'Đã kích hoạt' : 'Chưa kích hoạt'}
+                        {assetType.startDate} - {assetType.endDate}
                       </TableCell>
 
                       <TableCell sx={{ padding: '16px' }}>
