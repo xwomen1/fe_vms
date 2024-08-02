@@ -89,6 +89,10 @@ const Add = ({
           location: nvr.location,
           name: nvr.name,
           ipAddress: nvr.url,
+          type: {
+            id: '',
+            name: nvr.type
+          },
           macAddress: nvr.macAddress,
           protocol: selectedTitle,
           passWord: passWord,

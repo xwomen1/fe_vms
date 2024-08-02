@@ -332,6 +332,11 @@ const navigation = () => {
           path: '/organizational-structure'
         },
         {
+          title: 'Cơ cấu tổ chức',
+          icon: 'tabler:building',
+          path: '/organization/list'
+        },
+        {
           title: 'Vai Trò',
           icon: 'tabler:users',
           path: '/apps/roles'
