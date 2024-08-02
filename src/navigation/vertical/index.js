@@ -148,7 +148,8 @@ const navigation = () => {
           title: 'Khuôn mặt',
           path: '/vms/events/view/eventFace',
           icon: 'tabler:timeline-event-exclamation'
-        }, {
+        },
+        {
           title: 'Biển số',
           path: '/vms/events/view/eventCar',
           icon: 'tabler:timeline-event-exclamation'
@@ -329,6 +330,11 @@ const navigation = () => {
           title: 'Cơ cấu tổ chức',
           icon: 'tabler:building',
           path: '/organizational-structure'
+        },
+        {
+          title: 'Cơ cấu tổ chức',
+          icon: 'tabler:building',
+          path: '/organization/list'
         },
         {
           title: 'Vai Trò',

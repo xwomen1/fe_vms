@@ -156,9 +156,9 @@ const Add = ({
                 <TableBody>
                   {response && response.length > 0 ? (
                     response.map((nvr, index) => {
-                      if (nvr.type !== 'NVR') {
-                        return null // Ẩn dữ liệu không phải là 'NVR'
-                      }
+                      // if (nvr.type !== 'NVR') {
+                      //   return null // Ẩn dữ liệu không phải là 'NVR'
+                      // }
 
                       const foundNvr =
                         selectedIds?.length > 0 ? selectedIds.find(item => item.macAddress === nvr.macAddress) : null

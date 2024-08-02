@@ -177,7 +177,7 @@ const Filter = ({ open, onClose, valueFilter, callback }) => {
               </Grid>
               <Grid item xs={12} sm={4}>
                 <Controller
-                  name='vehicleType'
+                  name='brandId'
                   control={control}
                   render={({ field: { value, onChange } }) => (
                     console.log(value),
