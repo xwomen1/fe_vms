@@ -1,10 +1,8 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import Card from '@mui/material/Card'
 import Menu from '@mui/material/Menu'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
-import TreeView from '@mui/lab/TreeView'
-import TreeItem from '@mui/lab/TreeItem'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
@@ -13,29 +11,60 @@ import authConfig from 'src/configs/auth'
 import Table from '@mui/material/Table'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
-import { IconButton } from '@mui/material'
+import { Button, CardHeader, IconButton } from '@mui/material'
 import Swal from 'sweetalert2'
-import { fetchData } from 'src/store/apps/user'
-import { useRouter } from 'next/router'
 import axios from 'axios'
-import TableHeader from 'src/views/apps/asset/TableHeader'
 import CustomTextField from 'src/@core/components/mui/text-field'
-import Link from 'next/link'
+import Add from './popup/add'
+import Edit from './popup/edit'
+import toast from 'react-hot-toast'
+import Filter from './popup/filter'
 
 const UserList = ({ apiData }) => {
   const [value, setValue] = useState('')
-
-  const [addUserOpen, setAddUserOpen] = useState(false)
   const [assettype, setAssetType] = useState([])
-
-  const [total, setTotal] = useState([1])
+  const [total, setTotal] = useState(1)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
   const pageSizeOptions = [25, 50, 100]
   const [anchorEl, setAnchorEl] = useState(null)
+  const [assetId, setAssetId] = useState(null)
+  const [openPopupP, setOpenPopupP] = useState(false)
+  const [openPopupEdit, setOpenPopupEdit] = useState(false)
+  const [openPopupFilter, setOpenPopupFilter] = useState(false)
 
-  const handlePageChange = newPage => {
+  const handleAddFilterClick = (groupIds, groupName) => {
+    setOpenPopupFilter(true)
+  }
+
+  const handleCloseFilterPopup = () => {
+    setOpenPopupFilter(false)
+  }
+
+  const handleAddPClick = (groupIds, groupName) => {
+    setOpenPopupP(true)
+  }
+
+  const handleClosePPopup = () => {
+    setOpenPopupP(false)
+  }
+
+  const handleEditClick = (id, groupName) => {
+    setOpenPopupEdit(true)
+    setAssetId(id)
+  }
+
+  const handleCloseEditPopup = () => {
+    setOpenPopupEdit(false)
+  }
+
+  const handlePageChange = (event, newPage) => {
     setPage(newPage)
+  }
+
+  const handleSearch = () => {
+    setPage(1)
+    fetchDataAsset()
   }
 
   function showAlertConfirm(options, intl) {
@@ -52,7 +81,8 @@ const UserList = ({ apiData }) => {
       customClass: {
         content: 'content-class',
         confirmButton: 'swal-btn-confirm'
-      }
+      },
+      confirmButtonColor: '#FF9F43'
     }
 
     return Swal.fire({ ...defaultProps, ...options })
@@ -67,16 +97,12 @@ const UserList = ({ apiData }) => {
   }
 
   const handleSelectPageSize = size => {
-    setPageSize(size)
     setPage(1)
+    setPageSize(size)
     handleCloseMenu()
   }
 
-  const handleFilter = useCallback(val => {
-    setValue(val)
-  }, [])
-
-  console.log(total, 'totalpage')
+  //todoHue: 30/7/2024:BE thiếu status
 
   const handleDelete = idDelete => {
     showAlertConfirm({
@@ -93,25 +119,48 @@ const UserList = ({ apiData }) => {
             Authorization: `Bearer ${token}`
           }
         }
-        let urlDelete = `https://dev-ivi.basesystem.one/smc/smart-parking/api/v0/asset/type/delete/${idDelete}`
+        let urlDelete = ` https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/parking/delete/${idDelete}`
         axios
-          .delete(urlDelete, config)
+          .delete(urlDelete)
           .then(() => {
-            Swal.fire('Xóa thành công', '', 'success')
             const updatedData = assettype.filter(assettype => assettype.id !== idDelete)
             setAssetType(updatedData)
-            fetchData()
+            fetchDataAsset()
+            toast.success('Xoá thành công')
           })
           .catch(err => {
-            Swal.fire('Đã xảy ra lỗi', err.message, 'error')
+            console.error('Error moving group:', err)
+            toast.error(err?.response?.data || 'Thất bại')
           })
       }
     })
   }
 
-  const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen)
-  useEffect(() => {
-    const fetchFilteredOrAllUsers = async () => {
+  const fetchDataAsset = async (filteredParams = null) => {
+    if (filteredParams) {
+      try {
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          params: {
+            ...filteredParams,
+            limit: pageSize,
+            page: page,
+            keyword: value
+          }
+        }
+
+        const response = await axios.get(`https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/asset/`, config)
+
+        setAssetType(response.data.rows)
+        setTotal(response.data.totalPage)
+      } catch (error) {
+        console.error('Error fetching users:', error)
+      }
+    } else {
       try {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -125,7 +174,8 @@ const UserList = ({ apiData }) => {
             keyword: value
           }
         }
-        const response = await axios.get('https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/asset/', config)
+
+        const response = await axios.get(`https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/asset/`, config)
 
         setAssetType(response.data.rows)
         setTotal(response.data.totalPage)
@@ -133,48 +183,125 @@ const UserList = ({ apiData }) => {
         console.error('Error fetching users:', error)
       }
     }
-    fetchFilteredOrAllUsers()
-  }, [page, pageSize, total, value])
+  }
+  useEffect(() => {
+    fetchDataAsset()
+  }, [page, pageSize])
 
   return (
     <Grid container spacing={6.5}>
       <Grid item xs={12}>
         <Card>
-          <TableHeader value={value} handleFilter={handleFilter} toggle={toggleAddUserDrawer} />
+          <CardHeader
+            title={
+              <>
+                <Button variant='contained'>Danh sách tài sản</Button>
+              </>
+            }
+            titleTypographyProps={{ sx: { mb: [2, 0] } }}
+            sx={{
+              py: 4,
+              flexDirection: ['column', 'row'],
+              '& .MuiCardHeader-action': { m: 0 },
+              alignItems: ['flex-start', 'center']
+            }}
+            action={
+              <Grid container spacing={2}>
+                <Grid item>
+                  {' '}
+                  <Button variant='contained' style={{ margin: '0px 2px' }} onClick={handleAddFilterClick}>
+                    <Icon fontSize='1.25rem' icon='tabler:filter' />
+                  </Button>
+                </Grid>
+                <Grid item>
+                  {' '}
+                  <Button variant='contained' style={{ margin: '0px 2px' }} onClick={handleAddPClick}>
+                    <Icon fontSize='1.25rem' icon='tabler:plus' />
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <CustomTextField
+                    placeholder='Nhập tên  ...! '
+                    value={value}
+                    onChange={e => setValue(e.target.value)}
+                    InputProps={{
+                      endAdornment: (
+                        <IconButton
+                          size='small'
+                          title='Clear'
+                          aria-label='Clear'
+                          onClick={() => {
+                            setValue('')
+                            fetchDataAsset()
+                          }}
+                        >
+                          <Icon fontSize='1.25rem' icon='tabler:x' />
+                        </IconButton>
+                      )
+                    }}
+                    sx={{
+                      width: {
+                        xs: 1,
+                        sm: 'auto'
+                      },
+                      '& .MuiInputBase-root > svg': {
+                        mr: 2
+                      }
+                    }}
+                  />
+                  <Button variant='contained' style={{ margin: '0px 2px' }} onClick={handleSearch}>
+                    <Icon fontSize='1.25rem' icon='tabler:search' />
+                  </Button>
+                </Grid>
+              </Grid>
+            }
+          />
           <Grid container spacing={2}>
             <Grid item xs={0.1}></Grid>
 
             <Grid item xs={12}>
-              <div></div>
-
               <Table>
                 <TableHead>
                   <TableRow>
                     <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Mã loại tài sản</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Tên loại tài sản</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Mã tài sản</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Tên tài sản</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>S/N</TableCell>
+
                     <TableCell sx={{ padding: '16px' }}>Mô tả</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Loại tài sản</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Bãi đỗ xe</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Trạng thái kích hoạt</TableCell>
+
                     <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {assettype.map((assetType, index) => (
                     <TableRow key={assetType.id}>
-                      <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.code}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.name}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.detail}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{assetType?.code}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{assetType?.name}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{assetType?.codeSN}</TableCell>
+
+                      <TableCell sx={{ padding: '16px' }}>{assetType?.detail}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{assetType?.assetType?.name}</TableCell>
+
+                      <TableCell sx={{ padding: '16px' }}>{assetType?.parking?.name}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>
+                        {' '}
+                        {assetType.status === 'ACTIVE' ? 'Đã kích hoạt' : 'Chưa kích hoạt'}
+                      </TableCell>
                       <TableCell sx={{ padding: '16px' }}>
                         <Grid container spacing={2}>
                           <IconButton
                             size='small'
-                            component={Link}
-                            href={`/asset/${asset.id}`}
                             sx={{ color: 'text.secondary' }}
+                            onClick={() => handleEditClick(assetType.id)}
                           >
-                            <Icon icon='tabler:eye' />
+                            <Icon icon='tabler:edit' />
                           </IconButton>
-                          <IconButton onClick={() => handleDelete(user.userId)}>
+                          <IconButton onClick={() => handleDelete(assetType.id)}>
                             <Icon icon='tabler:trash' />
                           </IconButton>
                         </Grid>
@@ -183,7 +310,7 @@ const UserList = ({ apiData }) => {
                   ))}
                 </TableBody>
               </Table>
-              <br></br>
+              <br />
               <Grid container spacing={2} style={{ padding: 10 }}>
                 <Grid item xs={3}></Grid>
                 <Grid item xs={1.5} style={{ padding: 0 }}>
@@ -200,13 +327,28 @@ const UserList = ({ apiData }) => {
                   </Menu>
                 </Grid>
                 <Grid item xs={6}>
-                  <Pagination count={total} color='primary' onChange={(event, page) => handlePageChange(page)} />
+                  <Pagination count={total} color='primary' page={page} onChange={handlePageChange} />
                 </Grid>
               </Grid>
             </Grid>
           </Grid>
         </Card>
       </Grid>
+      {openPopupP && (
+        <>
+          <Add open={openPopupP} onClose={handleClosePPopup} fetchGroupData={fetchDataAsset} />
+        </>
+      )}
+      {openPopupEdit && (
+        <>
+          <Edit open={openPopupEdit} onClose={handleCloseEditPopup} fetchGroupData={fetchDataAsset} assetId={assetId} />
+        </>
+      )}
+      {openPopupFilter && (
+        <>
+          <Filter open={openPopupFilter} onClose={handleCloseFilterPopup} fetchGroupData={fetchDataAsset} />
+        </>
+      )}
     </Grid>
   )
 }

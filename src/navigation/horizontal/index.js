@@ -374,6 +374,11 @@ const navigation = () => {
           icon: 'tabler:phone'
         },
         {
+          path: '/smart-parking/caller-type',
+          title: 'Loại thuê bao',
+          icon: 'tabler:phone'
+        },
+        {
           path: '/smart-parking/cards',
           title: 'Thẻ',
           icon: 'tabler:cards'

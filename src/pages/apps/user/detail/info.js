@@ -547,40 +547,6 @@ const UserDetails = () => {
     setTimeEndAfternoon(newValue)
   }
 
-  const handleDeleteRowPolicy = (piId, policyId) => {
-    showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
-    }).then(({ value }) => {
-      if (value) {
-        const token = localStorage.getItem(authConfig.storageTokenKeyName)
-        if (!token) {
-          return
-        }
-
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          data: {
-            piId: piId,
-            policyId: policyId
-          }
-        }
-
-        let urlDelete = `https://dev-ivi.basesystem.one/smc/iam/api/v0/pi-policies`
-        axios
-          .delete(urlDelete, config)
-          .then(() => {
-            Swal.fire('Xóa thành công', '', 'success')
-            fetchUserData(userId)
-          })
-          .catch(err => {
-            Swal.fire('Đã xảy ra lỗi', err.response.data.message, 'error')
-          })
-      }
-    })
-  }
-
   const handleDeleteRow = index => {
     const updatedRows = [...groups]
     updatedRows.splice(index, 1)

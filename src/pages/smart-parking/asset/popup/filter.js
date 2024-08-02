@@ -54,9 +54,9 @@ const Filter = ({ open, onClose, fetchGroupData }) => {
 
   const fetchGroups = () => {
     axios
-      .get('https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=dv')
+      .get('https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/asset/type/')
       .then(response => {
-        setGroups(response.data)
+        setGroups(response.data.rows)
       })
       .catch(error => {
         console.error('Error fetching groups:', error)
@@ -65,9 +65,9 @@ const Filter = ({ open, onClose, fetchGroupData }) => {
 
   const fetchServices = () => {
     axios
-      .get('https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=dichvu')
+      .get('https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/parking/')
       .then(response => {
-        setServices(response.data)
+        setServices(response.data.rows)
       })
       .catch(error => {
         console.error('Error fetching services:', error)
@@ -80,9 +80,10 @@ const Filter = ({ open, onClose, fetchGroupData }) => {
 
   const handleOk = () => {
     const params = {
-      serviceParkingId: selectedService?.id || '',
+      parkingId: selectedService?.id || '',
       sort: '',
-      status: activationStatus === 'Yes' ? 'YES' : 'NO'
+      status: activationStatus === 'true' ? 'true' : 'false',
+      assetTypeId: selectedGroup?.id || ''
     }
 
     fetchGroupData(params)
@@ -106,7 +107,7 @@ const Filter = ({ open, onClose, fetchGroupData }) => {
       <Button>Lọc loại thuê bao</Button>
       <DialogContent>
         <Grid container spacing={2} alignItems='center'>
-          <Grid item xs={6}>
+          <Grid item xs={4}>
             <FormControl fullWidth>
               <InputLabel id='activation-status-label'>Trạng thái kích hoạt</InputLabel>
               <Select
@@ -115,12 +116,12 @@ const Filter = ({ open, onClose, fetchGroupData }) => {
                 value={activationStatus}
                 onChange={event => setActivationStatus(event.target.value)}
               >
-                <MenuItem value='Yes'>Đã kích hoạt</MenuItem>
-                <MenuItem value='No'>Chưa kích hoạt</MenuItem>
+                <MenuItem value='true'>Đã kích hoạt</MenuItem>
+                <MenuItem value='false'>Chưa kích hoạt</MenuItem>
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={4}>
             <Autocomplete
               value={selectedGroup}
               onChange={(event, newValue) => {
@@ -128,10 +129,10 @@ const Filter = ({ open, onClose, fetchGroupData }) => {
               }}
               options={groups}
               getOptionLabel={option => option.name}
-              renderInput={params => <TextField {...params} label='Đơn vị đang sử dụng' variant='outlined' fullWidth />}
+              renderInput={params => <TextField {...params} label='Loại tài sản' variant='outlined' fullWidth />}
             />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={4}>
             <Autocomplete
               value={selectedService}
               onChange={(event, newValue) => {
@@ -139,9 +140,7 @@ const Filter = ({ open, onClose, fetchGroupData }) => {
               }}
               options={services}
               getOptionLabel={option => option.name}
-              renderInput={params => (
-                <TextField {...params} label='Dịch vụ đang sử dụng' variant='outlined' fullWidth />
-              )}
+              renderInput={params => <TextField {...params} label='Bãi đỗ xe' variant='outlined' fullWidth />}
             />
           </Grid>
         </Grid>

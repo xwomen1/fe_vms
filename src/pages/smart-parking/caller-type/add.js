@@ -37,7 +37,7 @@ import Link from 'next/link'
 
 const UserDetails = () => {
   const router = useRouter()
-  const { id } = router.query
+  const { userId } = router.query
   const [timeValidity, setTimeValidity] = useState('Custom')
   const [user, setUser] = useState(null)
   const [readOnly, setReadOnly] = useState(true)
@@ -175,17 +175,36 @@ const UserDetails = () => {
       }
 
       const response = await axios.post(
-        `https://dev-ivi.basesystem.one/smc/smart-parking/api/v0/asset/create`,
+        `https://dev-ivi.basesystem.one/smc/iam/api/v0/users`,
         {
           ...params,
-          id: id,
+          userId: userId,
           fullName: fullNameValue,
-          email: email
+          email: email,
+          phoneNumber: phoneNumber,
+          identityNumber: identityNumber,
+          userCode: userCode,
+          syncCode: syncCode,
+          userStatus: status1,
+          timeEndAfternoon: convertStringToTimeArray(timeEndAfternoon),
+          timeStartAfternoon: convertStringToTimeArray(timeStartAfternoon),
+          timeStartMorning: convertStringToTimeArray(dateTime),
+          timeEndMorning: convertStringToTimeArray(timeEndMorning),
+          availableAt: ava1,
+          expiredAt: ava2,
+          note: note,
+          userGroups: userGroups,
+          policies: userPolicy,
+          userAccount: {
+            accStatus: 'ACTIVE',
+            username: account,
+            password: password
+          }
         },
         config
       )
       Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
-      router.push(`/apps/user/detail/${response.data.id}`)
+      router.push(`/apps/user/detail/${response.data.userId}`)
     } catch (error) {
       console.error('Error updating user details:', error)
       Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi cập nhật dữ liệu.', 'error')
@@ -198,6 +217,12 @@ const UserDetails = () => {
     const minute = date.getMinutes()
 
     return [hour, minute]
+  }
+
+  const handleDeleteRow = index => {
+    const updatedRows = [...rows]
+    updatedRows.splice(index, 1)
+    setRows(updatedRows)
   }
 
   useEffect(() => {
@@ -242,6 +267,23 @@ const UserDetails = () => {
 
     fetchGroupData()
   }, [])
+  const formatIsLeader = isLeader => <Checkbox checked={isLeader} disabled />
+
+  const handleTimeChange = newValue => {
+    setDateTime(newValue)
+  }
+
+  const handleTimeEndMorningChange = newValue => {
+    setTimeEndMorning(newValue)
+  }
+
+  const handleTimeStartAfetrnoonChange = newValue => {
+    setTimeStartAfternoon(newValue)
+  }
+
+  const handleTimeEndAfternoonChange = newValue => {
+    setTimeEndAfternoon(newValue)
+  }
 
   console.log('param', params)
 

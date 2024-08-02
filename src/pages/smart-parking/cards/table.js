@@ -18,17 +18,10 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 import Add from './popup/add'
 import Edit from './popup/edit'
 import toast from 'react-hot-toast'
-import Filters from './popup/filter'
-
-const initValueFilter = {
-  keyword: '',
-  limit: 25,
-  page: 1
-}
 
 const UserList = ({ apiData }) => {
   const [value, setValue] = useState('')
-  const [service, setservice] = useState([])
+  const [assettype, setAssetType] = useState([])
   const [total, setTotal] = useState(1)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
@@ -37,8 +30,6 @@ const UserList = ({ apiData }) => {
   const [assetId, setAssetId] = useState(null)
   const [openPopupP, setOpenPopupP] = useState(false)
   const [openPopupEdit, setOpenPopupEdit] = useState(false)
-  const [openPopupFilter, setOpenPopupFilter] = useState(false)
-  const [valueFilter, setValueFilter] = useState(initValueFilter)
 
   const handleAddPClick = (groupIds, groupName) => {
     setOpenPopupP(true)
@@ -50,15 +41,11 @@ const UserList = ({ apiData }) => {
 
   const handleEditClick = (id, groupName) => {
     setOpenPopupEdit(true)
+    setAssetId(id)
   }
 
   const handleCloseEditPopup = () => {
     setOpenPopupEdit(false)
-  }
-
-  const handleFilterClick = (id, groupName) => {
-    setOpenPopupFilter(true)
-    setAssetId(id)
   }
 
   const handlePageChange = (event, newPage) => {
@@ -124,8 +111,8 @@ const UserList = ({ apiData }) => {
         axios
           .delete(urlDelete)
           .then(() => {
-            const updatedData = service.filter(service => service.id !== idDelete)
-            setservice(updatedData)
+            const updatedData = assettype.filter(assettype => assettype.id !== idDelete)
+            setAssetType(updatedData)
             fetchDataAsset()
             toast.success('Xoá thành công')
           })
@@ -146,7 +133,6 @@ const UserList = ({ apiData }) => {
           Authorization: `Bearer ${token}`
         },
         params: {
-          ...valueFilter,
           limit: pageSize,
           page: page,
           keyword: value
@@ -154,28 +140,20 @@ const UserList = ({ apiData }) => {
       }
 
       const response = await axios.get(
-        'https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/service/parking/',
+        'https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/asset/type/',
         config
       )
 
-      setservice(response.data.rows)
+      setAssetType(response.data.rows)
       setTotal(response.data.totalPage)
     } catch (error) {
       console.error('Error fetching users:', error)
     }
   }
 
-  const handleSetFilter = data => {
-    setValueFilter(data)
-  }
-
   useEffect(() => {
     fetchDataAsset()
   }, [page, pageSize])
-
-  useEffect(() => {
-    fetchDataAsset()
-  }, [valueFilter])
 
   return (
     <Grid container spacing={6.5}>
@@ -184,7 +162,7 @@ const UserList = ({ apiData }) => {
           <CardHeader
             title={
               <>
-                <Button variant='contained'>Dịch vụ</Button>
+                <Button variant='contained'>Loại tài sản</Button>
               </>
             }
             titleTypographyProps={{ sx: { mb: [2, 0] } }}
@@ -196,12 +174,6 @@ const UserList = ({ apiData }) => {
             }}
             action={
               <Grid container spacing={2}>
-                <Grid item>
-                  {' '}
-                  <Button variant='contained' style={{ margin: '0px 2px' }} onClick={handleFilterClick}>
-                    <Icon fontSize='1.25rem' icon='tabler:filter' />
-                  </Button>
-                </Grid>
                 <Grid item>
                   {' '}
                   <Button variant='contained' style={{ margin: '0px 2px' }} onClick={handleAddPClick}>
@@ -253,41 +225,30 @@ const UserList = ({ apiData }) => {
                 <TableHead>
                   <TableRow>
                     <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Mã dịch vụ</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Tên dịch vụ</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Loại phương tiện</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Loại thuê bao</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Ngày áp dụng</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Trạng thái kích hoạt</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Mã loại tài sản</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Tên loại tài sản</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Mô tả</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {service.map((service, index) => (
-                    <TableRow key={service.id}>
+                  {assettype.map((assetType, index) => (
+                    <TableRow key={assetType.id}>
                       <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{service.code}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{service.name}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{service.vehicleType.name}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{service.subscriptionType.name}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>
-                        {service.startDate} - {service.endDate}
-                      </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{service.status}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{assetType.code}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{assetType.name}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{assetType.detail}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>
                         <Grid container spacing={2}>
                           <IconButton
                             size='small'
                             sx={{ color: 'text.secondary' }}
-                            onClick={() => handleEditClick(service.id)}
+                            onClick={() => handleEditClick(assetType.id)}
                           >
                             <Icon icon='tabler:edit' />
                           </IconButton>
-                          <IconButton onClick={() => handleDelete(service.id)}>
+                          <IconButton onClick={() => handleDelete(assetType.id)}>
                             <Icon icon='tabler:trash' />
-                          </IconButton>
-                          <IconButton onClick={() => handleDelete(service.id)}>
-                            <Icon icon="tabler:coin" />
                           </IconButton>
                         </Grid>
                       </TableCell>
@@ -327,16 +288,6 @@ const UserList = ({ apiData }) => {
       {openPopupEdit && (
         <>
           <Edit open={openPopupEdit} onClose={handleCloseEditPopup} fetchGroupData={fetchDataAsset} assetId={assetId} />
-        </>
-      )}
-      {openPopupFilter && (
-        <>
-          <Filters
-            open={openPopupFilter}
-            onClose={() => setOpenPopupFilter(false)}
-            assetId={assetId}
-            callback={handleSetFilter}
-          />
         </>
       )}
     </Grid>

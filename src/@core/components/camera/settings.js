@@ -248,7 +248,7 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
                     return (
                       <StyledTreeItem
                         key={index}
-                        labelText={`(${group.cameras?.length}) ${group.name} `}
+                        labelText={`(${group.cameras?.length > 0 ? group.cameras?.length : 0}) ${group.name} `}
                         nodeId={index + ''}
                         labelIcon='tabler:folder'
                         disabled={group.cameras?.length == 0}

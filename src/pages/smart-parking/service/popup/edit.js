@@ -73,7 +73,6 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
     axios
       .get(`https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/asset/type/find/${assetId}`)
       .then(response => {
-        // Lọc nhóm khác với groupName hiện tại
         setAssetType(response.data)
         setName(response.data.name)
         setCode(response.data.code)

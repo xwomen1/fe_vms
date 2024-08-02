@@ -1,5 +1,18 @@
 import { forwardRef, useState, useEffect } from 'react'
-import { Autocomplete, Button, DialogActions, Fade, Grid, IconButton, TextField, Typography } from '@mui/material'
+import {
+  Autocomplete,
+  Button,
+  DialogActions,
+  Fade,
+  FormControl,
+  Grid,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Typography
+} from '@mui/material'
 import { styled } from '@mui/material/styles'
 import axios from 'axios'
 import toast from 'react-hot-toast'
@@ -32,12 +45,15 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
   const [assetType, setAssetType] = useState({})
   const [name, setName] = useState(null)
   const [code, setCode] = useState(null)
+  const [sn, setSN] = useState(null)
+
   const [detail, setDetail] = useState(null)
   const [groups, setGroups] = useState([])
   const [selectedGroup, setSelectedGroup] = useState(null)
   const [donvi, setDonVi] = useState([])
   const [selectDonvi, setSelectDonvi] = useState(null)
   const [isDataLoaded, setIsDataLoaded] = useState(false)
+  const [activationStatus, setActivationStatus] = useState('')
 
   useEffect(() => {
     fetchGroups()
@@ -46,9 +62,9 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
 
   const fetchGroups = () => {
     axios
-      .get('https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=phankhu')
+      .get('https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/asset/type/')
       .then(response => {
-        setGroups(response.data)
+        setGroups(response.data.rows)
       })
       .catch(error => {
         console.error('Error fetching groups:', error)
@@ -57,9 +73,9 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
 
   const fetchUnit = () => {
     axios
-      .get('https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=dv')
+      .get('https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/parking/')
       .then(response => {
-        setDonVi(response.data)
+        setDonVi(response.data.rows)
       })
       .catch(error => {
         console.error('Error fetching units:', error)
@@ -79,20 +95,22 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
 
       setSelectedGroup(foundGroup || null)
       setSelectDonvi(foundUnit || null)
-
       setIsDataLoaded(true)
     }
   }, [groups, donvi, assetType])
 
   const fetchAssetType = () => {
     axios
-      .get(`https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/parking/find/${assetId}`)
+      .get(`https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/asset/find/${assetId}`)
       .then(response => {
         const data = response.data
         setAssetType(data)
         setName(data.name)
-        setCode(data.codeParking)
+        setCode(data.code)
         setDetail(data.detail)
+        setSN(response.data.codeSN || null)
+        setActivationStatus(response.data.status)
+        setSelectedGroup(response.data.assetType.name)
       })
       .catch(error => {
         console.error('Error fetching asset type:', error)
@@ -124,7 +142,7 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
     }
 
     axios
-      .put(`https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/parking/${assetId}`, params)
+      .put(`https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/asset/${assetId}`, params)
       .then(response => {
         console.log('Successfully updated:', response.data)
         toast.success('Cập nhật thành công')
@@ -151,37 +169,55 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
       </CustomCloseButton>
       <DialogContent>
         <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <CustomTextField label='Tên bãi đỗ xe' value={name} onChange={handleFullNameChange} fullWidth />
+          <Grid item xs={4}>
+            <CustomTextField label='Tên tài sản' value={name} onChange={handleFullNameChange} fullWidth />
           </Grid>
-          <Grid item xs={6}>
-            <CustomTextField label='Mã bãi đỗ xe' value={code} onChange={handleCodeChange} fullWidth />
+          <Grid item xs={4}>
+            <CustomTextField label='Mã tài sản' value={code} onChange={handleCodeChange} fullWidth />
+          </Grid>
+          <Grid item xs={4}>
+            <CustomTextField label='S/N' value={sn} onChange={handleCodeChange} fullWidth />
           </Grid>
           {isDataLoaded && (
             <>
-              <Grid item xs={6}>
+              <Grid item xs={4}>
                 <Autocomplete
                   value={selectedGroup}
                   onChange={(event, newValue) => {
                     setSelectedGroup(newValue)
                   }}
                   options={groups}
-                  getOptionLabel={option => option.name}
-                  renderInput={params => <CustomTextField {...params} label='Phân khu' variant='outlined' fullWidth />}
+                  getOptionLabel={option => option.name || ''} // Đảm bảo option có trường name
+                  renderInput={params => (
+                    <CustomTextField {...params} label='Loại tài sản' variant='outlined' fullWidth />
+                  )}
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={4}>
                 <Autocomplete
                   value={selectDonvi}
                   onChange={(event, newValue) => {
                     setSelectDonvi(newValue)
                   }}
                   options={donvi}
-                  getOptionLabel={option => option.name}
-                  renderInput={params => (
-                    <CustomTextField {...params} label='Đơn vị quản lý' variant='outlined' fullWidth />
-                  )}
+                  getOptionLabel={option => option.name || ''} // Đảm bảo option có trường name
+                  renderInput={params => <CustomTextField {...params} label='Bãi đỗ xe' variant='outlined' fullWidth />}
                 />
+              </Grid>
+              <Grid item xs={4}>
+                <FormControl fullWidth>
+                  <CustomTextField
+                    select
+                    labelId='activation-status-label'
+                    id='activation-status-select'
+                    value={activationStatus}
+                    onChange={event => setActivationStatus(event.target.value)}
+                    label='Trạng thái kích hoạt'
+                  >
+                    <MenuItem value='ACTIVE'>Đã kích hoạt</MenuItem>
+                    <MenuItem value='INACTIVE'>Chưa kích hoạt</MenuItem>
+                  </CustomTextField>
+                </FormControl>
               </Grid>
             </>
           )}

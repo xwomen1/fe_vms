@@ -178,10 +178,10 @@ const AddCamera = ({ nvr, onClose }) => {
                             padding: '5px 10px',
                             width: '70%',
                             display: 'inline-block',
-                            backgroundColor: camera.status === 'connect' ? 'green' : 'orange'
+                            backgroundColor: camera.status === 'connected' ? 'green' : 'orange'
                           }}
                         >
-                          {camera.status === 'connect' ? 'Đang hoạt động' : 'Không hoạt động'}
+                          {camera.status === 'connected' ? 'Đang hoạt động' : 'Không hoạt động'}
                         </span>
                       </TableCell>
                       <TableCell sx={{ padding: '16px' }}>
