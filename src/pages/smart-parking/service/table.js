@@ -20,6 +20,12 @@ import Edit from './popup/edit'
 import toast from 'react-hot-toast'
 import Filters from './popup/filter'
 
+const initValueFilter = {
+  keyword: '',
+  limit: 25,
+  page: 1
+}
+
 const UserList = ({ apiData }) => {
   const [value, setValue] = useState('')
   const [service, setservice] = useState([])
@@ -32,6 +38,7 @@ const UserList = ({ apiData }) => {
   const [openPopupP, setOpenPopupP] = useState(false)
   const [openPopupEdit, setOpenPopupEdit] = useState(false)
   const [openPopupFilter, setOpenPopupFilter] = useState(false)
+  const [valueFilter, setValueFilter] = useState(initValueFilter)
 
   const handleAddPClick = (groupIds, groupName) => {
     setOpenPopupP(true)
@@ -52,10 +59,6 @@ const UserList = ({ apiData }) => {
   const handleFilterClick = (id, groupName) => {
     setOpenPopupFilter(true)
     setAssetId(id)
-  }
-
-  const handleCloseFilterPopup = () => {
-    setOpenPopupFilter(false)
   }
 
   const handlePageChange = (event, newPage) => {
@@ -143,6 +146,7 @@ const UserList = ({ apiData }) => {
           Authorization: `Bearer ${token}`
         },
         params: {
+          ...valueFilter,
           limit: pageSize,
           page: page,
           keyword: value
@@ -161,9 +165,17 @@ const UserList = ({ apiData }) => {
     }
   }
 
+  const handleSetFilter = data => {
+    setValueFilter(data)
+  }
+
   useEffect(() => {
     fetchDataAsset()
   }, [page, pageSize])
+
+  useEffect(() => {
+    fetchDataAsset()
+  }, [valueFilter])
 
   return (
     <Grid container spacing={6.5}>
@@ -246,7 +258,7 @@ const UserList = ({ apiData }) => {
                     <TableCell sx={{ padding: '16px' }}>Loại phương tiện</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Loại thuê bao</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Ngày áp dụng</TableCell>
-
+                    <TableCell sx={{ padding: '16px' }}>Trạng thái kích hoạt</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
                   </TableRow>
                 </TableHead>
@@ -261,7 +273,7 @@ const UserList = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>
                         {service.startDate} - {service.endDate}
                       </TableCell>
-
+                      <TableCell sx={{ padding: '16px' }}>{service.status}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>
                         <Grid container spacing={2}>
                           <IconButton
@@ -274,35 +286,13 @@ const UserList = ({ apiData }) => {
                           <IconButton onClick={() => handleDelete(service.id)}>
                             <Icon icon='tabler:trash' />
                           </IconButton>
+                          <IconButton onClick={() => handleDelete(service.id)}>
+                            <Icon icon="tabler:coin" />
+                          </IconButton>
                         </Grid>
                       </TableCell>
                     </TableRow>
                   ))}
-                </TableBody>
-                <TableBody>
-                  <TableRow>
-                    <TableCell sx={{ padding: '16px' }}>1</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>1</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>1</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>1</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>1</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>1</TableCell>
-
-                    <TableCell sx={{ padding: '16px' }}>
-                      <Grid container spacing={2}>
-                        <IconButton
-                          size='small'
-                          sx={{ color: 'text.secondary' }}
-                          onClick={() => handleEditClick(service.id)}
-                        >
-                          <Icon icon='tabler:edit' />
-                        </IconButton>
-                        <IconButton onClick={() => handleDelete(service.id)}>
-                          <Icon icon='tabler:trash' />
-                        </IconButton>
-                      </Grid>
-                    </TableCell>
-                  </TableRow>
                 </TableBody>
               </Table>
               <br />
@@ -343,9 +333,9 @@ const UserList = ({ apiData }) => {
         <>
           <Filters
             open={openPopupFilter}
-            onClose={handleCloseFilterPopup}
-            fetchGroupData={fetchDataAsset}
+            onClose={() => setOpenPopupFilter(false)}
             assetId={assetId}
+            callback={handleSetFilter}
           />
         </>
       )}

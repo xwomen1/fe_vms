@@ -6,6 +6,7 @@ import {
   Fade,
   Grid,
   IconButton,
+  InputAdornment,
   MenuItem,
   TextField,
   Typography
@@ -21,6 +22,7 @@ import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import { Box } from '@mui/system'
 import DatePicker from 'react-datepicker'
 import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
+import { getApi } from 'src/@core/utils/requestUltils'
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Fade ref={ref} {...props} />
@@ -41,59 +43,197 @@ const CustomCloseButton = styled(IconButton)(({ theme }) => ({
   }
 }))
 
-const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
-  const [groups, setGroups] = useState([])
-  const [selectedGroup, setSelectedGroup] = useState(null)
-  const [availableAt, setAvailableAt] = useState('')
-  const [dailyprice, setDailyPrice] = useState('')
+const statusGroup = [
+  {
+    id: '1',
+    label: 'Tất cả',
+    name: ''
+  },
+  {
+    id: '2',
+    label: 'YES',
+    name: 'YES'
+  },
+  {
+    id: '3',
+    label: 'NO',
+    name: 'NO'
+  }
+]
+
+const eServiceParking = [
+  {
+    id: '1',
+    label: 'Tất cả',
+    name: ''
+  },
+  {
+    id: '2',
+    label: 'OTO',
+    name: 'OTO'
+  },
+  {
+    id: '3',
+    label: 'MOTORBIKE',
+    name: 'MOTORBIKE'
+  }
+]
+
+const convertDateToString = date => {
+  const pad = num => String(num).padStart(2, '0')
+  const year = date.getFullYear()
+  const month = pad(date.getMonth() + 1)
+  const day = pad(date.getDate())
+  const hours = pad(date.getHours())
+  const minutes = pad(date.getMinutes())
+  const seconds = pad(date.getSeconds())
+
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`
+}
+
+const Filter = ({ open, onClose, callback, groupName, fetchGroupData }) => {
+  const [loading, setLoading] = useState(false)
+  const [dailyPriceType, setDailyPriceType] = useState('')
+  const [holidayPriceType, setHolidayPriceType] = useState('')
+  const [weekendPriceType, setWeekendPriceType] = useState('')
   const [price1, setPrice1] = useState('')
   const [price2, setPrice2] = useState('')
   const [price3, setPrice3] = useState('')
 
-  useEffect(() => {
-    fetchGroups()
-  }, [groupName])
+  const [parkingList, setParkingList] = useState([])
+  const [vehicleTypes, setVehicleTypes] = useState([])
+  const [subTypes, setSubTypes] = useState([])
+  const [parking, setParking] = useState(null)
+  const [vehicleType, setVehicleType] = useState(null)
+  const [subType, setSubType] = useState(null)
+  const [status, setStatus] = useState(null)
+  const [serviceParking, setServiceParking] = useState(null)
 
-  const fetchGroups = () => {
-    axios
-      .get('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search')
-      .then(response => {
-        // Lọc nhóm khác với groupName hiện tại
-        const filteredGroups = response.data.filter(group => group.groupName !== groupName)
-        setGroups(filteredGroups)
-      })
-      .catch(error => {
-        console.error('Error fetching groups:', error)
-      })
+  const [startTime, setStartTime] = useState(null)
+  const [endTime, setEndTime] = useState(null)
+  const [startDate, setStartDate] = useState(null)
+  const [endDate, setEndDate] = useState(null)
+
+
+  useEffect(() => {
+    // fetchGroups()
+    fetchParkings()
+    fetchVehicleType()
+    fetchSubTypes()
+  }, [])
+
+  // const fetchGroups = () => {
+  //   axios
+  //     .get('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search')
+  //     .then(response => {
+  //       // Lọc nhóm khác với groupName hiện tại
+  //       const filteredGroups = response.data.filter(group => group.groupName !== groupName)
+  //       setGroups(filteredGroups)
+  //     })
+  //     .catch(error => {
+  //       console.error('Error fetching groups:', error)
+  //     })
+  // }
+
+  const fetchParkings = async () => {
+    setLoading(true)
+
+    try {
+      const res = await getApi(`https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/parking/`)
+      setParkingList(res.data?.rows)
+    } catch (error) {
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchVehicleType = async () => {
+    setLoading(true)
+
+    try {
+      const res = await getApi(`https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/vehicle/type/`)
+      setVehicleTypes(res.data?.rows)
+    } catch (error) {
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchSubTypes = async () => {
+    setLoading(true)
+
+    try {
+      const res = await getApi(`https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/sub/type/`)
+      setSubTypes(res.data?.rows)
+    } catch (error) {
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleOnChange = dates => {
+    const [start, end] = dates
+
+    setStartDate(start)
+    setEndDate(end)
   }
 
   const handleCancel = () => {
     onClose()
   }
 
-  const handleStartDateChange = date => {
-    setAvailableAt(date)
-  }
-
   const handleOk = () => {
-    if (selectedGroup) {
-      const params = {
-        groupId: groupId,
-        toGroupId: selectedGroup.groupId // Giả sử ID của group là 'groupId'
-      }
 
-      axios
-        .put('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/move', params)
-        .then(response => {
-          console.log('Group moved successfully:', response.data)
-          toast.success('Chuyển nhóm thành công')
-          onClose()
-          fetchGroupData() // Gọi lại fetch để cập nhật danh sách nhóm
-        })
-        .catch(error => {
-          console.error('Error moving group:', error)
-        })
+    const params = {
+      vehicleTypeId: vehicleType?.id,
+      subscriptionTypeId: subType?.id,
+      parkingId: parking?.id,
+      status: status?.name,
+      startDate: startDate !== null ? convertDateToString(startDate).split('T')[0] : null,
+      endDate: endDate !== null ? convertDateToString(endDate).split('T')[0] : null,
+      eServiceParking: serviceParking?.name,
+      startTime: startTime !== null ? convertDateToString(startTime).split('T')[1].split('Z')[0] : null,
+      endTime: endTime !== null ? convertDateToString(endTime).split('T')[1].split('Z')[0] : null,
+
+      dailyPriceMax: dailyPriceType === 'Tăng' ? price1 : null,
+      dailyPriceEqual: dailyPriceType === 'Bằng' ? price1 : null,
+      dailyPriceMin: dailyPriceType === 'Giảm' ? price1 : null,
+
+      holidayPriceMax: holidayPriceType === 'Tăng' ? price2 : null,
+      holidayPriceEqual: holidayPriceType === 'Bằng' ? price2 : null,
+      holidayPriceMin: holidayPriceType === 'Giảm' ? price2 : null,
+
+
+      weekendPriceMax: weekendPriceType === 'Tăng' ? price3 : null,
+      weekendPriceEqual: weekendPriceType === 'Bằng' ? price3 : null,
+      weekendPriceMin: weekendPriceType === 'Giảm' ? price3 : null,
+
+      // toGroupId: selectedGroup.groupId // Giả sử ID của group là 'groupId'
     }
+
+    callback(params)
+    onClose()
   }
 
   return (
@@ -109,86 +249,103 @@ const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
       <CustomCloseButton onClick={onClose}>
         <Icon icon='tabler:x' fontSize='1.25rem' />
       </CustomCloseButton>
-      <Button>Lọc đơn vị</Button>
+      <Button>
+        <Typography variant='h4' color='#FF9F43'>Lọc đơn vị</Typography>
+      </Button>
       <DialogContent>
         <Grid container spacing={2}>
           <Grid container spacing={2} alignItems='center'>
             <Grid item xs={12}>
               {' '}
-              Thông tin dịch vụ
+              <Typography variant='h5'>Thông tin dịch vụ</Typography>
             </Grid>
 
             <Grid item xs={4}>
               <Autocomplete
-                value={selectedGroup}
+                value={vehicleType}
                 onChange={(event, newValue) => {
-                  setSelectedGroup(newValue)
+                  setVehicleType(newValue)
                 }}
-                options={groups}
-                getOptionLabel={option => option.groupName}
-                renderInput={params => (
-                  <CustomInput {...params} label='Loại phương tiện' variant='outlined' fullWidth />
-                )}
+                options={vehicleTypes}
+                getOptionLabel={option => option.name}
+                renderInput={params => <CustomInput {...params} label='Loại phương tiện' variant='outlined' fullWidth />}
               />
             </Grid>
             <Grid item xs={4}>
               <Autocomplete
-                value={selectedGroup}
+                value={subType}
                 onChange={(event, newValue) => {
-                  setSelectedGroup(newValue)
+                  setSubType(newValue)
                 }}
-                options={groups}
-                getOptionLabel={option => option.groupName}
+                options={subTypes}
+                getOptionLabel={option => option.name}
                 renderInput={params => <CustomInput {...params} label='Loại thuê bao' variant='outlined' fullWidth />}
               />
             </Grid>
-
+            <Grid item xs={4}>
+              <DatePickerWrapper>
+                {/* <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                  <div>
+                    
+                  </div>
+                </Box> */}
+                <DatePicker
+                  selectsRange
+                  endDate={endDate}
+                  selected={startDate}
+                  startDate={startDate}
+                  id='date-range-picker'
+                  onChange={handleOnChange}
+                  shouldCloseOnSelect={false}
+                  customInput={
+                    <CustomInput
+                      label='Ngày áp dụng'
+                      start={startDate}
+                      end={endDate}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position='end'>
+                            <Icon icon="tabler:calendar" />
+                          </InputAdornment>
+                        )
+                      }}
+                    />
+                  }
+                />
+              </DatePickerWrapper>
+            </Grid>
             <Grid item xs={4}>
               <Autocomplete
-                value={selectedGroup}
+                value={status}
                 onChange={(event, newValue) => {
-                  setSelectedGroup(newValue)
+                  setStatus(newValue)
                 }}
-                options={groups}
-                getOptionLabel={option => option.groupName}
+                options={statusGroup}
+                getOptionLabel={option => option.label}
                 renderInput={params => (
                   <CustomInput {...params} label='Trạng thái kích hoạt' variant='outlined' fullWidth />
                 )}
               />
             </Grid>
             <Grid item xs={4}>
-              <DatePickerWrapper>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
-                  <div>
-                    <DatePicker
-                      selected={availableAt}
-                      onChange={handleStartDateChange}
-                      dateFormat='MM/dd/yyyy'
-                      customInput={<CustomInput label='Ngày bắt đầu' />}
-                    />
-                  </div>
-                </Box>
-              </DatePickerWrapper>
-            </Grid>
-            <Grid item xs={4}>
               <Autocomplete
-                value={selectedGroup}
+                value={serviceParking}
                 onChange={(event, newValue) => {
-                  setSelectedGroup(newValue)
+                  setServiceParking(newValue)
                 }}
-                options={groups}
-                getOptionLabel={option => option.groupName}
+                options={eServiceParking}
+                getOptionLabel={option => option.label}
                 renderInput={params => <CustomInput {...params} label='Nhóm dịch vụ' variant='outlined' fullWidth />}
               />
             </Grid>
             <Grid item xs={4}>
               <Autocomplete
-                value={selectedGroup}
+                value={parking}
                 onChange={(event, newValue) => {
-                  setSelectedGroup(newValue)
+                  setParking(newValue)
                 }}
-                options={groups}
-                getOptionLabel={option => option.groupName}
+                options={parkingList}
+                getOptionLabel={option => option.name}
                 renderInput={params => <CustomInput {...params} label='Bãi đỗ xe' variant='outlined' fullWidth />}
               />
             </Grid>
@@ -197,17 +354,32 @@ const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
             <Grid item xs={12}>
               {' '}
               <br></br>
-              Thông tin giá
+              <Typography variant='h5'>Thông tin giá</Typography>
             </Grid>
             <Grid item xs={4}>
               <DatePickerWrapper>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
                   <div>
                     <DatePicker
-                      selected={availableAt}
-                      onChange={handleStartDateChange}
-                      dateFormat='MM/dd/yyyy'
-                      customInput={<CustomInput label='Ngày bắt đầu' />}
+                      showTimeSelect
+                      selected={startTime}
+                      timeIntervals={15}
+                      showTimeSelectOnly
+                      dateFormat='h:mm:ss aa'
+                      id='time-only-picker'
+                      onChange={date => setStartTime(date)}
+                      customInput={
+                        <CustomInput
+                          label='Thời gian bắt đầu'
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position='end'>
+                                <Icon icon="tabler:clock" />
+                              </InputAdornment>
+                            )
+                          }}
+                        />
+                      }
                     />
                   </div>
                 </Box>
@@ -218,10 +390,25 @@ const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
                 <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
                   <div>
                     <DatePicker
-                      selected={availableAt}
-                      onChange={handleStartDateChange}
-                      dateFormat='MM/dd/yyyy'
-                      customInput={<CustomInput label='Ngày kết thúc' />}
+                      showTimeSelect
+                      selected={endTime}
+                      timeIntervals={15}
+                      showTimeSelectOnly
+                      dateFormat='h:mm:ss aa'
+                      id='time-only-picker'
+                      onChange={date => setEndTime(date)}
+                      customInput={
+                        <CustomInput
+                          label='Thời gian kết thúc'
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position='end'>
+                                <Icon icon="tabler:clock" />
+                              </InputAdornment>
+                            )
+                          }}
+                        />
+                      }
                     />
                   </div>
                 </Box>
@@ -234,10 +421,11 @@ const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
                 select
                 fullWidth
                 style={{ marginBottom: '16px' }}
-                value={dailyprice}
-                onChange={e => setDailyPrice(e.target.value)}
+                value={dailyPriceType}
+                onChange={e => setDailyPriceType(e.target.value)}
               >
                 <MenuItem value='Tăng'>Lớn hơn </MenuItem>
+                <MenuItem value='Bằng'>Bằng</MenuItem>
                 <MenuItem value='Giảm'>Nhỏ hơn</MenuItem>
               </CustomInput>
             </Grid>
@@ -247,10 +435,11 @@ const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
                 select
                 fullWidth
                 style={{ marginBottom: '16px' }}
-                value={dailyprice}
-                onChange={e => setDailyPrice(e.target.value)}
+                value={holidayPriceType}
+                onChange={e => setHolidayPriceType(e.target.value)}
               >
                 <MenuItem value='Tăng'>Lớn hơn </MenuItem>
+                <MenuItem value='Bằng'>Bằng</MenuItem>
                 <MenuItem value='Giảm'>Nhỏ hơn</MenuItem>
               </CustomInput>
             </Grid>
@@ -260,10 +449,11 @@ const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
                 select
                 fullWidth
                 style={{ marginBottom: '16px' }}
-                value={dailyprice}
-                onChange={e => setDailyPrice(e.target.value)}
+                value={weekendPriceType}
+                onChange={e => setWeekendPriceType(e.target.value)}
               >
                 <MenuItem value='Tăng'>Lớn hơn </MenuItem>
+                <MenuItem value='Bằng'>Bằng</MenuItem>
                 <MenuItem value='Giảm'>Nhỏ hơn</MenuItem>
               </CustomInput>
             </Grid>
@@ -307,4 +497,4 @@ const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
   )
 }
 
-export default Edit
+export default Filter

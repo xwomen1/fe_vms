@@ -390,10 +390,10 @@ const UserList = ({ apiData }) => {
                             padding: '5px 10px',
                             width: '70%',
                             display: 'inline-block',
-                            backgroundColor: assetType.status === 'connect' ? 'green' : 'orange'
+                            backgroundColor: assetType.status === 'connected' ? 'green' : 'orange'
                           }}
                         >
-                          {assetType.status === 'connect' ? 'Đang hoạt động' : 'Không hoạt động'}
+                          {assetType.status === 'connected' ? 'Đang hoạt động' : 'Không hoạt động'}
                         </span>
                       </TableCell>
 
