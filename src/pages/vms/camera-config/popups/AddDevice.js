@@ -239,8 +239,8 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
   const [selectedProtocol, setSelectedProtocol] = useState(null)
 
   const [rows, setRows] = useState([
-    { name: '', isProxied: false, url: '', type: '' },
-    { name: '', isProxied: false, url: '', type: '' }
+    { name: '', isProxied: false, url: '', codec: '' },
+    { name: '', isProxied: false, url: '', codec: '' }
   ])
   const [lat, setLat] = useState(null)
   const [lng, setLng] = useState(null)
@@ -422,7 +422,7 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
   }
 
   const handleAddRow = () => {
-    const newRow = { name: '', isProxied: false, url: '', type: '' } // Ensure isProxied is a boolean
+    const newRow = { name: '', isProxied: false, url: '', codec: '' } // Ensure isProxied is a boolean
     setRows([...rows, newRow])
   }
 
@@ -446,7 +446,7 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
 
   const handleStreamTypeChange = (index, event) => {
     const newRows = [...rows]
-    newRows[index].type = event.target.value
+    newRows[index].codec = event.target.value
     setRows(newRows)
   }
 
@@ -711,7 +711,7 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
                             <TableCell align='right'>
                               <CustomTextField
                                 type='text'
-                                value={row.type}
+                                value={row.codec}
                                 onChange={event => handleStreamTypeChange(index, event)}
                                 fullWidth
                               />

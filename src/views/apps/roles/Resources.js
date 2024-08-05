@@ -75,6 +75,10 @@ const UserList = () => {
     }
   }
 
+  const handelUpdate = id => {
+    console.log(id)
+  }
+
   const togglePermission = (resourceIndex, scope) => {
     const updatedResources = [...resources]
     const resource = updatedResources[resourceIndex]
@@ -145,6 +149,7 @@ const UserList = () => {
                         {['get', 'list', 'update', 'create', 'delete'].map(scope => (
                           <TableCell key={scope}>{scopeLabels[scope]}</TableCell>
                         ))}
+                        <TableCell>Hành động</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -170,6 +175,17 @@ const UserList = () => {
                               />
                             </TableCell>
                           ))}
+                          <TableCell>
+                            <Button
+                              variant='contained'
+                              onClick={() => {
+                                handelUpdate(resource.tenantId)
+                              }}
+                              disabled
+                            >
+                              <Icon icon='mdi:edit'></Icon>
+                            </Button>
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
