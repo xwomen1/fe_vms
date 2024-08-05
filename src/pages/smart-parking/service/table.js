@@ -28,7 +28,7 @@ const initValueFilter = {
 
 const UserList = ({ apiData }) => {
   const [value, setValue] = useState('')
-  const [service, setservice] = useState([])
+  const [service, setService] = useState([])
   const [total, setTotal] = useState(1)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
@@ -123,13 +123,13 @@ const UserList = ({ apiData }) => {
             Authorization: `Bearer ${token}`
           }
         }
-        let urlDelete = `https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/asset/type/delete/${idDelete}`
+        let urlDelete = `https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/service/parking/delete/${idDelete}`
         axios
           .delete(urlDelete)
           .then(() => {
-            const updatedData = service.filter(service => service.id !== idDelete)
-            setservice(updatedData)
-            fetchDataAsset()
+            // const updatedData = service.filter(service => service.id !== idDelete)
+            // setService(updatedData)
+            // fetchDataAsset()
             toast.success('Xoá thành công')
           })
           .catch(err => {
@@ -161,7 +161,7 @@ const UserList = ({ apiData }) => {
         config
       )
 
-      setservice(response.data.rows)
+      setService(response.data.rows)
       setTotal(response.data.totalPage)
     } catch (error) {
       console.error('Error fetching users:', error)

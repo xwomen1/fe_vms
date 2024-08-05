@@ -13,15 +13,11 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
   Typography
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
-import axios from 'axios'
 import toast from 'react-hot-toast'
-
 import Icon from 'src/@core/components/icon'
-
 import { Dialog, DialogTitle, DialogContent } from '@mui/material'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
@@ -140,34 +136,52 @@ const format_form = [
     type: 'DatePicker',
     require: true,
     width: 4
-  }
+  },
 ]
 
-
-
+const TimeLine = [
+  { id: '0', name: '00:00:00' },
+  { id: '1', name: '01:00:00' },
+  { id: '2', name: '02:00:00' },
+  { id: '3', name: '03:00:00' },
+  { id: '4', name: '04:00:00' },
+  { id: '5', name: '05:00:00' },
+  { id: '6', name: '06:00:00' },
+  { id: '7', name: '07:00:00' },
+  { id: '8', name: '08:00:00' },
+  { id: '9', name: '09:00:00' },
+  { id: '10', name: '10:00:00' },
+  { id: '11', name: '11:00:00' },
+  { id: '12', name: '12:00:00' },
+  { id: '13', name: '13:00:00' },
+  { id: '14', name: '14:00:00' },
+  { id: '15', name: '15:00:00' },
+  { id: '16', name: '16:00:00' },
+  { id: '17', name: '17:00:00' },
+  { id: '18', name: '18:00:00' },
+  { id: '19', name: '19:00:00' },
+  { id: '20', name: '20:00:00' },
+  { id: '21', name: '21:00:00' },
+  { id: '22', name: '22:00:00' },
+  { id: '23', name: '23:00:00' },
+  { id: '24', name: '24:00:00' },
+];
 
 const Edit = ({ open, onClose, id, setReload }) => {
   const [loading, setLoading] = useState(false)
-  const [name, setName] = useState(null)
-  const [code, setCode] = useState(null)
   const [detail, setDetail] = useState(null)
-  const [groups, setGroups] = useState([])
   const [servicePrice, setServicePrice] = useState([])
-
+  const [parking, setParking] = useState([])
   const [parkingList, setParkingList] = useState([])
   const [vehicleTypes, setVehicleTypes] = useState([])
   const [subTypes, setSubTypes] = useState([])
-  const [parking, setParking] = useState(null)
   const [vehicleType, setVehicleType] = useState(null)
   const [subType, setSubType] = useState(null)
   const [status, setStatus] = useState(null)
   const [serviceParking, setServiceParking] = useState(null)
-
-  const [startTime, setStartTime] = useState(null)
-  const [endTime, setEndTime] = useState(null)
+  const [data, setData] = useState(null)
   const [startDate, setStartDate] = useState(null)
   const [endDate, setEndDate] = useState(null)
-
   const [form, setForm] = useState(format_form)
 
   const {
@@ -185,6 +199,12 @@ const Edit = ({ open, onClose, id, setReload }) => {
   }, [])
 
   useEffect(() => {
+    if (data) {
+      setDetail(data)
+    }
+  }, [data])
+
+  useEffect(() => {
     if (detail) {
       setDetailFormValue()
     }
@@ -198,15 +218,14 @@ const Edit = ({ open, onClose, id, setReload }) => {
     setLoading(true)
     try {
       const res = await getApi(`https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/service/parking/find/${id}`)
-      setDetail(res.data)
-      setCode(res.data?.code)
-      setName(res.data?.name)
+      setData(res.data)
       setStatus(res.data?.status)
       setStartDate(res.data?.startDate)
       setEndDate(res.data?.endDate)
       setServiceParking(res.data?.eserviceParking)
       setSubType(res.data?.subscriptionType.name)
       setVehicleType(res.data?.vehicleType.name)
+      setParking(res?.data.parking)
       setServicePrice(res.data?.serviceParkingPrice)
     } catch (error) {
       if (error && error?.response?.data) {
@@ -279,38 +298,141 @@ const Edit = ({ open, onClose, id, setReload }) => {
   }
 
   const handleAddRow1 = () => {
-    const newRow1 = { policyName: '', description: '' }
-    setServicePrice([...servicePrice, newRow1])
+    const newRow = {
+      startTime: '',
+      endTime: '',
+      dailyPrice: '',
+      weekendPrice: '',
+      holidayPrice: '',
+      timeFree: '',
+      weight: '',
+      id: '',
+      endDate: '',
+      startDate: ''
+
+    }
+    setServicePrice([...servicePrice, newRow])
   }
 
+  const handleDeleteRow1 = index => {
+    const updatedRows = [...servicePrice]
+    updatedRows.splice(index, 1)
+    setServicePrice(updatedRows)
+  }
+
+  const handleAddRow2 = () => {
+    const newRow = {
+      codeParking: '',
+      detail: '',
+      id: '',
+      managementUnitId: '',
+      name: '',
+      nameManagementUnit: '',
+      nameSubdivision: '',
+      subdivisionId: ''
+    }
+    setParking([...parking, newRow])
+  }
+
+  const handleDeleteRow2 = index => {
+    const updatedRows = [...parking]
+    updatedRows.splice(index, 1)
+    setParking(updatedRows)
+  }
 
   const handleCancel = () => {
     onClose()
   }
 
-  const handleFullNameChange = event => {
-    setName(event.target.value)
+  const handleStartTime = (index, event) => {
+    const newRows = [...servicePrice]
+    newRows[index].startTime = event
+    setServicePrice(newRows)
   }
 
-  const handleCodeChange = event => {
-    setCode(event.target.value)
+  const handleEndTime = (index, event) => {
+    const newRows = [...servicePrice]
+    newRows[index].endTime = event
+    setServicePrice(newRows)
   }
 
-  const handleDetailChange = event => {
-    setDetail(event.target.value)
+
+  const handleDailyPrice = (index, event) => {
+    const newRows = [...servicePrice]
+    newRows[index].dailyPrice = event.target.value
+    setServicePrice(newRows)
   }
 
+  const handleWeekendPrice = (index, event) => {
+    const newRows = [...servicePrice]
+    newRows[index].weekendPrice = event.target.value
+    setServicePrice(newRows)
+  }
+
+
+  const handleHolidayPrice = (index, event) => {
+    const newRows = [...servicePrice]
+    newRows[index].holidayPrice = event.target.value
+    setServicePrice(newRows)
+  }
+
+  const handleTimeFree = (index, event) => {
+    const newRows = [...servicePrice]
+    newRows[index].timeFree = event.target.value
+    setServicePrice(newRows)
+  }
+
+  const handleWeight = (index, event) => {
+    const newRows = [...servicePrice]
+    newRows[index].weight = event.target.value
+    setServicePrice(newRows)
+  }
+
+  const handleRow2Change = (index, key, value) => {
+    setParking(prevParking => {
+      const updateRows = [...prevParking]
+      updateRows[index][key] = value
+
+      return updateRows
+    })
+  }
+
+  const handleParking = (index, newValue) => {
+    if (newValue) {
+      handleRow2Change(index, 'id', newValue.id)
+      handleRow2Change(index, 'name', newValue.name)
+      handleRow2Change(index, 'codeParking', newValue.codeParking)
+      handleRow2Change(index, 'subdivisionId', newValue.subdivisionId)
+      handleRow2Change(index, 'nameSubdivision', newValue.nameSubdivision)
+      handleRow2Change(index, 'detail', newValue.detail)
+      handleRow2Change(index, 'nameManagementUnit', newValue.nameManagementUnit)
+      handleRow2Change(index, 'managementUnitId', newValue.managementUnitId)
+    } else {
+      handleRow2Change(index, 'id', '')
+      handleRow2Change(index, 'name', '')
+      handleRow2Change(index, 'codeParking', '')
+      handleRow2Change(index, 'subdivisionId', '')
+      handleRow2Change(index, 'nameSubdivision', '')
+      handleRow2Change(index, 'detail', '')
+      handleRow2Change(index, 'nameManagementUnit', '')
+      handleRow2Change(index, 'managementUnitId', '')
+    }
+  }
 
   const handleOnChange = dates => {
     const [start, end] = dates
 
-    setStartDate(start)
-    setEndDate(end)
+    setStartDate(convertDateToString(start).split('T')[0])
+    setEndDate(convertDateToString(end).split('T')[0])
   }
 
   const onSubmit = values => {
     const params = {
-      ...values
+      ...values,
+      startDate: startDate,
+      endDate: endDate,
+      parking: parking,
+      serviceParkingPrice: servicePrice
     }
 
     putApi(`https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/service/parking/${detail.id}`, { ...params })
@@ -331,8 +453,6 @@ const Edit = ({ open, onClose, id, setReload }) => {
         setLoading(false)
         onClose()
       })
-
-    console.log('params', params);
   }
 
   return (
@@ -461,15 +581,13 @@ const Edit = ({ open, onClose, id, setReload }) => {
                   <TableHead>
                     <TableRow>
                       <TableCell>STT</TableCell>
-                      <TableCell>Giờ bắt đầu</TableCell>
-                      <TableCell>Giờ kết thúc</TableCell>
+                      <TableCell width={200}>Giờ bắt đầu</TableCell>
+                      <TableCell width={200}>Giờ kết thúc</TableCell>
                       <TableCell>Giá ngày thường</TableCell>
                       <TableCell>Giá ngày nghỉ</TableCell>
                       <TableCell>Giá ngày lễ</TableCell>
                       <TableCell>Thời gian miễn phí (giờ dầu)</TableCell>
                       <TableCell>Trọng số</TableCell>
-
-                      <TableCell>Mô tả</TableCell>
                       <TableCell align='center'>
                         <IconButton onClick={handleAddRow1} size='small' sx={{ marginLeft: '10px' }}>
                           <Icon icon='bi:plus' />
@@ -483,54 +601,45 @@ const Edit = ({ open, onClose, id, setReload }) => {
                         <TableCell>
                           {index + 1}
                         </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            value={row?.startTime}
-                            onChange={handleFullNameChange}
+                        <TableCell width={200}>
+                          <Autocomplete
+                            options={TimeLine}
+                            getOptionLabel={option => option.name}
+                            onChange={(event, newValue) => handleStartTime(index, newValue)}
+                            renderInput={params => <CustomTextField {...params} />}
                             fullWidth
-                            InputProps={{
-                              endAdornment: (
-                                <InputAdornment position='end'>
-                                  <Icon icon="tabler:clock" />
-                                </InputAdornment>
-                              )
-                            }}
+                          />
+                        </TableCell>{' '}
+                        <TableCell width={200}>
+                          <Autocomplete
+                            options={TimeLine}
+                            getOptionLabel={option => option.name}
+                            onChange={(event, newValue) => handleEndTime(index, newValue)}
+                            renderInput={params => <CustomTextField {...params} />}
+                            fullWidth
                           />
                         </TableCell>{' '}
                         <TableCell>
-                          <CustomTextField
-                            value={row?.endTime}
-                            onChange={handleFullNameChange}
-                            fullWidth
-                            InputProps={{
-                              endAdornment: (
-                                <InputAdornment position='end'>
-                                  <Icon icon="tabler:clock" />
-                                </InputAdornment>
-                              )
-                            }} />
+                          <CustomTextField value={row?.dailyPrice} onChange={event => handleDailyPrice(index, event)} fullWidth />
                         </TableCell>{' '}
                         <TableCell>
-                          <CustomTextField value={row?.dailyPrice} onChange={handleFullNameChange} fullWidth />
+                          <CustomTextField value={row?.weekendPrice} onChange={event => handleWeekendPrice(index, event)} fullWidth />
                         </TableCell>{' '}
                         <TableCell>
-                          <CustomTextField value={row?.weekendPrice} onChange={handleFullNameChange} fullWidth />
+                          <CustomTextField value={row?.holidayPrice} onChange={event => handleHolidayPrice(index, event)} fullWidth />
                         </TableCell>{' '}
                         <TableCell>
-                          <CustomTextField value={row?.holidayPrice} onChange={handleFullNameChange} fullWidth />
-                        </TableCell>{' '}
-                        <TableCell>
-                          <CustomTextField value={row?.timeFree} onChange={handleFullNameChange} fullWidth />
+                          <CustomTextField value={row?.timeFree} onChange={event => handleTimeFree(index, event)} fullWidth />
                         </TableCell>
                         <TableCell>
-                          <CustomTextField value={row?.weight} onChange={handleFullNameChange} fullWidth />
-                        </TableCell>{' '}
-                        <TableCell>
-                          <CustomTextField value={''} onChange={handleFullNameChange} fullWidth />
+                          <CustomTextField value={row?.weight} onChange={event => handleWeight(index, event)} fullWidth />
                         </TableCell>{' '}
                         <TableCell align='center'>
-                          {index > 0 && (
-                            <IconButton size='small' onClick={() => handleDeleteRow(index)}>
+                          {index >= 0 && (
+                            <IconButton
+                              size='small'
+                              onClick={() => handleDeleteRow1(index)}
+                            >
                               <Icon icon='bi:trash' />
                             </IconButton>
                           )}
@@ -554,30 +663,43 @@ const Edit = ({ open, onClose, id, setReload }) => {
                       <TableCell>Tên bãi đỗ xe</TableCell>
                       <TableCell>Khu vực</TableCell>
                       <TableCell align='center'>
-                        <IconButton onClick={handleAddRow1} size='small' sx={{ marginLeft: '10px' }}>
+                        <IconButton onClick={handleAddRow2} size='small' sx={{ marginLeft: '10px' }}>
                           <Icon icon='bi:plus' />
                         </IconButton>
                       </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {servicePrice.map((row, index) => (
+                    {parking.map((row, index) => (
                       <TableRow key={index}>
                         <TableCell>
                           {index + 1}
                         </TableCell>
                         <TableCell>
-                          <CustomTextField value={''} fullWidth />
+                          <Autocomplete
+                            options={parkingList}
+                            value={row?.codeParking}
+                            getOptionLabel={option => option.codeParking || row?.codeParking}
+                            onChange={(event, newValue) => handleParking(index, newValue)}
+                            renderInput={params => <CustomTextField {...params} />}
+                            fullWidth
+                          />
                         </TableCell>{' '}
                         <TableCell>
-                          <CustomTextField value={''} fullWidth />
+                          <CustomTextField
+                            value={row?.name}
+                            onChange={e => handleRow2Change(index, 'name', e.target.value)}
+                            fullWidth />
                         </TableCell>{' '}
                         <TableCell>
-                          <CustomTextField value={''} fullWidth />
+                          <CustomTextField
+                            value={row?.nameManagementUnit}
+                            onChange={e => handleRow2Change(index, 'nameManagementUnit', e.target.value)}
+                            fullWidth />
                         </TableCell>{' '}
                         <TableCell align='center'>
-                          {index > 0 && (
-                            <IconButton size='small' onClick={() => handleDeleteRow(index)}>
+                          {index >= 0 && (
+                            <IconButton size='small' onClick={() => handleDeleteRow2(index)}>
                               <Icon icon='bi:trash' />
                             </IconButton>
                           )}
