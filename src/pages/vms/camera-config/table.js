@@ -321,11 +321,21 @@ const Camera = ({ apiData }) => {
                     <Box></Box>
                   ) : (
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Button variant='contained' color='secondary' onClick={handleAddRoleClick}>Mật khẩu</Button>
-                      <Button variant='contained' color='secondary' onClick={handleAddNetworkClick}>Mạng</Button>
-                      <Button variant='contained' color='secondary' onClick={handleAddVideoClick}>Video</Button>
-                      <Button variant='contained' color='secondary' onClick={handleAddImageClick}>Hình ảnh</Button>
-                      <Button variant='contained' color='secondary' onClick={handleAddCloudClick}>Bộ nhớ</Button>
+                      <Button variant='contained' color='secondary' onClick={handleAddRoleClick}>
+                        Mật khẩu
+                      </Button>
+                      <Button variant='contained' color='secondary' onClick={handleAddNetworkClick}>
+                        Mạng
+                      </Button>
+                      <Button variant='contained' color='secondary' onClick={handleAddVideoClick}>
+                        Video
+                      </Button>
+                      <Button variant='contained' color='secondary' onClick={handleAddImageClick}>
+                        Hình ảnh
+                      </Button>
+                      <Button variant='contained' color='secondary' onClick={handleAddCloudClick}>
+                        Bộ nhớ
+                      </Button>
                     </Box>
                   )}
                 </Grid>
@@ -412,10 +422,10 @@ const Camera = ({ apiData }) => {
                               style={{
                                 backgroundColor:
                                   assetType.status.name === 'connected'
-                                    ? 'lightgreen'
+                                    ? '#449D44'
                                     : assetType.status.name === 'disconnected'
-                                      ? '#FF9F43'
-                                      : 'orange',
+                                    ? '#FF9F43'
+                                    : '#FF9F43',
                                 borderRadius: '10px',
                                 padding: '5px 10px',
                                 width: '70%',
@@ -426,8 +436,8 @@ const Camera = ({ apiData }) => {
                               {assetType.status.name === 'connected'
                                 ? 'Đã kết nối'
                                 : assetType.status.name === 'disconnected'
-                                  ? 'Mất kết nối'
-                                  : assetType.status.name}
+                                ? 'Mất kết nối'
+                                : assetType.status.name}
                             </div>
                           ) : (
                             assetType.status.name

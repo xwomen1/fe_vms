@@ -33,20 +33,20 @@ const UserList = ({ apiData }) => {
   const [openPopupEdit, setOpenPopupEdit] = useState(false)
   const [openPopupFilter, setOpenPopupFilter] = useState(false)
 
-  const handleAddFilterClick = (groupIds, groupName) => {
-    setOpenPopupFilter(true)
-  }
-
-  const handleCloseFilterPopup = () => {
-    setOpenPopupFilter(false)
-  }
-
   const handleAddPClick = (groupIds, groupName) => {
     setOpenPopupP(true)
   }
 
   const handleClosePPopup = () => {
     setOpenPopupP(false)
+  }
+
+  const handleAddFilterClick = (groupIds, groupName) => {
+    setOpenPopupFilter(true)
+  }
+
+  const handleCloseFilterPopup = () => {
+    setOpenPopupFilter(false)
   }
 
   const handleEditClick = (id, groupName) => {
@@ -102,8 +102,6 @@ const UserList = ({ apiData }) => {
     handleCloseMenu()
   }
 
-  //todoHue: 30/7/2024:BE thiếu status
-
   const handleDelete = idDelete => {
     showAlertConfirm({
       text: 'Bạn có chắc chắn muốn xóa?'
@@ -119,7 +117,7 @@ const UserList = ({ apiData }) => {
             Authorization: `Bearer ${token}`
           }
         }
-        let urlDelete = ` https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/parking/delete/${idDelete}`
+        let urlDelete = `https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/sub/type/delete/${idDelete}`
         axios
           .delete(urlDelete)
           .then(() => {
@@ -153,7 +151,10 @@ const UserList = ({ apiData }) => {
           }
         }
 
-        const response = await axios.get(`https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/asset/`, config)
+        const response = await axios.get(
+          `https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/sub/type/`,
+          config
+        )
 
         setAssetType(response.data.rows)
         setTotal(response.data.totalPage)
@@ -175,7 +176,10 @@ const UserList = ({ apiData }) => {
           }
         }
 
-        const response = await axios.get(`https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/asset/`, config)
+        const response = await axios.get(
+          `https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/sub/type/`,
+          config
+        )
 
         setAssetType(response.data.rows)
         setTotal(response.data.totalPage)
@@ -184,6 +188,7 @@ const UserList = ({ apiData }) => {
       }
     }
   }
+
   useEffect(() => {
     fetchDataAsset()
   }, [page, pageSize])
@@ -195,7 +200,7 @@ const UserList = ({ apiData }) => {
           <CardHeader
             title={
               <>
-                <Button variant='contained'>Danh sách tài sản</Button>
+                <Button variant='contained'>Loại thuê bao</Button>
               </>
             }
             titleTypographyProps={{ sx: { mb: [2, 0] } }}
@@ -221,7 +226,7 @@ const UserList = ({ apiData }) => {
                 </Grid>
                 <Grid item>
                   <CustomTextField
-                    placeholder='Nhập tên  ...! '
+                    placeholder='Nhập tên sự kiện ...! '
                     value={value}
                     onChange={e => setValue(e.target.value)}
                     InputProps={{
@@ -264,13 +269,9 @@ const UserList = ({ apiData }) => {
                 <TableHead>
                   <TableRow>
                     <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Mã tài sản</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Tên tài sản</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>S/N</TableCell>
-
+                    <TableCell sx={{ padding: '16px' }}>Mã loại thuê bao</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Tên loại thuê bao</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Mô tả</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Loại tài sản</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Bãi đỗ xe</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Trạng thái kích hoạt</TableCell>
 
                     <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
@@ -280,18 +281,13 @@ const UserList = ({ apiData }) => {
                   {assettype.map((assetType, index) => (
                     <TableRow key={assetType.id}>
                       <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType?.code}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType?.name}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType?.codeSN}</TableCell>
-
-                      <TableCell sx={{ padding: '16px' }}>{assetType?.detail}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType?.assetType?.name}</TableCell>
-
-                      <TableCell sx={{ padding: '16px' }}>{assetType?.parking?.name}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{assetType.code}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{assetType.name}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{assetType.detail}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>
-                        {' '}
-                        {assetType.status === 'ACTIVE' ? 'Đã kích hoạt' : 'Chưa kích hoạt'}
+                        {assetType.status === 'YES' ? 'Đã kích hoạt' : 'Chưa kích hoạt'}
                       </TableCell>
+
                       <TableCell sx={{ padding: '16px' }}>
                         <Grid container spacing={2}>
                           <IconButton
