@@ -348,12 +348,12 @@ const FaceManagement = () => {
             loaded
               ? { display: 'none' }
               : {
-                width: '100px',
-                height: '100px',
-                display: 'grid',
-                backgroundColor: '#C4C4C4',
-                placeItems: 'center'
-              }
+                  width: '100px',
+                  height: '100px',
+                  display: 'grid',
+                  backgroundColor: '#C4C4C4',
+                  placeItems: 'center'
+                }
           }
         >
           <CircularProgress size={20} />
@@ -379,7 +379,7 @@ const FaceManagement = () => {
     <>
       <Card>
         <CardHeader
-          title="Danh sách khuôn mặt"
+          title='Danh sách khuôn mặt'
           titleTypographyProps={{ sx: { mb: [2, 0] } }}
           action={
             <Grid container spacing={2}>
@@ -408,12 +408,7 @@ const FaceManagement = () => {
                   >
                     <Icon icon='tabler:file-export' />
                   </Button>
-                  <Button
-                    variant='contained'
-                    style={{}}
-                    component={Link}
-                    href={`/pages/face_management/detail/add`}
-                  >
+                  <Button variant='contained' style={{}} component={Link} href={`/pages/face_management/detail/add`}>
                     <Icon icon='tabler:plus' />
                     Thêm mới
                   </Button>
@@ -469,8 +464,7 @@ const FaceManagement = () => {
                 <TableCell sx={{ padding: '16px' }}>Lần cuối xuất hiện</TableCell>
                 <TableCell sx={{ padding: '16px' }}>Loại đối tượng</TableCell>
                 <TableCell sx={{ padding: '16px' }}>Trạng thái hoạt động </TableCell>
-                <TableCell sx={{ padding: '16px' }}>Chi tiết</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Xóa</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -499,29 +493,40 @@ const FaceManagement = () => {
                         <TableCell>{user.name}</TableCell>
                         <TableCell>{formatDate(user.lastAppearance)}</TableCell>
                         <TableCell>Nhân viên</TableCell>
-                        <TableCell
+                        <TableCell sx={{ padding: '16px', textAlign: 'center' }}>
+                          <div
+                            style={{
+                              backgroundColor:
+                                user.status === true ? '#449D44' : user.status === false ? '#FF9F43' : '#FF9F43',
+                              borderRadius: '10px',
+                              padding: '5px 10px',
+                              width: '70%',
+                              display: 'inline-block',
+                              color: 'white'
+                            }}
+                          >
+                            {user.status === true
+                              ? 'Đang hoạt động'
+                              : user.status === false
+                              ? 'Không hoạt động'
+                              : user.status}
+                          </div>
+                        </TableCell>
+                        {/* <TableCell
                           style={{
                             color: user.status ? '#FF9F43' : 'red'
                           }}
                         >
                           {user.status ? 'hoạt động' : 'không hoạt động'}
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            size='small'
-                            component={Link}
-                            href={`/pages/face_management/detail/${user.id}`}
-                            sx={{ color: 'blue', right: '10px' }}
-                          >
-                            Xem chi tiết
-                          </Button>
-                        </TableCell>
+                        </TableCell> */}
                         <TableCell sx={{ padding: '16px' }}>
-                          <Grid container spacing={2}>
-                            <IconButton onClick={() => handleDelete(user.id)}>
-                              <Icon icon='tabler:trash' />
-                            </IconButton>
-                          </Grid>
+                          <IconButton component={Link} href={`/pages/face_management/detail/${user.id}`}>
+                            <Icon icon='tabler:info-circle' />
+                          </IconButton>
+
+                          <IconButton onClick={() => handleDelete(user.id)}>
+                            <Icon icon='tabler:trash' />
+                          </IconButton>
                         </TableCell>
                       </TableRow>
                     )

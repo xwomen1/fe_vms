@@ -345,12 +345,12 @@ const Car_management = () => {
             loaded
               ? { display: 'none' }
               : {
-                width: '100px',
-                height: '100px',
-                display: 'grid',
-                backgroundColor: '#C4C4C4',
-                placeItems: 'center'
-              }
+                  width: '100px',
+                  height: '100px',
+                  display: 'grid',
+                  backgroundColor: '#C4C4C4',
+                  placeItems: 'center'
+                }
           }
         >
           <CircularProgress size={20} />
@@ -373,7 +373,7 @@ const Car_management = () => {
       ) : (
         <Card>
           <CardHeader
-            title="Danh sách biển số xe"
+            title='Danh sách biển số xe'
             titleTypographyProps={{ sx: { mb: [2, 0] } }}
             action={
               <Grid container spacing={2}>
@@ -461,8 +461,7 @@ const Car_management = () => {
                     <TableCell sx={{ padding: '16px' }}>Lần cuối xuất hiện</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Trạng thái</TableCell>
 
-                    <TableCell sx={{ padding: '16px' }}>Chi tiết</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Xóa</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -495,30 +494,40 @@ const Car_management = () => {
                         <TableCell>{user.vehicleType}</TableCell>
 
                         <TableCell>{user.lastAppearance}</TableCell>
-                        <TableCell
+                        <TableCell sx={{ padding: '16px', textAlign: 'center' }}>
+                          <div
+                            style={{
+                              backgroundColor:
+                                user.status == true ? '#449D44' : user.status == false ? '#FF9F43' : '#FF9F43',
+                              borderRadius: '10px',
+                              padding: '5px 10px',
+                              width: '70%',
+                              display: 'inline-block',
+                              color: 'white'
+                            }}
+                          >
+                            {user.status == true
+                              ? 'Đang hoạt động'
+                              : user.status == false
+                              ? 'Không hoạt động'
+                              : user.status}
+                          </div>
+                        </TableCell>
+                        {/* <TableCell
                           style={{
                             color: user.status ? '#FF9F43' : 'red'
                           }}
                         >
                           {user.status ? 'hoạt động' : 'không hoạt động'}
-                        </TableCell>
-
-                        <TableCell>
-                          <Button
-                            size='small'
-                            component={Link}
-                            href={`/pages/car_management/detail/${user.id}`}
-                            sx={{ color: 'blue', right: '10px' }}
-                          >
-                            Xem chi tiết
-                          </Button>
-                        </TableCell>
+                        </TableCell> */}
                         <TableCell sx={{ padding: '16px' }}>
-                          <Grid container spacing={2}>
-                            <IconButton onClick={() => handleDelete(user.id)}>
-                              <Icon icon='tabler:trash' />
-                            </IconButton>
-                          </Grid>
+                          <IconButton component={Link} href={`/pages/car_management/detail/${user.id}`}>
+                            <Icon icon='tabler:info-circle' />
+                          </IconButton>
+
+                          <IconButton onClick={() => handleDelete(user.id)}>
+                            <Icon icon='tabler:trash' />
+                          </IconButton>
                         </TableCell>
                       </TableRow>
                     ))
@@ -555,7 +564,6 @@ const Car_management = () => {
                   <Pagination count={total} page={page} color='primary' onChange={handlePageChange} />
                 </Grid>
               </Grid>
-
             </Grid>
           </CardContent>
         </Card>
