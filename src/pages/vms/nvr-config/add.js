@@ -1028,7 +1028,7 @@ const UserList = ({ apiData }) => {
                             style={{
                               backgroundColor:
                                 assetType.status.name === 'connected'
-                                  ? 'lightgreen'
+                                  ? '#449D44'
                                   : assetType.status.name === 'disconnected'
                                   ? '#FF9F43'
                                   : 'orange',

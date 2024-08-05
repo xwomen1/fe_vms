@@ -33,7 +33,6 @@ const AddCamera = ({ nvr, onClose }) => {
   const [notification, setNotification] = useState({ message: '', type: '' })
 
   useEffect(() => {
-
     const fetchGroupData = async () => {
       try {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)

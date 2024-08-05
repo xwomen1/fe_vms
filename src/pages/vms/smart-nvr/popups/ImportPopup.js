@@ -247,7 +247,7 @@ const ImportPopup = ({ open, handleClose }) => {
                   <TableCell>{data.password}</TableCell>
                   <TableCell>
                     {data.insertstatus ? (
-                      <Icon icon='tabler:check' color='green' />
+                      <Icon icon='tabler:check' color='#449D44' />
                     ) : (
                       <Icon icon='tabler:x' color='red' />
                     )}

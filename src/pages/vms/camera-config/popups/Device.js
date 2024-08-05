@@ -650,7 +650,7 @@ const Device = ({ onClose, camera }) => {
                       <TableCell align='right' style={{ width: '20%' }}>
                         <CustomTextField
                           type='text'
-                          value={row.type}
+                          value={row.codec}
                           onChange={event => handleStreamTypeChange(index, event)}
                           fullWidth
                         />

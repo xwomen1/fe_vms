@@ -27,28 +27,6 @@ const navigation = () => {
         },
 
         {
-          path: '/pages/door-access/list',
-          title: 'Quyền truy cập cửa',
-          icon: 'tabler:door-enter'
-        },
-        {
-          path: '/pages/schedule-access/list',
-          title: 'Quản lý lịch',
-          icon: 'tabler:calendar-due'
-        },
-
-        {
-          path: '/pages/door-management/list',
-          title: 'Quản lý cửa',
-          icon: 'tabler:door'
-        },
-        {
-          path: '/pages/group-access/list',
-          title: 'Nhóm quyền truy cập',
-          icon: 'tabler:mood-check'
-        },
-
-        {
           title: 'Chấm công',
           path: '/access-control/time-keeping',
           icon: 'tabler:lock-access'
@@ -148,7 +126,8 @@ const navigation = () => {
           title: 'Khuôn mặt',
           path: '/vms/events/view/eventFace',
           icon: 'tabler:timeline-event-exclamation'
-        }, {
+        },
+        {
           title: 'Biển số',
           path: '/vms/events/view/eventCar',
           icon: 'tabler:timeline-event-exclamation'
@@ -331,6 +310,11 @@ const navigation = () => {
           path: '/organizational-structure'
         },
         {
+          title: 'Cơ cấu tổ chức',
+          icon: 'tabler:building',
+          path: '/organization/list'
+        },
+        {
           title: 'Vai Trò',
           icon: 'tabler:users',
           path: '/apps/roles'
@@ -365,6 +349,11 @@ const navigation = () => {
         {
           path: '/smart-parking/caller',
           title: 'Thuê bao',
+          icon: 'tabler:phone'
+        },
+        {
+          path: '/smart-parking/caller-type',
+          title: 'Loại thuê bao',
           icon: 'tabler:phone'
         },
         {
@@ -407,6 +396,50 @@ const navigation = () => {
               path: '/smart-parking/asset'
             }
           ]
+        }
+
+        // {
+        //   path: '/pages/access-rights/list',
+        //   title: 'Quyền truy cập',
+        //   icon: 'tabler:shield'
+        // },
+        // {
+        //   path: '/pages/access-rights/list',
+        //   title: 'Thống kê',
+        //   icon: 'tabler:statistics/time?tab=%2Fstatistics%2Ftime'
+        // },
+        // {
+        //   path: '/pages/access-rights/list',
+        //   title: 'Hẹn lịch',
+        //   icon: 'tabler:guest-registrations'
+        // }
+      ]
+    },
+    {
+      path: '/',
+      title: 'Cài đặt nâng cao',
+      icon: 'tabler:lock-access',
+      children: [
+        {
+          path: '/pages/door-access/list',
+          title: 'Quyền truy cập cửa',
+          icon: 'tabler:door-enter'
+        },
+        {
+          path: '/pages/schedule-access/list',
+          title: 'Quản lý lịch',
+          icon: 'tabler:calendar-due'
+        },
+
+        {
+          path: '/pages/door-management/list',
+          title: 'Quản lý cửa',
+          icon: 'tabler:door'
+        },
+        {
+          path: '/pages/group-access/list',
+          title: 'Nhóm quyền truy cập',
+          icon: 'tabler:mood-check'
         }
 
         // {

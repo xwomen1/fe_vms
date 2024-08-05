@@ -7,25 +7,25 @@ import {
   FormControl,
   Grid,
   IconButton,
-  InputLabel,
   MenuItem,
   Select,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   TextField,
-  Typography
+  Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 
 import Icon from 'src/@core/components/icon'
-
-import { Dialog, DialogTitle, DialogContent } from '@mui/material'
+import TableContainer from '@mui/material/TableContainer'
+import Table from '@mui/material/Table'
+import TableRow from '@mui/material/TableRow'
+import TableHead from '@mui/material/TableHead'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import authConfig from 'src/configs/auth'
 
@@ -48,25 +48,113 @@ const CustomCloseButton = styled(IconButton)(({ theme }) => ({
   }
 }))
 
+const CustomFormControl = styled(FormControl)(({ theme }) => ({
+  marginBottom: theme.spacing(2),
+  '& .MuiFormLabel-root': {
+    fontSize: '1rem'
+  },
+  '& .MuiSelect-root': {
+    fontSize: '1rem'
+  }
+}))
+
+const CustomSelect = styled(Select)(({ theme }) => ({
+  '& .MuiSelect-select': {
+    padding: theme.spacing(1),
+    fontSize: '1rem'
+  },
+  '& .MuiOutlinedInput-notchedOutline': {
+    borderColor: theme.palette.primary.main
+  },
+  '&:hover .MuiOutlinedInput-notchedOutline': {
+    borderColor: theme.palette.primary.dark
+  }
+}))
+
 const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
-  const [assetType, setAssetType] = useState([])
+  const [assetType, setAssetType] = useState({})
+  const [subscriptionTypes, setSubscriptionTypes] = useState([])
+  const [selectedSubscriptionType, setSelectedSubscriptionType] = useState(null)
+  const [units, setUnits] = useState([])
+  const [selectedUnit, setSelectedUnit] = useState(null)
   const [name, setName] = useState(null)
   const [code, setCode] = useState(null)
-  const [detail, setDetail] = useState(null)
-  const [rows1, setRows1] = useState([])
-  const [groupOptions, setGroupOptions] = useState([])
-  const [groups, setGroup] = useState([])
-  const [policyOption, setPolicyOption] = useState([])
-  const [policies, setPolicies] = useState([])
+  const [phoneNumber, setPhoneNumber] = useState(null)
+  const [email, setEmail] = useState(null)
   const [activationStatus, setActivationStatus] = useState('')
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
+  const [vehicle, setVehicle] = useState([])
+  const [vehicleOption, setVehicleOption] = useState([])
 
-  const handleAddRow1 = () => {
-    const newRow = { name: '', description: '', id: '', code: '' } // Thêm groupId vào đây
-    setPolicies([...policies, newRow])
+  useEffect(() => {
+    handleSubscriptionTypeOpen()
+
+    handleUnitOpen()
+  }, [selectedSubscriptionType, selectedUnit])
+
+  const handleSubscriptionTypeOpen = async () => {
+    try {
+      const response = await axios.get('https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/sub/type/')
+      setSubscriptionTypes(response.data.rows)
+    } catch (error) {
+      console.error('Error fetching subscription types:', error)
+    }
   }
 
-  const handleCancel = () => {
-    onClose()
+  const handleUnitOpen = async () => {
+    try {
+      const response = await axios.get(
+        'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=dv'
+      )
+      setUnits(response.data)
+    } catch (error) {
+      console.error('Error fetching units:', error)
+    }
+  }
+
+  const handleSubscriptionTypeChange = event => {
+    const selectedType = subscriptionTypes.find(type => type.id === event.target.value)
+    setSelectedSubscriptionType(selectedType)
+  }
+
+  const handleUnitChange = event => {
+    setSelectedUnit(event.target.value)
+  }
+
+  const handleNameChange = event => {
+    setName(event.target.value)
+  }
+
+  const handleCodeChange = event => {
+    setCode(event.target.value)
+  }
+
+  const handlePhoneChange = event => {
+    setPhoneNumber(event.target.value)
+  }
+
+  const handleEmailChange = event => {
+    setEmail(event.target.value)
+  }
+
+  const handleStartDateChange = event => {
+    setStartDate(event.target.value)
+  }
+
+  const handleEndDateChange = event => {
+    setEndDate(event.target.value)
+  }
+
+  const handleDeleteRow1 = index => {
+    const updatedRows = [...vehicle]
+    updatedRows.splice(index, 1)
+    setVehicle(updatedRows)
+  }
+
+  const handleAddRow1 = () => {
+    const newRow = { plateNumber: '', name: '', id: '', code: '' } // Thêm groupId vào đây
+    setVehicle([...vehicle, newRow])
   }
   useEffect(() => {
     const fetchGroupData = async () => {
@@ -80,12 +168,9 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
           }
         }
 
-        const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=dv',
-          config
-        )
+        const response = await axios.get('https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/vehicle/', config)
 
-        setPolicyOption(response.data)
+        setVehicleOption(response.data.rows)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -94,48 +179,42 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
     fetchGroupData()
   }, [])
 
-  const filteredPolicyOptions = policyOption.filter(
-    option => !policies || !policies.some(policies => policies.name === option.name)
-  )
-
-  const handleFullNameChange = event => {
-    setName(event.target.value)
-  }
-
-  const handleCodeChange = event => {
-    setCode(event.target.value)
-  }
-
-  const handleDetailChange = event => {
-    setDetail(event.target.value)
-  }
-
   const handleOk = () => {
+    const vehicleIds = vehicle.map(v => v.id)
+
     const params = {
-      detail: detail,
-      name: name,
+      ...assetType,
+      subscriptionType: selectedSubscriptionType,
+      brandId: selectedUnit,
+      startDate: startDate,
+      endDate: endDate,
+      nameClient: name,
       code: code,
-      groupIds: [policies.id],
-      status: activationStatus === 'Yes' ? 'YES' : 'NO'
+      phoneNumber: phoneNumber,
+      email: email,
+      status: activationStatus === 'YES' ? 'YES' : 'NO',
+      vehicles: vehicleIds
     }
 
     axios
-      .post(
-        `https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/sub/type/create
-`,
-        params
-      )
+      .post(`https://dev-ivi.basesystem.one/camnet/camnet_parking/api/v0/sub/create`, params)
       .then(response => {
-        console.log(' successfully:', response.data)
-        toast.success('Thêm thành công')
+        toast.success('Cập nhật thành công')
         onClose()
-        fetchGroupData() // Gọi lại fetch để cập nhật danh sách nhóm
+        fetchGroupData()
       })
       .catch(error => {
-        console.error('Error moving group:', error)
-        toast.error(error?.response?.data || 'Thất bại')
+        console.error('Error updating asset:', error)
       })
   }
+
+  const handleCancel = () => {
+    onClose()
+  }
+
+  const filteredVehicleOptions = vehicleOption.filter(
+    option => !vehicle || !vehicle.some(vehicle => vehicle.brandName === option.brandName)
+  )
 
   return (
     <Dialog
@@ -153,43 +232,98 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
       <DialogContent>
         <Grid container spacing={2}>
           <Grid item xs={4}>
-            <TextField label='Mã Loại thuê bao' value={name} onChange={handleFullNameChange} fullWidth />
+            <CustomTextField label='Tên khách hàng' value={name || ''} onChange={handleNameChange} fullWidth />
           </Grid>
           <Grid item xs={4}>
-            <TextField label='Tên loại thuê bao' value={code} onChange={handleCodeChange} fullWidth />
+            <CustomTextField label='Mã thuê bao' value={code || ''} onChange={handleCodeChange} fullWidth />
           </Grid>
           <Grid item xs={4}>
-            <FormControl fullWidth>
-              <InputLabel id='activation-status-label'>Trạng thái kích hoạt</InputLabel>
-              <Select
+            <CustomTextField label='Số điện thoại' value={phoneNumber || ''} onChange={handlePhoneChange} fullWidth />
+          </Grid>
+          <Grid item xs={4}>
+            <CustomTextField label='Email' value={email || ''} onChange={handleEmailChange} fullWidth />
+          </Grid>
+          <Grid item xs={4}>
+            <CustomTextField
+              label='Ngày bắt đầu'
+              type='date'
+              value={startDate}
+              onChange={handleStartDateChange}
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <CustomTextField
+              label='Ngày kết thúc'
+              type='date'
+              value={endDate}
+              onChange={handleEndDateChange}
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <CustomFormControl fullWidth>
+              <Typography variant='h6' gutterBottom>
+                Loại thuê bao
+              </Typography>
+              <CustomSelect
+                id='subscription-type-select'
+                value={selectedSubscriptionType?.id || ''}
+                onChange={handleSubscriptionTypeChange}
+              >
+                {subscriptionTypes.map(type => (
+                  <MenuItem key={type.id} value={type.id}>
+                    {type.name}
+                  </MenuItem>
+                ))}
+              </CustomSelect>
+            </CustomFormControl>
+          </Grid>
+          <Grid item xs={4}>
+            <CustomFormControl fullWidth>
+              <Typography variant='h6' gutterBottom>
+                Đơn vị
+              </Typography>
+              <CustomSelect id='unit-select' value={selectedUnit || ''} onChange={handleUnitChange}>
+                {units.map(unit => (
+                  <MenuItem key={unit.id} value={unit.id}>
+                    {unit.name}
+                  </MenuItem>
+                ))}
+              </CustomSelect>
+            </CustomFormControl>
+          </Grid>
+          <Grid item xs={4}>
+            <CustomFormControl fullWidth>
+              <Typography variant='h6' gutterBottom>
+                Trạng thái kích hoạt
+              </Typography>
+              <CustomSelect
+                select
                 labelId='activation-status-label'
                 id='activation-status-select'
                 value={activationStatus}
                 onChange={event => setActivationStatus(event.target.value)}
               >
-                <MenuItem value='Yes'>Đã kích hoạt</MenuItem>
-                <MenuItem value='No'>Chưa kích hoạt</MenuItem>
-              </Select>
-            </FormControl>
+                <MenuItem value='ACTIVE'>Đã kích hoạt</MenuItem>
+                <MenuItem value='INACTIVE'>Chưa kích hoạt</MenuItem>
+              </CustomSelect>
+            </CustomFormControl>
           </Grid>
           <Grid item xs={12}>
-            <CustomTextField
-              rows={4}
-              multiline
-              label='Mô tả'
-              value={detail}
-              onChange={handleDetailChange}
-              id='textarea-outlined-static'
-              fullWidth
-            />
+            <Typography variant='h5'>Danh sách phương tiện</Typography>
           </Grid>
           <Grid item xs={11.8}>
             <TableContainer>
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Tên đơn vị</TableCell>
-                    <TableCell>Mã đơn vị</TableCell>
+                    <TableCell>Tên phương tiện</TableCell>
+                    <TableCell>Biển kiểm soát</TableCell>
+                    <TableCell>Loại phương tiện</TableCell>
+                    <TableCell>Mã thẻ</TableCell>
                     {/* {showPlusColumn && ( */}
                     <TableCell align='center'>
                       <IconButton onClick={handleAddRow1} size='small' sx={{ marginLeft: '10px' }}>
@@ -200,28 +334,30 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {policies.map((policy, index) => (
+                  {vehicle.map((policy, index) => (
                     <TableRow key={index}>
                       <TableCell>
                         {' '}
                         <Autocomplete
-                          options={filteredPolicyOptions}
-                          getOptionLabel={option => option.name}
-                          value={policyOption.find(option => option.name === policy.name) || null}
+                          options={filteredVehicleOptions}
+                          getOptionLabel={option => option.brandName}
+                          value={vehicleOption.find(option => option.brandName === policy.brandName) || null}
                           onChange={(event, newValue) => {
-                            const updatedRows = [...policies]
-                            updatedRows[index].name = newValue.name
+                            const updatedRows = [...vehicle]
+                            updatedRows[index].plateNumber = newValue.plateNumber
                             updatedRows[index].code = newValue.code
-                            updatedRows[index].description = newValue.description
+                            updatedRows[index].brandName = newValue.brandName
                             updatedRows[index].id = newValue.id
 
                             // updatedRows[index].id = newValue.id
-                            setPolicies(updatedRows)
+                            setVehicle(updatedRows)
                           }}
                           renderInput={params => <TextField {...params} label='Vai trò' />}
                         />
-                        {console.log(policies)}
                       </TableCell>
+                      <TableCell>{policy.plateNumber}</TableCell>
+
+                      <TableCell>{policy?.vehicleType?.name}</TableCell>
                       <TableCell>{policy.code}</TableCell>
 
                       <TableCell align='center'>
@@ -237,7 +373,6 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
           </Grid>
         </Grid>
       </DialogContent>
-
       <DialogActions>
         <Button onClick={handleCancel}>Huỷ</Button>
         <Button variant='contained' onClick={handleOk}>
