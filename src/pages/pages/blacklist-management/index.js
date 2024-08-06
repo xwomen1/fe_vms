@@ -1,23 +1,21 @@
-import { Box, Button, Card, CardContent, CardHeader, Dialog, DialogActions, DialogContent, Grid, IconButton, Input, Menu, MenuItem, Pagination, Paper, styled, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material"
+import { Box, Button, Card, CardContent, CardHeader, Dialog, DialogActions, DialogContent, Grid, IconButton, Input, Paper, styled, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
-import { useDropzone } from "react-dropzone"
 import { Controller, useForm } from "react-hook-form"
 import toast from "react-hot-toast"
 import Icon from 'src/@core/components/icon'
 import CustomTextField from "src/@core/components/mui/text-field"
 import { delApi, postApi } from "src/@core/utils/requestUltils"
+import authConfig from 'src/configs/auth'
 
-const VisuallyHiddenInput = styled('input')({
-    clip: 'rect(0 0 0 0)',
-    clipPath: 'inset(50%)',
-    height: 1,
-    overflow: 'hidden',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    whiteSpace: 'nowrap',
-    width: 1,
-});
+const buildUrlWithToken = (url) => {
+    const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+    if (token) {
+        return `${url}?token=${token}`;
+    }
+
+    return url;
+}
 
 const columns = [
     {
@@ -25,13 +23,17 @@ const columns = [
         flex: 0.25,
         maxWidth: 150,
         align: 'center',
-        field: 'image',
+        field: 'data',
         label: 'Ảnh',
-        renderCell: value => (
-            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                <img src={value} alt='' style={{ maxWidth: '100%', height: 'auto', objectFit: 'contain' }} />
-            </Box>
-        )
+        renderCell: data => {
+            const value = data?.find(item => item.faceType === 'CENTER')
+
+            return (
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <img src={buildUrlWithToken(value?.imageFileUrl)} alt='' style={{ width: 100, height: 100, objectFit: 'contain' }} />
+                </Box>
+            )
+        }
     },
     {
         id: 2,
@@ -122,10 +124,6 @@ const Blacklist = () => {
         };
         reader.readAsDataURL(file);
     };
-
-    // useEffect(() => {
-    //     fetchData()
-    // }, [reload])
 
     const fetchData = async (values) => {
         setLoading(false)
@@ -285,7 +283,7 @@ const Blacklist = () => {
                                                         render={({ field: { value, onChange } }) => (
                                                             <CustomTextField
                                                                 fullWidth
-                                                                value={value}
+                                                                value={value || ''}
                                                                 label={item.label}
                                                                 onChange={onChange}
                                                                 placeholder={item.placeholder}
