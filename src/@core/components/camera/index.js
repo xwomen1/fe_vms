@@ -34,7 +34,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
   const [status, setStatus] = useState('')
   const [reload, setReload] = useState(0)
   const [videoDimensions, setVideoDimensions] = useState({ width: '100%', height: null })
-  const timeoutRef = useRef(null) // useRef to store the timeout ID
+  const intervalRef = useRef(null);
 
   useEffect(() => {
     const heightCaculator = Math.floor((window.innerHeight - 90) / sizeScreen.split('x')[1])
@@ -59,12 +59,12 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
   }
 
   const createWsConnection = async () => {
-    console.log('Creating new WebSocket and RTCPeerConnection at:', new Date().toLocaleTimeString())
+    // console.log('Creating new WebSocket and RTCPeerConnection at:', new Date().toLocaleTimeString())
 
     const pc = new RTCPeerConnection(config)
 
     pc.ontrack = event => {
-      console.log('RTCPeerConnection track event at:', new Date().toLocaleTimeString())
+      // console.log('RTCPeerConnection track event at:', new Date().toLocaleTimeString())
       setLoading(false)
       const stream = event.streams[0]
       setRemoteStream(stream)
@@ -72,28 +72,27 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
     }
 
     pc.oniceconnectionstatechange = event => {
-      console.log(
-        'RTCPeerConnection ICE connection state change at:',
-        new Date().toLocaleTimeString(),
-        'New state:',
-        pc.iceConnectionState
-      )
+      // console.log(
+      //   'RTCPeerConnection ICE connection state change at:',
+      //   new Date().toLocaleTimeString(),
+      //   'New state:',
+      //   pc.iceConnectionState
+      // )
     }
 
     pc.onconnectionstatechange = event => {
-      console.log(
-        'RTCPeerConnection connection state change at:',
-        new Date().toLocaleTimeString(),
-        'New state:',
-        pc.connectionState
-      )
+      // console.log(
+      //   'RTCPeerConnection connection state change at:',
+      //   new Date().toLocaleTimeString(),
+      //   'New state:',
+      //   pc.connectionState
+      // )
       setStatus(pc.connectionState)
     }
 
     setRtcPeerConnection(pc)
 
     const ws = new WebSocket(`${SOCKET_LIVE_VIEW}/ivis/vms/api/v0/ws/signaling/${randomId(10)}`)
-    console.log('WebSocket connection URL:', `${SOCKET_LIVE_VIEW}/ivis/vms/api/v0/ws/signaling/${randomId(10)}`)
 
     setWebsocket(ws)
     await delay(500)
@@ -114,6 +113,10 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
   }, [websocketStatus])
 
   useEffect(() => {
+    console.log('websocket', websocket);
+    console.log('rtcPeerConnection', rtcPeerConnection);
+    console.log('websocketStatus', websocketStatus);
+
     if (rtcPeerConnection != null && websocketStatus && websocket !== null) {
       if (websocket.readyState === WebSocket.OPEN) {
         console.log('Sending message at:', new Date().toLocaleTimeString(), 'Message:', {
@@ -156,56 +159,9 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
     }
   }, [websocket])
 
-  const connectWebSocket = () => {
-    if (websocketStatus) {
-      //already have websocket => close it
-      if (websocket) {
-        websocket.close()
-
-        //setWebsocket(null) // Clear websocket reference
-      }
-      if (rtcPeerConnection) {
-        rtcPeerConnection.close()
-
-        //setRtcPeerConnection(null) // Clear rtcPeerConnection reference
-      }
-    } else {
-      //websocket already close not not available
-      createWsConnection()
-    }
-  }
-
   useEffect(() => {
-    // if (websocket && channel) {
-    //   // Close the existing WebSocket and RTCPeerConnection
-    //   if (rtcPeerConnection) {
-    //     rtcPeerConnection.close();
-    //     setRtcPeerConnection(null);
-    //   }
-    //   if (websocket) {
-    //     websocket.close();
-    //     setWebsocket(null);
-    //   }
-
-    //   // Create a new WebSocket and RTCPeerConnection
-    //   createWsConnection();
-    // }
-    // if (websocketStatus == true) {
-    //   if (websocket == null) {
-    //     setWebsocketStatus(false)
-    //   }else {
-
-    //   }
-    //   //connectWebSocket()
-    // }
     setWebsocketStatus(false)
-
-    // console.log('remoteVideoRef', remoteVideoRef);
   }, [id, channel])
-
-  // useEffect(() => {
-  //   connectWebSocket()
-  // }, [])
 
   // send message to WebSocket server
   const sendMessage = message => {
@@ -254,89 +210,58 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
     }
     setText(message?.content)
   }
+
   useEffect(() => {
-    console.log('Status changed to:', status, 'at:', new Date().toLocaleTimeString())
-
     const checkStatus = () => {
-      if (status === 'disconnected' || status === 'failed') {
-        console.log('Status is', status, 'at:', new Date().toLocaleTimeString())
+      if (status === 'disconnected' || status === 'failed' || status === '') {
+        console.log('Status is', status, 'at:', new Date().toLocaleTimeString());
 
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current)
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
         }
-        timeoutRef.current = setTimeout(() => {
-          console.log('Recreating WebSocket connection due to status:', status, 'at:', new Date().toLocaleTimeString())
-          createWsConnection()
-        }, 5000)
+        intervalRef.current = setInterval(() => {
+          console.log('Recreating WebSocket connection due to status:', status, 'at:', new Date().toLocaleTimeString());
+          setRtcPeerConnection(null)
+          setWebsocketStatus(false)
+          setWebsocket(null)
+          createWsConnection();
+        }, 5000);
       } else {
-        console.log('Status is connected, no need to retry at:', new Date().toLocaleTimeString())
+        console.log('Status is connected, no need to retry at:', new Date().toLocaleTimeString());
 
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current)
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
         }
       }
-    }
+    };
 
-    checkStatus()
+    checkStatus();
 
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
       }
-    }
-  }, [status])
+    };
+  }, [status]);
 
-  // set up WebSocket event listeners
-  // useEffect(() => {
-  //   if (websocket) {
-  //     setLoading(true)
-  //     websocket.addEventListener('open', () => {
-  //       // console.log('WebSocket connection established')
-  //       websocket.send(
-  //         JSON.stringify({
-  //           id: id,
-  //           type: 'request',
-  //           channel: channel,
-  //         })
-  //       )
-  //     })
-  //     websocket.addEventListener('message', handleMessage)
-  //     websocket.addEventListener('close', () => {
-  //       // console.log('WebSocket connection closed')
-  //     })
-  //     websocket.addEventListener('error', error => {
-  //       console.error('WebSocket error:', error)
-  //     })
-  //   }
-  // }, [websocket, channel])
-
-  // set up RTCPeerConnection event listeners
-  // useEffect(() => {
-  //   if (rtcPeerConnection) {
-  //     rtcPeerConnection.addEventListener('connectionstatechange', () => {
-  //       // console.log('RTCPeerConnection state:', rtcPeerConnection.connectionState)
-  //       setStatus(rtcPeerConnection.connectionState)
-  //     })
-  //   }
-  // }, [rtcPeerConnection])
   useEffect(() => {
     if (rtcPeerConnection) {
       rtcPeerConnection.addEventListener('connectionstatechange', () => {
-        console.log(
-          'RTCPeerConnection state change at:',
-          new Date().toLocaleTimeString(),
-          'New state:',
-          rtcPeerConnection.connectionState
-        )
+        // console.log(
+        //   'RTCPeerConnection state change at:',
+        //   new Date().toLocaleTimeString(),
+        //   'New state:',
+        //   rtcPeerConnection.connectionState
+        // )
         setStatus(rtcPeerConnection.connectionState)
       })
       rtcPeerConnection.addEventListener('iceconnectionstatechange', () => {
-        console.log(
-          'RTCPeerConnection ICE state change at:',
-          new Date().toLocaleTimeString(),
-          'New ICE state:',
-          rtcPeerConnection.iceConnectionState
-        )
+        // console.log(
+        //   'RTCPeerConnection ICE state change at:',
+        //   new Date().toLocaleTimeString(),
+        //   'New ICE state:',
+        //   rtcPeerConnection.iceConnectionState
+        // )
       })
     }
   }, [rtcPeerConnection])
