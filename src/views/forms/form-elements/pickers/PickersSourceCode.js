@@ -1,4 +1,6 @@
-export const PickersCallbacksJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** React Imports
+export const PickersCallbacksJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** React Imports
 import { useState } from 'react'
 
 // ** MUI Imports
@@ -60,9 +62,13 @@ const PickersCallbacks = ({ popperPlacement }) => {
 }
 
 export default PickersCallbacks
-`}</code></pre>) 
+`}</code>
+  </pre>
+)
 
-export const PickersBasicJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** React Imports
+export const PickersBasicJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** React Imports
 import { useState } from 'react'
 
 // ** MUI Imports
@@ -117,9 +123,13 @@ const PickersBasic = ({ popperPlacement }) => {
 }
 
 export default PickersBasic
-`}</code></pre>) 
+`}</code>
+  </pre>
+)
 
-export const PickersCustomInputJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** React Imports
+export const PickersCustomInputJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** React Imports
 import { forwardRef } from 'react'
 
 // ** Custom Component Import
@@ -140,9 +150,13 @@ const PickersComponent = forwardRef(({ ...props }, ref) => {
 })
 
 export default PickersComponent
-`}</code></pre>) 
+`}</code>
+  </pre>
+)
 
-export const PickersIncludeExcludeJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** React Imports
+export const PickersIncludeExcludeJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** React Imports
 import { useState } from 'react'
 
 // ** MUI Imports
@@ -226,9 +240,13 @@ const PickersIncludeExclude = ({ popperPlacement }) => {
 }
 
 export default PickersIncludeExclude
-`}</code></pre>) 
+`}</code>
+  </pre>
+)
 
-export const PickersCustomizationJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** React Imports
+export const PickersCustomizationJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** React Imports
 import { useState } from 'react'
 
 // ** MUI Imports
@@ -274,9 +292,13 @@ const PickersCustomization = ({ popperPlacement }) => {
 }
 
 export default PickersCustomization
-`}</code></pre>) 
+`}</code>
+  </pre>
+)
 
-export const PickersMinMaxJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** React Imports
+export const PickersMinMaxJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** React Imports
 import { useState } from 'react'
 
 // ** MUI Imports
@@ -322,9 +344,13 @@ const PickersMinMax = ({ popperPlacement }) => {
 }
 
 export default PickersMinMax
-`}</code></pre>) 
+`}</code>
+  </pre>
+)
 
-export const PickersMonthYearDropdownsJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** React Imports
+export const PickersMonthYearDropdownsJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** React Imports
 import { useState } from 'react'
 
 // ** MUI Imports
@@ -383,9 +409,13 @@ const PickersMonthYearDropdowns = ({ popperPlacement }) => {
 }
 
 export default PickersMonthYearDropdowns
-`}</code></pre>) 
+`}</code>
+  </pre>
+)
 
-export const PickersLocaleJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** React Imports
+export const PickersLocaleJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** React Imports
 import { useState } from 'react'
 
 // ** MUI Imports
@@ -393,13 +423,16 @@ import Box from '@mui/material/Box'
 import fr from 'date-fns/locale/fr'
 import ar from 'date-fns/locale/ar-SA'
 import en from 'date-fns/locale/en-US'
+import ja from 'date-fns/locale/ja'
+import zh from 'date-fns/locale/zh-CN'
+import vi from 'date-fns/locale/vi'
 import { useTranslation } from 'react-i18next'
 import DatePicker, { registerLocale } from 'react-datepicker'
 
 // ** Custom Component Imports
 import CustomInput from './PickersCustomInput'
 
-const langObj = { fr, ar, en }
+const langObj = { fr, ar, en, ja, vi, zh }
 
 const PickersLocale = ({ popperPlacement }) => {
   // ** States
@@ -439,9 +472,13 @@ const PickersLocale = ({ popperPlacement }) => {
 }
 
 export default PickersLocale
-`}</code></pre>) 
+`}</code>
+  </pre>
+)
 
-export const PickersMonthYearQuarterJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** React Imports
+export const PickersMonthYearQuarterJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** React Imports
 import { useState } from 'react'
 
 // ** MUI Imports
@@ -499,9 +536,13 @@ const PickersMonthYear = ({ popperPlacement }) => {
 }
 
 export default PickersMonthYear
-`}</code></pre>) 
+`}</code>
+  </pre>
+)
 
-export const PickersOptionsJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** React Imports
+export const PickersOptionsJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** React Imports
 import { useState } from 'react'
 
 // ** MUI Imports
@@ -587,9 +628,13 @@ const PickersOptions = ({ popperPlacement }) => {
 }
 
 export default PickersOptions
-`}</code></pre>) 
+`}</code>
+  </pre>
+)
 
-export const PickersRangeJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** React Imports
+export const PickersRangeJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** React Imports
 import { useState, forwardRef } from 'react'
 
 // ** MUI Imports
@@ -664,9 +709,13 @@ const PickersRange = ({ popperPlacement }) => {
 }
 
 export default PickersRange
-`}</code></pre>) 
+`}</code>
+  </pre>
+)
 
-export const PickersSpecificRangeJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** React Imports
+export const PickersSpecificRangeJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** React Imports
 import { useState } from 'react'
 
 // ** MUI Imports
@@ -717,9 +766,13 @@ const PickersSpecificRange = ({ popperPlacement }) => {
 }
 
 export default PickersSpecificRange
-`}</code></pre>) 
+`}</code>
+  </pre>
+)
 
-export const PickersTimeJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** React Imports
+export const PickersTimeJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** React Imports
 import { useState } from 'react'
 
 // ** MUI Imports
@@ -769,5 +822,6 @@ const PickersTime = ({ popperPlacement }) => {
 }
 
 export default PickersTime
-`}</code></pre>) 
-
+`}</code>
+  </pre>
+)

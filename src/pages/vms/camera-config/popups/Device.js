@@ -184,7 +184,7 @@ const Device = ({ onClose, camera }) => {
 
   const handleStreamTypeChange = (index, event) => {
     const newRows = [...rows]
-    newRows[index].type = event.target.value
+    newRows[index].codec = event.target.value
     setRows(newRows)
   }
 
@@ -199,7 +199,7 @@ const Device = ({ onClose, camera }) => {
   }
 
   const handleAddRow = () => {
-    const newRow = { name: '', isProxied: false, url: '', type: '' } // Ensure isProxied is a boolean
+    const newRow = { name: '', isProxied: false, url: '', codec: '' } // Ensure isProxied is a boolean
     setRows([...rows, newRow])
   }
 
@@ -312,7 +312,8 @@ const Device = ({ onClose, camera }) => {
         password: password,
         ipAddress: ipAddress,
         httpPort: http,
-        type: cameraGroupSelect,
+
+        // type: cameraGroupSelect,
         onvif: onvif,
         lat: lat.toString(),
         long: lng.toString(),
