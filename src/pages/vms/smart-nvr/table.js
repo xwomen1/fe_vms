@@ -283,6 +283,53 @@ const UserList = ({ apiData }) => {
     fetchFilteredOrAllUsers()
   }, [page, pageSize, total, value])
 
+  const fetchDataReload = async id => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.get(
+        `https://sbs.basesystem.one/ivis/vms/api/v0/device/nvr/synchronize?nvr_id=${id}`,
+        config
+      )
+      Swal.fire({
+        title: 'Reaload hành công!',
+        text: response?.message,
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
+    } catch (error) {
+      console.error('Error fetching users:', error)
+      Swal.fire({
+        title: 'Error!',
+        text: error.response?.data?.message,
+        icon: 'error',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
+    }
+  }
+
+  const handleReloadClick = id => {
+    fetchDataReload(id)
+  }
+
   return (
     <Grid container spacing={6.5}>
       <Grid item xs={12}>
@@ -394,8 +441,7 @@ const UserList = ({ apiData }) => {
                             padding: '5px 10px',
                             width: '70%',
                             display: 'inline-block',
-                            color: 'white',
-                            backgroundColor: assetType.status === 'connected' ? '#449D44' : 'FF9F43'
+                            backgroundColor: assetType.status === 'connected' ? 'lightgreen' : 'FF9F43'
                           }}
                         >
                           {assetType.status === 'connected' ? 'Đang hoạt động' : 'Không hoạt động'}
@@ -403,6 +449,9 @@ const UserList = ({ apiData }) => {
                       </TableCell>
 
                       <TableCell sx={{ padding: '16px' }}>
+                        <IconButton onClick={() => handleReloadClick(assetType.id)}>
+                          <Icon icon='tabler:reload' />
+                        </IconButton>
                         <IconButton size='small' onClick={() => handleAddPClick(assetType.id)}>
                           <Icon icon='tabler:edit' />
                         </IconButton>

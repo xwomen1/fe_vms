@@ -54,11 +54,34 @@ const InfraPopupDetail = ({ open, id, onClose, setReload }) => {
       }
 
       await axios.put(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${id}`, payload, config)
-      Swal.fire('Sửa thành công', '', 'success')
+      Swal.fire({
+        title: 'Thành công!',
+        text: 'Dữ liệu đã được sửa thành công.',
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
       setReload()
       onClose()
     } catch (error) {
       console.error('Error updating', error)
+      Swal.fire({
+        title: 'Error!',
+        text: error.response?.data?.message || error.message,
+        icon: 'error',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
     }
   }
 
