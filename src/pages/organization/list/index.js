@@ -23,12 +23,15 @@ import TreeView from '@mui/lab/TreeView'
 import TreeItem from '@mui/lab/TreeItem'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import PopUpAdd from '../popups/add'
+import PopUpAddInfa from '../popups/addInfa'
+import Delete from '../popups/delete'
 import DetailPopup from '../detail/detailInfra'
 
 const Organization = () => {
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
   const [adults, setAdults] = useState([])
   const [treeData, setTreeData] = useState({})
+  const [currentNodeId, setCurrentNodeId] = useState(null)
   const [expandedNodes, setExpandedNodes] = useState([])
   const [reload, setReload] = useState(0)
   const [loading, setLoading] = useState(false)
@@ -43,10 +46,12 @@ const Organization = () => {
   const [childrenData, setChildrenData] = useState([]) // State để lưu dữ liệu con
   const [openPopupId, setOpenPopupId] = useState(null)
   const [openPopup, setOpenPopup] = useState(false)
+  const [openPopupInfa, setOpenPopupInfa] = useState(false)
+  const [openPopupDelete, setOpenPopupDelete] = useState(false)
 
   useEffect(() => {
     fetchData()
-  }, [])
+  }, [reload])
 
   const fetchData = async () => {
     setLoading(true)
@@ -135,9 +140,10 @@ const Organization = () => {
               onClick={() => {
                 setSelectedId(node.id)
                 setSelectedName(node.name)
-                setSelectedCode(node.code || node.Code)
+                setSelectedCode(node.code)
                 setSelectedDetail(node.detail)
                 handleNodeToggle(null, node.id)
+                setCurrentNodeId(node.id)
               }}
               sx={{
                 backgroundColor: isSelected ? '#e0e0e0' : 'inherit',
@@ -168,6 +174,12 @@ const Organization = () => {
                 <IconButton size='small' onClick={() => handleAddNode(node.id)}>
                   <Icon icon='tabler:plus' />
                 </IconButton>
+                <IconButton>
+                  <Icon icon='tabler:trash' onClick={() => handleOpenPopupDelete(node.id)} />
+                </IconButton>
+                <IconButton>
+                  <Icon icon='tabler:edit' onClick={() => handleOpenPopupDetail(node.id)} />
+                </IconButton>
               </Box>
             </Box>
           }
@@ -178,6 +190,13 @@ const Organization = () => {
       )
     })
   }
+
+  useEffect(() => {
+    if (currentNodeId) {
+      fetchChildren(currentNodeId)
+    }
+  }, [currentNodeId, reload])
+
   useEffect(() => {
     if (selectedParentId) {
       fetchChildren(selectedParentId)
@@ -189,6 +208,10 @@ const Organization = () => {
     setOpenPopupId(id)
   }
 
+  const handleAddInfa = () => {
+    setOpenPopupInfa(true)
+  }
+
   const handleAddNode = id => {
     setOpenPopup(true)
     setOpenPopupId(id)
@@ -198,10 +221,30 @@ const Organization = () => {
     setOpenPopup(false)
   }
 
+  const handleCloseDelete = () => {
+    setOpenPopupDelete(false)
+  }
+
   const handleOpenPopupDetail = id => {
     console.log(id, 'id')
     setOpenPopupId(id)
     setOpenPopupDetail(true)
+  }
+
+  const handleOpenPopupDelete = id => {
+    setOpenPopupId(id)
+    setOpenPopupDelete(true)
+  }
+
+  const handleCloseDetail = () => {
+    setOpenPopupDetail(false)
+    setReload(prev => prev + 1)
+  }
+
+  const handleCloseInfa = () => {
+    console.log('đóng')
+
+    setOpenPopupInfa(false)
   }
 
   return (
@@ -220,15 +263,9 @@ const Organization = () => {
             <Grid container spacing={2}>
               <Grid item>
                 <Box sx={{ float: 'right' }}>
-                  <Button variant='contained'>
+                  <Button variant='contained' onClick={() => handleAddInfa()}>
+                    Thêm mới
                     <Icon icon='tabler:plus' />
-                  </Button>
-                </Box>
-              </Grid>
-              <Grid item>
-                <Box sx={{ float: 'right' }}>
-                  <Button variant='contained'>
-                    <Icon icon='tabler:trash' />
                   </Button>
                 </Box>
               </Grid>
@@ -249,22 +286,28 @@ const Organization = () => {
                       padding: '0.5rem',
                       cursor: 'pointer',
                       backgroundColor: selectedParentId === org.id ? '#f0f0f0' : 'inherit',
-                      display: 'flex', // Sử dụng Flexbox
-                      alignItems: 'center', // Căn chỉnh theo chiều dọc
-                      justifyContent: 'space-between' // Căn chỉnh các phần tử theo chiều ngang
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between'
                     }}
                     onClick={() => {
-                      setSelectedParentId(org.id) // Cập nhật ID được chọn, sẽ kích hoạt useEffect
+                      setSelectedParentId(org.id)
                       setSelectedId(org.id)
                       setSelectedName(org.name)
-                      setSelectedCode(org.code || org.Code)
+                      setSelectedCode(org.code)
                       setSelectedDetail(org.detail)
+                      setCurrentNodeId(org.id)
                     }}
                   >
                     <Typography variant='subtitle1'>{org.name}</Typography>
-                    <Button>
-                      <Icon icon='tabler:plus' onClick={() => handleAddMe(selectedParentId)} />
-                    </Button>
+                    <Box display='flex' alignItems='center'>
+                      <Button onClick={() => handleAddMe(org.id)} style={{ marginRight: '0.3rem' }}>
+                        <Icon icon='tabler:plus' />
+                      </Button>
+                      <Button>
+                        <Icon icon='tabler:trash' onClick={() => handleOpenPopupDelete(org.id)} />
+                      </Button>
+                    </Box>
                   </Paper>
                 </Grid>
               ))}
@@ -276,7 +319,7 @@ const Organization = () => {
             elevation={3}
             style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', padding: '1rem', width: '100%' }}
           >
-            <Typography variant='h6'>Danh sách con :</Typography>
+            <Typography variant='h6'>Danh sách cơ cấu nhỏ :</Typography>
             {loadingChildren ? (
               <Typography variant='body1'>Đang tải dữ liệu...</Typography>
             ) : (
@@ -336,7 +379,7 @@ const Organization = () => {
                               <Icon icon='tabler:edit' onClick={() => handleOpenPopupDetail(child.id)} />
                             </IconButton>
                             <IconButton>
-                              <Icon icon='tabler:trash' />
+                              <Icon icon='tabler:trash' onClick={() => handleOpenPopupDelete(child.id)} />
                             </IconButton>
                           </TableCell>
                         </TableRow>
@@ -349,6 +392,9 @@ const Organization = () => {
           </Card>
         </Grid>
       </Grid>
+      {openPopupInfa && (
+        <PopUpAddInfa open={openPopupInfa} onClose={handleCloseInfa} setReload={() => setReload(reload + 1)} />
+      )}
       {openPopup && (
         <PopUpAdd open={openPopup} onClose={handleClose} id={openPopupId} setReload={() => setReload(reload + 1)} />
       )}
@@ -356,6 +402,14 @@ const Organization = () => {
         <DetailPopup
           open={openPopupDetail}
           onClose={handleCloseDetail}
+          id={openPopupId}
+          setReload={() => setReload(reload + 1)}
+        />
+      )}
+      {openPopupDelete && (
+        <Delete
+          open={openPopupDelete}
+          onClose={handleCloseDelete}
           id={openPopupId}
           setReload={() => setReload(reload + 1)}
         />
