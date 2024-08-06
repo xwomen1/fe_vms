@@ -130,6 +130,7 @@ const AuthProvider = ({ children }) => {
 
         localStorage.setItem(authConfig.storageTokenKeyName, tokenReturn)
         localStorage.setItem(authConfig.onTokenExpiration, refreshToken)
+        localStorage.setItem(authConfig.username, params.username)
 
         const returnUrl = router.query.returnUrl
         setExpire(response.data.expires_in)

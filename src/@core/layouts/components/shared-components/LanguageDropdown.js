@@ -51,6 +51,7 @@ const LanguageDropdown = ({ settings, saveSettings }) => {
             }
           }
         },
+
         {
           text: 'Arabic',
           menuItemProps: {
@@ -59,6 +60,28 @@ const LanguageDropdown = ({ settings, saveSettings }) => {
             onClick: () => {
               handleLangItemClick('ar')
               saveSettings({ ...settings, direction: 'rtl' })
+            }
+          }
+        },
+        {
+          text: 'Vietnamese',
+          menuItemProps: {
+            sx: { py: 2 },
+            selected: i18n.language === 'vi',
+            onClick: () => {
+              handleLangItemClick('vi')
+              saveSettings({ ...settings, direction: 'ltr' })
+            }
+          }
+        },
+        {
+          text: 'Chinese',
+          menuItemProps: {
+            sx: { py: 2 },
+            selected: i18n.language === 'zh',
+            onClick: () => {
+              handleLangItemClick('zh')
+              saveSettings({ ...settings, direction: 'ltr' })
             }
           }
         }
