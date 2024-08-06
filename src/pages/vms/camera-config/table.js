@@ -301,6 +301,53 @@ const Camera = ({ apiData }) => {
     }
   }, [assettypeStatus])
 
+  const fetchDataReload = async id => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.get(
+        `https://sbs.basesystem.one/ivis/vms/api/v0/device/camera/synchronize?camera_id=${id}`,
+        config
+      )
+      Swal.fire({
+        title: 'Reaload hành công!',
+        text: response?.message,
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
+    } catch (error) {
+      console.error('Error fetching users:', error)
+      Swal.fire({
+        title: 'Error!',
+        text: error.response?.data?.message,
+        icon: 'error',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
+    }
+  }
+
+  const handleReloadClick = id => {
+    fetchDataReload(id)
+  }
+
   return (
     <Grid container spacing={0}>
       <Grid item xs={12}>
@@ -321,11 +368,21 @@ const Camera = ({ apiData }) => {
                     <Box></Box>
                   ) : (
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Button variant='contained' color='secondary' onClick={handleAddRoleClick}>Mật khẩu</Button>
-                      <Button variant='contained' color='secondary' onClick={handleAddNetworkClick}>Mạng</Button>
-                      <Button variant='contained' color='secondary' onClick={handleAddVideoClick}>Video</Button>
-                      <Button variant='contained' color='secondary' onClick={handleAddImageClick}>Hình ảnh</Button>
-                      <Button variant='contained' color='secondary' onClick={handleAddCloudClick}>Bộ nhớ</Button>
+                      <Button variant='contained' color='secondary' onClick={handleAddRoleClick}>
+                        Mật khẩu
+                      </Button>
+                      <Button variant='contained' color='secondary' onClick={handleAddNetworkClick}>
+                        Mạng
+                      </Button>
+                      <Button variant='contained' color='secondary' onClick={handleAddVideoClick}>
+                        Video
+                      </Button>
+                      <Button variant='contained' color='secondary' onClick={handleAddImageClick}>
+                        Hình ảnh
+                      </Button>
+                      <Button variant='contained' color='secondary' onClick={handleAddCloudClick}>
+                        Bộ nhớ
+                      </Button>
                     </Box>
                   )}
                 </Grid>
@@ -414,8 +471,8 @@ const Camera = ({ apiData }) => {
                                   assetType.status.name === 'connected'
                                     ? 'lightgreen'
                                     : assetType.status.name === 'disconnected'
-                                      ? '#FF9F43'
-                                      : 'orange',
+                                    ? '#FF9F43'
+                                    : 'orange',
                                 borderRadius: '10px',
                                 padding: '5px 10px',
                                 width: '70%',
@@ -426,8 +483,8 @@ const Camera = ({ apiData }) => {
                               {assetType.status.name === 'connected'
                                 ? 'Đã kết nối'
                                 : assetType.status.name === 'disconnected'
-                                  ? 'Mất kết nối'
-                                  : assetType.status.name}
+                                ? 'Mất kết nối'
+                                : assetType.status.name}
                             </div>
                           ) : (
                             assetType.status.name
@@ -435,6 +492,9 @@ const Camera = ({ apiData }) => {
                         </TableCell>
 
                         <TableCell sx={{ padding: '16px' }}>
+                          <IconButton onClick={() => handleReloadClick(assetType.id)}>
+                            <Icon icon='tabler:reload' />
+                          </IconButton>
                           <IconButton onClick={() => handleOpenLiveView(assetType)}>
                             <Icon icon='tabler:video' />
                           </IconButton>

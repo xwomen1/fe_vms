@@ -326,11 +326,12 @@ const navigation = () => {
           icon: 'tabler:building',
           path: '/cv'
         },
-        {
-          title: 'Cơ cấu tổ chức',
-          icon: 'tabler:building',
-          path: '/organizational-structure'
-        },
+
+        // {
+        //   title: 'Cơ cấu tổ chức',
+        //   icon: 'tabler:building',
+        //   path: '/organizational-structure'
+        // },
         {
           title: 'Cơ cấu tổ chức',
           icon: 'tabler:building',
