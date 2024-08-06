@@ -178,7 +178,7 @@ const AddCamera = ({ nvr, onClose }) => {
                             padding: '5px 10px',
                             width: '70%',
                             display: 'inline-block',
-                            backgroundColor: camera.status === 'connected' ? 'green' : 'orange'
+                            backgroundColor: camera.status === 'connected' ? '#449D44' : 'orange'
                           }}
                         >
                           {camera.status === 'connected' ? 'Đang hoạt động' : 'Không hoạt động'}

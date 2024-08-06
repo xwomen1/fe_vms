@@ -13,7 +13,7 @@ import authConfig from 'src/configs/auth'
 import Table from '@mui/material/Table'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
-import { IconButton, Box, CardHeader } from '@mui/material'
+import { IconButton, Box, CardHeader, Button } from '@mui/material'
 import Swal from 'sweetalert2'
 import { fetchData } from 'src/store/apps/user'
 import { useRouter } from 'next/router'
@@ -335,7 +335,11 @@ const UserList = ({ apiData }) => {
       <Grid item xs={12}>
         <Card>
           <CardHeader
-            title='Danh sách Smart NVR'
+            title={
+              <>
+                <Button variant='contained'>Danh sách Smart NVR</Button>
+              </>
+            }
             titleTypographyProps={{ sx: { mb: [2, 0] } }}
             sx={{
               py: 4,

@@ -116,24 +116,10 @@ const Filter = ({ open, onClose, callback, groupName, fetchGroupData }) => {
 
 
   useEffect(() => {
-    // fetchGroups()
     fetchParkings()
     fetchVehicleType()
     fetchSubTypes()
   }, [])
-
-  // const fetchGroups = () => {
-  //   axios
-  //     .get('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search')
-  //     .then(response => {
-  //       // Lọc nhóm khác với groupName hiện tại
-  //       const filteredGroups = response.data.filter(group => group.groupName !== groupName)
-  //       setGroups(filteredGroups)
-  //     })
-  //     .catch(error => {
-  //       console.error('Error fetching groups:', error)
-  //     })
-  // }
 
   const fetchParkings = async () => {
     setLoading(true)
@@ -249,9 +235,11 @@ const Filter = ({ open, onClose, callback, groupName, fetchGroupData }) => {
       <CustomCloseButton onClick={onClose}>
         <Icon icon='tabler:x' fontSize='1.25rem' />
       </CustomCloseButton>
-      <Button>
-        <Typography variant='h4' color='#FF9F43'>Lọc đơn vị</Typography>
-      </Button>
+      <Box sx={{ m: 5, textAlign: 'left' }}>
+        <Typography variant='h3' sx={{ mb: 3 }} color='#FF9F43'>
+          Lọc đơn vị
+        </Typography>
+      </Box>
       <DialogContent>
         <Grid container spacing={2}>
           <Grid container spacing={2} alignItems='center'>
@@ -284,11 +272,6 @@ const Filter = ({ open, onClose, callback, groupName, fetchGroupData }) => {
             </Grid>
             <Grid item xs={4}>
               <DatePickerWrapper>
-                {/* <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
-                  <div>
-                    
-                  </div>
-                </Box> */}
                 <DatePicker
                   selectsRange
                   endDate={endDate}
