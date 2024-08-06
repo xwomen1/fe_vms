@@ -45,6 +45,7 @@ export const ViewCameraPause = ({
   const [status, setStatus] = useState('')
   const [reload, setReload] = useState(0)
   const [selectedChannel, setSelectedChannel] = useState('Sub')
+  const intervalRef = useRef(null);
 
   useEffect(() => {
     const heightCaculator = Math.floor((window.innerHeight - 192) / sizeScreen.split('x')[1])
@@ -140,6 +141,39 @@ export const ViewCameraPause = ({
       }
     }
   }, [id, channel])
+
+  useEffect(() => {
+    const checkStatus = () => {
+      if (status === 'disconnected' || status === 'failed' || status === '') {
+        console.log('Status is', status, 'at:', new Date().toLocaleTimeString());
+
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+        }
+        intervalRef.current = setInterval(() => {
+          console.log('Recreating WebSocket connection due to status:', status, 'at:', new Date().toLocaleTimeString());
+          setRtcPeerConnection(null)
+          setWebsocketStatus(false)
+          setWebsocket(null)
+          createWsConnection();
+        }, 5000);
+      } else {
+        console.log('Status is connected, no need to retry at:', new Date().toLocaleTimeString());
+
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+        }
+      }
+    };
+
+    checkStatus();
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [status]);
 
   // useEffect(() => {
   //   createWsConnection()
