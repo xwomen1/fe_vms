@@ -94,7 +94,6 @@ export const ViewCameraPause = ({
       setLoading(false)
       const stream = event.streams[0]
       try {
-
         // if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {0
         // }
 
@@ -217,7 +216,7 @@ export const ViewCameraPause = ({
             viewType: 'playback',
             startTime: convertDateToString(startTime),
             endTime: convertDateToString(endTime),
-            channel: channel,
+            channel: channel
           })
         )
       })
@@ -232,15 +231,17 @@ export const ViewCameraPause = ({
   }, [websocket])
 
   useEffect(() => {
-    console.log('heightDiv', heightDiv);
+    console.log('heightDiv', heightDiv)
   }, [heightDiv])
 
   return (
     <div className='portlet portlet-video live' style={{ width: '100%' }}>
       <div className='portlet-title'>
         <div className='caption'>
-          <span className='label label-sm'
-            style={{ backgroundColor: status === 'connected' ? 'green' : 'red', color: 'white' }}>
+          <span
+            className='label label-sm'
+            style={{ backgroundColor: status === 'connected' ? 'green' : 'red', color: 'white' }}
+          >
             {status ? status.toUpperCase() : 'PLAYBACK'}
           </span>
           <span className='caption-subject font-dark sbold uppercase'>{name}</span>

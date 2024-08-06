@@ -231,8 +231,10 @@ export const ViewCameraPause = ({
     <div className='portlet portlet-video live' style={{ width: '100%' }}>
       <div className='portlet-title'>
         <div className='caption'>
-          <span className='label label-sm'
-            style={{ backgroundColor: status === 'connected' ? 'green' : 'red', color: 'white' }}>
+          <span
+            className='label label-sm'
+            style={{ backgroundColor: status === 'connected' ? 'green' : 'red', color: 'white' }}
+          >
             {status ? status.toUpperCase() : 'PLAYBACK'}
           </span>
           <span className='caption-subject font-dark sbold uppercase'>{name}</span>
