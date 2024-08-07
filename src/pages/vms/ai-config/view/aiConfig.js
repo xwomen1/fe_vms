@@ -53,7 +53,7 @@ const AIConfig = () => {
       id: 1,
       flex: 0.15,
       minWidth: 50,
-      align: 'right',
+      align: 'center',
       field: 'image',
       label: 'Hình ảnh'
     },
@@ -61,7 +61,7 @@ const AIConfig = () => {
       id: 2,
       flex: 0.25,
       minWidth: 50,
-      align: 'right',
+      align: 'left',
       field: 'name',
       label: 'camera'
     },
@@ -69,7 +69,7 @@ const AIConfig = () => {
       id: 3,
       flex: 0.15,
       minWidth: 120,
-      align: 'right',
+      align: 'center',
       field: 'ipAddress',
       label: 'IP'
     },
@@ -77,7 +77,7 @@ const AIConfig = () => {
       id: 4,
       flex: 0.15,
       minWidth: 120,
-      align: 'right',
+      align: 'center',
       field: 'location',
       label: 'Khu vực'
     },
@@ -85,7 +85,7 @@ const AIConfig = () => {
       id: 5,
       flex: 0.15,
       minWidth: 50,
-      align: 'right',
+      align: 'center',
       field: 'face',
       label: 'Nhận diện khuôn mặt',
       renderCell: row => {
@@ -103,7 +103,7 @@ const AIConfig = () => {
       id: 6,
       flex: 0.15,
       minWidth: 50,
-      align: 'right',
+      align: 'center',
       field: 'licensePlate',
       label: 'Nhận diện biển số',
       renderCell: row => {
@@ -112,7 +112,9 @@ const AIConfig = () => {
         return (
           <Switch
             checked={item?.license_plate_recognition || false}
-            onChange={e => handleSwitchChange(e, row.id, 'license_plate_recognition', row.alert_id, row.isExistLicensePlate)}
+            onChange={e =>
+              handleSwitchChange(e, row.id, 'license_plate_recognition', row.alert_id, row.isExistLicensePlate)
+            }
           />
         )
       }
@@ -127,9 +129,7 @@ const AIConfig = () => {
 
   const fetchCameraGroup = async () => {
     try {
-      const res = await getApi(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras?sort=%2Bcreated_at&page=1`
-      )
+      const res = await getApi(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras?sort=%2Bcreated_at&page=1`)
       setCameraGroup(res.data)
     } catch (error) {
       console.error('Error fetching data: ', error)
@@ -140,14 +140,14 @@ const AIConfig = () => {
     setLoading(true)
 
     const params = {
-      sort: '+created_at',
+      sort: '+created_at'
     }
 
     try {
       const res = await getApi(`https://sbs.basesystem.one/ivis/vms/api/v0/camera-model-ai`, { params })
       const list = []
-      const face = res.data?.find((item) => item.type === 'face_recognition')
-      const licensePlate = res.data?.find((item) => item.type === 'license_plate_recognition')
+      const face = res.data?.find(item => item.type === 'face_recognition')
+      const licensePlate = res.data?.find(item => item.type === 'license_plate_recognition')
       list.push(face)
       list.push(licensePlate)
       setModelAIList(list)
@@ -164,11 +164,11 @@ const AIConfig = () => {
     }
   }
 
-  const fetchModelAICameras = async (cameraGroup) => {
+  const fetchModelAICameras = async cameraGroup => {
     if (!cameraGroup) return
 
     try {
-      const promises = cameraGroup.map(async (camera) => {
+      const promises = cameraGroup.map(async camera => {
         const res = await getApi(
           `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties/camera/${camera.id}`
         )
@@ -189,14 +189,14 @@ const AIConfig = () => {
   }, [cameraGroup, reload])
 
   useEffect(() => {
-    if (!Array.isArray(alertAIList) || !Array.isArray(cameraGroup)) return;
+    if (!Array.isArray(alertAIList) || !Array.isArray(cameraGroup)) return
 
-    const data = cameraGroup.map((camera) => {
-      const item = alertAIList.find((alert) => alert?.camera_id === camera?.id);
-      if (!item) return camera;
+    const data = cameraGroup.map(camera => {
+      const item = alertAIList.find(alert => alert?.camera_id === camera?.id)
+      if (!item) return camera
 
-      const licensePlate = item.cameraaiproperty.find((a) => a?.cameraModelAI?.type === 'license_plate_recognition');
-      const face = item.cameraaiproperty.find((b) => b?.cameraModelAI?.type === 'face_recognition');
+      const licensePlate = item.cameraaiproperty.find(a => a?.cameraModelAI?.type === 'license_plate_recognition')
+      const face = item.cameraaiproperty.find(b => b?.cameraModelAI?.type === 'face_recognition')
 
       const alert = {
         name: camera.name,
@@ -205,12 +205,12 @@ const AIConfig = () => {
         isExistFace: face !== undefined && face?.isactive === true ? true : false,
         licensePlate: licensePlate ? licensePlate?.cameraModelAI?.type : null,
         isExistLicensePlate: licensePlate !== undefined && licensePlate?.isactive === true ? true : false
-      };
+      }
 
-      return { ...camera, ...alert };
-    });
+      return { ...camera, ...alert }
+    })
 
-    setDataList(data);
+    setDataList(data)
 
     const status = data.map((item, index) => {
       const camera_id = item.id
@@ -221,15 +221,14 @@ const AIConfig = () => {
       const license_plate_recognition = Boolean(item?.isExistLicensePlate)
 
       return { camera_id, name, face, face_recognition, licensePlate, license_plate_recognition }
-    });
+    })
 
-    setSwitchStates(status);
-  }, [alertAIList, cameraGroup]);
+    setSwitchStates(status)
+  }, [alertAIList, cameraGroup])
 
   const handleSwitchChange = (event, cameraId, type, cameraAIPropertyId, isModelExist) => {
-    const updatedSwitchStates = switchStates.map((item) => {
+    const updatedSwitchStates = switchStates.map(item => {
       if (item.camera_id === cameraId) {
-
         return {
           ...item,
           [type]: event.target.checked
@@ -239,27 +238,27 @@ const AIConfig = () => {
       return item
     })
 
-    const itemSelected = switchStates.find((item) => item.camera_id === cameraId)
+    const itemSelected = switchStates.find(item => item.camera_id === cameraId)
 
     const itemChange = {
       ...itemSelected,
-      [type]: event.target.checked,
+      [type]: event.target.checked
     }
 
-    const updatedList = updateCameraList.filter(item => item.camera_id !== cameraId);
-    updatedList.push(itemChange);
+    const updatedList = updateCameraList.filter(item => item.camera_id !== cameraId)
+    updatedList.push(itemChange)
     setUpdateCameraList(updatedList)
     setSwitchStates(updatedSwitchStates)
   }
 
   const handleModelAIsCameras = async () => {
-    const values = updateCameraList?.map((camera) => {
-      const camera_id = camera?.camera_id;
-      const alert = alertAIList.find(alert => alert?.camera_id === camera_id);
-      const id = alert?.id ?? '';
-      const cameraaiproperties = alert?.cameraaiproperty ?? [];
+    const values = updateCameraList?.map(camera => {
+      const camera_id = camera?.camera_id
+      const alert = alertAIList.find(alert => alert?.camera_id === camera_id)
+      const id = alert?.id ?? ''
+      const cameraaiproperties = alert?.cameraaiproperty ?? []
 
-      const cameraaiproperty = cameraaiproperties.map((item) => {
+      const cameraaiproperty = cameraaiproperties.map(item => {
         if (item.cameraModelAI.type === camera?.face) {
           return {
             ...item,
@@ -274,10 +273,10 @@ const AIConfig = () => {
         }
       })
 
-      return { camera_id, cameraaiproperty, id };
-    });
+      return { camera_id, cameraaiproperty, id }
+    })
 
-    const params = Object.values(values);
+    const params = Object.values(values)
 
     // array containing id = ''
     const params1 = params.filter(item => item.id === '')
@@ -286,29 +285,25 @@ const AIConfig = () => {
     const params2 = params.filter(item => item.id !== '')
 
     try {
-      await putApi(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties/cameras`,
-        params
-      );
-      setReload(reload + 1);
-      toast.success('Thao tác thành công');
+      await putApi(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties/cameras`, params)
+      setReload(reload + 1)
+      toast.success('Thao tác thành công')
     } catch (error) {
       if (error?.response?.data) {
-        console.error('error', error);
-        toast.error(error?.response?.data?.message);
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
       } else {
-        console.error('Error fetching data:', error);
-        toast.error(error);
+        console.error('Error fetching data:', error)
+        toast.error(error)
       }
     } finally {
-      setLoading(false);
+      setLoading(false)
       setUpdateCameraList([])
     }
   }
 
   const handleAddAlertIsActive = async (cameraId, type) => {
-
-    const values = modelAIList.find((model) => model.type === type)
+    const values = modelAIList.find(model => model.type === type)
 
     const params = {
       camera_id: cameraId,
@@ -326,10 +321,7 @@ const AIConfig = () => {
     }
 
     try {
-      await axios.post(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties`,
-        { ...params },
-      )
+      await axios.post(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties`, { ...params })
       setReload(reload + 1)
       toast.success('Thao tác thành công')
     } catch (error) {
@@ -344,7 +336,6 @@ const AIConfig = () => {
       setLoading(false)
     }
   }
-
 
   const handlePageChange = newPage => {
     setPage(newPage)
@@ -404,7 +395,7 @@ const AIConfig = () => {
                           skin='light'
                           sx={{ lineHeight: 1 }}
                           color={row.status.name === 'disconnected' ? 'primary' : 'success'}
-                          label={row.status.name}
+                          label={row.status.name === 'connected' ? 'Đã kết nối' : 'Mất kết nối'}
                         />
                       </TableCell>
                     </TableRow>
@@ -444,7 +435,7 @@ const AIConfig = () => {
               />
             </Grid>
             <Grid item xs={2}>
-              <Box sx={{ float: "right" }}>
+              <Box sx={{ float: 'right' }}>
                 <Button
                   variant='contained'
                   sx={{ marginRight: 2 }}
@@ -454,7 +445,9 @@ const AIConfig = () => {
                 >
                   Lưu
                 </Button>
-                <Button variant='contained' color='secondary'>Hủy</Button>
+                <Button variant='contained' color='secondary'>
+                  Hủy
+                </Button>
               </Box>
             </Grid>
           </Grid>

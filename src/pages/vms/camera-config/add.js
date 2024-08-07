@@ -107,7 +107,6 @@ const Add = ({ apiData }) => {
     return Swal.fire({ ...defaultProps, ...options })
   }
 
-
   useEffect(() => {
     const ws = new WebSocket(`wss://sbs.basesystem.one/ivis/vms/api/v0/websocket/topic/cameraStatus/${defaultCameraID}`)
 
@@ -718,7 +717,7 @@ const Add = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                      // loading={loading}
+                        // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.1}></Grid>
@@ -804,7 +803,7 @@ const Add = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                      // loading={loading}
+                        // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.4}></Grid>
@@ -922,7 +921,7 @@ const Add = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                      // loading={loading}
+                        // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.1}></Grid>
@@ -1033,22 +1032,22 @@ const Add = ({ apiData }) => {
                               style={{
                                 backgroundColor:
                                   assetType.status.name === 'connected'
-                                    ? 'lightgreen'
+                                    ? '#9af7d0'
                                     : assetType.status.name === 'disconnected'
-                                      ? '#FF9F43'
-                                      : 'orange',
+                                    ? '#95ef85'
+                                    : 'orange',
                                 borderRadius: '10px',
                                 padding: '5px 10px',
                                 width: '70%',
                                 display: 'inline-block',
-                                color: 'white'
+                                color: '#5e9154'
                               }}
                             >
                               {assetType.status.name === 'connected'
                                 ? 'Đã kết nối'
                                 : assetType.status.name === 'disconnected'
-                                  ? 'Mất kết nối'
-                                  : assetType.status.name}
+                                ? 'Mất kết nối'
+                                : assetType.status.name}
                             </div>
                           ) : (
                             assetType.status.name

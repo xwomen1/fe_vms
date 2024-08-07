@@ -304,7 +304,7 @@ const navigation = () => {
           icon: 'tabler:building',
           path: '/cv'
         },
-        
+
         // {
         //   title: 'Cơ cấu tổ chức',
         //   icon: 'tabler:building',
@@ -336,7 +336,7 @@ const navigation = () => {
           path: '/pages/digital-map'
         },
         {
-          title: 'Quản lý danh sách đen',
+          title: 'Quản lý danh sách khuôn mặt',
           icon: 'tabler:user-off',
           path: '/pages/blacklist-management'
         }

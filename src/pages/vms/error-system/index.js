@@ -199,32 +199,8 @@ const EventList = () => {
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/incidents/logs/status/${id}`, config)
       setLoading()
       fetchDataList()
-      Swal.fire({
-        title: 'Thành công!',
-        text: 'Thay đổi trạng thái thành công',
-        icon: 'success',
-        willOpen: () => {
-          const confirmButton = Swal.getConfirmButton()
-          if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
-            confirmButton.style.color = 'white'
-          }
-        }
-      })
     } catch (error) {
       console.error('Error status:', error)
-      Swal.fire({
-        title: 'Error!',
-        text: error.response?.data?.message || error.message,
-        icon: 'error',
-        willOpen: () => {
-          const confirmButton = Swal.getConfirmButton()
-          if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
-            confirmButton.style.color = 'white'
-          }
-        }
-      })
     } finally {
       setLoading(false)
     }
@@ -258,7 +234,7 @@ const EventList = () => {
     <>
       <Card>
         <CardHeader
-          title="Danh sách sự cố"
+          title='Danh sách sự cố'
           titleTypographyProps={{ sx: { mb: [2, 0] } }}
           sx={{
             py: 4,
