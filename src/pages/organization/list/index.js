@@ -319,7 +319,7 @@ const Organization = () => {
             elevation={3}
             style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', padding: '1rem', width: '100%' }}
           >
-            <Typography variant='h6'>Danh sách cơ cấu nhỏ :</Typography>
+            <Typography variant='h6'>Danh sách cơ cấu :</Typography>
             {loadingChildren ? (
               <Typography variant='body1'>Đang tải dữ liệu...</Typography>
             ) : (
@@ -349,7 +349,7 @@ const Organization = () => {
             </Paper>
           </Card>
           <Card>
-            <CardHeader title='Danh sách table con' />
+            <CardHeader title='Danh sách ' />
             <Paper>
               <TableContainer component={Paper}>
                 <Table>

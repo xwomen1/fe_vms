@@ -151,7 +151,7 @@ const AddModelAI = ({ show, onClose, setReload, data, id, typePopup }) => {
           placeholder: '35',
           type: 'TextField',
           require: true,
-          width: 3,
+          width: 4,
           defaultValue: '35'
         }
       )
@@ -185,7 +185,7 @@ const AddModelAI = ({ show, onClose, setReload, data, id, typePopup }) => {
         placeholder: '35',
         type: 'TextField',
         require: true,
-        width: 3,
+        width: 4,
         defaultValue: '35'
       }
     ])
