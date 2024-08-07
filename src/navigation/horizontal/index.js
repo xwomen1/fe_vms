@@ -35,6 +35,50 @@ const navigation = () => {
           path: '/pages/report-month/list',
           title: 'Báo cáo tháng',
           icon: 'tabler:id'
+        },
+        {
+          path: '/',
+          title: 'Cài đặt nâng cao',
+          icon: 'tabler:lock-access',
+          children: [
+            {
+              path: '/pages/door-access/list',
+              title: 'Quyền truy cập cửa',
+              icon: 'tabler:door-enter'
+            },
+            {
+              path: '/pages/schedule-access/list',
+              title: 'Quản lý lịch',
+              icon: 'tabler:calendar-due'
+            },
+
+            {
+              path: '/pages/door-management/list',
+              title: 'Quản lý cửa',
+              icon: 'tabler:door'
+            },
+            {
+              path: '/pages/group-access/list',
+              title: 'Nhóm quyền truy cập',
+              icon: 'tabler:mood-check'
+            }
+
+            // {
+            //   path: '/pages/access-rights/list',
+            //   title: 'Quyền truy cập',
+            //   icon: 'tabler:shield'
+            // },
+            // {
+            //   path: '/pages/access-rights/list',
+            //   title: 'Thống kê',
+            //   icon: 'tabler:statistics/time?tab=%2Fstatistics%2Ftime'
+            // },
+            // {
+            //   path: '/pages/access-rights/list',
+            //   title: 'Hẹn lịch',
+            //   icon: 'tabler:guest-registrations'
+            // }
+          ]
         }
 
         // {
@@ -336,7 +380,7 @@ const navigation = () => {
           path: '/pages/digital-map'
         },
         {
-          title: 'Quản lý danh sách đen',
+          title: 'Quản lý danh sách khuôn mặt',
           icon: 'tabler:user-off',
           path: '/pages/blacklist-management'
         }
@@ -397,50 +441,6 @@ const navigation = () => {
               path: '/smart-parking/asset'
             }
           ]
-        }
-
-        // {
-        //   path: '/pages/access-rights/list',
-        //   title: 'Quyền truy cập',
-        //   icon: 'tabler:shield'
-        // },
-        // {
-        //   path: '/pages/access-rights/list',
-        //   title: 'Thống kê',
-        //   icon: 'tabler:statistics/time?tab=%2Fstatistics%2Ftime'
-        // },
-        // {
-        //   path: '/pages/access-rights/list',
-        //   title: 'Hẹn lịch',
-        //   icon: 'tabler:guest-registrations'
-        // }
-      ]
-    },
-    {
-      path: '/',
-      title: 'Cài đặt nâng cao',
-      icon: 'tabler:lock-access',
-      children: [
-        {
-          path: '/pages/door-access/list',
-          title: 'Quyền truy cập cửa',
-          icon: 'tabler:door-enter'
-        },
-        {
-          path: '/pages/schedule-access/list',
-          title: 'Quản lý lịch',
-          icon: 'tabler:calendar-due'
-        },
-
-        {
-          path: '/pages/door-management/list',
-          title: 'Quản lý cửa',
-          icon: 'tabler:door'
-        },
-        {
-          path: '/pages/group-access/list',
-          title: 'Nhóm quyền truy cập',
-          icon: 'tabler:mood-check'
         }
 
         // {

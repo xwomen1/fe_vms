@@ -24,6 +24,7 @@ import {
   Typography
 } from '@mui/material'
 import Icon from 'src/@core/components/icon'
+import CustomChip from 'src/@core/components/mui/chip'
 import Swal from 'sweetalert2'
 import CircularProgress from '@mui/material/CircularProgress'
 import CustomTextField from 'src/@core/components/mui/text-field'
@@ -494,31 +495,17 @@ const FaceManagement = () => {
                         <TableCell>{formatDate(user.lastAppearance)}</TableCell>
                         <TableCell>Nhân viên</TableCell>
                         <TableCell sx={{ padding: '16px', textAlign: 'center' }}>
-                          <div
-                            style={{
-                              backgroundColor:
-                                user.status === true ? '#449D44' : user.status === false ? '#FF9F43' : '#FF9F43',
-                              borderRadius: '10px',
-                              padding: '5px 10px',
-                              width: '70%',
-                              display: 'inline-block',
-                              color: 'white'
-                            }}
-                          >
-                            {user.status === true
-                              ? 'Đang hoạt động'
-                              : user.status === false
-                              ? 'Không hoạt động'
-                              : user.status}
+                          <div>
+                            <CustomChip
+                              rounded
+                              size='small'
+                              skin='light'
+                              sx={{ lineHeight: 1 }}
+                              label={user.status === 'false' ? 'Không hoạt động' : 'Đang hoạt động'}
+                              color={user.status === 'false' ? 'primary' : 'success'}
+                            />
                           </div>
                         </TableCell>
-                        {/* <TableCell
-                          style={{
-                            color: user.status ? '#FF9F43' : 'red'
-                          }}
-                        >
-                          {user.status ? 'hoạt động' : 'không hoạt động'}
-                        </TableCell> */}
                         <TableCell sx={{ padding: '16px' }}>
                           <IconButton component={Link} href={`/pages/face_management/detail/${user.id}`}>
                             <Icon icon='tabler:info-circle' />

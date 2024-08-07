@@ -4,6 +4,7 @@ import Menu from '@mui/material/Menu'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
 import TreeView from '@mui/lab/TreeView'
+import CustomChip from 'src/@core/components/mui/chip'
 import TreeItem from '@mui/lab/TreeItem'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -283,53 +284,6 @@ const UserList = ({ apiData }) => {
     fetchFilteredOrAllUsers()
   }, [page, pageSize, total, value])
 
-  const fetchDataReload = async id => {
-    try {
-      const token = localStorage.getItem(authConfig.storageTokenKeyName)
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-
-      const response = await axios.get(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/device/nvr/synchronize?nvr_id=${id}`,
-        config
-      )
-      Swal.fire({
-        title: 'Reaload hành công!',
-        text: response?.message,
-        icon: 'success',
-        willOpen: () => {
-          const confirmButton = Swal.getConfirmButton()
-          if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
-            confirmButton.style.color = 'white'
-          }
-        }
-      })
-    } catch (error) {
-      console.error('Error fetching users:', error)
-      Swal.fire({
-        title: 'Error!',
-        text: error.response?.data?.message,
-        icon: 'error',
-        willOpen: () => {
-          const confirmButton = Swal.getConfirmButton()
-          if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
-            confirmButton.style.color = 'white'
-          }
-        }
-      })
-    }
-  }
-
-  const handleReloadClick = id => {
-    fetchDataReload(id)
-  }
-
   return (
     <Grid container spacing={6.5}>
       <Grid item xs={12}>
@@ -430,28 +384,24 @@ const UserList = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{assetType?.ipAddress}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType?.macAddress}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType?.location}</TableCell>
-                      <TableCell
-                        sx={{
-                          padding: '16px'
-                        }}
-                      >
-                        <span
-                          style={{
-                            borderRadius: '10px',
-                            padding: '5px 10px',
-                            width: '70%',
-                            display: 'inline-block',
-                            backgroundColor: assetType.status === 'connected' ? 'lightgreen' : 'FF9F43'
-                          }}
-                        >
-                          {assetType.status === 'connected' ? 'Đang hoạt động' : 'Không hoạt động'}
-                        </span>
+                      <TableCell sx={{ padding: '16px' }}>
+                        {assetType.status ? (
+                          <div>
+                            <CustomChip
+                              rounded
+                              size='small'
+                              skin='light'
+                              sx={{ lineHeight: 1 }}
+                              label={assetType.status === 'disconnected' ? 'Mất kết lỗi' : 'Đã kết lỗi'}
+                              color={assetType.status === 'disconnected' ? 'primary' : 'success'}
+                            />
+                          </div>
+                        ) : (
+                          assetType.status
+                        )}
                       </TableCell>
 
                       <TableCell sx={{ padding: '16px' }}>
-                        <IconButton onClick={() => handleReloadClick(assetType.id)}>
-                          <Icon icon='tabler:reload' />
-                        </IconButton>
                         <IconButton size='small' onClick={() => handleAddPClick(assetType.id)}>
                           <Icon icon='tabler:edit' />
                         </IconButton>

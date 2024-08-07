@@ -1,4 +1,5 @@
 import React from 'react'
+import { useRouter } from 'next/router'
 import {
   Box,
   Button,
@@ -30,6 +31,7 @@ import ImageCropper from '../ImageCropperPopup'
 import Link from 'next/link'
 
 const AddFaceManagement = () => {
+  const router = useRouter()
   const classes = useStyles()
   const [person, setPerson] = useState([])
   const [loading, setLoading] = useState(false)
@@ -270,7 +272,7 @@ const AddFaceManagement = () => {
         }
       }).then(result => {
         if (result.isConfirmed) {
-          window.location.href = `/pages/face_management/detail/${newId}`
+          router.push(`/pages/face_management/detail/${newId}`)
         }
       })
     } catch (error) {
@@ -337,7 +339,7 @@ const AddFaceManagement = () => {
   const fetchInitialData = useCallback(async () => {
     try {
       const response = await axios.get(
-        'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/code?Code=person_specify&sort=%2Bcreated_at&page=1'
+        'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/code?code=person_specify&sort=%2Bcreated_at&page=1'
       )
       const parentData = response.data[0]
       if (parentData.isParent) {
