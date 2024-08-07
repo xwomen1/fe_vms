@@ -24,6 +24,7 @@ import {
   Typography
 } from '@mui/material'
 import Icon from 'src/@core/components/icon'
+import CustomChip from 'src/@core/components/mui/chip'
 import Swal from 'sweetalert2'
 import CircularProgress from '@mui/material/CircularProgress'
 import CustomTextField from 'src/@core/components/mui/text-field'
@@ -494,22 +495,15 @@ const FaceManagement = () => {
                         <TableCell>{formatDate(user.lastAppearance)}</TableCell>
                         <TableCell>Nhân viên</TableCell>
                         <TableCell sx={{ padding: '16px', textAlign: 'center' }}>
-                          <div
-                            style={{
-                              backgroundColor:
-                                user.status === true ? '#9af7d0' : user.status === false ? '#95ef85' : '#95ef85',
-                              borderRadius: '10px',
-                              padding: '5px 10px',
-                              width: '70%',
-                              display: 'inline-block',
-                              color: 'white'
-                            }}
-                          >
-                            {user.status === true
-                              ? 'Đang hoạt động'
-                              : user.status === false
-                              ? 'Không hoạt động'
-                              : user.status}
+                          <div>
+                            <CustomChip
+                              rounded
+                              size='small'
+                              skin='light'
+                              sx={{ lineHeight: 1 }}
+                              label={user.status === 'false' ? 'Không hoạt động' : 'Đang hoạt động'}
+                              color={user.status === 'false' ? 'primary' : 'success'}
+                            />
                           </div>
                         </TableCell>
                         <TableCell sx={{ padding: '16px' }}>
