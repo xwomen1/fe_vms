@@ -1,4 +1,5 @@
 import React from 'react'
+import { useRouter } from 'next/router'
 import {
   Box,
   Button,
@@ -40,6 +41,7 @@ import Link from 'next/link'
 
 const AddFaceManagement = () => {
   const classes = useStyles()
+  const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [showLoading, setShowLoading] = useState(false)
   const [modalImage, setModalImage] = useState(null)
@@ -275,7 +277,7 @@ const AddFaceManagement = () => {
         }
       }).then(result => {
         if (result.isConfirmed) {
-          window.location.href = `/pages/car_management/detail/${newId}`
+          router.push(`/pages/car_management/detail/${newId}`)
         }
       })
     } catch (error) {

@@ -430,22 +430,37 @@ const UserList = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{assetType?.ipAddress}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType?.macAddress}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType?.location}</TableCell>
-                      <TableCell
-                        sx={{
-                          padding: '16px'
-                        }}
-                      >
-                        <span
-                          style={{
-                            borderRadius: '10px',
-                            padding: '5px 10px',
-                            width: '70%',
-                            display: 'inline-block',
-                            backgroundColor: assetType.status === 'connected' ? 'lightgreen' : 'FF9F43'
-                          }}
-                        >
-                          {assetType.status === 'connected' ? 'Đang hoạt động' : 'Không hoạt động'}
-                        </span>
+                      <TableCell sx={{ padding: '16px' }}>
+                        {assetType.status ? (
+                          <div
+                            style={{
+                              borderRadius: '10px',
+                              padding: '5px 10px',
+                              width: '70%',
+                              display: 'inline-block',
+                              color: 'white',
+                              backgroundColor:
+                                assetType.status === 'connected'
+                                  ? '#9af7d0'
+                                  : assetType.status === 'disconnected'
+                                  ? '#95ef85'
+                                  : 'orange',
+                              borderRadius: '10px',
+                              padding: '5px 10px',
+                              width: '70%',
+                              display: 'inline-block',
+                              color: '#5e9154'
+                            }}
+                          >
+                            {assetType.status === 'connected'
+                              ? 'Đã kết nối'
+                              : assetType.status === 'disconnected'
+                              ? 'Mất kết nối'
+                              : assetType.status}
+                          </div>
+                        ) : (
+                          assetType.status
+                        )}
                       </TableCell>
 
                       <TableCell sx={{ padding: '16px' }}>

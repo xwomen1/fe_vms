@@ -1026,17 +1026,22 @@ const UserList = ({ apiData }) => {
                         {assetType.status && assetType.status.name ? (
                           <div
                             style={{
+                              borderRadius: '10px',
+                              padding: '5px 10px',
+                              width: '70%',
+                              display: 'inline-block',
+                              color: 'white',
                               backgroundColor:
                                 assetType.status.name === 'connected'
-                                  ? '#449D44'
+                                  ? '#9af7d0'
                                   : assetType.status.name === 'disconnected'
-                                  ? '#FF9F43'
+                                  ? '#95ef85'
                                   : 'orange',
                               borderRadius: '10px',
                               padding: '5px 10px',
                               width: '70%',
                               display: 'inline-block',
-                              color: 'white'
+                              color: '#5e9154'
                             }}
                           >
                             {assetType.status.name === 'connected'

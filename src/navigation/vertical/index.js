@@ -380,7 +380,7 @@ const navigation = () => {
           path: '/pages/digital-map'
         },
         {
-          title: 'Quản lý danh sách đen',
+          title: 'Quản lý danh sách khuôn mặt',
           icon: 'tabler:user-off',
           path: '/pages/blacklist-management'
         }

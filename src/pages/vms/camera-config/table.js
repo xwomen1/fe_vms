@@ -469,15 +469,15 @@ const Camera = ({ apiData }) => {
                               style={{
                                 backgroundColor:
                                   assetType.status.name === 'connected'
-                                    ? 'lightgreen'
+                                    ? '#9af7d0'
                                     : assetType.status.name === 'disconnected'
-                                    ? '#FF9F43'
+                                    ? '#95ef85'
                                     : 'orange',
                                 borderRadius: '10px',
                                 padding: '5px 10px',
                                 width: '70%',
                                 display: 'inline-block',
-                                color: 'white'
+                                color: '#5e9154'
                               }}
                             >
                               {assetType.status.name === 'connected'
