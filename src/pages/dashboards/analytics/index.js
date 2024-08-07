@@ -121,67 +121,67 @@ const EventList = () => {
     }
   ]
 
-  // useEffect(() => {
-  //   // create WebSocket connection
+  useEffect(() => {
+    // create WebSocket connection
 
-  //   const ws = new WebSocket(
-  //     `wss://sbs.basesystem.one/ivis/vms/api/v0/websocket/topic/list_ai_event/be571c00-41cf-4878-a1de-b782625da62a`
-  //   )
+    const ws = new WebSocket(
+      `wss://sbs.basesystem.one/ivis/vms/api/v0/websocket/topic/list_ai_event/be571c00-41cf-4878-a1de-b782625da62a`
+    )
 
-  //   setWebsocket(ws)
+    setWebsocket(ws)
 
-  //   // create RTCPeerConnection
+    // create RTCPeerConnection
 
-  //   const pc = new RTCPeerConnection(config)
-  //   setRtcPeerConnection(pc)
+    const pc = new RTCPeerConnection(config)
+    setRtcPeerConnection(pc)
 
-  //   // listen for remote tracks and add them to remote stream
+    // listen for remote tracks and add them to remote stream
 
-  //   pc.ontrack = event => {
-  //     const stream = event.streams[0]
-  //     if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {
-  //       setRemoteStream(stream)
-  //       remoteVideoRef.current.srcObject = stream
-  //     }
-  //   }
+    pc.ontrack = event => {
+      const stream = event.streams[0]
+      if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {
+        setRemoteStream(stream)
+        remoteVideoRef.current.srcObject = stream
+      }
+    }
 
-  //   // close WebSocket and RTCPeerConnection on component unmount
+    // close WebSocket and RTCPeerConnection on component unmount
 
-  //   return () => {
-  //     if (websocket) {
-  //       websocket.close()
-  //     }
-  //     if (rtcPeerConnection) {
-  //       rtcPeerConnection.close()
-  //     }
-  //   }
-  // }, [])
+    return () => {
+      if (websocket) {
+        websocket.close()
+      }
+      if (rtcPeerConnection) {
+        rtcPeerConnection.close()
+      }
+    }
+  }, [])
 
-  // const handleMessage = async event => {
-  //   const message = JSON.parse(event.data)
-  //   const newMessage = JSON.parse(message?.data)
-  //   setEventData(newMessage)
-  // }
+  const handleMessage = async event => {
+    const message = JSON.parse(event.data)
+    const newMessage = JSON.parse(message?.data)
+    setEventData(newMessage)
+  }
 
-  // useEffect(() => {
-  //   if (websocket) {
-  //     websocket.addEventListener('open', () => {
-  //       websocket.send(
-  //         JSON.stringify({
-  //           id: defaultCameraID,
-  //           type: 'request'
-  //         })
-  //       )
-  //     })
-  //     websocket.addEventListener('message', handleMessage)
+  useEffect(() => {
+    if (websocket) {
+      websocket.addEventListener('open', () => {
+        websocket.send(
+          JSON.stringify({
+            id: defaultCameraID,
+            type: 'request'
+          })
+        )
+      })
+      websocket.addEventListener('message', handleMessage)
 
-  //     websocket.addEventListener('error', error => {
-  //       console.error('WebSocket error:', error)
-  //     })
+      websocket.addEventListener('error', error => {
+        console.error('WebSocket error:', error)
+      })
 
-  //     websocket.addEventListener('close', handleClose)
-  //   }
-  // }, [websocket])
+      websocket.addEventListener('close', handleClose)
+    }
+  }, [websocket])
 
   const handleClose = async event => {
     if (websocket) {
@@ -430,7 +430,7 @@ const EventList = () => {
             </TableContainer>
           </Grid>
           <br />
-          {/* <Grid container spacing={2} style={{ padding: 10 }}>
+          <Grid container spacing={2} style={{ padding: 10 }}>
             <Grid item xs={3}></Grid>
 
             <Grid item xs={1} style={{ padding: 0 }}>
@@ -447,7 +447,7 @@ const EventList = () => {
             <Grid item xs={6}>
               <Pagination count={total} page={page} color='primary' onChange={handlePageChange} />
             </Grid>
-          </Grid> */}
+          </Grid>
         </Card>
         <Grid container spacing={2}>
           <Grid item xs={8}>

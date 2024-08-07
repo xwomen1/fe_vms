@@ -19,6 +19,7 @@ import authConfig from 'src/configs/auth'
 import { makeStyles } from '@material-ui/core/styles'
 import Icon from 'src/@core/components/icon'
 import Swal from 'sweetalert2'
+import CustomChip from 'src/@core/components/mui/chip'
 import { useRouter } from 'next/router'
 import CircularProgress from '@mui/material/CircularProgress'
 import axios from 'axios'
@@ -161,7 +162,22 @@ const AddCamera = ({ nvr, onClose }) => {
                     <TableCell></TableCell>
                     <TableCell></TableCell>
                     <TableCell>{camera.location}</TableCell>
-                    <TableCell>{camera.status.name}</TableCell>
+                    <TableCell sx={{ padding: '16px', textAlign: 'center' }}>
+                      {camera.status.name ? (
+                        <div>
+                          <CustomChip
+                            rounded
+                            size='small'
+                            skin='light'
+                            sx={{ lineHeight: 1 }}
+                            label={camera.status.name === 'disconnected' ? 'Mất kết lỗi' : 'Đã kết lỗi'}
+                            color={camera.status.name === 'disconnected' ? 'primary' : 'success'}
+                          />
+                        </div>
+                      ) : (
+                        camera.status.name
+                      )}
+                    </TableCell>
                     <TableCell sx={{ padding: '16px' }}>
                       <Grid container spacing={2}>
                         {Array.isArray(nvrCameraList) && nvrCameraList.length > 0 ? (

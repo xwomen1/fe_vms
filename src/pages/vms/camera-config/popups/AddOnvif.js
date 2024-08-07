@@ -15,6 +15,7 @@ import {
 } from '@mui/material'
 import authConfig from 'src/configs/auth'
 import axios from 'axios'
+import CustomChip from 'src/@core/components/mui/chip'
 import Grid from '@mui/system/Unstable_Grid/Grid'
 import TableCell from '@mui/material/TableCell'
 import Icon from 'src/@core/components/icon'
@@ -188,7 +189,22 @@ const Add = ({
                           <TableCell sx={{ padding: '16px' }}>{camera.url}</TableCell>
                           <TableCell sx={{ padding: '16px' }}>{camera.macAddress}</TableCell>
                           <TableCell sx={{ padding: '16px' }}>{camera.location}</TableCell>
-                          <TableCell sx={{ padding: '16px' }}>{camera.status}</TableCell>
+                          <TableCell sx={{ padding: '16px', textAlign: 'center' }}>
+                            {camera.status ? (
+                              <div>
+                                <CustomChip
+                                  rounded
+                                  size='small'
+                                  skin='light'
+                                  sx={{ lineHeight: 1 }}
+                                  label={camera.status === 'disconnected' ? 'Mất kết lỗi' : 'Đã kết lỗi'}
+                                  color={camera.status === 'disconnected' ? 'primary' : 'success'}
+                                />
+                              </div>
+                            ) : (
+                              camera.status
+                            )}
+                          </TableCell>
                           <TableCell sx={{ padding: '16px' }}>
                             {foundcamera ? (
                               <IconButton onClick={() => handleDeleteCamera(foundcamera.id)}>

@@ -60,6 +60,7 @@ const Device = ({ onClose, camera }) => {
   const [protocol, setProtocol] = useState()
   const defaultValue = cameras?.type?.name || ''
   const [idBox, setIdBox] = useState(null)
+  const [errorNVR, setErrorNVR] = useState(false)
 
   const [cameraGroupSelect, setCameraGroupSelect] = useState({
     label: cameras?.type?.name || '',
@@ -291,7 +292,15 @@ const Device = ({ onClose, camera }) => {
   }, [defaultValue])
 
   const handleSaveClick = async () => {
-    handleSave() // Gọi hàm handleSave truyền từ props
+    if (!selectNVR) {
+      setErrorNVR(true)
+
+      return
+    } else {
+      setErrorNVR(false)
+    }
+
+    handleSave()
   }
 
   const handleSave = async () => {
@@ -570,12 +579,19 @@ const Device = ({ onClose, camera }) => {
               onChange={handleDDNSChange}
               options={nvrs || []}
               getOptionLabel={option => option.label}
-              renderInput={params => <CustomTextField {...params} label='Smart NVR' fullWidth />}
+              renderInput={params => (
+                <CustomTextField
+                  {...params}
+                  label='Smart NVR'
+                  fullWidth
+                  error={errorNVR}
+                  helperText={errorNVR ? 'Hãy chọn Smart NVR' : ''}
+                />
+              )}
               onFocus={handleComboboxFocusDevice}
-
-              // loading={loading}
-            />{' '}
+            />
           </Grid>
+
           <Grid item xs={3.9}>
             <Autocomplete
               value={regionsSelect}

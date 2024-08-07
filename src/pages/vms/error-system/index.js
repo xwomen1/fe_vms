@@ -30,6 +30,7 @@ import {
 import Filter from './popups/filter'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import { format } from 'date-fns'
+import CustomChip from 'src/@core/components/mui/chip'
 
 const EventList = () => {
   const [anchorEl, setAnchorEl] = useState(null)
@@ -311,8 +312,25 @@ const EventList = () => {
                         const value = row[column.field]
 
                         return (
-                          <TableCell key={column.id} align={column.align}>
-                            {column.field === 'createdAt' ? formatDateTime(value) : value}
+                          <TableCell key={column.id} align={column.align.align}>
+                            {column.field === 'createdAt' ? (
+                              formatDateTime(value)
+                            ) : column.field === 'status' ? (
+                              row.status ? (
+                                <CustomChip
+                                  rounded
+                                  size='small'
+                                  skin='light'
+                                  sx={{ lineHeight: 1, padding: '16px', textAlign: 'center' }}
+                                  label={row.status === 'Chưa xử lý' ? 'Chưa xử lý' : 'Đã kết nối'}
+                                  color={row.status === 'Chưa xử lý' ? 'primary' : 'success'}
+                                />
+                              ) : (
+                                row.status
+                              )
+                            ) : (
+                              value
+                            )}
                           </TableCell>
                         )
                       })}

@@ -4,6 +4,7 @@ import Menu from '@mui/material/Menu'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
 import TreeView from '@mui/lab/TreeView'
+import CustomChip from 'src/@core/components/mui/chip'
 import TreeItem from '@mui/lab/TreeItem'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -356,7 +357,6 @@ const UserList = ({ apiData }) => {
 
   const handleAddPClick = selectedNvrId => {
     setOpenPopupP(true)
-    setIdBox(cameraId)
     setSelectedNvrId(selectedNvrId)
   }
 
@@ -642,6 +642,53 @@ const UserList = ({ apiData }) => {
     setIsError(false)
     setPopupMessage('')
     setLoading(false)
+  }
+
+  const fetchDataReload = async id => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.get(
+        `https://sbs.basesystem.one/ivis/vms/api/v0/device/nvr/synchronize?nvr_id=${id}`,
+        config
+      )
+      Swal.fire({
+        title: 'Reaload thành công!',
+        text: response?.message,
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
+    } catch (error) {
+      console.error('Error fetching users:', error)
+      Swal.fire({
+        title: 'Error!',
+        text: error.response?.data?.message,
+        icon: 'error',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
+    }
+  }
+
+  const handleReloadClick = id => {
+    fetchDataReload(id)
   }
 
   return (
@@ -1024,31 +1071,15 @@ const UserList = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{assetType.location}</TableCell>
                       <TableCell sx={{ padding: '16px', textAlign: 'center' }}>
                         {assetType.status && assetType.status.name ? (
-                          <div
-                            style={{
-                              borderRadius: '10px',
-                              padding: '5px 10px',
-                              width: '70%',
-                              display: 'inline-block',
-                              color: 'white',
-                              backgroundColor:
-                                assetType.status.name === 'connected'
-                                  ? '#9af7d0'
-                                  : assetType.status.name === 'disconnected'
-                                  ? '#95ef85'
-                                  : 'orange',
-                              borderRadius: '10px',
-                              padding: '5px 10px',
-                              width: '70%',
-                              display: 'inline-block',
-                              color: '#5e9154'
-                            }}
-                          >
-                            {assetType.status.name === 'connected'
-                              ? 'Đã kết nối'
-                              : assetType.status.name === 'disconnected'
-                              ? 'Mất kết nối'
-                              : assetType.status.name}
+                          <div>
+                            <CustomChip
+                              rounded
+                              size='small'
+                              skin='light'
+                              sx={{ lineHeight: 1 }}
+                              label={assetType.status.name === 'disconnected' ? 'Mất kết lỗi' : 'Đã kết lỗi'}
+                              color={assetType.status.name === 'disconnected' ? 'primary' : 'success'}
+                            />
                           </div>
                         ) : (
                           assetType.status.name
@@ -1056,6 +1087,9 @@ const UserList = ({ apiData }) => {
                       </TableCell>
 
                       <TableCell sx={{ padding: '16px' }}>
+                        <IconButton onClick={() => handleReloadClick(assetType.id)}>
+                          <Icon icon='tabler:reload' />
+                        </IconButton>
                         <IconButton size='small' onClick={() => handleAddPClick(assetType.id)}>
                           <Icon icon='tabler:edit' />
                         </IconButton>

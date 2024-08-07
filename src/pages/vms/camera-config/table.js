@@ -7,6 +7,7 @@ import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
+import CustomChip from 'src/@core/components/mui/chip'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import authConfig from 'src/configs/auth'
 import Table from '@mui/material/Table'
@@ -316,7 +317,7 @@ const Camera = ({ apiData }) => {
         config
       )
       Swal.fire({
-        title: 'Reaload hành công!',
+        title: 'Reaload thành công!',
         text: response?.message,
         icon: 'success',
         willOpen: () => {
@@ -465,26 +466,15 @@ const Camera = ({ apiData }) => {
                         <TableCell sx={{ padding: '16px' }}>{assetType.location}</TableCell>
                         <TableCell sx={{ padding: '16px', textAlign: 'center' }}>
                           {assetType.status && assetType.status.name ? (
-                            <div
-                              style={{
-                                backgroundColor:
-                                  assetType.status.name === 'connected'
-                                    ? '#9af7d0'
-                                    : assetType.status.name === 'disconnected'
-                                    ? '#95ef85'
-                                    : 'orange',
-                                borderRadius: '10px',
-                                padding: '5px 10px',
-                                width: '70%',
-                                display: 'inline-block',
-                                color: '#5e9154'
-                              }}
-                            >
-                              {assetType.status.name === 'connected'
-                                ? 'Đã kết nối'
-                                : assetType.status.name === 'disconnected'
-                                ? 'Mất kết nối'
-                                : assetType.status.name}
+                            <div>
+                              <CustomChip
+                                rounded
+                                size='small'
+                                skin='light'
+                                sx={{ lineHeight: 1 }}
+                                label={assetType.status.name === 'disconnected' ? 'Mất kết lỗi' : 'Đã kết lỗi'}
+                                color={assetType.status.name === 'disconnected' ? 'primary' : 'success'}
+                              />
                             </div>
                           ) : (
                             assetType.status.name
