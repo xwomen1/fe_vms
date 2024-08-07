@@ -7,6 +7,8 @@ import Icon from 'src/@core/components/icon'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 import moment from 'moment'
 import { width } from '@mui/system'
+import { getApi } from 'src/@core/utils/requestUltils'
+import toast from 'react-hot-toast'
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Fade ref={ref} {...props} />
@@ -40,8 +42,17 @@ const format_form = [
     {
         name: 'imageObject',
         label: 'Hình ảnh',
-        placeholder: 'Nhập hình ảnh',
+        placeholder: 'Hình ảnh',
         type: 'ImageObject',
+        data: [],
+        require: true,
+        width: 12,
+    },
+    {
+        name: 'result',
+        label: 'Biển số xe',
+        placeholder: 'Biển số xe',
+        type: 'TextField',
         data: [],
         require: true,
         width: 12,
@@ -49,7 +60,7 @@ const format_form = [
     {
         name: 'description',
         label: 'Đối tượng',
-        placeholder: 'Nhập tên đối tượng',
+        placeholder: 'Tên đối tượng',
         type: 'TextField',
         data: [],
         require: true,
@@ -58,17 +69,17 @@ const format_form = [
     {
         name: 'timestamp',
         label: 'Thời gian',
-        placeholder: 'Nhập thời gian',
+        placeholder: 'Thời gian',
         type: 'TextField',
         data: [],
         require: true,
         width: 12,
     },
     {
-        name: 'camName',
+        name: 'cameraId',
         label: 'Camera',
-        placeholder: 'Nhập Camera',
-        type: 'VAutocomplete',
+        placeholder: 'Camera',
+        type: 'TextField',
         data: [],
         require: true,
         width: 12,
@@ -76,8 +87,8 @@ const format_form = [
     {
         name: 'location',
         label: 'Vị trí',
-        placeholder: 'Nhập vị trí',
-        type: 'VAutocomplete',
+        placeholder: 'Vị trí',
+        type: 'TextField',
         data: [],
         require: true,
         width: 12,
@@ -85,7 +96,7 @@ const format_form = [
     {
         name: 'imageResult',
         label: 'Ảnh toàn cảnh',
-        placeholder: 'Nhập ảnh toán cảnh',
+        placeholder: 'Ảnh toán cảnh',
         type: 'ImageResult',
         data: [],
         require: true,
@@ -96,6 +107,7 @@ const format_form = [
 const View = ({ data }) => {
     const [loading, setLoading] = useState(false)
     const [detail, setDetail] = useState(null)
+    const [cameraName, setCameraName] = useState('')
     const [form, setForm] = useState(format_form)
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
 
@@ -129,8 +141,30 @@ const View = ({ data }) => {
     useEffect(() => {
         if (detail) {
             setDetailFormValue()
+            fetchCamera()
         }
     }, [detail])
+
+    const fetchCamera = async () => {
+        setLoading(true)
+
+        try {
+            const response = await getApi(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${detail?.cameraId}`)
+            setCameraName(response?.data?.name)
+        } catch (error) {
+            if (error && error?.response?.data) {
+                console.error('error', error)
+                toast.error(error?.response?.data?.message)
+            } else {
+                console.error('Error fetching data:', error)
+                toast.error(error)
+            }
+        } finally {
+            () => {
+                setLoading(false)
+            }
+        }
+    }
 
     const setDetailFormValue = () => {
         reset(detail)
@@ -190,31 +224,10 @@ const View = ({ data }) => {
                                                     <CustomTextField
                                                         fullWidth
                                                         disabled={true}
-                                                        value={item.name == 'timestamp' ? moment(new Date(value)).format('DD/MM/YYYY HH:mm:ss') : value}
-                                                        label={item.label}
-                                                        onChange={onChange}
-                                                        placeholder={item.placeholder}
-                                                        error={Boolean(errors[item.name])}
-                                                        aria-describedby='validation-basic-last-name'
-                                                        {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
-                                                    />
-                                                )}
-                                            />
-                                        </Grid>
-                                    )
-                                }
-                                if (item.type == 'VAutocomplete') {
-                                    return (
-                                        <Grid item xs={12} key={index}>
-                                            <Controller
-                                                name={item.name}
-                                                control={control}
-                                                rules={{ required: true }}
-                                                render={({ field: { value, onChange } }) => (
-                                                    <CustomTextField
-                                                        fullWidth
-                                                        disabled={true}
-                                                        value={value}
+                                                        value={
+                                                            item.name === 'timestamp' ? moment(new Date(value)).format('DD/MM/YYYY HH:mm:ss')
+                                                                : item.name === 'cameraId' ? cameraName
+                                                                    : value}
                                                         label={item.label}
                                                         onChange={onChange}
                                                         placeholder={item.placeholder}

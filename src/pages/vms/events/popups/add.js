@@ -21,6 +21,7 @@ import Icon from 'src/@core/components/icon'
 import toast from 'react-hot-toast'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 import moment from 'moment'
+import { getApi } from 'src/@core/utils/requestUltils'
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Fade ref={ref} {...props} />
@@ -61,6 +62,15 @@ const format_form = [
     width: 12
   },
   {
+    name: 'result',
+    label: 'Biển số xe',
+    placeholder: 'Biển số xe',
+    type: 'TextField',
+    data: [],
+    require: true,
+    width: 12,
+  },
+  {
     name: 'description',
     label: 'Đối tượng',
     placeholder: 'Nhập tên đối tượng',
@@ -79,7 +89,7 @@ const format_form = [
     width: 12
   },
   {
-    name: 'camName',
+    name: 'cameraId',
     label: 'Camera',
     placeholder: 'Nhập Camera',
     type: 'VAutocomplete',
@@ -110,6 +120,7 @@ const format_form = [
 const Add = ({ show, onClose, id, data, setReload, filter }) => {
   const [loading, setLoading] = useState(false)
   const [cameraId, setCameraId] = useState(null)
+  const [cameraName, setCameraName] = useState('')
   const [cameraList, setCameraList] = useState([])
   const [locationList, setLocationList] = useState([])
   const API_REGIONS = `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/`
@@ -137,26 +148,13 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
     defaultValues: initValues
   })
 
-  const fetchCameraList = async () => {
-    try {
-      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras?sort=%2Bcreated_at`, config)
-      setCameraList(res.data)
-    } catch (error) {
-      console.error('Error fetching data: ', error)
-    }
-  }
+  useEffect(() => {
+    setDetail(data)
+    fetchCamera()
+    fetchCameraList()
+    fetchLocationList()
+  }, [])
 
-  const fetchLocationList = async () => {
-    try {
-      const res = await axios.get(
-        `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/parentsID?parentID=7cac40af-6b9e-47e6-9aba-8d458722d5a4`,
-        config
-      )
-      setLocationList(res.data)
-    } catch (error) {
-      console.error('Error fetching data: ', error)
-    }
-  }
 
   useEffect(() => {
     if (detail) {
@@ -168,11 +166,68 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
     reset(detail)
   }
 
-  useEffect(() => {
-    setDetail(data)
-    fetchCameraList()
-    fetchLocationList()
-  }, [])
+  const fetchCamera = async () => {
+    setLoading(true)
+
+    try {
+      const response = await getApi(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${data?.cameraId}`)
+
+      setCameraName(response?.data?.name)
+    } catch (error) {
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
+    } finally {
+      () => {
+        setLoading(false)
+      }
+    }
+  }
+
+  const fetchCameraList = async () => {
+    try {
+      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras?sort=%2Bcreated_at`, config)
+      setCameraList(res.data)
+    } catch (error) {
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
+    } finally {
+      () => {
+        setLoading(false)
+      }
+    }
+  }
+
+  const fetchLocationList = async () => {
+    try {
+      const res = await axios.get(
+        `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/parentsID?parentID=7cac40af-6b9e-47e6-9aba-8d458722d5a4`,
+        config
+      )
+      setLocationList(res.data)
+    } catch (error) {
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
+    } finally {
+      () => {
+        setLoading(false)
+      }
+    }
+  }
 
   const onSubmit = values => {
     const detail = {
@@ -182,8 +237,6 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
 
     handleUpdate(detail)
   }
-
-  const handleAdd = values => {}
 
   const handleUpdate = values => {
     const params = {
@@ -315,7 +368,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
                                     fullWidth
                                     label={item.label}
                                     SelectProps={{
-                                      value: value,
+                                      value: item.name === 'cameraId' ? cameraName : value,
                                       onChange: e => {
                                         onChange(e)
                                         if (item.name === 'camName') {
@@ -329,7 +382,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
                                     aria-describedby='validation-basic-select'
                                     {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
                                   >
-                                    {item.name === 'camName' &&
+                                    {item.name === 'cameraId' &&
                                       cameraList.map(x => (
                                         <MenuItem key={x.id} value={x.name}>
                                           {x.name}
