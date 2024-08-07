@@ -629,7 +629,7 @@ const Add = ({ apiData }) => {
         config
       )
       Swal.fire({
-        title: 'Reaload thành công!',
+        title: 'Reload thành công!',
         text: response?.message,
         icon: 'success',
         willOpen: () => {
