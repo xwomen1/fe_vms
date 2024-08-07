@@ -1,5 +1,3 @@
-import axios from 'axios'
-import authConfig from 'src/configs/auth'
 import {
   Box,
   Button,
@@ -40,20 +38,12 @@ const AIConfig = () => {
   const pageSizeOptions = [25, 50, 100]
   const [anchorEl, setAnchorEl] = useState(null)
 
-  const token = localStorage.getItem(authConfig.storageTokenKeyName)
-
-  const config = {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  }
-
   const columns = [
     {
       id: 1,
       flex: 0.15,
       minWidth: 50,
-      align: 'center',
+      align: 'right',
       field: 'image',
       label: 'Hình ảnh'
     },
@@ -61,7 +51,7 @@ const AIConfig = () => {
       id: 2,
       flex: 0.25,
       minWidth: 50,
-      align: 'left',
+      align: 'right',
       field: 'name',
       label: 'camera'
     },
@@ -69,7 +59,7 @@ const AIConfig = () => {
       id: 3,
       flex: 0.15,
       minWidth: 120,
-      align: 'center',
+      align: 'right',
       field: 'ipAddress',
       label: 'IP'
     },
@@ -77,7 +67,7 @@ const AIConfig = () => {
       id: 4,
       flex: 0.15,
       minWidth: 120,
-      align: 'center',
+      align: 'right',
       field: 'location',
       label: 'Khu vực'
     },
@@ -85,7 +75,7 @@ const AIConfig = () => {
       id: 5,
       flex: 0.15,
       minWidth: 50,
-      align: 'center',
+      align: 'right',
       field: 'face',
       label: 'Nhận diện khuôn mặt',
       renderCell: row => {
@@ -103,7 +93,7 @@ const AIConfig = () => {
       id: 6,
       flex: 0.15,
       minWidth: 50,
-      align: 'center',
+      align: 'right',
       field: 'licensePlate',
       label: 'Nhận diện biển số',
       renderCell: row => {
@@ -226,7 +216,7 @@ const AIConfig = () => {
     setSwitchStates(status)
   }, [alertAIList, cameraGroup])
 
-  const handleSwitchChange = (event, cameraId, type, cameraAIPropertyId, isModelExist) => {
+  const handleSwitchChange = (event, cameraId, type) => {
     const updatedSwitchStates = switchStates.map(item => {
       if (item.camera_id === cameraId) {
         return {
@@ -278,12 +268,6 @@ const AIConfig = () => {
 
     const params = Object.values(values)
 
-    // array containing id = ''
-    const params1 = params.filter(item => item.id === '')
-
-    // array does not contain id = ''
-    const params2 = params.filter(item => item.id !== '')
-
     try {
       await putApi(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties/cameras`, params)
       setReload(reload + 1)
@@ -299,41 +283,6 @@ const AIConfig = () => {
     } finally {
       setLoading(false)
       setUpdateCameraList([])
-    }
-  }
-
-  const handleAddAlertIsActive = async (cameraId, type) => {
-    const values = modelAIList.find(model => model.type === type)
-
-    const params = {
-      camera_id: cameraId,
-      cameraaiproperty: [
-        {
-          cameraModelAI: { ...values },
-          cameraAiZone: {
-            vfences: [],
-            vzone: {}
-          },
-          calendarDays: [],
-          isactive: true
-        }
-      ]
-    }
-
-    try {
-      await axios.post(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties`, { ...params })
-      setReload(reload + 1)
-      toast.success('Thao tác thành công')
-    } catch (error) {
-      if (error && error?.response?.data) {
-        console.error('error', error)
-        toast.error(error?.response?.data?.message)
-      } else {
-        console.error('Error fetching data:', error)
-        toast.error(error)
-      }
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -395,7 +344,7 @@ const AIConfig = () => {
                           skin='light'
                           sx={{ lineHeight: 1 }}
                           color={row.status.name === 'disconnected' ? 'primary' : 'success'}
-                          label={row.status.name === 'connected' ? 'Đã kết nối' : 'Mất kết nối'}
+                          label={row.status.name}
                         />
                       </TableCell>
                     </TableRow>

@@ -45,6 +45,7 @@ export const ViewCameraPause = ({
   const [status, setStatus] = useState('')
   const [reload, setReload] = useState(0)
   const [selectedChannel, setSelectedChannel] = useState('Sub')
+  const intervalRef = useRef(null);
 
   useEffect(() => {
     const heightCaculator = Math.floor((window.innerHeight - 192) / sizeScreen.split('x')[1])
@@ -94,7 +95,6 @@ export const ViewCameraPause = ({
       setLoading(false)
       const stream = event.streams[0]
       try {
-
         // if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {0
         // }
 
@@ -141,6 +141,39 @@ export const ViewCameraPause = ({
       }
     }
   }, [id, channel])
+
+  useEffect(() => {
+    const checkStatus = () => {
+      if (status === 'disconnected' || status === 'failed' || status === '') {
+        console.log('Status is', status, 'at:', new Date().toLocaleTimeString());
+
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+        }
+        intervalRef.current = setInterval(() => {
+          console.log('Recreating WebSocket connection due to status:', status, 'at:', new Date().toLocaleTimeString());
+          setRtcPeerConnection(null)
+          setWebsocketStatus(false)
+          setWebsocket(null)
+          createWsConnection();
+        }, 5000);
+      } else {
+        console.log('Status is connected, no need to retry at:', new Date().toLocaleTimeString());
+
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+        }
+      }
+    };
+
+    checkStatus();
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [status]);
 
   // useEffect(() => {
   //   createWsConnection()
@@ -217,7 +250,7 @@ export const ViewCameraPause = ({
             viewType: 'playback',
             startTime: convertDateToString(startTime),
             endTime: convertDateToString(endTime),
-            channel: channel,
+            channel: channel
           })
         )
       })
@@ -232,15 +265,17 @@ export const ViewCameraPause = ({
   }, [websocket])
 
   useEffect(() => {
-    console.log('heightDiv', heightDiv);
+    console.log('heightDiv', heightDiv)
   }, [heightDiv])
 
   return (
     <div className='portlet portlet-video live' style={{ width: '100%' }}>
       <div className='portlet-title'>
         <div className='caption'>
-          <span className='label label-sm'
-            style={{ backgroundColor: status === 'connected' ? 'green' : 'red', color: 'white' }}>
+          <span
+            className='label label-sm'
+            style={{ backgroundColor: status === 'connected' ? 'green' : 'red', color: 'white' }}
+          >
             {status ? status.toUpperCase() : 'PLAYBACK'}
           </span>
           <span className='caption-subject font-dark sbold uppercase'>{name}</span>

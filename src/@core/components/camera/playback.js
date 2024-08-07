@@ -43,6 +43,7 @@ export const ViewCameraPause = ({
   const [heightDiv, setHeightDiv] = useState(100)
   const [status, setStatus] = useState('')
   const [reload, setReload] = useState(0)
+  const intervalRef = useRef(null);
 
   useEffect(() => {
     const heightCaculator = Math.floor((window.innerHeight - 192) / sizeScreen.split('x')[1])
@@ -107,6 +108,39 @@ export const ViewCameraPause = ({
       }
     }
   }
+
+  useEffect(() => {
+    const checkStatus = () => {
+      if (status === 'disconnected' || status === 'failed' || status === '') {
+        console.log('Status is', status, 'at:', new Date().toLocaleTimeString());
+
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+        }
+        intervalRef.current = setInterval(() => {
+          console.log('Recreating WebSocket connection due to status:', status, 'at:', new Date().toLocaleTimeString());
+          setRtcPeerConnection(null)
+          setWebsocketStatus(false)
+          setWebsocket(null)
+          createWsConnection();
+        }, 5000);
+      } else {
+        console.log('Status is connected, no need to retry at:', new Date().toLocaleTimeString());
+
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+        }
+      }
+    };
+
+    checkStatus();
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [status]);
 
   useEffect(() => {
     if (rtcPeerConnection) {
@@ -231,8 +265,10 @@ export const ViewCameraPause = ({
     <div className='portlet portlet-video live' style={{ width: '100%' }}>
       <div className='portlet-title'>
         <div className='caption'>
-          <span className='label label-sm'
-            style={{ backgroundColor: status === 'connected' ? 'green' : 'red', color: 'white' }}>
+          <span
+            className='label label-sm'
+            style={{ backgroundColor: status === 'connected' ? 'green' : 'red', color: 'white' }}
+          >
             {status ? status.toUpperCase() : 'PLAYBACK'}
           </span>
           <span className='caption-subject font-dark sbold uppercase'>{name}</span>

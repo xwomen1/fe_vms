@@ -6,13 +6,17 @@ import Box from '@mui/material/Box'
 import fr from 'date-fns/locale/fr'
 import ar from 'date-fns/locale/ar-SA'
 import en from 'date-fns/locale/en-US'
+import ja from 'date-fns/locale/ja'
+import zh from 'date-fns/locale/zh-CN'
+import vi from 'date-fns/locale/vi'
+
 import { useTranslation } from 'react-i18next'
 import DatePicker, { registerLocale } from 'react-datepicker'
 
 // ** Custom Component Imports
 import CustomInput from './PickersCustomInput'
 
-const langObj = { fr, ar, en }
+const langObj = { fr, ar, en, ja, zh, vi }
 
 const PickersLocale = ({ popperPlacement }) => {
   // ** States
