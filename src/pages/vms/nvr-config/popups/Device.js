@@ -367,7 +367,7 @@ const Device = ({ onClose, nvr }) => {
             <CustomTextField
               label='Tên thiết bị'
               type='text'
-              value={cameraName}
+              value={cameraName || ''}
               onChange={handleCameraNameChange}
               fullWidth
             />
@@ -377,7 +377,7 @@ const Device = ({ onClose, nvr }) => {
             <CustomTextField
               label='Tên người dùng'
               type='text'
-              value={userName}
+              value={userName || ''}
               onChange={handleUserNameChange}
               fullWidth
             />
@@ -407,9 +407,9 @@ const Device = ({ onClose, nvr }) => {
           </Grid>
           <Grid item xs={3.9}>
             <Autocomplete
-              value={selectedProtocol}
+              value={selectedProtocol || ''}
               onChange={handleProtocolChange}
-              options={protocol}
+              options={protocol || ''}
               getOptionLabel={option => option.name}
               renderInput={params => <CustomTextField {...params} label='Giao thức' fullWidth />}
             />
@@ -418,7 +418,7 @@ const Device = ({ onClose, nvr }) => {
           <Grid item xs={0.1}></Grid>
           <Grid item xs={3.9}>
             <Autocomplete
-              value={regionsSelect}
+              value={regionsSelect || ''}
               onChange={handleRegionsChange}
               options={regions}
               getOptionLabel={option => option.label}

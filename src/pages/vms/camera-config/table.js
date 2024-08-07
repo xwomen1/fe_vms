@@ -472,7 +472,7 @@ const Camera = ({ apiData }) => {
                                 size='small'
                                 skin='light'
                                 sx={{ lineHeight: 1 }}
-                                label={assetType.status.name === 'disconnected' ? 'Mất kết lỗi' : 'Đã kết lỗi'}
+                                label={assetType.status.name === 'disconnected' ? 'Mất kết nối' : 'Đã kết nối'}
                                 color={assetType.status.name === 'disconnected' ? 'primary' : 'success'}
                               />
                             </div>

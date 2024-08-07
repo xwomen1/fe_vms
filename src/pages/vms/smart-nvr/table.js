@@ -392,7 +392,7 @@ const UserList = ({ apiData }) => {
                               size='small'
                               skin='light'
                               sx={{ lineHeight: 1 }}
-                              label={assetType.status === 'disconnected' ? 'Mất kết lỗi' : 'Đã kết lỗi'}
+                              label={assetType.status === 'disconnected' ? 'Mất kết nối' : 'Đã kết nối'}
                               color={assetType.status === 'disconnected' ? 'primary' : 'success'}
                             />
                           </div>

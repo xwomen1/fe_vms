@@ -187,7 +187,7 @@ const Add = ({
                                   size='small'
                                   skin='light'
                                   sx={{ lineHeight: 1 }}
-                                  label={nvr.status === 'disconnected' ? 'Mất kết lỗi' : 'Đã kết lỗi'}
+                                  label={nvr.status === 'disconnected' ? 'Mất kết nối' : 'Đã kết nối'}
                                   color={nvr.status === 'disconnected' ? 'primary' : 'success'}
                                 />
                               </div>

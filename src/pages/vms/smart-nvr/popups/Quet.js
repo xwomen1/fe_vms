@@ -18,6 +18,7 @@ import {
 import authConfig from 'src/configs/auth'
 import { makeStyles } from '@material-ui/core/styles'
 import Icon from 'src/@core/components/icon'
+import CustomChip from 'src/@core/components/mui/chip'
 import Swal from 'sweetalert2'
 import { useRouter } from 'next/router'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -167,23 +168,23 @@ const AddCamera = ({ nvr, onClose }) => {
                       <TableCell>{camera.ipAddress}</TableCell>
                       <TableCell></TableCell>
                       <TableCell>{camera.location}</TableCell>
-                      <TableCell
-                        sx={{
-                          padding: '16px'
-                        }}
-                      >
-                        <span
-                          style={{
-                            borderRadius: '10px',
-                            padding: '5px 10px',
-                            width: '70%',
-                            display: 'inline-block',
-                            backgroundColor: camera.status === 'connected' ? '#449D44' : 'orange'
-                          }}
-                        >
-                          {camera.status === 'connected' ? 'Đang hoạt động' : 'Không hoạt động'}
-                        </span>
+                      <TableCell sx={{ padding: '16px', textAlign: 'center' }}>
+                        {camera.status ? (
+                          <div>
+                            <CustomChip
+                              rounded
+                              size='small'
+                              skin='light'
+                              sx={{ lineHeight: 1 }}
+                              label={camera.status === 'disconnected' ? 'Mất kết nối' : 'Đã kết nối'}
+                              color={camera.status === 'disconnected' ? 'primary' : 'success'}
+                            />
+                          </div>
+                        ) : (
+                          camera.status
+                        )}
                       </TableCell>
+
                       <TableCell sx={{ padding: '16px' }}>
                         <IconButton disabled={loading} onClick={() => handleDelete(camera.id)}>
                           <Icon icon='tabler:trash' />
