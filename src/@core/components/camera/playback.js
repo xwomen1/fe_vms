@@ -173,18 +173,20 @@ export const ViewCameraPause = ({
     }
   }, [id])
 
-  // useEffect(() => {
-  //   createWsConnection()
+  useEffect(() => {
+    setRtcPeerConnection(null)
+    setWebsocket(null)
+    createWsConnection()
 
-  //   return () => {
-  //     if (websocket) {
-  //       websocket.close()
-  //     }
-  //     if (rtcPeerConnection) {
-  //       rtcPeerConnection.close()
-  //     }
-  //   }
-  // }, [reload])
+    return () => {
+      if (websocket) {
+        websocket.close()
+      }
+      if (rtcPeerConnection) {
+        rtcPeerConnection.close()
+      }
+    }
+  }, [reload])
 
   // send message to WebSocket server
   const sendMessage = message => {
@@ -306,7 +308,7 @@ export const ViewCameraPause = ({
           autoPlay
           srcObject={remoteStream}
         />
-        {(status === 'failed' || status == 'disconnected') && (
+        {(status === 'failed' || status === 'disconnected' || status === '') && (
           <IconButton
             sx={{
               left: '30%',
