@@ -151,31 +151,28 @@ const CameraGroup = ({ apiData }) => {
                 <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
                   <TableHead>
                     <TableRow>
-                      <TableCell sx={{ padding: '13px' }}>STT</TableCell>
-                      <TableCell sx={{ padding: '13px' }}>Tên nhóm</TableCell>
-                      <TableCell sx={{ padding: '13px' }}>Mô tả</TableCell>
-                      <TableCell sx={{ padding: '13px' }}>Số lượng camera</TableCell>
-                      <TableCell sx={{ padding: '13px' }}>Thao tác</TableCell>
+                      <TableCell align='center'>STT</TableCell>
+                      <TableCell align='center'>Tên nhóm</TableCell>
+                      <TableCell align='center'>Mô tả</TableCell>
+                      <TableCell align='center'>Số lượng camera</TableCell>
+                      <TableCell align='center'>Thao tác</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {cameras.length > 0 &&
                       cameras.map((camera, index) => (
                         <TableRow key={camera.id}>
-                          <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
-                          <TableCell sx={{ padding: '16px' }}>{camera.name}</TableCell>
-                          <TableCell sx={{ padding: '16px' }}>{camera.description}</TableCell>
-                          <TableCell sx={{ padding: '16px' }}>{camera.cameras ? camera.cameras.length : 0}</TableCell>
-
-                          <TableCell sx={{ padding: '16px' }}>
-                            <Grid container spacing={2}>
-                              <IconButton onClick={() => handleOpenPopupDetail(camera.id)}>
-                                <Icon icon='tabler:edit' />
-                              </IconButton>
-                              <IconButton onClick={() => handleOpenPopup(camera.id)}>
-                                <Icon icon='tabler:trash' />
-                              </IconButton>
-                            </Grid>
+                          <TableCell align='center'>{(page - 1) * pageSize + index + 1} </TableCell>
+                          <TableCell align='center'>{camera.name}</TableCell>
+                          <TableCell align='center'>{camera.description}</TableCell>
+                          <TableCell align='center'>{camera.cameras ? camera.cameras.length : 0}</TableCell>
+                          <TableCell align='center'>
+                            <IconButton onClick={() => handleOpenPopupDetail(camera.id)}>
+                              <Icon icon='tabler:edit' />
+                            </IconButton>
+                            <IconButton onClick={() => handleOpenPopup(camera.id)}>
+                              <Icon icon='tabler:trash' />
+                            </IconButton>
                           </TableCell>
                         </TableRow>
                       ))}

@@ -795,7 +795,7 @@ const UserList = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                        // loading={loading}
+                      // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.1}></Grid>
@@ -878,7 +878,7 @@ const UserList = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                        // loading={loading}
+                      // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.4}></Grid>
@@ -993,7 +993,7 @@ const UserList = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                        // loading={loading}
+                      // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.1}></Grid>
@@ -1050,26 +1050,26 @@ const UserList = ({ apiData }) => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Tên thiết bị</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Loại</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Địa chỉ IP</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Địa chỉ Mac</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Vị trí</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Trạng thái</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
+                    <TableCell align='center'>STT</TableCell>
+                    <TableCell align='center'>Tên thiết bị</TableCell>
+                    <TableCell align='center'>Loại</TableCell>
+                    <TableCell align='center'>Địa chỉ IP</TableCell>
+                    <TableCell align='center'>Địa chỉ Mac</TableCell>
+                    <TableCell align='center'>Vị trí</TableCell>
+                    <TableCell align='center'>Trạng thái</TableCell>
+                    <TableCell align='center'>Hành động</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {assettype.map((assetType, index) => (
                     <TableRow key={assetType.id}>
-                      <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.name}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.type.name}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.ipAddress}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.macAddress}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.location}</TableCell>
-                      <TableCell sx={{ padding: '16px', textAlign: 'center' }}>
+                      <TableCell align='center'>{(page - 1) * pageSize + index + 1} </TableCell>
+                      <TableCell align='center'>{assetType.name}</TableCell>
+                      <TableCell align='center'>{assetType.type.name}</TableCell>
+                      <TableCell align='center'>{assetType.ipAddress}</TableCell>
+                      <TableCell align='center'>{assetType.macAddress}</TableCell>
+                      <TableCell align='center'>{assetType.location}</TableCell>
+                      <TableCell align='center'>
                         {assetType.status && assetType.status.name ? (
                           <div>
                             <CustomChip
@@ -1086,7 +1086,7 @@ const UserList = ({ apiData }) => {
                         )}
                       </TableCell>
 
-                      <TableCell sx={{ padding: '16px' }}>
+                      <TableCell align='center'>
                         <IconButton onClick={() => handleReloadClick(assetType.id)}>
                           <Icon icon='tabler:reload' />
                         </IconButton>

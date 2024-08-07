@@ -366,7 +366,7 @@ const EventList = ({ eventData }) => {
                       {column.label}
                     </TableCell>
                   ))}
-                  <TableCell style={{ width: '30px' }}>Thao tác</TableCell>
+                  <TableCell style={{ width: '200px' }}>Thao tác</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
