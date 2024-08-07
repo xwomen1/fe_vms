@@ -122,6 +122,7 @@ const View = ({ data }) => {
 
     useEffect(() => {
         setDetail(data)
+        console.log('data', data);
     }, [])
 
 
