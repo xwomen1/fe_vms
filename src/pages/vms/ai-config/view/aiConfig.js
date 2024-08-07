@@ -1,5 +1,3 @@
-import axios from 'axios'
-import authConfig from 'src/configs/auth'
 import {
   Box,
   Button,
@@ -39,14 +37,6 @@ const AIConfig = () => {
   const [pageSize, setPageSize] = useState(25)
   const pageSizeOptions = [25, 50, 100]
   const [anchorEl, setAnchorEl] = useState(null)
-
-  const token = localStorage.getItem(authConfig.storageTokenKeyName)
-
-  const config = {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  }
 
   const columns = [
     {
@@ -226,7 +216,7 @@ const AIConfig = () => {
     setSwitchStates(status);
   }, [alertAIList, cameraGroup]);
 
-  const handleSwitchChange = (event, cameraId, type, cameraAIPropertyId, isModelExist) => {
+  const handleSwitchChange = (event, cameraId, type) => {
     const updatedSwitchStates = switchStates.map((item) => {
       if (item.camera_id === cameraId) {
 
@@ -279,12 +269,6 @@ const AIConfig = () => {
 
     const params = Object.values(values);
 
-    // array containing id = ''
-    const params1 = params.filter(item => item.id === '')
-
-    // array does not contain id = ''
-    const params2 = params.filter(item => item.id !== '')
-
     try {
       await putApi(
         `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties/cameras`,
@@ -305,46 +289,6 @@ const AIConfig = () => {
       setUpdateCameraList([])
     }
   }
-
-  const handleAddAlertIsActive = async (cameraId, type) => {
-
-    const values = modelAIList.find((model) => model.type === type)
-
-    const params = {
-      camera_id: cameraId,
-      cameraaiproperty: [
-        {
-          cameraModelAI: { ...values },
-          cameraAiZone: {
-            vfences: [],
-            vzone: {}
-          },
-          calendarDays: [],
-          isactive: true
-        }
-      ]
-    }
-
-    try {
-      await axios.post(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties`,
-        { ...params },
-      )
-      setReload(reload + 1)
-      toast.success('Thao tác thành công')
-    } catch (error) {
-      if (error && error?.response?.data) {
-        console.error('error', error)
-        toast.error(error?.response?.data?.message)
-      } else {
-        console.error('Error fetching data:', error)
-        toast.error(error)
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
-
 
   const handlePageChange = newPage => {
     setPage(newPage)
