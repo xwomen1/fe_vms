@@ -354,7 +354,7 @@ const UserList = ({ apiData }) => {
         config
       )
       Swal.fire({
-        title: 'Reaload thành công!',
+        title: 'Reload thành công!',
         text: response?.message,
         icon: 'success',
         willOpen: () => {
@@ -508,7 +508,7 @@ const UserList = ({ apiData }) => {
                               size='small'
                               skin='light'
                               sx={{ lineHeight: 1 }}
-                              label={assetType.status.name === 'disconnected' ? 'Mất kết lỗi' : 'Đã kết lỗi'}
+                              label={assetType.status.name === 'disconnected' ? 'Mất kết nối' : 'Đã kết nối'}
                               color={assetType.status.name === 'disconnected' ? 'primary' : 'success'}
                             />
                           </div>
