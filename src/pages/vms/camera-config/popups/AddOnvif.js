@@ -197,7 +197,7 @@ const Add = ({
                                   size='small'
                                   skin='light'
                                   sx={{ lineHeight: 1 }}
-                                  label={camera.status === 'disconnected' ? 'Mất kết lỗi' : 'Đã kết lỗi'}
+                                  label={camera.status === 'disconnected' ? 'Mất kết nối' : 'Đã kết nối'}
                                   color={camera.status === 'disconnected' ? 'primary' : 'success'}
                                 />
                               </div>
