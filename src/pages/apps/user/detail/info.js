@@ -472,7 +472,7 @@ const UserDetails = () => {
 
     fetchGroupData()
   }, [])
-  const formatIsLeader = isLeader => <Checkbox checked={isLeader} disabled />
+  const formatIsLeader = isLeader => <Checkbox checked={isLeader} />
 
   const policyList = policies.map(row => row.policyId)
 
@@ -656,7 +656,7 @@ const UserDetails = () => {
         const userGroup = {
           groupId: groupId,
           policyName: true,
-          isLeader: false
+          isLeader: isLeader
         }
         processedGroups.push(userGroup)
         console.log(userGroup)

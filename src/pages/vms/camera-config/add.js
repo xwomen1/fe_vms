@@ -629,7 +629,7 @@ const Add = ({ apiData }) => {
         config
       )
       Swal.fire({
-        title: 'Reaload thành công!',
+        title: 'Đồng bộ thành công!',
         text: response?.message,
         icon: 'success',
         willOpen: () => {
@@ -764,7 +764,7 @@ const Add = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                      // loading={loading}
+                        // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.1}></Grid>
@@ -850,7 +850,7 @@ const Add = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                      // loading={loading}
+                        // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.4}></Grid>
@@ -968,7 +968,7 @@ const Add = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                      // loading={loading}
+                        // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.1}></Grid>
