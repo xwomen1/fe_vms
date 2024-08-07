@@ -45,7 +45,7 @@ const EventList = ({ eventData }) => {
   const [isOpenEdit, setIsOpenEdit] = useState(false)
   const [eventDetail, setEventDetail] = useState(null)
   const [idDelete, setIdDelete] = useState(null)
-  const [deviceList, setDeviceList] = useState(null)
+  const [deviceList, setDeviceList] = useState([])
   const [reload, setReload] = useState(0)
   const [count, setCount] = useState('')
   const [total, setTotalPage] = useState(0)
@@ -114,7 +114,7 @@ const EventList = ({ eventData }) => {
     setLoading(true)
     try {
       const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/routine`, params)
-      setDeviceList(res.data)
+      setDeviceList(res?.data)
       setCount(res.count)
       setTotalPage(Math.ceil(res.count / pageSize))
     } catch (error) {

@@ -345,7 +345,7 @@ const UserList = ({ apiData }) => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ padding: '16px' }}>
+                    <TableCell align='center'>
                       <Checkbox
                         checked={selectedIds.length === assettype.length}
                         onChange={e => {
@@ -358,33 +358,33 @@ const UserList = ({ apiData }) => {
                         }}
                       />
                     </TableCell>
-                    <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Tên thiết bị</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Loại</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Địa chỉ IP</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Địa chỉ Mac</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Vị trí</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Trạng thái</TableCell>
+                    <TableCell align='center'>STT</TableCell>
+                    <TableCell align='center'>Tên thiết bị</TableCell>
+                    <TableCell align='center'>Loại</TableCell>
+                    <TableCell align='center'>Địa chỉ IP</TableCell>
+                    <TableCell align='center'>Địa chỉ Mac</TableCell>
+                    <TableCell align='center'>Vị trí</TableCell>
+                    <TableCell align='center'>Trạng thái</TableCell>
 
-                    <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
+                    <TableCell align='center'>Hành động</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {assettype.map((assetType, index) => (
                     <TableRow key={assetType.id}>
-                      <TableCell sx={{ padding: '16px' }}>
+                      <TableCell align='center'>
                         <Checkbox
                           checked={selectedIds.includes(assetType.id)}
                           onChange={() => handleCheckboxChange(assetType.id)}
                         />
                       </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType?.nameDevice}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType?.deviceType}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType?.ipAddress}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType?.macAddress}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType?.location}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>
+                      <TableCell align='center'>{(page - 1) * pageSize + index + 1} </TableCell>
+                      <TableCell align='center'>{assetType?.nameDevice}</TableCell>
+                      <TableCell align='center'>{assetType?.deviceType}</TableCell>
+                      <TableCell align='center'>{assetType?.ipAddress}</TableCell>
+                      <TableCell align='center'>{assetType?.macAddress}</TableCell>
+                      <TableCell align='center'>{assetType?.location}</TableCell>
+                      <TableCell align='center'>
                         {assetType.status ? (
                           <div>
                             <CustomChip
@@ -401,7 +401,7 @@ const UserList = ({ apiData }) => {
                         )}
                       </TableCell>
 
-                      <TableCell sx={{ padding: '16px' }}>
+                      <TableCell align='center'>
                         <IconButton size='small' onClick={() => handleAddPClick(assetType.id)}>
                           <Icon icon='tabler:edit' />
                         </IconButton>

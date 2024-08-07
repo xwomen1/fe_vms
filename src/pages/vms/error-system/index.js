@@ -212,13 +212,13 @@ const EventList = () => {
   }, [fetchDataList])
 
   const columns = [
-    { id: 1, flex: 0.25, minWidth: 50, align: 'left', field: 'eventName', label: 'Tên sự cố' },
-    { id: 2, flex: 0.15, minWidth: 150, align: 'left', field: 'severity', label: 'Mức độ' },
-    { id: 3, flex: 0.15, minWidth: 150, align: 'left', field: 'deviceType', label: 'Loại thiết bị' },
-    { id: 4, flex: 0.15, minWidth: 100, align: 'left', field: 'createdAt', label: 'Thời gian' },
-    { id: 5, flex: 0.15, minWidth: 100, align: 'left', field: 'location', label: 'Vị trí' },
-    { id: 6, flex: 0.25, minWidth: 50, align: 'left', field: 'status', label: 'Trạng thái' },
-    { id: 7, flex: 0.25, minWidth: 50, align: 'left', field: 'source', label: 'Nguồn' }
+    { id: 1, flex: 0.25, minWidth: 50, align: 'center', field: 'eventName', label: 'Tên sự cố' },
+    { id: 2, flex: 0.15, minWidth: 150, align: 'center', field: 'severity', label: 'Mức độ' },
+    { id: 3, flex: 0.15, minWidth: 150, align: 'center', field: 'deviceType', label: 'Loại thiết bị' },
+    { id: 4, flex: 0.15, minWidth: 100, align: 'center', field: 'createdAt', label: 'Thời gian' },
+    { id: 5, flex: 0.15, minWidth: 100, align: 'center', field: 'location', label: 'Vị trí' },
+    { id: 6, flex: 0.25, minWidth: 50, align: 'center', field: 'status', label: 'Trạng thái' },
+    { id: 7, flex: 0.25, minWidth: 50, align: 'center', field: 'source', label: 'Nguồn' }
   ]
 
   const handleSetValueFilter = data => {
@@ -294,7 +294,7 @@ const EventList = () => {
             <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
               <TableHead>
                 <TableRow>
-                  <TableCell>STT</TableCell>
+                  <TableCell align='center'>STT</TableCell>
                   {columns.map(column => (
                     <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
                       {column.label}
@@ -307,12 +307,12 @@ const EventList = () => {
                 {Array.isArray(devices) && devices.length > 0 ? (
                   devices.map((row, index) => (
                     <TableRow hover tabIndex={-1} key={index}>
-                      <TableCell>{(page - 1) * pageSize + index + 1}</TableCell>
+                      <TableCell align='center'>{(page - 1) * pageSize + index + 1}</TableCell>
                       {columns.map(column => {
                         const value = row[column.field]
 
                         return (
-                          <TableCell key={column.id} align={column.align.align}>
+                          <TableCell key={column.id} align={column.align}>
                             {column.field === 'createdAt' ? (
                               formatDateTime(value)
                             ) : column.field === 'status' ? (
@@ -334,7 +334,7 @@ const EventList = () => {
                           </TableCell>
                         )
                       })}
-                      <TableCell>
+                      <TableCell align='center'>
                         <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center' }}>
                           {row.eventName === 'Đã kết nối' ? (
                             <IconButton

@@ -346,12 +346,12 @@ const Car_management = () => {
             loaded
               ? { display: 'none' }
               : {
-                  width: '100px',
-                  height: '100px',
-                  display: 'grid',
-                  backgroundColor: '#C4C4C4',
-                  placeItems: 'center'
-                }
+                width: '100px',
+                height: '100px',
+                display: 'grid',
+                backgroundColor: '#C4C4C4',
+                placeItems: 'center'
+              }
           }
         >
           <CircularProgress size={20} />
@@ -454,29 +454,29 @@ const Car_management = () => {
                     <TableCell>
                       <Checkbox onChange={handleSelectAllChange} checked={selectAll} />
                     </TableCell>
-                    <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Ảnh xe</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Biển số xe</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Loại xe</TableCell>
+                    <TableCell align='center'>STT</TableCell>
+                    <TableCell align='center'>Ảnh xe</TableCell>
+                    <TableCell align='center'>Biển số xe</TableCell>
+                    <TableCell align='center'>Loại xe</TableCell>
 
-                    <TableCell sx={{ padding: '16px' }}>Lần cuối xuất hiện</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Trạng thái</TableCell>
+                    <TableCell align='center'>Lần cuối xuất hiện</TableCell>
+                    <TableCell align='center'>Trạng thái</TableCell>
 
-                    <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
+                    <TableCell align='center'>Hành động</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {Array.isArray(userData) && userData.length > 0 ? (
                     userData.map((user, index) => (
                       <TableRow key={user.id}>
-                        <TableCell>
+                        <TableCell align='center'>
                           <Checkbox
                             onChange={event => handleCheckboxChange(event, user.id)}
                             checked={selectedIds.includes(user.id)}
                           />
                         </TableCell>
-                        <TableCell>{index + 1}</TableCell>
-                        <TableCell>
+                        <TableCell align='center'>{index + 1}</TableCell>
+                        <TableCell align='center'>
                           {user && user.mainImageId.length > 0 ? (
                             <Img
                               src={buildUrlWithToken(
@@ -491,11 +491,11 @@ const Car_management = () => {
                             />
                           )}
                         </TableCell>
-                        <TableCell>{user.name}</TableCell>
-                        <TableCell>{user.vehicleType}</TableCell>
+                        <TableCell align='center'>{user.name}</TableCell>
+                        <TableCell align='center'>{user.vehicleType}</TableCell>
 
-                        <TableCell>{user.lastAppearance}</TableCell>
-                        <TableCell sx={{ padding: '16px', textAlign: 'center' }}>
+                        <TableCell align='center'>{user.lastAppearance}</TableCell>
+                        <TableCell align='center'>
                           <div>
                             <CustomChip
                               rounded
@@ -507,7 +507,7 @@ const Car_management = () => {
                             />
                           </div>
                         </TableCell>
-                        <TableCell sx={{ padding: '16px' }}>
+                        <TableCell align='center'>
                           <IconButton component={Link} href={`/pages/car_management/detail/${user.id}`}>
                             <Icon icon='tabler:info-circle' />
                           </IconButton>

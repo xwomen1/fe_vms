@@ -349,12 +349,12 @@ const FaceManagement = () => {
             loaded
               ? { display: 'none' }
               : {
-                  width: '100px',
-                  height: '100px',
-                  display: 'grid',
-                  backgroundColor: '#C4C4C4',
-                  placeItems: 'center'
-                }
+                width: '100px',
+                height: '100px',
+                display: 'grid',
+                backgroundColor: '#C4C4C4',
+                placeItems: 'center'
+              }
           }
         >
           <CircularProgress size={20} />
@@ -459,13 +459,13 @@ const FaceManagement = () => {
                 <TableCell>
                   <Checkbox onChange={handleSelectAllChange} checked={selectAll} />
                 </TableCell>
-                <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Ảnh đối tượng</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Tên Đối tượng</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Lần cuối xuất hiện</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Loại đối tượng</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Trạng thái hoạt động </TableCell>
-                <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
+                <TableCell align='center'>STT</TableCell>
+                <TableCell align='center'>Ảnh đối tượng</TableCell>
+                <TableCell align='center'>Tên Đối tượng</TableCell>
+                <TableCell align='center'>Lần cuối xuất hiện</TableCell>
+                <TableCell align='center'>Loại đối tượng</TableCell>
+                <TableCell align='center'>Trạng thái hoạt động </TableCell>
+                <TableCell align='center'>Hành động</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -476,14 +476,14 @@ const FaceManagement = () => {
                     console.log(user.status),
                     (
                       <TableRow key={user.id}>
-                        <TableCell>
+                        <TableCell align='center'>
                           <Checkbox
                             onChange={event => handleCheckboxChange(event, user.id)}
                             checked={selectedIds.includes(user.id)}
                           />
                         </TableCell>
-                        <TableCell>{index + 1}</TableCell>
-                        <TableCell>
+                        <TableCell align='center'>{index + 1}</TableCell>
+                        <TableCell align='center'>
                           <Img
                             src={buildUrlWithToken(
                               `https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${user.mainImageId}`
@@ -491,10 +491,10 @@ const FaceManagement = () => {
                             style={{ maxWidth: '91px', height: '56px', minWidth: '56px' }}
                           />
                         </TableCell>
-                        <TableCell>{user.name}</TableCell>
-                        <TableCell>{formatDate(user.lastAppearance)}</TableCell>
-                        <TableCell>Nhân viên</TableCell>
-                        <TableCell sx={{ padding: '16px', textAlign: 'center' }}>
+                        <TableCell align='center'>{user.name}</TableCell>
+                        <TableCell align='center'>{formatDate(user.lastAppearance)}</TableCell>
+                        <TableCell align='center'>Nhân viên</TableCell>
+                        <TableCell align='center'>
                           <div>
                             <CustomChip
                               rounded
@@ -506,7 +506,7 @@ const FaceManagement = () => {
                             />
                           </div>
                         </TableCell>
-                        <TableCell sx={{ padding: '16px' }}>
+                        <TableCell align='center'>
                           <IconButton component={Link} href={`/pages/face_management/detail/${user.id}`}>
                             <Icon icon='tabler:info-circle' />
                           </IconButton>

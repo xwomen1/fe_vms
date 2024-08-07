@@ -51,7 +51,7 @@ const AIConfig = () => {
       id: 2,
       flex: 0.25,
       minWidth: 50,
-      align: 'right',
+      align: 'center',
       field: 'name',
       label: 'camera'
     },
@@ -59,7 +59,7 @@ const AIConfig = () => {
       id: 3,
       flex: 0.15,
       minWidth: 120,
-      align: 'right',
+      align: 'center',
       field: 'ipAddress',
       label: 'IP'
     },
@@ -67,7 +67,7 @@ const AIConfig = () => {
       id: 4,
       flex: 0.15,
       minWidth: 120,
-      align: 'right',
+      align: 'center',
       field: 'location',
       label: 'Khu vực'
     },
@@ -75,7 +75,7 @@ const AIConfig = () => {
       id: 5,
       flex: 0.15,
       minWidth: 50,
-      align: 'right',
+      align: 'center',
       field: 'face',
       label: 'Nhận diện khuôn mặt',
       renderCell: row => {
@@ -93,7 +93,7 @@ const AIConfig = () => {
       id: 6,
       flex: 0.15,
       minWidth: 50,
-      align: 'right',
+      align: 'center',
       field: 'licensePlate',
       label: 'Nhận diện biển số',
       renderCell: row => {
@@ -314,20 +314,20 @@ const AIConfig = () => {
             <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
               <TableHead>
                 <TableRow>
-                  <TableCell align='right'>STT</TableCell>
+                  <TableCell align='center'>STT</TableCell>
                   {columns.map(column => (
                     <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
                       {column.label}
                     </TableCell>
                   ))}
-                  <TableCell align='right'>Trạng thái</TableCell>
+                  <TableCell align='center'>Trạng thái</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {dataList.slice(0, pageSize).map((row, index) => {
                   return (
                     <TableRow hover tabIndex={-1} key={index}>
-                      <TableCell align='right'>{index + 1}</TableCell>
+                      <TableCell align='center'>{index + 1}</TableCell>
                       {columns.map(column => {
                         const value = row[column.field]
 
@@ -337,7 +337,7 @@ const AIConfig = () => {
                           </TableCell>
                         )
                       })}
-                      <TableCell align='right'>
+                      <TableCell align='center'>
                         <CustomChip
                           rounded
                           size='small'
