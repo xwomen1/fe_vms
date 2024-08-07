@@ -497,7 +497,7 @@ const FaceManagement = () => {
                           <div
                             style={{
                               backgroundColor:
-                                user.status === true ? '#449D44' : user.status === false ? '#FF9F43' : '#FF9F43',
+                                user.status === true ? '#9af7d0' : user.status === false ? '#95ef85' : '#95ef85',
                               borderRadius: '10px',
                               padding: '5px 10px',
                               width: '70%',
@@ -512,13 +512,6 @@ const FaceManagement = () => {
                               : user.status}
                           </div>
                         </TableCell>
-                        {/* <TableCell
-                          style={{
-                            color: user.status ? '#FF9F43' : 'red'
-                          }}
-                        >
-                          {user.status ? 'hoạt động' : 'không hoạt động'}
-                        </TableCell> */}
                         <TableCell sx={{ padding: '16px' }}>
                           <IconButton component={Link} href={`/pages/face_management/detail/${user.id}`}>
                             <Icon icon='tabler:info-circle' />
