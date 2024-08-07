@@ -121,6 +121,7 @@ const EventDetails = ({ show, onClose, data, setReload }) => {
             <Dialog
                 fullWidth
                 open={show}
+                onClose={onClose}
                 maxWidth='lg'
                 scroll='body'
                 TransitionComponent={Transition}
