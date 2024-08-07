@@ -28,7 +28,7 @@ const initValueFilter = {
 
 const UserList = ({ apiData }) => {
   const [value, setValue] = useState('')
-  const [service, setService] = useState([])
+  const [dataList, setDataList] = useState([])
   const [total, setTotal] = useState(1)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
@@ -68,10 +68,7 @@ const UserList = ({ apiData }) => {
     setPage(newPage)
   }
 
-  const handleSearch = () => {
-    setPage(1)
-    fetchDataAsset()
-  }
+
 
   function showAlertConfirm(options, intl) {
     const defaultProps = {
@@ -127,9 +124,6 @@ const UserList = ({ apiData }) => {
         axios
           .delete(urlDelete)
           .then(() => {
-            // const updatedData = service.filter(service => service.id !== idDelete)
-            // setService(updatedData)
-            // fetchDataAsset()
             toast.success('Xoá thành công')
           })
           .catch(err => {
@@ -140,7 +134,7 @@ const UserList = ({ apiData }) => {
     })
   }
 
-  const fetchDataAsset = async () => {
+  const fetchData = async () => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -152,7 +146,6 @@ const UserList = ({ apiData }) => {
           ...valueFilter,
           limit: pageSize,
           page: page,
-          keyword: value
         }
       }
 
@@ -161,7 +154,15 @@ const UserList = ({ apiData }) => {
         config
       )
 
-      setService(response.data.rows)
+      console.log();
+
+
+      if (response.data?.rows) {
+        setDataList(response.data?.rows)
+      } else {
+        setDataList([])
+      }
+
       setTotal(response.data.totalPage)
     } catch (error) {
       console.error('Error fetching users:', error)
@@ -172,12 +173,20 @@ const UserList = ({ apiData }) => {
     setValueFilter(data)
   }
 
+  const handleSearch = () => {
+    const filter = {
+      ...valueFilter,
+      keyword: value
+    }
+    setValueFilter(filter)
+  }
+
   useEffect(() => {
-    fetchDataAsset()
+    fetchData()
   }, [page, pageSize, reload])
 
   useEffect(() => {
-    fetchDataAsset()
+    fetchData()
   }, [valueFilter])
 
   return (
@@ -224,7 +233,6 @@ const UserList = ({ apiData }) => {
                           aria-label='Clear'
                           onClick={() => {
                             setValue('')
-                            fetchDataAsset()
                           }}
                         >
                           <Icon fontSize='1.25rem' icon='tabler:x' />
@@ -266,7 +274,7 @@ const UserList = ({ apiData }) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {service.map((service, index) => (
+                  {dataList.map((service, index) => (
                     <TableRow key={service.id}>
                       <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{service.code}</TableCell>
@@ -289,9 +297,6 @@ const UserList = ({ apiData }) => {
                           <IconButton onClick={() => handleDelete(service?.id)}>
                             <Icon icon='tabler:trash' />
                           </IconButton>
-                          {/* <IconButton >
-                            <Icon icon="tabler:coin" />
-                          </IconButton> */}
                         </Grid>
                       </TableCell>
                     </TableRow>
@@ -324,7 +329,7 @@ const UserList = ({ apiData }) => {
       </Grid>
       {openPopupP && (
         <>
-          <Add open={openPopupP} onClose={handleClosePPopup} fetchGroupData={fetchDataAsset} />
+          <Add open={openPopupP} onClose={handleClosePPopup} fetchGroupData={fetchData} />
         </>
       )}
       {openPopupEdit && (
