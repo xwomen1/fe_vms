@@ -142,51 +142,52 @@ export const ViewCameraPause = ({
     }
   }, [id, channel])
 
-  useEffect(() => {
-    const checkStatus = () => {
-      if (status === 'disconnected' || status === 'failed' || status === '') {
-        console.log('Status is', status, 'at:', new Date().toLocaleTimeString());
-
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current);
-        }
-        intervalRef.current = setInterval(() => {
-          console.log('Recreating WebSocket connection due to status:', status, 'at:', new Date().toLocaleTimeString());
-          setRtcPeerConnection(null)
-          setWebsocketStatus(false)
-          setWebsocket(null)
-          createWsConnection();
-        }, 5000);
-      } else {
-        console.log('Status is connected, no need to retry at:', new Date().toLocaleTimeString());
-
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current);
-        }
-      }
-    };
-
-    checkStatus();
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [status]);
-
   // useEffect(() => {
-  //   createWsConnection()
+  //   const checkStatus = () => {
+  //     if (status === 'disconnected' || status === 'failed' || status === '') {
+  //       console.log('Status is', status, 'at:', new Date().toLocaleTimeString());
+
+  //       if (intervalRef.current) {
+  //         clearInterval(intervalRef.current);
+  //       }
+  //       intervalRef.current = setInterval(() => {
+  //         console.log('Recreating WebSocket connection due to status:', status, 'at:', new Date().toLocaleTimeString());
+  //         setRtcPeerConnection(null)
+  //         setWebsocket(null)
+  //         createWsConnection();
+  //       }, 5000);
+  //     } else {
+  //       console.log('Status is connected, no need to retry at:', new Date().toLocaleTimeString());
+
+  //       if (intervalRef.current) {
+  //         clearInterval(intervalRef.current);
+  //       }
+  //     }
+  //   };
+
+  //   checkStatus();
 
   //   return () => {
-  //     if (websocket) {
-  //       websocket.close()
+  //     if (intervalRef.current) {
+  //       clearInterval(intervalRef.current);
   //     }
-  //     if (rtcPeerConnection) {
-  //       rtcPeerConnection.close()
-  //     }
-  //   }
-  // }, [reload])
+  //   };
+  // }, [status]);
+
+  useEffect(() => {
+    setRtcPeerConnection(null)
+    setWebsocket(null)
+    createWsConnection()
+
+    return () => {
+      if (websocket) {
+        websocket.close()
+      }
+      if (rtcPeerConnection) {
+        rtcPeerConnection.close()
+      }
+    }
+  }, [reload])
 
   // send message to WebSocket server
   const sendMessage = message => {
@@ -331,7 +332,7 @@ export const ViewCameraPause = ({
           autoPlay
           srcObject={remoteStream}
         />
-        {(status === 'failed' || status == 'disconnected') && (
+        {(status === 'failed' || status === 'disconnected' || status === '') && (
           <IconButton
             sx={{
               left: '30%',
