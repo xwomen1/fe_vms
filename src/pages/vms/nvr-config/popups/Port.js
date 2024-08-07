@@ -48,10 +48,10 @@ const Port = ({ nvr, onClose }) => {
       }
 
       const data = {
-        http: http || nvr?.http,
-        rtsp: rtsp || nvr?.rtsp,
-        https: https || nvr?.https,
-        server: server || nvr?.server
+        http: http || '',
+        rtsp: rtsp || '',
+        https: https || '',
+        server: server || ''
       }
 
       await axios.put(

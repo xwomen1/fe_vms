@@ -48,10 +48,10 @@ const UserDetails = ({ cameras, onClose }) => {
       }
 
       const data = {
-        http: http || cameras?.http,
-        rtsp: rtsp || cameras?.rtsp,
-        https: https || cameras?.https,
-        server: server || cameras?.server
+        http: http || '',
+        rtsp: rtsp || '',
+        https: https || '',
+        server: server || ''
       }
 
       await axios.put(

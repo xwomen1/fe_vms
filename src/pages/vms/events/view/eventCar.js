@@ -281,7 +281,7 @@ const EventList = ({ eventData }) => {
       }
 
       axios
-        .delete(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/delete/${idDelete}`, config)
+        .delete(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/${idDelete}`, config)
         .then(() => {
           toast.success('Xóa thành công')
           setIdDelete(null)
@@ -289,7 +289,7 @@ const EventList = ({ eventData }) => {
         })
         .catch(error => {
           console.error('Error fetching data:', error)
-          toast.error(error)
+          toast.error(error?.response?.data || '')
         })
         .finally(() => {
           setLoading(false)
