@@ -16,6 +16,7 @@ import {
 import authConfig from 'src/configs/auth'
 import axios from 'axios'
 import Grid from '@mui/system/Unstable_Grid/Grid'
+import CustomChip from 'src/@core/components/mui/chip'
 import TableCell from '@mui/material/TableCell'
 import Icon from 'src/@core/components/icon'
 import TableBody from '@mui/material/TableBody'
@@ -164,7 +165,14 @@ const Add = ({
   }, [open])
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth='xl' style={{ maxWidth: '80%', margin: 'auto' }}>
+    <Dialog
+      open={open}
+      onClose={loadingDaiIP ? null : handleClose}
+      disableEscapeKeyDown={loadingDaiIP}
+      fullWidth
+      maxWidth='xl'
+      style={{ maxWidth: '80%', margin: 'auto' }}
+    >
       <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Quét Camera</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} alignItems='center'>
@@ -202,7 +210,22 @@ const Add = ({
                           <TableCell sx={{ padding: '16px' }}>{camera.url}</TableCell>
                           <TableCell sx={{ padding: '16px' }}>{camera.macAddress}</TableCell>
                           <TableCell sx={{ padding: '16px' }}>{camera.location}</TableCell>
-                          <TableCell sx={{ padding: '16px' }}>{camera.status}</TableCell>
+                          <TableCell sx={{ padding: '16px', textAlign: 'center' }}>
+                            {camera.status ? (
+                              <div>
+                                <CustomChip
+                                  rounded
+                                  size='small'
+                                  skin='light'
+                                  sx={{ lineHeight: 1 }}
+                                  label={camera.status === 'disconnected' ? 'Mất kết lỗi' : 'Đã kết lỗi'}
+                                  color={camera.status === 'disconnected' ? 'primary' : 'success'}
+                                />
+                              </div>
+                            ) : (
+                              camera.status
+                            )}
+                          </TableCell>
                           <TableCell sx={{ padding: '16px' }}>
                             {foundcamera ? (
                               <IconButton onClick={() => handleDeleteCamera(foundcamera.id)}>
@@ -239,7 +262,7 @@ const Add = ({
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} variant='contained'>
+        <Button onClick={handleClose} disabled={loadingDaiIP} variant='contained'>
           Hủy
         </Button>
       </DialogActions>

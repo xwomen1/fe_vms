@@ -591,7 +591,7 @@ const Device = ({ onClose, camera }) => {
               onFocus={handleComboboxFocusDevice}
             />
           </Grid>
-          ;
+
           <Grid item xs={3.9}>
             <Autocomplete
               value={regionsSelect}

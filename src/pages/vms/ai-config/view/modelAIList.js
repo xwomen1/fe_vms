@@ -284,7 +284,7 @@ const ModelAIList = () => {
                           {column.label}
                         </TableCell>
                       ))}
-                      <TableCell align='right'>Thao tác</TableCell>
+                      <TableCell align='center'>Thao tác</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -301,7 +301,7 @@ const ModelAIList = () => {
                           )
                         })}
                         <TableCell>
-                          <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'end' }}>
+                          <Grid container spacing={2} sx={{ justifyContent: 'center' }}>
                             <IconButton
                               size='small'
                               sx={{ color: 'text.secondary' }}

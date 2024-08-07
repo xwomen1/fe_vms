@@ -14,6 +14,7 @@ import {
   CircularProgress
 } from '@mui/material'
 import authConfig from 'src/configs/auth'
+import CustomChip from 'src/@core/components/mui/chip'
 import axios from 'axios'
 import Grid from '@mui/system/Unstable_Grid/Grid'
 import TableCell from '@mui/material/TableCell'
@@ -150,7 +151,14 @@ const Add = ({
   }
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth='xl' style={{ maxWidth: '80%', margin: 'auto' }}>
+    <Dialog
+      open={open}
+      onClose={loadingOnvif ? null : handleClose}
+      disableEscapeKeyDown={loadingOnvif}
+      fullWidth
+      maxWidth='xl'
+      style={{ maxWidth: '80%', margin: 'auto' }}
+    >
       <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Quét NVR - {selectedTitle}</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} alignItems='center'>
@@ -189,7 +197,22 @@ const Add = ({
                           <TableCell sx={{ padding: '16px' }}>{nvr.url}</TableCell>
                           <TableCell sx={{ padding: '16px' }}>{nvr.macAddress}</TableCell>
                           <TableCell sx={{ padding: '16px' }}>{nvr.location}</TableCell>
-                          <TableCell sx={{ padding: '16px' }}>{nvr.status}</TableCell>
+                          <TableCell sx={{ padding: '16px', textAlign: 'center' }}>
+                            {nvr.status ? (
+                              <div>
+                                <CustomChip
+                                  rounded
+                                  size='small'
+                                  skin='light'
+                                  sx={{ lineHeight: 1 }}
+                                  label={nvr.status === 'disconnected' ? 'Mất kết lỗi' : 'Đã kết lỗi'}
+                                  color={nvr.status === 'disconnected' ? 'primary' : 'success'}
+                                />
+                              </div>
+                            ) : (
+                              nvr.status
+                            )}
+                          </TableCell>
                           <TableCell sx={{ padding: '16px' }}>
                             {foundNvr ? (
                               <IconButton onClick={() => handleDeleteNvr(foundNvr.id)}>
@@ -226,7 +249,7 @@ const Add = ({
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} variant='contained'>
+        <Button onClick={handleClose} disabled={loadingOnvif} variant='contained'>
           Hủy
         </Button>
       </DialogActions>

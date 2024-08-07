@@ -317,7 +317,7 @@ const Camera = ({ apiData }) => {
         config
       )
       Swal.fire({
-        title: 'Reaload hành công!',
+        title: 'Reaload thành công!',
         text: response?.message,
         icon: 'success',
         willOpen: () => {
