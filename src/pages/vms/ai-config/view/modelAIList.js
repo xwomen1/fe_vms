@@ -343,14 +343,13 @@ const ModelAIList = () => {
             <Grid item xs={12}>
               <Grid container spacing={2} style={{ padding: 10 }}>
                 <Grid item xs={3}></Grid>
-                <Grid item xs={1}>
-                  <span style={{ fontSize: 15 }}> dòng/trang</span>
-                </Grid>
+
                 <Grid item xs={1} style={{ padding: 0 }}>
                   <Box>
-                    <Button onClick={handleOpenMenu} endIcon={<Icon icon='tabler:selector' />}>
-                      {pageSize}
-                    </Button>
+                    <IconButton onClick={handleOpenMenu}>
+                      <Icon icon='tabler:selector' />
+                      <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
+                    </IconButton>
                     <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
                       {pageSizeOptions.map(size => (
                         <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>

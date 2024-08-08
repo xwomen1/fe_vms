@@ -349,12 +349,12 @@ const FaceManagement = () => {
             loaded
               ? { display: 'none' }
               : {
-                width: '100px',
-                height: '100px',
-                display: 'grid',
-                backgroundColor: '#C4C4C4',
-                placeItems: 'center'
-              }
+                  width: '100px',
+                  height: '100px',
+                  display: 'grid',
+                  backgroundColor: '#C4C4C4',
+                  placeItems: 'center'
+                }
           }
         >
           <CircularProgress size={20} />
@@ -501,8 +501,8 @@ const FaceManagement = () => {
                               size='small'
                               skin='light'
                               sx={{ lineHeight: 1 }}
-                              label={user.status === 'false' ? 'Không hoạt động' : 'Đang hoạt động'}
-                              color={user.status === 'false' ? 'primary' : 'success'}
+                              label={user.status === false ? 'Không hoạt động' : 'Đang hoạt động'}
+                              color={user.status === false ? 'primary' : 'success'}
                             />
                           </div>
                         </TableCell>
@@ -531,14 +531,13 @@ const FaceManagement = () => {
           <br></br>
           <Grid container spacing={2} style={{ padding: 10 }}>
             <Grid item xs={3}></Grid>
-            <Grid item xs={1}>
-              <span style={{ fontSize: 15 }}> dòng/trang</span>
-            </Grid>
+
             <Grid item xs={1} style={{ padding: 0 }}>
               <Box>
-                <Button onClick={handleOpenMenu} endIcon={<Icon icon='tabler:selector' />}>
-                  {pageSize}
-                </Button>
+                <IconButton onClick={handleOpenMenu}>
+                  <Icon icon='tabler:selector' />
+                  <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
+                </IconButton>
                 <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
                   {pageSizeOptions.map(size => (
                     <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>

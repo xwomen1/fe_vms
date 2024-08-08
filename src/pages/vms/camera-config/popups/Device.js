@@ -61,6 +61,8 @@ const Device = ({ onClose, camera }) => {
   const defaultValue = cameras?.type?.name || ''
   const [idBox, setIdBox] = useState(null)
   const [errorNVR, setErrorNVR] = useState(false)
+  const [errorProtocol, setErrorProtocol] = useState(false)
+  const [errorType, setErrorType] = useState(false)
 
   const [cameraGroupSelect, setCameraGroupSelect] = useState({
     label: cameras?.type?.name || '',
@@ -159,6 +161,7 @@ const Device = ({ onClose, camera }) => {
 
   const handleProtocolChange = (event, newValue) => {
     setSelectedProtocol(newValue)
+    setErrorProtocol(false) // Reset the error state when a protocol is selected
   }
 
   const handleUserNameChange = event => {
@@ -292,14 +295,30 @@ const Device = ({ onClose, camera }) => {
   }, [defaultValue])
 
   const handleSaveClick = async () => {
+    // Validate selectedNVR and selectedProtocol
     if (!selectNVR) {
       setErrorNVR(true)
-
-      return
     } else {
       setErrorNVR(false)
     }
 
+    if (!selectedProtocol) {
+      setErrorProtocol(true)
+    } else {
+      setErrorProtocol(false)
+    }
+    if (!cameraGroupSelect) {
+      setErrorType(true)
+    } else {
+      setErrorType(false)
+    }
+
+    // If either field has an error, do not proceed with save
+    if (!selectNVR || !selectedProtocol || !cameraGroupSelect) {
+      return
+    }
+
+    // Proceed with save if validation passes
     handleSave()
   }
 
@@ -473,6 +492,7 @@ const Device = ({ onClose, camera }) => {
 
   const handleCameraGroupChange = (event, newValue) => {
     setCameraGroupSelect(newValue)
+    setErrorType(false) // Reset the error state when a protocol is selected
   }
 
   const handleRegionsChange = (event, newValue) => {
@@ -541,7 +561,15 @@ const Device = ({ onClose, camera }) => {
               onChange={handleCameraGroupChange}
               options={cameraGroup || []}
               getOptionLabel={option => option.label}
-              renderInput={params => <CustomTextField {...params} label='Loại Camera' fullWidth />}
+              renderInput={params => (
+                <CustomTextField
+                  {...params}
+                  label='Loại Camera'
+                  fullWidth
+                  error={errorType}
+                  helperText={errorType ? 'Hãy chọn Loại camera' : ''}
+                />
+              )}
               onFocus={handleComboboxFocus}
             />{' '}
           </Grid>
@@ -569,7 +597,15 @@ const Device = ({ onClose, camera }) => {
               onChange={handleProtocolChange}
               options={protocol || []}
               getOptionLabel={option => option.name}
-              renderInput={params => <CustomTextField {...params} label='Giao thức' fullWidth />}
+              renderInput={params => (
+                <CustomTextField
+                  {...params}
+                  label='Giao thức'
+                  fullWidth
+                  error={errorProtocol}
+                  helperText={errorProtocol ? 'Hãy chọn Protocol' : ''}
+                />
+              )}
             />
           </Grid>
           <Grid item xs={0.1}></Grid>

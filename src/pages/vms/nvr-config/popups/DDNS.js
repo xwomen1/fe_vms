@@ -173,24 +173,6 @@ const TCP = ({ onClose, mtu, nvr }) => {
   const handleSave = async () => {
     try {
       setLoading(true)
-      if (password !== confirmPassword) {
-        onClose()
-        Swal.fire({
-          title: 'Lỗi!',
-          text: 'Mật khẩu và xác nhận mật khẩu không khớp nhau.',
-          icon: 'error',
-          willOpen: () => {
-            const confirmButton = Swal.getConfirmButton()
-            if (confirmButton) {
-              confirmButton.style.backgroundColor = '#FF9F43'
-              confirmButton.style.color = 'white'
-            }
-          }
-        })
-        setLoading(false)
-
-        return
-      }
 
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
