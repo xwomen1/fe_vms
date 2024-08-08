@@ -253,7 +253,7 @@ const AddFaceManagement = () => {
         note: note,
         type: {
           id: selectedOption.id,
-          name: selectedOption.name
+          name: selectedOption.code
         }
       }
 
@@ -316,7 +316,7 @@ const AddFaceManagement = () => {
       const recurseFetch = async (parentId, level) => {
         const childData = await fetchChildData(parentId)
         for (const child of childData) {
-          result.push({ name: child.name, id: child.id, level })
+          result.push({ code: child.code, name: child.name, id: child.id, level })
           if (child.isParent) {
             await recurseFetch(child.id, level + 1)
           }
@@ -536,6 +536,7 @@ const AddFaceManagement = () => {
                       >
                         Loại đối tượng
                       </p>
+                      {console.log(person)}
                       <Autocomplete
                         options={person}
                         getOptionLabel={option => option.name}

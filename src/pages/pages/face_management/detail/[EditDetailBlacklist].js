@@ -48,6 +48,7 @@ const EditFaceManagement = () => {
   const [img2, setImg2] = useState(null)
   const [img3, setImg3] = useState(null)
   const [img4, setImg4] = useState(null)
+  const [title1, setTitle1] = useState('')
   const [title, setTitle] = useState('')
 
   const buildUrlWithToken = url => {
@@ -148,9 +149,8 @@ const EditFaceManagement = () => {
         if (id) {
           const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${id}`, config)
           const imgs = [...response.data.imgs]
-          console.log(response, 'respon')
           setStatus1(response.data.status)
-          setTitle(response.data?.type)
+          setTitle1(response.data?.type)
           setFileAvatarId(response.data.mainImageId)
           setListFileUpload(
             imgs.map(img =>
@@ -187,6 +187,89 @@ const EditFaceManagement = () => {
     fetchFilteredOrAllUsers()
   }, [id])
 
+  const fetchChildData = useCallback(async parentId => {
+    try {
+      const response = await axios.get(
+        `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`
+      )
+
+      return response.data
+    } catch (error) {
+      console.error('Error fetching child data:', error)
+
+      return []
+    }
+  }, [])
+
+  const fetchAllChildData = useCallback(
+    async (parentId, level = 0) => {
+      let result = []
+      setLoading(true)
+
+      const recurseFetch = async (parentId, level) => {
+        const childData = await fetchChildData(parentId)
+        for (const child of childData) {
+          result.push({ code: child.code, name: child.name, id: child.id, level })
+          if (child.isParent) {
+            await recurseFetch(child.id, level + 1)
+          }
+        }
+      }
+
+      try {
+        await recurseFetch(parentId, level)
+      } catch (error) {
+        console.error('Error fetching all child data:', error)
+      } finally {
+        setLoading(false)
+      }
+
+      return result
+    },
+    [fetchChildData]
+  )
+
+  const fetchInitialData = useCallback(async () => {
+    try {
+      const response = await axios.get(
+        'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/code?code=person_specify&sort=%2Bcreated_at&page=1'
+      )
+      const parentData = response.data[0]
+      if (parentData.isParent) {
+        const allChildData = await fetchAllChildData(parentData.id, 0)
+        setPerson(allChildData)
+      }
+      if (parentData.id === title1.id) {
+        setTitle(parentData.name)
+        console.log(parentData.name, 'name')
+      } else if (parentData.isParent) {
+        const allChildData = await fetchAllChildData(parentData.id, 0)
+        const matchingChild = allChildData.find(child => child.id === title1.id)
+        if (matchingChild) {
+          setTitle(matchingChild.name)
+          console.log(matchingChild.name, 'name')
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching initial data:', error)
+    }
+  }, [fetchAllChildData, title1])
+
+  useEffect(() => {
+    fetchInitialData()
+  }, [fetchInitialData])
+
+  const renderOption = (props, option) => (
+    <li {...props} style={{ paddingLeft: `${option.level * 20}px` }}>
+      {option.name}
+    </li>
+  )
+
+  const handleOptionChange = (event, newValue) => {
+    console.log(newValue, 'newvalue')
+    setTitle(newValue)
+  }
+
   const handleUpdate = async () => {
     setLoading(true)
     try {
@@ -209,7 +292,7 @@ const EditFaceManagement = () => {
         })),
         type: {
           id: title.id,
-          name: title.name
+          name: title.code
         }
       }
 
@@ -340,77 +423,7 @@ const EditFaceManagement = () => {
     })
   }
 
-  const fetchChildData = useCallback(async parentId => {
-    try {
-      const response = await axios.get(
-        `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`
-      )
-
-      return response.data
-    } catch (error) {
-      console.error('Error fetching child data:', error)
-
-      return []
-    }
-  }, [])
-
-  const fetchAllChildData = useCallback(
-    async (parentId, level = 0) => {
-      let result = []
-      setLoading(true)
-
-      const recurseFetch = async (parentId, level) => {
-        const childData = await fetchChildData(parentId)
-        for (const child of childData) {
-          result.push({ name: child.name, id: child.id, level })
-          if (child.isParent) {
-            await recurseFetch(child.id, level + 1)
-          }
-        }
-      }
-
-      try {
-        await recurseFetch(parentId, level)
-      } catch (error) {
-        console.error('Error fetching all child data:', error)
-      } finally {
-        setLoading(false)
-      }
-
-      return result
-    },
-    [fetchChildData]
-  )
-
-  const fetchInitialData = useCallback(async () => {
-    try {
-      const response = await axios.get(
-        'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/code?code=person_specify&sort=%2Bcreated_at&page=1'
-      )
-      const parentData = response.data[0]
-      if (parentData.isParent) {
-        const allChildData = await fetchAllChildData(parentData.id, 0)
-        setPerson(allChildData)
-      }
-    } catch (error) {
-      console.error('Error fetching initial data:', error)
-    }
-  }, [fetchAllChildData])
-
-  useEffect(() => {
-    fetchInitialData()
-  }, [fetchInitialData])
-
-  const renderOption = (props, option) => (
-    <li {...props} style={{ paddingLeft: `${option.level * 20}px` }}>
-      {option.name}
-    </li>
-  )
-
-  const handleOptionChange = (event, newValue) => {
-    console.log(newValue, 'newvalue')
-    setTitle(newValue)
-  }
+  const selectedOption = person.find(option => option.id === title.id)
 
   return (
     <>
@@ -581,11 +594,11 @@ const EditFaceManagement = () => {
                   >
                     Loại đối tượng
                   </p>
-                  {console.log(title)}
+
                   <Autocomplete
                     value={title}
                     options={person}
-                    getOptionLabel={option => option.name || 'Không có dữ liệu'}
+                    getOptionLabel={option => option.name || title}
                     renderInput={params => (
                       <CustomTextField
                         {...params}
