@@ -263,7 +263,7 @@ const AddFaceManagement = () => {
         note: note,
         type: {
           id: selectedOption.id,
-          name: selectedOption.code
+          code: selectedOption.code
         }
       }
 

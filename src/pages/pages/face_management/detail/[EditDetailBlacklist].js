@@ -301,7 +301,8 @@ const EditFaceManagement = () => {
         })),
         type: {
           id: title.id,
-          name: title.code
+          code: title.code,
+          name: title.name
         }
       }
 
