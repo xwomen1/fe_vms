@@ -59,6 +59,7 @@ const AddFaceManagement = () => {
   const [isSuccess, setIsSuccess] = useState(false)
   const [selectedOption, setSelectedOption] = useState('')
   const [redirectUrl, setRedirectUrl] = useState('')
+  const [errorType, setErrorType] = useState(false)
 
   const handleInputChange = e => {
     const value = e.target.value
@@ -233,6 +234,15 @@ const AddFaceManagement = () => {
   const handleAddBlacklist = async () => {
     setLoading(true)
     setShowLoading(true)
+
+    if (!selectedOption) {
+      setErrorType(true)
+      setLoading(false)
+      setShowLoading(false)
+
+      return
+    }
+
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -259,6 +269,7 @@ const AddFaceManagement = () => {
 
       const response = await axios.post(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist`, params, config)
       const newId = response.data.id
+
       Swal.fire({
         title: 'Thành công!',
         text: 'Dữ liệu đã được Thêm thành công.',
@@ -291,6 +302,7 @@ const AddFaceManagement = () => {
       console.error('Error adding member to group:', error)
     } finally {
       setLoading(false)
+      setShowLoading(false)
     }
   }
 
@@ -367,6 +379,7 @@ const AddFaceManagement = () => {
 
   const handleOptionChange = (event, newValue) => {
     setSelectedOption(newValue)
+    setErrorType(!newValue)
     console.log(newValue)
   }
 
@@ -540,7 +553,14 @@ const AddFaceManagement = () => {
                       <Autocomplete
                         options={person}
                         getOptionLabel={option => option.name}
-                        renderInput={params => <CustomTextField {...params} fullWidth />}
+                        renderInput={params => (
+                          <CustomTextField
+                            {...params}
+                            fullWidth
+                            error={errorType}
+                            helperText={errorType ? 'Hãy chọn loại đối tượng' : ''}
+                          />
+                        )}
                         renderOption={renderOption}
                         loading={loading}
                         onChange={handleOptionChange}

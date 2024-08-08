@@ -62,6 +62,7 @@ const Device = ({ onClose, nvr }) => {
   const [http, setHttp] = useState(null)
   const [onvif, setOnvif] = useState(null)
   const [idBox, setIdBox] = useState(null)
+  const [errorNVR, setErrorNVR] = useState(false)
 
   const [viewport, setViewport] = React.useState({
     longitude: 105.83416,
@@ -210,7 +211,16 @@ const Device = ({ onClose, nvr }) => {
   console.log(selectedProtocol, 'selectprotocol')
 
   const handleSaveClick = async () => {
-    handleSave() // Gọi hàm handleSave truyền từ props
+    // Kiểm tra nếu chưa chọn giá trị từ Autocomplete
+    if (!selectNVR) {
+      setErrorNVR(true) // Hiển thị thông báo lỗi
+
+      return // Ngừng thực hiện nếu không có giá trị
+    }
+
+    // Nếu đã chọn giá trị, đặt lại lỗi và gọi handleSave
+    setErrorNVR(false)
+    await handleSave()
   }
 
   const handleSave = async () => {
@@ -411,7 +421,15 @@ const Device = ({ onClose, nvr }) => {
               onChange={handleProtocolChange}
               options={protocol || ''}
               getOptionLabel={option => option.name}
-              renderInput={params => <CustomTextField {...params} label='Giao thức' fullWidth />}
+              renderInput={params => (
+                <CustomTextField
+                  error={errorNVR}
+                  helperText={errorNVR ? 'Hãy chọn Giao thức' : ''}
+                  {...params}
+                  label='Giao thức'
+                  fullWidth
+                />
+              )}
             />
           </Grid>
 
@@ -434,11 +452,17 @@ const Device = ({ onClose, nvr }) => {
               onChange={handleDDNSChange}
               options={nvrs || []}
               getOptionLabel={option => option.label}
-              renderInput={params => <CustomTextField {...params} label='Smart NVR' fullWidth />}
+              renderInput={params => (
+                <CustomTextField
+                  error={errorNVR}
+                  helperText={errorNVR ? 'Hãy chọn Smart NVR' : ''}
+                  {...params}
+                  label='Smart NVR'
+                  fullWidth
+                />
+              )}
               onFocus={handleComboboxFocusDevice}
-
-              // loading={loading}
-            />{' '}
+            />
           </Grid>
           <Grid item xs={4}>
             {formatDDNS(isOfflineSetting)} thiết bị đang ngoại tuyến
