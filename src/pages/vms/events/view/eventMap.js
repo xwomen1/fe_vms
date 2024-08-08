@@ -69,12 +69,12 @@ const columns = [
   {
     id: 2,
     flex: 0.15,
-    type: 'eventTypeString',
+    type: 'result',
     maxWidth: 70,
     align: 'center',
     field: 'event',
-    label: 'Sự kiện',
-    field: 'eventTypeString'
+    label: 'Kết quả',
+    field: 'result'
   },
   {
     id: 3,
@@ -325,10 +325,10 @@ const EventMap = () => {
       const sortedRows = rows.sort((a, b) => a.timestamp - b.timestamp)
 
       const newSelectedPoints = sortedRows
-        .filter(row => row.LongtitudeOfCam && row.LatitudeOfCam) // Lọc ra các điểm có tọa độ
+        .filter(row => row.longtitudeOfCam && row.latitudeOfCam) // Lọc ra các điểm có tọa độ
         .map(row => ({
-          longitude: row.LongtitudeOfCam,
-          latitude: row.LatitudeOfCam,
+          longitude: row.longtitudeOfCam,
+          latitude: row.latitudeOfCam,
           timestamp: row.timestamp
         }))
       setSelectedPoints(newSelectedPoints)
@@ -341,24 +341,24 @@ const EventMap = () => {
     }
   }
 
-  const handleCameraSelect = (event, cameraId, LongitudeOfCam, LatitudeOfCam, timestamp) => {
-    if (event.target.checked && LongitudeOfCam && LatitudeOfCam) {
+  const handleCameraSelect = (event, cameraId, longitudeOfCam, latitudeOfCam, timestamp) => {
+    if (event.target.checked && longitudeOfCam && latitudeOfCam) {
       // Kiểm tra xem điểm đã tồn tại chưa trước khi thêm mới
       const pointExists = selectedPoints.some(
-        point => point.longitude === LongitudeOfCam && point.latitude === LatitudeOfCam && point.timestamp === timestamp
+        point => point.longitude === longitudeOfCam && point.latitude === latitudeOfCam && point.timestamp === timestamp
       )
 
       if (!pointExists) {
         setSelectedCameraIds(prevIds => [...prevIds, cameraId])
         setSelectedPoints(prevPoints => [
           ...prevPoints,
-          { longitude: LongitudeOfCam, latitude: LatitudeOfCam, timestamp }
+          { longitude: longitudeOfCam, latitude: latitudeOfCam, timestamp }
         ])
       }
     } else {
       setSelectedCameraIds(prevIds => prevIds.filter(id => id !== cameraId))
       setSelectedPoints(prevPoints =>
-        prevPoints.filter(point => point.longitude !== LongitudeOfCam || point.latitude !== LatitudeOfCam)
+        prevPoints.filter(point => point.longitude !== longitudeOfCam || point.latitude !== latitudeOfCam)
       )
       setSelectedTimes(prevTimes => prevTimes.filter(time => time.time !== timestamp))
     }
@@ -553,7 +553,7 @@ const EventMap = () => {
                   <Checkbox
                     checked={isItemSelected}
                     onChange={event =>
-                      handleCameraSelect(event, row.id, row.LongtitudeOfCam, row.LatitudeOfCam, row.timestamp)
+                      handleCameraSelect(event, row.id, row.longtitudeOfCam, row.latitudeOfCam, row.timestamp)
                     }
                     inputProps={{ 'aria-labelledby': labelId }}
                   />

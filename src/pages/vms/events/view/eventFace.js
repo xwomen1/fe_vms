@@ -42,7 +42,7 @@ const initValueFilter = {
   page: 1
 }
 
-const EventList = ({  }) => {
+const EventList = ({}) => {
   const [keyword, setKeyword] = useState('')
   const [valueFilter, setValueFilter] = useState(initValueFilter)
   const [loading, setLoading] = useState(false)
@@ -128,9 +128,8 @@ const EventList = ({  }) => {
     const message = JSON.parse(event.data)
     const newMessage = JSON.parse(message?.data)
     console.log(newMessage, 'newmessage')
-    if(newMessage.eventType === 'AI_EVENT_BLACKLIST_FACE_RECOGNITION'){
+    if (newMessage.eventType === 'AI_EVENT_BLACKLIST_FACE_RECOGNITION') {
       setEventData(newMessage)
-
     }
   }
 
@@ -195,6 +194,14 @@ const EventList = ({  }) => {
       label: 'Sự kiện',
       field: 'eventTypeString',
       renderCell: value => <Chip label={value} color={eventTypeColors[value]} />
+    },
+    {
+      id: 7,
+      flex: 0.15,
+      maxWidth: 150,
+      align: 'center',
+      label: 'Kết quả',
+      field: 'result'
     },
     {
       id: 3,
@@ -264,7 +271,7 @@ const EventList = ({  }) => {
     const params = {
       ...config1,
       params: {
-        camName: keyword || '',
+        keyword: keyword || '',
         limit: pageSize,
         page: parseInt(page),
         location: valueFilter?.location || '',

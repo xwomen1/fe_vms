@@ -42,7 +42,7 @@ const initValueFilter = {
   page: 1
 }
 
-const EventList = ({  }) => {
+const EventList = ({}) => {
   const [keyword, setKeyword] = useState('')
   const [valueFilter, setValueFilter] = useState(initValueFilter)
   const [loading, setLoading] = useState(false)
@@ -120,10 +120,10 @@ const EventList = ({  }) => {
   const handleMessage = async event => {
     const message = JSON.parse(event.data)
     const newMessage = JSON.parse(message?.data)
-    if(newMessage.eventType === 'LICENSE_PLATE_RECOGNITION'){
+    if (newMessage.eventType === 'LICENSE_PLATE_RECOGNITION') {
       setEventData(newMessage)
-
-    }  }
+    }
+  }
 
   useEffect(() => {
     if (websocket) {
@@ -194,6 +194,14 @@ const EventList = ({  }) => {
       renderCell: value => <Chip label={value} color={eventTypeColors[value]} />
     },
     {
+      id: 7,
+      flex: 0.15,
+      maxWidth: 150,
+      align: 'center',
+      label: 'Kết quả',
+      field: 'result'
+    },
+    {
       id: 3,
       flex: 0.15,
       maxWidth: 50,
@@ -261,7 +269,7 @@ const EventList = ({  }) => {
     const params = {
       ...config1,
       params: {
-        camName: keyword || '',
+        keyword: keyword || '',
         limit: pageSize,
         page: parseInt(page),
         location: valueFilter?.location || '',

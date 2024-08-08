@@ -1,7 +1,19 @@
 import { useState, forwardRef, useEffect } from 'react'
 import authConfig from 'src/configs/auth'
 import { Controller, useForm } from 'react-hook-form'
-import { Box, Button, Card, Dialog, DialogActions, DialogContent, Fade, Grid, IconButton, Typography, styled } from '@mui/material'
+import {
+  Box,
+  Button,
+  Card,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  Fade,
+  Grid,
+  IconButton,
+  Typography,
+  styled
+} from '@mui/material'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import Icon from 'src/@core/components/icon'
 import CustomAvatar from 'src/@core/components/mui/avatar'
@@ -11,271 +23,272 @@ import { getApi } from 'src/@core/utils/requestUltils'
 import toast from 'react-hot-toast'
 
 const Transition = forwardRef(function Transition(props, ref) {
-    return <Fade ref={ref} {...props} />
+  return <Fade ref={ref} {...props} />
 })
 
 const CustomCloseButton = styled(IconButton)(({ theme }) => ({
-    top: 0,
-    right: 0,
-    color: 'grey.500',
-    position: 'absolute',
-    boxShadow: theme.shadows[2],
-    transform: 'translate(10px, -10px)',
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: `${theme.palette.background.paper} !important`,
-    transition: 'transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out',
-    '&:hover': {
-        transform: 'translate(7px, -5px)'
-    }
+  top: 0,
+  right: 0,
+  color: 'grey.500',
+  position: 'absolute',
+  boxShadow: theme.shadows[2],
+  transform: 'translate(10px, -10px)',
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: `${theme.palette.background.paper} !important`,
+  transition: 'transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out',
+  '&:hover': {
+    transform: 'translate(7px, -5px)'
+  }
 }))
 
 const initValues = {
-    imageObject: null,
-    camName: null,
-    description: '',
-    timestamp: null,
-    location: null,
-    imageResult: null,
+  imageObject: null,
+  camName: null,
+  description: '',
+  timestamp: null,
+  location: null,
+  imageResult: null
 }
 
 const format_form = [
-    {
-        name: 'imageObject',
-        label: 'Hình ảnh',
-        placeholder: 'Hình ảnh',
-        type: 'ImageObject',
-        data: [],
-        require: true,
-        width: 12,
-    },
-    {
-        name: 'result',
-        label: 'Biển số xe',
-        placeholder: 'Biển số xe',
-        type: 'TextField',
-        data: [],
-        require: true,
-        width: 12,
-    },
-    {
-        name: 'description',
-        label: 'Đối tượng',
-        placeholder: 'Tên đối tượng',
-        type: 'TextField',
-        data: [],
-        require: true,
-        width: 12,
-    },
-    {
-        name: 'timestamp',
-        label: 'Thời gian',
-        placeholder: 'Thời gian',
-        type: 'TextField',
-        data: [],
-        require: true,
-        width: 12,
-    },
-    {
-        name: 'cameraId',
-        label: 'Camera',
-        placeholder: 'Camera',
-        type: 'TextField',
-        data: [],
-        require: true,
-        width: 12,
-    },
-    {
-        name: 'location',
-        label: 'Vị trí',
-        placeholder: 'Vị trí',
-        type: 'TextField',
-        data: [],
-        require: true,
-        width: 12,
-    },
-    {
-        name: 'imageResult',
-        label: 'Ảnh toàn cảnh',
-        placeholder: 'Ảnh toán cảnh',
-        type: 'ImageResult',
-        data: [],
-        require: true,
-        width: 12,
-    },
+  {
+    name: 'imageObject',
+    label: 'Hình ảnh',
+    placeholder: 'Hình ảnh',
+    type: 'ImageObject',
+    data: [],
+    require: true,
+    width: 12
+  },
+  {
+    name: 'result',
+    label: 'Kết quả',
+    placeholder: 'Kết quả',
+    type: 'TextField',
+    data: [],
+    require: true,
+    width: 12
+  },
+  {
+    name: 'description',
+    label: 'Đối tượng',
+    placeholder: 'Tên đối tượng',
+    type: 'TextField',
+    data: [],
+    require: true,
+    width: 12
+  },
+  {
+    name: 'timestamp',
+    label: 'Thời gian',
+    placeholder: 'Thời gian',
+    type: 'TextField',
+    data: [],
+    require: true,
+    width: 12
+  },
+  {
+    name: 'cameraId',
+    label: 'Camera',
+    placeholder: 'Camera',
+    type: 'TextField',
+    data: [],
+    require: true,
+    width: 12
+  },
+  {
+    name: 'location',
+    label: 'Vị trí',
+    placeholder: 'Vị trí',
+    type: 'TextField',
+    data: [],
+    require: true,
+    width: 12
+  },
+  {
+    name: 'imageResult',
+    label: 'Ảnh toàn cảnh',
+    placeholder: 'Ảnh toán cảnh',
+    type: 'ImageResult',
+    data: [],
+    require: true,
+    width: 12
+  }
 ]
 
 const View = ({ data }) => {
-    const [loading, setLoading] = useState(false)
-    const [detail, setDetail] = useState(null)
-    const [cameraName, setCameraName] = useState('')
-    const [form, setForm] = useState(format_form)
-    const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
+  const [loading, setLoading] = useState(false)
+  const [detail, setDetail] = useState(null)
+  const [cameraName, setCameraName] = useState('')
+  const [form, setForm] = useState(format_form)
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
 
-    const token = localStorage.getItem(authConfig.storageTokenKeyName)
+  const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
-    const config = {
-        headers: {
-            Authorization: `Bearer ${token}`
-        },
-        params: {}
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    params: {}
+  }
+
+  const {
+    handleSubmit,
+    control,
+    setError,
+    setValue,
+    reset,
+    clearErrors,
+    formState: { errors }
+  } = useForm({
+    defaultValues: initValues
+  })
+
+  useEffect(() => {
+    setDetail(data)
+    console.log('data', data)
+  }, [])
+
+  useEffect(() => {
+    if (detail) {
+      setDetailFormValue()
+      fetchCamera()
+    }
+  }, [detail])
+
+  const fetchCamera = async () => {
+    setLoading(true)
+
+    try {
+      const response = await getApi(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${detail?.cameraId}`)
+      setCameraName(response?.data?.name)
+    } catch (error) {
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
+    } finally {
+      ;() => {
+        setLoading(false)
+      }
+    }
+  }
+
+  const setDetailFormValue = () => {
+    reset(detail)
+  }
+
+  const handleImageLoad = event => {
+    const { naturalWidth, naturalHeight } = event.target
+    setDimensions({ width: naturalWidth, height: naturalHeight })
+  }
+
+  const getBoxStyles = () => {
+    if (dimensions.width < dimensions.height) {
+      return { width: '40vh' }
     }
 
-    const {
-        handleSubmit,
-        control,
-        setError,
-        setValue,
-        reset,
-        clearErrors,
-        formState: { errors },
-    } = useForm({
-        defaultValues: initValues
-    })
+    return {}
+  }
 
-    useEffect(() => {
-        setDetail(data)
-        console.log('data', data);
-    }, [])
-
-
-    useEffect(() => {
-        if (detail) {
-            setDetailFormValue()
-            fetchCamera()
-        }
-    }, [detail])
-
-    const fetchCamera = async () => {
-        setLoading(true)
-
-        try {
-            const response = await getApi(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${detail?.cameraId}`)
-            setCameraName(response?.data?.name)
-        } catch (error) {
-            if (error && error?.response?.data) {
-                console.error('error', error)
-                toast.error(error?.response?.data?.message)
-            } else {
-                console.error('Error fetching data:', error)
-                toast.error(error)
-            }
-        } finally {
-            () => {
-                setLoading(false)
-            }
-        }
-    }
-
-    const setDetailFormValue = () => {
-        reset(detail)
-    }
-
-    const handleImageLoad = (event) => {
-        const { naturalWidth, naturalHeight } = event.target
-        setDimensions({ width: naturalWidth, height: naturalHeight })
-    }
-
-    const getBoxStyles = () => {
-        if (dimensions.width < dimensions.height) {
-
-            return { width: '40vh' }
-        }
-
-        return {}
-    }
-
-    return (
-        <Box>
-            <form>
-                <Grid container spacing={12}>
-                    <Grid item xs={12} sm={3}>
-                        <Grid container spacing={2}>
-                            {form.map((item, index) => {
-                                if (item.type == 'ImageObject') {
-                                    return (
-                                        <Grid item xs={12} key={index}>
-                                            <Controller
-                                                name={item.name}
-                                                control={control}
-                                                rules={{ required: true }}
-                                                render={({ field: { value, onChange } }) => (
-                                                    <Box>
-                                                        <Typography sx={{ mb: 1 }}>Ảnh đối tượng</Typography>
-                                                        <CustomAvatar
-                                                            src={value}
-                                                            variant='rounded'
-                                                            alt={''}
-                                                            sx={{ width: '100%', height: '100%', mb: 4 }}
-                                                        />
-                                                    </Box>
-                                                )}
-                                            />
-                                        </Grid>
-                                    )
-                                }
-                                if (item.type == 'TextField') {
-                                    return (
-                                        <Grid item xs={12} key={index}>
-                                            <Controller
-                                                name={item.name}
-                                                control={control}
-                                                rules={{ required: true }}
-                                                render={({ field: { value, onChange } }) => (
-                                                    <CustomTextField
-                                                        fullWidth
-                                                        disabled={true}
-                                                        value={
-                                                            item.name === 'timestamp' ? moment(new Date(value)).format('DD/MM/YYYY HH:mm:ss')
-                                                                : item.name === 'cameraId' ? cameraName
-                                                                    : value}
-                                                        label={item.label}
-                                                        onChange={onChange}
-                                                        placeholder={item.placeholder}
-                                                        error={Boolean(errors[item.name])}
-                                                        aria-describedby='validation-basic-last-name'
-                                                        {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
-                                                    />
-                                                )}
-                                            />
-                                        </Grid>
-                                    )
-                                }
-                            })}
-                        </Grid>
+  return (
+    <Box>
+      <form>
+        <Grid container spacing={12}>
+          <Grid item xs={12} sm={3}>
+            <Grid container spacing={2}>
+              {form.map((item, index) => {
+                if (item.type == 'ImageObject') {
+                  return (
+                    <Grid item xs={12} key={index}>
+                      <Controller
+                        name={item.name}
+                        control={control}
+                        rules={{ required: true }}
+                        render={({ field: { value, onChange } }) => (
+                          <Box>
+                            <Typography sx={{ mb: 1 }}>Ảnh đối tượng</Typography>
+                            <CustomAvatar
+                              src={value}
+                              variant='rounded'
+                              alt={''}
+                              sx={{ width: '100%', height: '100%', mb: 4 }}
+                            />
+                          </Box>
+                        )}
+                      />
                     </Grid>
-                    <Grid item xs={12} sm={9}>
-                        <Grid container spacing={0}>
-                            {form.map((item, index) => {
-                                if (item.type == 'ImageResult') {
-                                    return (
-                                        <Grid item xs={12} key={index}>
-                                            <Controller
-                                                name={item.name}
-                                                control={control}
-                                                rules={{ required: true }}
-                                                render={({ field: { value, onChange } }) => (
-                                                    <Box sx={getBoxStyles()}>
-                                                        <Typography sx={{ mb: 1 }}>Ảnh toàn cảnh</Typography>
-                                                        <CustomAvatar
-                                                            src={value}
-                                                            onLoad={handleImageLoad}
-                                                            variant='rounded'
-                                                            alt={''}
-                                                            sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                                        />
-                                                    </Box>
-                                                )}
-                                            />
-                                        </Grid>
-                                    )
-                                }
-                            })}
-                        </Grid>
+                  )
+                }
+                if (item.type == 'TextField') {
+                  return (
+                    <Grid item xs={12} key={index}>
+                      <Controller
+                        name={item.name}
+                        control={control}
+                        rules={{ required: true }}
+                        render={({ field: { value, onChange } }) => (
+                          <CustomTextField
+                            fullWidth
+                            disabled={true}
+                            value={
+                              item.name === 'timestamp'
+                                ? moment(new Date(value)).format('DD/MM/YYYY HH:mm:ss')
+                                : item.name === 'cameraId'
+                                ? cameraName
+                                : value
+                            }
+                            label={item.label}
+                            onChange={onChange}
+                            placeholder={item.placeholder}
+                            error={Boolean(errors[item.name])}
+                            aria-describedby='validation-basic-last-name'
+                            {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
+                          />
+                        )}
+                      />
                     </Grid>
-                </Grid>
-            </form>
-        </Box>
-    )
+                  )
+                }
+              })}
+            </Grid>
+          </Grid>
+          <Grid item xs={12} sm={9}>
+            <Grid container spacing={0}>
+              {form.map((item, index) => {
+                if (item.type == 'ImageResult') {
+                  return (
+                    <Grid item xs={12} key={index}>
+                      <Controller
+                        name={item.name}
+                        control={control}
+                        rules={{ required: true }}
+                        render={({ field: { value, onChange } }) => (
+                          <Box sx={getBoxStyles()}>
+                            <Typography sx={{ mb: 1 }}>Ảnh toàn cảnh</Typography>
+                            <CustomAvatar
+                              src={value}
+                              onLoad={handleImageLoad}
+                              variant='rounded'
+                              alt={''}
+                              sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                          </Box>
+                        )}
+                      />
+                    </Grid>
+                  )
+                }
+              })}
+            </Grid>
+          </Grid>
+        </Grid>
+      </form>
+    </Box>
+  )
 }
 
 export default View

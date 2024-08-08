@@ -35,7 +35,7 @@ const initValueFilter = {
   page: 1
 }
 
-const EventList = ({  }) => {
+const EventList = ({}) => {
   const [keyword, setKeyword] = useState('')
   const [valueFilter, setValueFilter] = useState(initValueFilter)
   const [loading, setLoading] = useState(false)
@@ -193,7 +193,7 @@ const EventList = ({  }) => {
     const params = {
       ...config1,
       params: {
-        camName: keyword || '',
+        keyword: keyword || '',
         limit: pageSize,
         page: parseInt(page),
         location: valueFilter?.location || '',
@@ -422,7 +422,6 @@ const EventList = ({  }) => {
                       <Typography sx={{ marginTop: '10px' }}>
                         {item?.timestamp ? new Date(item?.timestamp).toLocaleString() : 'Thời gian'}
                       </Typography>
-                      <Typography sx={{ marginTop: '10px' }}>{item?.location ? item?.location : 'Vị trí'}</Typography>
                       <Typography
                         sx={{
                           marginTop: '10px',
@@ -432,8 +431,10 @@ const EventList = ({  }) => {
                           textOverflow: 'ellipsis'
                         }}
                       >
-                        {item?.description ? item?.description : 'Tên đối tượng'}
+                        {item?.result}
                       </Typography>
+                      <Typography sx={{ marginTop: '10px' }}>{item?.location ? item?.location : 'Vị trí'}</Typography>
+
                       <IconButton
                         size='small'
                         sx={{ color: 'text.secondary' }}
