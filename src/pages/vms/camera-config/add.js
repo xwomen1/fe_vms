@@ -253,15 +253,6 @@ const Add = ({ apiData }) => {
     }
   }
 
-  const handleRadioChange = event => {
-    setSelectedValue(event.target.value)
-    if (event.target.value === 'LoaiGT') {
-      setProtocolSelected(true)
-    } else {
-      setProtocolSelected(false)
-    }
-  }
-
   const handlePageChange = newPage => {
     setPage(newPage)
   }
@@ -366,18 +357,6 @@ const Add = ({ apiData }) => {
 
   const handleCloseNetWorkPopup = () => {
     setOpenPopupNetwork(false)
-  }
-
-  const handleCloseVideoPopup = () => {
-    setOpenPopupVideo(false)
-  }
-
-  const handleCloseImagePopup = () => {
-    setOpenPopupImage(false)
-  }
-
-  const handleCloseCloudPopup = () => {
-    setOpenPopupCloud(false)
   }
 
   const handleAddConnectCameraClick = () => {
@@ -597,10 +576,6 @@ const Add = ({ apiData }) => {
     setIdBox(newValue.value)
   }
 
-  const handleDDNSChangeTitle = (event, newValue) => {
-    setSelectedTitle(newValue.name)
-  }
-
   const resetPopupState = () => {
     setResponse(null)
     setIsError(false)
@@ -661,6 +636,20 @@ const Add = ({ apiData }) => {
     fetchDataReload(id)
   }
 
+  const handleRadioChange = event => {
+    setSelectedValue(event.target.value)
+    if (event.target.value === 'LoaiGT') {
+      setProtocolSelected(true)
+    } else {
+      setProtocolSelected(false)
+    }
+  }
+  console.log(protocolSelected)
+
+  const handleDDNSChangeTitle = (event, newValue) => {
+    setSelectedTitle(newValue.name)
+  }
+
   return (
     <>
       <Grid container spacing={6.5}>
@@ -696,9 +685,19 @@ const Add = ({ apiData }) => {
                           options={protocol}
                           id='autocomplete-custom'
                           getOptionLabel={option => option.name || ''}
-                          renderInput={params => <CustomTextField placeholder='Khác' {...params} />}
+                          renderInput={params => (
+                            <CustomTextField
+                              placeholder='Khác'
+                              {...params}
+                              InputProps={{
+                                ...params.InputProps,
+                                style: { cursor: protocolSelected ? 'pointer' : 'not-allowed' }
+                              }}
+                            />
+                          )}
                           onChange={handleDDNSChangeTitle}
                           disabled={!protocolSelected}
+                          style={{ pointerEvents: protocolSelected ? 'auto' : 'none' }}
                         />
                       </Grid>
                     </Grid>
@@ -1081,7 +1080,7 @@ const Add = ({ apiData }) => {
                                 size='small'
                                 skin='light'
                                 sx={{ lineHeight: 1 }}
-                                label={assetType.status.name === 'disconnected' ? 'Mất kết lỗi' : 'Đã kết lỗi'}
+                                label={assetType.status.name === 'disconnected' ? 'Mất kết nối' : 'Đã kết nối'}
                                 color={assetType.status.name === 'disconnected' ? 'primary' : 'success'}
                               />
                             </div>

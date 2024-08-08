@@ -726,9 +726,19 @@ const UserList = ({ apiData }) => {
                           options={protocol}
                           id='autocomplete-custom'
                           getOptionLabel={option => option.name || ''}
-                          renderInput={params => <CustomTextField placeholder='Khác' {...params} />}
+                          renderInput={params => (
+                            <CustomTextField
+                              placeholder='Khác'
+                              {...params}
+                              InputProps={{
+                                ...params.InputProps,
+                                style: { cursor: protocolSelected ? 'pointer' : 'not-allowed' }
+                              }}
+                            />
+                          )}
                           onChange={handleDDNSChangeTitle}
                           disabled={!protocolSelected}
+                          style={{ pointerEvents: protocolSelected ? 'auto' : 'none' }}
                         />
                       </Grid>
                     </Grid>
@@ -1077,7 +1087,7 @@ const UserList = ({ apiData }) => {
                               size='small'
                               skin='light'
                               sx={{ lineHeight: 1 }}
-                              label={assetType.status.name === 'disconnected' ? 'Mất kết lỗi' : 'Đã kết lỗi'}
+                              label={assetType.status.name === 'disconnected' ? 'Mất kết nối' : 'Đã kết nối'}
                               color={assetType.status.name === 'disconnected' ? 'primary' : 'success'}
                             />
                           </div>

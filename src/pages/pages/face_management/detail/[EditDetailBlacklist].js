@@ -50,6 +50,7 @@ const EditFaceManagement = () => {
   const [img4, setImg4] = useState(null)
   const [title1, setTitle1] = useState('')
   const [title, setTitle] = useState('')
+  const [errorType, setErrorType] = useState(false)
 
   const buildUrlWithToken = url => {
     const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -267,11 +268,19 @@ const EditFaceManagement = () => {
 
   const handleOptionChange = (event, newValue) => {
     console.log(newValue, 'newvalue')
+    setErrorType(!newValue)
     setTitle(newValue)
   }
 
   const handleUpdate = async () => {
     setLoading(true)
+    if (!selectedOption) {
+      setErrorType(true)
+      setLoading(false)
+      setShowLoading(false)
+
+      return
+    }
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -423,7 +432,7 @@ const EditFaceManagement = () => {
     })
   }
 
-  const selectedOption = person.find(option => option.id === title.id)
+  const selectedOption = person.find(option => option.id === title?.id)
 
   return (
     <>
@@ -603,7 +612,9 @@ const EditFaceManagement = () => {
                       <CustomTextField
                         {...params}
                         fullWidth
-                        placeholder={Object.keys(title).length === 0 ? 'Không có dữ liệu' : ''}
+                        placeholder={!title || Object.keys(title).length === 0 ? 'Không có dữ liệu' : ''}
+                        error={errorType}
+                        helperText={errorType ? 'Hãy chọn loại đối tượng' : ''}
                       />
                     )}
                     renderOption={renderOption}

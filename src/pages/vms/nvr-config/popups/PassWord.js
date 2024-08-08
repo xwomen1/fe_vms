@@ -1,6 +1,6 @@
-import React, { forwardRef, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import CustomTextField from 'src/@core/components/mui/text-field'
-import { Button, CircularProgress, Dialog, DialogActions, Grid, IconButton, InputAdornment } from '@mui/material'
+import { Button, CircularProgress, Grid, IconButton, InputAdornment, DialogActions } from '@mui/material'
 import axios from 'axios'
 import authConfig from 'src/configs/auth'
 import Swal from 'sweetalert2'
@@ -17,6 +17,12 @@ const PassWord = ({ onClose, nvr }) => {
   const [ipAddress, setIpAddress] = useState('')
   const [httpPort, setHttpPort] = useState('')
   const [username, setUserName] = useState('')
+
+  const [errors, setErrors] = useState({
+    password: '',
+    confirmPassword: ''
+  })
+
   const classes = useStyles()
 
   const handlePasswordChange = event => {
@@ -35,45 +41,26 @@ const PassWord = ({ onClose, nvr }) => {
     setShowPassword(!showPassword)
   }
 
-  useEffect(() => {
-    const fetchGroupData = async () => {
-      try {
-        if (nvr != null) {
-          const token = localStorage.getItem(authConfig.storageTokenKeyName)
+  const validatePasswords = () => {
+    let isValid = true
+    let errors = {}
 
-          const config = {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-          const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${nvr}`, config)
-          setIpAddress(response.data.ipAddress)
-          setHttpPort(response.data.httpPort)
-          setUserName(response.data.username)
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
+    if (password !== confirmPassword) {
+      errors.confirmPassword = 'Mật khẩu và xác nhận mật khẩu không khớp nhau.'
+      isValid = false
+    } else {
+      errors.confirmPassword = ''
     }
 
-    fetchGroupData()
-  }, [nvr])
+    setErrors(errors)
+
+    return isValid
+  }
 
   const saveChange = async () => {
     setLoading(true)
-    if (password !== confirmPassword) {
-      Swal.fire({
-        title: 'Lỗi!',
-        text: 'Mật khẩu và xác nhận mật khẩu không khớp nhau.',
-        icon: 'error',
-        willOpen: () => {
-          const confirmButton = Swal.getConfirmButton()
-          if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
-            confirmButton.style.color = 'white'
-          }
-        }
-      })
+
+    if (!validatePasswords()) {
       setLoading(false)
 
       return
@@ -113,8 +100,8 @@ const PassWord = ({ onClose, nvr }) => {
     } catch (error) {
       console.error('Error updating user details:', error)
       Swal.fire({
-        title: 'Error!',
-        text: error.response?.data?.message,
+        title: 'Lỗi!',
+        text: error.response?.data?.message || 'Có lỗi xảy ra.',
         icon: 'error',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
@@ -130,17 +117,41 @@ const PassWord = ({ onClose, nvr }) => {
     }
   }
 
+  useEffect(() => {
+    const fetchGroupData = async () => {
+      try {
+        if (nvr != null) {
+          const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+          const config = {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+          const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${nvr}`, config)
+          setIpAddress(response.data.ipAddress)
+          setHttpPort(response.data.httpPort)
+          setUserName(response.data.username)
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+
+    fetchGroupData()
+  }, [nvr])
+
   return (
     <div style={{ width: '100%' }} className={classes.loadingContainer}>
-      <Grid container spacing={2} style={{ minWidth: 500 }} className={classes.loadingContainer}></Grid>
       {loading && <CircularProgress className={classes.circularProgress} />}
 
-      {/* Reduced minHeight here */}
       <Grid container spacing={2} style={{ minWidth: 400 }}>
         <Grid container item style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
           <Grid item xs={12}>
             <CustomTextField
               label='Mật khẩu cũ'
+              autoComplete='new-password' // Thay đổi giá trị thành 'new-password'
+              form='off' // Thêm thuộc tính form với giá trị 'off'
               type={showPassword ? 'text' : 'password'}
               onChange={handlePasswordOldChange}
               fullWidth
@@ -161,6 +172,8 @@ const PassWord = ({ onClose, nvr }) => {
               type={showPassword ? 'text' : 'password'}
               onChange={handlePasswordChange}
               fullWidth
+              helperText={errors.password}
+              error={Boolean(errors.password)}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position='end'>
@@ -178,6 +191,8 @@ const PassWord = ({ onClose, nvr }) => {
               type={showPassword ? 'text' : 'password'}
               onChange={handleConfirmPasswordChange}
               fullWidth
+              helperText={errors.confirmPassword}
+              error={Boolean(errors.confirmPassword)}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position='end'>
@@ -208,6 +223,9 @@ const useStyles = makeStyles(() => ({
     left: '50%',
     transform: 'translate(-50%, -50%)',
     zIndex: 99999
+  },
+  loadingContainer: {
+    position: 'relative'
   }
 }))
 
