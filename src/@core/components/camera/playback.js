@@ -120,7 +120,8 @@ export const ViewCameraPause = ({
         intervalRef.current = setInterval(() => {
           console.log('Recreating WebSocket connection due to status:', status, 'at:', new Date().toLocaleTimeString());
           setRtcPeerConnection(null)
-          setWebsocketStatus(false)
+
+          // setWebsocketStatus(false)
           setWebsocket(null)
           createWsConnection();
         }, 5000);
