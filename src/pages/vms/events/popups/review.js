@@ -46,19 +46,54 @@ const Review = ({ id, name, channel, data }) => {
     const [dateTime, setDateTime] = useState(new Date())
 
     const [timeFilter, setTimeFilter] = useState({
-        start_time: timestamp - 5 * 60 * 1000,
-        end_time: timestamp + 5 * 60 * 1000
+        start_time: timestamp - 5  * 1000,
+        end_time: timestamp + 5  * 1000
     })
 
-    const [timePlay, setTimePlay] = useState(timestamp - 5 * 60 * 1000)
+    const [timePlay, setTimePlay] = useState(timestamp - 5 * 1000)
     const [currentTime, setCurrentTime] = useState(0)
     const datePickerRef = useRef(null)
     const [play, setPlay] = useState(true)
-    const [valueRange, setValueRange] = useState(60 * 60 * 1000)
+    const defaultValue = 10 * 1000
+    const [valueRange, setValueRange] = useState(defaultValue);
+
+    // const minutes = Math.floor(valueRange / (60 * 1000))
+    // const seconds = Math.floor((valueRange % (60 * 1000)) / 1000)
     const debouncedSearch = useDebounce(valueRange, 700)
     const [duration, setDuration] = useState(0)
     const [reload, setReload] = useState(0)
     const [volume, setVolume] = useState(30)
+
+    const formatTimeRange = (value) => {
+        const minutes = Math.floor(value / (60 * 1000));
+        const seconds = Math.floor((value % (60 * 1000)) / 1000);
+        
+        return { minutes, seconds };
+    };
+
+    const handleIncreaseRange = () => {
+        const newRange = valueRange * 2;
+        setTimeRange(newRange, true);
+    };
+
+    const handleDecreaseRange = () => {
+        const newRange = valueRange / 2;
+        setTimeRange(newRange, false);
+    };
+
+    // Helper function to update timeFilter based on new valueRange
+    const setTimeRange = (newRange, isIncrease) => {
+        setValueRange(newRange);
+
+        const rangeDiff = isIncrease ? newRange - valueRange : valueRange - newRange;
+
+        setTimeFilter(prev => ({
+            ...prev,
+            end_time: isIncrease ? prev.end_time + rangeDiff : prev.end_time - rangeDiff
+        }));
+    };
+
+    const { minutes, seconds } = formatTimeRange(valueRange);
 
     useEffect(() => {
         setCamera({ id: id, name: name, channel: channel })
@@ -76,21 +111,13 @@ const Review = ({ id, name, channel, data }) => {
 
         return time
     }
-    function valuetext(value) {
 
-        const timeCurrent = new Date(timeFilter.start_time + value)
-
-        return `${timeCurrent.getFullYear() +
-            '/' +
-            timeDisplay(timeCurrent.getMonth() + 1) +
-            '/' +
-            timeCurrent.getDate() +
-            ' ' +
-            timeDisplay(timeCurrent.getHours()) +
-            ':' +
-            timeDisplay(timeCurrent.getMinutes())
-            }`
-    }
+    const valuetext = value => {
+        const timeCurrent = new Date(timeFilter.start_time + value);
+        
+return `${timeCurrent.getHours()}:${timeDisplay(timeCurrent.getMinutes())}:${timeDisplay(timeCurrent.getSeconds())}`;
+    };
+    
 
     const handleIconClick = () => {
         if (datePickerRef.current) {
@@ -98,20 +125,25 @@ const Review = ({ id, name, channel, data }) => {
         }
     }
 
+
     const renderMarks = () => {
-        const marks = []
-        const part = 10
-        for (let i = 0; i <= part; i++) {
-            let step = Math.floor(valueRange / part)
-            let timeCurrent = new Date(timeFilter.start_time + step * i)
+        const marks = [];
+        const step = 1000; // Giữ step nhỏ để tạo dấu đánh dấu liên tục
+        const start = timeFilter.start_time;
+        const end = timeFilter.end_time;
+        const numMarks = Math.ceil((end - start) / step);
+
+        for (let i = 0; i <= numMarks; i++) {
+            const time = start + i * step;
+            const timeCurrent = new Date(time);
             marks.push({
-                value: step * i,
-                label: timeCurrent.getHours() + ':' + timeCurrent.getMinutes()
-            })
+                value: time - start,
+                label: `${timeCurrent.getHours()}:${timeCurrent.getMinutes()}:${timeCurrent.getSeconds()}`
+            });
         }
 
-        return marks
-    }
+        return marks;
+    };
 
     const renderMarksSpeed = () => {
         const marks = [
@@ -168,8 +200,8 @@ const Review = ({ id, name, channel, data }) => {
                             name={camera.name}
                             channel={camera.channel}
                             sizeScreen={'1x2'}
-                            startTime={timePlay || time_start}
-                            endTime={timeFilter?.end_time || time_end}
+                            startTime={timePlay}
+                            endTime={timeFilter?.end_time}
                             play={play}
                             duration={duration}
                             onChangeDuration={setDuration}
@@ -262,76 +294,64 @@ const Review = ({ id, name, channel, data }) => {
                             <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'end' }}>
                                 <IconButton
                                     style={{ padding: 5 }}
-                                    onClick={() => {
-                                        setValueRange(valueRange * 2)
-                                        setTimeFilter({
-                                            ...timeFilter,
-                                            end_time: timeFilter.end_time + valueRange
-                                        })
-                                    }}
+                                    onClick={handleIncreaseRange}
                                 >
                                     <Icon icon='tabler:plus' size='1em' color='#FFF' />
                                 </IconButton>
                                 <IconButton
-                                    onClick={() => {
-                                        setValueRange(valueRange / 2)
-                                        setTimeFilter({
-                                            ...timeFilter,
-                                            end_time: timeFilter.end_time - valueRange
-                                        })
-                                    }}
+                                    onClick={handleDecreaseRange}
                                     style={{ padding: 5 }}
                                 >
                                     <Icon icon='tabler:minus' size='1em' color='#FFF' />
                                 </IconButton>
                                 <Typography style={{ color: '#fff', fontWeight: 'bold' }}>
-                                    {`${Math.floor(valueRange / (60 * 60 * 1000))} giờ -  ${(valueRange - 60 * 60 * 1000 * Math.floor(valueRange / (60 * 60 * 1000))) / (60 * 1000)
-                                        } phút `}
+                                {`${minutes} phút - ${seconds} giây`}
                                 </Typography>
                             </Box>
                             <Box className='w-100'>
-                                <Slider
-                                    defaultValue={0}
-                                    color='secondary'
-                                    step={2000}
-                                    min={0}
-                                    max={valueRange}
-                                    valueLabelDisplay='on'
-                                    onChange={handleSeekChange}
-                                    value={timePlay - timeFilter?.start_time + currentTime}
-                                    getAriaValueText={valuetext}
-                                    valueLabelFormat={valuetext}
-                                    marks={renderMarks()}
-                                    aria-labelledby='custom-marks-slider'
-                                    sx={{
-                                        '& .MuiSlider-thumb': {
+                            <Slider
+                                defaultValue={0}
+                                color='secondary'
+                                step={1000} // Bước nhảy theo giây
+                                min={0}
+                                max={timeFilter.end_time - timeFilter.start_time}
+                                valueLabelDisplay='on'
+                                onChange={handleSeekChange}
+                                value={timePlay - timeFilter?.start_time + currentTime}
+                                getAriaValueText={valuetext}
+                                valueLabelFormat={valuetext}
+                                marks={renderMarks()}
+                                aria-labelledby='custom-marks-slider'
+                                sx={{
+                                    '& .MuiSlider-thumb': {
+                                        width: 20,
+                                        height: 20,
+                                        transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
+                                        '&::before': {
+                                            boxShadow: '0 2px 12px 0 rgba(0,0,0,0.4)'
+                                        },
+                                        '&:hover, &.Mui-focusVisible': {
+                                            boxShadow: `0px 0px 0px 8px ${'rgb(0 0 0 / 16%)'}`
+                                        },
+                                        '&.Mui-active': {
                                             width: 20,
-                                            height: 20,
-                                            transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
-                                            '&::before': {
-                                                boxShadow: '0 2px 12px 0 rgba(0,0,0,0.4)'
-                                            },
-                                            '&:hover, &.Mui-focusVisible': {
-                                                boxShadow: `0px 0px 0px 8px ${'rgb(0 0 0 / 16%)'}`
-                                            },
-                                            '&.Mui-active': {
-                                                width: 20,
-                                                height: 20
-                                            }
-                                        },
-                                        '& .MuiSlider-track': {
-                                            opacity: 0,
-                                            backgroundColor: '#fff'
-                                        },
-                                        '& .MuiSlider-rail': {
-                                            opacity: 0.28,
-                                            backgroundColor: '#fff'
-                                        },
-                                        '& .MuiSlider-markLabel': {
-                                            color: '#fff'
+                                            height: 20
                                         }
-                                    }}
-                                />
+                                    },
+                                    '& .MuiSlider-track': {
+                                        opacity: 0,
+                                        backgroundColor: '#fff'
+                                    },
+                                    '& .MuiSlider-rail': {
+                                        opacity: 0.28,
+                                        backgroundColor: '#fff'
+                                    },
+                                    '& .MuiSlider-markLabel': {
+                                        color: '#fff'
+                                    }
+                                }}
+                            />
+
                             </Box>
                         </div>
                         <div className='right-controls'>
