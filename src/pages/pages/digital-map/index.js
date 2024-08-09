@@ -1,7 +1,7 @@
 "use client";
 
 import { TreeItem, TreeView } from "@mui/lab"
-import { Box, Card, CardContent, CardHeader, Grid, IconButton, styled, Typography } from "@mui/material"
+import { Box, Button, Card, CardContent, CardHeader, Grid, IconButton, List, styled, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
 import Icon from 'src/@core/components/icon'
 import { callApi } from "src/@core/utils/requestUltils"
@@ -64,13 +64,15 @@ const StyledTreeItem = props => {
 
 
 const DigitalMap = () => {
-
     const [keyword, setKeyword] = useState('')
     const [cameraList, setCameraList] = useState([])
     const [dataList, setDataList] = useState([])
     const [idCameraSelected, setIdCameraSelected] = useState(null)
     const [camera, setCamera] = useState({ id: '', name: '', channel: '' })
     const [cameraGroup, setCameraGroup] = useState([])
+    const [open1, setOpen1] = useState(false)
+    const [open2, setOpen2] = useState(false)
+    const [open3, setOpen3] = useState(false)
 
     const clientId = 'be571c00-41cf-4878-a1de-b782625da62a'
     const [eventsData, setEventData] = useState([])
@@ -90,7 +92,6 @@ const DigitalMap = () => {
             },
         ]
     }
-
 
     // create WebSocket connection
     const createWsConnection = () => {
@@ -294,95 +295,196 @@ const DigitalMap = () => {
         )
     }
 
+    useEffect(() => {
+        console.log('open1', open1);
+
+    }, [open1])
+
     return (
         <>
-            <Grid container spacing={2}>
-                <Grid item xs={2}>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12}>
-                            <Card>
-                                <CardHeader title='Danh sách Camera' />
-                                <CardContent>
-                                    <CustomTextField
-                                        value={keyword}
-                                        placeholder='Search…'
-                                        InputProps={{
-                                            startAdornment: (
-                                                <Box sx={{ mr: 2, display: 'flex' }}>
-                                                    <Icon fontSize='1.25rem' icon='tabler:search' />
-                                                </Box>
-                                            ),
-                                            endAdornment: (
-                                                <IconButton size='small' title='Clear' aria-label='Clear' onClick={() => setKeyword('')}>
-                                                    <Icon fontSize='1.25rem' icon='tabler:x' />
-                                                </IconButton>
-                                            )
-                                        }}
-                                        onChange={handleSearch}
-                                        sx={{
-                                            width: {
-                                                xs: 1,
-                                                sm: 'auto'
-                                            },
-                                            '& .MuiInputBase-root > svg': {
-                                                mr: 2
-                                            }
-                                        }}
-                                    />
-                                    <Box sx={{
-                                        height: {
-                                            xs: '300px',
-                                            sm: '300px',
-                                            lg: '30vh',
+            <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                <div style={{ display: 'inline-block', position: 'absolute', margin: 5, zIndex: 10 }}>
+
+                    {!open1 && (
+                        <Button variant='contained' onClick={() => setOpen1(true)}>
+                            Danh sách camera
+                        </Button>
+                    )}
+                    {open1 && (
+                        <Card sx={{ width: '320px' }}>
+                            <CardHeader title='Danh sách Camera'
+                                action={
+                                    <Grid container spacing={0}>
+                                        <IconButton onClick={() => setOpen1(false)}>
+                                            <Icon icon="tabler:square-rounded-minus" />
+                                        </IconButton>
+                                    </Grid>
+                                }
+                            />
+                            <CardContent>
+                                <CustomTextField
+                                    value={keyword}
+                                    placeholder='Search…'
+                                    InputProps={{
+                                        startAdornment: (
+                                            <Box sx={{ mr: 2, display: 'flex' }}>
+                                                <Icon fontSize='1.25rem' icon='tabler:search' />
+                                            </Box>
+                                        ),
+                                        endAdornment: (
+                                            <IconButton size='small' title='Clear' aria-label='Clear' onClick={() => setKeyword('')}>
+                                                <Icon fontSize='1.25rem' icon='tabler:x' />
+                                            </IconButton>
+                                        )
+                                    }}
+                                    onChange={handleSearch}
+                                    sx={{
+                                        width: {
+                                            xs: 1,
+                                            sm: 'auto'
                                         },
-                                        overflow: 'auto',
-                                        marginTop: '10px'
-                                    }}>
-                                        <TreeView
-                                            sx={{ minHeight: 300 }}
-                                            defaultExpanded={['root']}
-                                            defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
-                                            defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
-                                        >
-                                            {dataList.map(group => renderTree(group))}
-                                        </TreeView>
-                                    </Box>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Card>
-                                <CardHeader title='Camera đã chọn' />
-                                <CardContent>
-                                    <Box sx={{
-                                        height: {
-                                            xs: '300px',
-                                            sm: '300px',
-                                            lg: '30vh',
+                                        '& .MuiInputBase-root > svg': {
+                                            mr: 2
+                                        }
+                                    }}
+                                />
+                                <Box sx={{
+                                    height: {
+                                        xs: '300px',
+                                        sm: '300px',
+                                        lg: '30vh',
+                                    },
+                                    overflow: 'auto',
+                                    marginTop: '10px'
+                                }}>
+                                    <TreeView
+                                        sx={{ minHeight: 300 }}
+                                        defaultExpanded={['root']}
+                                        defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
+                                        defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
+                                    >
+                                        {dataList.map(group => renderTree(group))}
+                                    </TreeView>
+                                </Box>
+                            </CardContent>
+                        </Card>
+                    )}
+                </div>
+                <div style={{ display: 'inline-block', position: 'absolute', margin: 5, marginLeft: open1 ? '330px' : '185px', zIndex: 10 }}>
+
+                    {!open2 && (
+                        <Button variant='contained' onClick={() => setOpen2(true)}>
+                            Danh sách Khu vực
+                        </Button>
+                    )}
+                    {open2 && (
+                        <Card>
+                            <CardHeader title='Danh sách Khu vực'
+                                action={
+                                    <Grid container spacing={0}>
+                                        <IconButton onClick={() => setOpen2(false)}>
+                                            <Icon icon="tabler:square-rounded-minus" />
+                                        </IconButton>
+                                    </Grid>
+                                }
+                            />
+                            <CardContent>
+                                <CustomTextField
+                                    value={keyword}
+                                    placeholder='Search…'
+                                    InputProps={{
+                                        startAdornment: (
+                                            <Box sx={{ mr: 2, display: 'flex' }}>
+                                                <Icon fontSize='1.25rem' icon='tabler:search' />
+                                            </Box>
+                                        ),
+                                        endAdornment: (
+                                            <IconButton size='small' title='Clear' aria-label='Clear' onClick={() => setKeyword('')}>
+                                                <Icon fontSize='1.25rem' icon='tabler:x' />
+                                            </IconButton>
+                                        )
+                                    }}
+                                    onChange={handleSearch}
+                                    sx={{
+                                        width: {
+                                            xs: 1,
+                                            sm: 'auto'
                                         },
-                                        overflow: 'auto',
-                                        marginTop: '10px'
-                                    }}>
-                                        <TreeView>
-                                            {cameraGroup.map((cam, index) => (
-                                                <StyledTreeItem
-                                                    key={cam.id}
-                                                    nodeId={cam.id}
-                                                    labelText={cam.name}
-                                                    labelIcon='tabler:camera'
-                                                />
-                                            ))}
-                                        </TreeView>
-                                    </Box>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                    </Grid>
-                </Grid>
-                <Grid item xs={10}>
+                                        '& .MuiInputBase-root > svg': {
+                                            mr: 2
+                                        }
+                                    }}
+                                />
+                                <Box sx={{
+                                    height: {
+                                        xs: '300px',
+                                        sm: '300px',
+                                        lg: '30vh',
+                                    },
+                                    overflow: 'auto',
+                                    marginTop: '10px'
+                                }}>
+                                    <TreeView
+                                        sx={{ minHeight: 300 }}
+                                        defaultExpanded={['root']}
+                                        defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
+                                        defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
+                                    >
+                                        {dataList.map(group => renderTree(group))}
+                                    </TreeView>
+                                </Box>
+                            </CardContent>
+                        </Card>
+                    )}
+                </div>
+                <div style={{ display: 'inline-block', position: 'absolute', margin: 5, zIndex: 10, marginLeft: (open1 && open2) ? '660px' : ((open1 && !open2) || (!open1 && open2)) ? '515px' : '370px' }}>
+
+                    {!open3 && (
+                        <Button variant='contained' onClick={() => setOpen3(true)}>
+                            Danh sách camera đã chọn
+                        </Button>
+                    )}
+                    {open3 && (
+                        <Card>
+                            <CardHeader title='Danh sách Camera đã chọn'
+                                action={
+                                    <Grid container spacing={0}>
+                                        <IconButton onClick={() => setOpen3(false)}>
+                                            <Icon icon="tabler:square-rounded-minus" />
+                                        </IconButton>
+                                    </Grid>
+                                }
+                            />
+                            <CardContent>
+                                <Box sx={{
+                                    height: {
+                                        xs: '300px',
+                                        sm: '300px',
+                                        lg: '30vh',
+                                    },
+                                    overflow: 'auto',
+                                    marginTop: '10px'
+                                }}>
+                                    <TreeView>
+                                        {cameraGroup.map((cam, index) => (
+                                            <StyledTreeItem
+                                                key={cam.id}
+                                                nodeId={cam.id}
+                                                labelText={cam.name}
+                                                labelIcon='tabler:camera'
+                                            />
+                                        ))}
+                                    </TreeView>
+                                </Box>
+                            </CardContent>
+                        </Card>
+                    )}
+                </div>
+
+                <div style={{ position: 'absolute', width: '100%', height: '100%', zIndex: 1 }}>
                     <IndoorMap cameraGroup={cameraGroup} />
-                </Grid>
-            </Grid>
+                </div>
+            </div>
         </>
     )
 }
