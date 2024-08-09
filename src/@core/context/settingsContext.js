@@ -27,7 +27,8 @@ const staticSettings = {
   layout: initialSettings.layout,
   navHidden: initialSettings.navHidden,
   lastLayout: initialSettings.lastLayout,
-  toastPosition: initialSettings.toastPosition
+  toastPosition: initialSettings.toastPosition,
+  themeColor: 'info'
 }
 
 const restoreSettings = () => {
