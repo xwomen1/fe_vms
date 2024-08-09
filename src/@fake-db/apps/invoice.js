@@ -280,7 +280,7 @@ const data = {
       service: 'Unlimited Extended License',
       total: 4372,
       avatar: '',
-      avatarColor: 'warning',
+      avatarColor: 'info',
       invoiceStatus: 'Sent',
       balance: '-$344',
       dueDate: `17 ${currentMonth} ${now.getFullYear()}`

@@ -28,7 +28,7 @@ import SalaryRulePage from '../salaryRule/salaryRule'
 import toast from 'react-hot-toast'
 import httpStatusMessages from 'src/message'
 
-const UserList = ({ apiData }) => {
+const SalaryTable = ({ apiData }) => {
   const [value, setValue] = useState('')
   const [valueGroup, setValueGroup] = useState('')
   const [editRow, setEditRow] = useState(null) // New state for edit mode
@@ -567,15 +567,4 @@ const UserList = ({ apiData }) => {
   )
 }
 
-export const getStaticProps = async () => {
-  const res = await axios.get('/cards/statistics')
-  const apiData = res.data
-
-  return {
-    props: {
-      apiData
-    }
-  }
-}
-
-export default UserList
+export default SalaryTable
