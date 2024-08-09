@@ -70,6 +70,7 @@ const DigitalMap = () => {
     const [idCameraSelected, setIdCameraSelected] = useState(null)
     const [camera, setCamera] = useState({ id: '', name: '', channel: '' })
     const [cameraGroup, setCameraGroup] = useState([])
+    const [areaGroup, setAreaGroup] = useState([])
     const [open1, setOpen1] = useState(false)
     const [open2, setOpen2] = useState(false)
     const [open3, setOpen3] = useState(false)
@@ -193,6 +194,10 @@ const DigitalMap = () => {
         setDataList(data)
     }, [cameraList]);
 
+    useEffect(() => {
+        fetchAreaGroup()
+    }, [])
+
 
     useEffect(() => {
         const addStatus = (data) => {
@@ -252,6 +257,29 @@ const DigitalMap = () => {
         }
     }
 
+
+    const fetchAreaGroup = async () => {
+        try {
+            const res = await callApi(
+                `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=abbe3f3c-963b-4d23-a766-42a8261607c3`)
+            if (Array.isArray(res?.data)) {
+                setAreaGroup(res?.data)
+            } else {
+                setAreaGroup([])
+            }
+
+        } catch (error) {
+            if (error && error?.response?.data) {
+                console.error('error', error)
+                toast.error(error?.response?.data?.message)
+            } else {
+                console.error('Error fetching data:', error)
+                toast.error(error)
+            }
+        }
+    }
+
+
     const handleSearch = e => {
         setKeyword(e.target.value)
     }
@@ -294,11 +322,6 @@ const DigitalMap = () => {
             </StyledTreeItem>
         )
     }
-
-    useEffect(() => {
-        console.log('open1', open1);
-
-    }, [open1])
 
     return (
         <>
@@ -370,7 +393,7 @@ const DigitalMap = () => {
                         </Card>
                     )}
                 </div>
-                <div style={{ display: 'inline-block', position: 'absolute', margin: 5, marginLeft: open1 ? '330px' : '185px', zIndex: 10 }}>
+                <div style={{ display: 'inline-block', position: 'absolute', margin: 5, marginLeft: open1 ? '335px' : '185px', zIndex: 10 }}>
 
                     {!open2 && (
                         <Button variant='contained' onClick={() => setOpen2(true)}>
@@ -378,7 +401,7 @@ const DigitalMap = () => {
                         </Button>
                     )}
                     {open2 && (
-                        <Card>
+                        <Card sx={{ width: '320px' }}>
                             <CardHeader title='Danh sách Khu vực'
                                 action={
                                     <Grid container spacing={0}>
@@ -389,7 +412,7 @@ const DigitalMap = () => {
                                 }
                             />
                             <CardContent>
-                                <CustomTextField
+                                {/* <CustomTextField
                                     value={keyword}
                                     placeholder='Search…'
                                     InputProps={{
@@ -414,7 +437,7 @@ const DigitalMap = () => {
                                             mr: 2
                                         }
                                     }}
-                                />
+                                /> */}
                                 <Box sx={{
                                     height: {
                                         xs: '300px',
@@ -430,14 +453,14 @@ const DigitalMap = () => {
                                         defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
                                         defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
                                     >
-                                        {dataList.map(group => renderTree(group))}
+                                        {areaGroup.map(group => renderTree(group))}
                                     </TreeView>
                                 </Box>
                             </CardContent>
                         </Card>
                     )}
                 </div>
-                <div style={{ display: 'inline-block', position: 'absolute', margin: 5, zIndex: 10, marginLeft: (open1 && open2) ? '660px' : ((open1 && !open2) || (!open1 && open2)) ? '515px' : '370px' }}>
+                <div style={{ display: 'inline-block', position: 'absolute', margin: 5, zIndex: 10, marginLeft: (open1 && open2) ? '665px' : (open1 && !open2) ? '520px' : (!open1 && open2) ? '515px' : '370px' }}>
 
                     {!open3 && (
                         <Button variant='contained' onClick={() => setOpen3(true)}>
@@ -445,7 +468,7 @@ const DigitalMap = () => {
                         </Button>
                     )}
                     {open3 && (
-                        <Card>
+                        <Card sx={{ width: '320px' }}>
                             <CardHeader title='Danh sách Camera đã chọn'
                                 action={
                                     <Grid container spacing={0}>
