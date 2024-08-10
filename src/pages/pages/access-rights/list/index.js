@@ -66,11 +66,11 @@ const AccessRight = () => {
   const tabList = [
     {
       id: 'overview',
-      value: 'Tổng quan'
+      value: 'Overview'
     },
     {
       id: 'setPermissions',
-      value: 'Thiết lập quyền'
+      value: 'Permission Setup'
     }
   ]
 
@@ -93,49 +93,49 @@ const AccessRight = () => {
       id: 1,
       flex: 0.25,
       minWidth: 50,
-      align: 'right',
+      align: 'center',
       field: 'nameCalendar',
-      label: 'Tên lịch'
+      label: 'Schedule Name'
     },
     {
       id: 2,
       flex: 0.25,
       minWidth: 50,
-      align: 'right',
+      align: 'center',
       field: 'name',
-      label: 'Họ tên'
+      label: 'Full Name'
     },
     {
       id: 3,
       flex: 0.15,
       minWidth: 100,
-      align: 'right',
-      label: 'Phòng ban',
+      align: 'center',
+      label: 'Department',
       field: 'groupName'
     },
     {
       id: 4,
       flex: 0.15,
       minWidth: 200,
-      align: 'right',
+      align: 'center',
       field: 'doorInName',
-      label: 'Cửa vào'
+      label: 'Door In'
     },
     {
       id: 5,
       flex: 0.15,
       minWidth: 200,
-      align: 'right',
+      align: 'center',
       field: 'doorOutName',
-      label: 'Cửa ra'
+      label: 'Door Out'
     },
     {
       id: 6,
       flex: 0.15,
       type: 'date',
       minWidth: 130,
-      align: 'right',
-      label: 'Ngày bắt đầu',
+      align: 'center',
+      label: 'Start Date',
       field: 'startDate',
       valueGetter: params => new Date(params.value)
     },
@@ -144,8 +144,8 @@ const AccessRight = () => {
       flex: 0.15,
       type: 'date',
       minWidth: 130,
-      align: 'right',
-      label: 'Ngày kết thúc',
+      align: 'center',
+      label: 'End Date',
       field: 'endDate',
       valueGetter: params => new Date(params.value)
     }
@@ -156,41 +156,41 @@ const AccessRight = () => {
       id: 1,
       flex: 0.25,
       minWidth: 50,
-      align: 'right',
+      align: 'center',
       field: 'nameCalendar',
-      label: 'Tên lịch'
+      label: 'Schedule Name'
     },
     {
       id: 2,
       flex: 0.15,
       minWidth: 150,
-      align: 'right',
-      label: 'Phòng ban',
+      align: 'center',
+      label: 'Department',
       field: 'groupName'
     },
     {
       id: 3,
       flex: 0.15,
       minWidth: 230,
-      align: 'right',
+      align: 'center',
       field: 'doorInName',
-      label: 'Cửa vào'
+      label: 'Door In'
     },
     {
       id: 4,
       flex: 0.15,
       minWidth: 230,
-      align: 'right',
+      align: 'center',
       field: 'doorOutName',
-      label: 'Cửa ra'
+      label: 'Door Out'
     },
     {
       id: 5,
       flex: 0.25,
       minWidth: 50,
-      align: 'right',
+      align: 'center',
       field: 'sizeUser',
-      label: 'Số lượng người dùng'
+      label: 'Number of People'
     }
   ]
 
@@ -369,16 +369,16 @@ const AccessRight = () => {
       if (row.calendarDays && Array.isArray(row.calendarDays)) {
         row.calendarDays.forEach(calendarDay => {
           acc.push({
-            'Tên lịch': row.nameCalendar,
-            'Phòng ban': row.groupName,
+            'Schedule Name': row.nameCalendar,
+            'Department': row.groupName,
             'Ngày trong tuần': calendarDay.dayOfWeek,
             'Giờ bắt đầu': calendarDay.timePeriods[0]?.startTimeInMinute,
             'Giờ kết thúc': calendarDay.timePeriods[0]?.endTimeInMinute,
-            'Cửa vào': row.doorInName,
-            'Cửa ra': row.doorOutName,
-            'Ngày bắt đầu': row.startDate,
-            'Ngày kết thúc': row.endDate,
-            'Số lượng người': row.sizeUser
+            'Door In': row.doorInName,
+            'Door Out': row.doorOutName,
+            'Start Date': row.startDate,
+            'End Date': row.endDate,
+            'Number of People': row.sizeUser
           })
         })
       }
@@ -412,9 +412,11 @@ const AccessRight = () => {
       >
         <Box sx={{ mb: 4, textAlign: 'center' }}>
           <Typography variant='h3' sx={{ mb: 3 }}>
-            Xác nhận
+          Confirm
           </Typography>
-          <Typography sx={{ color: 'text.secondary' }}>Bạn có chắc chắn muốn xóa không ?</Typography>
+          <Typography sx={{ color: 'text.secondary' }}>
+          Are you sure you want to delete this?
+          </Typography>
         </Box>
       </DialogContent>
       <DialogActions
@@ -424,6 +426,9 @@ const AccessRight = () => {
           pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
         }}
       >
+        <Button variant='tonal' color='secondary' sx={{ mr: 1 }} onClick={() => setIsOpenDel(false)}>
+          Cancel
+        </Button>
         <Button
           variant='contained'
           onClick={() => {
@@ -431,10 +436,7 @@ const AccessRight = () => {
             setIsOpenDel(false)
           }}
         >
-          Đồng ý
-        </Button>
-        <Button variant='tonal' color='secondary' sx={{ mr: 1 }} onClick={() => setIsOpenDel(false)}>
-          Hủy
+          Ok
         </Button>
       </DialogActions>
     </Dialog>
@@ -457,12 +459,12 @@ const AccessRight = () => {
           config
         )
         .then(() => {
-          toast.success('Xóa thành công')
+          toast.success('Deleted Successfully')
           setIdDelete(null)
           setReload(reload + 1)
         })
         .catch(error => {
-          setErrorMessage(`lỗi trong quá trình xóa ... (${error.message})`)
+          setErrorMessage(`Error During Deletion ... (${error.message})`)
           toast.error(error.message)
         })
         .finally(() => {
@@ -478,14 +480,14 @@ const AccessRight = () => {
         <CardHeader
           title={
             <>
-              <Button variant='contained'>Quyền truy cập</Button>
+              <Button variant='contained'>Access Permissions</Button>
             </>
           }
           titleTypographyProps={{ sx: { mb: [2, 0] } }}
           action={
             <Grid container spacing={2}>
               <Grid item>
-                <Box sx={{ float: 'right' }}>
+                <Box sx={{ float: 'center' }}>
                   <IconButton
                     aria-label='import file'
                     color='primary'
@@ -577,20 +579,20 @@ const AccessRight = () => {
                   <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
                     <TableHead>
                       <TableRow>
-                        <TableCell>STT</TableCell>
+                        <TableCell>No.</TableCell>
                         {columns.map(column => (
                           <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
                             {column.label}
                           </TableCell>
                         ))}
-                        <TableCell>Thao tác</TableCell>
+                        <TableCell>Action</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {loading ? (
                         <TableRow>
                           <TableCell colSpan={columns.length + 2} align='center'>
-                            Đang tải dữ liệu...
+                            Loading data...
                           </TableCell>
                         </TableRow>
                       ) : errorMessage ? (
@@ -602,7 +604,7 @@ const AccessRight = () => {
                       ) : rows.length === 0 ? (
                         <TableRow>
                           <TableCell colSpan={columns.length + 2} align='center'>
-                            Không có dữ liệu
+                           No Data Available
                           </TableCell>
                         </TableRow>
                       ) : (
@@ -688,14 +690,14 @@ const AccessRight = () => {
                             {column.label}
                           </TableCell>
                         ))}
-                        <TableCell>Thao tác</TableCell>
+                        <TableCell>Action</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {loading ? (
                         <TableRow>
                           <TableCell colSpan={columns1.length + 2} align='center'>
-                            Đang tải dữ liệu...
+                            Loading data...
                           </TableCell>
                         </TableRow>
                       ) : errorMessage ? (
@@ -707,7 +709,7 @@ const AccessRight = () => {
                       ) : dataList1.length === 0 ? (
                         <TableRow>
                           <TableCell colSpan={columns1.length + 2} align='center'>
-                            Không có dữ liệu
+                          No Data Available
                           </TableCell>
                         </TableRow>
                       ) : (

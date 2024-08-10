@@ -288,7 +288,7 @@ const Add = ({ show, onClose, setReload }) => {
         { ...params },
         config
       )
-      toast.success('Thêm mới thành công')
+      toast.success('Create Successful')
       setReload()
       onClose()
     } catch (err) {
@@ -326,8 +326,8 @@ const Add = ({ show, onClose, setReload }) => {
             </CustomCloseButton>
             <Box sx={{ mb: 8, textAlign: 'left' }}>
               <Typography variant='h3' sx={{ mb: 3 }}>
-                Cấu hình lịch
-              </Typography>
+              Schedule Configuration
+                            </Typography>
             </Box>
             <Grid container spacing={3}>
               <Grid item xs={4}>
@@ -339,12 +339,12 @@ const Add = ({ show, onClose, setReload }) => {
                     <CustomTextField
                       fullWidth
                       value={value}
-                      label='Tên Lịch'
+                      label='Schedule Name'
                       onChange={onChange}
-                      placeholder='Tên lịch'
+                      placeholder='Schedule Name'
                       error={Boolean(errors.nameCalendar)}
                       aria-describedby='validation-basic-last-name'
-                      {...(errors.nameCalendar && { helperText: 'Trường này bắt buộc' })}
+                      {...(errors.nameCalendar && { helperText: 'This field is required' })}
                     />
                   )}
                 />
@@ -358,7 +358,7 @@ const Add = ({ show, onClose, setReload }) => {
                     <CustomTextField
                       select
                       fullWidth
-                      label='Công ty'
+                      label='Department'
                       value={value}
                       onChange={e => {
                         const selectedValue = e.target.value
@@ -369,7 +369,7 @@ const Add = ({ show, onClose, setReload }) => {
                       id='validation-basic-select'
                       error={Boolean(errors.groupId)}
                       aria-describedby='validation-basic-select'
-                      {...(errors.groupId && { helperText: 'Trường này bắt buộc' })}
+                      {...(errors.groupId && { helperText: 'This field is required' })}
                     >
                       {groupName.map(item => (
                         <MenuItem key={item.id} value={item.id}>
@@ -390,7 +390,7 @@ const Add = ({ show, onClose, setReload }) => {
                       select
                       fullWidth
                       defaultValue=''
-                      label='Cửa vào'
+                      label='Door In'
                       SelectProps={{
                         value: value,
                         onChange: e => {
@@ -401,7 +401,7 @@ const Add = ({ show, onClose, setReload }) => {
                       id='validation-basic-select'
                       error={Boolean(errors.doorInId)}
                       aria-describedby='validation-basic-select'
-                      {...(errors.doorInId && { helperText: 'Trường này bắt buộc' })}
+                      {...(errors.doorInId && { helperText: 'This field is required' })}
                     >
                       {doorList.map(door => (
                         <MenuItem key={door.id} value={door.id}>
@@ -426,7 +426,7 @@ const Add = ({ show, onClose, setReload }) => {
                         select
                         fullWidth
                         defaultValue=''
-                        label='Cửa ra'
+                        label='Door Out'
                         SelectProps={{
                           value: value,
                           onChange: e => onChange(e)
@@ -434,7 +434,7 @@ const Add = ({ show, onClose, setReload }) => {
                         id='validation-basic-select'
                         error={Boolean(errors.doorOutId)}
                         aria-describedby='validation-basic-select'
-                        {...(errors.doorOutId && { helperText: 'Trường này bắt buộc' })}
+                        {...(errors.doorOutId && { helperText: 'This field is required' })}
                       >
                         {filteredDoorList.map(door => (
                           <MenuItem key={door.id} value={door.id}>
@@ -453,8 +453,8 @@ const Add = ({ show, onClose, setReload }) => {
                       selected={start}
                       id='basic-input'
                       onChange={date => setStart(date)}
-                      placeholderText='Ngày bắt đầu'
-                      customInput={<CustomInput label='Ngày bắt đầu' />}
+                      placeholderText='Start Date'
+                      customInput={<CustomInput label='End Date' />}
                     />
                   </div>
                 </DatePickerWrapper>
@@ -466,8 +466,8 @@ const Add = ({ show, onClose, setReload }) => {
                       selected={end}
                       id='basic-input'
                       onChange={date => setEnd(date)}
-                      placeholderText='Ngày kết thúc'
-                      customInput={<CustomInput label='Ngày kết thúc' />}
+                      placeholderText='End Date'
+                      customInput={<CustomInput label='End Date' />}
                       minDate={start}
                     />
                   </div>
@@ -476,11 +476,11 @@ const Add = ({ show, onClose, setReload }) => {
               <Grid item xs={2}>
                 <FormControlLabel
                   control={<Checkbox onChange={handleCheckboxChange} />}
-                  label='Luôn luôn'
+                  label='Alway'
                   style={{ marginTop: '25px' }}
                 />
               </Grid>
-              <Grid item>Bảng cấu hình thời gian</Grid>
+              <Grid item>Time Settings</Grid>
               <Grid item xs={12}>
                 <Controller
                   name='calendarDays'
@@ -496,7 +496,7 @@ const Add = ({ show, onClose, setReload }) => {
                       disabled={!isCheckboxChecked} // Truyền giá trị disabled từ checkbox vào Daily
                       error={Boolean(errors.calendarDays)}
                       aria-describedby='validation-basic-last-name'
-                      {...(errors.calendarDays && { helperText: 'Trường này bắt buộc' })}
+                      {...(errors.calendarDays && { helperText: 'This field is required' })}
                     />
                   )}
                 />
@@ -518,10 +518,10 @@ const Add = ({ show, onClose, setReload }) => {
               </Box>
             )}
             <Button variant='tonal' color='secondary' onClick={onClose}>
-              Hủy
+              Cancel
             </Button>
             <Button variant='contained' onClick={handleSubmit(onSubmit)}>
-              Thêm
+              Ok
             </Button>
           </DialogActions>
         </Dialog>

@@ -55,37 +55,37 @@ const dataDailyDefault = [
     value: 1
   },
   {
-    label: 'Thứ 2',
+    label: 'MONDAY',
     dayOfWeek: 'MONDAY',
     value: 2
   },
   {
-    label: 'Thứ 3',
+    label: 'TUESDAY',
     dayOfWeek: 'TUESDAY',
     value: 3
   },
   {
-    label: 'Thứ 4',
+    label: 'WEDNESDAY',
     dayOfWeek: 'WEDNESDAY',
     value: 4
   },
   {
-    label: 'Thứ 5',
+    label: 'THURSDAY',
     dayOfWeek: 'THURSDAY',
     value: 5
   },
   {
-    label: 'Thứ 6',
+    label: 'FRIDAY',
     dayOfWeek: 'FRIDAY',
     value: 6
   },
   {
-    label: 'Thứ 7',
+    label: 'SATURDAY',
     dayOfWeek: 'SATURDAY',
     value: 7
   },
   {
-    label: 'CN',
+    label: 'SUNDAY',
     dayOfWeek: 'SUNDAY',
     value: 8
   }
@@ -164,7 +164,7 @@ const Add = ({ show, onClose, setReload }) => {
       }
 
       await axios.post(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/schedules`, { ...params }, config)
-      toast.success('Thêm mới thành công')
+      toast.success('Successfully Added')
       setReload()
       onClose()
     } catch (err) {
@@ -198,7 +198,7 @@ const Add = ({ show, onClose, setReload }) => {
             </CustomCloseButton>
             <Box sx={{ mb: 8, textAlign: 'left' }}>
               <Typography variant='h3' sx={{ mb: 3 }}>
-                Cấu hình lịch
+                Add New Schedule
               </Typography>
             </Box>
             <Grid container spacing={3}>
@@ -211,12 +211,12 @@ const Add = ({ show, onClose, setReload }) => {
                     <CustomTextField
                       fullWidth
                       value={value}
-                      label='Tên Lịch'
+                      label='Schedule Name'
                       onChange={onChange}
-                      placeholder='Tên lịch'
+                      placeholder='Schedule Name'
                       error={Boolean(errors.name)}
                       aria-describedby='validation-basic-last-name'
-                      {...(errors.name && { helperText: 'Trường này bắt buộc' })}
+                      {...(errors.name && { helperText: 'This field is required' })}
                     />
                   )}
                 />
@@ -230,17 +230,17 @@ const Add = ({ show, onClose, setReload }) => {
                     <CustomTextField
                       fullWidth
                       value={value}
-                      label='Mô tả'
+                      label='Desciption'
                       onChange={onChange}
-                      placeholder='Mô tả'
+                      placeholder='Desciption'
                       error={Boolean(errors.description)}
                       aria-describedby='validation-basic-last-name'
-                      {...(errors.description && { helperText: 'Trường này bắt buộc' })}
+                      {...(errors.description && { helperText: 'This field is required' })}
                     />
                   )}
                 />
               </Grid>
-              <Grid item>Bảng cấu hình thời gian</Grid>
+              <Grid item>Time Settings</Grid>
               <Grid item xs={12}>
                 <Controller
                   name='listScheduleWeekly'
@@ -255,7 +255,7 @@ const Add = ({ show, onClose, setReload }) => {
                       dataDailyProps={dataDailyState}
                       error={Boolean(errors.listScheduleWeekly)}
                       aria-describedby='validation-basic-last-name'
-                      {...(errors.listScheduleWeekly && { helperText: 'Trường này bắt buộc' })}
+                      {...(errors.listScheduleWeekly && { helperText: 'This field is required' })}
                     />
                   )}
                 />
@@ -277,10 +277,10 @@ const Add = ({ show, onClose, setReload }) => {
               </Box>
             )}
             <Button variant='tonal' color='secondary' onClick={onClose}>
-              Hủy
+              Cancel
             </Button>
             <Button variant='contained' onClick={handleSubmit(onSubmit)}>
-              Thêm
+              Ok
             </Button>
           </DialogActions>
         </Dialog>

@@ -112,7 +112,7 @@ const ScheduleAccess = () => {
         <CardHeader
           title={
             <>
-              <Button variant='contained'>Lịch hoạt động</Button>
+              <Button variant='contained'>Schedule</Button>
             </>
           }
           titleTypographyProps={{ sx: { mb: [2, 0] } }}
@@ -126,7 +126,7 @@ const ScheduleAccess = () => {
             <Grid container spacing={2}>
               <Grid item>
                 <CustomTextField
-                  placeholder='Nhập tên lịch ...! '
+                  placeholder='Enter data ...! '
                   value={searchKeyword}
                   onChange={e => setSearchKeyword(e.target.value)}
                   InputProps={{
@@ -155,13 +155,13 @@ const ScheduleAccess = () => {
                   }}
                 />
                 <Button variant='contained' style={{ marginLeft: '10px' }} onClick={handleSearch}>
-                  Tìm kiếm <Icon fontSize='1.25rem' icon='tabler:search' />
+                  Search <Icon fontSize='1.25rem' icon='tabler:search' />
                 </Button>
               </Grid>
               <Grid item>
                 <Box sx={{ textAlign: 'right' }}>
-                  <Button aria-label='Thêm mới' variant='contained' onClick={() => setIsOpenAdd(true)}>
-                    thêm mới
+                  <Button aria-label='Add' variant='contained' onClick={() => setIsOpenAdd(true)}>
+                    Add
                     <Icon icon='tabler:plus' />
                   </Button>
                 </Box>
@@ -173,11 +173,11 @@ const ScheduleAccess = () => {
           <Table>
             <TableHead style={{ background: '#F6F6F7' }}>
               <TableRow>
-                <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Tên</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Mô tả</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Người tạo</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Thao tác</TableCell>
+                <TableCell sx={{ padding: '16px' }}>No.</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Name</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Description</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Create By</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

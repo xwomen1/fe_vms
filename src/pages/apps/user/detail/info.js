@@ -94,6 +94,7 @@ const UserDetails = () => {
   const [ava2, setAva2] = useState(null)
   const [data, setData] = useState(null)
   let groupACIds = []
+  const [isLeader, setIsLeader] = useState(false)
 
   const handleAddRoleClickPolicy = () => {
     setOpenPopupPolicy(true)
@@ -489,7 +490,13 @@ const UserDetails = () => {
         const response = await axios.get(`https://dev-ivi.basesystem.one/smc/iam/api/v0/users/${userId}`, config)
         const userData = response.data
         setData(userData)
-        setGroup(userData.userGroups)
+        if (userData.userGroups && userData.userGroups.length > 0) {
+          const userGroupsData = userData.userGroups.map(group => ({
+            ...group,
+            isLeader: group.isLeader || false // Đảm bảo có giá trị mặc định
+          }))
+          setGroup(userGroupsData)
+        }
 
         setPolicies(response.data.policies)
         setPiId(response.data.piId)
@@ -656,7 +663,7 @@ const UserDetails = () => {
         const userGroup = {
           groupId: groupId,
           policyName: true,
-          isLeader: isLeader
+          isLeader: row.isLeader
         }
         processedGroups.push(userGroup)
         console.log(userGroup)
@@ -1143,9 +1150,22 @@ const UserDetails = () => {
                             {console.log('Group:', group)}
                             <TableCell>{group.groupCode}</TableCell>
                             <TableCell align='right'>
-                              {/* Render formatted content in isLeader column */}
-                              {formatIsLeader(group.isLeader)}
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={group.isLeader}
+                                    onChange={event => {
+                                      const updatedRows = [...groups]
+                                      updatedRows[index].isLeader = event.target.checked // Cập nhật giá trị isLeader
+                                      setGroup(updatedRows)
+                                      setIsLeader(event.target.checked) // Cập nhật state isLeader
+                                    }}
+                                  />
+                                }
+                                label='Là lãnh đạo đơn vị'
+                              />
                             </TableCell>
+
                             {showPlusColumn && (
                               <TableCell align='center'>
                                 <IconButton onClick={() => handleDeleteRow(index)}>
