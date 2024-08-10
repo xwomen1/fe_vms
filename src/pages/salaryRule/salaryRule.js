@@ -197,14 +197,14 @@ const SalaryRulePage = ({ isOpen, onClose, camera }) => {
         othour: othour,
         salary: salary,
         businessDay: businessDay,
-        salaryLevels: rows.map(row => ({
+        salaryLevels: rows?.map(row => ({
           salaryLevel: parseInt(row.salaryLevel),
           coefficient: parseFloat(row.coefficient)
         }))
       }
 
       const response = await axios.put(
-        'https://dev-ivi.basesystem.one/smc/iam/api/v0/salary/regulation/update/c952ce18-867d-47b6-b4b5-9fa96917d8dc',
+        'https://dev-ivi.basesystem.one/smc/iam/api/v0/salary/regulation/update',
         data,
         config
       )
@@ -216,7 +216,7 @@ const SalaryRulePage = ({ isOpen, onClose, camera }) => {
         setLabelColor('red')
       }
       setSalaryRule(data)
-      toast.success(httpMessage)
+      toast.success('Sửa thành công')
     } catch (error) {
       console.error('Error saving data:', error)
       toast.error(error.message)

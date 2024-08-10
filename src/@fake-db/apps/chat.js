@@ -91,7 +91,7 @@ const data = {
     },
     {
       id: 9,
-      avatarColor: 'warning',
+      avatarColor: 'info',
       fullName: 'Bridgett Omohundro',
       role: 'Designer, television/film set',
       about:

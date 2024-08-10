@@ -102,7 +102,7 @@ const data = {
       currentPlan: 'company',
       status: 'pending',
       avatar: '',
-      avatarColor: 'warning'
+      avatarColor: 'info'
     },
     {
       id: 8,
@@ -400,7 +400,7 @@ const data = {
       currentPlan: 'team',
       status: 'active',
       avatar: '',
-      avatarColor: 'warning'
+      avatarColor: 'info'
     },
     {
       id: 29,
@@ -602,7 +602,7 @@ const data = {
       currentPlan: 'team',
       status: 'inactive',
       avatar: '',
-      avatarColor: 'warning'
+      avatarColor: 'info'
     },
     {
       id: 43,
@@ -705,7 +705,7 @@ const data = {
       currentPlan: 'team',
       status: 'inactive',
       avatar: '',
-      avatarColor: 'warning'
+      avatarColor: 'info'
     },
     {
       id: 50,
@@ -770,7 +770,7 @@ const projectListData = [
     hours: '230:10',
     progressValue: 49,
     totalTask: '120/186',
-    progressColor: 'warning',
+    progressColor: 'info',
     projectType: 'Python Project',
     projectTitle: 'Dojo React Project',
     img: '/images/icons/project-icons/python.png'
