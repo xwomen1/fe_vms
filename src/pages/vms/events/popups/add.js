@@ -101,7 +101,7 @@ const format_form = [
     name: 'location',
     label: 'Vị trí',
     placeholder: 'Nhập vị trí',
-    type: 'VAutocomplete',
+    type: 'TextField',
     data: [],
     require: true,
     width: 12
@@ -150,7 +150,6 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
 
   useEffect(() => {
     setDetail(data)
-    fetchCamera()
     fetchCameraList()
     fetchLocationList()
   }, [])
@@ -164,28 +163,6 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
 
   const setDetailFormValue = () => {
     reset(detail)
-  }
-
-  const fetchCamera = async () => {
-    setLoading(true)
-
-    try {
-      const response = await getApi(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${data?.cameraId}`)
-
-      setCameraName(response?.data?.name)
-    } catch (error) {
-      if (error && error?.response?.data) {
-        console.error('error', error)
-        toast.error(error?.response?.data?.message)
-      } else {
-        console.error('Error fetching data:', error)
-        toast.error(error)
-      }
-    } finally {
-      () => {
-        setLoading(false)
-      }
-    }
   }
 
   const fetchCameraList = async () => {
@@ -368,7 +345,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
                                     fullWidth
                                     label={item.label}
                                     SelectProps={{
-                                      value: item.name === 'cameraId' ? cameraName : value,
+                                      value: value,
                                       onChange: e => {
                                         onChange(e)
                                         if (item.name === 'camName') {
