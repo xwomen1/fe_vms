@@ -233,7 +233,7 @@ const AccessControlDevice = () => {
         },
         config
       )
-      toast.success('Thêm mới thành công')
+      toast.success('Successfully Added')
       fetchDataList() // Làm mới dữ liệu sau khi thêm mới
     } catch (error) {
       console.error('Error saving data:', error)
@@ -313,7 +313,7 @@ const AccessControlDevice = () => {
         <CardHeader
           title={
             <>
-              <Button variant='contained'>Quản lý thiết bị</Button>
+              <Button variant='contained'>Device Management</Button>
             </>
           }
           titleTypographyProps={{ sx: { mb: [2, 0] } }}
@@ -341,7 +341,7 @@ const AccessControlDevice = () => {
               </Grid>
               <Grid item>
                 <CustomTextField
-                  placeholder='Nhập tên thiết bị ...! '
+                  placeholder='Enter device name'
                   value={searchKeyword}
                   onChange={e => setSearchKeyword(e.target.value)}
                   InputProps={{
@@ -370,7 +370,7 @@ const AccessControlDevice = () => {
                   }}
                 />
                 <Button variant='contained' style={{ marginLeft: '10px' }} onClick={handleSearch}>
-                  Tìm kiếm <Icon fontSize='1.25rem' icon='tabler:search' />
+                  Search <Icon fontSize='1.25rem' icon='tabler:search' />
                 </Button>
               </Grid>
             </Grid>
@@ -400,13 +400,13 @@ const AccessControlDevice = () => {
                     <TableCell>
                       <Checkbox />
                     </TableCell>
-                    <TableCell>Tên</TableCell>
-                    <TableCell>Vị trí</TableCell>
-                    <TableCell>Loại thiết bị</TableCell>
-                    <TableCell>Địa chỉ IP</TableCell>
-                    <TableCell>Trạng thái</TableCell>
-                    <TableCell>Phiên bản app</TableCell>
-                    <TableCell>PB phần cứng</TableCell>
+                    <TableCell>Name</TableCell>
+                    <TableCell>Location</TableCell>
+                    <TableCell>Device Type</TableCell>
+                    <TableCell>IP Address</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell>App Version</TableCell>
+                    <TableCell>Hardware Version</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -441,12 +441,12 @@ const AccessControlDevice = () => {
       </Grid>
 
       <Dialog open={open} onClose={handleClose} fullWidth>
-        <DialogTitle>Tạo nhóm thiết bị</DialogTitle>
+        <DialogTitle>Create Device Group</DialogTitle>
         <DialogContent>
           <CustomTextField
             autoFocus
             margin='dense'
-            label='Tên nhóm '
+            label='Group Name '
             fullWidth
             value={newName}
             onChange={e => setNewName(e.target.value)}
@@ -454,33 +454,33 @@ const AccessControlDevice = () => {
           <div>
             {' '}
             <p style={{ color: 'red', textAlign: 'center', display: nameNull ? 'block' : 'none' }}>
-              Vui lòng nhập tên nhóm.
+            Please enter the group name            
             </p>
             <p style={{ color: 'red', textAlign: 'center', display: name50 ? 'block' : 'none' }}>
-              Tên nhóm không được vượt quá 50 ký tự.
+            The group name must not exceed 50 characters
             </p>
           </div>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} variant='contained'>
-            Hủy
+            Cancel
           </Button>
           <Button onClick={handleSave} variant='contained'>
-            Tạo
+            Ok
           </Button>
         </DialogActions>
       </Dialog>
       <Dialog open={openDelete} onClose={handleCloseDelete} fullWidth>
-        <DialogTitle style={{ fontSize: '20px' }}>Xóa nhóm thiết bị</DialogTitle>
+        <DialogTitle style={{ fontSize: '20px' }}>Delete Device Group</DialogTitle>
         <DialogContent>
-          Cần thực hiện việc xoá toàn bộ thiết bị trong thư mục mới có thể tiến hành việc xoá thư mục này
+        You need to remove all devices from the group before you can proceed with deleting the group
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDelete} variant='contained'>
-            Hủy
+            Cancel
           </Button>
           <Button onClick={handleDeleteOnclick} variant='contained'>
-            Đồng ý
+            Ok
           </Button>
         </DialogActions>
       </Dialog>

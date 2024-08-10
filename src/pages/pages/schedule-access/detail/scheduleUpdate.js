@@ -19,12 +19,12 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 import Daily from '../mocdata/daily'
 
 const dataDailyDefault = [
-  { label: 'Thứ 2', dayOfWeek: 'MONDAY', value: 2 },
-  { label: 'Thứ 3', dayOfWeek: 'TUESDAY', value: 3 },
-  { label: 'Thứ 4', dayOfWeek: 'WEDNESDAY', value: 4 },
-  { label: 'Thứ 5', dayOfWeek: 'THURSDAY', value: 5 },
-  { label: 'Thứ 6', dayOfWeek: 'FRIDAY', value: 6 },
-  { label: 'Thứ 7', dayOfWeek: 'SATURDAY', value: 7 }
+  { label: 'MONDAY', dayOfWeek: 'MONDAY', value: 2 },
+  { label: 'TUESDAY', dayOfWeek: 'TUESDAY', value: 3 },
+  { label: 'WEDNESDAY', dayOfWeek: 'WEDNESDAY', value: 4 },
+  { label: 'THURSDAY', dayOfWeek: 'THURSDAY', value: 5 },
+  { label: 'FRIDAY', dayOfWeek: 'FRIDAY', value: 6 },
+  { label: 'SATURDAY', dayOfWeek: 'SATURDAY', value: 7 }
 ]
 
 const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
@@ -98,7 +98,7 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
             margin: '20px 0 20px 0'
           }}
         >
-          <span>Bảng cấu hình thời gian</span>
+          <span>Time Settings</span>
         </div>
 
         <div
@@ -187,7 +187,7 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
       await axios.put(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/schedules/${id}`, formData, config)
 
       setReload()
-      toast.success('Cập nhật thành công')
+      toast.success('Update Successful')
     } catch (error) {
       console.error('Error updating data: ', error)
       toast.error(error.message || 'Có lỗi xảy ra khi cập nhật')
@@ -236,12 +236,12 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
               </IconButton>
             </Box>
             <Typography variant='h3' sx={{ mb: 3 }}>
-              Chi tiết lịch hoạt động
+            Detail Schedule
             </Typography>
             <Grid container spacing={1}>
               <Grid item xs={6}>
                 <CustomTextField
-                  label='Tên lịch hoạt động'
+                  label='Schedule Name'
                   value={name}
                   onChange={e => handleInputChange('name', e.target.value)}
                   fullWidth
@@ -249,7 +249,7 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
               </Grid>
               <Grid item xs={6}>
                 <CustomTextField
-                  label='Mô tả'
+                  label='Desciption'
                   value={description}
                   onChange={e => handleInputChange('description', e.target.value)}
                   fullWidth
@@ -257,7 +257,7 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
               </Grid>
               <Grid item xs={12}>
                 <span style={{ color: '#f5963a', fontSize: 20, position: 'relative' }}>
-                  Cấu hình thời gian hoạt động
+                  Operating Time Configuration
                   <span
                     style={{
                       position: 'absolute',
@@ -284,10 +284,10 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
             }}
           >
             <Button onClick={onClose} variant='contained' color='primary'>
-              Hủy
+              Cancel
             </Button>
             <Button onClick={handleSave} variant='contained' color='primary'>
-              Lưu
+              Ok
             </Button>
           </DialogActions>
         </Dialog>

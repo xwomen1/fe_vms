@@ -116,7 +116,7 @@ const DoorAccess = () => {
         <CardHeader
           title={
             <>
-              <Button variant='contained'>Danh sách quản lý truy cập cửa </Button>
+              <Button variant='contained'>Access Management List </Button>
             </>
           }
           titleTypographyProps={{ sx: { mb: [2, 0] } }}
@@ -130,7 +130,7 @@ const DoorAccess = () => {
             <Grid container spacing={2}>
               <Grid item>
                 <CustomTextField
-                  placeholder='Nhập tên truy cập cửa ...! '
+                  placeholder='Enter Access Door Name ...! '
                   value={searchKeyword}
                   onChange={e => setSearchKeyword(e.target.value)}
                   InputProps={{
@@ -159,13 +159,13 @@ const DoorAccess = () => {
                   }}
                 />
                 <Button variant='contained' style={{ marginLeft: '10px' }} onClick={handleSearch}>
-                  Tìm kiếm <Icon fontSize='1.25rem' icon='tabler:search' />
+                  Search <Icon fontSize='1.25rem' icon='tabler:search' />
                 </Button>
               </Grid>
               <Grid item>
                 <Box sx={{ textAlign: 'right' }}>
-                  <Button onClick={() => setIsOpenAdd(true)} aria-label='Thêm mới' variant='contained'>
-                    thêm mới
+                  <Button onClick={() => setIsOpenAdd(true)} aria-label='Add' variant='contained'>
+                    Add
                     <Icon icon='tabler:plus' />
                   </Button>
                 </Box>
@@ -177,13 +177,13 @@ const DoorAccess = () => {
           <Table>
             <TableHead style={{ background: '#F6F6F7' }}>
               <TableRow>
-                <TableCell>STT</TableCell>
-                <TableCell>Tên</TableCell>
-                <TableCell>Mô tả</TableCell>
-                <TableCell>Cửa</TableCell>
-                <TableCell>Lịch</TableCell>
-                <TableCell>Người cập nhật</TableCell>
-                <TableCell>Thao tác</TableCell>
+                <TableCell>No.</TableCell>
+                <TableCell>Name</TableCell>
+                <TableCell>Description</TableCell>
+                <TableCell>Door</TableCell>
+                <TableCell>Schedule</TableCell>
+                <TableCell>Updated By</TableCell>
+                <TableCell>Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -224,7 +224,7 @@ const DoorAccess = () => {
               ) : (
                 <TableRow>
                   <TableCell colSpan={7} align='center'>
-                    Không có dữ liệu
+                  No Data Available
                   </TableCell>
                 </TableRow>
               )}

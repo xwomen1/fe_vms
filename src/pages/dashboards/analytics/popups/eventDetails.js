@@ -90,7 +90,7 @@ const EventDetails = ({ show, onClose, data, setReload }) => {
         if (videoDownloadUrl) {
           await handleExportLinkDownload(videoDownloadUrl)
         } else {
-          toast.error('Không tìm thấy URL tải về video')
+          toast.error('Download URL for Video Not Found')
         }
       } catch (error) {
         if (error && error?.response?.data) {
@@ -150,7 +150,7 @@ const EventDetails = ({ show, onClose, data, setReload }) => {
           </CustomCloseButton>
           <Box sx={{ mb: 8, textAlign: 'left' }}>
             <Typography variant='h3' sx={{ mb: 3 }}>
-              Chi tiết sự kiện
+            Event Detail
             </Typography>
           </Box>
           <Grid container spacing={0} style={{ marginTop: 10 }}>
@@ -158,8 +158,8 @@ const EventDetails = ({ show, onClose, data, setReload }) => {
               <Grid item xs={12}>
                 {' '}
                 <TabList onChange={handleChange} aria-label='customized tabs example'>
-                  <Tab value='1' label='Chi tiết' key={1} />
-                  <Tab value='2' label='Xem lại' key={2} />
+                  <Tab value='1' label='Detail' key={1} />
+                  <Tab value='2' label='Playback' key={2} />
                 </TabList>
               </Grid>
               <Grid item xs={12}>
@@ -182,11 +182,11 @@ const EventDetails = ({ show, onClose, data, setReload }) => {
         >
           {value === '1' && (
             <Button type='submit' variant='contained' onClick={() => handleDownloadFile()}>
-              Xuất file
+              Export File
             </Button>
           )}
           <Button variant='contained' onClick={onClose}>
-            Đóng
+            Close
           </Button>
         </DialogActions>
       </Dialog>

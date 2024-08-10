@@ -159,7 +159,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
           </CustomCloseButton>
           <Box sx={{ mb: 8, textAlign: 'center' }}>
             <Typography variant='h3' sx={{ mb: 3 }}>
-              Bộ lọc
+              Filter
             </Typography>
           </Box>
           <form>
@@ -173,7 +173,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                       <CustomTextField
                         select
                         fullWidth
-                        label='Công ty'
+                        label='Department'
                         SelectProps={{
                           value: value || '',
                           onChange: e => onChange(e.target.value),
@@ -220,7 +220,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                         select
                         fullWidth
                         defaultValue=''
-                        label='Cửa vào'
+                        label='Door In'
                         SelectProps={{
                           value: value,
                           onChange: e => onChange(e)
@@ -259,7 +259,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                         select
                         fullWidth
                         defaultValue=''
-                        label='Cửa ra'
+                        label='Door Out'
                         SelectProps={{
                           value: value,
                           onChange: e => onChange(e)
@@ -297,13 +297,13 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                   }}
                 >
                   <Button type='submit' variant='contained' onClick={handleSubmit(onSubmit)}>
-                    Lọc
+                    Ok
                   </Button>
                   <Button variant='tonal' onClick={handleSubmit(onReset)}>
-                    Mặc định
+                    Default
                   </Button>
                   <Button variant='tonal' color='secondary' onClick={onClose}>
-                    Hủy
+                    Cancel
                   </Button>
                 </DialogActions>
               </Grid>

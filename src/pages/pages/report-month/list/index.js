@@ -221,7 +221,7 @@ function ReportMonth({ history }) {
     // Tạo một worksheet từ dữ liệu đã gộp cho khoảng ngày đã chọn
     const filteredData = users.map(employee => {
       const row = {
-        'Họ tên nhân viên': employee.fullName
+        'Họ Employee Name': employee.fullName
       }
 
       daysInRange.forEach(day => {
@@ -329,7 +329,7 @@ function ReportMonth({ history }) {
         title={
           <>
             <Grid>
-              <Button variant='contained'> Báo cáo tháng</Button>
+              <Button variant='contained'> Monthly Report</Button>
             </Grid>
           </>
         }
@@ -350,7 +350,7 @@ function ReportMonth({ history }) {
               options={groups || ''}
               autoHighlight
               getOptionLabel={option => option.name}
-              renderInput={params => <CustomTextField placeholder='Phòng ban' {...params} label='Phòng ban' />}
+              renderInput={params => <CustomTextField placeholder='Department' {...params} label='Department' />}
               renderOption={(props, option) => (
                 <div {...props}>
                   <TreeView style={{ width: '100%' }}>{renderGroup(option)}</TreeView>
@@ -376,7 +376,7 @@ function ReportMonth({ history }) {
                   id='basic-input'
                   onChange={date => setStart(date)}
                   placeholderText='Click to select a date'
-                  customInput={<CustomInput label='Ngày bắt đầu' />}
+                  customInput={<CustomInput label='Start Date' />}
                 />
               </div>
             </DatePickerWrapper>
@@ -389,7 +389,7 @@ function ReportMonth({ history }) {
                   id='basic-input'
                   onChange={date => setEnd(date)}
                   placeholderText='Click to select a date'
-                  customInput={<CustomInput label='Ngày kết thúc' />}
+                  customInput={<CustomInput label='Start End' />}
                   minDate={start}
                 />
               </div>
@@ -397,28 +397,28 @@ function ReportMonth({ history }) {
           </Grid>
           <Grid item xs={12} sm={7}>
             <Button onClick={handleSearch} style={{ marginTop: 20 }} variant='contained'>
-              Tìm kiếm
+              Search
             </Button>
           </Grid>
           <Grid item xs={12} sm={1}>
             <Button
-              style={{ marginTop: 20 }}
+              style={{ marginTop: 20, marginLeft: -30 }}
               variant='outlined'
               color='secondary'
               startIcon={<Icon icon='tabler:download' />}
               onClick={exportToExcel}
             >
-              Tải xuống
+              Download
             </Button>
           </Grid>
         </Grid>
         <br /> <hr />
         <br />
         <TableContainer component={Paper} sx={{ maxHeight: 600 }}>
-          <Table aria-label='Bảng báo cáo tháng'>
+          <Table aria-label='Monthly Report'>
             <TableHead>
               <TableRow>
-                <TableCell style={fixedColumnStyles}>Tên Nhân Viên</TableCell>
+                <TableCell style={fixedColumnStyles}>Employee Name</TableCell>
                 {daysInRange.map((day, index) => (
                   <TableCell
                     key={index}

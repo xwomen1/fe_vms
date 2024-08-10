@@ -132,13 +132,13 @@ const EventList = () => {
   }
 
   const columns = [
-    { id: 1, flex: 0.25, minWidth: 50, align: 'left', field: 'userName', label: 'Họ và tên' },
-    { id: 2, flex: 0.15, minWidth: 150, align: 'left', field: 'accessCode', label: 'Mã nhân viên' },
-    { id: 3, flex: 0.15, minWidth: 100, align: 'left', field: 'doorIn', label: 'Cửa vào' },
-    { id: 4, flex: 0.15, minWidth: 100, align: 'left', field: 'doorOut', label: 'Cửa ra' },
-    { id: 6, flex: 0.25, minWidth: 50, align: 'left', field: 'timeMin', label: 'Thời gian vào' },
-    { id: 7, flex: 0.25, minWidth: 50, align: 'left', field: 'timeMax', label: 'Thời gian ra' },
-    { id: 8, flex: 0.25, minWidth: 50, align: 'left', field: 'totalTime', label: 'Tổng thời gian' }
+    { id: 1, flex: 0.25, minWidth: 50, align: 'left', field: 'userName', label: 'Full Name' },
+    { id: 2, flex: 0.15, minWidth: 150, align: 'left', field: 'accessCode', label: 'Employee Code' },
+    { id: 3, flex: 0.15, minWidth: 100, align: 'left', field: 'doorIn', label: 'Door In' },
+    { id: 4, flex: 0.15, minWidth: 100, align: 'left', field: 'doorOut', label: 'Door Out' },
+    { id: 6, flex: 0.25, minWidth: 50, align: 'left', field: 'timeMin', label: 'Time In' },
+    { id: 7, flex: 0.25, minWidth: 50, align: 'left', field: 'timeMax', label: 'Time Out' },
+    { id: 8, flex: 0.25, minWidth: 50, align: 'left', field: 'totalTime', label: 'Total Time' }
   ]
 
   return (
@@ -146,7 +146,7 @@ const EventList = () => {
       <CardHeader
         title={
           <>
-            <Button variant='contained'>Danh sách sự kiện</Button>
+            <Button variant='contained'>Event List</Button>
           </>
         }
         titleTypographyProps={{ sx: { mb: [2, 0] } }}
@@ -161,7 +161,7 @@ const EventList = () => {
             <Grid item></Grid>
             <Grid item>
               <CustomTextField
-                placeholder='Nhập tên sự kiện ...! '
+                placeholder='Enter event'
                 value={searchKeyword}
                 onChange={e => setSearchKeyword(e.target.value)}
                 InputProps={{
@@ -190,7 +190,7 @@ const EventList = () => {
                 }}
               />
               <Button variant='contained' style={{ margin: '0px 2px' }} onClick={handleSearch}>
-                Tìm kiếm <Icon fontSize='1.25rem' icon='tabler:search' />
+                Search <Icon fontSize='1.25rem' icon='tabler:search' />
               </Button>
             </Grid>
           </Grid>
@@ -202,7 +202,7 @@ const EventList = () => {
             <Table stickyHeader aria-label='sticky table'>
               <TableHead>
                 <TableRow>
-                  <TableCell>STT</TableCell>
+                  <TableCell>No.</TableCell>
                   {columns.map(column => (
                     <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
                       {column.label}
@@ -234,7 +234,7 @@ const EventList = () => {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={columns.length + 1}>Không có dữ liệu ...</TableCell>
+                    <TableCell colSpan={columns.length + 1}>Loading data ...</TableCell>
                   </TableRow>
                 )}
               </TableBody>
