@@ -346,7 +346,7 @@ export const ViewCameraPause = ({
             {(status === 'failed' || status === 'disconnected' || status === '') && (
               <IconButton
                 sx={{
-                  left: '30%',
+                  left: '50%',
                   top: '50%',
                   position: 'absolute',
                   color: '#efefef',
