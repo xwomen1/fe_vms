@@ -5,6 +5,7 @@ import Link from 'next/link'
 import IconButton from '@mui/material/IconButton'
 import Icon from 'src/@core/components/icon'
 import { connect } from 'react-redux'
+import { Box, CircularProgress } from '@mui/material'
 
 const config = {
   bundlePolicy: 'max-bundle',
@@ -209,6 +210,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
         break
     }
     setText(message?.content)
+    setLoading(false)
   }
 
   useEffect(() => {
@@ -284,60 +286,71 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
 
   return (
     <div className='portlet portlet-video live' style={{ width: '100%' }}>
-      <div className='portlet-title'>
-        <div className='caption'>
-          <span
-            className='label label-sm'
-            style={{ backgroundColor: status === 'connected' ? 'green' : 'red', color: 'white' }}
-          >
-            {status ? status.toUpperCase() : 'LIVE'}
-          </span>
-
-          <span className='caption-subject font-dark sbold uppercase'>{name}</span>
+      {loading && (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: heightDiv - 26 }}>
+          <Box sx={{ display: 'flex' }}>
+            <CircularProgress />
+          </Box>
         </div>
-        <div className='media-top-controls'>
-          <div className='btn-group'>
-            <Button
-              className={`sd_btn btn btn-default btn-xs ${channel === 'Sub' ? 'active' : ''}`}
-              onClick={() => handSetChanel(id, 'Sub')}
-            >
-              SD
-            </Button>
-            <Button
-              className={`hd_btn btn btn-default btn-xs ${channel === 'Main' ? 'active' : ''}`}
-              onClick={() => handSetChanel(id, 'Main')}
-            >
-              HD
-            </Button>
+      )}
+      {!loading && (
+        <div>
+          <div className='portlet-title'>
+            <div className='caption'>
+              <span
+                className='label label-sm'
+                style={{ backgroundColor: status === 'connected' ? 'green' : 'red', color: 'white' }}
+              >
+                {status ? status.toUpperCase() : 'LIVE'}
+              </span>
+
+              <span className='caption-subject font-dark sbold uppercase'>{name}</span>
+            </div>
+            <div className='media-top-controls'>
+              <div className='btn-group'>
+                <Button
+                  className={`sd_btn btn btn-default btn-xs ${channel === 'Sub' ? 'active' : ''}`}
+                  onClick={() => handSetChanel(id, 'Sub')}
+                >
+                  SD
+                </Button>
+                <Button
+                  className={`hd_btn btn btn-default btn-xs ${channel === 'Main' ? 'active' : ''}`}
+                  onClick={() => handSetChanel(id, 'Main')}
+                >
+                  HD
+                </Button>
+              </div>
+            </div>
+          </div>
+          <div>
+            <video
+              style={{
+                width: '100%',
+                height: heightDiv - 26,
+                objectFit: 'fill'
+              }}
+              ref={remoteVideoRef}
+              playsInline
+              autoPlay
+            />
+            {(status === 'failed' || status === 'disconnected' || status === '') && (
+              <IconButton
+                sx={{
+                  left: '30%',
+                  top: '50%',
+                  position: 'absolute',
+                  color: '#efefef',
+                  transform: 'translateY(-50%)'
+                }}
+                onClick={() => setReload(reload + 1)}
+              >
+                <Icon icon='tabler:reload' fontSize={30} />
+              </IconButton>
+            )}
           </div>
         </div>
-      </div>
-      <div>
-        <video
-          style={{
-            width: '100%',
-            height: heightDiv - 26,
-            objectFit: 'fill'
-          }}
-          ref={remoteVideoRef}
-          playsInline
-          autoPlay
-        />
-        {(status === 'failed' || status === 'disconnected' || status === '') && (
-          <IconButton
-            sx={{
-              left: '30%',
-              top: '50%',
-              position: 'absolute',
-              color: '#efefef',
-              transform: 'translateY(-50%)'
-            }}
-            onClick={() => setReload(reload + 1)}
-          >
-            <Icon icon='tabler:reload' fontSize={30} />
-          </IconButton>
-        )}
-      </div>
+      )}
     </div>
   )
 }
