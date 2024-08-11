@@ -29,31 +29,29 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 import { format } from 'date-fns'
 import authConfig from 'src/configs/auth'
 import Icon from 'src/@core/components/icon'
-import { Cell, Pie, PieChart } from 'recharts'
-import { Legend } from 'chart.js'
-import dynamic from 'next/dynamic'
 import EventDetails from './popups/eventDetails'
+import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, Legend, Sector } from 'recharts'
 
 const EventList = () => {
   const [deviceList, setDeviceList] = useState(null)
   const [eventsData, setEventData] = useState('')
   const defaultCameraID = '0eb23593-a9b1-4278-9fb1-4d18f30ed6ff'
   const [count, setCount] = useState('')
+  const [pageSize1, setPageSize1] = useState(25)
   const [websocket, setWebsocket] = useState(null)
   const [rtcPeerConnection, setRtcPeerConnection] = useState(null)
-  const [status1, setStatus1] = useState([]) // Changed to an array to hold status data
-  const [error, setError] = useState(null)
+  const [cameraData, setCameraData] = useState([])
+  const [chartData, setChartData] = useState([])
   const [total, setTotalPage] = useState(0)
   const [total1, setTotalPage1] = useState(0)
   const [eventDetail, setEventDetail] = useState(null)
   const [isOpenView, setIsOpenView] = useState(false)
-
+  const [devices, setDevices] = useState([])
   const [page, setPage] = useState(1)
   const [page1, setPage1] = useState(1)
+  const [activeIndex, setActiveIndex] = useState(null)
 
   const [pageSize, setPageSize] = useState(25)
-  const [pageSize1, setPageSize1] = useState(25)
-  const [devices, setDevices] = useState([])
 
   const pageSizeOptions = [25, 50, 100]
 
@@ -78,6 +76,36 @@ const EventList = () => {
       }
     ]
   }
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+        const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras?limit=25&page=1`, config)
+        const cameras = response.data
+
+        // Đếm số lượng kết nối và không kết nối
+        const connectedCount = cameras.filter(camera => camera.status.name === 'connected').length
+        const disconnectedCount = cameras.filter(camera => camera.status.name === 'disconnected').length
+
+        setChartData([
+          { name: 'Kết nối', value: connectedCount },
+          { name: 'Mất kết nối', value: disconnectedCount }
+        ])
+      } catch (error) {
+        console.error('Error fetching camera data:', error)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  console.log(chartData)
 
   const columns = [
     {
@@ -144,9 +172,6 @@ const EventList = () => {
         remoteVideoRef.current.srcObject = stream
       }
     }
-
-    // close WebSocket and RTCPeerConnection on component unmount
-
     return () => {
       if (websocket) {
         websocket.close()
@@ -188,32 +213,6 @@ const EventList = () => {
       websocket.close()
     }
   }
-
-  const fetchFilteredOrAllUsers = async () => {
-    try {
-      const token = localStorage.getItem(authConfig.storageTokenKeyName)
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        params: {
-          limit: pageSize,
-          page: page
-        }
-      }
-      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/cameras', config)
-      const statuses = response.data.map(item => item.status.name)
-
-      console.log(statuses, 'status')
-      setStatus1(statuses)
-    } catch (error) {
-      console.error('Error fetching users:', error)
-    }
-  }
-  useEffect(() => {
-    fetchFilteredOrAllUsers()
-  }, [])
 
   useEffect(() => {
     if (rtcPeerConnection) {
@@ -278,48 +277,7 @@ const EventList = () => {
     setPage(1)
   }
 
-  const formatDateTime = dateTimeString => {
-    const date = new Date(dateTimeString)
-
-    return format(date, 'HH:mm dd/MM/yyyy')
-  }
-
-  const pieChartOptions = {
-    chart: {
-      width: 380,
-      type: 'pie'
-    },
-    labels: ['Hoạt động', 'Không hoạt động'],
-    responsive: [
-      {
-        breakpoint: 480,
-        options: {
-          chart: {
-            width: 200
-          },
-          legend: {
-            position: 'bottom'
-          }
-        }
-      }
-    ],
-    colors: ['#FF9933', '#0099FF'],
-    dataLabels: {
-      enabled: true,
-      formatter: (val, opts) => opts.w.config.series[opts.seriesIndex]
-    },
-    tooltip: {
-      enabled: true,
-      y: {
-        formatter: val => val
-      }
-    }
-  }
-
-  const pieChartData = [
-    status1.filter(status => status === 'connected').length,
-    status1.filter(status => status === 'disconnected').length
-  ]
+  const COLORS = ['#0088FE', '#ff9933']
 
   const handlePageChange1 = (event, newPage) => {
     setPage1(newPage)
@@ -355,16 +313,24 @@ const EventList = () => {
   }, [fetchDataList1])
 
   const columns1 = [
-    { id: 1, flex: 0.25, minWidth: 70, align: 'left', field: 'eventName', label: 'Tên sự cố' },
-    { id: 2, flex: 0.15, minWidth: 50, align: 'left', field: 'severity', label: 'Mức độ' },
-    { id: 4, flex: 0.15, minWidth: 100, align: 'left', field: 'createdAt', label: 'Thời gian' },
-    { id: 5, flex: 0.15, minWidth: 100, align: 'left', field: 'location', label: 'Vị trí' },
-    { id: 6, flex: 0.25, minWidth: 50, align: 'left', field: 'status', label: 'Trạng thái' },
-    { id: 7, flex: 0.25, minWidth: 50, align: 'left', field: 'source', label: 'Nguồn' }
+    { id: 1, flex: 0.25, minWidth: 70, align: 'left', field: 'eventName', label: 'Incident Name' },
+    { id: 2, flex: 0.15, minWidth: 50, align: 'left', field: 'severity', label: 'Severity Level' },
+    { id: 4, flex: 0.15, minWidth: 100, align: 'left', field: 'createdAt', label: 'Time' },
+    { id: 5, flex: 0.15, minWidth: 100, align: 'left', field: 'location', label: 'Location' },
+    { id: 6, flex: 0.25, minWidth: 50, align: 'left', field: 'status', label: 'Status' },
+    { id: 7, flex: 0.25, minWidth: 50, align: 'left', field: 'source', label: 'Source' }
   ]
 
-  // Prepare data for the pie chart
-  const ApexCharts = dynamic(() => import('react-apexcharts'), { ssr: false })
+  console.log(chartData, 'chaData')
+  const formatDateTime = dateTimeString => {
+    const date = new Date(dateTimeString)
+
+    return format(date, 'HH:mm dd/MM/yyyy')
+  }
+
+  const onPieEnter = (_, index) => {
+    setActiveIndex(index)
+  }
 
   return (
     <>
@@ -452,7 +418,7 @@ const EventList = () => {
         <Grid container spacing={2}>
           <Grid item xs={8}>
             <Grid>
-              <p style={{ marginLeft: '3%', fontSize: '20px' }}>Top 5 sự cố hệ thống</p>
+              <p style={{ marginLeft: '3%', fontSize: '20px' }}>Top 5 System Incidents</p>
             </Grid>
             <Card>
               <Grid container spacing={0}>
@@ -499,11 +465,92 @@ const EventList = () => {
           </Grid>
           <Grid item xs={4}>
             <Grid>
-              <p style={{ marginLeft: '3%', fontSize: '20px' }}>Danh sách camera</p>
+              <p style={{ marginLeft: '3%', fontSize: '20px' }}>Camera List</p>
             </Grid>
             <Card>
-              {/* Add Pie Chart here */}
-              <ApexCharts options={pieChartOptions} series={pieChartData} type='pie' width={380} />
+              <div style={{ marginLeft: '25px' }}>
+                {chartData.length > 0 ? ( // Kiểm tra dữ liệu trước khi render
+                  <PieChart width={400} height={400}>
+                    <Pie
+                      data={chartData}
+                      cx={200}
+                      cy={200}
+                      labelLine={false}
+                      label={({ name, value }) => {
+                        return name === 'Connected' ? `Kết nối : ${value}` : `Mất kết nối : ${value}`
+                      }}
+                      outerRadius={130}
+                      fill='#8884d8'
+                      dataKey='value'
+                      activeIndex={activeIndex}
+                      activeShape={props => {
+                        const RADIAN = Math.PI / 180
+                        const {
+                          cx,
+                          cy,
+                          midAngle,
+                          innerRadius,
+                          outerRadius,
+                          startAngle,
+                          endAngle,
+                          fill,
+                          payload,
+                          percent,
+                          value
+                        } = props
+                        const sin = Math.sin(-RADIAN * midAngle)
+                        const cos = Math.cos(-RADIAN * midAngle)
+                        const sx = cx + (outerRadius + 10) * cos
+                        const sy = cy + (outerRadius + 10) * sin
+                        const mx = cx + (outerRadius + 30) * cos
+                        const my = cy + (outerRadius + 30) * sin
+                        const ex = mx + (cos >= 0 ? 1 : -1) * 22
+                        const ey = my
+                        const textAnchor = cos >= 0 ? 'start' : 'end'
+
+                        return (
+                          <g>
+                            <text x={cx} y={cy} dy={8} textAnchor='middle' fill={fill}>
+                              {payload.name}
+                            </text>
+                            <Sector
+                              cx={cx}
+                              cy={cy}
+                              innerRadius={innerRadius}
+                              outerRadius={outerRadius + 10}
+                              startAngle={startAngle}
+                              endAngle={endAngle}
+                              fill={fill}
+                            />
+                            <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill='none' />
+                            <circle cx={ex} cy={ey} r={2} fill={fill} stroke='none' />
+                            <text
+                              x={ex + (cos >= 0 ? 1 : -1) * 12}
+                              y={ey}
+                              textAnchor={textAnchor}
+                              fill='#333'
+                            >{`Camera:   ${value}`}</text>
+                            <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} dy={18} textAnchor={textAnchor} fill='#999'>
+                              {`(Rate ${(percent * 100).toFixed(2)}%)`}
+                            </text>
+                          </g>
+                        )
+                      }}
+                      onMouseEnter={onPieEnter}
+                      onMouseLeave={() => setActiveIndex(null)}
+                      onClick={onPieEnter}
+                    >
+                      {chartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <RechartsTooltip />
+                    <Legend />
+                  </PieChart>
+                ) : (
+                  <p>Loading...</p>
+                )}
+              </div>
             </Card>
           </Grid>
         </Grid>

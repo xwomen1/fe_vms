@@ -59,6 +59,15 @@ const format_form = [
     width: 12
   },
   {
+    name: 'result',
+    label: 'Kết quả',
+    placeholder: 'Nhập kết quả',
+    type: 'TextField',
+    data: [],
+    require: true,
+    width: 12
+  },
+  {
     name: 'description',
     label: 'Đối tượng',
     placeholder: 'Nhập tên đối tượng',
