@@ -1,5 +1,5 @@
-import { Box, Card, CardContent, Grid, IconButton } from "@mui/material"
-import { use, useEffect, useState } from "react"
+import { Card, Grid, IconButton } from "@mui/material"
+import { useState } from "react"
 import ViewCamera from "src/@core/components/camera"
 import Icon from 'src/@core/components/icon'
 

@@ -46,8 +46,8 @@ const Review = ({ id, name, channel, data }) => {
     const [dateTime, setDateTime] = useState(new Date())
 
     const [timeFilter, setTimeFilter] = useState({
-        start_time: timestamp - 5  * 1000,
-        end_time: timestamp + 5  * 1000
+        start_time: timestamp - 5 * 1000,
+        end_time: timestamp + 5 * 1000
     })
 
     const [timePlay, setTimePlay] = useState(timestamp - 5 * 1000)
@@ -67,7 +67,7 @@ const Review = ({ id, name, channel, data }) => {
     const formatTimeRange = (value) => {
         const minutes = Math.floor(value / (60 * 1000));
         const seconds = Math.floor((value % (60 * 1000)) / 1000);
-        
+
         return { minutes, seconds };
     };
 
@@ -114,10 +114,10 @@ const Review = ({ id, name, channel, data }) => {
 
     const valuetext = value => {
         const timeCurrent = new Date(timeFilter.start_time + value);
-        
-return `${timeCurrent.getHours()}:${timeDisplay(timeCurrent.getMinutes())}:${timeDisplay(timeCurrent.getSeconds())}`;
+
+        return `${timeCurrent.getHours()}:${timeDisplay(timeCurrent.getMinutes())}:${timeDisplay(timeCurrent.getSeconds())}`;
     };
-    
+
 
     const handleIconClick = () => {
         if (datePickerRef.current) {
@@ -127,47 +127,16 @@ return `${timeCurrent.getHours()}:${timeDisplay(timeCurrent.getMinutes())}:${tim
 
 
     const renderMarks = () => {
-        const marks = [];
-        const step = 1000; // Giữ step nhỏ để tạo dấu đánh dấu liên tục
-        const start = timeFilter.start_time;
-        const end = timeFilter.end_time;
-        const numMarks = Math.ceil((end - start) / step);
-
-        for (let i = 0; i <= numMarks; i++) {
-            const time = start + i * step;
-            const timeCurrent = new Date(time);
+        const marks = []
+        const part = 10
+        for (let i = 0; i <= part; i++) {
+            let step = Math.floor(valueRange / part)
+            let timeCurrent = new Date(timeFilter.start_time + step * i)
             marks.push({
-                value: time - start,
-                label: `${timeCurrent.getHours()}:${timeCurrent.getMinutes()}:${timeCurrent.getSeconds()}`
-            });
+                value: step * i,
+                label: timeCurrent.getHours() + ':' + timeCurrent.getMinutes()
+            })
         }
-
-        return marks;
-    };
-
-    const renderMarksSpeed = () => {
-        const marks = [
-            {
-                value: 0.5,
-                label: '0.5x'
-            },
-            {
-                value: 0.75,
-                label: '0.75x'
-            },
-            {
-                value: 1,
-                label: '1x'
-            },
-            {
-                value: 1.5,
-                label: '1.5x'
-            },
-            {
-                value: 2,
-                label: '2x'
-            }
-        ]
 
         return marks
     }
@@ -216,49 +185,6 @@ return `${timeCurrent.getHours()}:${timeDisplay(timeCurrent.getMinutes())}:${tim
                 <Grid item xs={12}>
                     <div className='bottom-controls' style={{ background: '#000' }}>
                         <div className='left-controls'>
-                            <Box className='w-100' sx={{ px: 2 }}>
-                                <Slider
-                                    defaultValue={1}
-                                    min={0.5}
-                                    max={2}
-                                    step={0.25}
-                                    marks={renderMarksSpeed()}
-                                    value={speed}
-                                    onChange={(event, newValue) => {
-                                        setSpeed(newValue)
-                                    }}
-                                    valueLabelDisplay='auto'
-                                    color='secondary'
-                                    sx={{
-                                        '& .MuiSlider-thumb': {
-                                            width: 8,
-                                            height: 8,
-                                            transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
-                                            '&::before': {
-                                                boxShadow: '0 2px 12px 0 rgba(0,0,0,0.4)'
-                                            },
-                                            '&:hover, &.Mui-focusVisible': {
-                                                boxShadow: `0px 0px 0px 8px ${'rgb(0 0 0 / 16%)'}`
-                                            },
-                                            '&.Mui-active': {
-                                                width: 20,
-                                                height: 20
-                                            }
-                                        },
-                                        '& .MuiSlider-track': {
-                                            backgroundColor: '#fff',
-                                            opacity: 0
-                                        },
-                                        '& .MuiSlider-rail': {
-                                            opacity: 0.28,
-                                            backgroundColor: '#fff'
-                                        },
-                                        '& .MuiSlider-markLabel': {
-                                            color: '#fff'
-                                        }
-                                    }}
-                                />
-                            </Box>
                             <div className='w-100' style={{ display: 'flex', justifyContent: 'space-between' }}>
                                 {timeFilter && (
                                     <IconButton
@@ -305,52 +231,52 @@ return `${timeCurrent.getHours()}:${timeDisplay(timeCurrent.getMinutes())}:${tim
                                     <Icon icon='tabler:minus' size='1em' color='#FFF' />
                                 </IconButton>
                                 <Typography style={{ color: '#fff', fontWeight: 'bold' }}>
-                                {`${minutes} phút - ${seconds} giây`}
+                                    {`${minutes} phút - ${seconds} giây`}
                                 </Typography>
                             </Box>
                             <Box className='w-100'>
-                            <Slider
-                                defaultValue={0}
-                                color='secondary'
-                                step={1000} // Bước nhảy theo giây
-                                min={0}
-                                max={timeFilter.end_time - timeFilter.start_time}
-                                valueLabelDisplay='on'
-                                onChange={handleSeekChange}
-                                value={timePlay - timeFilter?.start_time + currentTime}
-                                getAriaValueText={valuetext}
-                                valueLabelFormat={valuetext}
-                                marks={renderMarks()}
-                                aria-labelledby='custom-marks-slider'
-                                sx={{
-                                    '& .MuiSlider-thumb': {
-                                        width: 20,
-                                        height: 20,
-                                        transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
-                                        '&::before': {
-                                            boxShadow: '0 2px 12px 0 rgba(0,0,0,0.4)'
-                                        },
-                                        '&:hover, &.Mui-focusVisible': {
-                                            boxShadow: `0px 0px 0px 8px ${'rgb(0 0 0 / 16%)'}`
-                                        },
-                                        '&.Mui-active': {
+                                <Slider
+                                    defaultValue={0}
+                                    color='secondary'
+                                    step={1000} // Bước nhảy theo giây
+                                    min={0}
+                                    max={timeFilter.end_time - timeFilter.start_time}
+                                    valueLabelDisplay='on'
+                                    onChange={handleSeekChange}
+                                    value={timePlay - timeFilter?.start_time + currentTime}
+                                    getAriaValueText={valuetext}
+                                    valueLabelFormat={valuetext}
+                                    marks={renderMarks()}
+                                    aria-labelledby='custom-marks-slider'
+                                    sx={{
+                                        '& .MuiSlider-thumb': {
                                             width: 20,
-                                            height: 20
+                                            height: 20,
+                                            transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
+                                            '&::before': {
+                                                boxShadow: '0 2px 12px 0 rgba(0,0,0,0.4)'
+                                            },
+                                            '&:hover, &.Mui-focusVisible': {
+                                                boxShadow: `0px 0px 0px 8px ${'rgb(0 0 0 / 16%)'}`
+                                            },
+                                            '&.Mui-active': {
+                                                width: 20,
+                                                height: 20
+                                            }
+                                        },
+                                        '& .MuiSlider-track': {
+                                            opacity: 0,
+                                            backgroundColor: '#fff'
+                                        },
+                                        '& .MuiSlider-rail': {
+                                            opacity: 0.28,
+                                            backgroundColor: '#fff'
+                                        },
+                                        '& .MuiSlider-markLabel': {
+                                            color: '#fff'
                                         }
-                                    },
-                                    '& .MuiSlider-track': {
-                                        opacity: 0,
-                                        backgroundColor: '#fff'
-                                    },
-                                    '& .MuiSlider-rail': {
-                                        opacity: 0.28,
-                                        backgroundColor: '#fff'
-                                    },
-                                    '& .MuiSlider-markLabel': {
-                                        color: '#fff'
-                                    }
-                                }}
-                            />
+                                    }}
+                                />
 
                             </Box>
                         </div>
