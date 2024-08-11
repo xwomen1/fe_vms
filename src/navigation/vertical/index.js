@@ -1,65 +1,65 @@
 const navigation = () => {
   return [
     {
-      title: 'Trang chủ',
+      title: 'Home',
       icon: 'tabler:smart-home',
       path: '/dashboards/analytics'
     },
     {
       path: '/',
-      title: 'Kiểm soát vào ra',
+      title: 'Access Control',
       icon: 'tabler:lock-access',
       children: [
         {
-          title: 'Sự kiện',
+          title: 'Event',
           path: '/access-control/event-management',
           icon: 'tabler:calendar-event'
         },
         {
-          title: 'Thiết bị',
+          title: 'Device Management',
           path: '/device-management',
           icon: 'tabler:accessible'
         },
         {
           path: '/pages/access-rights/list',
-          title: 'Quyền truy cập',
+          title: 'Access Permissions',
           icon: 'tabler:calendar-month'
         },
 
         {
-          title: 'Chấm công',
+          title: 'Time Tracking Management',
           path: '/access-control/time-keeping',
           icon: 'tabler:lock-access'
         },
         {
           path: '/pages/report-month/list',
-          title: 'Báo cáo tháng',
+          title: 'Monthly Report',
           icon: 'tabler:id'
         },
         {
           path: '/',
-          title: 'Cài đặt nâng cao',
+          title: 'Advanced Settings',
           icon: 'tabler:lock-access',
           children: [
             {
               path: '/pages/door-access/list',
-              title: 'Quyền truy cập cửa',
+              title: 'Door Access Permissions',
               icon: 'tabler:door-enter'
             },
             {
               path: '/pages/schedule-access/list',
-              title: 'Quản lý lịch',
+              title: 'Calendar Management',
               icon: 'tabler:calendar-due'
             },
 
             {
               path: '/pages/door-management/list',
-              title: 'Quản lý cửa',
+              title: 'Door Management',
               icon: 'tabler:door'
             },
             {
               path: '/pages/group-access/list',
-              title: 'Nhóm quyền truy cập',
+              title: 'Access Group',
               icon: 'tabler:mood-check'
             }
 
@@ -100,27 +100,27 @@ const navigation = () => {
     },
     {
       path: '/',
-      title: 'Quản lý hiệu suất',
+      title: 'Performance Management',
       icon: 'tabler:lock-access',
       children: [
         {
-          title: 'Thiết lập bộ KPI',
+          title: 'Set Up KPI Metrics',
           path: '/kpi',
           icon: 'tabler:calendar-event'
         },
         {
-          title: 'Giao KPI',
+          title: 'Assign KPI',
           path: '/kpi/assign-kpi',
           icon: 'tabler:calendar-event'
         },
         {
-          title: 'Đánh giá KPI',
+          title: 'Assess KPI',
           path: '/kpi/assess-kpi',
           icon: 'tabler:calendar-event'
         },
         {
           path: '/mappingACToInf',
-          title: 'Cài đặt nâng cao',
+          title: 'Advanced Settings',
           icon: 'tabler:shield'
         }
 
@@ -138,11 +138,11 @@ const navigation = () => {
     },
     {
       path: '/asset',
-      title: 'Hệ thống VMS',
+      title: 'VMS System',
       icon: 'tabler:camera',
       children: [
         {
-          title: 'Xem trực tiếp',
+          title: 'Live View',
           path: '/vms/live-view',
           icon: 'tabler:video'
         },
@@ -152,27 +152,27 @@ const navigation = () => {
         //   path: '/vms/live-view-p2p-private'
         // },
         {
-          title: 'Xem lại',
+          title: 'Playback',
           path: '/vms/playback-camera',
           icon: 'tabler:video-minus'
         },
         {
-          title: 'Trích xuất clip',
+          title: 'Extract Clip',
           path: '/vms/clip-extraction',
           icon: 'tabler:file-export'
         },
         {
-          title: 'Sự kiện AI',
+          title: 'AI Event',
           path: '/vms/events/view/eventList',
           icon: 'tabler:timeline-event-exclamation'
         },
         {
-          title: 'Khuôn mặt',
+          title: 'Face',
           path: '/vms/events/view/eventFace',
           icon: 'tabler:timeline-event-exclamation'
         },
         {
-          title: 'Biển số',
+          title: 'License Plate',
           path: '/vms/events/view/eventCar',
           icon: 'tabler:timeline-event-exclamation'
         },
@@ -184,22 +184,22 @@ const navigation = () => {
         // },
 
         {
-          title: 'Bản đồ AI',
+          title: 'AI Map',
           path: '/vms/events/view/eventMap',
           icon: 'tabler:timeline-event-exclamation'
         },
         {
-          title: 'Tổng quan AI',
+          title: 'AI Overview',
           path: '/vms/ai-config/view/eventOverview',
           icon: 'tabler:settings'
         },
         {
-          title: 'Danh sách cấu hình AI',
+          title: 'AI Configuration List',
           path: '/vms/ai-config/view/aiConfig',
           icon: 'tabler:settings'
         },
         {
-          title: 'Khoang vùng AI',
+          title: 'AI Region',
           path: '/vms/ai-config/view/eventConfig',
           icon: 'tabler:settings'
         },
@@ -209,32 +209,32 @@ const navigation = () => {
           icon: 'tabler:settings'
         },
         {
-          title: 'Sự cố hệ thống',
+          title: 'System Incident',
           path: '/vms/error-system',
           icon: 'tabler:id-badge-off'
         },
         {
-          title: 'Nhóm camera',
+          title: 'Camera Group',
           path: '/vms/camera-group',
           icon: 'tabler:schema'
         },
         {
-          title: 'Danh sách camera',
+          title: 'Camera List',
           path: '/vms/camera-config/table',
           icon: 'tabler:device-cctv'
         },
         {
-          title: 'Thêm camera',
+          title: 'Add Camera',
           path: '/vms/camera-config/add',
           icon: 'tabler:device-cctv'
         },
         {
-          title: 'Danh sách NVR',
+          title: 'NVR List',
           path: '/vms/nvr-config/table',
           icon: 'tabler:server-2'
         },
         {
-          title: 'Thêm NVR',
+          title: 'Add NVR',
           path: '/vms/nvr-config/add',
           icon: 'tabler:server-2'
         },
@@ -245,12 +245,12 @@ const navigation = () => {
         },
         {
           path: '/pages/face_management/list',
-          title: 'Quản lý khuôn mặt',
+          title: 'Face Management',
           icon: 'tabler:face-id'
         },
         {
           path: '/pages/car_management/list',
-          title: 'Quản lý Biển số',
+          title: 'License Plate Management',
           icon: 'tabler:id-badge-2'
         }
 
@@ -338,13 +338,13 @@ const navigation = () => {
       icon: 'tabler:user',
       children: [
         {
-          title: 'Người dùng',
+          title: 'User',
           icon: 'tabler:user',
           path: '/apps/user/list'
         },
 
         {
-          title: 'Hồ sơ ứng tuyển',
+          title: 'Applicant Profile',
           icon: 'tabler:building',
           path: '/cv'
         },
@@ -355,32 +355,32 @@ const navigation = () => {
         //   path: '/organizational-structure'
         // },
         {
-          title: 'Cơ cấu tổ chức',
+          title: 'Organizational Structure',
           icon: 'tabler:building',
           path: '/organization/list'
         },
         {
-          title: 'Vai Trò',
+          title: 'Role',
           icon: 'tabler:users',
           path: '/apps/roles'
         },
         {
-          title: 'Bảng lương',
+          title: 'Payroll',
           icon: 'tabler:coin-pound',
           path: '/salary'
         },
         {
-          title: 'Quy định về lương',
+          title: 'Salary Regulations',
           icon: 'tabler:moneybag',
           path: '/salaryRule'
         },
         {
-          title: 'Bản đồ số',
+          title: 'Digital Map',
           icon: 'tabler:map',
           path: '/pages/digital-map'
         },
         {
-          title: 'Quản lý danh sách khuôn mặt',
+          title: 'Face List Management',
           icon: 'tabler:user-off',
           path: '/pages/blacklist-management'
         }
@@ -393,51 +393,51 @@ const navigation = () => {
       children: [
         {
           path: '/smart-parking/caller',
-          title: 'Thuê bao',
+          title: 'Subscription',
           icon: 'tabler:phone'
         },
         {
           path: '/smart-parking/caller-type',
-          title: 'Loại thuê bao',
+          title: 'Subscription Type',
           icon: 'tabler:phone'
         },
         {
           path: '/smart-parking/cards',
-          title: 'Thẻ',
+          title: 'Card',
           icon: 'tabler:cards'
         },
         {
           path: '/smart-parking/vehicle',
-          title: 'Phương tiện',
+          title: 'Vehicle',
           icon: 'tabler:car'
         },
         {
           path: '/smart-parking/vehicle-type',
-          title: 'Loại phương tiện',
+          title: 'Vehicle Type',
           icon: 'tabler:parking'
         },
         {
           path: '/smart-parking/service',
-          title: 'Dịch vụ',
+          title: 'Service',
           icon: 'tabler:zoom-money'
         },
         {
           path: '/smart-parking/parking',
-          title: 'Bãi đỗ xe',
+          title: 'Parking Lot',
           icon: 'tabler:parking'
         },
 
         {
           path: '/smart-parking/asset',
-          title: 'Tài sản',
+          title: 'Asset Management',
           icon: 'tabler:moneybag',
           children: [
             {
-              title: 'Loại tài sản',
+              title: 'Asset Type',
               path: '/smart-parking/assetType'
             },
             {
-              title: 'Tài sản',
+              title: 'Asset',
               path: '/smart-parking/asset'
             }
           ]

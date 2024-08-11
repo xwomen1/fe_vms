@@ -105,8 +105,8 @@ const defaultValues = {
 const format_form = [
   {
     name: 'nameCalendar',
-    label: 'Tên lịch',
-    placeholder: 'Tên lịch',
+    label: 'Schedule Name',
+    placeholder: 'Schedule Name',
     type: 'TextField',
     data: [],
     require: true,
@@ -122,24 +122,24 @@ const format_form = [
   },
   {
     name: 'doorInName',
-    label: 'Cửa vào',
-    placeholder: 'Cửa vào',
+    label: 'Door In',
+    placeholder: 'Door In',
     type: 'AutocompleteDoorIn',
     require: true,
     width: 6
   },
   {
     name: 'doorOutName',
-    label: 'Cửa ra',
-    placeholder: 'Cửa ra',
+    label: 'Door Out',
+    placeholder: 'Door Out',
     type: 'AutocompleteDoorOut',
     require: true,
     width: 6
   },
   {
     name: 'startDate',
-    label: 'Ngày bắt đầu',
-    placeholder: 'Ngày bắt đầu',
+    label: 'Start Date',
+    placeholder: 'Start Date',
     type: 'startDate',
     data: [],
     require: false,
@@ -147,8 +147,8 @@ const format_form = [
   },
   {
     name: 'endDate',
-    label: 'Ngày Kết thúc',
-    placeholder: 'Ngày kết thúc',
+    label: 'End Date',
+    placeholder: 'End Date',
     type: 'endDate',
     data: [],
     require: false,
@@ -270,30 +270,34 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
   }
 
   const ViewContent = () => {
+    const dayMapping = {
+      1: 'SUNDAY',
+      2: 'MONDAY',
+      3: 'TUESDAY',
+      4: 'WEDNESDAY',
+      5: 'THURSDAY',
+      6: 'FRIDAY',
+      7: 'SATURDAY'
+    };
+    
     const transformCalendarDays = calendarDays => {
-      console.log('calendarDays', calendarDays)
-
+      console.log('calendarDays', calendarDays);
+    
       return calendarDays.map(day => {
-        const { dayOfWeek, timePeriods } = day
-        const value = dataDailyDefault.find(item => item.dayOfWeek === dayOfWeek)?.value || 1
-
-        let label
-        if (value === 1) {
-          label = 'CN'
-        } else if (value >= 2 && value <= 7) {
-          label = `Thứ ${value}`
-        } else {
-          label = 'CN'
-        }
-
+        const { dayOfWeek, timePeriods } = day;
+        const value = dataDailyDefault.find(item => item.dayOfWeek === dayOfWeek)?.value || 1;
+    
+        const label = dayMapping[value] || 'SUNDAY';
+    
         return {
           label,
           dayOfWeek,
           value,
           timePeriods
-        }
-      })
-    }
+        };
+      });
+    };
+    
 
     useEffect(() => {
       if (detail && detail.calendarDays) {
@@ -311,7 +315,7 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
             margin: '20px 0 20px 0'
           }}
         >
-          <span>Bảng cấu hình thời gian</span>
+          <span>Time Settings</span>
         </div>
 
         <div
@@ -390,7 +394,7 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
         config
       )
       setReload()
-      toast.success('Cập nhật thành công')
+      toast.success('Update Successful')
     } catch (error) {
       console.error('Error updating data: ', error)
       toast.error(error.message || 'Có lỗi xảy ra khi cập nhật')
@@ -433,7 +437,7 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
           </CustomCloseButton>
           <Box sx={{ mb: 8, textAlign: 'left' }}>
             <Typography variant='h3' sx={{ mb: 3 }}>
-              Cấu hình lịch
+            Schedule Configuration
             </Typography>
           </Box>
           <form>
@@ -480,12 +484,12 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
                               <Autocomplete
                                 fullWidth
                                 id='autocomplete-custom'
-                                label='Công ty'
+                                label='Department'
                                 value={selectedOption}
                                 options={userGroups}
                                 getOptionLabel={option => option.name || ''}
                                 renderInput={params => (
-                                  <CustomTextField {...params} label='Công ty' placeholder='Khác' />
+                                  <CustomTextField {...params} label='Department' placeholder='Department' />
                                 )}
                                 onChange={(event, newValue) => {
                                   onChange(newValue ? newValue.id : null)
@@ -514,11 +518,11 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
                             <Autocomplete
                               fullWidth
                               id='autocomplete-doorInId'
-                              label='Cửa vào'
+                              label='Door In'
                               value={selectedOption}
                               options={filteredDoorList}
                               getOptionLabel={option => option.name || ''}
-                              renderInput={params => <CustomTextField {...params} label='Cửa vào' placeholder='Khác' />}
+                              renderInput={params => <CustomTextField {...params} label='Door In' placeholder='Door In' />}
                               onChange={(event, newValue) => {
                                 onChange(newValue ? newValue.id : null)
                                 handleDoorInIdChange(newValue ? newValue.id : null) // Save selected doorInId
@@ -547,11 +551,11 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
                             <Autocomplete
                               fullWidth
                               id='autocomplete-doorOutId'
-                              label='Cửa ra'
+                              label='Door Out'
                               value={selectedOption}
                               options={filteredDoorList}
                               getOptionLabel={option => option.name || ''}
-                              renderInput={params => <CustomTextField {...params} label='Cửa ra' placeholder='Khác' />}
+                              renderInput={params => <CustomTextField {...params} label='Door Out' placeholder='Door Out' />}
                               onChange={(event, newValue) => {
                                 onChange(newValue ? newValue.id : null)
                                 handleDoorOutIdChange(newValue ? newValue.id : null) // Save selected doorOutId
@@ -568,7 +572,7 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
                   return (
                     <Grid item xs={12} key={index}>
                       <span style={{ color: '#f5963a', fontSize: 20, position: 'relative' }}>
-                        Cấu hình thời gian hoạt động
+                       Operating Time Configuration
                         <span
                           style={{
                             position: 'absolute',
@@ -602,7 +606,7 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
                               customInput={
                                 <CustomTextField
                                   fullWidth
-                                  label='Ngày bắt đầu'
+                                  label='Start Date'
                                   error={Boolean(errors.startDate)}
                                   helperText={errors.startDate ? 'Trường này bắt buộc' : ''}
                                 />
@@ -629,7 +633,7 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
                               customInput={
                                 <CustomTextField
                                   fullWidth
-                                  label='Ngày kết thúc'
+                                  label='End Date'
                                   error={Boolean(errors.endDate)}
                                   helperText={errors.endDate ? 'Trường này bắt buộc' : ''}
                                 />
@@ -654,10 +658,10 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
           }}
         >
           <Button variant='contained' onClick={onClose}>
-            Hủy
+            Cancel
           </Button>
           <Button variant='contained' onClick={handleSave} disabled={loading}>
-            {loading ? 'Đang lưu...' : 'Lưu'}
+            {loading ? 'Saving...' : 'Ok'}
           </Button>
         </DialogActions>
       </Dialog>

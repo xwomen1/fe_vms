@@ -282,9 +282,9 @@ const Review = ({ id, name, channel, data }) => {
                   <Icon icon='tabler:minus' size='1em' color='#FFF' />
                 </IconButton>
                 <Typography style={{ color: '#fff', fontWeight: 'bold' }}>
-                  {`${Math.floor(valueRange / (60 * 60 * 1000))} giờ -  ${
+                  {`${Math.floor(valueRange / (60 * 60 * 1000))} hour -  ${
                     (valueRange - 60 * 60 * 1000 * Math.floor(valueRange / (60 * 60 * 1000))) / (60 * 1000)
-                  } phút `}
+                  } minute `}
                 </Typography>
               </Box>
               <Box className='w-100'>

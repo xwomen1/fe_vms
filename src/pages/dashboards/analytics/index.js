@@ -94,8 +94,8 @@ const EventList = () => {
         const disconnectedCount = cameras.filter(camera => camera.status.name === 'disconnected').length
 
         setChartData([
-          { name: 'Kết nối', value: connectedCount },
-          { name: 'Mất kết nối', value: disconnectedCount }
+          { name: 'Connected', value: connectedCount },
+          { name: 'Disconnected', value: disconnectedCount }
         ])
       } catch (error) {
         console.error('Error fetching camera data:', error)
@@ -114,7 +114,7 @@ const EventList = () => {
       maxWidth: 50,
       align: 'center',
       field: 'imageObject',
-      label: 'Hình ảnh',
+      label: 'Image',
       renderCell: value => (
         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
           <img src={value} alt='' style={{ width: '100px', height: '100px', objectFit: 'contain' }} />
@@ -127,7 +127,7 @@ const EventList = () => {
       maxWidth: 50,
       align: 'center',
       field: 'description',
-      label: 'Tên đối tượng'
+      label: 'Object Name'
     },
     {
       id: 4,
@@ -135,7 +135,7 @@ const EventList = () => {
       maxWidth: 30,
       align: 'center',
       field: 'timestamp',
-      label: 'Thời gian',
+      label: 'Time',
       renderCell: value => new Date(value).toLocaleString()
     },
 
@@ -145,7 +145,7 @@ const EventList = () => {
       maxWidth: 50,
       align: 'center',
       field: 'location',
-      label: 'Khu vực'
+      label: 'Location'
     }
   ]
 
@@ -172,6 +172,7 @@ const EventList = () => {
         remoteVideoRef.current.srcObject = stream
       }
     }
+
     return () => {
       if (websocket) {
         websocket.close()
@@ -321,7 +322,6 @@ const EventList = () => {
     { id: 7, flex: 0.25, minWidth: 50, align: 'left', field: 'source', label: 'Source' }
   ]
 
-  console.log(chartData, 'chaData')
   const formatDateTime = dateTimeString => {
     const date = new Date(dateTimeString)
 
@@ -337,7 +337,7 @@ const EventList = () => {
       <Grid component={Paper}>
         <Card>
           <CardHeader
-            title='Top 5 sự kiện AI'
+            title='Top 5 AI Events'
             titleTypographyProps={{ sx: { mb: [2, 0] } }}
             sx={{
               py: 4,
@@ -351,13 +351,13 @@ const EventList = () => {
               <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
                 <TableHead>
                   <TableRow>
-                    <TableCell>STT</TableCell>
+                    <TableCell>No.</TableCell>
                     {columns.map(column => (
                       <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
                         {column.label}
                       </TableCell>
                     ))}
-                    <TableCell>Thao tác</TableCell>
+                    <TableCell align='center'>Action</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -477,7 +477,7 @@ const EventList = () => {
                       cy={200}
                       labelLine={false}
                       label={({ name, value }) => {
-                        return name === 'Connected' ? `Kết nối : ${value}` : `Mất kết nối : ${value}`
+                        return name === 'Connected' ? `Connected : ${value}` : `Disconnected : ${value}`
                       }}
                       outerRadius={130}
                       fill='#8884d8'
@@ -485,6 +485,7 @@ const EventList = () => {
                       activeIndex={activeIndex}
                       activeShape={props => {
                         const RADIAN = Math.PI / 180
+
                         const {
                           cx,
                           cy,

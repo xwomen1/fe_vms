@@ -146,36 +146,13 @@ const View = ({ data }) => {
 
   useEffect(() => {
     setDetail(data)
-    console.log('data', data)
   }, [])
 
   useEffect(() => {
     if (detail) {
       setDetailFormValue()
-      fetchCamera()
     }
   }, [detail])
-
-  const fetchCamera = async () => {
-    setLoading(true)
-
-    try {
-      const response = await getApi(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${detail?.cameraId}`)
-      setCameraName(response?.data?.name)
-    } catch (error) {
-      if (error && error?.response?.data) {
-        console.error('error', error)
-        toast.error(error?.response?.data?.message)
-      } else {
-        console.error('Error fetching data:', error)
-        toast.error(error)
-      }
-    } finally {
-      ;() => {
-        setLoading(false)
-      }
-    }
-  }
 
   const setDetailFormValue = () => {
     reset(detail)
@@ -237,8 +214,6 @@ const View = ({ data }) => {
                             value={
                               item.name === 'timestamp'
                                 ? moment(new Date(value)).format('DD/MM/YYYY HH:mm:ss')
-                                : item.name === 'cameraId'
-                                ? cameraName
                                 : value
                             }
                             label={item.label}

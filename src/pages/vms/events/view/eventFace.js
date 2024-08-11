@@ -28,7 +28,6 @@ import {
 } from '@mui/material'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import Filter from '../popups/filter'
-import View from '../popups/view'
 import Add from '../popups/add'
 import EventDetails from '../popups/eventDetails'
 
@@ -42,7 +41,7 @@ const initValueFilter = {
   page: 1
 }
 
-const EventList = ({}) => {
+const EventList = ({ }) => {
   const [keyword, setKeyword] = useState('')
   const [valueFilter, setValueFilter] = useState(initValueFilter)
   const [loading, setLoading] = useState(false)
@@ -127,7 +126,6 @@ const EventList = ({}) => {
   const handleMessage = async event => {
     const message = JSON.parse(event.data)
     const newMessage = JSON.parse(message?.data)
-    console.log(newMessage, 'newmessage')
     if (newMessage.eventType === 'AI_EVENT_BLACKLIST_FACE_RECOGNITION') {
       setEventData(newMessage)
     }
@@ -161,7 +159,7 @@ const EventList = ({}) => {
 
   useEffect(() => {
     if (rtcPeerConnection) {
-      rtcPeerConnection.addEventListener('connectionstatechange', () => {})
+      rtcPeerConnection.addEventListener('connectionstatechange', () => { })
     }
   }, [rtcPeerConnection])
 
