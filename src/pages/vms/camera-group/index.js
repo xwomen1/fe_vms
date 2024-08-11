@@ -188,7 +188,7 @@ const CameraGroup = ({ apiData }) => {
                   <Box>
                     <IconButton onClick={handleOpenMenu}>
                       <Icon icon='tabler:selector' />
-                      <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
+                      <p style={{ fontSize: 15 }}>{pageSize} line/page</p>
                     </IconButton>
                     <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
                       {pageSizeOptions.map(size => (

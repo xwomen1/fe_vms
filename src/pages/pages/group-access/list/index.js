@@ -108,7 +108,7 @@ const GroupAccess = () => {
             <>
               <Grid container spacing={2} alignItems='center'>
                 <Grid item>
-                  <Button variant='contained'>Danh sách quản lý nhóm quyền truy cập</Button>
+                  <Button variant='contained'>Access group management</Button>
                 </Grid>
               </Grid>
             </>
@@ -124,7 +124,7 @@ const GroupAccess = () => {
             <Grid container spacing={2}>
               <Grid item>
                 <CustomTextField
-                  placeholder='Nhập tên truy cập cửa ...! '
+                  placeholder='Searching..! '
                   value={searchKeyword}
                   onChange={e => setSearchKeyword(e.target.value)}
                   InputProps={{
@@ -153,13 +153,13 @@ const GroupAccess = () => {
                   }}
                 />
                 <Button variant='contained' sx={{ ml: 2 }} onClick={handleSearch}>
-                  Tìm kiếm <Icon fontSize='1.25rem' icon='tabler:search' />
+                  Search <Icon fontSize='1.25rem' icon='tabler:search' />
                 </Button>
               </Grid>
               <Grid item>
                 <Box sx={{ textAlign: 'right' }}>
                   <Button variant='contained' component={Link} href={`/pages/group-access/detail/add`}>
-                    thêm mới
+                    Add
                     <Icon icon='tabler:plus' />
                   </Button>
                 </Box>
@@ -171,14 +171,14 @@ const GroupAccess = () => {
           <Table>
             <TableHead style={{ background: '#F6F6F7' }}>
               <TableRow>
-                <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Tên</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Mô tả</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Cấp truy cập cửa</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Nhóm người</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Người</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Người tạo</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Thao tác</TableCell>
+                <TableCell sx={{ padding: '16px' }}>NO.</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Name</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Description</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Door Access</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Group</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Member</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Creator</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -202,12 +202,12 @@ const GroupAccess = () => {
                     <TableCell>
                       {user.doorAccesses && user.doorAccesses.length > 0
                         ? user.doorAccesses.map(door => door.objectName).join(', ')
-                        : 'Không có tên'}
+                        : 'None'}
                     </TableCell>
                     <TableCell>
                       {user.userGroups && user.userGroups.length > 0
                         ? user.userGroups.map(door => door.objectName).join(', ')
-                        : 'Không có tên'}
+                        : 'None'}
                     </TableCell>
                     <TableCell>{user.users}</TableCell>
                     <TableCell>{user.createdByUser}</TableCell>
@@ -226,7 +226,7 @@ const GroupAccess = () => {
               ) : (
                 <TableRow>
                   <TableCell colSpan={8} align='center'>
-                    Không có dữ liệu
+                  Data not available
                   </TableCell>
                 </TableRow>
               )}
@@ -238,7 +238,7 @@ const GroupAccess = () => {
             <Grid item xs={12} sm={6} md={4} sx={{ textAlign: 'right', mb: 1 }}>
               <IconButton onClick={handleOpenMenu}>
                 <Icon icon='tabler:selector' />
-                <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
+                <p style={{ fontSize: 15 }}>{pageSize} line/page</p>
               </IconButton>
               <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
                 {pageSizeOptions.map(size => (

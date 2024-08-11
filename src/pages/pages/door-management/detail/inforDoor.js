@@ -167,7 +167,7 @@ const InforDoor = ({ idInfor }) => {
       <div>
         <Card>
           <CardHeader
-            title='Thông tin cửa'
+            title='Door information'
             titleTypographyProps={{ sx: { mb: [2, 0] } }}
             sx={{
               py: 4,
@@ -180,14 +180,14 @@ const InforDoor = ({ idInfor }) => {
                 <Grid item>
                   <Box sx={{ float: 'right' }}>
                     <Button variant='contained' component={Link} href={`/pages/door-management/list`}>
-                      Hủy
+                      Cancel
                     </Button>
                   </Box>
                 </Grid>
                 <Grid item>
                   <Box sx={{ float: 'right', marginLeft: '2%' }}>
                     <Button aria-label='Bộ lọc' variant='contained' onClick={updateDoor}>
-                      Lưu
+                      Save
                     </Button>
                   </Box>
                 </Grid>
@@ -204,7 +204,7 @@ const InforDoor = ({ idInfor }) => {
             >
               <Grid item xs={3.8}>
                 <CustomTextField
-                  label='Tên'
+                  label='Name'
                   value={inforDoor ? inforDoor.name : ''}
                   onChange={e => handleInputChange('name', e.target.value)}
                   fullWidth
@@ -217,7 +217,7 @@ const InforDoor = ({ idInfor }) => {
                   getOptionLabel={option => option.name}
                   value={selectedGroup}
                   onChange={(event, newValue) => setSelectedGroup(newValue)}
-                  renderInput={params => <CustomTextField {...params} label='Nhóm Cửa' fullWidth />}
+                  renderInput={params => <CustomTextField {...params} label='Door group' fullWidth />}
                   loading={loading}
                 />
               </Grid>
@@ -233,7 +233,7 @@ const InforDoor = ({ idInfor }) => {
               <Grid item xs={0.1}></Grid>
               <Grid item xs={3.8} style={{ marginTop: 20 }}>
                 <CustomTextField
-                  label='Miêu tả'
+                  label='Description'
                   value={inforDoor ? inforDoor.description : ''}
                   onChange={e => handleInputChange('description', e.target.value)}
                   fullWidth
@@ -242,7 +242,7 @@ const InforDoor = ({ idInfor }) => {
               <Grid item xs={0.1}></Grid>
               <Grid item xs={3.8} style={{ marginTop: 20 }}>
                 <CustomTextField
-                  label='Người cập nhật cuối'
+                  label='Last editor'
                   value={inforDoor ? inforDoor.lastUpdatedByUser?.fullName : ''}
                   fullWidth
                   disabled
@@ -251,7 +251,7 @@ const InforDoor = ({ idInfor }) => {
               <Grid item xs={0.1}></Grid>
               <Grid item xs={3.8} style={{ marginTop: 20 }}>
                 <CustomTextField
-                  label='Thời gian cập nhật'
+                  label='Updated time'
                   value={inforDoor ? formatDate(inforDoor.updatedAt) : ''}
                   disabled
                   fullWidth

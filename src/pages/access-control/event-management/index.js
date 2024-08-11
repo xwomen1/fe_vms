@@ -246,7 +246,7 @@ const EventList = () => {
         <Grid container spacing={2}>
           <Grid item xs={3}></Grid>
           <Grid item xs={1} sx={{ textAlign: 'center', marginTop: '5px' }}>
-            <span style={{ fontSize: 15 }}> dòng/trang</span>
+            <span style={{ fontSize: 15 }}> line/page</span>
           </Grid>
           <Grid item xs={1}>
             <Box>

@@ -56,9 +56,9 @@ const SliderWarning = styled(MuiSlider)(({ theme }) => ({
 
 // Styled component for a info Slider
 const SliderInfo = styled(MuiSlider)(({ theme }) => ({
-  color: theme.palette.info.main,
+  color: theme.palette.info.dark,
   '& .MuiSlider-thumb:hover, & .MuiSlider-thumb.Mui-focusVisible': {
-    boxShadow: `0 0 0 8px ${hexToRGBA(theme.palette.info.main, 0.16)} !important`
+    boxShadow: `0 0 0 8px ${hexToRGBA(theme.palette.info.dark, 0.16)} !important`
   },
   '@media(hover:none)': {
     '& .MuiSlider-thumb:hover, & .MuiSlider-thumb.Mui-focusVisible': {
@@ -66,7 +66,7 @@ const SliderInfo = styled(MuiSlider)(({ theme }) => ({
     }
   },
   '& .MuiSlider-thumb.Mui-active, & .MuiSlider-thumb.Mui-focusVisible.Mui-active': {
-    boxShadow: `0 0 0 10px ${hexToRGBA(theme.palette.info.main, 0.16)} !important`
+    boxShadow: `0 0 0 10px ${hexToRGBA(theme.palette.info.dark, 0.16)} !important`
   }
 }))
 

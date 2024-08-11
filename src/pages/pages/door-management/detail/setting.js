@@ -126,7 +126,7 @@ const InforDoor = ({ idSetting }) => {
       <div>
         <Card>
           <CardHeader
-            title='Cấu hình cửa'
+            title='Door Config'
             titleTypographyProps={{ sx: { mb: [2, 0] } }}
             sx={{
               py: 4,
@@ -139,14 +139,14 @@ const InforDoor = ({ idSetting }) => {
                 <Grid item>
                   <Box sx={{ float: 'right' }}>
                     <Button variant='contained' component={Link} href={`/pages/door-management/list`}>
-                      Hủy
+                      Cancel
                     </Button>
                   </Box>
                 </Grid>
                 <Grid item>
                   <Box sx={{ float: 'right', marginLeft: '2%' }}>
                     <Button aria-label='Bộ lọc' variant='contained' onClick={updateDoor}>
-                      Lưu
+                      Save
                     </Button>
                   </Box>
                 </Grid>
@@ -165,7 +165,7 @@ const InforDoor = ({ idSetting }) => {
                 <Autocomplete
                   options={deviceGroups}
                   getOptionLabel={option => option.name}
-                  renderInput={params => <CustomTextField {...params} label='Nhóm thiết bị' fullWidth />}
+                  renderInput={params => <CustomTextField {...params} label='Device group' fullWidth />}
                   loading={loading}
                 />
               </Grid>
@@ -174,7 +174,7 @@ const InforDoor = ({ idSetting }) => {
                 <Autocomplete
                   options={deviceTypeOptions}
                   getOptionLabel={option => option.label}
-                  renderInput={params => <CustomTextField {...params} label='Loại thiết bị' fullWidth />}
+                  renderInput={params => <CustomTextField {...params} label='Device type' fullWidth />}
                   loading={loading}
                 />
               </Grid>
@@ -183,7 +183,7 @@ const InforDoor = ({ idSetting }) => {
                 <Autocomplete
                   getOptionLabel={option => option.name}
                   disabled
-                  renderInput={params => <CustomTextField {...params} label='Chiều định danh' fullWidth />}
+                  renderInput={params => <CustomTextField {...params} label='Designation direction' fullWidth />}
                   loading={loading}
                 />
               </Grid>
@@ -191,7 +191,7 @@ const InforDoor = ({ idSetting }) => {
               <Grid item xs={5.8} style={{ marginTop: 20 }}>
                 <Autocomplete
                   getOptionLabel={option => option.name}
-                  renderInput={params => <CustomTextField {...params} label='Thiết bị' fullWidth />}
+                  renderInput={params => <CustomTextField {...params} label='Device' fullWidth />}
                   disabled
                   loading={loading}
                 />

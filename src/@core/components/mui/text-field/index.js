@@ -46,7 +46,7 @@ const TextFieldStyled = styled(TextField)(({ theme }) => ({
         borderColor: theme.palette.secondary.main
       },
       '&.MuiInputBase-colorInfo': {
-        borderColor: theme.palette.info.main
+        borderColor: theme.palette.info.dark
       },
       '&.MuiInputBase-colorSuccess': {
         borderColor: theme.palette.success.main

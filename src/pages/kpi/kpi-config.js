@@ -41,7 +41,7 @@ const columns = [
     maxWidth: 50,
     align: 'center',
     field: 'name',
-    label: 'Tên KPI'
+    label: 'Name'
   },
   {
     id: 2,
@@ -49,7 +49,7 @@ const columns = [
     maxWidth: 50,
     align: 'center',
     field: 'type',
-    label: 'Mô tả'
+    label: 'Description'
   },
   {
     id: 3,
@@ -57,7 +57,7 @@ const columns = [
     maxWidth: 50,
     align: 'center',
     field: 'username',
-    label: 'Người tạo'
+    label: 'Creator'
   },
   {
     id: 4,
@@ -65,7 +65,7 @@ const columns = [
     maxWidth: 30,
     align: 'center',
     field: 'time',
-    label: 'Ngày tạo',
+    label: 'Date created',
     renderCell: value => new Date(value).toLocaleString()
   },
   {
@@ -74,7 +74,7 @@ const columns = [
     maxWidth: 50,
     align: 'center',
     field: 'updatedBy',
-    label: 'Người cập nhật'
+    label: 'Editor'
   },
   {
     id: 6,
@@ -82,7 +82,7 @@ const columns = [
     maxWidth: 50,
     align: 'center',
     field: 'updateTime',
-    label: 'Ngày cập nhật',
+    label: 'Date Updated',
     renderCell: value => new Date(value).toLocaleString()
   },
   {
@@ -91,7 +91,7 @@ const columns = [
     maxWidth: 50,
     align: 'center',
     field: 'status',
-    label: 'Trạng thái'
+    label: 'Status'
   }
 ]
 
@@ -201,7 +201,7 @@ const AutocompleteAsynchronousRequest = () => {
           <Grid item xs={8} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
             <CustomTextField
               sx={{ mr: 2 }}
-              placeholder='Tìm kiếm'
+              placeholder='Search'
               InputProps={{
                 startAdornment: (
                   <InputAdornment position='start'>
@@ -214,7 +214,7 @@ const AutocompleteAsynchronousRequest = () => {
               onChange={e => handleFilter(e.target.value)}
             />
             <Button variant='contained' component={Link} href={`/kpi/adds`}>
-              Thêm mới
+              Add
             </Button>
           </Grid>
         }

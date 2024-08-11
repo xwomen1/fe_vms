@@ -473,7 +473,7 @@ const DoorManagement = () => {
     <>
       <Card>
         <CardHeader
-          title={<Button variant='contained'>Danh sách cửa</Button>}
+          title={<Button variant='contained'>Door</Button>}
           titleTypographyProps={{ sx: { mb: [2, 0] } }}
           sx={{
             py: 4,
@@ -524,7 +524,7 @@ const DoorManagement = () => {
                     variant='contained'
                     disabled={selectedIds.length === 0}
                   >
-                    Khóa cửa
+                    Lock
                   </Button>
                 </Box>
               </Grid>
@@ -536,7 +536,7 @@ const DoorManagement = () => {
                     variant='contained'
                     disabled={selectedIds.length === 0}
                   >
-                    Xả cửa
+                    Discharge
                   </Button>
                 </Box>
               </Grid>
@@ -548,7 +548,7 @@ const DoorManagement = () => {
                     variant='contained'
                     disabled={selectedIds.length === 0}
                   >
-                    Đặt lại chế độ
+                    Reset
                   </Button>
                 </Box>
               </Grid>
@@ -556,7 +556,7 @@ const DoorManagement = () => {
                 <CustomTextField
                   value={value}
                   onChange={e => handleFilter(e.target.value)}
-                  placeholder='Tìm kiếm sự kiện '
+                  placeholder='Search '
                   InputProps={{
                     startAdornment: (
                       <Box sx={{ mr: 2, display: 'flex' }}>
@@ -607,12 +607,12 @@ const DoorManagement = () => {
                     <TableCell>
                       <Checkbox checked={selectedIds.length > 0} onChange={handleSelectAllChange} />
                     </TableCell>
-                    <TableCell>Tên Cửa</TableCell>
-                    <TableCell>Tên thiết bị</TableCell>
-                    <TableCell>Miêu tả</TableCell>
-                    <TableCell>Trạng thái</TableCell>
-                    <TableCell>Người chỉnh sửa cuối</TableCell>
-                    <TableCell>Thao tác</TableCell>
+                    <TableCell>Door Name</TableCell>
+                    <TableCell>Device Name</TableCell>
+                    <TableCell>Description</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell>Last editor</TableCell>
+                    <TableCell>Action</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -657,7 +657,7 @@ const DoorManagement = () => {
                 <Grid item xs={1.5} style={{ padding: 0, marginLeft: '12%' }}>
                   <IconButton onClick={handleOpenMenu}>
                     <Icon icon='tabler:selector' />
-                    <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
+                    <p style={{ fontSize: 15 }}>{pageSize} line/page</p>
                   </IconButton>
                   <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
                     {pageSizeOptions.map(size => (

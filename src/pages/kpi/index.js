@@ -51,12 +51,12 @@ const Caller = () => {
           <TabList onChange={handleChange} aria-label='customized tabs example'>
             <Tab
               value='1'
-              label='Thiết lập bộ KPI
+              label='Set up KPIs
 '
             />
             <Tab
               value='2'
-              label='Danh mục chỉ tiêu KPIs
+              label='List of KPIs
 '
             />
           </TabList>

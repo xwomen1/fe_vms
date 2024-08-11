@@ -337,7 +337,7 @@ const Vehicle = () => {
         <CardActions sx={{ backgroundColor: 'white', padding: 2 }}>
           <Grid container spacing={2} alignItems='center'>
             <Grid item xs={12} sm={4} sx={{ textAlign: 'right', mb: 1 }}>
-              <span style={{ fontSize: 15 }}>Dòng/trang</span>
+              <span style={{ fontSize: 15 }}>line/page</span>
             </Grid>
             <Grid item xs={12} sm={1}>
               <Button onClick={handleOpenMenu} endIcon={<Icon icon='tabler:selector' />}>

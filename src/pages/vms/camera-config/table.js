@@ -369,19 +369,19 @@ const Camera = ({ apiData }) => {
                     <Box></Box>
                   ) : (
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Button variant='contained' color='secondary' onClick={handleAddRoleClick}>
+                      <Button variant='contained' onClick={handleAddRoleClick}>
                         Mật khẩu
                       </Button>
-                      <Button variant='contained' color='secondary' onClick={handleAddNetworkClick}>
+                      <Button variant='contained' onClick={handleAddNetworkClick}>
                         Mạng
                       </Button>
-                      <Button variant='contained' color='secondary' onClick={handleAddVideoClick}>
+                      <Button variant='contained' onClick={handleAddVideoClick}>
                         Video
                       </Button>
-                      <Button variant='contained' color='secondary' onClick={handleAddImageClick}>
+                      <Button variant='contained' onClick={handleAddImageClick}>
                         Hình ảnh
                       </Button>
-                      <Button variant='contained' color='secondary' onClick={handleAddCloudClick}>
+                      <Button variant='contained' onClick={handleAddCloudClick}>
                         Bộ nhớ
                       </Button>
                     </Box>
@@ -508,7 +508,7 @@ const Camera = ({ apiData }) => {
                   <Box>
                     <IconButton onClick={handleOpenMenu}>
                       <Icon icon='tabler:selector' />
-                      <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
+                      <p style={{ fontSize: 15 }}>{pageSize} line/page</p>
                     </IconButton>
                     <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
                       {pageSizeOptions.map(size => (

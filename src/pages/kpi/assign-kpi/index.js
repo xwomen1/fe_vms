@@ -45,7 +45,7 @@ const Caller = () => {
         <Grid>
           {' '}
           <TabList onChange={handleChange} aria-label='customized tabs example'>
-            <Tab value='1' label='Giao KPI' />
+            <Tab value='1' label='Assign KPI' />
           </TabList>
         </Grid>
         <TabPanel value='1'>

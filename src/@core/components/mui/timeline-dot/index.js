@@ -14,6 +14,7 @@ const TimelineDot = props => {
 
   // ** Hook
   const theme = useTheme()
+
   const bgColors = useBgColor()
 
   const colors = {
@@ -44,13 +45,18 @@ const TimelineDot = props => {
     },
     info: {
       boxShadow: 'none',
-      color: theme.palette.info.main,
+      color: theme.palette.info.dark,
       backgroundColor: bgColors.infoLight.backgroundColor
     },
     grey: {
       boxShadow: 'none',
       color: theme.palette.grey[500],
       backgroundColor: hexToRGBA(theme.palette.grey[500], 0.12)
+    },
+    dark: {
+      boxShadow: 'none',
+      color: '#1268B3',
+      backgroundColor: '#002060'
     }
   }
 
