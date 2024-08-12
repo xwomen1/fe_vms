@@ -430,7 +430,6 @@ const SalaryTable = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>No.</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Access Code</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Full Name</TableCell>
-<<<<<<< HEAD
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Group</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Base Salary</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Salary Grade</TableCell>
@@ -440,17 +439,6 @@ const SalaryTable = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phone Allowance</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Other Allowances</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>KPCĐ</TableCell>
-=======
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Đơn vị</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Lương cơ bản</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Bậc lương</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phụ cấp trách nhiệm</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phụ cấp ăn trưa</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phụ cấp xăng xe</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phụ cấp điện thoại</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phụ cấp khác</TableCell>
-                      {/* <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>KPCĐ</TableCell> */}
->>>>>>> 81982d675fe3abb3e66cbf81b11cfb7f12655783
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>BHXH</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>BHYT</TableCell>
                       {/* <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>BHTN</TableCell> */}
