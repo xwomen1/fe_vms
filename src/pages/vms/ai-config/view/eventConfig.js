@@ -776,7 +776,7 @@ const EventConfig = () => {
               handleActiveAlertAI(alert?.cameraModelAI?.modelName)
             }}
           >
-            {alert.isactive == true ? 'Tắt cảnh báo ' : 'Bật cảnh báo'}
+            {alert.isactive == true ? 'Turn Off Alert' : 'Turn On Alert'}
           </Button>
         </Card>
       </>
@@ -855,7 +855,7 @@ const EventConfig = () => {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <Card>
-                <CardHeader title='Cảnh báo AI' />
+                <CardHeader title='AI Warning' />
                 <CardContent sx={{ height: '60vh', overflow: 'auto' }}>{alertAIListView()}</CardContent>
                 <CardActions>
                   <Grid container spacing={0}>
@@ -877,7 +877,7 @@ const EventConfig = () => {
                               }
                             }}
                           >
-                            Thêm mới cảnh báo
+                            Add New Warning
                           </Button>
                         </Grid>
                         <Grid item xs={6}>
@@ -892,7 +892,7 @@ const EventConfig = () => {
                               setIsOpenDel(true)
                             }}
                           >
-                            Xóa cảnh báo
+                            Delete Warning
                           </Button>
                         </Grid>
                       </Grid>
@@ -969,7 +969,7 @@ const EventConfig = () => {
                                 variant='outlined'
                                 disabled={eventSelect === null}
                               >
-                                Khoanh vùng
+                                Define Zone
                               </Button>
                             </Grid>
                             <Grid item xs={12} sm={6}>
@@ -982,7 +982,7 @@ const EventConfig = () => {
                                 variant='outlined'
                                 disabled={eventSelect === null}
                               >
-                                Rào ảo
+                                Virtual Fence
                               </Button>
                             </Grid>
                             <Grid item xs={12} sm={6}>
@@ -994,7 +994,7 @@ const EventConfig = () => {
                                 variant='outlined'
                                 disabled={eventSelect === null}
                               >
-                                Xóa
+                                Delete
                               </Button>
                             </Grid>
                             <Grid item xs={12} sm={6}>
@@ -1004,7 +1004,7 @@ const EventConfig = () => {
                                 variant='outlined'
                                 disabled={eventSelect === null}
                               >
-                                Lịch
+                                Schedule
                               </Button>
                             </Grid>
                           </Grid>

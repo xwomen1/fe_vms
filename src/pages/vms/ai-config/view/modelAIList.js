@@ -48,7 +48,7 @@ const columns = [
     minWidth: 50,
     align: 'center',
     field: 'modelName',
-    label: 'Tên Model AI'
+    label: 'Model AI Name'
   },
   {
     id: 2,
@@ -64,7 +64,7 @@ const columns = [
     minWidth: 120,
     align: 'center',
     field: 'updatedAt',
-    label: 'Ngày thay đổi',
+    label: 'Update At',
     renderCell: value => formatDate(value) // Add this line to format the date
   }
 ]
@@ -163,9 +163,9 @@ const ModelAIList = () => {
       >
         <Box sx={{ mb: 4, textAlign: 'center' }}>
           <Typography variant='h3' sx={{ mb: 3 }}>
-            Xác nhận
+          Confirm
           </Typography>
-          <Typography sx={{ color: 'text.secondary' }}>Bạn có chắc chắn muốn xóa không ?</Typography>
+          <Typography sx={{ color: 'text.secondary' }}>Are you sure you want to delete?</Typography>
         </Box>
       </DialogContent>
       <DialogActions
@@ -182,7 +182,7 @@ const ModelAIList = () => {
             setIsOpenDel(false)
           }}
         >
-          Đồng ý
+          Ok
         </Button>
         <Button variant='tonal' color='secondary' sx={{ mr: 1 }} onClick={() => setIsOpenDel(false)}>
           Cancel
@@ -199,7 +199,7 @@ const ModelAIList = () => {
         await axios.delete(`https://sbs.basesystem.one/ivis/vms/api/v0/camera-model-ai/${idDelete}`, config)
         setReload(reload + 1)
         setIdDelete(null)
-        toast.success('Xóa thành công')
+        toast.success('Deleted Successfully')
       } catch (error) {
         if (error && error?.response?.data) {
           console.error('error', error)
@@ -218,7 +218,7 @@ const ModelAIList = () => {
     <>
       <Card>
         <CardHeader
-          title='Danh sách Model AI'
+          title='Model AI List'
           titleTypographyProps={{ sx: { mb: [2, 0] } }}
           sx={{
             py: 4,
@@ -236,13 +236,13 @@ const ModelAIList = () => {
                     setIsOpenAdd(true)
                   }}
                 >
-                  Thêm mới
+                  Add New
                 </Button>
               </Grid>
               <Grid item>
                 <CustomTextField
                   value={keyword}
-                  placeholder='Tìm kiếm sự kiện '
+                  placeholder='Search Events'
                   InputProps={{
                     startAdornment: (
                       <Box sx={{ mr: 2, display: 'flex' }}>
@@ -278,13 +278,13 @@ const ModelAIList = () => {
                 <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
                   <TableHead>
                     <TableRow>
-                      <TableCell>STT</TableCell>
+                      <TableCell>No.</TableCell>
                       {columns.map(column => (
                         <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
                           {column.label}
                         </TableCell>
                       ))}
-                      <TableCell align='center'>Thao tác</TableCell>
+                      <TableCell align='center'>Actions</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>

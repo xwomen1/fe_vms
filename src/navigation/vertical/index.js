@@ -365,7 +365,7 @@ const navigation = () => {
           path: '/apps/roles'
         },
         {
-          title: 'Payroll',
+          title: 'Salary',
           icon: 'tabler:coin-pound',
           path: '/salary'
         },

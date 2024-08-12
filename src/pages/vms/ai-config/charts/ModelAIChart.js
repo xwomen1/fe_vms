@@ -59,7 +59,7 @@ const ModelAIChart = () => {
     xaxis: {
       axisBorder: { show: false },
       axisTicks: { color: theme.palette.divider },
-      categories: ['Khuôn mặt', 'Biển số', 'Trèo tường', 'Hung khí'],
+      categories: ['Face', 'License Plate', 'Wall Climbing', 'Weapon'],
       labels: {
         style: { colors: theme.palette.text.disabled }
       }
