@@ -217,7 +217,7 @@ const EventList = () => {
 
   useEffect(() => {
     if (rtcPeerConnection) {
-      rtcPeerConnection.addEventListener('connectionstatechange', () => {})
+      rtcPeerConnection.addEventListener('connectionstatechange', () => { })
     }
   }, [rtcPeerConnection])
 
