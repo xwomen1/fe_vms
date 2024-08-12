@@ -438,7 +438,7 @@ const SalaryTable = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phụ cấp xăng xe</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phụ cấp điện thoại</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phụ cấp khác</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>KPCĐ</TableCell>
+                      {/* <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>KPCĐ</TableCell> */}
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>BHXH</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>BHYT</TableCell>
                       {/* <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>BHTN</TableCell> */}
@@ -515,7 +515,7 @@ const SalaryTable = ({ apiData }) => {
                             user?.brandAllowance || '0'
                           )}
                         </TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{salary * KPCD || '0'}</TableCell>
+                        {/* <TableCell sx={{ whiteSpace: 'nowrap' }}>{salary * KPCD || '0'}</TableCell> */}
                         <TableCell sx={{ whiteSpace: 'nowrap' }}>{salary * BHXH || '0'}</TableCell>
                         <TableCell sx={{ whiteSpace: 'nowrap' }}>{salary * BHYT || '0'}</TableCell>
                         {/* <TableCell sx={{ whiteSpace: 'nowrap' }}>{salary * BHTN || '0'}</TableCell> */}

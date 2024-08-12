@@ -8,7 +8,7 @@ const RolePopup = ({ open, onClose, onSelect, userId, piId }) => {
   const [selectedRole, setSelectedRole] = useState(null)
   const [roleOptions, setRoleOptions] = useState([])
   const [defaultGroup, setDefaultGroup] = useState(null)
-  const [selectedGroupId, setSelectedGroupId] = useState(null) // Thêm trạng thái để lưu trữ id của nhóm được chọn
+  const [selectedGroupId, setSelectedGroupId] = useState(null) // Thêm Status để Save trữ id của nhóm được chọn
   const [groupOptions, setGroupOptions] = useState([])
   console.log(piId, 'userIDds')
 
@@ -16,7 +16,7 @@ const RolePopup = ({ open, onClose, onSelect, userId, piId }) => {
     setDefaultGroup(newValue)
     console.log(newValue.groupId)
     if (newValue) {
-      setSelectedGroupId(newValue.policyId) // Cập nhật trạng thái với id của nhóm được chọn
+      setSelectedGroupId(newValue.policyId) // Cập nhật Status với id của nhóm được chọn
     }
   }
 

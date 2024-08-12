@@ -303,13 +303,13 @@ const UserList = ({ apiData }) => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Mã định danh</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>NO.</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Access code</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Full Name</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Email</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Số điện thoại </TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Đơn vị</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Loại hợp đồng</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Phone Number </TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Group</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Contract Type</TableCell>
 
                     <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
                   </TableRow>

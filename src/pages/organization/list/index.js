@@ -251,7 +251,7 @@ const Organization = () => {
     <>
       <Card>
         <CardHeader
-          title={<Button variant='contained'>Quản lý cơ cấu tổ chức</Button>}
+          title={<Button variant='contained'>Manage Organizational Structure</Button>}
           titleTypographyProps={{ sx: { mb: [2, 0] } }}
           sx={{
             py: 4,
@@ -264,8 +264,7 @@ const Organization = () => {
               <Grid item>
                 <Box sx={{ float: 'right' }}>
                   <Button variant='contained' onClick={() => handleAddInfa()}>
-                    Thêm mới
-                    <Icon icon='tabler:plus' />
+                    Add <Icon icon='tabler:plus' />
                   </Button>
                 </Box>
               </Grid>
@@ -319,7 +318,7 @@ const Organization = () => {
             elevation={3}
             style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', padding: '1rem', width: '100%' }}
           >
-            <Typography variant='h6'>Danh sách cơ cấu :</Typography>
+            <Typography variant='h6'>List</Typography>
             {loadingChildren ? (
               <Typography variant='body1'>Đang tải dữ liệu...</Typography>
             ) : (
@@ -333,33 +332,33 @@ const Organization = () => {
         </Grid>
         <Grid item xs={7}>
           <Card>
-            <CardHeader title='Chi tiết' />
+            <CardHeader title='Detail' />
             <Paper>
               <Grid container spacing={3} style={{ padding: '1rem' }}>
                 <Grid item xs={12}>
-                  <CustomTextField fullWidth label='Tên' value={selectedName} />
+                  <CustomTextField fullWidth label='Name' value={selectedName} />
                 </Grid>
                 <Grid item xs={12}>
-                  <CustomTextField fullWidth label='Mã tổ chức' value={selectedCode} />
+                  <CustomTextField fullWidth label='Code' value={selectedCode} />
                 </Grid>
                 <Grid item xs={12}>
-                  <CustomTextField fullWidth label='Mô tả chi tiết' value={selectedDetail} />
+                  <CustomTextField fullWidth label='Detail' value={selectedDetail} />
                 </Grid>
               </Grid>
             </Paper>
           </Card>
           <Card>
-            <CardHeader title='Danh sách ' />
+            <CardHeader title='List ' />
             <Paper>
               <TableContainer component={Paper}>
                 <Table>
                   <TableHead>
                     <TableRow>
                       <TableCell>STT</TableCell>
-                      <TableCell>Tên</TableCell>
-                      <TableCell>Mã tổ chức</TableCell>
-                      <TableCell>Chi tiết</TableCell>
-                      <TableCell>Hành động</TableCell>
+                      <TableCell>Name</TableCell>
+                      <TableCell>Code</TableCell>
+                      <TableCell>Detail</TableCell>
+                      <TableCell>Action</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>

@@ -45,7 +45,7 @@ const columns = [
     maxWidth: 150,
     align: 'center',
     field: 'data',
-    label: 'Ảnh',
+    label: 'Image',
     renderCell: data => {
       const value = data?.find(item => item.faceType === 'CENTER')
 
@@ -74,7 +74,7 @@ const columns = [
     maxWidth: 150,
     align: 'center',
     field: 'quality',
-    label: 'Chất lượng'
+    label: 'Quality'
   },
   {
     id: 4,
@@ -82,7 +82,7 @@ const columns = [
     maxWidth: 150,
     align: 'center',
     field: 'distance',
-    label: 'Mức độ giống'
+    label: 'Similarity level'
   }
 ]
 
@@ -281,7 +281,7 @@ const Blacklist = () => {
     <>
       <div style={{ padding: '30px' }}>
         <Typography variant='h3' sx={{ marginBottom: '30px' }}>
-          Quản lý danh sách đen
+          Blacklist
         </Typography>
 
         <Card>
@@ -328,8 +328,8 @@ const Blacklist = () => {
                   <Grid item xs={3}>
                     <CustomTextField
                       value={keyword}
-                      label={'Tìm kiếm'}
-                      placeholder='Tìm kiếm đối tượng'
+                      label={'Search'}
+                      placeholder='Search đối tượng'
                       InputProps={{
                         startAdornment: (
                           <Box sx={{ mr: 2, display: 'flex' }}>
@@ -357,7 +357,7 @@ const Blacklist = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <Button variant='contained' color='secondary' sx={{ margin: 2, float: 'right' }}>
-                    Xóa toàn bộ
+                    Delete all
                   </Button>
                   <Button
                     variant='contained'
@@ -365,7 +365,7 @@ const Blacklist = () => {
                     sx={{ margin: 2, float: 'right' }}
                     onClick={handleSubmit(onSubmit)}
                   >
-                    Tìm kiếm
+                    Search
                   </Button>
                 </Grid>
               </Grid>
@@ -375,20 +375,20 @@ const Blacklist = () => {
 
         <br />
         <Card>
-          <CardHeader title='Danh sách đen' />
+          <CardHeader title='Blacklist' />
           <CardContent>
             <Grid container spacing={0}>
               <TableContainer component={Paper} sx={{ maxHeight: 1000 }}>
                 <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
                   <TableHead>
                     <TableRow>
-                      <TableCell style={{ width: '20px' }}>STT</TableCell>
+                      <TableCell style={{ width: '20px' }}>NO.</TableCell>
                       {columns.map(column => (
                         <TableCell key={column.id} align={column.align} sx={{ maxWidth: column.maxWidth }}>
                           {column.label}
                         </TableCell>
                       ))}
-                      <TableCell style={{ maxWidth: '50px' }}>Hành động</TableCell>
+                      <TableCell style={{ maxWidth: '50px' }}>Action</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -432,20 +432,20 @@ const Blacklist = () => {
         </Card>
         <br />
         <Card>
-          <CardHeader title='Danh sách member' />
+          <CardHeader title='Member' />
           <CardContent>
             <Grid container spacing={0}>
               <TableContainer component={Paper} sx={{ maxHeight: 1000 }}>
                 <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
                   <TableHead>
                     <TableRow>
-                      <TableCell style={{ width: '20px' }}>STT</TableCell>
+                      <TableCell style={{ width: '20px' }}>NO.</TableCell>
                       {columns.map(column => (
                         <TableCell key={column.id} align={column.align} sx={{ maxWidth: column.maxWidth }}>
                           {column.label}
                         </TableCell>
                       ))}
-                      <TableCell style={{ maxWidth: '50px' }}>Hành động</TableCell>
+                      <TableCell style={{ maxWidth: '50px' }}>Action</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>

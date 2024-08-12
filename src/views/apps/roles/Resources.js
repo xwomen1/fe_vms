@@ -99,11 +99,11 @@ const UserList = () => {
   }
 
   const scopeLabels = {
-    get: 'xem danh sách',
-    list: 'xem chi tiết',
-    update: 'cập nhật',
-    create: 'thêm mới',
-    delete: 'xóa'
+    get: 'Get',
+    list: 'Find by ID',
+    update: 'Put',
+    create: 'Add',
+    delete: 'Delete'
   }
 
   return (
@@ -112,13 +112,13 @@ const UserList = () => {
         <Grid item xs={12}>
           <Card>
             <CardHeader
-              title='Danh sách tài nguyên'
+              title='Resource List'
               action={
                 <Grid container spacing={2}>
                   <Grid item>
                     <Box sx={{ float: 'right' }}>
                       <Button aria-label='Bộ lọc' variant='contained' onClick={() => setIsOpenAdd(true)}>
-                        Thêm mới <Icon icon='mdi:plus'></Icon>
+                        Add <Icon icon='mdi:plus'></Icon>
                       </Button>
                     </Box>
                   </Grid>
@@ -149,7 +149,7 @@ const UserList = () => {
                         {['get', 'list', 'update', 'create', 'delete'].map(scope => (
                           <TableCell key={scope}>{scopeLabels[scope]}</TableCell>
                         ))}
-                        <TableCell>Hành động</TableCell>
+                        <TableCell>Action</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
