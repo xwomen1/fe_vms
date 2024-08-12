@@ -45,7 +45,7 @@ const columns = [
     maxWidth: 150,
     align: 'center',
     field: 'data',
-    label: 'Ảnh',
+    label: 'Image',
     renderCell: data => {
       const value = data?.find(item => item.faceType === 'CENTER')
 
@@ -74,7 +74,7 @@ const columns = [
     maxWidth: 150,
     align: 'center',
     field: 'quality',
-    label: 'Chất lượng'
+    label: 'Quality'
   },
   {
     id: 4,
@@ -82,14 +82,14 @@ const columns = [
     maxWidth: 150,
     align: 'center',
     field: 'distance',
-    label: 'Mức độ giống'
+    label: 'Distance'
   }
 ]
 
 const form_filter = [
   {
     name: 'threshold',
-    label: 'Ngưỡng',
+    label: 'Threshold',
     placeholder: '0.1',
     type: 'TextField',
     require: true,
@@ -97,7 +97,7 @@ const form_filter = [
   },
   {
     name: 'topk',
-    label: 'Độ giống',
+    label: 'Similarity',
     placeholder: '5',
     type: 'TextField',
     require: true,
@@ -216,7 +216,7 @@ const Blacklist = () => {
 
       try {
         await delApi(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${id}`)
-        toast.success('Xóa thành công')
+        toast.success('Delete Successful')
       } catch (error) {
         if (error && error?.response?.data) {
           console.error('error', error)
@@ -281,7 +281,7 @@ const Blacklist = () => {
     <>
       <div style={{ padding: '30px' }}>
         <Typography variant='h3' sx={{ marginBottom: '30px' }}>
-          Quản lý danh sách đen
+          Blacklist Management
         </Typography>
 
         <Card>
@@ -317,7 +317,7 @@ const Blacklist = () => {
                                 placeholder={item.placeholder}
                                 error={Boolean(errors.firstName)}
                                 aria-describedby='validation-basic-first-name'
-                                {...(errors.firstName && { helperText: 'Trường này bắt buộc' })}
+                                {...(errors.firstName && { helperText: 'This field is required' })}
                               />
                             )}
                           />
@@ -328,8 +328,8 @@ const Blacklist = () => {
                   <Grid item xs={3}>
                     <CustomTextField
                       value={keyword}
-                      label={'Tìm kiếm'}
-                      placeholder='Tìm kiếm đối tượng'
+                      label={'Search'}
+                      placeholder='Search Objects'
                       InputProps={{
                         startAdornment: (
                           <Box sx={{ mr: 2, display: 'flex' }}>
@@ -357,7 +357,7 @@ const Blacklist = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <Button variant='contained' color='secondary' sx={{ margin: 2, float: 'right' }}>
-                    Xóa toàn bộ
+                    Delete All
                   </Button>
                   <Button
                     variant='contained'
@@ -365,7 +365,7 @@ const Blacklist = () => {
                     sx={{ margin: 2, float: 'right' }}
                     onClick={handleSubmit(onSubmit)}
                   >
-                    Tìm kiếm
+                    Search
                   </Button>
                 </Grid>
               </Grid>
@@ -375,7 +375,7 @@ const Blacklist = () => {
 
         <br />
         <Card>
-          <CardHeader title='Danh sách đen' />
+          <CardHeader title='Black List' />
           <CardContent>
             <Grid container spacing={0}>
               <TableContainer component={Paper} sx={{ maxHeight: 1000 }}>
@@ -388,7 +388,7 @@ const Blacklist = () => {
                           {column.label}
                         </TableCell>
                       ))}
-                      <TableCell style={{ maxWidth: '50px' }}>Hành động</TableCell>
+                      <TableCell style={{ maxWidth: '50px' }}>Actions</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -432,7 +432,7 @@ const Blacklist = () => {
         </Card>
         <br />
         <Card>
-          <CardHeader title='Danh sách member' />
+          <CardHeader title='Member List' />
           <CardContent>
             <Grid container spacing={0}>
               <TableContainer component={Paper} sx={{ maxHeight: 1000 }}>
@@ -445,7 +445,7 @@ const Blacklist = () => {
                           {column.label}
                         </TableCell>
                       ))}
-                      <TableCell style={{ maxWidth: '50px' }}>Hành động</TableCell>
+                      <TableCell style={{ maxWidth: '50px' }}>Actions</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>

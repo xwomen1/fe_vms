@@ -330,12 +330,12 @@ const DigitalMap = () => {
 
                     {!open1 && (
                         <Button variant='contained' onClick={() => setOpen1(true)}>
-                            Danh sách camera
+                            Camera List
                         </Button>
                     )}
                     {open1 && (
                         <Card sx={{ width: '320px' }}>
-                            <CardHeader title='Danh sách Camera'
+                            <CardHeader title='Camera List'
                                 action={
                                     <Grid container spacing={0}>
                                         <IconButton onClick={() => setOpen1(false)}>
@@ -397,12 +397,12 @@ const DigitalMap = () => {
 
                     {!open2 && (
                         <Button variant='contained' onClick={() => setOpen2(true)}>
-                            Danh sách Khu vực
+                            Area List
                         </Button>
                     )}
                     {open2 && (
                         <Card sx={{ width: '320px' }}>
-                            <CardHeader title='Danh sách Khu vực'
+                            <CardHeader title='Area List'
                                 action={
                                     <Grid container spacing={0}>
                                         <IconButton onClick={() => setOpen2(false)}>
@@ -464,12 +464,12 @@ const DigitalMap = () => {
 
                     {!open3 && (
                         <Button variant='contained' onClick={() => setOpen3(true)}>
-                            Danh sách camera đã chọn
+                            Selected Camera List
                         </Button>
                     )}
                     {open3 && (
                         <Card sx={{ width: '320px' }}>
-                            <CardHeader title='Danh sách Camera đã chọn'
+                            <CardHeader title='Selected Camera List'
                                 action={
                                     <Grid container spacing={0}>
                                         <IconButton onClick={() => setOpen3(false)}>

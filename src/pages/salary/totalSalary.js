@@ -359,32 +359,32 @@ const UserList = ({ apiData }) => {
                   <TableHead>
                     <TableRow>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>STT</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Mã định danh</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Access Code</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Full Name</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Đơn vị</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Lương cơ bản</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Group</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Base Salary</TableCell>
 
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Bậc lương</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Lương chính</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Salary Grade</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Primary Salary</TableCell>
 
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Ngày công</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Workdays</TableCell>
 
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>PC trách nhiệm</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>PC ăn trưa</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Responsibility Allowance</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Lunch Allowance</TableCell>
 
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>PC xăng xe</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>PC điện thoại</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>PC khác</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phụ cấp OT</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phụ cấp công tác</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Tổng phụ cấp</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Card Allowance</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phone Allowance</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Other Allowances</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>OT Allowance</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Business Trip Allowance</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Total Allowances</TableCell>
 
                       {/* <TableCell sx={{ padding: '16px' , whiteSpace: 'nowrap' }}>KPCĐ</TableCell> */}
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>BHXH</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>BHYT</TableCell>
 
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Tổng BH</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Nhận</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Total BH</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Receive</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
