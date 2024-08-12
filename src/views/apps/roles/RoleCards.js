@@ -142,7 +142,7 @@ const RolesCards = () => {
   }
 
   const handleSwitchChange = () => {
-    // Cập nhật trạng thái của policyData dựa trên trạng thái hiện tại của isAdminAccessActive
+    // Put trạng thái của policyData dựa trên trạng thái hiện tại của isAdminAccessActive
 
     const newStatus = isAdminAccessActive ? 'INACTIVE' : 'ACTIVE'
     setPolicyData(prevPolicyData => ({
@@ -156,7 +156,7 @@ const RolesCards = () => {
     setPolicyData(updatedPolicy)
   }
 
-  // Hàm cập nhật thông tin trong trường Role Code
+  // Hàm Put thông tin trong trường Role Code
   const handleRoleCodeChange = e => {
     const updatedPolicy = { ...policyData, policyCode: e.target.value }
     setPolicyData(updatedPolicy)
@@ -200,7 +200,7 @@ const RolesCards = () => {
       handleClose()
       Swal.fire({
         title: 'Thành công!',
-        text: 'Dữ liệu đã được cập nhật thành công.',
+        text: 'Dữ liệu đã được Put thành công.',
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
@@ -242,7 +242,7 @@ const RolesCards = () => {
       const selectedResource = resourcesData.find(item => item.resourceName === resource)
 
       if (selectedResource) {
-        // Thực hiện cập nhật payload ngay sau khi nhận được thông tin từ API
+        // Thực hiện Put payload ngay sau khi nhận được thông tin từ API
         const newScopes = isChecked
           ? policyData.scopes.filter(item => !(item.resourceName === resource && item.scope === scope))
           : policyData.scopes
@@ -356,7 +356,7 @@ const RolesCards = () => {
           <Typography variant='h3' sx={{ mb: 3 }}>
             Xác nhận
           </Typography>
-          <Typography sx={{ color: 'text.secondary' }}>Bạn có chắc chắn muốn xóa không ?</Typography>
+          <Typography sx={{ color: 'text.secondary' }}>Bạn có chắc chắn muốn Delete không ?</Typography>
         </Box>
       </DialogContent>
       <DialogActions
@@ -376,7 +376,7 @@ const RolesCards = () => {
           Đồng ý
         </Button>
         <Button variant='tonal' color='secondary' sx={{ mr: 1 }} onClick={() => setIsOpenDel(false)}>
-          Hủy
+          Cancel
         </Button>
       </DialogActions>
     </Dialog>
@@ -397,7 +397,7 @@ const RolesCards = () => {
       axios
         .delete(`https://dev-ivi.basesystem.one/smc/iam/api/v0/policies/${idDelete}`, config)
         .then(() => {
-          toast.success('Xóa thành công')
+          toast.success('Delete thành công')
           setIdDelete(null)
           fetchDataPolicies()
         })
@@ -416,9 +416,7 @@ const RolesCards = () => {
         <Card>
           <CardContent>
             <Box sx={{ mb: 1.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography sx={{ color: 'text.secondary' }}>{`Tổng số người dùng ${
-                userCounts[item.policyId] || 0
-              } `}</Typography>
+              <Typography sx={{ color: 'text.secondary' }}>{`Total ${userCounts[item.policyId] || 0} `}</Typography>
               <AvatarGroup
                 max={4}
                 className='pull-up'
@@ -447,7 +445,7 @@ const RolesCards = () => {
                 >
                   <Button variant='contained'>
                     <Icon icon='tabler:edit' />
-                    Chỉnh sửa
+                    Edit
                   </Button>
                 </Typography>
               </Box>
@@ -585,7 +583,7 @@ const RolesCards = () => {
                           >
                             {resource}
                           </TableCell>
-                          {['xem danh sách', 'xem chi tiết', 'cập nhật', 'thêm mới', 'xóa'].map((scope, i) => {
+                          {['Get', 'Find by ID', 'Put', 'Add', 'Delete'].map((scope, i) => {
                             const englishScope = ['get', 'list', 'update', 'create', 'delete'][i]
 
                             return (

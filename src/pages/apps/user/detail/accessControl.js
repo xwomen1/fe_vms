@@ -91,7 +91,7 @@ const AccessRight = () => {
       minWidth: 50,
       align: 'left',
       field: 'nameCalendar',
-      label: 'Tên lịch'
+      label: 'Name Schedule'
     },
     {
       id: 2,
@@ -99,14 +99,14 @@ const AccessRight = () => {
       minWidth: 50,
       align: 'left',
       field: 'name',
-      label: 'Họ tên'
+      label: 'Name'
     },
     {
       id: 3,
       flex: 0.15,
       minWidth: 100,
       align: 'left',
-      label: 'Phòng ban',
+      label: 'Group',
       field: 'groupName'
     },
     {
@@ -115,7 +115,7 @@ const AccessRight = () => {
       minWidth: 200,
       align: 'left',
       field: 'doorInName',
-      label: 'Cửa vào'
+      label: 'Door in'
     },
     {
       id: 5,
@@ -123,7 +123,7 @@ const AccessRight = () => {
       minWidth: 200,
       align: 'left',
       field: 'doorOutName',
-      label: 'Cửa ra'
+      label: 'Door out'
     },
     {
       id: 6,
@@ -131,7 +131,7 @@ const AccessRight = () => {
       type: 'date',
       minWidth: 130,
       align: 'left',
-      label: 'Ngày bắt đầu',
+      label: 'Start date',
       field: 'startDate',
       valueGetter: params => new Date(params.value)
     },
@@ -141,7 +141,7 @@ const AccessRight = () => {
       type: 'date',
       minWidth: 130,
       align: 'left',
-      label: 'Ngày kết thúc',
+      label: 'End date',
       field: 'endDate',
       valueGetter: params => new Date(params.value)
     }
@@ -263,15 +263,15 @@ const AccessRight = () => {
       if (row.calendarDays && Array.isArray(row.calendarDays)) {
         row.calendarDays.forEach(calendarDay => {
           acc.push({
-            'Tên lịch': row.nameCalendar,
+            Name: row.nameCalendar,
             'Phòng ban': row.groupName,
             'Ngày trong tuần': calendarDay.dayOfWeek,
             'Giờ bắt đầu': calendarDay.timePeriods[0]?.startTimeInMinute,
             'Giờ kết thúc': calendarDay.timePeriods[0]?.endTimeInMinute,
             'Cửa vào': row.doorInName,
             'Cửa ra': row.doorOutName,
-            'Ngày bắt đầu': row.startDate,
-            'Ngày kết thúc': row.endDate,
+            'Start date': row.startDate,
+            'End date': row.endDate,
             'Số lượng người': row.sizeUser
           })
         })
@@ -406,7 +406,7 @@ const AccessRight = () => {
                         {column.label}
                       </TableCell>
                     ))}
-                    <TableCell>Thao tác</TableCell>
+                    <TableCell>Action</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>

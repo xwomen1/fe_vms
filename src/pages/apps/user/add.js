@@ -213,7 +213,7 @@ const Add = () => {
       return
     }
     if (!fullNameValue || fullNameValue.length <= 3) {
-      Swal.fire('Lỗi!', 'Tên không được để trống và độ dài phải >3', 'error')
+      Swal.fire('Lỗi!', 'Name không được để trống và độ dài phải >3', 'error')
 
       return
     }
@@ -223,27 +223,27 @@ const Add = () => {
       return
     }
     if (!phoneNumber) {
-      Swal.fire('Lỗi!', 'Số điện thoại không được để trống', 'error')
+      Swal.fire('Lỗi!', 'Phone Number không được để trống', 'error')
 
       return
     }
     if (!identityNumber) {
-      Swal.fire('Lỗi!', 'Số giấy tờ không được để trống', 'error')
+      Swal.fire('Lỗi!', 'Identify number không được để trống', 'error')
 
       return
     }
     if (!userCode) {
-      Swal.fire('Lỗi!', 'Mã người dùng không được để trống', 'error')
+      Swal.fire('Lỗi!', 'Code không được để trống', 'error')
 
       return
     }
     if (!syncCode) {
-      Swal.fire('Lỗi!', 'Mã đồng bộ không được để trống', 'error')
+      Swal.fire('Lỗi!', 'Synchronize code không được để trống', 'error')
 
       return
     }
     if (!account) {
-      Swal.fire('Lỗi!', 'Tên tài khoản không được để trống', 'error')
+      Swal.fire('Lỗi!', 'Name Account không được để trống', 'error')
 
       return
     }
@@ -548,16 +548,16 @@ const Add = () => {
               <Icon icon='tabler:chevron-left' />
             </IconButton>
 
-            <h2 style={{ color: 'black' }}>Thêm mới người dùng: </h2>
+            <h2 style={{ color: 'black' }}>Add người dùng: </h2>
           </Grid>
           <Grid container spacing={2}>
             <div style={{ width: '80%' }}></div>
             <>
               <Button variant='contained' component={Link} href={`/apps/user/list`}>
-                Huỷ
+                Cancel
               </Button>
               <Button variant='contained' onClick={saveChanges} sx={{ marginLeft: '10px' }}>
-                Lưu
+                Save
               </Button>
             </>
           </Grid>
@@ -566,18 +566,18 @@ const Add = () => {
           </Grid>
           <Grid container spacing={2} style={{ marginLeft: 10 }}>
             <Grid item xs={4}>
-              <TextField label='Tên' onChange={handleFullNameChange} fullWidth />
+              <TextField label='Name' onChange={handleFullNameChange} fullWidth />
             </Grid>
             <Grid item xs={4}>
               <TextField label='Email' onChange={handleEmailChange} fullWidth />
             </Grid>
             <Grid item xs={3.8}>
-              <TextField label='Số điện thoại' onChange={handlePhoneNumberChange} fullWidth />
+              <TextField label='Phone Number' onChange={handlePhoneNumberChange} fullWidth />
             </Grid>
             <Grid item xs={4}>
               {/* Update Select to use the gender state */}
               <FormControl fullWidth>
-                <InputLabel id='gender-label'>Giới tính</InputLabel>
+                <InputLabel id='gender-label'>Gender</InputLabel>
                 <Select
                   labelId='gender-label'
                   id='gender-select'
@@ -592,17 +592,17 @@ const Add = () => {
               </FormControl>
             </Grid>
             <Grid item xs={4}>
-              <TextField label='Số giấy tờ' onChange={handleIdentityNumberChange} fullWidth />
+              <TextField label='Identify number' onChange={handleIdentityNumberChange} fullWidth />
             </Grid>
             <Grid item xs={3.8}>
-              <TextField label='Mã người dùng' onChange={handleUserCodeChange} fullWidth />
+              <TextField label='Code' onChange={handleUserCodeChange} fullWidth />
             </Grid>
             <Grid item xs={4}>
-              <TextField label='Mã đồng bộ' onChange={handleSyncCodeChange} fullWidth />
+              <TextField label='Synchronize code' onChange={handleSyncCodeChange} fullWidth />
             </Grid>
             <Grid item xs={4}>
               <FormControl fullWidth>
-                <InputLabel id='region-label'>Cấp bậc</InputLabel>
+                <InputLabel id='region-label'>Level</InputLabel>
                 <Select
                   labelId='region-label'
                   id='region-select'
@@ -619,7 +619,7 @@ const Add = () => {
             </Grid>
             <Grid item xs={3.8}>
               <FormControl fullWidth>
-                <InputLabel id='region-label'>Loại hợp đồng</InputLabel>
+                <InputLabel id='region-label'>Contract Type</InputLabel>
                 <Select
                   labelId='region-label'
                   id='region-select'
@@ -635,11 +635,11 @@ const Add = () => {
               </FormControl>{' '}
             </Grid>
             <Grid item xs={2} style={{ marginTop: '1.1%' }}>
-              Trạng thái
-              <Switch checked={status1 === 'ACTIVE'} onChange={handleStatusChange} color='primary' label='Trạng thái' />
+              Status
+              <Switch checked={status1 === 'ACTIVE'} onChange={handleStatusChange} color='primary' label='Status' />
             </Grid>
             <Grid item xs={1} style={{ marginTop: '2%' }}>
-              Ca sáng:
+              Morning shift:
             </Grid>
 
             <Grid item xs={1}>
@@ -679,7 +679,7 @@ const Add = () => {
               </DatePickerWrapper>
             </Grid>
             <Grid item xs={1} style={{ marginTop: '2%' }}>
-              Ca chiều:
+              Afternoon shift:
             </Grid>
             <Grid item xs={1}>
               <DatePickerWrapper>
@@ -719,15 +719,15 @@ const Add = () => {
             </Grid>
             <Grid item xs={3.8}>
               <FormControl fullWidth>
-                <InputLabel id='time-validity-label'>Thời gian hiệu lực</InputLabel>
+                <InputLabel id='time-validity-label'>Validity period</InputLabel>
                 <Select
                   labelId='time-validity-label'
                   id='time-validity-select'
                   value={timeValidity}
                   onChange={handleTimeValidityChange}
                 >
-                  <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
-                  <MenuItem value='Undefined'>Không xác định</MenuItem>
+                  <MenuItem value='Custom'>Custom</MenuItem>
+                  <MenuItem value='Undefined'>None</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -742,7 +742,7 @@ const Add = () => {
                             selected={availableAt}
                             onChange={handleStartDateChange}
                             dateFormat='MM/dd/yyyy'
-                            customInput={<CustomInput label='Ngày bắt đầu' />}
+                            customInput={<CustomInput label='Start date' />}
                           />
                         </div>
                       </Box>
@@ -756,7 +756,7 @@ const Add = () => {
                             selected={expiredAt}
                             onChange={handleEndDateChange}
                             dateFormat='MM/dd/yyyy'
-                            customInput={<CustomInput label='Ngày kết thúc' />}
+                            customInput={<CustomInput label='End date' />}
                           />
                         </div>
                       </Box>
@@ -766,19 +766,19 @@ const Add = () => {
               )}
             </Grid>
             <Grid item xs={11.8}>
-              <TextField rows={4} multiline label='Ghi chú' onChange={handleNoteChange} fullWidth />
+              <TextField rows={4} multiline label='Note' onChange={handleNoteChange} fullWidth />
             </Grid>
             <Grid item xs={12}>
-              <Typography variant='h5'>Đơn vị</Typography>
+              <Typography variant='h5'>Group</Typography>
             </Grid>
             <Grid item xs={11.8}>
               <TableContainer>
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Đơn vị</TableCell>
-                      <TableCell>Mã đơn vị</TableCell>
-                      <TableCell align='right'>Là lãnh đạo đơn vị</TableCell>
+                      <TableCell>Group</TableCell>
+                      <TableCell>Group Code</TableCell>
+                      <TableCell align='right'>Is Leader</TableCell>
                       <TableCell align='center'>
                         <IconButton size='small' onClick={handleAddRow} sx={{ marginLeft: '10px' }}>
                           <Icon icon='bi:plus' />
@@ -802,7 +802,7 @@ const Add = () => {
                               // updatedRows[index].id = newValue.id
                               setRows(updatedRows)
                             }}
-                            renderInput={params => <TextField {...params} label='Đơn vị' />}
+                            renderInput={params => <TextField {...params} label='Group' />}
                           />
                         </TableCell>
                         {console.log(rows)}
@@ -828,17 +828,17 @@ const Add = () => {
           <Grid item xs={12}>
             <FormControlLabel
               control={<Checkbox checked={createAccount} onChange={handleCreateAccountChange} color='primary' />}
-              label='Tạo tài khoản đăng nhập'
+              label='Tạo Account đăng nhập'
               labelPlacement='start'
             />
           </Grid>
           {createAccount && (
             <Grid container spacing={2} style={{ marginLeft: 10 }}>
               <Grid item xs={12}>
-                <Typography variant='h5'>Thông tin tài khoản</Typography>
+                <Typography variant='h5'>Account Information</Typography>
               </Grid>
               <Grid item xs={4}>
-                <TextField label='Tài khoản' onChange={handleAccountChange} fullWidth />
+                <TextField label='Account' onChange={handleAccountChange} fullWidth />
               </Grid>
               <Grid item xs={4}>
                 <TextField label='Mật khẩu' type='password' onChange={handlePasswordChange} fullWidth />
@@ -857,20 +857,20 @@ const Add = () => {
                       color='primary'
                     />
                   }
-                  label='Trạng thái'
+                  label='Status'
                   labelPlacement='start'
                 />
               </Grid>
               <Grid item xs={12}>
-                <Typography variant='h5'>Vai trò</Typography>
+                <Typography variant='h5'>Role</Typography>
               </Grid>
               <Grid item xs={11.8}>
                 <TableContainer>
                   <Table>
                     <TableHead>
                       <TableRow>
-                        <TableCell>Tên vai trò</TableCell>
-                        <TableCell>Mô tả</TableCell>
+                        <TableCell>Name</TableCell>
+                        <TableCell>Description</TableCell>
                         <TableCell align='center'>
                           <IconButton onClick={handleAddRow1} size='small' sx={{ marginLeft: '10px' }}>
                             <Icon icon='bi:plus' />
@@ -893,7 +893,7 @@ const Add = () => {
                                 updatedRows[index].policyId = newValue.policyId
                                 setRows1(updatedRows)
                               }}
-                              renderInput={params => <TextField {...params} label='Vai trò' />}
+                              renderInput={params => <TextField {...params} label='Role' />}
                             />
                           </TableCell>
                           <TableCell>{row.description}</TableCell>

@@ -109,7 +109,7 @@ const AccessRight = () => {
       minWidth: 50,
       align: 'right',
       field: 'name',
-      label: 'Tên trường'
+      label: 'Name trường'
     },
     {
       id: 2,
@@ -195,7 +195,7 @@ const AccessRight = () => {
       minWidth: 50,
       align: 'right',
       field: 'ChuyenNganh',
-      label: 'Chức danh, chức vụ, đơn vị công tác'
+      label: 'Chức danh, chức vụ, Group công tác'
     }
   ]
 
@@ -233,7 +233,7 @@ const AccessRight = () => {
         <img
           {...props}
           src={src}
-          alt='Ảnh'
+          alt='Image'
           onLoad={() => setLoaded(true)}
           style={loaded ? { width: '100px', height: '100px' } : { display: 'none' }}
         />
@@ -250,7 +250,7 @@ const AccessRight = () => {
             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Grid item xs={4}></Grid>
               <Grid item xs={8} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-                <Button variant='contained'>Lưu</Button>
+                <Button variant='contained'>Save</Button>
                 <Button variant='contained' style={{ marginLeft: '2%' }}>
                   Hủy
                 </Button>
@@ -286,13 +286,13 @@ const AccessRight = () => {
                   style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                 />
               </Box>
-              <div style={{ textAlign: 'center', marginTop: '-4%', marginBottom: '3%' }}>Ảnh đại diện</div>
+              <div style={{ textAlign: 'center', marginTop: '-4%', marginBottom: '3%' }}>Image đại diện</div>
             </Grid>
             <Grid item xs={3}>
-              <CustomTextField label='Họ Tên' value={row.data[0].fullName} fullWidth />
+              <CustomTextField label='Họ Name' value={row.data[0].fullName} fullWidth />
             </Grid>
             <Grid item xs={3}>
-              <CustomTextField label='Tên gọi Khác' value={row.data[0].fullName} fullWidth />
+              <CustomTextField label='Name gọi Khác' value={row.data[0].fullName} fullWidth />
             </Grid>
             <Grid item xs={3}>
               <DatePickerWrapper>
@@ -313,7 +313,7 @@ const AccessRight = () => {
             </Grid>
 
             <Grid item xs={3}>
-              <CustomTextField label='Giới tính' value={row.data[0].GioiTinh} fullWidth />
+              <CustomTextField label='Gender' value={row.data[0].GioiTinh} fullWidth />
             </Grid>
 
             <Grid item xs={3}>
@@ -678,7 +678,7 @@ const AccessRight = () => {
               </TableContainer>
               <Grid item xs={12} style={{ marginTop: '2%' }}>
                 <CustomTextField
-                  label='... Nhận xét, đánh giá của cơ quan, đơn vị quản lý và sử dụng cán bộ, công chức .!'
+                  label='... Nhận xét, đánh giá của cơ quan, Group quản lý và sử dụng cán bộ, công chức .!'
                   fullWidth
                 />
               </Grid>

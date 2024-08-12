@@ -82,7 +82,7 @@ const columns = [
     maxWidth: 150,
     align: 'center',
     field: 'distance',
-    label: 'Distance'
+    label: 'Similarity level'
   }
 ]
 
@@ -281,7 +281,7 @@ const Blacklist = () => {
     <>
       <div style={{ padding: '30px' }}>
         <Typography variant='h3' sx={{ marginBottom: '30px' }}>
-          Blacklist Management
+          Blacklist
         </Typography>
 
         <Card>
@@ -329,7 +329,7 @@ const Blacklist = () => {
                     <CustomTextField
                       value={keyword}
                       label={'Search'}
-                      placeholder='Search Objects'
+                      placeholder='Search đối tượng'
                       InputProps={{
                         startAdornment: (
                           <Box sx={{ mr: 2, display: 'flex' }}>
@@ -357,7 +357,7 @@ const Blacklist = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <Button variant='contained' color='secondary' sx={{ margin: 2, float: 'right' }}>
-                    Delete All
+                    Delete all
                   </Button>
                   <Button
                     variant='contained'
@@ -375,20 +375,20 @@ const Blacklist = () => {
 
         <br />
         <Card>
-          <CardHeader title='Black List' />
+          <CardHeader title='Blacklist' />
           <CardContent>
             <Grid container spacing={0}>
               <TableContainer component={Paper} sx={{ maxHeight: 1000 }}>
                 <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
                   <TableHead>
                     <TableRow>
-                      <TableCell style={{ width: '20px' }}>STT</TableCell>
+                      <TableCell style={{ width: '20px' }}>NO.</TableCell>
                       {columns.map(column => (
                         <TableCell key={column.id} align={column.align} sx={{ maxWidth: column.maxWidth }}>
                           {column.label}
                         </TableCell>
                       ))}
-                      <TableCell style={{ maxWidth: '50px' }}>Actions</TableCell>
+                      <TableCell style={{ maxWidth: '50px' }}>Action</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -432,20 +432,20 @@ const Blacklist = () => {
         </Card>
         <br />
         <Card>
-          <CardHeader title='Member List' />
+          <CardHeader title='Member' />
           <CardContent>
             <Grid container spacing={0}>
               <TableContainer component={Paper} sx={{ maxHeight: 1000 }}>
                 <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
                   <TableHead>
                     <TableRow>
-                      <TableCell style={{ width: '20px' }}>STT</TableCell>
+                      <TableCell style={{ width: '20px' }}>NO.</TableCell>
                       {columns.map(column => (
                         <TableCell key={column.id} align={column.align} sx={{ maxWidth: column.maxWidth }}>
                           {column.label}
                         </TableCell>
                       ))}
-                      <TableCell style={{ maxWidth: '50px' }}>Actions</TableCell>
+                      <TableCell style={{ maxWidth: '50px' }}>Action</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
