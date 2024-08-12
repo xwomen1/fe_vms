@@ -365,7 +365,7 @@ const InforAll = ({ idInfor }) => {
       <div>
         <Card>
           <CardHeader
-            title='Thông tin thiết bị'
+            title='Device Information'
             titleTypographyProps={{ sx: { mb: [2, 0] } }}
             sx={{
               py: 4,
@@ -403,7 +403,7 @@ const InforAll = ({ idInfor }) => {
           >
             <Grid item xs={2.8}>
               <CustomTextField
-                label='Tên'
+                label='Name'
                 value={device ? device.name : ''}
                 onChange={e => handleInputChange('name', e.target.value)}
                 fullWidth
@@ -428,14 +428,14 @@ const InforAll = ({ idInfor }) => {
                     }))
                   }
                 }}
-                renderInput={params => <CustomTextField {...params} label='Nhóm thiết bị' fullWidth />}
+                renderInput={params => <CustomTextField {...params} label='Device Group' fullWidth />}
                 loading={loading}
               />
             </Grid>
             <Grid item xs={0.1}></Grid>
             <Grid item xs={2.8}>
               <CustomTextField
-                label='ID thiết bị '
+                label='Device ID '
                 onChange={e => handleInputChange('serialNumber', e.target.value)}
                 value={device ? device.serialNumber : ''}
                 fullWidth
@@ -452,13 +452,13 @@ const InforAll = ({ idInfor }) => {
                     handleInputChange('deviceType', newValue.value)
                   }
                 }}
-                renderInput={params => <CustomTextField {...params} label='loại thiết bị' fullWidth />}
+                renderInput={params => <CustomTextField {...params} label='Device Type' fullWidth />}
               />
             </Grid>
             <Grid item xs={0.1}></Grid>
             <Grid item xs={2.8} style={{ marginTop: 20 }}>
               <CustomTextField
-                label='Nâng cấp phiên bản app'
+                label='Upgrade App Version'
                 value={device ? device.firmware : ''}
                 onChange={e => handleInputChange('firmware', e.target.value)}
                 fullWidth
@@ -467,7 +467,7 @@ const InforAll = ({ idInfor }) => {
             <Grid item xs={0.1}></Grid>
             <Grid item xs={2.8} style={{ marginTop: 20 }}>
               <CustomTextField
-                label='Tên sản phẩm '
+                label='Product Name'
                 value={device ? device.model : ''}
                 onChange={e => handleInputChange('model', e.target.value)}
                 fullWidth
@@ -484,13 +484,13 @@ const InforAll = ({ idInfor }) => {
                     setDevice(prevDevice => ({ ...prevDevice, direction: newValue.value }))
                   }
                 }}
-                renderInput={params => <CustomTextField {...params} label='Chiều định danh' fullWidth />}
+                renderInput={params => <CustomTextField {...params} label='Identifier Dimension' fullWidth />}
               />{' '}
             </Grid>
             <Grid item xs={0.1}></Grid>
             <Grid item xs={2.8} style={{ marginTop: 20 }}>
               <CustomTextField
-                placeholder='  Nhập loại Hardware Version...'
+                placeholder='Enter Hardware Version Type...'
                 disabled
                 label='Hardware Version'
                 fullWidth
@@ -498,7 +498,7 @@ const InforAll = ({ idInfor }) => {
             </Grid>
             <Grid item xs={0.1}></Grid>
             <Grid item xs={2.8} style={{ marginTop: 20 }}>
-              <CustomTextField placeholder='  Nhập loại năng lượng...' disabled label='Loại năng lượng' fullWidth />
+              <CustomTextField placeholder='Enter Energy Type...' disabled label='Energy Type' fullWidth />
             </Grid>
             <Grid item xs={0.1}></Grid>
             <Grid item xs={2.8} style={{ marginTop: 20 }}>
@@ -533,22 +533,22 @@ const InforAll = ({ idInfor }) => {
             <Grid item xs={0.1}></Grid>
             <Grid item xs={2.8} style={{ marginTop: 20 }}>
               <CustomTextField
-                label='Ghi chú'
+                label='Note'
                 value={device ? device.description : ''}
                 onChange={e => handleInputChange('description', e.target.value)}
                 fullWidth
               />
             </Grid>
             <Grid item xs={0.1}></Grid>
-            <p style={{ fontSize: '0.8rem' }}>Khôi phục cài đặt thiết bị</p>
+            <p style={{ fontSize: '0.8rem' }}>Restore Device Settings</p>
             <Grid item xs={2.8} style={{ marginTop: 39, display: 'inline-flex', marginLeft: '-145px' }}>
               <Grid>
                 <Button fullWidth variant='contained'>
-                  Toàn bộ
+                  All
                 </Button>
               </Grid>
               <Grid fullWidth style={{ marginLeft: '3%' }}>
-                <Button variant='contained'>Khôi phục cài đặt mạng </Button>
+                <Button variant='contained'>Restore Network</Button>
               </Grid>
             </Grid>
           </Grid>

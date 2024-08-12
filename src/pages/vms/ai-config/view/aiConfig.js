@@ -345,7 +345,7 @@ const AIConfig = () => {
                           skin='light'
                           sx={{ lineHeight: 1 }}
                           color={row.status.name === 'disconnected' ? 'primary' : 'success'}
-                          label={row.status.name === 'disconnected' ? 'Mất kết nối' : 'Đã kết nối'}
+                          label={row.status.name === 'disconnected' ? 'Disconnected' : 'Connected'}
                         />
                       </TableCell>
                     </TableRow>
