@@ -64,10 +64,10 @@ const KPI = () => {
         action={
           <Box>
             <Button variant='contained' color='primary' style={{ marginRight: '10px' }}>
-              Tải lại
+              Reload
             </Button>
             <Button variant='contained' onClick={() => handleOpenAdd()}>
-              Thêm mới
+              Add
             </Button>
           </Box>
         }
@@ -76,15 +76,15 @@ const KPI = () => {
         <Table stickyHeader aria-label='sticky table'>
           <TableHead>
             <TableRow>
-              <TableCell align='center'>STT</TableCell>
-              <TableCell align='center'>Mã KPI</TableCell>
-              <TableCell align='center'>Tên KPI</TableCell>
-              <TableCell align='center'>Mã mục tiêu</TableCell>
-              <TableCell align='center'>Mục tiêu</TableCell>
-              <TableCell align='center'>Tần suất đo</TableCell>
-              <TableCell align='center'>Đơn vị đo</TableCell>
-              <TableCell align='center'>Chiều hướng tốt</TableCell>
-              <TableCell align='center'>Cách Đo lường</TableCell>
+              <TableCell align='center'>NO.</TableCell>
+              <TableCell align='center'>Code</TableCell>
+              <TableCell align='center'>Name</TableCell>
+              <TableCell align='center'>Target Code</TableCell>
+              <TableCell align='center'>Target</TableCell>
+              <TableCell align='center'>Frequency</TableCell>
+              <TableCell align='center'>Unit</TableCell>
+              <TableCell align='center'>Direction</TableCell>
+              <TableCell align='center'>Measure</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

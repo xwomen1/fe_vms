@@ -178,7 +178,8 @@ const Caller = () => {
   function valuetext(value) {
     const timeCurrent = new Date(timeFilter.start_time + value)
 
-    return `${timeCurrent.getFullYear() +
+    return `${
+      timeCurrent.getFullYear() +
       '/' +
       timeDisplay(timeCurrent.getMonth() + 1) +
       '/' +
@@ -189,7 +190,7 @@ const Caller = () => {
       timeDisplay(timeCurrent.getMinutes()) +
       ':' +
       timeDisplay(timeCurrent.getSeconds())
-      }`
+    }`
   }
 
   const handleIconClick = () => {
@@ -247,7 +248,7 @@ const Caller = () => {
       <Grid container spacing={0}>
         {cameraGroup.length > 0 &&
           cameraGroup.map((camera, index) => (
-            <Grid item xs={Math.floor(12 / sizeScreen.split('x')[0])} key={index} >
+            <Grid item xs={Math.floor(12 / sizeScreen.split('x')[0])} key={index}>
               <ViewCamera
                 name={camera?.deviceName}
                 id={camera.id}
@@ -267,7 +268,7 @@ const Caller = () => {
               />
             </Grid>
           ))}
-        <div className='video-controls' >
+        <div className='video-controls'>
           <div
             style={{
               width: '100%'
@@ -381,8 +382,9 @@ const Caller = () => {
                     <Icon icon='tabler:minus' size='1em' color='#FFF' />
                   </IconButton>
                   <Typography style={{ color: '#fff', fontWeight: 'bold' }}>
-                    {`${Math.floor(valueRange / (60 * 60 * 1000))} giờ -  ${(valueRange - 60 * 60 * 1000 * Math.floor(valueRange / (60 * 60 * 1000))) / (60 * 1000)
-                      } phút `}
+                    {`${Math.floor(valueRange / (60 * 60 * 1000))} giờ -  ${
+                      (valueRange - 60 * 60 * 1000 * Math.floor(valueRange / (60 * 60 * 1000))) / (60 * 1000)
+                    } phút `}
                   </Typography>
                 </Box>
                 <Box className='w-100'>

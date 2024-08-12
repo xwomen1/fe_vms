@@ -57,13 +57,13 @@ const Alert = () => {
           }
         }),
         standardInfo: ({ theme }) => ({
-          color: theme.palette.info.main,
-          backgroundColor: hexToRGBA(theme.palette.info.main, 0.16),
+          color: theme.palette.info.dark,
+          backgroundColor: hexToRGBA(theme.palette.info.dark, 0.16),
           '& .MuiAlertTitle-root': {
-            color: theme.palette.info.main
+            color: theme.palette.info.dark
           },
           '& .MuiAlert-icon': {
-            color: theme.palette.info.main
+            color: theme.palette.info.dark
           }
         }),
         standardWarning: ({ theme }) => ({
@@ -101,14 +101,14 @@ const Alert = () => {
           }
         }),
         outlinedInfo: ({ theme }) => ({
-          borderColor: theme.palette.info.main,
-          color: theme.palette.info.main,
+          borderColor: theme.palette.info.dark,
+          color: theme.palette.info.dark,
           '& .MuiAlertTitle-root': {
-            color: theme.palette.info.main
+            color: theme.palette.info.dark
           },
           '& .MuiAlert-icon': {
             color: theme.palette.common.white,
-            backgroundColor: theme.palette.info.main
+            backgroundColor: theme.palette.info.dark
           }
         }),
         outlinedWarning: ({ theme }) => ({
@@ -146,7 +146,7 @@ const Alert = () => {
         }),
         filledInfo: ({ theme }) => ({
           '& .MuiAlert-icon': {
-            color: theme.palette.info.main
+            color: theme.palette.info.dark
           }
         }),
         filledWarning: ({ theme }) => ({

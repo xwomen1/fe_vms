@@ -68,8 +68,6 @@ const UserList = ({ apiData }) => {
     setPage(newPage)
   }
 
-
-
   function showAlertConfirm(options, intl) {
     const defaultProps = {
       title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
@@ -145,7 +143,7 @@ const UserList = ({ apiData }) => {
         params: {
           ...valueFilter,
           limit: pageSize,
-          page: page,
+          page: page
         }
       }
 
@@ -154,8 +152,7 @@ const UserList = ({ apiData }) => {
         config
       )
 
-      console.log();
-
+      console.log()
 
       if (response.data?.rows) {
         setDataList(response.data?.rows)
@@ -309,7 +306,7 @@ const UserList = ({ apiData }) => {
                 <Grid item xs={1.5} style={{ padding: 0 }}>
                   <IconButton onClick={handleOpenMenu}>
                     <Icon icon='tabler:selector' />
-                    <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
+                    <p style={{ fontSize: 15 }}>{pageSize} line/page</p>
                   </IconButton>
                   <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
                     {pageSizeOptions.map(size => (
@@ -334,7 +331,12 @@ const UserList = ({ apiData }) => {
       )}
       {openPopupEdit && (
         <>
-          <Edit open={openPopupEdit} onClose={handleCloseEditPopup} id={editId} setReload={() => setReload(reload + 1)} />
+          <Edit
+            open={openPopupEdit}
+            onClose={handleCloseEditPopup}
+            id={editId}
+            setReload={() => setReload(reload + 1)}
+          />
         </>
       )}
       {openPopupFilter && (

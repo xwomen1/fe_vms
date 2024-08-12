@@ -370,7 +370,7 @@ const AccessRight = () => {
         row.calendarDays.forEach(calendarDay => {
           acc.push({
             'Schedule Name': row.nameCalendar,
-            'Department': row.groupName,
+            Department: row.groupName,
             'Ngày trong tuần': calendarDay.dayOfWeek,
             'Giờ bắt đầu': calendarDay.timePeriods[0]?.startTimeInMinute,
             'Giờ kết thúc': calendarDay.timePeriods[0]?.endTimeInMinute,
@@ -412,11 +412,9 @@ const AccessRight = () => {
       >
         <Box sx={{ mb: 4, textAlign: 'center' }}>
           <Typography variant='h3' sx={{ mb: 3 }}>
-          Confirm
+            Confirm
           </Typography>
-          <Typography sx={{ color: 'text.secondary' }}>
-          Are you sure you want to delete this?
-          </Typography>
+          <Typography sx={{ color: 'text.secondary' }}>Are you sure you want to delete this?</Typography>
         </Box>
       </DialogContent>
       <DialogActions
@@ -604,7 +602,7 @@ const AccessRight = () => {
                       ) : rows.length === 0 ? (
                         <TableRow>
                           <TableCell colSpan={columns.length + 2} align='center'>
-                           No Data Available
+                            No Data Available
                           </TableCell>
                         </TableRow>
                       ) : (
@@ -651,7 +649,7 @@ const AccessRight = () => {
               <Grid container spacing={2} style={{ padding: 10 }}>
                 <Grid item xs={3}></Grid>
                 <Grid item xs={1}>
-                  <span style={{ fontSize: 15 }}> dòng/trang</span>
+                  <span style={{ fontSize: 15 }}> line/page</span>
                 </Grid>
                 <Grid item xs={1} style={{ padding: 0 }}>
                   <Box>
@@ -709,7 +707,7 @@ const AccessRight = () => {
                       ) : dataList1.length === 0 ? (
                         <TableRow>
                           <TableCell colSpan={columns1.length + 2} align='center'>
-                          No Data Available
+                            No Data Available
                           </TableCell>
                         </TableRow>
                       ) : (
@@ -768,7 +766,7 @@ const AccessRight = () => {
               <Grid container spacing={2} style={{ padding: 10 }}>
                 <Grid item xs={3}></Grid>
                 <Grid item xs={1}>
-                  <span style={{ fontSize: 15 }}> dòng/trang</span>
+                  <span style={{ fontSize: 15 }}> line/page</span>
                 </Grid>
                 <Grid item xs={1} style={{ padding: 0 }}>
                   <Box>

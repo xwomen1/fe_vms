@@ -261,7 +261,7 @@ const LoginPage = () => {
                   justifyContent: 'space-between'
                 }}
               ></Box>
-              <Button fullWidth type='submit' variant='contained' sx={{ mb: 4, backgroundColor: '#FF9C73' }}>
+              <Button fullWidth type='submit' variant='contained' sx={{ mb: 4 }}>
                 Login
               </Button>
             </form>

@@ -42,24 +42,24 @@ const AddPopup = ({ open, onClose, onAddNewKpi }) => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogTitle style={{ fontSize: '24px', fontWeight: 'bold' }}>Chọn bộ KPI áp dụng cho nhân viên</DialogTitle>
+      <DialogTitle style={{ fontSize: '24px', fontWeight: 'bold' }}>Select KPI for employee</DialogTitle>
       <DialogContent>
         <TextField
-          label='Bộ KPI'
+          label=' KPI'
           select
           fullWidth
           style={{ marginBottom: '16px' }}
           value={chieuHuongTot}
           onChange={e => setChieuHuongTot(e.target.value)}
         >
-          <MenuItem value='Tăng'>Đánh giá nhân viên kinh doanh</MenuItem>
-          <MenuItem value='Công việc'>Đánh giá nhân viên kỹ thuật</MenuItem>
-          <MenuItem value='Công việc1'>Đánh giá nhân viên bảo hiểm </MenuItem>
-          <MenuItem value='Công việc2'>Đánh giá nhân viên kế toán</MenuItem>
-          <MenuItem value='Công việc3'>Đánh giá nhân viên logistic</MenuItem>{' '}
+          <MenuItem value='Tăng'>Sales staff evaluation</MenuItem>
+          <MenuItem value='Công việc'>Technical staff evaluation</MenuItem>
+          <MenuItem value='Công việc1'>Insurance agent review </MenuItem>
+          <MenuItem value='Công việc2'>Accountant Evaluation</MenuItem>
+          <MenuItem value='Công việc3'>Logistics staff evaluation</MenuItem>{' '}
         </TextField>
         <TextField
-          label='Thông tin bộ KPI'
+          label='Information'
           type='text'
           fullWidth
           style={{ marginBottom: '16px' }}

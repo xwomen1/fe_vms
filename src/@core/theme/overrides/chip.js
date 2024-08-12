@@ -73,9 +73,9 @@ const Chip = () => {
         }),
         deletableColorInfo: ({ theme }) => ({
           '&.MuiChip-light .MuiChip-deleteIcon': {
-            color: hexToRGBA(theme.palette.info.main, 0.7),
+            color: hexToRGBA(theme.palette.info.dark, 0.7),
             '&:hover': {
-              color: theme.palette.info.main
+              color: theme.palette.info.dark
             }
           }
         })

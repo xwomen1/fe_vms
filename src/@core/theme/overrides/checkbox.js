@@ -100,7 +100,7 @@ const Checkbox = () => {
             fill: theme.palette.warning.main
           },
           '&.Mui-checked.MuiCheckbox-colorInfo svg path:first-of-type': {
-            fill: theme.palette.info.main
+            fill: theme.palette.info.dark
           }
         })
       }

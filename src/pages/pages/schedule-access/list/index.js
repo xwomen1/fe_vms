@@ -229,7 +229,7 @@ const ScheduleAccess = () => {
             <Grid item xs={12} sm={6} md={4} sx={{ textAlign: 'right', marginBottom: '8px' }}>
               <IconButton onClick={handleOpenMenu}>
                 <Icon icon='tabler:selector' />
-                <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
+                <p style={{ fontSize: 15 }}>{pageSize} line/page</p>
               </IconButton>
               <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
                 {pageSizeOptions.map(size => (

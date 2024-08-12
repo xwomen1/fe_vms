@@ -55,7 +55,7 @@ const Timeline = () => {
           boxShadow: `0 0 0 3px ${hexToRGBA(theme.palette.warning.main, 0.16)}`
         }),
         filledInfo: ({ theme }) => ({
-          boxShadow: `0 0 0 3px ${hexToRGBA(theme.palette.info.main, 0.16)}`
+          boxShadow: `0 0 0 3px ${hexToRGBA(theme.palette.info.dark, 0.16)}`
         }),
         filledGrey: ({ theme }) => ({
           boxShadow: `0 0 0 3px ${hexToRGBA(theme.palette.grey[400], 0.16)}`
@@ -76,7 +76,7 @@ const Timeline = () => {
           '& svg': { color: theme.palette.warning.main }
         }),
         outlinedInfo: ({ theme }) => ({
-          '& svg': { color: theme.palette.info.main }
+          '& svg': { color: theme.palette.info.dark }
         }),
         outlinedGrey: ({ theme }) => ({
           '& svg': { color: theme.palette.grey[400] }

@@ -178,10 +178,10 @@ const CalendarWrapper = styled(Box)(({ theme }) => {
           },
           '&.bg-info': {
             borderColor: 'transparent',
-            color: theme.palette.info.main,
+            color: theme.palette.info.dark,
             backgroundColor: bgColors.infoLight.backgroundColor,
             '& .fc-event-title, & .fc-event-time': {
-              color: theme.palette.info.main
+              color: theme.palette.info.dark
             }
           }
         },
@@ -191,7 +191,7 @@ const CalendarWrapper = styled(Box)(({ theme }) => {
             backgroundColor: theme.palette.primary.main
           },
           '&:hover td': {
-            backgroundColor: hexToRGBA(theme.palette.primary.light, 0.1)
+            backgroundColor: hexToRGBA(theme.palette.primary.main, 0.1)
           }
         },
         '&.bg-success': {
@@ -223,8 +223,8 @@ const CalendarWrapper = styled(Box)(({ theme }) => {
         },
         '&.bg-info': {
           '& .fc-list-event-dot': {
-            borderColor: theme.palette.info.main,
-            backgroundColor: theme.palette.info.main
+            borderColor: theme.palette.info.dark,
+            backgroundColor: theme.palette.info.dark
           },
           '&:hover td': {
             backgroundColor: hexToRGBA(theme.palette.info.light, 0.1)

@@ -68,8 +68,8 @@ const Switch = () => {
               backgroundColor: theme.palette.warning.main
             },
             '&.MuiSwitch-colorInfo + .MuiSwitch-track': {
-              borderColor: theme.palette.info.main,
-              backgroundColor: theme.palette.info.main
+              borderColor: theme.palette.info.dark,
+              backgroundColor: theme.palette.info.dark
             }
           }
         }),
