@@ -53,8 +53,8 @@ const initValues = {
 const format_form = [
   {
     name: 'imageObject',
-    label: 'Hình ảnh',
-    placeholder: 'Hình ảnh',
+    label: 'Image',
+    placeholder: 'Image',
     type: 'ImageObject',
     data: [],
     require: true,
@@ -62,8 +62,8 @@ const format_form = [
   },
   {
     name: 'result',
-    label: 'Kết quả',
-    placeholder: 'Kết quả',
+    label: 'Result',
+    placeholder: 'Result',
     type: 'TextField',
     data: [],
     require: true,
@@ -71,8 +71,8 @@ const format_form = [
   },
   {
     name: 'description',
-    label: 'Đối tượng',
-    placeholder: 'Tên đối tượng',
+    label: 'Object',
+    placeholder: 'Object Name',
     type: 'TextField',
     data: [],
     require: true,
@@ -80,8 +80,8 @@ const format_form = [
   },
   {
     name: 'timestamp',
-    label: 'Thời gian',
-    placeholder: 'Thời gian',
+    label: 'Date',
+    placeholder: 'Date',
     type: 'TextField',
     data: [],
     require: true,
@@ -98,8 +98,8 @@ const format_form = [
   },
   {
     name: 'location',
-    label: 'Vị trí',
-    placeholder: 'Vị trí',
+    label: 'Location',
+    placeholder: 'Location',
     type: 'TextField',
     data: [],
     require: true,
@@ -107,7 +107,7 @@ const format_form = [
   },
   {
     name: 'imageResult',
-    label: 'Ảnh toàn cảnh',
+    label: 'Full Screen',
     placeholder: 'Ảnh toán cảnh',
     type: 'ImageResult',
     data: [],
@@ -187,7 +187,7 @@ const View = ({ data }) => {
                         rules={{ required: true }}
                         render={({ field: { value, onChange } }) => (
                           <Box>
-                            <Typography sx={{ mb: 1 }}>Ảnh đối tượng</Typography>
+                            <Typography sx={{ mb: 1 }}>Object Image</Typography>
                             <CustomAvatar
                               src={value}
                               variant='rounded'
@@ -212,9 +212,7 @@ const View = ({ data }) => {
                             fullWidth
                             disabled={true}
                             value={
-                              item.name === 'timestamp'
-                                ? moment(new Date(value)).format('DD/MM/YYYY HH:mm:ss')
-                                : value
+                              item.name === 'timestamp' ? moment(new Date(value)).format('DD/MM/YYYY HH:mm:ss') : value
                             }
                             label={item.label}
                             onChange={onChange}
@@ -243,7 +241,7 @@ const View = ({ data }) => {
                         rules={{ required: true }}
                         render={({ field: { value, onChange } }) => (
                           <Box sx={getBoxStyles()}>
-                            <Typography sx={{ mb: 1 }}>Ảnh toàn cảnh</Typography>
+                            <Typography sx={{ mb: 1 }}>Full Screen</Typography>
                             <CustomAvatar
                               src={value}
                               onLoad={handleImageLoad}

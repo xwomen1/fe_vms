@@ -145,7 +145,7 @@ const Events = () => {
               <Tab value='2' label='Khuôn mặt' key={2} />
               <Tab value='3' label='Biển số' key={3} />
               <Tab value='4' label='Phát hiện đám đông' key={4} disabled={!isDetectCrowdEnabled} />
-              <Tab value='5' label='Bản đồ' key={5} />
+              <Tab value='5' label='Map' key={5} />
             </TabList>
           </Grid>
           <Grid item xs={12}>

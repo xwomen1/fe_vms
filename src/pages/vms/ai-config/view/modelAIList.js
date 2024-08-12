@@ -56,7 +56,7 @@ const columns = [
     minWidth: 50,
     align: 'center',
     field: 'countCamera',
-    label: 'Số lượng camera'
+    label: ' camera'
   },
   {
     id: 3,
@@ -185,7 +185,7 @@ const ModelAIList = () => {
           Đồng ý
         </Button>
         <Button variant='tonal' color='secondary' sx={{ mr: 1 }} onClick={() => setIsOpenDel(false)}>
-          Hủy
+          Cancel
         </Button>
       </DialogActions>
     </Dialog>

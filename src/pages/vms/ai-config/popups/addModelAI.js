@@ -364,11 +364,11 @@ const AddModelAI = ({ show, onClose, setReload, data, id, typePopup }) => {
             color={typePopup === 'view' ? 'primary' : 'secondary'}
             onClick={onClose}
           >
-            {typePopup === 'view' ? 'Đóng' : 'Hủy'}
+            {typePopup === 'view' ? 'Đóng' : 'Cancel'}
           </Button>
           {typePopup === 'add' && (
             <Button type='submit' variant='contained' onClick={handleSubmit(onSubmit)}>
-              Lưu
+              Save
             </Button>
           )}
         </DialogActions>

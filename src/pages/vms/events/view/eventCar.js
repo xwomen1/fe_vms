@@ -164,10 +164,10 @@ const EventList = ({}) => {
   }
 
   const eventTypeColors = {
-    'Phát hiện sự kiện AI': 'success',
-    'Phát hiện đối tượng nguy hiểm': 'error',
+    'Phát hiện Event AI': 'success',
+    'Phát hiện Object nguy hiểm': 'error',
     'Phát hiện hành vi bất thường': 'warning',
-    'Phát hiện đối tượng danh sách đen': 'secondary'
+    'Phát hiện Object danh sách đen': 'secondary'
   }
 
   const columns = [
@@ -177,7 +177,7 @@ const EventList = ({}) => {
       maxWidth: 50,
       align: 'center',
       field: 'imageObject',
-      label: 'Hình ảnh',
+      label: 'Image',
       renderCell: value => (
         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
           <img src={value} alt='' style={{ maxWidth: '100%', height: 'auto', objectFit: 'contain' }} />
@@ -189,7 +189,7 @@ const EventList = ({}) => {
       flex: 0.15,
       maxWidth: 150,
       align: 'center',
-      label: 'Sự kiện',
+      label: 'Event',
       field: 'eventTypeString',
       renderCell: value => <Chip label={value} color={eventTypeColors[value]} />
     },
@@ -198,7 +198,7 @@ const EventList = ({}) => {
       flex: 0.15,
       maxWidth: 150,
       align: 'center',
-      label: 'Kết quả',
+      label: 'Result',
       field: 'result'
     },
     {
@@ -207,7 +207,7 @@ const EventList = ({}) => {
       maxWidth: 50,
       align: 'center',
       field: 'description',
-      label: 'Tên đối tượng'
+      label: 'Object Name'
     },
     {
       id: 4,
@@ -215,7 +215,7 @@ const EventList = ({}) => {
       maxWidth: 50,
       align: 'center',
       field: 'timestamp',
-      label: 'Thời gian',
+      label: 'Date',
       renderCell: value => new Date(value).toLocaleString()
     },
     {
@@ -232,7 +232,7 @@ const EventList = ({}) => {
       maxWidth: 50,
       align: 'center',
       field: 'location',
-      label: 'Khu vực'
+      label: 'Location'
     }
   ]
 
@@ -343,9 +343,9 @@ const EventList = ({}) => {
       >
         <Box sx={{ mb: 4, textAlign: 'center' }}>
           <Typography variant='h3' sx={{ mb: 3 }}>
-            Xác nhận
+            Accept
           </Typography>
-          <Typography sx={{ color: 'text.secondary' }}>Bạn có chắc chắn muốn xóa không ?</Typography>
+          <Typography sx={{ color: 'text.secondary' }}>Do you want to delete it?</Typography>
         </Box>
       </DialogContent>
       <DialogActions
@@ -362,10 +362,10 @@ const EventList = ({}) => {
             setIsOpenDel(false)
           }}
         >
-          Đồng ý
+          Accept
         </Button>
         <Button variant='tonal' color='secondary' sx={{ mr: 1 }} onClick={() => setIsOpenDel(false)}>
-          Hủy
+          Cancel
         </Button>
       </DialogActions>
     </Dialog>
@@ -402,7 +402,7 @@ const EventList = ({}) => {
     <>
       <Card>
         <CardHeader
-          title='Danh sách biển số xe'
+          title='License plates'
           titleTypographyProps={{ sx: { mb: [2, 0] } }}
           sx={{
             py: 4,
@@ -415,7 +415,7 @@ const EventList = ({}) => {
               <Grid item>
                 <Box sx={{ float: 'right' }}>
                   <IconButton
-                    aria-label='Bộ lọc'
+                    aria-label='Filter'
                     onClick={() => {
                       setIsOpenFilter(true)
                     }}
@@ -428,7 +428,7 @@ const EventList = ({}) => {
               <Grid item>
                 <CustomTextField
                   value={keyword}
-                  placeholder='Tìm kiếm sự kiện '
+                  placeholder='Search '
                   InputProps={{
                     startAdornment: (
                       <Box sx={{ mr: 2, display: 'flex' }}>
@@ -461,13 +461,13 @@ const EventList = ({}) => {
             <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
               <TableHead>
                 <TableRow>
-                  <TableCell style={{ width: '20px' }}>STT</TableCell>
+                  <TableCell style={{ width: '20px' }}>NO.</TableCell>
                   {columns.map(column => (
                     <TableCell key={column.id} align={column.align} sx={{ maxWidth: column.maxWidth }}>
                       {column.label}
                     </TableCell>
                   ))}
-                  <TableCell style={{ width: '200px' }}>Thao tác</TableCell>
+                  <TableCell style={{ width: '200px' }}>Action</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
