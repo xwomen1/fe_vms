@@ -105,7 +105,7 @@ const SalaryTable = ({ apiData }) => {
       const statusMessage = getHttpStatusMessage(response.status)
       setHttpMessage(statusMessage)
 
-      toast.success('Sửa thành công')
+      toast.success('Update Successful')
 
       // Refresh user data
     } catch (error) {
@@ -427,9 +427,20 @@ const SalaryTable = ({ apiData }) => {
                   {' '}
                   <TableHead>
                     <TableRow>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>STT</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Mã định danh</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>No.</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Access Code</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Full Name</TableCell>
+<<<<<<< HEAD
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Group</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Base Salary</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Salary Grade</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Responsibility Allowance</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Lunch Allowance</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Car Allowance</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phone Allowance</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Other Allowances</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>KPCĐ</TableCell>
+=======
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Đơn vị</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Lương cơ bản</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Bậc lương</TableCell>
@@ -439,10 +450,11 @@ const SalaryTable = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phụ cấp điện thoại</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phụ cấp khác</TableCell>
                       {/* <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>KPCĐ</TableCell> */}
+>>>>>>> 81982d675fe3abb3e66cbf81b11cfb7f12655783
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>BHXH</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>BHYT</TableCell>
                       {/* <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>BHTN</TableCell> */}
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Hành động</TableCell>{' '}
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Actions</TableCell>{' '}
                       {/* Add this line */}
                     </TableRow>
                   </TableHead>

@@ -89,7 +89,7 @@ const columns = [
 const form_filter = [
   {
     name: 'threshold',
-    label: 'Ngưỡng',
+    label: 'Threshold',
     placeholder: '0.1',
     type: 'TextField',
     require: true,
@@ -97,7 +97,7 @@ const form_filter = [
   },
   {
     name: 'topk',
-    label: 'Độ giống',
+    label: 'Similarity',
     placeholder: '5',
     type: 'TextField',
     require: true,
@@ -216,7 +216,7 @@ const Blacklist = () => {
 
       try {
         await delApi(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${id}`)
-        toast.success('Xóa thành công')
+        toast.success('Delete Successful')
       } catch (error) {
         if (error && error?.response?.data) {
           console.error('error', error)
@@ -317,7 +317,7 @@ const Blacklist = () => {
                                 placeholder={item.placeholder}
                                 error={Boolean(errors.firstName)}
                                 aria-describedby='validation-basic-first-name'
-                                {...(errors.firstName && { helperText: 'Trường này bắt buộc' })}
+                                {...(errors.firstName && { helperText: 'This field is required' })}
                               />
                             )}
                           />
