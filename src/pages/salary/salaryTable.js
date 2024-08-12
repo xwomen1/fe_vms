@@ -74,18 +74,15 @@ const SalaryTable = ({ apiData }) => {
   const handleChange = (field, value) => {
     setEditData({
       ...editData,
-      salary: {
-        ...editData.salary,
-        ...editData.salaryLevel,
+      salary: parseFloat(editData.salary) || 0,
+      salaryLevel: parseFloat(editData.salaryLevel) || 0,
+      responsibilityAllowance: parseFloat(editData.responsibilityAllowance) || 0,
+      lunchAllowance: parseFloat(editData.lunchAllowance) || 0,
+      carAllowance: parseFloat(editData.carAllowance) || 0,
+      phoneAllowance: parseFloat(editData.phoneAllowance) || 0,
+      brandAllowance: parseFloat(editData.brandAllowance) || 0,
 
-        ...editData.responsibilityAllowance,
-        ...editData.lunchAllowance,
-        ...editData.carAllowance,
-        ...editData.phoneAllowance,
-        ...editData.brandAllowance,
-
-        [field]: value
-      }
+      [field]: parseFloat(value) || 0
     })
   }
 
@@ -444,7 +441,7 @@ const SalaryTable = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>KPCĐ</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>BHXH</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>BHYT</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>BHTN</TableCell>
+                      {/* <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>BHTN</TableCell> */}
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Hành động</TableCell>{' '}
                       {/* Add this line */}
                     </TableRow>
@@ -460,11 +457,11 @@ const SalaryTable = ({ apiData }) => {
                         <TableCell sx={{ whiteSpace: 'nowrap' }}>
                           {editRow === user.userId ? (
                             <CustomTextField
-                              value={editData.salary?.salaryLevel}
+                              value={editData?.salaryLevel}
                               onChange={e => handleChange('salaryLevel', e.target.value)}
                             />
                           ) : (
-                            user?.salary?.salaryLevel || '0'
+                            user?.salaryLevel || '0'
                           )}
                         </TableCell>
 
@@ -475,7 +472,7 @@ const SalaryTable = ({ apiData }) => {
                               onChange={e => handleChange('responsibilityAllowance', e.target.value)}
                             />
                           ) : (
-                            user?.salary?.responsibilityAllowance || '0'
+                            user?.responsibilityAllowance || '0'
                           )}
                         </TableCell>
                         <TableCell sx={{ whiteSpace: 'nowrap' }}>
@@ -485,7 +482,7 @@ const SalaryTable = ({ apiData }) => {
                               onChange={e => handleChange('lunchAllowance', e.target.value)}
                             />
                           ) : (
-                            user?.salary?.lunchAllowance || '0'
+                            user?.lunchAllowance || '0'
                           )}
                         </TableCell>
                         <TableCell sx={{ whiteSpace: 'nowrap' }}>
@@ -495,7 +492,7 @@ const SalaryTable = ({ apiData }) => {
                               onChange={e => handleChange('carAllowance', e.target.value)}
                             />
                           ) : (
-                            user?.salary?.carAllowance || '0'
+                            user?.carAllowance || '0'
                           )}
                         </TableCell>
                         <TableCell sx={{ whiteSpace: 'nowrap' }}>
@@ -505,7 +502,7 @@ const SalaryTable = ({ apiData }) => {
                               onChange={e => handleChange('phoneAllowance', e.target.value)}
                             />
                           ) : (
-                            user?.salary?.phoneAllowance || '0'
+                            user?.phoneAllowance || '0'
                           )}
                         </TableCell>
                         <TableCell sx={{ whiteSpace: 'nowrap' }}>
@@ -515,13 +512,13 @@ const SalaryTable = ({ apiData }) => {
                               onChange={e => handleChange('brandAllowance', e.target.value)}
                             />
                           ) : (
-                            user?.salary?.brandAllowance || '0'
+                            user?.brandAllowance || '0'
                           )}
                         </TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{user.salary?.salary * KPCD || '0'}</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{user.salary?.salary * BHXH || '0'}</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{user.salary?.salary * BHYT || '0'}</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{user.salary?.salary * BHTN || '0'}</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{salary * KPCD || '0'}</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{salary * BHXH || '0'}</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{salary * BHYT || '0'}</TableCell>
+                        {/* <TableCell sx={{ whiteSpace: 'nowrap' }}>{salary * BHTN || '0'}</TableCell> */}
                         <TableCell sx={{ whiteSpace: 'nowrap' }}>
                           {editRow === user.userId ? (
                             <IconButton onClick={() => handleSave(user.userId)}>
