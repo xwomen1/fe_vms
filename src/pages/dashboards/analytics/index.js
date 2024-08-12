@@ -296,7 +296,7 @@ const EventList = () => {
           Authorization: `Bearer ${token}`
         },
         params: {
-          page: page,
+          page: 1,
           limit: 5
         }
       }
@@ -438,7 +438,7 @@ const EventList = () => {
                       {Array.isArray(devices) && devices.length > 0 ? (
                         devices.map((row, index) => (
                           <TableRow hover tabIndex={-1} key={index}>
-                            <TableCell>{(page - 1) * pageSize + index + 1}</TableCell>
+                            <TableCell>{index + 1}</TableCell>
                             {columns1.map(column => {
                               const value = row[column.field]
 
