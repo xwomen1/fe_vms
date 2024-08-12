@@ -335,14 +335,13 @@ const UserList = ({ apiData }) => {
   const handleChange = (field, value) => {
     setEditData(prevEditData => ({
       ...prevEditData,
-      salary: {
-        ...prevEditData.salary,
 
-        ...prevEditData.ot,
-        ...prevEditData.goOnBusiness,
+      ...prevEditData.salary,
 
-        [field]: value
-      }
+      ...prevEditData.ot,
+      ...prevEditData.goOnBusiness,
+
+      [field]: value
     }))
   }
 
@@ -465,18 +464,15 @@ const UserList = ({ apiData }) => {
 
                         <TableCell sx={{ padding: '16px' }}>
                           {editRow === user.userId ? (
-                            <CustomTextField
-                              value={editData.salary?.ot}
-                              onChange={e => handleChange('ot', e.target.value)}
-                            />
+                            <CustomTextField value={editData?.ot} onChange={e => handleChange('ot', e.target.value)} />
                           ) : (
-                            user?.salary?.ot || '0'
+                            user?.ot || '0'
                           )}
                         </TableCell>
                         <TableCell sx={{ padding: '16px' }}>
-                          {((salary * user?.salary?.salaryLevel) / (editedTimeHourDay * editedTimeDayMonth)) *
+                          {((salary * user?.salaryLevel) / (editedTimeHourDay * editedTimeDayMonth)) *
                             (OT / 100) *
-                            user?.salary?.ot || '0'}
+                            user?.ot || '0'}
                         </TableCell>
 
                         <TableCell sx={{ padding: '16px' }}>
@@ -486,10 +482,10 @@ const UserList = ({ apiData }) => {
                               onChange={e => handleChange('goOnBusiness', e.target.value)}
                             />
                           ) : (
-                            user?.salary?.goOnBusiness || '0'
+                            user?.goOnBusiness || '0'
                           )}
                         </TableCell>
-                        <TableCell sx={{ padding: '16px' }}>{user?.salary?.goOnBusiness * business || '0'}</TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{user?.goOnBusiness * business || '0'}</TableCell>
                         <TableCell sx={{ padding: '16px' }}>
                           {editRow === user.userId ? (
                             <IconButton onClick={() => handleSave(user.userId)}>

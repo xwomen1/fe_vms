@@ -81,6 +81,8 @@ const InforAll = ({ idInfor }) => {
       await fetchRegions() // Ensure fetchRegions updates regions before proceeding
       setRegions(currentRegions => {
         const matchingRegion = currentRegions.find(region => region.name === deviceData.doorName)
+        console.log(matchingRegion, 'match')
+
         if (matchingRegion) {
           setSelectedRegion(matchingRegion)
         }
