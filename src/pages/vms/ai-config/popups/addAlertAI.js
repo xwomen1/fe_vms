@@ -308,7 +308,7 @@ const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => 
               <Grid container spacing={2} style={{ padding: 10 }}>
                 <Grid item xs={2}></Grid>
                 <Grid item xs={2}>
-                  <span style={{ fontSize: 15 }}> dòng/trang</span>
+                  <span style={{ fontSize: 15 }}> line/page</span>
                 </Grid>
                 <Grid item xs={1} style={{ padding: 0 }}>
                   <Box>

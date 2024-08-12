@@ -1,4 +1,6 @@
-export const SliderColorsJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** MUI Imports
+export const SliderColorsJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** MUI Imports
 import Slider from '@mui/material/Slider'
 import Typography from '@mui/material/Typography'
 
@@ -14,9 +16,13 @@ const SliderColors = () => {
 }
 
 export default SliderColors
-`}</code></pre>) 
+`}</code>
+  </pre>
+)
 
-export const SliderBasicJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** MUI Imports
+export const SliderBasicJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** MUI Imports
 import Slider from '@mui/material/Slider'
 import Typography from '@mui/material/Typography'
 
@@ -32,9 +38,13 @@ const SliderBasic = () => {
 }
 
 export default SliderBasic
-`}</code></pre>) 
+`}</code>
+  </pre>
+)
 
-export const SliderControlledUncontrolledJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** React Imports
+export const SliderControlledUncontrolledJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** React Imports
 import { useState } from 'react'
 
 // ** MUI Imports
@@ -56,9 +66,13 @@ const SliderControlledUncontrolled = () => {
 }
 
 export default SliderControlledUncontrolled
-`}</code></pre>) 
+`}</code>
+  </pre>
+)
 
-export const SliderCustomColorsJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** MUI Imports
+export const SliderCustomColorsJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** MUI Imports
 import { styled } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import MuiSlider from '@mui/material/Slider'
@@ -116,9 +130,9 @@ const SliderWarning = styled(MuiSlider)(({ theme }) => ({
 
 // Styled component for a info Slider
 const SliderInfo = styled(MuiSlider)(({ theme }) => ({
-  color: theme.palette.info.main,
+  color: theme.palette.info.dark,
   '& .MuiSlider-thumb:hover, & .MuiSlider-thumb.Mui-focusVisible': {
-    boxShadow: 0 0 0 8px {hexToRGBA(theme.palette.info.main, 0.16)} !important
+    boxShadow: 0 0 0 8px {hexToRGBA(theme.palette.info.dark, 0.16)} !important
   },
   '@media(hover:none)': {
     '& .MuiSlider-thumb:hover, & .MuiSlider-thumb.Mui-focusVisible': {
@@ -126,7 +140,7 @@ const SliderInfo = styled(MuiSlider)(({ theme }) => ({
     }
   },
   '& .MuiSlider-thumb.Mui-active, & .MuiSlider-thumb.Mui-focusVisible.Mui-active': {
-    boxShadow: 0 0 0 10px {hexToRGBA(theme.palette.info.main, 0.16)} !important
+    boxShadow: 0 0 0 10px {hexToRGBA(theme.palette.info.dark, 0.16)} !important
   }
 }))
 
@@ -146,9 +160,13 @@ const SliderCustomColors = () => {
 }
 
 export default SliderCustomColors
-`}</code></pre>) 
+`}</code>
+  </pre>
+)
 
-export const SliderCustomMarksJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** MUI Imports
+export const SliderCustomMarksJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** MUI Imports
 import Slider from '@mui/material/Slider'
 
 const marks = [
@@ -188,9 +206,13 @@ const SliderCustomMarks = () => {
 }
 
 export default SliderCustomMarks
-`}</code></pre>) 
+`}</code>
+  </pre>
+)
 
-export const SliderLabelAlwaysVisibleJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** MUI Imports
+export const SliderLabelAlwaysVisibleJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** MUI Imports
 import Slider from '@mui/material/Slider'
 
 const marks = [
@@ -230,9 +252,13 @@ const SliderLabelAlwaysVisible = () => {
 }
 
 export default SliderLabelAlwaysVisible
-`}</code></pre>) 
+`}</code>
+  </pre>
+)
 
-export const SliderRestrictedValuesJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** MUI Imports
+export const SliderRestrictedValuesJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** MUI Imports
 import Slider from '@mui/material/Slider'
 
 const marks = [
@@ -277,9 +303,13 @@ const SliderRestrictedValues = () => {
 }
 
 export default SliderRestrictedValues
-`}</code></pre>) 
+`}</code>
+  </pre>
+)
 
-export const SliderRemovedTrackJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** MUI Imports
+export const SliderRemovedTrackJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** MUI Imports
 import Slider from '@mui/material/Slider'
 
 const marks = [
@@ -318,9 +348,13 @@ const SliderRemovedTrack = () => {
 }
 
 export default SliderRemovedTrack
-`}</code></pre>) 
+`}</code>
+  </pre>
+)
 
-export const SliderDiscreteJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** MUI Imports
+export const SliderDiscreteJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** MUI Imports
 import Slider from '@mui/material/Slider'
 
 const valuetext = value => {
@@ -343,9 +377,13 @@ const SliderDiscrete = () => {
 }
 
 export default SliderDiscrete
-`}</code></pre>) 
+`}</code>
+  </pre>
+)
 
-export const SliderRangeJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** MUI Imports
+export const SliderRangeJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** MUI Imports
 import Slider from '@mui/material/Slider'
 
 const valuetext = value => {
@@ -364,9 +402,13 @@ const SliderRange = () => {
 }
 
 export default SliderRange
-`}</code></pre>) 
+`}</code>
+  </pre>
+)
 
-export const SliderSizesJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** MUI Imports
+export const SliderSizesJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** MUI Imports
 import Slider from '@mui/material/Slider'
 import Typography from '@mui/material/Typography'
 
@@ -382,9 +424,13 @@ const SliderSizes = () => {
 }
 
 export default SliderSizes
-`}</code></pre>) 
+`}</code>
+  </pre>
+)
 
-export const SliderVerticalJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** MUI Imports
+export const SliderVerticalJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** MUI Imports
 import Box from '@mui/material/Box'
 import Slider from '@mui/material/Slider'
 
@@ -434,9 +480,13 @@ const SliderVertical = () => {
 }
 
 export default SliderVertical
-`}</code></pre>) 
+`}</code>
+  </pre>
+)
 
-export const SliderSmallStepsJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** MUI Imports
+export const SliderSmallStepsJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** MUI Imports
 import Slider from '@mui/material/Slider'
 
 const valuetext = value => {
@@ -457,9 +507,13 @@ const SliderSmallSteps = () => {
 }
 
 export default SliderSmallSteps
-`}</code></pre>) 
+`}</code>
+  </pre>
+)
 
-export const SliderInvertedTrackJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** MUI Imports
+export const SliderInvertedTrackJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** MUI Imports
 import Slider from '@mui/material/Slider'
 
 const marks = [
@@ -498,9 +552,13 @@ const SliderInvertedTrack = () => {
 }
 
 export default SliderInvertedTrack
-`}</code></pre>) 
+`}</code>
+  </pre>
+)
 
-export const SliderCustomizedJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** MUI Imports
+export const SliderCustomizedJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** MUI Imports
 import { styled } from '@mui/material/styles'
 import MuiSlider from '@mui/material/Slider'
 
@@ -582,9 +640,13 @@ const SliderCustomized = () => (
 )
 
 export default SliderCustomized
-`}</code></pre>) 
+`}</code>
+  </pre>
+)
 
-export const SliderMinimumDistanceJSXCode = (<pre className='language-jsx'><code className='language-jsx'>{`// ** React Imports
+export const SliderMinimumDistanceJSXCode = (
+  <pre className='language-jsx'>
+    <code className='language-jsx'>{`// ** React Imports
 import { useState } from 'react'
 
 // ** MUI Imports
@@ -651,5 +713,6 @@ const SliderMinimumDistance = () => {
 }
 
 export default SliderMinimumDistance
-`}</code></pre>) 
-
+`}</code>
+  </pre>
+)

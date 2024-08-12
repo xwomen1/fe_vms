@@ -148,7 +148,7 @@ const AccessRight = () => {
       minWidth: 50,
       align: 'center',
       field: 'name',
-      label: 'Mã'
+      label: 'Code'
     },
     {
       id: 2,
@@ -156,14 +156,14 @@ const AccessRight = () => {
       minWidth: 50,
       align: 'center',
       field: 'ChuyenNganh',
-      label: 'Tên chỉ tiêu'
+      label: 'Name'
     },
     {
       id: 3,
       flex: 0.15,
       minWidth: 100,
       align: 'center',
-      label: 'Mục tiêu',
+      label: 'Target',
       field: 'Ngay'
     },
     {
@@ -172,14 +172,14 @@ const AccessRight = () => {
       minWidth: 50,
       align: 'center',
       field: 'HT',
-      label: 'Mô tả'
+      label: 'Description'
     },
     {
       id: 5,
       flex: 0.15,
       minWidth: 100,
       align: 'center',
-      label: 'Đơn vị đo',
+      label: 'Measure',
       field: 'CD'
     },
     {
@@ -187,7 +187,7 @@ const AccessRight = () => {
       flex: 0.15,
       minWidth: 100,
       align: 'center',
-      label: 'Độ quan trọng (%)',
+      label: 'Importance(%)',
       field: 'MQH'
     },
     {
@@ -195,7 +195,7 @@ const AccessRight = () => {
       flex: 0.15,
       minWidth: 100,
       align: 'center',
-      label: 'Cách đánh giá',
+      label: 'Evaluate',
       field: 'HVT'
     },
     {
@@ -203,7 +203,7 @@ const AccessRight = () => {
       flex: 0.15,
       minWidth: 100,
       align: 'center',
-      label: 'Cách tính',
+      label: 'Calculate',
       field: 'NS'
     }
   ]
@@ -215,7 +215,7 @@ const AccessRight = () => {
       minWidth: 50,
       align: 'center',
       field: 'from',
-      label: 'Từ'
+      label: 'From'
     },
     {
       id: 2,
@@ -223,14 +223,14 @@ const AccessRight = () => {
       minWidth: 50,
       align: 'center',
       field: 'to',
-      label: 'Đến'
+      label: 'To'
     },
     {
       id: 3,
       flex: 0.15,
       minWidth: 100,
       align: 'center',
-      label: 'Xếp loại',
+      label: 'Classification',
       field: 'xl'
     }
   ]
@@ -242,7 +242,7 @@ const AccessRight = () => {
       minWidth: 50,
       align: 'center',
       field: 'vaitro',
-      label: 'Vai trò'
+      label: 'Role'
     },
     {
       id: 2,
@@ -250,7 +250,7 @@ const AccessRight = () => {
       minWidth: 50,
       align: 'center',
       field: 'hesok',
-      label: 'Hệ số K điều chỉnh'
+      label: 'adjustment coefficient k'
     }
   ]
 
@@ -310,15 +310,15 @@ const AccessRight = () => {
                 href={`/kpi`}
                 startIcon={<Icon icon='tabler:chevron-left' />}
               >
-                Quay lại
+                Back
               </Button>
             </Grid>
             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Grid item xs={4}></Grid>
               <Grid item xs={8} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-                <Button variant='contained'>Lưu thay đổi</Button>
+                <Button variant='contained'>Save</Button>
                 <Button variant='contained' style={{ marginLeft: '2%' }}>
-                  Hủy
+                  Cancel
                 </Button>
               </Grid>
             </Grid>
@@ -334,53 +334,53 @@ const AccessRight = () => {
             </Grid> */}
 
             <Grid item xs={3}>
-              <TextField label='Tên bộ KPI' fullWidth />
+              <TextField label='Name' fullWidth />
             </Grid>
             <Grid item xs={3}>
-              <TextField label='Mô tả' fullWidth />
+              <TextField label='Description' fullWidth />
             </Grid>
             <Grid item xs={3}>
               <FormControl fullWidth>
-                <InputLabel id='time-validity-label'>Trạng thái</InputLabel>
+                <InputLabel id='time-validity-label'>Status</InputLabel>
                 <Select labelId='time-validity-label' id='time-validity-select'>
-                  <MenuItem value='Custom'>Hoạt động</MenuItem>
-                  <MenuItem value='Undefined'>Không hoạt động</MenuItem>
+                  <MenuItem value='Custom'>Active</MenuItem>
+                  <MenuItem value='Undefined'>Inactive</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
             <Grid item xs={3}>
               <FormControl fullWidth>
-                <InputLabel id='time-validity-label'>Chiều hướng</InputLabel>
+                <InputLabel id='time-validity-label'>Direction</InputLabel>
                 <Select labelId='time-validity-label' id='time-validity-select'>
-                  <MenuItem value='Custom'>Tăng</MenuItem>
-                  <MenuItem value='Undefined'>Giảm</MenuItem>
+                  <MenuItem value='Custom'>Increase</MenuItem>
+                  <MenuItem value='Undefined'>Decrease</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
             <Grid item xs={3}>
               <FormControl fullWidth>
-                <InputLabel id='time-validity-label'>Tần suất đo</InputLabel>
+                <InputLabel id='time-validity-label'>Frequency</InputLabel>
                 <Select labelId='time-validity-label' id='time-validity-select'>
-                  <MenuItem value='Custom'>Ngày</MenuItem>
-                  <MenuItem value='Undefined'>Tháng</MenuItem>
-                  <MenuItem value='Undefined'>Quý</MenuItem>
-                  <MenuItem value='Undefined'>Năm</MenuItem>
+                  <MenuItem value='Custom'>Day</MenuItem>
+                  <MenuItem value='Undefined'>Month</MenuItem>
+                  <MenuItem value='Undefined'>Quarter</MenuItem>
+                  <MenuItem value='Undefined'>Year</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
             <Grid item xs={3}>
               <FormControl fullWidth>
-                <InputLabel id='time-validity-label'>Công thức xếp loại</InputLabel>
+                <InputLabel id='time-validity-label'>Scale</InputLabel>
                 <Select labelId='time-validity-label' id='time-validity-select'>
-                  <MenuItem value='Custom'>Thang điểm 5</MenuItem>
-                  <MenuItem value='Undefined'>Thang điểm 10</MenuItem>
+                  <MenuItem value='Custom'> 5</MenuItem>
+                  <MenuItem value='Undefined'> 10</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
 
             <Grid item xs={12}>
               <CardHeader
-                title='Danh sách chỉ tiêu
+                title='List of indicators
 '
                 titleTypographyProps={{ sx: { mb: [2, 0] } }}
                 sx={{
@@ -391,7 +391,7 @@ const AccessRight = () => {
                 }}
                 action={
                   <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-                    <Button variant='contained'>Thêm mới</Button>
+                    <Button variant='contained'>Add</Button>
                   </Grid>
                 }
               />
@@ -412,7 +412,7 @@ const AccessRight = () => {
                     {loading ? (
                       <TableRow>
                         <TableCell colSpan={columns.length + 2} align='center'>
-                          Đang tải dữ liệu...
+                          Loading...
                         </TableCell>
                       </TableRow>
                     ) : errorMessage ? (
@@ -424,7 +424,7 @@ const AccessRight = () => {
                     ) : row.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={columns.length + 2} align='center'>
-                          Không có dữ liệu
+                          None of Data
                         </TableCell>
                       </TableRow>
                     ) : (
@@ -450,7 +450,7 @@ const AccessRight = () => {
             </Grid>
             <Grid item xs={6}>
               <CardHeader
-                title='Điều chỉnh điểm KPI theo hệ số K'
+                title='Adjust KPI score according to K coefficient'
                 titleTypographyProps={{ sx: { mb: [2, 0] } }}
                 sx={{
                   py: 4,
@@ -516,7 +516,7 @@ const AccessRight = () => {
             </Grid>
             <Grid item xs={6}>
               <CardHeader
-                title='Thang điểm 5'
+                title='5 point scale'
                 titleTypographyProps={{ sx: { mb: [2, 0] } }}
                 sx={{
                   py: 4,
@@ -526,7 +526,7 @@ const AccessRight = () => {
                 }}
                 action={
                   <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-                    <Button>+ Thêm mới</Button>
+                    <Button>+ Add</Button>
                   </Grid>
                 }
               />{' '}
@@ -534,7 +534,7 @@ const AccessRight = () => {
                 <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
                   <TableHead>
                     <TableRow>
-                      <TableCell>STT</TableCell>
+                      <TableCell>NO.</TableCell>
                       {columns2.map(column => (
                         <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
                           {column.label}
@@ -546,7 +546,7 @@ const AccessRight = () => {
                     {loading ? (
                       <TableRow>
                         <TableCell colSpan={columns2.length + 2} align='center'>
-                          Đang tải dữ liệu...
+                          Loading...
                         </TableCell>
                       </TableRow>
                     ) : errorMessage ? (
@@ -558,7 +558,7 @@ const AccessRight = () => {
                     ) : row.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={columns2.length + 2} align='center'>
-                          Không có dữ liệu
+                          None of data
                         </TableCell>
                       </TableRow>
                     ) : (

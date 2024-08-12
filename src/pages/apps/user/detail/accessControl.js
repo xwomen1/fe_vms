@@ -89,7 +89,7 @@ const AccessRight = () => {
       id: 1,
       flex: 0.25,
       minWidth: 50,
-      align: 'right',
+      align: 'left',
       field: 'nameCalendar',
       label: 'Tên lịch'
     },
@@ -97,7 +97,7 @@ const AccessRight = () => {
       id: 2,
       flex: 0.25,
       minWidth: 50,
-      align: 'right',
+      align: 'left',
       field: 'name',
       label: 'Họ tên'
     },
@@ -105,7 +105,7 @@ const AccessRight = () => {
       id: 3,
       flex: 0.15,
       minWidth: 100,
-      align: 'right',
+      align: 'left',
       label: 'Phòng ban',
       field: 'groupName'
     },
@@ -113,7 +113,7 @@ const AccessRight = () => {
       id: 4,
       flex: 0.15,
       minWidth: 200,
-      align: 'right',
+      align: 'left',
       field: 'doorInName',
       label: 'Cửa vào'
     },
@@ -121,7 +121,7 @@ const AccessRight = () => {
       id: 5,
       flex: 0.15,
       minWidth: 200,
-      align: 'right',
+      align: 'left',
       field: 'doorOutName',
       label: 'Cửa ra'
     },
@@ -130,7 +130,7 @@ const AccessRight = () => {
       flex: 0.15,
       type: 'date',
       minWidth: 130,
-      align: 'right',
+      align: 'left',
       label: 'Ngày bắt đầu',
       field: 'startDate',
       valueGetter: params => new Date(params.value)
@@ -140,7 +140,7 @@ const AccessRight = () => {
       flex: 0.15,
       type: 'date',
       minWidth: 130,
-      align: 'right',
+      align: 'left',
       label: 'Ngày kết thúc',
       field: 'endDate',
       valueGetter: params => new Date(params.value)

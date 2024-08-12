@@ -52,7 +52,7 @@ const Button = () => {
           props: { variant: 'text', color: 'info' },
           style: ({ theme }) => ({
             '&:hover': {
-              backgroundColor: hexToRGBA(theme.palette.info.main, 0.08)
+              backgroundColor: hexToRGBA(theme.palette.info.dark, 0.08)
             }
           })
         },
@@ -100,7 +100,7 @@ const Button = () => {
           props: { variant: 'outlined', color: 'info' },
           style: ({ theme }) => ({
             '&:hover': {
-              backgroundColor: hexToRGBA(theme.palette.info.main, 0.08)
+              backgroundColor: hexToRGBA(theme.palette.info.dark, 0.08)
             }
           })
         },
@@ -139,9 +139,9 @@ const Button = () => {
         {
           props: { variant: 'tonal', color: 'info' },
           style: ({ theme }) => ({
-            color: theme.palette.info.main,
-            backgroundColor: hexToRGBA(theme.palette.info.main, 0.16),
-            '&:hover, &:active': { backgroundColor: hexToRGBA(theme.palette.info.main, 0.24) }
+            color: theme.palette.info.dark,
+            backgroundColor: hexToRGBA(theme.palette.info.dark, 0.16),
+            '&:hover, &:active': { backgroundColor: hexToRGBA(theme.palette.info.dark, 0.24) }
           })
         },
         {
@@ -234,7 +234,7 @@ const Button = () => {
             borderColor: theme.palette.warning.main
           }),
           ...(ownerState.color === 'info' && {
-            borderColor: theme.palette.info.main
+            borderColor: theme.palette.info.dark
           })
         }),
         sizeSmall: ({ ownerState, theme }) => ({

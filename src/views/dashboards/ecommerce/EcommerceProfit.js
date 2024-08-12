@@ -24,17 +24,17 @@ const EcommerceProfit = () => {
     },
     stroke: { width: 2 },
     tooltip: { enabled: false },
-    colors: [hexToRGBA(theme.palette.info.main, 1)],
+    colors: [hexToRGBA(theme.palette.info.dark, 1)],
     markers: {
       size: 3.5,
       strokeWidth: 3,
       strokeColors: 'transparent',
-      colors: [theme.palette.info.main],
+      colors: [theme.palette.info.dark],
       discrete: [
         {
           size: 5,
           seriesIndex: 0,
-          strokeColor: theme.palette.info.main,
+          strokeColor: theme.palette.info.dark,
           fillColor: theme.palette.background.paper,
           dataPointIndex: series[0].data.length - 1
         }

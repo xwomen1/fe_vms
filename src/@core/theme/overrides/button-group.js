@@ -38,7 +38,7 @@ const ButtonGroup = () => {
         {
           props: { variant: 'contained', color: 'info' },
           style: ({ theme }) => ({
-            backgroundColor: theme.palette.info.main
+            backgroundColor: theme.palette.info.dark
           })
         },
         {
@@ -77,7 +77,7 @@ const ButtonGroup = () => {
           props: { variant: 'tonal', color: 'info', orientation: 'horizontal' },
           style: ({ theme }) => ({
             '& .MuiButton-tonal:not(:last-child)': {
-              borderRight: `1px solid ${hexToRGBA(theme.palette.info.main, 0.24)}`
+              borderRight: `1px solid ${hexToRGBA(theme.palette.info.dark, 0.24)}`
             }
           })
         },
@@ -125,7 +125,7 @@ const ButtonGroup = () => {
           props: { variant: 'tonal', color: 'info', orientation: 'vertical' },
           style: ({ theme }) => ({
             '& .MuiButton-tonal:not(:last-child)': {
-              borderBottom: `1px solid ${hexToRGBA(theme.palette.info.main, 0.24)}`
+              borderBottom: `1px solid ${hexToRGBA(theme.palette.info.dark, 0.24)}`
             }
           })
         },

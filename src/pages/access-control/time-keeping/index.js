@@ -97,7 +97,7 @@ const EventList = () => {
     fetchDataList()
   }, [page, pageSize])
 
-  const columns =[
+  const columns = [
     { id: 1, flex: 0.25, minWidth: 50, align: 'left', field: 'fullName', label: 'Full Name' },
     { id: 2, flex: 0.15, minWidth: 150, align: 'left', field: 'accessCode', label: 'Employee Code' },
     { id: 3, flex: 0.15, minWidth: 100, align: 'left', field: 'groupName', label: 'Department' },
@@ -106,8 +106,7 @@ const EventList = () => {
     { id: 6, flex: 0.25, minWidth: 50, align: 'left', field: 'timeMin', label: 'Check-in Time' },
     { id: 7, flex: 0.25, minWidth: 50, align: 'left', field: 'timeMax', label: 'Check-out Time' },
     { id: 8, flex: 0.25, minWidth: 50, align: 'left', field: 'totalTime', label: 'Total Time' }
-]
-
+  ]
 
   return (
     <Card sx={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
@@ -153,7 +152,8 @@ const EventList = () => {
                 }}
               />
               <Button variant='contained' sx={{ ml: 2 }} onClick={handleSearch}>
-                Search<Icon fontSize='1.25rem' icon='tabler:search' />
+                Search
+                <Icon fontSize='1.25rem' icon='tabler:search' />
               </Button>
             </Grid>
           </Grid>
@@ -197,7 +197,7 @@ const EventList = () => {
               ) : (
                 <TableRow>
                   <TableCell colSpan={columns.length + 1} align='center'>
-                  No Data Available ...
+                    No Data Available ...
                   </TableCell>
                 </TableRow>
               )}
@@ -208,7 +208,7 @@ const EventList = () => {
       <CardActions sx={{ backgroundColor: 'white', padding: 2 }}>
         <Grid container spacing={2} alignItems='center'>
           <Grid item xs={12} sm={4} sx={{ textAlign: 'right', mb: 1 }}>
-            <span style={{ fontSize: 15 }}>Dòng/trang</span>
+            <span style={{ fontSize: 15 }}>line/page</span>
           </Grid>
           <Grid item xs={12} sm={1}>
             <Button onClick={handleOpenMenu} endIcon={<Icon icon='tabler:selector' />}>

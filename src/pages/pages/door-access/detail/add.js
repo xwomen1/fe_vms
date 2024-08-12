@@ -267,19 +267,15 @@ const DoorAccessUpdate = ({ show, onClose, setReload }) => {
             <Icon icon='tabler:x' />
           </IconButton>
           <Typography variant='h3' gutterBottom>
-            Chi tiết quản lý truy cập cửa
+            Add
           </Typography>
           <Grid container spacing={2}>
             <Grid item xs={6}>
-              <CustomTextField
-                onChange={e => handleInputChange('name', e.target.value)}
-                label='Tên cấp truy cập'
-                fullWidth
-              />
+              <CustomTextField onChange={e => handleInputChange('name', e.target.value)} label='Name' fullWidth />
             </Grid>
             <Grid item xs={6}>
               <CustomTextField
-                label='Mô tả'
+                label='Detail'
                 onChange={e => handleInputChange('description', e.target.value)}
                 fullWidth
               />
@@ -289,9 +285,9 @@ const DoorAccessUpdate = ({ show, onClose, setReload }) => {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Nhóm</TableCell>
-                      <TableCell>Cửa</TableCell>
-                      <TableCell>Lịch hoạt động</TableCell>
+                      <TableCell>Group</TableCell>
+                      <TableCell>Door</TableCell>
+                      <TableCell>Schedule</TableCell>
                       <TableCell align='center'>
                         <IconButton size='small' onClick={handleAddRow}>
                           <Icon icon='bi:plus' />
@@ -339,10 +335,10 @@ const DoorAccessUpdate = ({ show, onClose, setReload }) => {
         </DialogContent>
         <DialogActions sx={{ pr: 4, pb: 8 }}>
           <Button onClick={onClose} variant='contained' color='primary'>
-            Hủy
+            Cancel
           </Button>
           <Button onClick={handleSave} variant='contained' color='primary'>
-            Lưu
+            Save
           </Button>
         </DialogActions>
       </Dialog>

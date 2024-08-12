@@ -82,7 +82,7 @@ const Radio = () => {
             fill: theme.palette.warning.main
           },
           '&.Mui-checked.MuiRadio-colorInfo svg path:first-of-type': {
-            fill: theme.palette.info.main
+            fill: theme.palette.info.dark
           }
         })
       }

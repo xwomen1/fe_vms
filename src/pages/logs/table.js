@@ -163,19 +163,24 @@ const Logs = ({ apiData }) => {
                   {assettype.map((assetType, index) => (
                     <TableRow key={assetType.id}>
                       <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>
-                        {new Date(assetType.timestamp).toLocaleString()}
-                      </TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{new Date(assetType.timestamp).toLocaleString()}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.method}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>
-                        <span style={{ backgroundColor: '#C8E6C9', color: 'green', padding: '4px 8px', borderRadius: '40px' }}>
+                        <span
+                          style={{
+                            backgroundColor: '#C8E6C9',
+                            color: 'green',
+                            padding: '4px 8px',
+                            borderRadius: '40px'
+                          }}
+                        >
                           {assetType.status}
                         </span>
-                      </TableCell>                      <TableCell sx={{ padding: '16px' }}>{assetType.detail}</TableCell>
+                      </TableCell>{' '}
+                      <TableCell sx={{ padding: '16px' }}>{assetType.detail}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.userName}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>
                         <Grid container spacing={2}>
-                          
                           <IconButton onClick={() => handleDelete(assetType.id)}>
                             <Icon icon='tabler:trash' />
                           </IconButton>
@@ -191,7 +196,7 @@ const Logs = ({ apiData }) => {
                 <Grid item xs={1.5} style={{ padding: 0 }}>
                   <IconButton onClick={handleOpenMenu}>
                     <Icon icon='tabler:selector' />
-                    <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
+                    <p style={{ fontSize: 15 }}>{pageSize} line/page</p>
                   </IconButton>
                   <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
                     {pageSizeOptions.map(size => (
