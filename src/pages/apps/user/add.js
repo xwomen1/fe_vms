@@ -548,7 +548,7 @@ const Add = () => {
               <Icon icon='tabler:chevron-left' />
             </IconButton>
 
-            <h2 style={{ color: 'black' }}>Add người dùng: </h2>
+            <h2 style={{ color: 'black' }}>Add </h2>
           </Grid>
           <Grid container spacing={2}>
             <div style={{ width: '80%' }}></div>
@@ -841,10 +841,10 @@ const Add = () => {
                 <TextField label='Account' onChange={handleAccountChange} fullWidth />
               </Grid>
               <Grid item xs={4}>
-                <TextField label='Mật khẩu' type='password' onChange={handlePasswordChange} fullWidth />
+                <TextField label='Password' type='password' onChange={handlePasswordChange} fullWidth />
               </Grid>
               <Grid item xs={3.8}>
-                <TextField label='Xác nhận mật khẩu' type='password' onChange={handleConfirmPasswordChange} fullWidth />
+                <TextField label='Confirm password' type='password' onChange={handleConfirmPasswordChange} fullWidth />
               </Grid>
               <Grid item xs={2} style={{ marginTop: '1.1%' }}>
                 <FormControlLabel

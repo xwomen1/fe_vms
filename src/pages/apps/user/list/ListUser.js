@@ -311,7 +311,7 @@ const UserList = ({ apiData }) => {
                     <TableCell sx={{ padding: '16px' }}>Group</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Contract Type</TableCell>
 
-                    <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Action</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
