@@ -49,7 +49,6 @@ const initValues = {
 }
 
 const format_form = [
-
   {
     name: 'imageObject',
     label: 'Image',
@@ -61,8 +60,8 @@ const format_form = [
   },
   {
     name: 'result',
-    label: 'Result',
-    placeholder: 'result',
+    label: 'result',
+    placeholder: 'Nhập kết quả',
     type: 'TextField',
     data: [],
     require: true,
