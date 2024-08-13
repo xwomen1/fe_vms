@@ -19,12 +19,14 @@ import {
   Table,
   TableBody,
   TableCell,
+  Switch,
   TableContainer,
   TableHead,
   TableRow,
   Tooltip,
   Typography
 } from '@mui/material'
+import FormControlLabel from '@mui/material/FormControlLabel'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import { format } from 'date-fns'
 import authConfig from 'src/configs/auth'
@@ -50,7 +52,7 @@ const EventList = () => {
   const [page, setPage] = useState(1)
   const [page1, setPage1] = useState(1)
   const [activeIndex, setActiveIndex] = useState(null)
-
+  const [isRealtime, setIsRealtime] = useState(true)
   const [pageSize, setPageSize] = useState(25)
 
   const pageSizeOptions = [25, 50, 100]
@@ -149,39 +151,65 @@ const EventList = () => {
     }
   ]
 
-  useEffect(() => {
-    // create WebSocket connection
+  const handleSwitchChange = event => {
+    const isChecked = event.target.checked
+    setIsRealtime(isChecked)
 
-    const ws = new WebSocket(
-      `wss://sbs.basesystem.one/ivis/vms/api/v0/websocket/topic/list_ai_event/be571c00-41cf-4878-a1de-b782625da62a`
-    )
-
-    setWebsocket(ws)
-
-    // create RTCPeerConnection
-
-    const pc = new RTCPeerConnection(config)
-    setRtcPeerConnection(pc)
-
-    // listen for remote tracks and add them to remote stream
-
-    pc.ontrack = event => {
-      const stream = event.streams[0]
-      if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {
-        setRemoteStream(stream)
-        remoteVideoRef.current.srcObject = stream
-      }
-    }
-
-    return () => {
-      if (websocket) {
-        websocket.close()
-      }
+    if (!isChecked && websocket) {
+      websocket.close()
+      setWebsocket(null)
       if (rtcPeerConnection) {
         rtcPeerConnection.close()
+        setRtcPeerConnection(null)
       }
     }
-  }, [])
+  }
+
+  useEffect(() => {
+    if (isRealtime) {
+      const ws = new WebSocket(
+        `wss://sbs.basesystem.one/ivis/vms/api/v0/websocket/topic/list_ai_event/be571c00-41cf-4878-a1de-b782625da62a`
+      )
+      setWebsocket(ws)
+
+      const pc = new RTCPeerConnection(config)
+      setRtcPeerConnection(pc)
+
+      ws.addEventListener('open', () => {
+        ws.send(
+          JSON.stringify({
+            id: defaultCameraID,
+            type: 'request'
+          })
+        )
+      })
+
+      ws.addEventListener('message', handleMessage)
+      ws.addEventListener('error', error => {
+        console.error('WebSocket error:', error)
+      })
+      ws.addEventListener('close', handleClose)
+
+      pc.ontrack = event => {
+        const stream = event.streams[0]
+        if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {
+          setRemoteStream(stream)
+          remoteVideoRef.current.srcObject = stream
+        }
+      }
+
+      return () => {
+        if (ws) {
+          ws.close()
+          setWebsocket(null)
+        }
+        if (pc) {
+          pc.close()
+          setRtcPeerConnection(null)
+        }
+      }
+    }
+  }, [isRealtime])
 
   const handleMessage = async event => {
     const message = JSON.parse(event.data)
@@ -212,6 +240,11 @@ const EventList = () => {
   const handleClose = async event => {
     if (websocket) {
       websocket.close()
+      setWebsocket(null)
+    }
+    if (rtcPeerConnection) {
+      rtcPeerConnection.close()
+      setRtcPeerConnection(null)
     }
   }
 
@@ -222,11 +255,7 @@ const EventList = () => {
   }, [rtcPeerConnection])
 
   useEffect(() => {
-    fetchDataList()
-  }, [page, pageSize])
-
-  useEffect(() => {
-    if (eventsData) {
+    if (isRealtime && eventsData) {
       const newList = []
 
       deviceList?.map((item, index) => {
@@ -242,7 +271,11 @@ const EventList = () => {
 
       setDeviceList([...newList])
     }
-  }, [eventsData, deviceList])
+  }, [isRealtime, eventsData, deviceList])
+
+  useEffect(() => {
+    fetchDataList()
+  }, [page, pageSize])
 
   const fetchDataList = async () => {
     const params = {
@@ -339,6 +372,14 @@ const EventList = () => {
           <CardHeader
             title='Top 5 AI Events'
             titleTypographyProps={{ sx: { mb: [2, 0] } }}
+            action={
+              <FormControlLabel
+                control={
+                  <Switch checked={isRealtime} onChange={handleSwitchChange} name='realtimeEvents' color='primary' />
+                }
+                label='Real time event.'
+              />
+            }
             sx={{
               py: 4,
               flexDirection: ['column', 'row'],

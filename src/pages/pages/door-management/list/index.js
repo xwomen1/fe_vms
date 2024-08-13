@@ -247,7 +247,7 @@ const DoorManagement = () => {
         content: 'content-class',
         confirmButton: 'swal-btn-confirm'
       },
-      confirmButtonColor: '#FF9F43'
+      confirmButtonColor: '#002060'
     }
 
     return Swal.fire({ ...defaultProps, ...options })
@@ -275,7 +275,7 @@ const DoorManagement = () => {
               willOpen: () => {
                 const confirmButton = Swal.getConfirmButton()
                 if (confirmButton) {
-                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.backgroundColor = '#002060'
                   confirmButton.style.color = 'white'
                 }
               }
@@ -294,7 +294,7 @@ const DoorManagement = () => {
               willOpen: () => {
                 const confirmButton = Swal.getConfirmButton()
                 if (confirmButton) {
-                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.backgroundColor = '#002060'
                   confirmButton.style.color = 'white'
                 }
               }
@@ -315,7 +315,8 @@ const DoorManagement = () => {
       customClass: {
         confirmButton: 'swal-btn-confirm',
         cancelButton: 'swal-btn-cancel'
-      }
+      },
+      confirmButtonColor: '#002060'
     })
 
     if (confirmResult.isConfirmed) {
@@ -356,7 +357,8 @@ const DoorManagement = () => {
       customClass: {
         confirmButton: 'swal-btn-confirm',
         cancelButton: 'swal-btn-cancel'
-      }
+      },
+      confirmButtonColor: '#002060'
     })
 
     if (confirmResult.isConfirmed) {
@@ -397,7 +399,8 @@ const DoorManagement = () => {
       customClass: {
         confirmButton: 'swal-btn-confirm',
         cancelButton: 'swal-btn-cancel'
-      }
+      },
+      confirmButtonColor: '#002060'
     })
 
     if (confirmResult.isConfirmed) {

@@ -115,7 +115,7 @@ const InforDoor = ({ idSetting }) => {
       console.log(response.data, 'updateData')
     } catch (error) {
       console.error('Error updating door:', error)
-      toast.error(error.message || 'Error updating door')
+      toast.error(error.response?.data?.message || error.message)
     } finally {
       setLoading(false)
     }

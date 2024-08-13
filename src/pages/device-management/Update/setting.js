@@ -97,34 +97,12 @@ const Setting = ({ idSetting }) => {
         params,
         config
       )
-      Swal.fire({
-        title: 'Thành công!',
-        text: 'Dữ liệu đã được cập nhật thành công.',
-        icon: 'success',
-        willOpen: () => {
-          const confirmButton = Swal.getConfirmButton()
-          if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
-            confirmButton.style.color = 'white'
-          }
-        }
-      })
+      toast.success('Update Successful')
     } catch (error) {
       console.error('Error updating user details:', error)
       setLoading(false)
 
-      Swal.fire({
-        title: 'Error!',
-        text: error.response?.data?.message || error.message,
-        icon: 'error',
-        willOpen: () => {
-          const confirmButton = Swal.getConfirmButton()
-          if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
-            confirmButton.style.color = 'white'
-          }
-        }
-      })
+      toast.error(error.response?.data?.message || error.message)
     }
   }
 
