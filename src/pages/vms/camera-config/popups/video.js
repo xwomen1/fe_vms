@@ -1,6 +1,5 @@
 import { forwardRef, useEffect, useState } from 'react'
-import { Box, Fade, Grid, IconButton, Paper, styled, Typography } from '@mui/material'
-
+import { Box, Fade, Grid, IconButton, styled, Typography } from '@mui/material'
 import { Autocomplete, Button, Dialog, DialogContent, DialogActions } from '@mui/material'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import { getApi, putApi } from 'src/@core/utils/requestUltils'
@@ -98,26 +97,11 @@ const format_form = [
         id: '20',
         name: 'Lowest'
       },
-      {
-        id: '30',
-        name: 'Lower'
-      },
-      {
-        id: '45',
-        name: 'Low'
-      },
-      {
-        id: '60',
-        name: 'Medium'
-      },
-      {
-        id: '75',
-        name: 'High'
-      },
-      {
-        id: '90',
-        name: 'Highest'
-      }
+      { id: '30', name: 'Lower' },
+      { id: '45', name: 'Low' },
+      { id: '60', name: 'Medium' },
+      { id: '75', name: 'High' },
+      { id: '90', name: 'Highest' }
     ],
     disabled: false,
     require: true,
@@ -129,34 +113,13 @@ const format_form = [
     placeholder: 'Resolution',
     type: 'Autocomplete',
     data: [
-      {
-        id: '3840x2160',
-        name: '3840*2160'
-      },
-      {
-        id: '3072x2048',
-        name: '3072*2048'
-      },
-      {
-        id: '2592*1944',
-        name: '2592x1944'
-      },
-      {
-        id: '2560*1440',
-        name: '2560x1440'
-      },
-      {
-        id: '2304*1296',
-        name: '2304x1296'
-      },
-      {
-        id: '1920*1080',
-        name: '1920x1080'
-      },
-      {
-        id: '1280*720',
-        name: '1280x720'
-      }
+      { id: '3840x2160', name: '3840*2160' },
+      { id: '3072x2048', name: '3072*2048' },
+      { id: '2592*1944', name: '2592x1944' },
+      { id: '2560*1440', name: '2560x1440' },
+      { id: '2304*1296', name: '2304x1296' },
+      { id: '1920*1080', name: '1920x1080' },
+      { id: '1280*720', name: '1280x720' }
     ],
     disabled: false,
     require: true,
@@ -168,14 +131,8 @@ const format_form = [
     placeholder: 'Video encoding',
     type: 'Autocomplete',
     data: [
-      {
-        id: 'H264',
-        name: 'H264'
-      },
-      {
-        id: 'H265',
-        name: 'H265'
-      }
+      { id: 'H264', name: 'H264' },
+      { id: 'H265', name: 'H265' }
     ],
     disabled: false,
     require: true,
@@ -188,7 +145,14 @@ const VideoConfig = ({ open, onClose, camera }) => {
   const [loading, setLoading] = useState(false)
   const [detail, setDetail] = useState(null)
   const [form, setForm] = useState(format_form)
-  const [DDNSOption, setDDNS] = useState([])
+  const [streamType, setStreamType] = useState(null)
+  const [bitrateType, setBitrateType] = useState(null)
+  const [frameRate, setFrameRate] = useState(null)
+  const [h265, setH265] = useState(null)
+  const [videoQuality, setVideoQuality] = useState(null)
+  const [resolution, setResolution] = useState(null)
+  const [videoEncoding, setVideoEncoding] = useState(null)
+
 
   const {
     control,
@@ -196,6 +160,7 @@ const VideoConfig = ({ open, onClose, camera }) => {
     handleSubmit,
     formState: { errors }
   } = useForm({})
+
   useEffect(() => {
     fetchData()
   }, [])
@@ -210,12 +175,6 @@ const VideoConfig = ({ open, onClose, camera }) => {
     reset(detail)
   }
 
-
-
-  const handleDDNSChange = (event, newValue) => {
-    setSelectedNicType(newValue)
-  }
-
   const handleCancel = () => {
     onClose()
   }
@@ -227,16 +186,16 @@ const VideoConfig = ({ open, onClose, camera }) => {
       const response = await getApi(
         `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/videoconfig/{idCamera}?idCamera=${camera}`
       )
+      const videoConfig = response.data?.videoConfig
+      setDetail(videoConfig)
+      setStreamType(videoConfig?.streamType)
+      setBitrateType(videoConfig?.bitrateType)
+      setFrameRate(videoConfig?.frameRate)
+      setH265(videoConfig?.h265)
+      setVideoQuality(videoConfig?.videoQuality)
+      setResolution(videoConfig?.resolution)
+      setVideoEncoding(videoConfig?.videoEncoding)
 
-      const nicTypes = response.data.map(item => ({
-        label: item.name,
-        value: item.value
-      }))
-      setDDNS(nicTypes)
-
-      if (nicTypes.length > 0) {
-        setSelectedNicType(nicTypes[0].value)
-      }
     } catch (error) {
       if (error && error?.response?.data) {
         console.error('error', error)
@@ -250,42 +209,6 @@ const VideoConfig = ({ open, onClose, camera }) => {
         setLoading(false)
       }
     }
-  }
-
-  const fetchCameraTypes = async () => {
-    setLoading(true)
-    try {
-
-      const response = await getApi(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/videoconfig/{idCamera}?idCamera=${camera}`
-      )
-
-      const nicTypes = response.data.map(item => ({
-        label: item.name,
-        value: item.value
-      }))
-      setDDNS(nicTypes)
-
-      if (nicTypes.length > 0) {
-        setSelectedNicType(nicTypes[0].value)
-      }
-    } catch (error) {
-      if (error && error?.response?.data) {
-        console.error('error', error)
-        toast.error(error?.response?.data?.message)
-      } else {
-        console.error('Error fetching data:', error)
-        toast.error(error)
-      }
-    } finally {
-      () => {
-        setLoading(false)
-      }
-    }
-  }
-
-  const handleCamera = () => {
-    fetchCameraTypes()
   }
 
   const onSubmit = values => {
@@ -376,6 +299,15 @@ const VideoConfig = ({ open, onClose, camera }) => {
               )
             }
             if (item.type === 'Autocomplete') {
+              const result = item.name === 'dataStreamType' ? streamType :
+                item?.name === 'bitrateType' ? bitrateType :
+                  item?.name === 'frameRate' ? frameRate :
+                    item?.name === 'h265' ? h265 :
+                      item?.name === 'videoQuality' ? videoQuality :
+                        item?.name === 'resolution' ? resolution :
+                          item?.name === 'videoEncoding' ? videoEncoding
+                            : ''
+
               return (
                 <Grid item xs={item.width} key={item.name} sx={{ display: 'flex', alignItems: 'center' }}>
                   <Controller
@@ -385,7 +317,7 @@ const VideoConfig = ({ open, onClose, camera }) => {
                     render={({ field: { value, onChange } }) => (
                       <Autocomplete
                         fullWidth
-                        value={value || ''}
+                        value={result || ''}
                         onChange={(event, selectedItem) => {
                           onChange(selectedItem)
                         }}
