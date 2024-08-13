@@ -456,7 +456,7 @@ const FaceManagement = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>
+                <TableCell align='center'>
                   <Checkbox onChange={handleSelectAllChange} checked={selectAll} />
                 </TableCell>
                 <TableCell align='center'>STT</TableCell>

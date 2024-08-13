@@ -150,7 +150,7 @@ const EventDetails = ({ show, onClose, data, setReload }) => {
           </CustomCloseButton>
           <Box sx={{ mb: 8, textAlign: 'left' }}>
             <Typography variant='h3' sx={{ mb: 3 }}>
-            Event Detail
+              Event Detail
             </Typography>
           </Box>
           <Grid container spacing={0} style={{ marginTop: 10 }}>
@@ -180,11 +180,11 @@ const EventDetails = ({ show, onClose, data, setReload }) => {
             pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
           }}
         >
-          {value === '1' && (
+          {/* {value === '1' && (
             <Button type='submit' variant='contained' onClick={() => handleDownloadFile()}>
               Export File
             </Button>
-          )}
+          )} */}
           <Button variant='contained' onClick={onClose}>
             Close
           </Button>

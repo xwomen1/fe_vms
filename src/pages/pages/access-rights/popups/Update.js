@@ -278,26 +278,25 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
       5: 'THURSDAY',
       6: 'FRIDAY',
       7: 'SATURDAY'
-    };
-    
+    }
+
     const transformCalendarDays = calendarDays => {
-      console.log('calendarDays', calendarDays);
-    
+      console.log('calendarDays', calendarDays)
+
       return calendarDays.map(day => {
-        const { dayOfWeek, timePeriods } = day;
-        const value = dataDailyDefault.find(item => item.dayOfWeek === dayOfWeek)?.value || 1;
-    
-        const label = dayMapping[value] || 'SUNDAY';
-    
+        const { dayOfWeek, timePeriods } = day
+        const value = dataDailyDefault.find(item => item.dayOfWeek === dayOfWeek)?.value || 1
+
+        const label = dayMapping[value] || 'SUNDAY'
+
         return {
           label,
           dayOfWeek,
           value,
           timePeriods
-        };
-      });
-    };
-    
+        }
+      })
+    }
 
     useEffect(() => {
       if (detail && detail.calendarDays) {
@@ -437,7 +436,7 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
           </CustomCloseButton>
           <Box sx={{ mb: 8, textAlign: 'left' }}>
             <Typography variant='h3' sx={{ mb: 3 }}>
-            Schedule Configuration
+              Schedule Configuration
             </Typography>
           </Box>
           <form>
@@ -522,7 +521,9 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
                               value={selectedOption}
                               options={filteredDoorList}
                               getOptionLabel={option => option.name || ''}
-                              renderInput={params => <CustomTextField {...params} label='Door In' placeholder='Door In' />}
+                              renderInput={params => (
+                                <CustomTextField {...params} label='Door In' placeholder='Door In' />
+                              )}
                               onChange={(event, newValue) => {
                                 onChange(newValue ? newValue.id : null)
                                 handleDoorInIdChange(newValue ? newValue.id : null) // Save selected doorInId
@@ -555,7 +556,9 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
                               value={selectedOption}
                               options={filteredDoorList}
                               getOptionLabel={option => option.name || ''}
-                              renderInput={params => <CustomTextField {...params} label='Door Out' placeholder='Door Out' />}
+                              renderInput={params => (
+                                <CustomTextField {...params} label='Door Out' placeholder='Door Out' />
+                              )}
                               onChange={(event, newValue) => {
                                 onChange(newValue ? newValue.id : null)
                                 handleDoorOutIdChange(newValue ? newValue.id : null) // Save selected doorOutId
@@ -572,7 +575,7 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
                   return (
                     <Grid item xs={12} key={index}>
                       <span style={{ color: '#f5963a', fontSize: 20, position: 'relative' }}>
-                       Operating Time Configuration
+                        Operating Time Configuration
                         <span
                           style={{
                             position: 'absolute',

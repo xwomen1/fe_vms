@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
+
 import authConfig from 'src/configs/auth'
 import axios from 'axios'
 import toast from 'react-hot-toast'
@@ -32,6 +34,7 @@ import Swal from 'sweetalert2'
 import CustomTextField from 'src/@core/components/mui/text-field'
 
 const AddDoor = () => {
+  const router = useRouter()
   const [inforDoor, setInforDoor] = useState({})
   const [loading, setLoading] = useState(false)
   const [deviceGroups, setDeviceGroups] = useState([])
@@ -176,8 +179,9 @@ const AddDoor = () => {
       const updateData = {
         description: inforDoor.description,
         doorGroupId: selectedGroup ? selectedGroup.id : inforDoor.doorGroupId,
-        name: inforDoor.name,
-        deviceId: inforDoor.deviceGroupId
+        name: inforDoor.name
+
+        // deviceId: inforDoor.deviceGroupId
       }
 
       const response = await axios.post(
@@ -186,9 +190,9 @@ const AddDoor = () => {
         config
       )
       toast.success('Thêm thành công!')
-      window.location.href = `/pages/door-management/list`
+      router.push(`/pages/door-management/list`)
     } catch (error) {
-      toast.error(error.message)
+      toast.error(error.response?.data?.message)
     } finally {
       setLoading(false)
     }
