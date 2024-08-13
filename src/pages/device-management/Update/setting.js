@@ -97,7 +97,18 @@ const Setting = ({ idSetting }) => {
         params,
         config
       )
-      toast.success('Update Successful')
+      Swal.fire({
+        title: 'Success',
+        text: 'Data has been updated successfully.',
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
     } catch (error) {
       console.error('Error updating user details:', error)
       setLoading(false)
