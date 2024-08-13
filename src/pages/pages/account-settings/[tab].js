@@ -88,7 +88,7 @@ const UserList = ({ apiData }) => {
       )
       Swal.fire({
         title: 'Thành công!',
-        text: 'Dữ liệu đã được cập nhật thành công.',
+        text: 'Data has been updated successfully.',
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()

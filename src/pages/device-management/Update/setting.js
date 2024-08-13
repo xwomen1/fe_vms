@@ -98,8 +98,8 @@ const Setting = ({ idSetting }) => {
         config
       )
       Swal.fire({
-        title: 'Thành công!',
-        text: 'Dữ liệu đã được cập nhật thành công.',
+        title: 'Success',
+        text: 'Data has been updated successfully.',
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()

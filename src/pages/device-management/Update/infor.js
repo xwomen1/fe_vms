@@ -181,8 +181,8 @@ const InforAll = ({ idInfor }) => {
 
       setLoading(false)
       Swal.fire({
-        title: 'Thành công!',
-        text: 'Dữ liệu đã được cập nhật thành công.',
+        title: 'Success',
+        text: 'Data has been updated successfully.',
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
@@ -378,14 +378,14 @@ const InforAll = ({ idInfor }) => {
                 <Grid item>
                   <Box sx={{ float: 'right' }}>
                     <Button variant='contained' component={Link} href={`/device-management`}>
-                      Hủy
+                      Cancel
                     </Button>
                   </Box>
                 </Grid>
                 <Grid item>
                   <Box sx={{ float: 'right', marginLeft: '2%' }}>
                     <Button aria-label='Bộ lọc' variant='contained' onClick={handleUpdateDevice}>
-                      Lưu
+                      Save
                     </Button>
                   </Box>
                 </Grid>
