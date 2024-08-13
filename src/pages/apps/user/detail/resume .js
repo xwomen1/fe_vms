@@ -252,7 +252,7 @@ const AccessRight = () => {
               <Grid item xs={8} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
                 <Button variant='contained'>Save</Button>
                 <Button variant='contained' style={{ marginLeft: '2%' }}>
-                  Hủy
+                  No
                 </Button>
               </Grid>
             </Grid>

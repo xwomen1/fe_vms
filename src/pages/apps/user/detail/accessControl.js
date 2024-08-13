@@ -325,10 +325,10 @@ const AccessRight = () => {
             setIsOpenDel(false)
           }}
         >
-          Đồng ý
+          Yes
         </Button>
         <Button variant='tonal' color='secondary' sx={{ mr: 1 }} onClick={() => setIsOpenDel(false)}>
-          Hủy
+          No
         </Button>
       </DialogActions>
     </Dialog>
@@ -494,11 +494,11 @@ const AccessRight = () => {
       {/* Delete Confirmation Dialog */}
       <Dialog open={isOpenDel} onClose={() => setIsOpenDel(false)}>
         <DialogContent>
-          <Typography>Bạn có chắc chắn muốn xóa không?</Typography>
+          <Typography>Do you want to delete it?</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsOpenDel(false)} color='primary'>
-            Hủy bỏ
+           No
           </Button>
         </DialogActions>
       </Dialog>

@@ -48,7 +48,7 @@ const UserList = ({ apiData }) => {
       showConfirmButton: true,
       focusCancel: true,
       reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Yes',
       cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
       customClass: {
         content: 'content-class',
@@ -61,7 +61,7 @@ const UserList = ({ apiData }) => {
 
   const handleDelete = idDelete => {
     showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
+      text: 'Do you agree to delete it?'
     }).then(({ value }) => {
       if (value) {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -295,7 +295,7 @@ const UserList = ({ apiData }) => {
 
   const handleDeleteInf = id => {
     showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
+      text: 'Do you agree to delete it?'
     }).then(({ value }) => {
       if (value) {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)

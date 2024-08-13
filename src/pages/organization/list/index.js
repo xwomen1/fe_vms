@@ -364,7 +364,7 @@ const Organization = () => {
                   <TableBody>
                     {childrenData.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={5}>Không có dữ liệu</TableCell>
+                        <TableCell colSpan={5}>Data is not available</TableCell>
                       </TableRow>
                     ) : (
                       childrenData.map((child, index) => (

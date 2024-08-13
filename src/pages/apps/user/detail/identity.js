@@ -112,7 +112,7 @@ const UserDetails = () => {
       showConfirmButton: true,
       focusCancel: true,
       reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Yes',
       cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
       customClass: {
         content: 'content-class',
@@ -431,7 +431,7 @@ const UserDetails = () => {
 
   const handleDeleteRow = (userId, groupId) => {
     showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
+      text: 'Do you agree to delete it?'
     }).then(({ value }) => {
       if (value) {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -519,7 +519,7 @@ const UserDetails = () => {
                     <div style={{ width: '80%' }}></div>
                     {editing ? (
                       <>
-                        <Button variant='contained' onClick={handleCancel}  sx={{ marginRight: '1%' }}>
+                        <Button variant='contained' onClick={handleCancel} sx={{ marginRight: '1%' }}>
                           Cancel
                         </Button>
                         <Button variant='contained' onClick={saveChanges}>
