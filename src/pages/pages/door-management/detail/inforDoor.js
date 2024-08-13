@@ -143,7 +143,8 @@ const InforDoor = ({ idInfor }) => {
       const updateData = {
         description: inforDoor.description,
         doorGroupId: selectedGroup ? selectedGroup.id : inforDoor.doorGroupId,
-        name: inforDoor.name
+        name: inforDoor.name,
+        deviceId: inforDoor.deviceId
       }
 
       const response = await axios.put(

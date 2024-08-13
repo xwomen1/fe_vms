@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react'
 import {
   Autocomplete,
   Button,
@@ -13,14 +14,10 @@ import {
   TableHead,
   TableRow
 } from '@mui/material'
-import React from 'react'
-import { useEffect, useState } from 'react'
-import authConfig from 'src/configs/auth'
 import axios from 'axios'
 import 'react-datepicker/dist/react-datepicker.css'
 import 'react-perfect-scrollbar/dist/css/styles.css'
 import DatePicker from 'react-datepicker'
-import TreeItem from '@mui/lab/TreeItem'
 import * as XLSX from 'xlsx'
 import Icon from 'src/@core/components/icon'
 import CustomTextField from 'src/@core/components/mui/text-field'
@@ -30,6 +27,7 @@ import TreeView from '@mui/lab/TreeView'
 import { useForm } from 'react-hook-form'
 import useUrlState from '../useUrlState'
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
+import authConfig from 'src/configs/auth'
 
 const initValueFilter = {}
 
@@ -37,21 +35,23 @@ function ReportMonth({ history }) {
   const [loading, setLoading] = useState(false)
   const [valueFilter, setValueFilter] = useUrlState(initValueFilter)
   const [start, setStart] = useState(null)
-  const [users, setUsers] = useState([])
   const [end, setEnd] = useState(null)
+  const [users, setUsers] = useState([])
   const [daysInRange, setDaysInRange] = useState([])
   const [groups, setGroups] = useState([])
   const [selectedGroupId, setSelectedGroupId] = useState('')
+  const [selectedGroups, setSelectedGroups] = useState([])
 
   const {
+    handleSubmit,
     reset,
+    setValue,
     formState: { errors }
-  } = useForm({
-    defaultValues: valueFilter
-  })
+  } = useForm({ defaultValues: valueFilter })
 
   useEffect(() => {
     const fetchData = async () => {
+      // await fetchGroupData()
       const today = new Date()
       const startDate = new Date(today.getFullYear(), today.getMonth(), 1)
       const endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0)
@@ -59,12 +59,11 @@ function ReportMonth({ history }) {
       setEnd(endDate)
       calculateDaysInRange(startDate, endDate)
     }
-
     fetchData()
   }, [])
 
   useEffect(() => {
-    if (selectedGroupId !== null) {
+    if (selectedGroupId) {
       setValueFilter({ ...valueFilter, page: 1 })
       setUsers([])
     }
@@ -80,12 +79,8 @@ function ReportMonth({ history }) {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
       const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        params: {
-          groupId: selectedGroupId?.id || ''
-        }
+        headers: { Authorization: `Bearer ${token}` },
+        params: { groupId: selectedGroupId?.id || '', page: valueFilter.page, limit: valueFilter.limit }
       }
 
       const response = await axios.get(
@@ -100,7 +95,6 @@ function ReportMonth({ history }) {
       setLoading(false)
     }
   }
-
   useEffect(() => {
     const fetchGroupData = async () => {
       try {
@@ -128,10 +122,9 @@ function ReportMonth({ history }) {
   }
 
   const calculateDaysInRange = (start, end) => {
-    if (start && end && start instanceof Date && end instanceof Date) {
+    if (start && end) {
       const days = []
       let currentDay = new Date(start)
-
       while (currentDay <= end) {
         days.push(format(currentDay, 'dd/MM/yyyy'))
         currentDay.setDate(currentDay.getDate() + 1)
@@ -146,92 +139,61 @@ function ReportMonth({ history }) {
   }
 
   const exportToExcel = () => {
-    // Tạo một workbook mới
     const workbook = XLSX.utils.book_new()
 
-    // Tạo một worksheet từ dữ liệu đã gộp cho khoảng ngày đã chọn
     const filteredData = users.map(employee => {
-      const row = {
-        'Họ Employee Name': employee.fullName
-      }
-
+      const row = { 'Họ Employee Name': employee.fullName }
       daysInRange.forEach(day => {
         const formattedDay = format(parse(day, 'dd/MM/yyyy', new Date()), 'dd/MM/yyyy')
 
-        const matchingTimes = employee.eventEachUsers.filter(time => {
-          const startDate = format(new Date(time.minEventAt), 'dd/MM/yyyy')
-          const endDate = format(new Date(time.maxEventAt), 'dd/MM/yyyy')
-
-          return isWithinInterval(parse(formattedDay, 'dd/MM/yyyy', new Date()), {
-            start: parse(startDate, 'dd/MM/yyyy', new Date()),
-            end: parse(endDate, 'dd/MM/yyyy', new Date())
+        const matchingTimes = employee.eventEachUsers.filter(time =>
+          isWithinInterval(parse(formattedDay, 'dd/MM/yyyy', new Date()), {
+            start: parse(format(new Date(time.minEventAt), 'dd/MM/yyyy'), 'dd/MM/yyyy', new Date()),
+            end: parse(format(new Date(time.maxEventAt), 'dd/MM/yyyy'), 'dd/MM/yyyy', new Date())
           })
-        })
+        )
 
         const totalDuration = matchingTimes.reduce((sum, time) => {
           const startTime = format(new Date(time.minEventAt), 'HH:mm')
           const endTime = format(new Date(time.maxEventAt), 'HH:mm')
-
           const lunchStart = '12:00'
           const lunchEnd = '13:30'
 
-          // Nếu thời gian nằm ngoài thời gian nghỉ trưa hoặc không nằm trong thời gian làm việc
           if (endTime <= lunchStart || startTime >= lunchEnd) {
             sum += time.maxEventAt - time.minEventAt
           } else {
-            // Trường hợp còn lại, tính thời gian làm việc trừ thời gian nghỉ trưa
-            if (startTime < lunchStart) {
+            if (startTime < lunchStart)
               sum += parse(lunchStart, 'HH:mm', new Date()) - parse(startTime, 'HH:mm', new Date())
-            }
-            if (endTime > lunchEnd) {
-              sum += parse(endTime, 'HH:mm', new Date()) - parse(lunchEnd, 'HH:mm', new Date())
-            }
+            if (endTime > lunchEnd) sum += parse(endTime, 'HH:mm', new Date()) - parse(lunchEnd, 'HH:mm', new Date())
           }
 
           return sum
         }, 0)
 
-        const formattedTimes = matchingTimes
+        row[`ThoiGian_${formattedDay}_`] = `${matchingTimes
           .map(
             time =>
               `Vào: ${format(new Date(time.minEventAt), 'HH:mm')} - Ra: ${format(new Date(time.maxEventAt), 'HH:mm')}`
           )
-          .join('\n')
-        const totalTime = formatDuration(totalDuration)
-
-        // Thời gian vào, ra và tổng thời gian được thêm vào dòng tương ứng
-        row[`ThoiGian_${formattedDay}_`] = `${formattedTimes}\nTongThoiGian: ${totalTime}`
+          .join('\n')}\nTongThoiGian: ${formatDuration(totalDuration)}`
       })
 
       return row
     })
 
     const worksheet = XLSX.utils.json_to_sheet(filteredData)
-
-    // Thêm worksheet vào workbook
     XLSX.utils.book_append_sheet(workbook, worksheet, 'DanhSachNhanVien')
-
-    // Tạo buffer cho file Excel
     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
 
-    // Tạo Blob từ buffer
     const blob = new Blob([excelBuffer], {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheetcharset=UTF-8'
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
     })
-
-    // Tạo đường dẫn URL cho Blob
     const url = URL.createObjectURL(blob)
-
-    // Tạo một thẻ a để tải xuống
     const a = document.createElement('a')
     a.href = url
     a.download = 'DanhSachNhanVien.xlsx'
-
-    // Thêm thẻ a vào body và click để bắt đầu tải xuống
     document.body.appendChild(a)
     a.click()
-
-    // Xóa thẻ a sau khi đã tải xuống
     document.body.removeChild(a)
   }
 
@@ -240,17 +202,11 @@ function ReportMonth({ history }) {
     const minutes = Math.floor((durationInMilliseconds / (1000 * 60)) % 60)
     const hours = Math.floor((durationInMilliseconds / (1000 * 60 * 60)) % 24)
 
-    const formattedHours = hours.toString().padStart(2, '0')
-    const formattedMinutes = minutes.toString().padStart(2, '0')
-    const formattedSeconds = seconds.toString().padStart(2, '0')
-
-    return `${formattedHours}:${formattedMinutes}`
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
   }
+
   const emptyColumnCount = Math.max(0, 9 - daysInRange.length)
-
-  // Tạo một mảng chứa các cột rỗng
   const emptyColumn = Array.from({ length: emptyColumnCount }, (_, index) => index)
-
   const cellWidth = 150
   const minCellWidth = 150
 
@@ -258,11 +214,9 @@ function ReportMonth({ history }) {
     <Card>
       <CardHeader
         title={
-          <>
-            <Grid>
-              <Button variant='contained'> Monthly Report</Button>
-            </Grid>
-          </>
+          <Grid>
+            <Button variant='contained'> Monthly Report</Button>
+          </Grid>
         }
         titleTypographyProps={{ sx: { mb: [2, 0] } }}
         sx={{
@@ -284,35 +238,30 @@ function ReportMonth({ history }) {
               renderInput={params => <CustomTextField placeholder='Department' {...params} label='Department' />}
               onChange={(e, value) => {
                 setSelectedGroupId(value ? { id: value.id } : '')
+                setSelectedGroups(value ? [{ id: value.id }] : [])
               }}
               value={selectedGroupId ? groups.find(g => g.id === selectedGroupId.id) : null}
             />
           </Grid>
           <Grid item xs={12} sm={1}>
             <DatePickerWrapper>
-              <div>
-                <DatePicker
-                  selected={start}
-                  id='basic-input'
-                  onChange={date => setStart(date)}
-                  placeholderText='Click to select a date'
-                  customInput={<CustomInput label='Start Date' />}
-                />
-              </div>
+              <DatePicker
+                selected={start}
+                onChange={date => setStart(date)}
+                placeholderText='Click to select a date'
+                customInput={<CustomInput label='Start Date' />}
+              />
             </DatePickerWrapper>
           </Grid>
           <Grid item xs={12} sm={1}>
             <DatePickerWrapper>
-              <div>
-                <DatePicker
-                  selected={end}
-                  id='basic-input'
-                  onChange={date => setEnd(date)}
-                  placeholderText='Click to select a date'
-                  customInput={<CustomInput label='Start End' />}
-                  minDate={start}
-                />
-              </div>
+              <DatePicker
+                selected={end}
+                onChange={date => setEnd(date)}
+                placeholderText='Click to select a date'
+                customInput={<CustomInput label='End Date' />}
+                minDate={start}
+              />
             </DatePickerWrapper>
           </Grid>
           <Grid item xs={12} sm={7}>
@@ -332,7 +281,8 @@ function ReportMonth({ history }) {
             </Button>
           </Grid>
         </Grid>
-        <br /> <hr />
+        <br />
+        <hr />
         <br />
         <TableContainer component={Paper} sx={{ maxHeight: 600 }}>
           <Table aria-label='Monthly Report'>
@@ -344,7 +294,7 @@ function ReportMonth({ history }) {
                     key={index}
                     style={{ ...headerCellStyle, width: `${cellWidth}px`, minWidth: `${minCellWidth}px` }}
                   >
-                    {`${day}`}
+                    {day}
                   </TableCell>
                 ))}
                 {emptyColumn.map(colIndex => (
@@ -358,50 +308,30 @@ function ReportMonth({ history }) {
             <TableBody>
               {users.map((employee, employeeIndex) => (
                 <TableRow key={employeeIndex}>
-                  <TableCell
-                    key={employeeIndex}
-                    style={{
-                      ...fixedColumnStyle,
-                      position: 'sticky',
-                      top: 0,
-                      backgroundColor: 'white',
-                      zIndex: 2
-                    }}
-                  >
-                    {employee?.fullName}
-                  </TableCell>
+                  <TableCell style={fixedColumnStyle}>{employee?.fullName}</TableCell>
                   {daysInRange.map((day, dayIndex) => {
                     const formattedDay = format(parse(day, 'dd/MM/yyyy', new Date()), 'dd/MM/yyyy')
 
-                    // Kiểm tra xem eventEachUsers có tồn tại và là một mảng
-                    const matchingTimes = (employee.eventEachUsers || []).filter(time => {
-                      const startDate = format(new Date(time.minEventAt), 'dd/MM/yyyy')
-                      const endDate = format(new Date(time.maxEventAt), 'dd/MM/yyyy')
-
-                      return isWithinInterval(parse(formattedDay, 'dd/MM/yyyy', new Date()), {
-                        start: parse(startDate, 'dd/MM/yyyy', new Date()),
-                        end: parse(endDate, 'dd/MM/yyyy', new Date())
+                    const matchingTimes = (employee.eventEachUsers || []).filter(time =>
+                      isWithinInterval(parse(formattedDay, 'dd/MM/yyyy', new Date()), {
+                        start: parse(format(new Date(time.minEventAt), 'dd/MM/yyyy'), 'dd/MM/yyyy', new Date()),
+                        end: parse(format(new Date(time.maxEventAt), 'dd/MM/yyyy'), 'dd/MM/yyyy', new Date())
                       })
-                    })
+                    )
 
                     const totalDuration = matchingTimes.reduce((sum, time) => {
                       const startTime = format(new Date(time.minEventAt), 'HH:mm')
                       const endTime = format(new Date(time.maxEventAt), 'HH:mm')
-
                       const lunchStart = '12:00'
                       const lunchEnd = '13:30'
 
-                      // Nếu thời gian nằm ngoài thời gian nghỉ trưa hoặc không nằm trong thời gian làm việc
                       if (endTime <= lunchStart || startTime >= lunchEnd) {
                         sum += time.maxEventAt - time.minEventAt
                       } else {
-                        // Trường hợp còn lại, tính thời gian làm việc trừ thời gian nghỉ trưa
-                        if (startTime < lunchStart) {
+                        if (startTime < lunchStart)
                           sum += parse(lunchStart, 'HH:mm', new Date()) - parse(startTime, 'HH:mm', new Date())
-                        }
-                        if (endTime > lunchEnd) {
+                        if (endTime > lunchEnd)
                           sum += parse(endTime, 'HH:mm', new Date()) - parse(lunchEnd, 'HH:mm', new Date())
-                        }
                       }
 
                       return sum
@@ -410,16 +340,11 @@ function ReportMonth({ history }) {
                     return (
                       <TableCell
                         key={dayIndex}
-                        style={{
-                          ...cellStyle,
-                          width: `${cellWidth}px`,
-                          minWidth: `${minCellWidth}px`
-                        }}
+                        style={{ ...cellStyle, width: `${cellWidth}px`, minWidth: `${minCellWidth}px` }}
                       >
                         {matchingTimes.map((time, timeIndex) => (
                           <div key={timeIndex}>
-                            {format(new Date(time.minEventAt), ' HH:mm')} -{' '}
-                            {format(new Date(time.maxEventAt), ' HH:mm')}
+                            {format(new Date(time.minEventAt), 'HH:mm')} - {format(new Date(time.maxEventAt), 'HH:mm')}
                           </div>
                         ))}
                         {matchingTimes.length > 0 && (
@@ -461,8 +386,6 @@ const headerCellStyle = {
 
 const fixedColumnStyle = {
   ...cellStyle,
-  width: 'auto',
-  minWidth: '150px',
   position: 'sticky',
   left: 0,
   zIndex: 1
@@ -470,8 +393,6 @@ const fixedColumnStyle = {
 
 const fixedColumnStyles = {
   ...cellStyle,
-  width: 'auto',
-  minWidth: '200px',
   position: 'sticky',
   backgroundColor: '#f2f2f2',
   left: 0,
