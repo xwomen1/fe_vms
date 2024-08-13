@@ -199,7 +199,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                       {value && (
                         <IconButton
                           size='small'
-                          style={{ position: 'absolute', right: 25, top: 25 }}
+                          style={{ position: 'absolute', right: 25, top: 30 }}
                           onClick={() => handleClear(onChange, 'groupId')}
                         >
                           <Icon icon='tabler:x' fontSize='1rem' />
@@ -239,7 +239,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                       {value && (
                         <IconButton
                           size='small'
-                          style={{ position: 'absolute', right: 25, top: 25 }}
+                          style={{ position: 'absolute', right: 25, top: 30 }}
                           onClick={() => handleClear(onChange, 'doorInId')}
                         >
                           <Icon icon='tabler:x' fontSize='1rem' />
@@ -278,7 +278,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                       {value && (
                         <IconButton
                           size='small'
-                          style={{ position: 'absolute', right: 25, top: 25 }}
+                          style={{ position: 'absolute', right: 25, top: 30 }}
                           onClick={() => handleClear(onChange, 'doorOutId')}
                         >
                           <Icon icon='tabler:x' fontSize='1rem' />
