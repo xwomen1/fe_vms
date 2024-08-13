@@ -399,11 +399,11 @@ const SalaryTable = ({ apiData }) => {
       <Card>
         <TableHeader value={value} handleFilter={handleFilter} toggle={toggleSalaryRule} />
 
-        <Grid container spacing={2}>
+        <Grid container spacing={3}>
           {/* <Grid item xs={0.1}></Grid> */}
-          <Grid item xs={0.2}></Grid>
+          <Grid item xs={0.1}></Grid>
 
-          <Grid item xs={1.5} component={Paper}>
+          <Grid item xs={2} component={Paper}>
             <div>
               <CustomTextField
                 value={valueGroup}
@@ -420,7 +420,7 @@ const SalaryTable = ({ apiData }) => {
               </TreeView>
             </div>
           </Grid>
-          <Grid item xs={10.3}>
+          <Grid item xs={9.7}>
             <Paper elevation={3}>
               <TableContainer component={Paper} style={{ maxWidth: '100%', overflowX: 'auto' }}>
                 <Table stickyHeader aria-label='sticky table'>
@@ -438,7 +438,6 @@ const SalaryTable = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Car Allowance</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phone Allowance</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Other Allowances</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>KPCĐ</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>BHXH</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>BHYT</TableCell>
                       {/* <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>BHTN</TableCell> */}
