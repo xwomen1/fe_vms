@@ -49,7 +49,7 @@ const columns = [
     maxWidth: 50,
     align: 'center',
     field: 'imageObject',
-    label: 'Hình ảnh',
+    label: 'Image',
     renderCell: value => (
       <Box sx={{ display: 'flex', justifyContent: 'center' }}>
         <img src={value} alt='' style={{ maxWidth: '60%', height: 'auto', objectFit: 'contain' }} />
@@ -62,7 +62,7 @@ const columns = [
     type: 'timestamp',
     maxWidth: 70,
     align: 'center',
-    label: 'Ngày giờ',
+    label: 'Date',
     field: 'timestamp',
     valueGetter: params => new Date(params.field)
   },
@@ -73,7 +73,7 @@ const columns = [
     maxWidth: 70,
     align: 'center',
     field: 'event',
-    label: 'Kết quả',
+    label: 'Result',
     field: 'result'
   },
   {
@@ -248,7 +248,7 @@ const EventMap = () => {
     const { longitude: lon1, latitude: lat1 } = point1
     const { longitude: lon2, latitude: lat2 } = point2
 
-    // Nếu cả hai điểm đều có tọa độ, thì nối chúng trên bản đồ
+    // Nếu cả hai điểm đều có tọa độ, thì nối chúng trên Map
     if (lon1 && lat1 && lon2 && lat2) {
       drawLineOnMap(point1, point2)
     }
@@ -270,7 +270,7 @@ const EventMap = () => {
   }
 
   const drawLineOnMap = (point1, point2) => {
-    // Tạo một đường thẳng trên bản đồ từ point1 đến point2
+    // Tạo một đường thẳng trên Map từ point1 đến point2
     const newConnection = {
       type: 'Feature',
       geometry: {
@@ -333,7 +333,7 @@ const EventMap = () => {
         }))
       setSelectedPoints(newSelectedPoints)
 
-      // Gọi hàm handleTimeSelect với các điểm mới được chọn
+      // Gọi hàm handleTimeSelect với các điểm mới được Select
     } else {
       setSelectedCameraIds([])
       setSelectedPoints([])
@@ -367,7 +367,7 @@ const EventMap = () => {
   const handleExport = async () => {
     const excelData = rows.reduce((acc, row) => {
       acc.push({
-        'Ngày giờ': row.time,
+        Date: row.time,
         'Sự kiện': row.event,
         Camera: row.camera
       })
@@ -479,7 +479,7 @@ const EventMap = () => {
 
   const calculateCenter = () => {
     if (selectedPoints.length === 0) {
-      // Trả về giá trị mặc định nếu không có điểm nào được chọn
+      // Trả về giá trị mặc định nếu không có điểm nào được Select
       return {
         latitude: 21.027763,
         longitude: 105.83416,
@@ -487,11 +487,11 @@ const EventMap = () => {
       }
     }
 
-    // Tính tổng tất cả các vị trí
+    // Tính tổng tất cả các Location
     const totalLatitude = selectedPoints.reduce((acc, point) => acc + parseFloat(point.latitude), 0)
     const totalLongitude = selectedPoints.reduce((acc, point) => acc + parseFloat(point.longitude), 0)
 
-    // Tính trung bình vị trí của các điểm được chọn
+    // Tính trung bình Location của các điểm được Select
     const averageLatitude = totalLatitude / selectedPoints.length
     const averageLongitude = totalLongitude / selectedPoints.length
 
@@ -586,7 +586,7 @@ const EventMap = () => {
         <Grid item xs={12}>
           <Card>
             <CardHeader
-              title='Bản đồ'
+              title='Map'
               sx={{
                 py: 4,
                 flexDirection: ['column', 'row'],
@@ -599,7 +599,7 @@ const EventMap = () => {
                     <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
                       <CustomTextField
                         value={keyword}
-                        placeholder='Tìm đối tượng'
+                        placeholder='Find Object'
                         InputProps={{
                           startAdornment: (
                             <Box sx={{ mr: 2, display: 'flex' }}>
@@ -628,7 +628,7 @@ const EventMap = () => {
                   <Grid item>
                     <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
                       <Button variant='outlined' onClick={handleSearch}>
-                        Tìm kiếm
+                        Search
                       </Button>
                     </Box>
                   </Grid>
@@ -639,8 +639,8 @@ const EventMap = () => {
                           selected={startTime}
                           id='basic-input'
                           onChange={date => setStartTime(date)}
-                          placeholderText='Chọn ngày bắt đầu'
-                          customInput={<CustomInput label='Ngày bắt đầu' />}
+                          placeholderText='Select Start date'
+                          customInput={<CustomInput label='Start date' />}
                         />
                       </div>
                     </DatePickerWrapper>
@@ -652,8 +652,8 @@ const EventMap = () => {
                           selected={endTime}
                           id='basic-input'
                           onChange={date => setEndTime(date)}
-                          placeholderText='Chọn ngày kết thúc'
-                          customInput={<CustomInput label='Ngày kết thúc' />}
+                          placeholderText='Select End date'
+                          customInput={<CustomInput label='End date' />}
                         />
                       </div>
                     </DatePickerWrapper>
@@ -676,7 +676,7 @@ const EventMap = () => {
                 <Grid container spacing={2}>
                   <Grid item xs={5}>
                     <Button variant='contained' onClick={handleDeleteList}>
-                      Xóa danh sách
+                      Delete
                     </Button>
                   </Grid>
                   <Grid item xs={5}>
@@ -688,7 +688,7 @@ const EventMap = () => {
                         setSelectedPoints([])
                       }}
                     >
-                      Đóng bảng
+                      Close
                     </Button>
                   </Grid>
                 </Grid>

@@ -99,7 +99,7 @@ const UserList = ({ show, onClose, setReload }) => {
         }
 
         await axios.post('https://dev-ivi.basesystem.one/smc/iam/api/v0/resources', postData, config)
-        toast.success(`Thêm mới tài nguyên hàng ${rowIndex + 1} thành công!`)
+        toast.success(`Add tài nguyên hàng ${rowIndex + 1} thành công!`)
       } catch (error) {
         console.error(`Error adding resource for row ${rowIndex + 1}:`, error)
         toast.error(`Error adding resource for row ${rowIndex + 1}: ${error.message || 'Error adding resource'}`)
@@ -117,16 +117,16 @@ const UserList = ({ show, onClose, setReload }) => {
   }
 
   const scopeLabels = {
-    get: 'xem danh sách',
-    list: 'xem chi tiết',
-    update: 'cập nhật',
-    create: 'thêm mới',
-    delete: 'xóa'
+    get: 'Get',
+    list: 'Find by ID',
+    update: 'Put',
+    create: 'Add',
+    delete: 'Delete'
   }
 
   return (
     <Dialog open={show} onClose={onClose} maxWidth='xl' fullWidth>
-      <DialogTitle>Tạo mới tài nguyên</DialogTitle>
+      <DialogTitle>Add</DialogTitle>
       <DialogContent>
         <Grid container spacing={0}>
           <Grid
@@ -139,15 +139,15 @@ const UserList = ({ show, onClose, setReload }) => {
               <Table>
                 <TableHead style={{ background: '#F6F6F7', position: 'sticky', top: 0, zIndex: 1, fontSize: '1px' }}>
                   <TableRow>
-                    <TableCell>Chọn service</TableCell>
-                    <TableCell>Nhập Resource code</TableCell>
-                    <TableCell>Nhập Resource name</TableCell>
-                    <TableCell>xem danh sách</TableCell>
-                    <TableCell>xem chi tiết</TableCell>
-                    <TableCell>cập nhật</TableCell>
-                    <TableCell>thêm mới</TableCell>
-                    <TableCell>xóa</TableCell>
-                    <TableCell>Hành động</TableCell>
+                    <TableCell>Select Service</TableCell>
+                    <TableCell>Insert Resource code</TableCell>
+                    <TableCell>Insert Resource name</TableCell>
+                    <TableCell>Get</TableCell>
+                    <TableCell>Find by ID</TableCell>
+                    <TableCell>Put</TableCell>
+                    <TableCell>Add</TableCell>
+                    <TableCell>Delete</TableCell>
+                    <TableCell>Action</TableCell>
                     <TableCell>
                       <Button onClick={addRow} variant='contained'>
                         <Icon variant='contained' icon='mdi:plus' />
@@ -171,14 +171,14 @@ const UserList = ({ show, onClose, setReload }) => {
                       </TableCell>
                       <TableCell style={{ width: '35%' }}>
                         <CustomTextField
-                          placeholder='Nhập Resource code'
+                          placeholder='Insert Resource code'
                           onChange={e => handleRowChange(rowIndex, 'resourceCode', e.target.value)}
                           fullWidth
                         />
                       </TableCell>
                       <TableCell style={{ width: '35%' }}>
                         <CustomTextField
-                          placeholder='Nhập Resource name'
+                          placeholder='Insert Resource name'
                           onChange={e => handleRowChange(rowIndex, 'resourceName', e.target.value)}
                           fullWidth
                         />
@@ -212,9 +212,9 @@ const UserList = ({ show, onClose, setReload }) => {
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Hủy</Button>
+        <Button onClick={onClose}>Cancel</Button>
         <Button aria-label='Bộ lọc' variant='contained' onClick={handleAddRows}>
-          Thêm mới
+          Add
         </Button>
       </DialogActions>
     </Dialog>

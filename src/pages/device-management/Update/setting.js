@@ -133,7 +133,7 @@ const Setting = ({ idSetting }) => {
       <div>
         <Card>
           <CardHeader
-            title='Cấu hình mạng'
+            title='Network Configuration'
             titleTypographyProps={{ sx: { mb: [2, 0] } }}
             sx={{
               py: 4,
@@ -146,14 +146,14 @@ const Setting = ({ idSetting }) => {
                 <Grid item>
                   <Box sx={{ float: 'right' }}>
                     <Button variant='contained' component={Link} href={`/device-management`}>
-                      Hủy
+                      Cancel
                     </Button>
                   </Box>
                 </Grid>
                 <Grid item>
                   <Box sx={{ float: 'right', marginLeft: '2%' }}>
                     <Button aria-label='Bộ lọc' variant='contained' onClick={handleUpdateDevice}>
-                      Lưu
+                      Save
                     </Button>
                   </Box>
                 </Grid>
@@ -174,7 +174,7 @@ const Setting = ({ idSetting }) => {
                 <p>TCP/IP</p>
                 <FormControlLabel
                   control={<Checkbox checked={isDHCPEnabled} onChange={handleDHCPChange} />}
-                  label='Sử dụng DHCP'
+                  label='Use DHCP'
                 />
               </Grid>
               <Grid item xs={0.1}></Grid>
@@ -182,8 +182,8 @@ const Setting = ({ idSetting }) => {
             <Grid item xs={0.1}></Grid>
             <Grid item xs={2.8}>
               <CustomTextField
-                label='Địa chỉ IP'
-                placeholder='Nhập Địa chỉ IP...'
+                label='IP Address'
+                placeholder='Enter IP Address...'
                 name='ipAddress'
                 value={device ? device.ipAddress : ''}
                 onChange={handleChange}
@@ -195,7 +195,7 @@ const Setting = ({ idSetting }) => {
             <Grid item xs={2.8}>
               <CustomTextField
                 label='Gateway'
-                placeholder='Nhập Gateway...'
+                placeholder='Enter Gateway...'
                 name='gateway'
                 onChange={handleSettingsChange}
                 value={device.settings ? device.settings.gateway : ''}
@@ -207,7 +207,7 @@ const Setting = ({ idSetting }) => {
             <Grid item xs={2.8}>
               <CustomTextField
                 label='Subnet Mask'
-                placeholder='Nhập Subnet Mask...'
+                placeholder='Enter Subnet Mask...'
                 name='netmask'
                 onChange={handleSettingsChange}
                 value={device.settings ? device.settings.netmask : ''}
@@ -218,11 +218,11 @@ const Setting = ({ idSetting }) => {
             <Grid item xs={0.1}></Grid>
             <Grid item xs={2.8}>
               <CustomTextField
-                label='Địa chỉ Mac'
+                label='Mac Address'
                 name='mac'
                 onChange={handleSettingsChange}
                 disabled={isDHCPEnabled}
-                placeholder='Nhập địa chỉ Mac...'
+                placeholder='Enter Mac Address...'
                 value={device.settings ? device.settings.mac : ''}
                 fullWidth
               />

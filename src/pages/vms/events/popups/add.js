@@ -54,8 +54,8 @@ const initValues = {
 const format_form = [
   {
     name: 'imageObject',
-    label: 'Hình ảnh',
-    placeholder: 'Nhập hình ảnh',
+    label: 'Image',
+    placeholder: 'Nhập Image',
     type: 'ImageObject',
     data: [],
     require: true,
@@ -68,12 +68,12 @@ const format_form = [
     type: 'TextField',
     data: [],
     require: true,
-    width: 12,
+    width: 12
   },
   {
     name: 'description',
-    label: 'Đối tượng',
-    placeholder: 'Nhập tên đối tượng',
+    label: 'Object',
+    placeholder: 'Nhập Object Name',
     type: 'TextField',
     data: [],
     require: true,
@@ -81,8 +81,8 @@ const format_form = [
   },
   {
     name: 'timestamp',
-    label: 'Thời gian',
-    placeholder: 'Nhập thời gian',
+    label: 'Date',
+    placeholder: 'Nhập Date',
     type: 'TextField',
     data: [],
     require: true,
@@ -99,8 +99,8 @@ const format_form = [
   },
   {
     name: 'location',
-    label: 'Vị trí',
-    placeholder: 'Nhập vị trí',
+    label: 'Location',
+    placeholder: 'Nhập Location',
     type: 'TextField',
     data: [],
     require: true,
@@ -108,7 +108,7 @@ const format_form = [
   },
   {
     name: 'imageResult',
-    label: 'Ảnh toàn cảnh',
+    label: 'Full Screen',
     placeholder: 'Nhập ảnh toán cảnh',
     type: 'ImageResult',
     data: [],
@@ -154,7 +154,6 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
     fetchLocationList()
   }, [])
 
-
   useEffect(() => {
     if (detail) {
       setDetailFormValue()
@@ -178,7 +177,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
         toast.error(error)
       }
     } finally {
-      () => {
+      ;() => {
         setLoading(false)
       }
     }
@@ -200,7 +199,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
         toast.error(error)
       }
     } finally {
-      () => {
+      ;() => {
         setLoading(false)
       }
     }
@@ -273,7 +272,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
             </CustomCloseButton>
             <Box sx={{ mb: 8, textAlign: 'left' }}>
               <Typography variant='h3' sx={{ mb: 3 }}>
-                Chi tiết sự kiện
+                Event Detail
               </Typography>
             </Box>
             <form>
@@ -290,7 +289,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
                               rules={{ required: true }}
                               render={({ field: { value, onChange } }) => (
                                 <Box>
-                                  <Typography sx={{ mb: 1 }}>Ảnh đối tượng</Typography>
+                                  <Typography sx={{ mb: 1 }}>Object Image</Typography>
                                   <CustomAvatar
                                     src={value}
                                     variant='rounded'
@@ -393,7 +392,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
                               rules={{ required: true }}
                               render={({ field: { value, onChange } }) => (
                                 <Box sx={getBoxStyles()}>
-                                  <Typography sx={{ mb: 1 }}>Ảnh toàn cảnh</Typography>
+                                  <Typography sx={{ mb: 1 }}>Full Screen</Typography>
                                   <CustomAvatar
                                     src={value}
                                     onLoad={handleImageLoad}
@@ -421,10 +420,10 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
             }}
           >
             <Button variant='tonal' color='secondary' onClick={onClose}>
-              Hủy
+              Cancel
             </Button>
             <Button variant='contained' onClick={handleSubmit(onSubmit)}>
-              Sửa
+              Save
             </Button>
           </DialogActions>
         </Dialog>

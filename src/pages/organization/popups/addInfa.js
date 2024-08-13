@@ -97,10 +97,10 @@ const InfraPopupAdd = ({ open, onClose, setReload }) => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogTitle style={{ fontSize: '24px', fontWeight: 'bold' }}>Thêm cơ cấu tổ chức</DialogTitle>
+      <DialogTitle style={{ fontSize: '24px', fontWeight: 'bold' }}>Add</DialogTitle>
       <DialogContent>
         <CustomTextField
-          label='Tên'
+          label='Name'
           type='text'
           fullWidth
           style={{ marginBottom: '16px' }}
@@ -108,7 +108,7 @@ const InfraPopupAdd = ({ open, onClose, setReload }) => {
           onChange={e => setName(e.target.value)}
         />
         <CustomTextField
-          label='Mã định danh'
+          label='Code'
           type='text'
           fullWidth
           style={{ marginBottom: '16px' }}
@@ -116,7 +116,7 @@ const InfraPopupAdd = ({ open, onClose, setReload }) => {
           onChange={e => setType(e.target.value)}
         />
         <CustomTextField
-          label='Ghi chú'
+          label='Note'
           type='text'
           fullWidth
           style={{ marginBottom: '16px' }}

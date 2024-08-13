@@ -30,8 +30,8 @@ const Storage = ({ id, name, channel }) => {
   const [duration, setDuration] = useState(0)
   const [volume, setVolume] = useState(30)
   const [minuteType, setMinuteType] = useState(null)
-  const [startTime, setStartTime] = useState(new Date());
-  const [endTime, setEndTime] = useState(new Date());
+  const [startTime, setStartTime] = useState(new Date())
+  const [endTime, setEndTime] = useState(new Date())
 
   const [startDate, setStartDate] = useState(() => {
     const today = new Date()
@@ -55,13 +55,13 @@ const Storage = ({ id, name, channel }) => {
   const [dataList, setDataList] = useState([])
 
   useEffect(() => {
-    setCamera({ id, name, channel });
-  }, [id, name, channel]);
+    setCamera({ id, name, channel })
+  }, [id, name, channel])
 
   useEffect(() => {
-    setStartTime(startDate.getTime());
-    setEndTime(endDate.getTime());
-  }, [startDate, endDate]);
+    setStartTime(startDate.getTime())
+    setEndTime(endDate.getTime())
+  }, [startDate, endDate])
 
   const fetchDateList = async () => {
     if (camera.id !== '') {
@@ -206,7 +206,7 @@ const Storage = ({ id, name, channel }) => {
         <Grid item xs={12} sm={9}>
           <Card>
             <CardHeader
-              title='Trích clip'
+              title='Extract clip'
               action={
                 <Grid container spacing={2}>
                   <Grid item xs={3}></Grid>
@@ -219,7 +219,7 @@ const Storage = ({ id, name, channel }) => {
                             maxDate={endDate}
                             onChange={date => setStartDate(date)}
                             dateFormat='dd/MM/yyyy'
-                            customInput={<CustomInput label='Ngày bắt đầu' />}
+                            customInput={<CustomInput label='Start date' />}
                           />
                         </div>
                       </Box>
@@ -234,7 +234,7 @@ const Storage = ({ id, name, channel }) => {
                             maxDate={new Date()}
                             onChange={date => setEndDate(date)}
                             dateFormat='dd/MM/yyyy'
-                            customInput={<CustomInput label='Ngày kết thúc' />}
+                            customInput={<CustomInput label='End date' />}
                           />
                         </div>
                       </Box>
@@ -243,7 +243,7 @@ const Storage = ({ id, name, channel }) => {
 
                   <Grid item xs={3} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end' }}>
                     <Button variant='contained' onClick={() => fetchDateList()}>
-                      Tìm kiếm
+                      Search
                     </Button>
                   </Grid>
                 </Grid>
@@ -310,7 +310,7 @@ const Storage = ({ id, name, channel }) => {
                 )}
               </IconButton>
               <Button type='submit' variant='contained' onClick={() => handleDownloadFile()}>
-                Xuất file
+                Export
               </Button>
             </DialogActions>
           </Card>

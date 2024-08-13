@@ -102,14 +102,14 @@ const InfraPopupAdd = ({ open, onClose, id, setReload }) => {
     let isValid = true
 
     if (name.trim() === '') {
-      setNameError('Tên không được để trống')
+      setNameError('Name không được để trống')
       isValid = false
     } else {
       setNameError('')
     }
 
     if (note.trim() === '') {
-      setNoteError('Ghi chú không được để trống')
+      setNoteError('Note không được để trống')
       isValid = false
     } else {
       setNoteError('')
@@ -133,10 +133,10 @@ const InfraPopupAdd = ({ open, onClose, id, setReload }) => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogTitle style={{ fontSize: '24px', fontWeight: 'bold' }}>Thêm cơ cấu tổ chức</DialogTitle>
+      <DialogTitle style={{ fontSize: '24px', fontWeight: 'bold' }}>Add</DialogTitle>
       <DialogContent>
         <CustomTextField
-          label='Tên'
+          label='Name'
           type='text'
           fullWidth
           style={{ marginBottom: '16px' }}
@@ -146,7 +146,7 @@ const InfraPopupAdd = ({ open, onClose, id, setReload }) => {
           helperText={nameError}
         />
         <CustomTextField
-          label='Mã định danh'
+          label='Code'
           type='text'
           fullWidth
           style={{ marginBottom: '16px' }}
@@ -156,7 +156,7 @@ const InfraPopupAdd = ({ open, onClose, id, setReload }) => {
           helperText={typeError}
         />
         <CustomTextField
-          label='Ghi chú'
+          label='Note'
           type='text'
           fullWidth
           style={{ marginBottom: '16px' }}

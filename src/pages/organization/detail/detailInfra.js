@@ -89,13 +89,13 @@ const InfraPopupDetail = ({ open, id, onClose, setReload }) => {
     let isValid = true
 
     if (name.trim() === '') {
-      setNameError('Tên địa phương không được để trống')
+      setNameError('Name địa phương không được để trống')
       isValid = false
     } else {
       setNameError('')
     }
     if (detail.trim() === '') {
-      setDetailError('Ghi chú địa phương không được để trống')
+      setDetailError('Note địa phương không được để trống')
       isValid = false
     } else {
       setDetailError('')
@@ -123,7 +123,7 @@ const InfraPopupDetail = ({ open, id, onClose, setReload }) => {
         <Grid container spacing={2} alignItems='center'>
           <Grid item xs={6}>
             <CustomTextField
-              label='Tên'
+              label='Name'
               value={name}
               onChange={e => setName(e.target.value)}
               fullWidth
@@ -143,7 +143,7 @@ const InfraPopupDetail = ({ open, id, onClose, setReload }) => {
           </Grid>
           <Grid item xs={12}>
             <CustomTextField
-              label='Ghi chú'
+              label='Note'
               value={detail}
               onChange={e => setDetail(e.target.value)}
               fullWidth

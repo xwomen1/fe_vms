@@ -49,7 +49,7 @@ const TableHeader = ({ handleFilter, exportValue, importValue, toggle, value, on
         <hr />
         <Button component={Link} href={`/apps/user/add`} variant='contained' sx={{ '& svg': { mr: 2 } }}>
           <Icon fontSize='1.125rem' icon='tabler:plus' />
-          Thêm mới
+          Add
         </Button>
         <Button
           variant='contained'
@@ -57,7 +57,7 @@ const TableHeader = ({ handleFilter, exportValue, importValue, toggle, value, on
           sx={{ '& svg': { mr: 1 }, backgroundColor: '#A9A9A9' }}
         >
           <Icon fontSize='1.125rem' icon='tabler:filter' />
-          Lọc
+          Filter
         </Button>
       </Box>
     </Box>

@@ -125,7 +125,7 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode, fetchUserD
               {
                 faceType: faceType, // Sử dụng biến faceType từ props
                 featureType: 'ACCESS',
-                imageFileId: imageId // Sử dụng id của ảnh từ phản hồi API đầu tiên
+                imageFileId: imageId // Sử dụng id của Image từ phản hồi API đầu tiên
               }
             ],
             updateType: 'ADD'
@@ -180,7 +180,7 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode, fetchUserD
         }
       }
 
-      // Đóng dialog sau khi lưu thành công
+      // Đóng dialog sau khi Save thành công
       onClose()
     } catch (error) {
       Swal.fire('Đã xảy ra lỗi', error.response.data.message, 'error')
@@ -204,19 +204,19 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode, fetchUserD
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'white' }}>
             {imageData && imageNew == null && imageUrl != '/images/user.jpg' && (
               <div>
-                <img src={imageData} alt='Ảnh' style={{ height: '50%', width: '50%' }} />
+                <img src={imageData} alt='Image' style={{ height: '50%', width: '50%' }} />
               </div>
             )}
             {imageData && imageNew !== null && !loading && (
               <div style={{ marginRight: 50 }}>
-                <img src={imageData} alt='Ảnh' style={{ height: '200px', width: '200px' }} />
+                <img src={imageData} alt='Image' style={{ height: '200px', width: '200px' }} />
               </div>
             )}
             {imageNew && (
               <div>
-                <img src={imageNew} alt='Ảnh' style={{ height: '200px', width: '200px' }} />
+                <img src={imageNew} alt='Image' style={{ height: '200px', width: '200px' }} />
                 <Button component='label'>
-                  Đổi ảnh
+                  Đổi Image
                   <input type='file' onChange={handleFileChange} style={{ display: 'none' }} />
                 </Button>
               </div>
@@ -240,7 +240,7 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode, fetchUserD
                   style={{ display: 'none' }}
                 />
                 <Button component='label'>
-                  Chọn ảnh
+                  Chọn Image
                   <input type='file' onChange={handleFileChange} style={{ display: 'none' }} />
                 </Button>
               </div>
@@ -253,7 +253,7 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode, fetchUserD
             <div style={{ width: 20 }}></div>
 
             <Button variant='contained' color='primary' onClick={handleSave}>
-              Lưu
+              Save
             </Button>
           </div>
         </div>

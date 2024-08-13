@@ -305,14 +305,14 @@ const ClipExtraction = () => {
         <TabContext value={value}>
           <Grid item xs={12} sx={{ mb: 5 }}>
             <TabList onChange={handleChange} aria-label='customized tabs example'>
-              <Tab value='1' label='Trích xuất clip' key={1} />
-              <Tab value='2' label='Xem lại' key={2} />
+              <Tab value='1' label='Extract clip' key={1} />
+              <Tab value='2' label='Playback' key={2} />
               <Tab value='3' label='Trực tiếp' key={3} />
             </TabList>
           </Grid>
           <Grid item xs={12} sm={4} lg={2}>
             <Card>
-              <CardHeader title='Danh sách Camera' />
+              <CardHeader title='Cameras' />
               <CardContent>
                 <CustomTextField
                   value={keyword}

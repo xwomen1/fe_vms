@@ -50,8 +50,8 @@ const RolesComponent = () => {
       <TabContext value={value}>
         <Grid item xs={12}>
           <TabList onChange={handleChange} aria-label='customized tabs example'>
-            <Tab value='1' label='Vai trò' key={1} />
-            <Tab value='2' label='Thiết lập tài nguyên' key={2} />
+            <Tab value='1' label='Role' key={1} />
+            <Tab value='2' label='Resource Setup' key={2} />
           </TabList>
         </Grid>
         <Grid item xs={12}>
