@@ -72,7 +72,7 @@ function ReportMonth({ history }) {
 
   useEffect(() => {
     fetchDataSource()
-  }, [valueFilter.page, valueFilter.groupId])
+  }, [ valueFilter.groupId])
 
   const fetchDataSource = async () => {
     setLoading(true)

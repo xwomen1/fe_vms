@@ -151,7 +151,7 @@ const LoginPage = () => {
             margin: theme => theme.spacing(8, 0, 8, 8)
           }}
         >
-          <LoginIllustration alt='login-illustration' src={`/images/a.jpg`} style={{ width: '70%' }} />
+          <LoginIllustration alt='login-illustration' src={`/images/login.jpg`} style={{ width: '70%' }} />
         </Box>
       ) : null}
       <RightWrapper>
