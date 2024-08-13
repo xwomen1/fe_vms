@@ -208,67 +208,67 @@ const Add = () => {
 
   const saveChanges = async () => {
     if (password !== confirmPassword) {
-      Swal.fire('Lỗi!', 'Mật khẩu và xác nhận mật khẩu không khớp nhau.', 'error')
+      Swal.fire('error!', 'Password and confirm password do not match.', 'error')
 
       return
     }
     if (!fullNameValue || fullNameValue.length <= 3) {
-      Swal.fire('Lỗi!', 'Name không được để trống và độ dài phải >3', 'error')
+      Swal.fire('error!', 'Name cannot be empty and length must be >3', 'error')
 
       return
     }
     if (!email) {
-      Swal.fire('Lỗi!', 'Email không được để trống', 'error')
+      Swal.fire('error!', 'Email cannot be blank', 'error')
 
       return
     }
     if (!phoneNumber) {
-      Swal.fire('Lỗi!', 'Phone Number không được để trống', 'error')
+      Swal.fire('error!', 'Phone Number cannot be blank', 'error')
 
       return
     }
     if (!identityNumber) {
-      Swal.fire('Lỗi!', 'Identify number không được để trống', 'error')
+      Swal.fire('error!', 'Identify number cannot be blank', 'error')
 
       return
     }
     if (!userCode) {
-      Swal.fire('Lỗi!', 'Code không được để trống', 'error')
+      Swal.fire('error!', 'Code cannot be blank', 'error')
 
       return
     }
     if (!syncCode) {
-      Swal.fire('Lỗi!', 'Synchronize code không được để trống', 'error')
+      Swal.fire('error!', 'Synchronize code cannot be blank', 'error')
 
       return
     }
     if (!account) {
-      Swal.fire('Lỗi!', 'Name Account không được để trống', 'error')
+      Swal.fire('error!', 'Account Name cannot be blank', 'error')
 
       return
     }
     if (userGroups.length === 0) {
-      Swal.fire('Lỗi!', 'Nhóm người dùng không được để trống.', 'error')
+      Swal.fire('error!', 'User group cannot be left blank.', 'error')
 
       return
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
-      Swal.fire('Lỗi!', 'Địa chỉ email không hợp lệ.', 'error')
+      Swal.fire('error!', 'Invalid email address.', 'error')
 
       return
     }
 
     if (password.length < 6) {
-      Swal.fire('Lỗi!', 'Mật khẩu phải chứa ít nhất 6 ký tự.', 'error')
+      Swal.fire('error!', 'Password must contain at least 6 characters.', 'error')
 
       return
     }
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,}$/
     if (!passwordRegex.test(password)) {
       Swal.fire(
-        'Lỗi!',
-        'Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt.',
+        'error!',
+        'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
         'error'
       )
 
@@ -280,7 +280,7 @@ const Add = () => {
       const genderMapping = { MALE: 'MALE', FEMALE: 'FEMALE', OTHER: 'OTHER' }
 
       if (processedGroups.length === 0) {
-        Swal.fire('Lỗi!', 'Nhóm người dùng không được để trống.', 'error')
+        Swal.fire('error!', 'User group cannot be left blank.', 'error')
 
         return
       }
@@ -328,15 +328,15 @@ const Add = () => {
       if (groupACIds.length > 0) {
         await addMemberToGroup(groupACIds, response.data.userId)
       } else {
-        console.error('Không có groupACId nào trong mảng')
+        console.error('There is no groupACId in the array.')
       }
 
-      Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
+      Swal.fire('Success!', 'New user added successfully.', 'success')
 
       router.push(`/apps/user/detail/${response.data.userId}`)
     } catch (error) {
       console.error('Error updating user details:', error)
-      Swal.fire('Lỗi!', error?.response?.data?.message, 'error')
+      Swal.fire('error!', error?.response?.data?.message, 'error')
     }
   }
 
@@ -362,7 +362,7 @@ const Add = () => {
       if (response.data && response.data.groupACId) {
         groupACIds.push(response.data.groupACId)
       } else {
-        throw new Error('Không lấy được groupACId từ API')
+        throw new Error('Unable to get groupACId from API')
       }
 
       return response.data.groupId
@@ -585,9 +585,9 @@ const Add = () => {
                   onChange={handleGenderChange} // Update onChange handler
                 >
                   {/* MenuItems for gender options */}
-                  <MenuItem value='MALE'>Nam</MenuItem>
-                  <MenuItem value='FEMALE'>Nữ</MenuItem>
-                  <MenuItem value='OTHER'>Khác</MenuItem>
+                  <MenuItem value='MALE'>MALE</MenuItem>
+                  <MenuItem value='FEMALE'>FEMALE</MenuItem>
+                  <MenuItem value='OTHER'>OTHER</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
