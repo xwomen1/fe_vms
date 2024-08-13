@@ -548,7 +548,7 @@ const Add = () => {
               <Icon icon='tabler:chevron-left' />
             </IconButton>
 
-            <h2 style={{ color: 'black' }}>Add </h2>
+            <h2 style={{ color: 'black' }}>Add New User</h2>
           </Grid>
           <Grid container spacing={2}>
             <div style={{ width: '80%' }}></div>
@@ -828,14 +828,14 @@ const Add = () => {
           <Grid item xs={12}>
             <FormControlLabel
               control={<Checkbox checked={createAccount} onChange={handleCreateAccountChange} color='primary' />}
-              label='Tạo Account đăng nhập'
+              label='Create Login Account'
               labelPlacement='start'
             />
           </Grid>
           {createAccount && (
             <Grid container spacing={2} style={{ marginLeft: 10 }}>
               <Grid item xs={12}>
-                <Typography variant='h5'>Account Information</Typography>
+                <Typography variant='h5'>Create Login Account</Typography>
               </Grid>
               <Grid item xs={4}>
                 <TextField label='Account' onChange={handleAccountChange} fullWidth />

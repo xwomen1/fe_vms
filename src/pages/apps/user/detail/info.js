@@ -197,15 +197,15 @@ const UserDetails = () => {
   }
   function showAlertConfirm(options, intl) {
     const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Confirm',
       imageWidth: 213,
       showCancelButton: true,
       showCloseButton: true,
       showConfirmButton: true,
       focusCancel: true,
       reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
-      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Ok',
+      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Cancle',
       customClass: {
         content: 'content-class',
         confirmButton: 'swal-btn-confirm'
@@ -327,46 +327,46 @@ const UserDetails = () => {
     const genderMapping = { MALE: 'MALE', FEMALE: 'FEMALE', OTHER: 'OTHER' }
     const genderValue = genderMapping[gender]
     if (!fullNameValue || fullNameValue.length <= 3) {
-      Swal.fire('Lỗi!', 'Name không được để trống và độ dài phải >3', 'error')
+      Swal.fire('error!', 'Name cannot be blank and length must be >3', 'error')
 
       return
     }
     if (!email) {
-      Swal.fire('Lỗi!', 'Email không được để trống', 'error')
+      Swal.fire('error!', 'Email cannot be left blank', 'error')
 
       return
     }
     if (!phoneNumber) {
-      Swal.fire('Lỗi!', 'Phone Number không được để trống ', 'error')
+      Swal.fire('error!', 'Phone Number cannot be left blank', 'error')
 
       return
     }
     if (!identityNumber) {
-      Swal.fire('Lỗi!', 'Identify number không được để trống', 'error')
+      Swal.fire('error!', 'Identify number cannot be left blank', 'error')
 
       return
     }
 
     if (userGroups.length === 0) {
-      Swal.fire('Lỗi!', 'Group người dùng không được để trống.', 'error')
+      Swal.fire('error!', 'Group cannot be left blank', 'error')
 
       return
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
-      Swal.fire('Lỗi!', 'Địa chỉ email không hợp lệ.', 'error')
+      Swal.fire('error!', 'Invalid email address', 'error')
 
       return
     }
 
     const phoneRegex = /^\d+$/
     if (!phoneRegex.test(phoneNumber)) {
-      Swal.fire('Lỗi!', 'Phone Number không hợp lệ.', 'error')
+      Swal.fire('error!', 'Phone Number invalid', 'error')
 
       return
     }
     if (!phoneNumber || phoneNumber.length <= 9) {
-      Swal.fire('Lỗi!', 'Phone Number không hợp lệ', 'error')
+      Swal.fire('error!', 'Phone Number invalid', 'error')
 
       return
     }
@@ -374,7 +374,7 @@ const UserDetails = () => {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
       const processedGroups = await userGroups(groups) // Call the userGroups function passing rows
       if (processedGroups.length === 0) {
-        Swal.fire('Lỗi!', 'Group người dùng không được để trống.', 'error')
+        Swal.fire('error!', 'Group User cannot leave blank.', 'error')
 
         return
       }
@@ -419,13 +419,13 @@ const UserDetails = () => {
       if (groupACIds.length > 0) {
         await addMemberToGroup(groupACIds, userId)
       } else {
-        console.error('Không có groupACId nào trong mảng')
+        console.error('There is no groupACId in the array')
       }
 
-      Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
+      Swal.fire('Success!', 'Data has been updated successfully.', 'success')
     } catch (error) {
       console.error('Error updating user details:', error)
-      Swal.fire('Lỗi!', error?.response?.data?.message, 'error')
+      Swal.fire('error!', error?.response?.data?.message, 'error')
     }
     fetchUserData()
   }
@@ -806,10 +806,10 @@ const UserDetails = () => {
                 {/* {editing ? ( */}
                 <>
                   <Button variant='contained' onClick={handleCancel} sx={{ marginRight: '10px' }}>
-                    Huỷ
+                    Cancel
                   </Button>
                   <Button variant='contained' onClick={saveChanges}>
-                    Lưu
+                    Save
                   </Button>
                 </>
 

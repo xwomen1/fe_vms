@@ -377,7 +377,7 @@ const AccessRight = () => {
                 <CustomTextField
                   value={value}
                   sx={{ mr: 2 }}
-                  placeholder='Tìm lịch'
+                  placeholder='Search schedule'
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position='start'>

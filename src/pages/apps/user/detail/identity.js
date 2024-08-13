@@ -162,10 +162,10 @@ const UserDetails = () => {
         },
         config
       )
-      Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
+      Swal.fire('Success!', 'Data has been updated successfully', 'success')
     } catch (error) {
       console.error('Error updating user details:', error)
-      Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi cập nhật dữ liệu.', 'error')
+      Swal.fire('error!', 'An error occurred while updating data', 'error')
     }
   }
 
@@ -519,11 +519,11 @@ const UserDetails = () => {
                     <div style={{ width: '80%' }}></div>
                     {editing ? (
                       <>
-                        <Button variant='contained' onClick={saveChanges} sx={{ marginRight: '1%' }}>
-                          Save
-                        </Button>
-                        <Button variant='contained' onClick={handleCancel}>
+                        <Button variant='contained' onClick={handleCancel}  sx={{ marginRight: '1%' }}>
                           Cancel
+                        </Button>
+                        <Button variant='contained' onClick={saveChanges}>
+                          Save
                         </Button>
                       </>
                     ) : (
