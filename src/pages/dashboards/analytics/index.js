@@ -156,7 +156,6 @@ const EventList = () => {
     setIsRealtime(isChecked)
 
     if (!isChecked && websocket) {
-      // Đóng kết nối WebSocket và RTCPeerConnection khi tắt switch
       websocket.close()
       setWebsocket(null)
       if (rtcPeerConnection) {
@@ -168,7 +167,6 @@ const EventList = () => {
 
   useEffect(() => {
     if (isRealtime) {
-      // Tạo kết nối WebSocket khi isRealtime là true
       const ws = new WebSocket(
         `wss://sbs.basesystem.one/ivis/vms/api/v0/websocket/topic/list_ai_event/be571c00-41cf-4878-a1de-b782625da62a`
       )
@@ -379,7 +377,7 @@ const EventList = () => {
                 control={
                   <Switch checked={isRealtime} onChange={handleSwitchChange} name='realtimeEvents' color='primary' />
                 }
-                label='Sự kiện thời gian thực'
+                label='Real time event.'
               />
             }
             sx={{
