@@ -46,7 +46,7 @@ const AIConfig = () => {
       minWidth: 50,
       align: 'right',
       field: 'image',
-      label: 'Hình ảnh'
+      label: 'Image'
     },
     {
       id: 2,
@@ -70,7 +70,7 @@ const AIConfig = () => {
       minWidth: 120,
       align: 'center',
       field: 'location',
-      label: 'Khu vực'
+      label: 'Location'
     },
     {
       id: 5,
@@ -78,7 +78,7 @@ const AIConfig = () => {
       minWidth: 50,
       align: 'center',
       field: 'face',
-      label: 'Nhận diện khuôn mặt',
+      label: 'Facial recognition',
       renderCell: row => {
         const item = switchStates.find(item => item.camera_id === row.id)
 
@@ -96,7 +96,7 @@ const AIConfig = () => {
       minWidth: 50,
       align: 'center',
       field: 'licensePlate',
-      label: 'Nhận diện biển số',
+      label: 'License plate recognition',
       renderCell: row => {
         const item = switchStates.find(item => item.camera_id === row.id)
 
@@ -307,7 +307,7 @@ const AIConfig = () => {
 
   return (
     <Card>
-      <CardHeader title='Danh sách cấu hình AI' />
+      <CardHeader title='AI Config' />
 
       <Grid container spacing={2}>
         <Grid item xs={12}>
@@ -315,13 +315,13 @@ const AIConfig = () => {
             <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
               <TableHead>
                 <TableRow>
-                  <TableCell align='center'>STT</TableCell>
+                  <TableCell align='center'>NO.</TableCell>
                   {columns.map(column => (
                     <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
                       {column.label}
                     </TableCell>
                   ))}
-                  <TableCell align='center'>Trạng thái</TableCell>
+                  <TableCell align='center'>Status</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -345,7 +345,7 @@ const AIConfig = () => {
                           skin='light'
                           sx={{ lineHeight: 1 }}
                           color={row.status.name === 'disconnected' ? 'primary' : 'success'}
-                          label={row.status.name === 'disconnected' ? 'Mất kết nối' : 'Đã kết nối'}
+                          label={row.status.name === 'disconnected' ? 'Disconnected' : 'Connected'}
                         />
                       </TableCell>
                     </TableRow>
@@ -392,10 +392,10 @@ const AIConfig = () => {
                     handleModelAIsCameras(switchStates)
                   }}
                 >
-                  Lưu
+                  Save
                 </Button>
                 <Button variant='contained' color='secondary'>
-                  Hủy
+                  Cancel
                 </Button>
               </Box>
             </Grid>

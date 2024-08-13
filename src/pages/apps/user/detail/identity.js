@@ -89,7 +89,7 @@ const UserDetails = () => {
 
   const [rows1, setRows1] = useState([])
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
-  const [faceType, setFaceType] = useState(null) // State để lưu faceType của ảnh được chọn
+  const [faceType, setFaceType] = useState(null) // State để Save faceType của Image được chọn
 
   const config = {
     headers: {
@@ -260,7 +260,7 @@ const UserDetails = () => {
 
   const ImgCards = ({ data, imgTitle }) => {
     const emptyImages = Array.from({ length: 5 }, (_, index) => ({
-      // Tạo dữ liệu mẫu cho 5 ô ảnh trống
+      // Tạo dữ liệu mẫu cho 5 ô Image trống
       imageFileUrl: '/images/user.jpg',
       imageBase64: null,
       faceType: index === 0 ? 'LEFT' : index === 1 ? 'RIGHT' : index === 2 ? 'CENTER' : index === 3 ? 'ABOVE' : 'BOTTOM'
@@ -276,7 +276,7 @@ const UserDetails = () => {
       return url
     }
 
-    // Tạo dữ liệu cho các ảnh từ API trả về hoặc dùng dữ liệu mẫu
+    // Tạo dữ liệu cho các Image từ API trả về hoặc dùng dữ liệu mẫu
     const imagesToShow = useMemo(() => {
       if (data.length === 0) {
         return emptyImages
@@ -288,7 +288,7 @@ const UserDetails = () => {
             (index === 0 ? 'LEFT' : index === 1 ? 'RIGHT' : index === 2 ? 'CENTER' : index === 3 ? 'ABOVE' : 'BOTTOM')
         }))
 
-        // Nếu dữ liệu ít hơn 5 ảnh, thêm các ô ảnh trống vào
+        // Nếu dữ liệu ít hơn 5 Image, thêm các ô Image trống vào
         while (filledImages.length < 5) {
           filledImages.push(emptyImages[filledImages.length])
         }
@@ -301,7 +301,7 @@ const UserDetails = () => {
       <div style={{ display: 'flex', gap: '34px' }}>
         {imagesToShow.map((item, index) => (
           <div
-            key={index} // Đảm bảo mỗi ô ảnh có một key duy nhất
+            key={index} // Đảm bảo mỗi ô Image có một key duy nhất
             style={{
               display: 'flex',
               flexDirection: 'column',
@@ -320,7 +320,7 @@ const UserDetails = () => {
             <p style={{ margin: 0, marginTop: '5px', whiteSpace: 'nowrap' }}>
               {imgTitle} {index + 1}
             </p>
-            {editing && ( // Hiển thị nút chỉ khi đang ở chế độ chỉnh sửa
+            {editing && ( // Hiển thị nút chỉ khi đang ở chế độ Edit
               <IconButton
                 size='small'
                 onClick={() => {
@@ -344,25 +344,25 @@ const UserDetails = () => {
     // Nếu data trống hoặc không tồn tại, trả về mảng rỗng
     if (!data || data.length === 0) {
       return Array.from({ length: 5 }, (_, index) => ({
-        imageFileUrl: '/images/user.jpg', // Đường dẫn ảnh mặc định
+        imageFileUrl: '/images/user.jpg', // Đường dẫn Image mặc định
         imageBase64: null,
         faceType: getFaceTypeFromIndex(index)
       }))
     }
 
-    // Nếu data có ít hơn 5 ảnh, thêm các ô ảnh trống vào để đạt được 5 ảnh
+    // Nếu data có ít hơn 5 Image, thêm các ô Image trống vào để đạt được 5 Image
     while (data.length < 5) {
       data.push({
-        imageFileUrl: '/images/user.jpg', // Đường dẫn ảnh mặc định
+        imageFileUrl: '/images/user.jpg', // Đường dẫn Image mặc định
         imageBase64: null,
         faceType: null
       })
     }
 
-    // Lấy giá trị faceType từ ảnh đầu tiên của API
+    // Lấy giá trị faceType từ Image đầu tiên của API
     const firstImageFaceType = data[0].faceType
 
-    // Tạo một mảng chứa các giá trị faceType có thể được sử dụng cho các ảnh còn lại
+    // Tạo một mảng chứa các giá trị faceType có thể được sử dụng cho các Image còn lại
     const availableFaceTypes = ['LEFT', 'RIGHT', 'CENTER', 'ABOVE', 'BOTTOM'].filter(
       type => type !== firstImageFaceType
     )
@@ -377,7 +377,7 @@ const UserDetails = () => {
   }
 
   const getFaceTypeFromIndex = index => {
-    // Xác định faceType dựa trên index của ảnh
+    // Xác định faceType dựa trên index của Image
     switch (index) {
       case 0:
         return 'LEFT'
@@ -421,7 +421,7 @@ const UserDetails = () => {
         <img
           {...props}
           src={src}
-          alt='Ảnh'
+          alt='Image'
           onLoad={() => setLoaded(true)}
           style={loaded ? { width: '100px', height: '100px' } : { display: 'none' }}
         />
@@ -506,29 +506,29 @@ const UserDetails = () => {
           <Grid container spacing={3} component={Paper}>
             <Grid style={{ borderRadius: '0.05%' }}>
               {/* <Grid container spacing={2}>
-                <h3 style={{ color: 'black', marginLeft: '1%' }}> Thông tin người dùng</h3>
+                <h3 style={{ color: 'black', marginLeft: '1%' }}> Information</h3>
               </Grid> */}
 
               <Grid container spacing={2} style={{ color: 'black', marginLeft: '1%' }}>
                 <Grid container spacing={2}>
                   {' '}
                   <Grid item xs={3}>
-                    <h2 style={{ color: 'black', marginLeft: '1%' }}> Thông tin định danh khuôn mặt</h2>
+                    <h2 style={{ color: 'black', marginLeft: '1%' }}> Face Identify</h2>
                   </Grid>
                   <Grid container spacing={2}>
                     <div style={{ width: '80%' }}></div>
                     {editing ? (
                       <>
                         <Button variant='contained' onClick={saveChanges} sx={{ marginRight: '1%' }}>
-                          Lưu
+                          Save
                         </Button>
                         <Button variant='contained' onClick={handleCancel}>
-                          Huỷ
+                          Cancel
                         </Button>
                       </>
                     ) : (
                       <Button variant='contained' onClick={toggleEdit}>
-                        Chỉnh sửa
+                        Edit
                       </Button>
                     )}
                   </Grid>
@@ -542,43 +542,38 @@ const UserDetails = () => {
                       timeCaption='Time'
                       dateFormat='hh:mm dd/MM/yyyy'
                       disabled={true}
-                      customInput={<CustomInput label='Thời gian cập nhật' />}
+                      customInput={<CustomInput label='Date Update' />}
                       fullWidth
                     />
                   </Grid>
                   <Grid item xs={4}>
-                    <CustomTextField
-                      label='Trạng thái'
-                      value={statusText}
-                      InputProps={{ readOnly: readOnly }}
-                      fullWidth
-                    />
+                    <CustomTextField label='Status' value={statusText} InputProps={{ readOnly: readOnly }} fullWidth />
                   </Grid>
                   <Grid item xs={4} style={{ marginTop: '1.1%' }}>
                     <Switch
                       checked={status1 === true}
                       onChange={handleStatusChange}
                       color='primary'
-                      label='Trạng thái'
+                      label='Status'
                       disabled={readOnly}
                     />
                   </Grid>
                   <Grid item xs={4}></Grid>
                   <Grid item xs={12}>
-                    <h2 style={{ color: 'black', marginLeft: '15%' }}> Hình ảnh khuôn mặt</h2>
+                    <h2 style={{ color: 'black', marginLeft: '15%' }}> Image</h2>
                   </Grid>
                   <div>
                     {(identityData?.faces?.length && (
                       <>
                         <div style={{ display: 'flex' }}>
-                          <ImgCards data={processedImages} imgTitle='Ảnh' />
+                          <ImgCards data={processedImages} imgTitle='Image' />
                         </div>
                       </>
                     )) || (
                       <>
-                        <h4 style={{ fontSize: '16px' }}>Hình ảnh khuôn mặt</h4>
+                        <h4 style={{ fontSize: '16px' }}>Image</h4>
                         <div style={{ display: 'flex' }}>
-                          <ImgCards data={[]} imgTitle='Ảnh' />
+                          <ImgCards data={[]} imgTitle='Image' />
                         </div>
                       </>
                     )}
@@ -596,7 +591,7 @@ const UserDetails = () => {
                     )}
                   </div>
                   <Grid item xs={12}>
-                    <h2 style={{ color: 'black', marginLeft: '1%' }}> Thông tin định danh vân tay</h2>
+                    <h2 style={{ color: 'black', marginLeft: '1%' }}> Identify fingerprint</h2>
                   </Grid>
                   <Grid item xs={3}>
                     <DatePicker
@@ -606,17 +601,12 @@ const UserDetails = () => {
                       timeCaption='Time'
                       dateFormat='hh:mm dd/MM/yyyy'
                       disabled={true}
-                      customInput={<CustomInput label='Thời gian cập nhật' />}
+                      customInput={<CustomInput label='Date Update' />}
                       fullWidth
                     />
                   </Grid>
                   <Grid item xs={4}>
-                    <CustomTextField
-                      label='Trạng thái'
-                      value={statusText1}
-                      InputProps={{ readOnly: readOnly }}
-                      fullWidth
-                    />
+                    <CustomTextField label='Status' value={statusText1} InputProps={{ readOnly: readOnly }} fullWidth />
                   </Grid>
                   <Grid item xs={12} style={{ height: 20 }}></Grid>
                   {user.fingerprints.length === 0 && (
@@ -626,7 +616,7 @@ const UserDetails = () => {
                         alt='Fingerprint'
                         style={{ width: '15%', height: '100%', marginLeft: '20%' }}
                       />
-                      <p style={{ color: 'black', marginLeft: '20%' }}> Người dùng chưa được định danh vân tay</p>
+                      <p style={{ color: 'black', marginLeft: '20%' }}> Fingerprint is not available</p>
                     </Grid>
                   )}
                   <Grid item xs={4}></Grid>
@@ -636,7 +626,7 @@ const UserDetails = () => {
               <br></br>
               <Grid container spacing={2} style={{ marginLeft: 10 }}>
                 <Grid item xs={12}>
-                  <h2 style={{ color: 'black', marginLeft: '1%' }}> Danh sách thẻ</h2>
+                  <h2 style={{ color: 'black', marginLeft: '1%' }}> Cards</h2>
                 </Grid>
                 <Grid item xs={11.8}>
                   <TableContainer>
@@ -644,13 +634,13 @@ const UserDetails = () => {
                       <TableHead>
                         <TableRow>
                           <TableCell>STT</TableCell>
-                          <TableCell>Thời gian</TableCell>
-                          <TableCell>Mã số thẻ</TableCell>
-                          <TableCell>Trạng thái</TableCell>
+                          <TableCell>Date</TableCell>
+                          <TableCell>Code</TableCell>
+                          <TableCell>Status</TableCell>
 
                           <TableCell align='center'>
                             <Button variant='contained' size='small'>
-                              Thêm thẻ <Icon icon='bi:plus' />
+                              Add <Icon icon='bi:plus' />
                             </Button>
                           </TableCell>
                         </TableRow>
@@ -670,7 +660,7 @@ const UserDetails = () => {
                                   updatedRows[index].policyId = newValue.policyId
                                   setRows(updatedRows)
                                 }}
-                                renderInput={params => <TextField {...params} label='Đơn vị' />}
+                                renderInput={params => <TextField {...params} label='Group' />}
                               />
                             </TableCell>
                             <TableCell>{row.description}</TableCell>
@@ -697,22 +687,22 @@ const UserDetails = () => {
           <Grid container spacing={3}>
             <Grid style={{ borderRadius: '0.05%' }}>
               <Grid container spacing={2}>
-                {/* <h3 style={{ color: 'black', marginLeft: '1%' }}> Thông tin người dùng</h3> */}
+                {/* <h3 style={{ color: 'black', marginLeft: '1%' }}> Information</h3> */}
               </Grid>
               <Grid container spacing={2}>
                 <div style={{ width: '80%' }}></div>
                 {editing ? (
                   <>
                     <Button variant='contained' onClick={saveChanges} sx={{ marginRight: '10px' }}>
-                      Lưu
+                      Save
                     </Button>
                     <Button variant='contained' onClick={handleCancel}>
-                      Huỷ
+                      Cancel
                     </Button>
                   </>
                 ) : (
                   <Button variant='contained' onClick={toggleEdit}>
-                    Chỉnh sửa
+                    Edit
                   </Button>
                 )}
               </Grid>
@@ -720,7 +710,7 @@ const UserDetails = () => {
               <Grid container spacing={2} style={{ marginLeft: 10 }}>
                 <Grid container spacing={2}>
                   <Grid item xs={9}>
-                    <h2 style={{ color: 'black', marginLeft: '1%' }}> Thông tin định danh khuôn mặt</h2>
+                    <h2 style={{ color: 'black', marginLeft: '1%' }}> Face Identify</h2>
                   </Grid>
                 </Grid>
                 <Grid item xs={12} container spacing={2}>
@@ -731,13 +721,13 @@ const UserDetails = () => {
                       timeCaption='Time'
                       dateFormat='hh:mm dd/MM/yyyy'
                       disabled={true}
-                      customInput={<CustomInput label='Thời gian cập nhật' />}
+                      customInput={<CustomInput label='Date Update' />}
                       fullWidth
                     />
                   </Grid>
                   <Grid item xs={4}>
                     <CustomTextField
-                      label='Trạng thái'
+                      label='Status'
                       value={'Không hoạt động'}
                       InputProps={{ readOnly: readOnly }}
                       fullWidth
@@ -745,7 +735,7 @@ const UserDetails = () => {
                   </Grid>
                   <Grid item xs={4}></Grid>
                   <Grid item xs={12}>
-                    <h2 style={{ color: 'black', marginLeft: '1%' }}> Hình ảnh khuôn mặt</h2>
+                    <h2 style={{ color: 'black', marginLeft: '1%' }}> Image</h2>
                   </Grid>
                   <Grid item xs={12} style={{ alignContent: 'center' }}>
                     <img
@@ -757,7 +747,7 @@ const UserDetails = () => {
                   </Grid>
 
                   <Grid item xs={12}>
-                    <h2 style={{ color: 'black', marginLeft: '1%' }}> Thông tin định danh vân tay</h2>
+                    <h2 style={{ color: 'black', marginLeft: '1%' }}> Identify fingerprint</h2>
                   </Grid>
                   <Grid item xs={3}>
                     <DatePicker
@@ -766,13 +756,13 @@ const UserDetails = () => {
                       timeCaption='Time'
                       dateFormat='hh:mm dd/MM/yyyy'
                       disabled={true}
-                      customInput={<CustomInput label='Thời gian cập nhật' />}
+                      customInput={<CustomInput label='Date Update' />}
                       fullWidth
                     />
                   </Grid>
                   <Grid item xs={4}>
                     <CustomTextField
-                      label='Trạng thái'
+                      label='Status'
                       value={'Chưa định danh'}
                       InputProps={{ readOnly: readOnly }}
                       fullWidth
@@ -785,7 +775,7 @@ const UserDetails = () => {
                       alt='Fingerprint'
                       style={{ width: '15%', height: '100%', marginLeft: '20%' }}
                     />
-                    <p style={{ color: 'black', marginLeft: '20%' }}> Người dùng chưa được định danh vân tay</p>
+                    <p style={{ color: 'black', marginLeft: '20%' }}> Fingerprint is not available</p>
                   </Grid>
                   <Grid item xs={4}></Grid>
                 </Grid>
@@ -794,7 +784,7 @@ const UserDetails = () => {
               <br></br>
               <Grid container spacing={2} style={{ marginLeft: 10 }}>
                 <Grid item xs={12}>
-                  <h2 style={{ color: 'black', marginLeft: '1%' }}> Danh sách thẻ</h2>
+                  <h2 style={{ color: 'black', marginLeft: '1%' }}> Cards</h2>
                 </Grid>
                 <Grid item xs={11.8}>
                   <TableContainer>
@@ -802,13 +792,13 @@ const UserDetails = () => {
                       <TableHead>
                         <TableRow>
                           <TableCell>STT</TableCell>
-                          <TableCell>Thời gian</TableCell>
-                          <TableCell>Mã số thẻ</TableCell>
-                          <TableCell>Trạng thái</TableCell>
+                          <TableCell>Date</TableCell>
+                          <TableCell>Code</TableCell>
+                          <TableCell>Status</TableCell>
 
                           <TableCell align='center'>
                             <IconButton size='small' sx={{ marginLeft: '10px', color: 'blue' }}>
-                              Thêm thẻ <Icon icon='bi:plus' />
+                              Add <Icon icon='bi:plus' />
                             </IconButton>
                           </TableCell>
                         </TableRow>

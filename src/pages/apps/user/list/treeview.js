@@ -365,11 +365,11 @@ const UserList = ({ apiData }) => {
 
           <Grid item xs={3} component={Paper}>
             <div>
-              <h2>Nhóm người dùng</h2>
+              <h2>User Group</h2>
               <CustomTextField
                 value={valueGroup}
                 sx={{ mr: 4 }}
-                placeholder='Tìm kiếm Phòng ban'
+                placeholder='Search'
                 onChange={e => handleFilterGroup(e.target.value)}
               />
               <TreeView
@@ -384,12 +384,12 @@ const UserList = ({ apiData }) => {
           <Grid item xs={1}></Grid>
           <Grid item xs={3} component={Paper}>
             <div>
-              <h2>Nhóm cơ cấu tổ chức</h2>
+              <h2>Organizational Structure Group</h2>
 
               <CustomTextField
                 value={valueGroupIn}
                 sx={{ mr: 4 }}
-                placeholder='Tìm kiếm cơ cấu tổ chức'
+                placeholder='Search'
                 onChange={e => handleFilterGroupIn(e.target.value)}
               />
               <TreeView

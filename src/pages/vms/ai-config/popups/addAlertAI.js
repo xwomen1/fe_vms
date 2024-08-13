@@ -56,7 +56,7 @@ const columns = [
     minWidth: 50,
     align: 'right',
     field: 'modelName',
-    label: 'Tên Model AI'
+    label: 'AI Model Name'
   }
 ]
 
@@ -247,7 +247,7 @@ const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => 
           </CustomCloseButton>
           <Box sx={{ mb: 8, textAlign: 'left' }}>
             <Typography variant='h3' sx={{ mb: 3 }}>
-              Danh sách Model AI
+              AI Model List
             </Typography>
           </Box>
 
@@ -257,14 +257,14 @@ const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => 
                 <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
                   <TableHead>
                     <TableRow>
-                      <TableCell>STT</TableCell>
+                      <TableCell>No.</TableCell>
                       {columns.map(column => (
                         <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
                           {column.label}
                         </TableCell>
                       ))}
-                      <TableCell align='right'>Tồn tại</TableCell>
-                      <TableCell align='right'>Thao tác</TableCell>
+                      <TableCell align='right'>Availability</TableCell>
+                      <TableCell align='right'>Actions</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -282,7 +282,7 @@ const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => 
                         })}
                         <TableCell align='right'>
                           <Typography color={alertIdList.some(alert => alert === row.id) ? '#28C76F' : 'primary'}>
-                            {alertIdList.some(alert => alert === row.id) ? 'Đã thêm' : 'Chưa thêm'}
+                            {alertIdList.some(alert => alert === row.id) ? 'Already Added' : 'Not Added'}
                           </Typography>
                         </TableCell>
 
@@ -344,7 +344,7 @@ const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => 
           }}
         >
           <Button variant='contained' color='primary' onClick={onClose}>
-            Đóng
+            Close
           </Button>
         </DialogActions>
       </Dialog>

@@ -154,10 +154,10 @@ const EventList = ({}) => {
   }
 
   const eventTypeColors = {
-    'Phát hiện sự kiện AI': 'success',
-    'Phát hiện đối tượng nguy hiểm': 'error',
+    'Phát hiện Event AI': 'success',
+    'Phát hiện Object nguy hiểm': 'error',
     'Phát hiện hành vi bất thường': 'warning',
-    'Phát hiện đối tượng danh sách đen': 'secondary'
+    'Phát hiện Object danh sách đen': 'secondary'
   }
 
   useEffect(() => {
@@ -266,9 +266,9 @@ const EventList = ({}) => {
       >
         <Box sx={{ mb: 4, textAlign: 'center' }}>
           <Typography variant='h3' sx={{ mb: 3 }}>
-            Xác nhận
+            Accept
           </Typography>
-          <Typography sx={{ color: 'text.secondary' }}>Bạn có chắc chắn muốn xóa không ?</Typography>
+          <Typography sx={{ color: 'text.secondary' }}>Do you want to delete it?</Typography>
         </Box>
       </DialogContent>
       <DialogActions
@@ -285,10 +285,10 @@ const EventList = ({}) => {
             setIsOpenDel(false)
           }}
         >
-          Đồng ý
+          Accept
         </Button>
         <Button variant='tonal' color='secondary' sx={{ mr: 1 }} onClick={() => setIsOpenDel(false)}>
-          Hủy
+          Cancel
         </Button>
       </DialogActions>
     </Dialog>
@@ -325,7 +325,7 @@ const EventList = ({}) => {
     <>
       <Card>
         <CardHeader
-          title='Danh sách sự kiện AI'
+          title='Event list'
           titleTypographyProps={{ sx: { mb: [2, 0] } }}
           sx={{
             py: 4,
@@ -338,7 +338,7 @@ const EventList = ({}) => {
               <Grid item>
                 <Box sx={{ float: 'right' }}>
                   <IconButton
-                    aria-label='Bộ lọc'
+                    aria-label='Filter'
                     onClick={() => {
                       setIsOpenFilter(true)
                     }}
@@ -351,7 +351,7 @@ const EventList = ({}) => {
               <Grid item>
                 <CustomTextField
                   value={keyword}
-                  placeholder='Tìm kiếm sự kiện '
+                  placeholder='Search '
                   InputProps={{
                     startAdornment: (
                       <Box sx={{ mr: 2, display: 'flex' }}>
@@ -420,7 +420,7 @@ const EventList = ({}) => {
                         />
                       </Box>
                       <Typography sx={{ marginTop: '10px' }}>
-                        {item?.timestamp ? new Date(item?.timestamp).toLocaleString() : 'Thời gian'}
+                        {item?.timestamp ? new Date(item?.timestamp).toLocaleString() : 'Date'}
                       </Typography>
                       <Typography
                         sx={{
@@ -433,7 +433,7 @@ const EventList = ({}) => {
                       >
                         {item?.result}
                       </Typography>
-                      <Typography sx={{ marginTop: '10px' }}>{item?.location ? item?.location : 'Vị trí'}</Typography>
+                      <Typography sx={{ marginTop: '10px' }}>{item?.location ? item?.location : 'Location'}</Typography>
 
                       <IconButton
                         size='small'

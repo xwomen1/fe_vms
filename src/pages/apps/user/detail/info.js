@@ -327,7 +327,7 @@ const UserDetails = () => {
     const genderMapping = { MALE: 'MALE', FEMALE: 'FEMALE', OTHER: 'OTHER' }
     const genderValue = genderMapping[gender]
     if (!fullNameValue || fullNameValue.length <= 3) {
-      Swal.fire('Lỗi!', 'Tên không được để trống và độ dài phải >3', 'error')
+      Swal.fire('Lỗi!', 'Name không được để trống và độ dài phải >3', 'error')
 
       return
     }
@@ -337,18 +337,18 @@ const UserDetails = () => {
       return
     }
     if (!phoneNumber) {
-      Swal.fire('Lỗi!', 'Số điện thoại không được để trống ', 'error')
+      Swal.fire('Lỗi!', 'Phone Number không được để trống ', 'error')
 
       return
     }
     if (!identityNumber) {
-      Swal.fire('Lỗi!', 'Số giấy tờ không được để trống', 'error')
+      Swal.fire('Lỗi!', 'Identify number không được để trống', 'error')
 
       return
     }
 
     if (userGroups.length === 0) {
-      Swal.fire('Lỗi!', 'Đơn vị người dùng không được để trống.', 'error')
+      Swal.fire('Lỗi!', 'Group người dùng không được để trống.', 'error')
 
       return
     }
@@ -361,12 +361,12 @@ const UserDetails = () => {
 
     const phoneRegex = /^\d+$/
     if (!phoneRegex.test(phoneNumber)) {
-      Swal.fire('Lỗi!', 'Số điện thoại không hợp lệ.', 'error')
+      Swal.fire('Lỗi!', 'Phone Number không hợp lệ.', 'error')
 
       return
     }
     if (!phoneNumber || phoneNumber.length <= 9) {
-      Swal.fire('Lỗi!', 'Số điện thoại không hợp lệ', 'error')
+      Swal.fire('Lỗi!', 'Phone Number không hợp lệ', 'error')
 
       return
     }
@@ -374,7 +374,7 @@ const UserDetails = () => {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
       const processedGroups = await userGroups(groups) // Call the userGroups function passing rows
       if (processedGroups.length === 0) {
-        Swal.fire('Lỗi!', 'Đơn vị người dùng không được để trống.', 'error')
+        Swal.fire('Lỗi!', 'Group người dùng không được để trống.', 'error')
 
         return
       }
@@ -799,7 +799,7 @@ const UserDetails = () => {
           <Grid container spacing={3} component={Paper}>
             <Grid style={{ borderRadius: '0.05%', marginLeft: 10 }}>
               <Grid container spacing={2}>
-                <h2 style={{ color: 'black', marginLeft: '1%' }}> Thông tin người dùng</h2>
+                <h2 style={{ color: 'black', marginLeft: '1%' }}> Information</h2>
               </Grid>
               <Grid container spacing={2}>
                 <div style={{ width: '80%' }}></div>
@@ -821,7 +821,7 @@ const UserDetails = () => {
               </Grid>
               <Grid container spacing={2}>
                 <Grid item xs={4}>
-                  <TextField label='Tên' value={fullNameValue} onChange={handleFullNameChange} fullWidth />
+                  <TextField label='Name' value={fullNameValue} onChange={handleFullNameChange} fullWidth />
                 </Grid>
                 {console.log(user.userAccount.accStatus)}
                 <Grid item xs={4}>
@@ -832,7 +832,7 @@ const UserDetails = () => {
                   {' '}
                   {/* Sửa đổi xs={4} thành xs={8} */}
                   <TextField
-                    label='Số điện thoại'
+                    label='Phone Number'
                     value={phoneNumber}
                     onChange={handlePhoneNumberChange}
                     fullWidth // Thêm thuộc tính fullWidth vào đây
@@ -841,7 +841,7 @@ const UserDetails = () => {
                 <Grid item xs={4}>
                   {/* Update Select to use the gender state */}
                   <FormControl fullWidth>
-                    <InputLabel id='gender-label'>Giới tính</InputLabel>
+                    <InputLabel id='gender-label'>Gender</InputLabel>
                     <Select
                       labelId='gender-label'
                       id='gender-select'
@@ -857,21 +857,26 @@ const UserDetails = () => {
                 </Grid>
                 <Grid item xs={4}>
                   <TextField
-                    label='Số giấy tờ'
+                    label='Identify number'
                     value={identityNumber}
                     onChange={handleIdentityNumberChange}
                     fullWidth
                   />
                 </Grid>
                 <Grid item xs={3.8}>
-                  <TextField label='Mã người dùng' defaultValue={userCode} onChange={handleUserCodeChange} fullWidth />
+                  <TextField label='Code' defaultValue={userCode} onChange={handleUserCodeChange} fullWidth />
                 </Grid>
                 <Grid item xs={4}>
-                  <TextField label='Mã đồng bộ' defaultValue={syncCode} onChange={handleSyncCodeChange} fullWidth />
+                  <TextField
+                    label='Synchronize code'
+                    defaultValue={syncCode}
+                    onChange={handleSyncCodeChange}
+                    fullWidth
+                  />
                 </Grid>
                 <Grid item xs={4}>
                   <FormControl fullWidth>
-                    <InputLabel id='region-label'>Cấp bậc</InputLabel>
+                    <InputLabel id='region-label'>Level</InputLabel>
                     <Select
                       labelId='region-label'
                       id='region-select'
@@ -888,7 +893,7 @@ const UserDetails = () => {
                 </Grid>
                 <Grid item xs={3.8}>
                   <FormControl fullWidth>
-                    <InputLabel id='region-label'>Loại hợp đồng</InputLabel>
+                    <InputLabel id='region-label'>Contract Type</InputLabel>
                     <Select
                       labelId='region-label'
                       id='region-select'
@@ -904,17 +909,12 @@ const UserDetails = () => {
                   </FormControl>{' '}
                 </Grid>
                 <Grid item xs={2} style={{ marginTop: '1.1%' }}>
-                  Trạng thái
-                  <Switch
-                    checked={status1 === 'ACTIVE'}
-                    onChange={handleStatusChange}
-                    color='primary'
-                    label='Trạng thái'
-                  />
+                  Status
+                  <Switch checked={status1 === 'ACTIVE'} onChange={handleStatusChange} color='primary' label='Status' />
                 </Grid>
 
                 <Grid item xs={1} style={{ marginTop: '2%' }}>
-                  Ca sáng:
+                  Morning shift:
                 </Grid>
 
                 <Grid item xs={1}>
@@ -954,7 +954,7 @@ const UserDetails = () => {
                   </DatePickerWrapper>
                 </Grid>
                 <Grid item xs={1} style={{ marginTop: '2%' }}>
-                  Ca chiều:
+                  Afternoon shift:
                 </Grid>
                 <Grid item xs={1}>
                   <DatePickerWrapper>
@@ -995,15 +995,15 @@ const UserDetails = () => {
                 {/* <Grid item ={1} style={{ marginTop: '2%' }}></Grid> */}
                 <Grid item xs={3.8}>
                   <FormControl fullWidth>
-                    <InputLabel id='time-validity-label'>Thời gian hiệu lực</InputLabel>
+                    <InputLabel id='time-validity-label'>Validity period</InputLabel>
                     <Select
                       labelId='time-validity-label'
                       id='time-validity-select'
                       value={timeValidity}
                       onChange={handleTimeValidityChange}
                     >
-                      <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
-                      <MenuItem value='Undefined'>Không xác định</MenuItem>
+                      <MenuItem value='Custom'>Custom</MenuItem>
+                      <MenuItem value='Undefined'>None</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -1020,7 +1020,7 @@ const UserDetails = () => {
                                   selected={availableAt}
                                   onChange={handleStartDateChange}
                                   dateFormat='dd/MM/yyyy'
-                                  customInput={<CustomInput label='Ngày bắt đầu' />}
+                                  customInput={<CustomInput label='Start date' />}
                                 />
                               </div>
                             </Box>
@@ -1035,7 +1035,7 @@ const UserDetails = () => {
                                     selected={expiredAt}
                                     onChange={handleEndDateChange}
                                     dateFormat='dd/MM/yyyy'
-                                    customInput={<CustomInput label='Ngày kết thúc' />}
+                                    customInput={<CustomInput label='End date' />}
                                   />
                                 </div>
                               </Box>
@@ -1055,7 +1055,7 @@ const UserDetails = () => {
                                 selected={availableAt}
                                 onChange={handleStartDateChange}
                                 dateFormat='dd/MM/yyyy'
-                                customInput={<CustomInput label='Ngày bắt đầu' />}
+                                customInput={<CustomInput label='Start date' />}
                               />
                             </div>
                           </Box>
@@ -1069,7 +1069,7 @@ const UserDetails = () => {
                                 selected={expiredAt}
                                 onChange={handleEndDateChange}
                                 dateFormat='dd/MM/yyyy'
-                                customInput={<CustomInput label='Ngày kết thúc' />}
+                                customInput={<CustomInput label='End date' />}
                               />
                             </div>
                           </Box>
@@ -1082,7 +1082,7 @@ const UserDetails = () => {
                   <TextField
                     rows={4}
                     multiline
-                    label='Ghi chú'
+                    label='Note'
                     value={note}
                     onChange={handleNoteChange}
                     id='textarea-outlined-static'
@@ -1090,16 +1090,16 @@ const UserDetails = () => {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <Typography variant='h5'>Đơn vị</Typography>
+                  <Typography variant='h5'>Group</Typography>
                 </Grid>
                 <Grid item xs={11.8}>
                   <TableContainer>
                     <Table>
                       <TableHead>
                         <TableRow>
-                          <TableCell>Đơn vị</TableCell>
-                          <TableCell>Mã đơn vị</TableCell>
-                          <TableCell align='right'>Là lãnh đạo đơn vị</TableCell>
+                          <TableCell>Group</TableCell>
+                          <TableCell>Group Code</TableCell>
+                          <TableCell align='right'>Is Leader</TableCell>
                           {showPlusColumn && (
                             <TableCell align='center'>
                               <IconButton onClick={handleAddRow} size='small' sx={{ marginLeft: '10px' }}>
@@ -1144,7 +1144,7 @@ const UserDetails = () => {
                                   setGroup(updatedRows)
                                   console.log(updatedRows, 'hihih')
                                 }}
-                                renderInput={params => <TextField {...params} label='Đơn vị' />}
+                                renderInput={params => <TextField {...params} label='Group' />}
                               />
                             </TableCell>
                             {console.log('Group:', group)}
@@ -1162,7 +1162,7 @@ const UserDetails = () => {
                                     }}
                                   />
                                 }
-                                label='Là lãnh đạo đơn vị'
+                                label='Is Leader'
                               />
                             </TableCell>
 
@@ -1183,11 +1183,11 @@ const UserDetails = () => {
               <br></br>
               <Grid container spacing={2}>
                 <Grid item xs={12}>
-                  <Typography variant='h5'>Thông tin tài khoản</Typography>
+                  <Typography variant='h5'>Account Information</Typography>
                 </Grid>
                 <Grid item xs={4}>
                   <TextField
-                    label='Tài khoản'
+                    label='Account'
                     defaultValue={user?.userAccount.username}
                     onChange={handleUserNameChange}
                     id='form-props-read-only-input'
@@ -1197,7 +1197,7 @@ const UserDetails = () => {
                 </Grid>
                 <Grid item xs={4}>
                   <TextField
-                    label='Loại tài khoản'
+                    label='Account Type'
                     defaultValue={user?.userAccount.identityProviderType}
                     id='form-props-read-only-input'
                     InputProps={{ readOnly: readOnlys }}
@@ -1240,21 +1240,21 @@ const UserDetails = () => {
                         color='primary'
                       />
                     }
-                    label='Trạng thái'
+                    label='Status'
                     labelPlacement='start'
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <Typography variant='h5'>Vai trò</Typography>
+                  <Typography variant='h5'>Role</Typography>
                 </Grid>
                 <Grid item xs={11.8}>
                   <TableContainer>
                     <Table>
                       <TableHead>
                         <TableRow>
-                          <TableCell>Tên vai trò</TableCell>
-                          <TableCell>Mã vai trò</TableCell>
-                          <TableCell>Mô tả</TableCell>
+                          <TableCell>Name</TableCell>
+                          <TableCell>Code</TableCell>
+                          <TableCell>Description</TableCell>
                           {/* {showPlusColumn && ( */}
                           <TableCell align='center'>
                             <IconButton onClick={handleAddRow1} size='small' sx={{ marginLeft: '10px' }}>
@@ -1283,7 +1283,7 @@ const UserDetails = () => {
                                   // updatedRows[index].id = newValue.id
                                   setPolicies(updatedRows)
                                 }}
-                                renderInput={params => <TextField {...params} label='Vai trò' />}
+                                renderInput={params => <TextField {...params} label='Role' />}
                               />
                             </TableCell>
                             <TableCell>{policy.policyCode}</TableCell>

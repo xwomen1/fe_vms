@@ -1,16 +1,30 @@
-import { useEffect, useRef, useState } from "react"
-import axios from "axios"
-import { TreeItem, TreeView } from "@mui/lab"
+import { useEffect, useRef, useState } from 'react'
+import axios from 'axios'
+import { TreeItem, TreeView } from '@mui/lab'
 import Icon from 'src/@core/components/icon'
-import { Box, Button, Card, CardContent, CardHeader, Grid, IconButton, Typography, styled, CardActions, Dialog, DialogContent, DialogActions } from "@mui/material"
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Grid,
+  IconButton,
+  Typography,
+  styled,
+  CardActions,
+  Dialog,
+  DialogContent,
+  DialogActions
+} from '@mui/material'
 import authConfig from 'src/configs/auth'
-import { format } from "date-fns"
-import CustomTextField from "src/@core/components/mui/text-field"
-import Schedule from "../popups/schedule"
-import CustomAutocomplete from "src/@core/components/mui/autocomplete"
-import toast from "react-hot-toast"
-import AddAlertAI from "../popups/addAlertAI"
-import Review from "./viewCamera"
+import { format } from 'date-fns'
+import CustomTextField from 'src/@core/components/mui/text-field'
+import Schedule from '../popups/schedule'
+import CustomAutocomplete from 'src/@core/components/mui/autocomplete'
+import toast from 'react-hot-toast'
+import AddAlertAI from '../popups/addAlertAI'
+import Review from './viewCamera'
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   '&:hover > .MuiTreeItem-content:not(.Mui-selected)': {
@@ -43,8 +57,7 @@ const StyledTreeItem = props => {
     <StyledTreeItemRoot
       {...other}
       label={
-        <Box
-          sx={{ py: 1, display: 'flex', alignItems: 'center', '& svg': { mr: 1 } }}>
+        <Box sx={{ py: 1, display: 'flex', alignItems: 'center', '& svg': { mr: 1 } }}>
           <Icon icon={labelIcon} color={color} />
           <Typography variant='body2' sx={{ flexGrow: 1, fontWeight: 500, textDecoration: textDirection }}>
             {labelText}
@@ -159,13 +172,13 @@ const EventConfig = () => {
     bundlePolicy: 'max-bundle',
     iceServers: [
       {
-        urls: 'stun:dev-ivis-camera-api.basesystem.one:3478',
+        urls: 'stun:dev-ivis-camera-api.basesystem.one:3478'
       },
       {
         urls: 'turn:dev-ivis-camera-api.basesystem.one:3478',
         username: 'demo',
-        credential: 'demo',
-      },
+        credential: 'demo'
+      }
     ]
   }
 
@@ -175,19 +188,16 @@ const EventConfig = () => {
 
     setWebsocket(ws)
 
-    //create RTCPeerConnection 
+    //create RTCPeerConnection
     const pc = new RTCPeerConnection(configWs)
     setRtcPeerConnection(pc)
 
     //listen for remote tracks and add them to remote stream
 
-    pc.ontrack = (event) => {
+    pc.ontrack = event => {
       const stream = event.streams[0]
-      if (
-        !remoteVideoRef.current?.srcObject ||
-        remoteVideoRef.current?.srcObject.id !== stream.id
-      ) {
-        setRemoteStream(stream);
+      if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {
+        setRemoteStream(stream)
         remoteVideoRef.current.srcObject = stream
       }
     }
@@ -204,25 +214,22 @@ const EventConfig = () => {
     }
   }
 
-  const handleMessage = async (event) => {
+  const handleMessage = async event => {
     const message = JSON.parse(event.data)
     const newMessage = JSON.parse(message?.data)
     setEventData(newMessage)
   }
 
-  const handleClose = async (event) => {
+  const handleClose = async event => {
     if (websocket) {
       websocket.close()
     }
   }
 
   useEffect(() => {
-
-    const addStatusToCameras = (data) => {
-
+    const addStatusToCameras = data => {
       return data.map(group => {
         if (group?.cameras && group?.cameras.length > 0) {
-
           return {
             ...group,
             cameras: group?.cameras.map(camera => {
@@ -232,24 +239,21 @@ const EventConfig = () => {
                 ...camera,
                 status: matchedEvent?.status ? matchedEvent?.status : false
               }
-            }
-            )
+            })
           }
         }
 
-        return group;
+        return group
       })
     }
     const data = addStatusToCameras(cameraGroup)
     setDataList(data)
-  }, [cameraGroup]);
+  }, [cameraGroup])
 
   useEffect(() => {
-    const addStatus = (data) => {
-
+    const addStatus = data => {
       return data.map(group => {
         if (group?.cameras && group?.cameras.length > 0) {
-
           return {
             ...group,
             cameras: group?.cameras.map(camera => {
@@ -259,22 +263,24 @@ const EventConfig = () => {
               return {
                 ...camera,
                 status:
-                  matchedEvent?.status === camera?.status && matchedEvent?.status !== undefined ? camera?.status
-                    : matchedEvent?.status !== camera?.status && matchedEvent?.status !== undefined ? matchedEvent?.status
-                      : matchedEvent?.status !== camera?.status && matchedEvent?.status === undefined ? camera?.status
-                        : false
+                  matchedEvent?.status === camera?.status && matchedEvent?.status !== undefined
+                    ? camera?.status
+                    : matchedEvent?.status !== camera?.status && matchedEvent?.status !== undefined
+                    ? matchedEvent?.status
+                    : matchedEvent?.status !== camera?.status && matchedEvent?.status === undefined
+                    ? camera?.status
+                    : false
               }
-            }
-            )
+            })
           }
         }
 
-        return group;
+        return group
       })
     }
     const data = addStatus(dataList)
     setDataList(data)
-  }, [eventsData]);
+  }, [eventsData])
 
   useEffect(() => {
     const cleanup = createWsConnection()
@@ -284,11 +290,11 @@ const EventConfig = () => {
 
   useEffect(() => {
     if (websocket) {
-      websocket.addEventListener('open', (event) => { })
+      websocket.addEventListener('open', event => {})
 
       websocket.addEventListener('message', handleMessage)
 
-      websocket.addEventListener('error', (error) => {
+      websocket.addEventListener('error', error => {
         console.error('WebSocket error: ', error)
       })
 
@@ -662,7 +668,6 @@ const EventConfig = () => {
   }
 
   const handleDeleteAlert = async () => {
-
     if (alert !== null) {
       const changedAlerts = alertList.filter(item => item?.cameraModelAI?.id !== alert?.cameraModelAI?.id)
 
@@ -691,7 +696,8 @@ const EventConfig = () => {
             Xác nhận
           </Typography>
           <Typography sx={{ color: 'text.secondary' }}>
-            Bạn có chắc chắn muốn xóa <strong style={{ fontStyle: 'italic', color: '#FF9F43' }}>{eventSelect}</strong> không ?
+            Bạn có chắc chắn muốn xóa <strong style={{ fontStyle: 'italic', color: '#FF9F43' }}>{eventSelect}</strong>{' '}
+            không ?
           </Typography>
         </Box>
       </DialogContent>
@@ -707,12 +713,12 @@ const EventConfig = () => {
           onClick={() => {
             handleDeleteAlert()
             setIsOpenDel(false)
-          }}>
+          }}
+        >
           Đồng ý
         </Button>
-        <Button variant='tonal' color='secondary'
-          sx={{ mr: 1 }} onClick={() => setIsOpenDel(false)}>
-          Hủy
+        <Button variant='tonal' color='secondary' sx={{ mr: 1 }} onClick={() => setIsOpenDel(false)}>
+          Cancel
         </Button>
       </DialogActions>
     </Dialog>
@@ -723,7 +729,6 @@ const EventConfig = () => {
       <>
         <Card
           onClick={() => {
-
             setAlert(alert)
 
             if (alert.isactive == true) {
@@ -771,7 +776,7 @@ const EventConfig = () => {
               handleActiveAlertAI(alert?.cameraModelAI?.modelName)
             }}
           >
-            {alert.isactive == true ? 'Tắt cảnh báo ' : 'Bật cảnh báo'}
+            {alert.isactive == true ? 'Turn Off Alert' : 'Turn On Alert'}
           </Button>
         </Card>
       </>
@@ -783,22 +788,21 @@ const EventConfig = () => {
       <StyledTreeItem key={group.id} nodeId={group.id} labelText={group.name} labelIcon='tabler:folder'>
         {group.cameras && group.cameras.length > 0
           ? group.cameras.map(camera => {
-
-            return (
-              <StyledTreeItem
-                key={camera.id}
-                nodeId={camera.id}
-                color={camera?.status == true ? '#28c76f' : ''}
-                textDirection={camera.id === idCameraSelect ? 'underline' : ''}
-                labelText={camera.deviceName}
-                labelIcon='tabler:camera'
-                onClick={() => handleItemClick(camera.id, camera.deviceName)}
-              />
-            );
-          })
+              return (
+                <StyledTreeItem
+                  key={camera.id}
+                  nodeId={camera.id}
+                  color={camera?.status == true ? '#28c76f' : ''}
+                  textDirection={camera.id === idCameraSelect ? 'underline' : ''}
+                  labelText={camera.deviceName}
+                  labelIcon='tabler:camera'
+                  onClick={() => handleItemClick(camera.id, camera.deviceName)}
+                />
+              )
+            })
           : null}
       </StyledTreeItem>
-    );
+    )
   }
 
   return (
@@ -806,7 +810,7 @@ const EventConfig = () => {
       <Grid container spacing={2}>
         <Grid item xs={12} sm={3}>
           <Card>
-            <CardHeader title='Danh sách Camera' />
+            <CardHeader title='Cameras' />
             <CardContent>
               <CustomTextField
                 value={keyword}
@@ -851,10 +855,8 @@ const EventConfig = () => {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <Card>
-                <CardHeader title='Cảnh báo AI' />
-                <CardContent sx={{ height: '60vh', overflow: 'auto' }} >
-                  {alertAIListView()}
-                </CardContent>
+                <CardHeader title='AI Warning' />
+                <CardContent sx={{ height: '60vh', overflow: 'auto' }}>{alertAIListView()}</CardContent>
                 <CardActions>
                   <Grid container spacing={0}>
                     <Grid item xs={12}>
@@ -875,7 +877,7 @@ const EventConfig = () => {
                               }
                             }}
                           >
-                            Thêm mới cảnh báo
+                            Add New Warning
                           </Button>
                         </Grid>
                         <Grid item xs={6}>
@@ -890,7 +892,7 @@ const EventConfig = () => {
                               setIsOpenDel(true)
                             }}
                           >
-                            Xóa cảnh báo
+                            Delete Warning
                           </Button>
                         </Grid>
                       </Grid>
@@ -918,7 +920,7 @@ const EventConfig = () => {
                                 variant='outlined'
                                 disabled={eventSelect === null}
                               >
-                                Hủy
+                                Cancel
                               </Button>
                             </Grid>
                             <Grid item xs={12} sm={4}>
@@ -935,7 +937,7 @@ const EventConfig = () => {
                                 variant='outlined'
                                 disabled={eventSelect === null}
                               >
-                                Lưu
+                                Save
                               </Button>
                             </Grid>
                             {isDraw == 'line' && (
@@ -967,7 +969,7 @@ const EventConfig = () => {
                                 variant='outlined'
                                 disabled={eventSelect === null}
                               >
-                                Khoanh vùng
+                                Define Zone
                               </Button>
                             </Grid>
                             <Grid item xs={12} sm={6}>
@@ -980,7 +982,7 @@ const EventConfig = () => {
                                 variant='outlined'
                                 disabled={eventSelect === null}
                               >
-                                Rào ảo
+                                Virtual Fence
                               </Button>
                             </Grid>
                             <Grid item xs={12} sm={6}>
@@ -992,7 +994,7 @@ const EventConfig = () => {
                                 variant='outlined'
                                 disabled={eventSelect === null}
                               >
-                                Xóa
+                                Delete
                               </Button>
                             </Grid>
                             <Grid item xs={12} sm={6}>
@@ -1002,7 +1004,7 @@ const EventConfig = () => {
                                 variant='outlined'
                                 disabled={eventSelect === null}
                               >
-                                Lịch
+                                Schedule
                               </Button>
                             </Grid>
                           </Grid>
@@ -1037,8 +1039,9 @@ const EventConfig = () => {
                   }}
                 >
                   <div>
-                    {idCameraSelect !== null &&
-                      <Review key={idCameraSelect} id={idCameraSelect} name={nameCameraSelect} channel={'Sub'} />}
+                    {idCameraSelect !== null && (
+                      <Review key={idCameraSelect} id={idCameraSelect} name={nameCameraSelect} channel={'Sub'} />
+                    )}
                   </div>
                   <canvas
                     ref={canvasRef}
@@ -1060,10 +1063,15 @@ const EventConfig = () => {
       </Grid>
 
       {isOpenSchedule && (
-        <Schedule onClose={() => setIsOpenSchedule(false)} show={isOpenSchedule} callback={handleSetSchedule} data={calendar} />
+        <Schedule
+          onClose={() => setIsOpenSchedule(false)}
+          show={isOpenSchedule}
+          callback={handleSetSchedule}
+          data={calendar}
+        />
       )}
 
-      {isOpenModelAI &&
+      {isOpenModelAI && (
         <AddAlertAI
           show={isOpenModelAI}
           onClose={() => {
@@ -1075,7 +1083,7 @@ const EventConfig = () => {
           cameraId={isOpenModelAIType === 'add' ? idCameraSelect : cameraAIPropertyId}
           setReload={() => setReload(reload + 1)}
         />
-      }
+      )}
 
       {isOpenDel && DeleteView()}
     </>

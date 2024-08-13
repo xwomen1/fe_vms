@@ -42,7 +42,7 @@ const columns = [
     maxWidth: 50,
     align: 'center',
     field: 'name',
-    label: 'Tên phiếu'
+    label: 'Name'
   },
   {
     id: 2,
@@ -50,7 +50,7 @@ const columns = [
     maxWidth: 50,
     align: 'center',
     field: 'type',
-    label: 'Tên bộ KPI'
+    label: 'KPI name'
   },
   {
     id: 3,
@@ -58,7 +58,7 @@ const columns = [
     maxWidth: 50,
     align: 'center',
     field: 'status',
-    label: 'Trạng thái'
+    label: 'Status'
   },
   {
     id: 32,
@@ -66,7 +66,7 @@ const columns = [
     maxWidth: 50,
     align: 'center',
     field: 'year',
-    label: 'Năm đánh giá'
+    label: 'Appreciated year '
   },
   {
     id: 31,
@@ -74,7 +74,7 @@ const columns = [
     maxWidth: 50,
     align: 'center',
     field: 'userreport',
-    label: 'Người báo cáo'
+    label: 'Reporter'
   },
   {
     id: 34,
@@ -82,7 +82,7 @@ const columns = [
     maxWidth: 50,
     align: 'center',
     field: 'username',
-    label: 'Người thẩm định'
+    label: 'Appraiser'
   }
 ]
 
@@ -215,7 +215,7 @@ const AutocompleteAsynchronousRequest = () => {
           <Grid item xs={8} sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
             <CustomTextField
               sx={{ mr: 2 }}
-              placeholder='Tìm kiếm'
+              placeholder='Search'
               InputProps={{
                 startAdornment: (
                   <InputAdornment position='start'>
@@ -228,7 +228,7 @@ const AutocompleteAsynchronousRequest = () => {
               onChange={e => handleFilter(e.target.value)}
             />
             <Button variant='contained' onClick={() => handleOpenAdd()}>
-              Thêm mới
+              Add
             </Button>
           </Grid>
         }

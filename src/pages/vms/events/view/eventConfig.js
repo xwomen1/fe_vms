@@ -534,7 +534,7 @@ const EventConfig = () => {
         config
       )
       setReload(reload + 1)
-      toast.success('Thao tác thành công')
+      toast.success('Action thành công')
     } catch (error) {
       console.error('Error fetching data: ', error)
       toast.error(error)
@@ -639,7 +639,7 @@ const EventConfig = () => {
               Độ nhạy: {alert?.sensitivity}
             </Typography>
             <Typography variant='body1' alignLeft={2}>
-              Đối tượng: {alert?.target}
+              Object: {alert?.target}
             </Typography>
           </CardContent>
           <Button
@@ -773,7 +773,7 @@ const EventConfig = () => {
                             variant='outlined'
                             disabled={!eventSelect}
                           >
-                            Hủy
+                            Cancel
                           </Button>
                         </Grid>
                         <Grid item xs={12} sm={4}>

@@ -47,7 +47,7 @@ const Caller = () => {
           <TabList onChange={handleChange} aria-label='customized tabs example'>
             <Tab
               value='1'
-              label='Danh sách nhóm quyền truy cập
+              label='Access Groups
 '
             />
           </TabList>
