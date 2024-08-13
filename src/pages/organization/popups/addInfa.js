@@ -60,8 +60,8 @@ const InfraPopupAdd = ({ open, onClose, setReload }) => {
       const response = await axios.post('https://sbs.basesystem.one/ivis/infrares/api/v0/regions', data, config)
       console.log(data)
       Swal.fire({
-        title: 'Thành công!',
-        text: 'Dữ liệu đã được thêm thành công.',
+        title: 'Success!',
+        text: 'Data added successfully.',
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
