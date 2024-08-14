@@ -53,15 +53,15 @@ const UserList = ({ apiData }) => {
 
   function showAlertConfirm(options, intl) {
     const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Confirm',
       imageWidth: 213,
       showCancelButton: true,
       showCloseButton: true,
       showConfirmButton: true,
       focusCancel: true,
       reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
-      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Ok',
+      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Cancel',
       customClass: {
         content: 'content-class',
         confirmButton: 'swal-btn-confirm'
@@ -209,7 +209,7 @@ const UserList = ({ apiData }) => {
 
   const handleDelete = idDelete => {
     showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
+      text: 'Are you sure you want to delete?'
     }).then(({ value }) => {
       if (value) {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -226,13 +226,13 @@ const UserList = ({ apiData }) => {
         axios
           .delete(urlDelete, config)
           .then(() => {
-            Swal.fire('Xóa thành công', '', 'success')
+            Swal.fire('Delete Successful', '', 'success')
             const updatedData = userData.filter(user => user.userId !== idDelete)
             setUserData(updatedData)
             fetchData()
           })
           .catch(err => {
-            Swal.fire('Đã xảy ra lỗi', err.message, 'error')
+            Swal.fire('error', err.message, 'error')
           })
       }
     })
@@ -286,7 +286,7 @@ const UserList = ({ apiData }) => {
               <CustomTextField
                 value={valueGroup}
                 sx={{ mr: 4 }}
-                placeholder='Search Group'
+                placeholder='Search Department'
                 onChange={e => handleFilterGroup(e.target.value)}
               />
               <TreeView

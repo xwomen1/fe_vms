@@ -205,24 +205,26 @@ const EventList = () => {
           </Table>
         </TableContainer>
       </CardContent>
-      <CardActions sx={{ backgroundColor: 'white', padding: 2 }}>
-        <Grid container spacing={2} alignItems='center'>
-          <Grid item xs={12} sm={4} sx={{ textAlign: 'right', mb: 1 }}>
-            <span style={{ fontSize: 15 }}>line/page</span>
+      <CardActions sx={{ backgroundColor: 'white' }}>
+        <Grid container spacing={2}>
+          <Grid item xs={3}></Grid>
+
+          <Grid item xs={1}>
+            <Box>
+              <IconButton onClick={handleOpenMenu}>
+                <Icon icon='tabler:selector' />
+                <p style={{ fontSize: 15 }}>{pageSize} line/page</p>
+              </IconButton>
+              <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+                {pageSizeOptions.map(size => (
+                  <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
+                    {size}
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
           </Grid>
-          <Grid item xs={12} sm={1}>
-            <Button onClick={handleOpenMenu} endIcon={<Icon icon='tabler:selector' />}>
-              {pageSize}
-            </Button>
-            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
-              {pageSizeOptions.map(size => (
-                <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
-                  {size}
-                </MenuItem>
-              ))}
-            </Menu>
-          </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={6}>
             <Pagination count={totalPage} page={page} color='primary' onChange={handlePageChange} />
           </Grid>
         </Grid>

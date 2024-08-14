@@ -110,7 +110,9 @@ const Daily = ({ dataDailyProps, callbackOfDaily, disabled }) => {
 
   const onClickDeleteItem = (date, time) => {
     if (!disabled) {
-      const newTime = date.times.filter(i => i.type !== time.type)
+      const newTime = date.times.filter(i => {
+        return i.startTimeInMinute !== time.startTimeInMinute || i.endTimeInMinute !== time.endTimeInMinute
+      })
       setDataDaily([...dataDaily.filter(e => e.value !== date.value), { ...date, times: newTime || [] }])
     }
   }

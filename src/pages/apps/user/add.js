@@ -74,6 +74,9 @@ const Add = () => {
   const [filteredRegionOptions, setFilteredRegionOptions] = useState(user?.level)
   const [filteredContractOptions, setFilteredContractOptions] = useState(user?.contractType)
   const [gender, setGender] = useState('')
+  const [isLeader, setIsLeader] = useState(false)
+  const [groups, setGroup] = useState([])
+
   let groupACIds = []
   const [regionOptions, setRegionOptions] = useState([])
 
@@ -208,67 +211,72 @@ const Add = () => {
 
   const saveChanges = async () => {
     if (password !== confirmPassword) {
-      Swal.fire('Lỗi!', 'Mật khẩu và xác nhận mật khẩu không khớp nhau.', 'error')
+      Swal.fire('error!', 'Password and confirm password do not match.', 'error')
 
       return
     }
     if (!fullNameValue || fullNameValue.length <= 3) {
-      Swal.fire('Lỗi!', 'Name không được để trống và độ dài phải >3', 'error')
+      Swal.fire('error!', 'Name cannot be empty and length must be >3', 'error')
 
       return
     }
     if (!email) {
-      Swal.fire('Lỗi!', 'Email không được để trống', 'error')
+      Swal.fire('error!', 'Email cannot be blank', 'error')
+
+      return
+    }
+    if (!gender) {
+      Swal.fire('error!', 'Gender cannot be blank', 'error')
 
       return
     }
     if (!phoneNumber) {
-      Swal.fire('Lỗi!', 'Phone Number không được để trống', 'error')
+      Swal.fire('error!', 'Phone Number cannot be blank', 'error')
 
       return
     }
     if (!identityNumber) {
-      Swal.fire('Lỗi!', 'Identify number không được để trống', 'error')
+      Swal.fire('error!', 'Identify number cannot be blank', 'error')
 
       return
     }
     if (!userCode) {
-      Swal.fire('Lỗi!', 'Code không được để trống', 'error')
+      Swal.fire('error!', 'Code cannot be blank', 'error')
 
       return
     }
     if (!syncCode) {
-      Swal.fire('Lỗi!', 'Synchronize code không được để trống', 'error')
+      Swal.fire('error!', 'Synchronize code cannot be blank', 'error')
 
       return
     }
     if (!account) {
-      Swal.fire('Lỗi!', 'Name Account không được để trống', 'error')
+      Swal.fire('error!', 'Account Name cannot be blank', 'error')
 
       return
     }
     if (userGroups.length === 0) {
-      Swal.fire('Lỗi!', 'Nhóm người dùng không được để trống.', 'error')
+      Swal.fire('error!', 'User group cannot be left blank.', 'error')
 
       return
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
-      Swal.fire('Lỗi!', 'Địa chỉ email không hợp lệ.', 'error')
+      Swal.fire('error!', 'Invalid email address.', 'error')
 
       return
     }
 
     if (password.length < 6) {
-      Swal.fire('Lỗi!', 'Mật khẩu phải chứa ít nhất 6 ký tự.', 'error')
+      Swal.fire('error!', 'Password must contain at least 6 characters.', 'error')
 
       return
     }
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,}$/
     if (!passwordRegex.test(password)) {
       Swal.fire(
-        'Lỗi!',
-        'Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt.',
+        'error!',
+        'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
         'error'
       )
 
@@ -280,7 +288,7 @@ const Add = () => {
       const genderMapping = { MALE: 'MALE', FEMALE: 'FEMALE', OTHER: 'OTHER' }
 
       if (processedGroups.length === 0) {
-        Swal.fire('Lỗi!', 'Nhóm người dùng không được để trống.', 'error')
+        Swal.fire('error!', 'User group cannot be left blank.', 'error')
 
         return
       }
@@ -328,15 +336,15 @@ const Add = () => {
       if (groupACIds.length > 0) {
         await addMemberToGroup(groupACIds, response.data.userId)
       } else {
-        console.error('Không có groupACId nào trong mảng')
+        console.error('There is no groupACId in the array.')
       }
 
-      Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
+      Swal.fire('Success!', 'New user added successfully.', 'success')
 
       router.push(`/apps/user/detail/${response.data.userId}`)
     } catch (error) {
       console.error('Error updating user details:', error)
-      Swal.fire('Lỗi!', error?.response?.data?.message, 'error')
+      Swal.fire('error!', error?.response?.data?.message, 'error')
     }
   }
 
@@ -362,7 +370,7 @@ const Add = () => {
       if (response.data && response.data.groupACId) {
         groupACIds.push(response.data.groupACId)
       } else {
-        throw new Error('Không lấy được groupACId từ API')
+        throw new Error('Unable to get groupACId from API')
       }
 
       return response.data.groupId
@@ -403,7 +411,7 @@ const Add = () => {
         const userGroup = {
           groupId: groupId,
           policyName: true,
-          isLeader: false
+          isLeader: row.isLeader
         }
         processedGroups.push(userGroup)
         console.log(userGroup)
@@ -548,7 +556,7 @@ const Add = () => {
               <Icon icon='tabler:chevron-left' />
             </IconButton>
 
-            <h2 style={{ color: 'black' }}>Add </h2>
+            <h2 style={{ color: 'black' }}>Add New User</h2>
           </Grid>
           <Grid container spacing={2}>
             <div style={{ width: '80%' }}></div>
@@ -585,9 +593,9 @@ const Add = () => {
                   onChange={handleGenderChange} // Update onChange handler
                 >
                   {/* MenuItems for gender options */}
-                  <MenuItem value='MALE'>Nam</MenuItem>
-                  <MenuItem value='FEMALE'>Nữ</MenuItem>
-                  <MenuItem value='OTHER'>Khác</MenuItem>
+                  <MenuItem value='MALE'>MALE</MenuItem>
+                  <MenuItem value='FEMALE'>FEMALE</MenuItem>
+                  <MenuItem value='OTHER'>OTHER</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -769,15 +777,15 @@ const Add = () => {
               <TextField rows={4} multiline label='Note' onChange={handleNoteChange} fullWidth />
             </Grid>
             <Grid item xs={12}>
-              <Typography variant='h5'>Group</Typography>
+              <Typography variant='h5'>Department</Typography>
             </Grid>
             <Grid item xs={11.8}>
               <TableContainer>
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Group</TableCell>
-                      <TableCell>Group Code</TableCell>
+                      <TableCell>Department</TableCell>
+                      <TableCell>Department Code</TableCell>
                       <TableCell align='right'>Is Leader</TableCell>
                       <TableCell align='center'>
                         <IconButton size='small' onClick={handleAddRow} sx={{ marginLeft: '10px' }}>
@@ -802,12 +810,27 @@ const Add = () => {
                               // updatedRows[index].id = newValue.id
                               setRows(updatedRows)
                             }}
-                            renderInput={params => <TextField {...params} label='Group' />}
+                            renderInput={params => <TextField {...params} label='Department' />}
                           />
                         </TableCell>
                         {console.log(rows)}
                         <TableCell>{row.code}</TableCell>
-                        <TableCell align='right'>{formatIsLeader(row.isLeader)}</TableCell>
+                        <TableCell align='right'>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={row.isLeader}
+                                onChange={event => {
+                                  const updatedRows = [...rows]
+                                  updatedRows[index].isLeader = event.target.checked // Cập nhật giá trị isLeader
+                                  setRows(updatedRows)
+                                  setIsLeader(event.target.checked) // Cập nhật state isLeader
+                                }}
+                              />
+                            }
+                            label='Is Leader'
+                          />
+                        </TableCell>{' '}
                         <TableCell align='center'>
                           {index > 0 && (
                             <IconButton size='small' onClick={() => handleDeleteRow(index)}>
@@ -828,14 +851,14 @@ const Add = () => {
           <Grid item xs={12}>
             <FormControlLabel
               control={<Checkbox checked={createAccount} onChange={handleCreateAccountChange} color='primary' />}
-              label='Tạo Account đăng nhập'
+              label='Create Login Account'
               labelPlacement='start'
             />
           </Grid>
           {createAccount && (
             <Grid container spacing={2} style={{ marginLeft: 10 }}>
               <Grid item xs={12}>
-                <Typography variant='h5'>Account Information</Typography>
+                <Typography variant='h5'>Create Login Account</Typography>
               </Grid>
               <Grid item xs={4}>
                 <TextField label='Account' onChange={handleAccountChange} fullWidth />

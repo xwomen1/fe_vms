@@ -181,8 +181,8 @@ const InforAll = ({ idInfor }) => {
 
       setLoading(false)
       Swal.fire({
-        title: 'Thành công!',
-        text: 'Dữ liệu đã được cập nhật thành công.',
+        title: 'Success',
+        text: 'Data has been updated successfully.',
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
@@ -207,22 +207,12 @@ const InforAll = ({ idInfor }) => {
       console.error('Error updating user details:', error)
       setLoading(false)
 
-      Swal.fire({
-        title: 'Error!',
-        text: error.response?.data?.message || error.message,
-        icon: 'error',
-        willOpen: () => {
-          const confirmButton = Swal.getConfirmButton()
-          if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
-            confirmButton.style.color = 'white'
-          }
-        }
-      })
+      toast.error(error.response?.data?.message || error.message)
     }
   }
 
-  console.log(idDoor, 'idDoor')
+  console.log(selectedRegion, 'selectedRegion')
+  console.log(regions, 'regions')
 
   const handleInputChange = (field, value) => {
     setDevice(prevDevice => ({
@@ -241,9 +231,10 @@ const InforAll = ({ idInfor }) => {
         }
       })
       const data = response.data
+      console.log(data, 'data')
 
-      const parentRegion = data.find(region => region.id === parentIdToFilter)
-
+      const parentRegion = data.find(region => region.parentID === parentIdToFilter)
+      console.log(parentRegion, 'data')
       if (parentRegion) {
         const childResponse = await axios.get(
           `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentIdToFilter}`,
@@ -253,13 +244,16 @@ const InforAll = ({ idInfor }) => {
             }
           }
         )
+
+        console.log(childResponse, 'childResponse')
+
         const childData = childResponse.data
 
-        // Chỉ lấy dữ liệu của "child regions"
         const combinedData = childData.map(child => ({
           id: child.id,
           name: child.name
         }))
+        console.log(combinedData, 'combinedData')
 
         setRegions(combinedData)
       }
@@ -378,14 +372,14 @@ const InforAll = ({ idInfor }) => {
                 <Grid item>
                   <Box sx={{ float: 'right' }}>
                     <Button variant='contained' component={Link} href={`/device-management`}>
-                      Hủy
+                      Cancel
                     </Button>
                   </Box>
                 </Grid>
                 <Grid item>
                   <Box sx={{ float: 'right', marginLeft: '2%' }}>
                     <Button aria-label='Bộ lọc' variant='contained' onClick={handleUpdateDevice}>
-                      Lưu
+                      Save
                     </Button>
                   </Box>
                 </Grid>

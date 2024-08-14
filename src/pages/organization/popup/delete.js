@@ -5,7 +5,7 @@ import authConfig from 'src/configs/auth'
 import Swal from 'sweetalert2'
 import { useRouter } from 'next/router'
 
-const InfraPopup = ({ open, id, onClose, setReload }) => {
+const InfraPopup = ({ open, id, onClose, onSuccess }) => {
   const router = useRouter()
   const [errorOccurred, setErrorOccurred] = useState(false) // Thêm trạng thái để xác định xem đã xảy ra lỗi hay không
 
@@ -28,18 +28,18 @@ const InfraPopup = ({ open, id, onClose, setReload }) => {
       .then(() => {
         onClose()
         Swal.fire({
-          title: 'Thành công!',
-          text: 'Dữ liệu đã được xóa thành công.',
+          title: 'Success!',
+          text: 'Data was deleted successfully.',
           icon: 'success',
           willOpen: () => {
             const confirmButton = Swal.getConfirmButton()
             if (confirmButton) {
-              confirmButton.style.backgroundColor = '#FF9F43'
+              confirmButton.style.backgroundColor = '#002060'
               confirmButton.style.color = 'white'
             }
           }
         })
-        setReload()
+        onSuccess()
       })
       .catch(error => {
         setErrorOccurred(true) // Đặt trạng thái lỗi thành true khi xảy ra lỗi
@@ -50,7 +50,7 @@ const InfraPopup = ({ open, id, onClose, setReload }) => {
           willOpen: () => {
             const confirmButton = Swal.getConfirmButton()
             if (confirmButton) {
-              confirmButton.style.backgroundColor = '#FF9F43'
+              confirmButton.style.backgroundColor = '#002060'
               confirmButton.style.color = 'white'
             }
           }
@@ -67,8 +67,8 @@ const InfraPopup = ({ open, id, onClose, setReload }) => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogTitle style={{ fontSize: '24px', fontWeight: 'bold' }}>Xác nhận</DialogTitle>
-      <DialogContent>Bạn có chắc chắn muốn xóa ?</DialogContent>
+      <DialogTitle style={{ fontSize: '24px', fontWeight: 'bold' }}>Confirm</DialogTitle>
+      <DialogContent>Are you sure you want to delete ?</DialogContent>
       <DialogActions style={{ display: 'flex' }}>
         <Button onClick={onClose}>Cancel</Button>
         <Button onClick={handleDelete}>OK</Button>

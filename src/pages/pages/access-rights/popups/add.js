@@ -326,8 +326,8 @@ const Add = ({ show, onClose, setReload }) => {
             </CustomCloseButton>
             <Box sx={{ mb: 8, textAlign: 'left' }}>
               <Typography variant='h3' sx={{ mb: 3 }}>
-              Schedule Configuration
-                            </Typography>
+                Schedule Configuration
+              </Typography>
             </Box>
             <Grid container spacing={3}>
               <Grid item xs={4}>
@@ -454,7 +454,7 @@ const Add = ({ show, onClose, setReload }) => {
                       id='basic-input'
                       onChange={date => setStart(date)}
                       placeholderText='Start Date'
-                      customInput={<CustomInput label='End Date' />}
+                      customInput={<CustomInput label='Start Date' />}
                     />
                   </div>
                 </DatePickerWrapper>
@@ -493,7 +493,7 @@ const Add = ({ show, onClose, setReload }) => {
                         setDataDailyState(v)
                       }}
                       dataDailyProps={dataDailyState}
-                      disabled={!isCheckboxChecked} // Truyền giá trị disabled từ checkbox vào Daily
+                      disabled={isCheckboxChecked} // Truyền giá trị disabled từ checkbox vào Daily
                       error={Boolean(errors.calendarDays)}
                       aria-describedby='validation-basic-last-name'
                       {...(errors.calendarDays && { helperText: 'This field is required' })}

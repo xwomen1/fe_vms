@@ -143,7 +143,8 @@ const InforDoor = ({ idInfor }) => {
       const updateData = {
         description: inforDoor.description,
         doorGroupId: selectedGroup ? selectedGroup.id : inforDoor.doorGroupId,
-        name: inforDoor.name
+        name: inforDoor.name,
+        deviceId: inforDoor.deviceId
       }
 
       const response = await axios.put(
@@ -156,7 +157,7 @@ const InforDoor = ({ idInfor }) => {
       console.log(response.data, 'updateData')
     } catch (error) {
       console.error('Error updating door:', error)
-      toast.error(error.message || 'Error updating door')
+      toast.error(error.response?.data?.message || error.message)
     } finally {
       setLoading(false)
     }

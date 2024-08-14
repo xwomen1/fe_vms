@@ -3,17 +3,15 @@ import { Autocomplete, TextField, Button, Dialog, DialogTitle, DialogContent, Di
 import axios from 'axios'
 import authConfig from 'src/configs/auth'
 import Swal from 'sweetalert2'
+import { router } from 'websocket'
+import { useRouter } from 'next/router'
 import CustomTextField from 'src/@core/components/mui/text-field'
 
-const InfraPopupAdd = ({ open, onClose, id, setReload }) => {
-  console.log(setReload, id)
+const InfraPopupAdd = ({ open, onClose, onSuccess }) => {
   const [adults, setAdults] = useState([])
   const [name, setName] = useState('')
   const [note, setNote] = useState('')
   const [type, setType] = useState('')
-  const [nameError, setNameError] = useState('')
-  const [noteError, setNoteError] = useState('')
-  const [typeError, setTypeError] = useState('')
 
   const fetchDataAdults = async () => {
     try {
@@ -41,7 +39,7 @@ const InfraPopupAdd = ({ open, onClose, id, setReload }) => {
     }
   }
 
-  const Add = async () => {
+  const handleAdd = async () => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -56,28 +54,30 @@ const InfraPopupAdd = ({ open, onClose, id, setReload }) => {
         detail: note,
         isParent: true,
         name: name,
-        parentID: id,
+        parentID: adults,
         code: type
       }
       const response = await axios.post('https://sbs.basesystem.one/ivis/infrares/api/v0/regions', data, config)
       console.log(data)
       Swal.fire({
-        title: 'Thành công!',
-        text: 'Dữ liệu đã được thêm thành công.',
+        title: 'Success!',
+        text: 'Data has been successfully add.',
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
       })
-      setReload()
-      onClose()
-    } catch (error) {
+
       onClose()
 
+      if (onSuccess) {
+        onSuccess()
+      }
+    } catch (error) {
       console.error('Error adding infra:', error)
 
       Swal.fire({
@@ -87,83 +87,45 @@ const InfraPopupAdd = ({ open, onClose, id, setReload }) => {
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
       })
     }
   }
+
   useEffect(() => {
     fetchDataAdults()
   }, [])
 
-  const validateInputs = () => {
-    let isValid = true
-
-    if (name.trim() === '') {
-      setNameError('Name không được để trống')
-      isValid = false
-    } else {
-      setNameError('')
-    }
-
-    if (note.trim() === '') {
-      setNoteError('Note không được để trống')
-      isValid = false
-    } else {
-      setNoteError('')
-    }
-
-    if (type.trim() === '') {
-      setTypeError('Mã không được để trống')
-      isValid = false
-    } else {
-      setTypeError('')
-    }
-
-    return isValid
-  }
-
-  const handleAdd = () => {
-    if (validateInputs()) {
-      Add()
-    }
-  }
-
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogTitle style={{ fontSize: '24px', fontWeight: 'bold' }}>Add</DialogTitle>
+      <DialogTitle style={{ fontSize: '24px', fontWeight: 'bold' }}>Add Organizational</DialogTitle>
       <DialogContent>
         <CustomTextField
-          label='Name'
+          label='Tên'
           type='text'
           fullWidth
           style={{ marginBottom: '16px' }}
           value={name}
           onChange={e => setName(e.target.value)}
-          error={!!nameError}
-          helperText={nameError}
         />
         <CustomTextField
-          label='Code'
+          label='Mã định danh'
           type='text'
           fullWidth
           style={{ marginBottom: '16px' }}
           value={type}
           onChange={e => setType(e.target.value)}
-          error={!!typeError}
-          helperText={typeError}
         />
         <CustomTextField
-          label='Note'
+          label='Ghi chú'
           type='text'
           fullWidth
           style={{ marginBottom: '16px' }}
           value={note}
           onChange={e => setNote(e.target.value)}
-          error={!!noteError}
-          helperText={noteError}
         />
       </DialogContent>
       <DialogActions style={{ display: 'flex' }}>

@@ -143,7 +143,7 @@ const UserList = () => {
                   <Table>
                     <TableHead style={{ background: '#F6F6F7', position: 'sticky', top: 0, zIndex: 1 }}>
                       <TableRow>
-                        <TableCell>Tên service</TableCell>
+                        <TableCell>Service Name</TableCell>
                         <TableCell>Resource code</TableCell>
                         <TableCell>Resource name</TableCell>
                         {['get', 'list', 'update', 'create', 'delete'].map(scope => (
