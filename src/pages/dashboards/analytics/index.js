@@ -19,12 +19,14 @@ import {
   Table,
   TableBody,
   TableCell,
+  Switch,
   TableContainer,
   TableHead,
   TableRow,
   Tooltip,
   Typography
 } from '@mui/material'
+import FormControlLabel from '@mui/material/FormControlLabel'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import { format } from 'date-fns'
 import authConfig from 'src/configs/auth'
@@ -39,7 +41,6 @@ const EventList = () => {
   const [count, setCount] = useState('')
   const [pageSize1, setPageSize1] = useState(25)
   const [websocket, setWebsocket] = useState(null)
-  const [rtcPeerConnection, setRtcPeerConnection] = useState(null)
   const [cameraData, setCameraData] = useState([])
   const [chartData, setChartData] = useState([])
   const [total, setTotalPage] = useState(0)
@@ -50,7 +51,7 @@ const EventList = () => {
   const [page, setPage] = useState(1)
   const [page1, setPage1] = useState(1)
   const [activeIndex, setActiveIndex] = useState(null)
-
+  const [isRealtime, setIsRealtime] = useState(false)
   const [pageSize, setPageSize] = useState(25)
 
   const pageSizeOptions = [25, 50, 100]
@@ -103,6 +104,12 @@ const EventList = () => {
     }
 
     fetchData()
+
+    return () => {
+      if (websocket != undefined && websocket != null) {
+        websocket.close()
+      }
+    }
   }, [])
 
   console.log(chartData)
@@ -149,39 +156,46 @@ const EventList = () => {
     }
   ]
 
+  const handleSwitchChange = event => {
+    const isChecked = event.target.checked
+    setIsRealtime(isChecked)
+
+    if (!isChecked && websocket) {
+      websocket.close()
+      setWebsocket(null)
+    }
+  }
+
   useEffect(() => {
-    // create WebSocket connection
+    if (isRealtime) {
+      const ws = new WebSocket(
+        `wss://sbs.basesystem.one/ivis/vms/api/v0/websocket/topic/list_ai_event/be571c00-41cf-4878-a1de-b782625da62a`
+      )
+      setWebsocket(ws)
 
-    const ws = new WebSocket(
-      `wss://sbs.basesystem.one/ivis/vms/api/v0/websocket/topic/list_ai_event/be571c00-41cf-4878-a1de-b782625da62a`
-    )
+      ws.addEventListener('open', () => {
+        ws.send(
+          JSON.stringify({
+            id: defaultCameraID,
+            type: 'request'
+          })
+        )
+      })
 
-    setWebsocket(ws)
+      ws.addEventListener('message', handleMessage)
+      ws.addEventListener('error', error => {
+        console.error('WebSocket error:', error)
+      })
+      ws.addEventListener('close', handleClose)
 
-    // create RTCPeerConnection
-
-    const pc = new RTCPeerConnection(config)
-    setRtcPeerConnection(pc)
-
-    // listen for remote tracks and add them to remote stream
-
-    pc.ontrack = event => {
-      const stream = event.streams[0]
-      if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {
-        setRemoteStream(stream)
-        remoteVideoRef.current.srcObject = stream
+      return () => {
+        if (ws) {
+          ws.close()
+          setWebsocket(null)
+        }
       }
     }
-
-    return () => {
-      if (websocket) {
-        websocket.close()
-      }
-      if (rtcPeerConnection) {
-        rtcPeerConnection.close()
-      }
-    }
-  }, [])
+  }, [isRealtime])
 
   const handleMessage = async event => {
     const message = JSON.parse(event.data)
@@ -212,21 +226,12 @@ const EventList = () => {
   const handleClose = async event => {
     if (websocket) {
       websocket.close()
+      setWebsocket(null)
     }
   }
 
   useEffect(() => {
-    if (rtcPeerConnection) {
-      rtcPeerConnection.addEventListener('connectionstatechange', () => { })
-    }
-  }, [rtcPeerConnection])
-
-  useEffect(() => {
-    fetchDataList()
-  }, [page, pageSize])
-
-  useEffect(() => {
-    if (eventsData) {
+    if (isRealtime && eventsData) {
       const newList = []
 
       deviceList?.map((item, index) => {
@@ -242,7 +247,11 @@ const EventList = () => {
 
       setDeviceList([...newList])
     }
-  }, [eventsData, deviceList])
+  }, [isRealtime, eventsData])
+
+  useEffect(() => {
+    fetchDataList()
+  }, [page, pageSize])
 
   const fetchDataList = async () => {
     const params = {
@@ -269,25 +278,7 @@ const EventList = () => {
     }
   }
 
-  const handlePageChange = (event, newPage) => {
-    setPage(newPage)
-  }
-
-  const handleSelectPageSize = size => {
-    setPageSize(size)
-    setPage(1)
-  }
-
   const COLORS = ['#0088FE', '#ff9933']
-
-  const handlePageChange1 = (event, newPage) => {
-    setPage1(newPage)
-  }
-
-  const handleSelectPageSize1 = size => {
-    setPageSize1(size)
-    setPage1(1)
-  }
 
   const fetchDataList1 = useCallback(async () => {
     try {
@@ -339,6 +330,14 @@ const EventList = () => {
           <CardHeader
             title='Top 5 AI Events'
             titleTypographyProps={{ sx: { mb: [2, 0] } }}
+            action={
+              <FormControlLabel
+                control={
+                  <Switch checked={isRealtime} onChange={handleSwitchChange} name='realtimeEvents' color='primary' />
+                }
+                label='Real time event.'
+              />
+            }
             sx={{
               py: 4,
               flexDirection: ['column', 'row'],
@@ -395,25 +394,6 @@ const EventList = () => {
               </Table>
             </TableContainer>
           </Grid>
-          <br />
-          <Grid container spacing={2} style={{ padding: 10 }}>
-            <Grid item xs={3}></Grid>
-
-            <Grid item xs={1} style={{ padding: 0 }}>
-              <Box>
-                <Menu>
-                  {pageSizeOptions.map(size => (
-                    <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
-                      {size}
-                    </MenuItem>
-                  ))}
-                </Menu>
-              </Box>
-            </Grid>
-            <Grid item xs={6}>
-              <Pagination count={total} page={page} color='primary' onChange={handlePageChange} />
-            </Grid>
-          </Grid>
         </Card>
         <Grid container spacing={2}>
           <Grid item xs={8}>
@@ -459,8 +439,6 @@ const EventList = () => {
                   </Table>
                 </TableContainer>
               </Grid>
-
-              <br />
             </Card>
           </Grid>
           <Grid item xs={4}>
