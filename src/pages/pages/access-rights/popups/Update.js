@@ -594,61 +594,8 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
                     </Grid>
                   )
                 }
-                if (item.type === 'startDate') {
-                  return (
-                    <Grid item xs={12} sm={4} key={index}>
-                      <Controller
-                        name='startDate'
-                        control={control}
-                        rules={{ required: item.require }}
-                        render={({ field: { value, onChange } }) => (
-                          <DatePickerWrapper>
-                            <DatePicker
-                              selected={value ? new Date(value) : null}
-                              onChange={onChange}
-                              customInput={
-                                <CustomTextField
-                                  fullWidth
-                                  label='Start Date'
-                                  error={Boolean(errors.startDate)}
-                                  helperText={errors.startDate ? 'Trường này bắt buộc' : ''}
-                                />
-                              }
-                            />
-                          </DatePickerWrapper>
-                        )}
-                      />
-                    </Grid>
-                  )
-                }
-                if (item.type === 'endDate') {
-                  return (
-                    <Grid item xs={12} sm={4} key={index}>
-                      <Controller
-                        name='endDate'
-                        control={control}
-                        rules={{ required: item.require }}
-                        render={({ field: { value, onChange } }) => (
-                          <DatePickerWrapper>
-                            <DatePicker
-                              selected={value ? new Date(value) : null}
-                              onChange={onChange}
-                              customInput={
-                                <CustomTextField
-                                  fullWidth
-                                  label='End Date'
-                                  error={Boolean(errors.endDate)}
-                                  helperText={errors.endDate ? 'Trường này bắt buộc' : ''}
-                                />
-                              }
-                            />
-                          </DatePickerWrapper>
-                        )}
-                      />
-                    </Grid>
-                  )
-                }
               })}
+
               <Grid item xs={12}></Grid>
             </Grid>
           </form>

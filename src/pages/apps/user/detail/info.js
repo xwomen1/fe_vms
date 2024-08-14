@@ -931,10 +931,11 @@ const UserDetails = () => {
                           selected={dateTime}
                           timeIntervals={15}
                           showTimeSelectOnly
-                          dateFormat='h:mm '
+                          dateFormat='h:mm a' // Thay đổi định dạng giờ
                           id='time-only-picker'
                           onChange={date => handleTimeChange(date)}
                           customInput={<CustomInput />}
+                          filterTime={time => time.getHours() < 12} // Chỉ cho phép giờ AM
                         />
                       </div>
                     </Box>
@@ -1095,15 +1096,15 @@ const UserDetails = () => {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <Typography variant='h5'>Group</Typography>
+                  <Typography variant='h5'>Department</Typography>
                 </Grid>
                 <Grid item xs={11.8}>
                   <TableContainer>
                     <Table>
                       <TableHead>
                         <TableRow>
-                          <TableCell>Group</TableCell>
-                          <TableCell>Group Code</TableCell>
+                          <TableCell>Department</TableCell>
+                          <TableCell>Department Code</TableCell>
                           <TableCell align='right'>Is Leader</TableCell>
                           {showPlusColumn && (
                             <TableCell align='center'>

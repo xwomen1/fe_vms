@@ -86,7 +86,7 @@ const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
       <CustomCloseButton onClick={onClose}>
         <Icon icon='tabler:x' fontSize='1.25rem' />
       </CustomCloseButton>
-      <Button>Move Group</Button>
+      <Button>Move Department</Button>
       <DialogContent>
         <Grid container spacing={2} alignItems='center'>
           <Grid item xs={3}>
@@ -106,7 +106,7 @@ const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
               }}
               options={groups}
               getOptionLabel={option => option.groupName}
-              renderInput={params => <TextField {...params} label='Chọn Group' variant='outlined' fullWidth />}
+              renderInput={params => <TextField {...params} label='Select Department' variant='outlined' fullWidth />}
             />
           </Grid>
         </Grid>
