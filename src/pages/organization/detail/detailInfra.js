@@ -125,7 +125,7 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
         <Grid container spacing={2} alignItems='center'>
           <Grid item xs={6}>
             <CustomTextField
-              label='Tên'
+              label='Name'
               value={name}
               onChange={e => setName(e.target.value)}
               fullWidth
@@ -135,7 +135,7 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
           </Grid>
           <Grid item xs={6}>
             <CustomTextField
-              label='Mã'
+              label='Code'
               value={type}
               onChange={e => setType(e.target.value)}
               fullWidth
@@ -145,7 +145,7 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
           </Grid>
           <Grid item xs={12}>
             <CustomTextField
-              label='Ghi chú'
+              label='Note'
               value={detail}
               onChange={e => setDetail(e.target.value)}
               fullWidth
