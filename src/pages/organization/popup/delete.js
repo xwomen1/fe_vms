@@ -5,7 +5,7 @@ import authConfig from 'src/configs/auth'
 import Swal from 'sweetalert2'
 import { useRouter } from 'next/router'
 
-const InfraPopup = ({ open, id, onClose, setReload }) => {
+const InfraPopup = ({ open, id, onClose, onSuccess }) => {
   const router = useRouter()
   const [errorOccurred, setErrorOccurred] = useState(false) // Thêm trạng thái để xác định xem đã xảy ra lỗi hay không
 
@@ -34,12 +34,12 @@ const InfraPopup = ({ open, id, onClose, setReload }) => {
           willOpen: () => {
             const confirmButton = Swal.getConfirmButton()
             if (confirmButton) {
-              confirmButton.style.backgroundColor = '#FF9F43'
+              confirmButton.style.backgroundColor = '#002060'
               confirmButton.style.color = 'white'
             }
           }
         })
-        setReload()
+        onSuccess()
       })
       .catch(error => {
         setErrorOccurred(true) // Đặt trạng thái lỗi thành true khi xảy ra lỗi
@@ -50,7 +50,7 @@ const InfraPopup = ({ open, id, onClose, setReload }) => {
           willOpen: () => {
             const confirmButton = Swal.getConfirmButton()
             if (confirmButton) {
-              confirmButton.style.backgroundColor = '#FF9F43'
+              confirmButton.style.backgroundColor = '#002060'
               confirmButton.style.color = 'white'
             }
           }

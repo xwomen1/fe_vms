@@ -5,8 +5,7 @@ import authConfig from 'src/configs/auth'
 import Swal from 'sweetalert2'
 import CustomTextField from 'src/@core/components/mui/text-field'
 
-const InfraPopupAdd = ({ open, onClose, id, setReload }) => {
-  console.log(setReload, id)
+const InfraPopupAdd = ({ open, onClose, onSuccess, id }) => {
   const [adults, setAdults] = useState([])
   const [name, setName] = useState('')
   const [note, setNote] = useState('')
@@ -63,23 +62,26 @@ const InfraPopupAdd = ({ open, onClose, id, setReload }) => {
       console.log(data)
       Swal.fire({
         title: 'Success!',
-        text: 'Data added successfully.',
+        text: 'Data has been successfully add.',
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
       })
-      setReload()
+
       onClose()
+
+      if (onSuccess) {
+        onSuccess()
+      }
     } catch (error) {
       onClose()
 
       console.error('Error adding infra:', error)
-
       Swal.fire({
         title: 'Error!',
         text: error.response?.data?.message || error.message,
@@ -87,13 +89,14 @@ const InfraPopupAdd = ({ open, onClose, id, setReload }) => {
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
       })
     }
   }
+
   useEffect(() => {
     fetchDataAdults()
   }, [])
@@ -102,21 +105,21 @@ const InfraPopupAdd = ({ open, onClose, id, setReload }) => {
     let isValid = true
 
     if (name.trim() === '') {
-      setNameError('Name cannot be blank')
+      setNameError('Name cannot be left blank')
       isValid = false
     } else {
       setNameError('')
     }
 
     if (note.trim() === '') {
-      setNoteError('Note cannot be blank')
+      setNoteError('Note cannot be left blank')
       isValid = false
     } else {
       setNoteError('')
     }
 
     if (type.trim() === '') {
-      setTypeError('Code cannot be blank')
+      setTypeError('Code cannot be left blank')
       isValid = false
     } else {
       setTypeError('')
@@ -133,10 +136,10 @@ const InfraPopupAdd = ({ open, onClose, id, setReload }) => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogTitle style={{ fontSize: '24px', fontWeight: 'bold' }}>Add</DialogTitle>
+      <DialogTitle style={{ fontSize: '24px', fontWeight: 'bold' }}>Add Organizational</DialogTitle>
       <DialogContent>
         <CustomTextField
-          label='Name'
+          label='Tên'
           type='text'
           fullWidth
           style={{ marginBottom: '16px' }}
@@ -146,7 +149,7 @@ const InfraPopupAdd = ({ open, onClose, id, setReload }) => {
           helperText={nameError}
         />
         <CustomTextField
-          label='Code'
+          label='Mã định danh'
           type='text'
           fullWidth
           style={{ marginBottom: '16px' }}
@@ -156,7 +159,7 @@ const InfraPopupAdd = ({ open, onClose, id, setReload }) => {
           helperText={typeError}
         />
         <CustomTextField
-          label='Note'
+          label='Ghi chú'
           type='text'
           fullWidth
           style={{ marginBottom: '16px' }}
