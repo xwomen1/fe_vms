@@ -28,8 +28,8 @@ const InfraPopup = ({ open, id, onClose, onSuccess }) => {
       .then(() => {
         onClose()
         Swal.fire({
-          title: 'Thành công!',
-          text: 'Dữ liệu đã được xóa thành công.',
+          title: 'Success!',
+          text: 'Data was deleted successfully.',
           icon: 'success',
           willOpen: () => {
             const confirmButton = Swal.getConfirmButton()
@@ -67,8 +67,8 @@ const InfraPopup = ({ open, id, onClose, onSuccess }) => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogTitle style={{ fontSize: '24px', fontWeight: 'bold' }}>Xác nhận</DialogTitle>
-      <DialogContent>Bạn có chắc chắn muốn xóa ?</DialogContent>
+      <DialogTitle style={{ fontSize: '24px', fontWeight: 'bold' }}>Confirm</DialogTitle>
+      <DialogContent>Are you sure you want to delete ?</DialogContent>
       <DialogActions style={{ display: 'flex' }}>
         <Button onClick={onClose}>Cancel</Button>
         <Button onClick={handleDelete}>OK</Button>

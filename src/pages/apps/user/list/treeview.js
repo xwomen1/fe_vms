@@ -16,7 +16,7 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 import { IconButton, Typography, Box } from '@mui/material'
 import Edit from '../detail/popup/editGroup'
 
-const UserList = ({ apiData }) => {
+const GroupSynchronization = ({ apiData }) => {
   const [valueGroup, setValueGroup] = useState('')
   const [valueGroupIn, setValueGroupIn] = useState('')
 
@@ -48,7 +48,7 @@ const UserList = ({ apiData }) => {
       showConfirmButton: true,
       focusCancel: true,
       reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Yes',
       cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
       customClass: {
         content: 'content-class',
@@ -61,7 +61,7 @@ const UserList = ({ apiData }) => {
 
   const handleDelete = idDelete => {
     showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
+      text: 'Do you agree to delete it?'
     }).then(({ value }) => {
       if (value) {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -295,7 +295,7 @@ const UserList = ({ apiData }) => {
 
   const handleDeleteInf = id => {
     showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
+      text: 'Do you agree to delete it?'
     }).then(({ value }) => {
       if (value) {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -365,7 +365,7 @@ const UserList = ({ apiData }) => {
 
           <Grid item xs={3} component={Paper}>
             <div>
-              <h2>User Group</h2>
+              <h2>User Department</h2>
               <CustomTextField
                 value={valueGroup}
                 sx={{ mr: 4 }}
@@ -384,7 +384,7 @@ const UserList = ({ apiData }) => {
           <Grid item xs={1}></Grid>
           <Grid item xs={3} component={Paper}>
             <div>
-              <h2>Organizational Structure Group</h2>
+              <h2>Organizational Structure Department</h2>
 
               <CustomTextField
                 value={valueGroupIn}
@@ -429,4 +429,4 @@ export const getStaticProps = async () => {
   }
 }
 
-export default UserList
+export default GroupSynchronization

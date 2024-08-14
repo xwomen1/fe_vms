@@ -346,7 +346,7 @@ const UpDateCar = () => {
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates/${id}`, params, config)
       Swal.fire({
         title: 'Thành công!',
-        text: 'Dữ liệu đã được cập nhật thành công.',
+        text: 'Data has been updated successfully.',
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()

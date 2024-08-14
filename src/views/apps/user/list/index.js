@@ -28,7 +28,7 @@ const TableHeader = props => {
       }}
     >
       <Box>
-        <Grid style={{ fontSize: 30, color: 'black' }}>User Group List</Grid>
+        <Grid style={{ fontSize: 30, color: 'black' }}>User Department List</Grid>
       </Box>
     </Box>
   )

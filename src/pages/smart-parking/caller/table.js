@@ -201,7 +201,7 @@ const UserList = ({ apiData }) => {
           <CardHeader
             title={
               <>
-                <Button variant='contained'>Danh sách thuê bao</Button>
+                <Button variant='contained'>Subscriber List</Button>
               </>
             }
             titleTypographyProps={{ sx: { mb: [2, 0] } }}
@@ -227,7 +227,7 @@ const UserList = ({ apiData }) => {
                 </Grid>
                 <Grid item>
                   <CustomTextField
-                    placeholder='Nhập tên sự kiện ...! '
+                    placeholder='Enter event name ...! '
                     value={value}
                     onChange={e => setValue(e.target.value)}
                     InputProps={{
@@ -269,17 +269,17 @@ const UserList = ({ apiData }) => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Mã thuê bao</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Tên thuê bao</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Số điện thoại</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>No.</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Subscriber Code</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Subscriber Name</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Phone Number</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Email</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Loại thuê bao</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Subscriber Type</TableCell>
 
-                    <TableCell sx={{ padding: '16px' }}>Đơn vị</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Hạn sử dụng</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Group</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Expiration Date</TableCell>
 
-                    <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>

@@ -101,7 +101,7 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
       setDetailError('')
     }
     if (type.trim() === '') {
-      setTypeError('Mã địa phương không được để trống')
+      setTypeError('Code local cannot be left blank')
       isValid = false
     } else {
       setTypeError('')
@@ -118,7 +118,7 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth='xl' style={{ maxWidth: '50%', margin: 'auto' }}>
-      <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Cập nhật thông tin</DialogTitle>
+      <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Update information</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} alignItems='center'>
           <Grid item xs={6}>
@@ -154,8 +154,8 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Hủy</Button>
-        <Button onClick={handleUpdate}>Cập nhật</Button>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={handleUpdate}>Update</Button>
       </DialogActions>
     </Dialog>
   )

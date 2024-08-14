@@ -51,7 +51,7 @@ const EventList = () => {
   const [page, setPage] = useState(1)
   const [page1, setPage1] = useState(1)
   const [activeIndex, setActiveIndex] = useState(null)
-  const [isRealtime, setIsRealtime] = useState(true)
+  const [isRealtime, setIsRealtime] = useState(false)
   const [pageSize, setPageSize] = useState(25)
 
   const pageSizeOptions = [25, 50, 100]

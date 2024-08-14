@@ -325,10 +325,10 @@ const AccessRight = () => {
             setIsOpenDel(false)
           }}
         >
-          Đồng ý
+          Yes
         </Button>
         <Button variant='tonal' color='secondary' sx={{ mr: 1 }} onClick={() => setIsOpenDel(false)}>
-          Hủy
+          No
         </Button>
       </DialogActions>
     </Dialog>
@@ -377,7 +377,7 @@ const AccessRight = () => {
                 <CustomTextField
                   value={value}
                   sx={{ mr: 2 }}
-                  placeholder='Tìm lịch'
+                  placeholder='Search schedule'
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position='start'>
@@ -413,7 +413,7 @@ const AccessRight = () => {
                   {loading ? (
                     <TableRow>
                       <TableCell colSpan={columns.length + 2} align='center'>
-                        Đang tải dữ liệu...
+                        Loading data...
                       </TableCell>
                     </TableRow>
                   ) : errorMessage ? (
@@ -425,7 +425,7 @@ const AccessRight = () => {
                   ) : rows.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={columns.length + 2} align='center'>
-                        Không có dữ liệu
+                        Data is not available
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -494,11 +494,11 @@ const AccessRight = () => {
       {/* Delete Confirmation Dialog */}
       <Dialog open={isOpenDel} onClose={() => setIsOpenDel(false)}>
         <DialogContent>
-          <Typography>Bạn có chắc chắn muốn xóa không?</Typography>
+          <Typography>Do you want to delete it?</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsOpenDel(false)} color='primary'>
-            Hủy bỏ
+            No
           </Button>
         </DialogActions>
       </Dialog>

@@ -62,7 +62,7 @@ const InfraPopupAdd = ({ open, onClose, onSuccess, id }) => {
       console.log(data)
       Swal.fire({
         title: 'Thành công!',
-        text: 'Dữ liệu đã được cập nhật thành công.',
+        text: 'Dữ liệu đã được thêm thành công.',
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
@@ -119,7 +119,7 @@ const InfraPopupAdd = ({ open, onClose, onSuccess, id }) => {
     }
 
     if (type.trim() === '') {
-      setTypeError('Mã không được để trống')
+      setTypeError('Code cannot be blank')
       isValid = false
     } else {
       setTypeError('')

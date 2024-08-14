@@ -63,7 +63,7 @@ const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
         .put('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/move', params)
         .then(response => {
           console.log('Group moved successfully:', response.data)
-          toast.success('Chuyển nhóm thành công')
+          toast.success('Group moved successfully')
           onClose()
           fetchGroupData() // Gọi lại fetch để cập nhật danh sách nhóm
         })
@@ -86,17 +86,17 @@ const Edit = ({ open, onClose, groupId, groupName, fetchGroupData }) => {
       <CustomCloseButton onClick={onClose}>
         <Icon icon='tabler:x' fontSize='1.25rem' />
       </CustomCloseButton>
-      <Button>Chuyển Phòng ban vào Phòng ban khác</Button>
+      <Button>Move Group</Button>
       <DialogContent>
         <Grid container spacing={2} alignItems='center'>
           <Grid item xs={3}>
-            <Typography>Từ:</Typography>
+            <Typography>From:</Typography>
           </Grid>
           <Grid item xs={9}>
             <TextField value={groupName} disabled={true} fullWidth />
           </Grid>
           <Grid item xs={3}>
-            <Typography>Đến:</Typography>
+            <Typography>To:</Typography>
           </Grid>
           <Grid item xs={9}>
             <Autocomplete

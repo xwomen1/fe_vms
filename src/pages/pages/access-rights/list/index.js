@@ -501,16 +501,7 @@ const AccessRight = () => {
                   >
                     <Icon icon='tabler:file-export' />
                   </IconButton>
-                  <IconButton
-                    aria-label='Thêm mới'
-                    color='primary'
-                    onClick={() => {
-                      setIsOpenAdd(true)
-                    }}
-                    disabled={tab === 'setPermissions' ? false : true}
-                  >
-                    <Icon icon='tabler:square-plus' />
-                  </IconButton>
+
                   <IconButton
                     aria-label='Bộ lọc'
                     onClick={() => {
@@ -520,6 +511,17 @@ const AccessRight = () => {
                   >
                     <Icon icon='tabler:filter' />
                   </IconButton>
+                  <Button
+                    variant='contained'
+                    aria-label='Add'
+                    color='primary'
+                    onClick={() => {
+                      setIsOpenAdd(true)
+                    }}
+                    disabled={tab === 'setPermissions' ? false : true}
+                  >
+                    Add
+                  </Button>
                 </Box>
               </Grid>
               <Grid item>
@@ -648,14 +650,13 @@ const AccessRight = () => {
               </Grid>
               <Grid container spacing={2} style={{ padding: 10 }}>
                 <Grid item xs={3}></Grid>
-                <Grid item xs={1}>
-                  <span style={{ fontSize: 15 }}> line/page</span>
-                </Grid>
+
                 <Grid item xs={1} style={{ padding: 0 }}>
                   <Box>
-                    <Button onClick={handleOpenMenu} endIcon={<Icon icon='tabler:selector' />}>
-                      {pageSize}
-                    </Button>
+                    <IconButton onClick={handleOpenMenu}>
+                      <Icon icon='tabler:selector' />
+                      <p style={{ fontSize: 15 }}>{pageSize} line/page</p>
+                    </IconButton>
                     <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
                       {pageSizeOptions.map(size => (
                         <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
@@ -765,14 +766,13 @@ const AccessRight = () => {
               </Grid>
               <Grid container spacing={2} style={{ padding: 10 }}>
                 <Grid item xs={3}></Grid>
-                <Grid item xs={1}>
-                  <span style={{ fontSize: 15 }}> line/page</span>
-                </Grid>
+
                 <Grid item xs={1} style={{ padding: 0 }}>
                   <Box>
-                    <Button onClick={handleOpenMenu} endIcon={<Icon icon='tabler:selector' />}>
-                      {pageSize}
-                    </Button>
+                    <IconButton onClick={handleOpenMenu}>
+                      <Icon icon='tabler:selector' />
+                      <p style={{ fontSize: 15 }}>{pageSize} line/page</p>
+                    </IconButton>
                     <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
                       {pageSizeOptions.map(size => (
                         <MenuItem key={size} onClick={() => handleSelectPageSize1(size)}>

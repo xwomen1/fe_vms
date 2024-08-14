@@ -5,7 +5,7 @@ import { createContext, useState, useEffect } from 'react'
 import themeConfig from 'src/configs/themeConfig'
 
 const initialSettings = {
-  themeColor: 'info',
+  themeColor: 'success',
   mode: themeConfig.mode,
   skin: themeConfig.skin,
   footer: themeConfig.footer,
@@ -28,7 +28,7 @@ const staticSettings = {
   navHidden: initialSettings.navHidden,
   lastLayout: initialSettings.lastLayout,
   toastPosition: initialSettings.toastPosition,
-  themeColor: 'info'
+  themeColor: 'success'
 }
 
 const restoreSettings = () => {
