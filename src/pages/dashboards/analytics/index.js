@@ -41,7 +41,6 @@ const EventList = () => {
   const [count, setCount] = useState('')
   const [pageSize1, setPageSize1] = useState(25)
   const [websocket, setWebsocket] = useState(null)
-  const [rtcPeerConnection, setRtcPeerConnection] = useState(null)
   const [cameraData, setCameraData] = useState([])
   const [chartData, setChartData] = useState([])
   const [total, setTotalPage] = useState(0)
@@ -105,6 +104,12 @@ const EventList = () => {
     }
 
     fetchData()
+
+    return () => {
+      if (websocket != undefined && websocket != null) {
+        websocket.close()
+      }
+    }
   }, [])
 
   console.log(chartData)
@@ -158,10 +163,6 @@ const EventList = () => {
     if (!isChecked && websocket) {
       websocket.close()
       setWebsocket(null)
-      if (rtcPeerConnection) {
-        rtcPeerConnection.close()
-        setRtcPeerConnection(null)
-      }
     }
   }
 
@@ -171,9 +172,6 @@ const EventList = () => {
         `wss://sbs.basesystem.one/ivis/vms/api/v0/websocket/topic/list_ai_event/be571c00-41cf-4878-a1de-b782625da62a`
       )
       setWebsocket(ws)
-
-      const pc = new RTCPeerConnection(config)
-      setRtcPeerConnection(pc)
 
       ws.addEventListener('open', () => {
         ws.send(
@@ -190,22 +188,10 @@ const EventList = () => {
       })
       ws.addEventListener('close', handleClose)
 
-      pc.ontrack = event => {
-        const stream = event.streams[0]
-        if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {
-          setRemoteStream(stream)
-          remoteVideoRef.current.srcObject = stream
-        }
-      }
-
       return () => {
         if (ws) {
           ws.close()
           setWebsocket(null)
-        }
-        if (pc) {
-          pc.close()
-          setRtcPeerConnection(null)
         }
       }
     }
@@ -242,17 +228,7 @@ const EventList = () => {
       websocket.close()
       setWebsocket(null)
     }
-    if (rtcPeerConnection) {
-      rtcPeerConnection.close()
-      setRtcPeerConnection(null)
-    }
   }
-
-  useEffect(() => {
-    if (rtcPeerConnection) {
-      rtcPeerConnection.addEventListener('connectionstatechange', () => {})
-    }
-  }, [rtcPeerConnection])
 
   useEffect(() => {
     if (isRealtime && eventsData) {
@@ -271,7 +247,7 @@ const EventList = () => {
 
       setDeviceList([...newList])
     }
-  }, [isRealtime, eventsData, deviceList])
+  }, [isRealtime, eventsData])
 
   useEffect(() => {
     fetchDataList()
@@ -302,25 +278,7 @@ const EventList = () => {
     }
   }
 
-  const handlePageChange = (event, newPage) => {
-    setPage(newPage)
-  }
-
-  const handleSelectPageSize = size => {
-    setPageSize(size)
-    setPage(1)
-  }
-
   const COLORS = ['#0088FE', '#ff9933']
-
-  const handlePageChange1 = (event, newPage) => {
-    setPage1(newPage)
-  }
-
-  const handleSelectPageSize1 = size => {
-    setPageSize1(size)
-    setPage1(1)
-  }
 
   const fetchDataList1 = useCallback(async () => {
     try {
@@ -436,25 +394,6 @@ const EventList = () => {
               </Table>
             </TableContainer>
           </Grid>
-          <br />
-          <Grid container spacing={2} style={{ padding: 10 }}>
-            <Grid item xs={3}></Grid>
-
-            <Grid item xs={1} style={{ padding: 0 }}>
-              <Box>
-                <Menu>
-                  {pageSizeOptions.map(size => (
-                    <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
-                      {size}
-                    </MenuItem>
-                  ))}
-                </Menu>
-              </Box>
-            </Grid>
-            <Grid item xs={6}>
-              <Pagination count={total} page={page} color='primary' onChange={handlePageChange} />
-            </Grid>
-          </Grid>
         </Card>
         <Grid container spacing={2}>
           <Grid item xs={8}>
@@ -500,8 +439,6 @@ const EventList = () => {
                   </Table>
                 </TableContainer>
               </Grid>
-
-              <br />
             </Card>
           </Grid>
           <Grid item xs={4}>
