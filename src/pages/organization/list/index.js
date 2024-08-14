@@ -243,7 +243,11 @@ const OrganizationalStructure = () => {
               </IconButton>
             </Box>
           }
-          onClick={() => console.log(node.id)}
+          onClick={async () => {
+            // await handleChangeTab(selectedTab) // Thay đổi tab
+            await fetchChildData(node.id) // Fetch lại dữ liệu cho bảng
+            console.log(node.id)
+          }}
           sx={{ marginLeft: '3%', marginTop: '4%' }}
           icon={
             node.isParent ? (
