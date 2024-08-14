@@ -61,8 +61,8 @@ const InfraPopupAdd = ({ open, onClose, onSuccess, id }) => {
       const response = await axios.post('https://sbs.basesystem.one/ivis/infrares/api/v0/regions', data, config)
       console.log(data)
       Swal.fire({
-        title: 'Thành công!',
-        text: 'Dữ liệu đã được thêm thành công.',
+        title: 'Success!',
+        text: 'Data has been successfully add.',
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
@@ -105,21 +105,21 @@ const InfraPopupAdd = ({ open, onClose, onSuccess, id }) => {
     let isValid = true
 
     if (name.trim() === '') {
-      setNameError('Tên không được để trống')
+      setNameError('Name cannot be left blank')
       isValid = false
     } else {
       setNameError('')
     }
 
     if (note.trim() === '') {
-      setNoteError('Ghi chú không được để trống')
+      setNoteError('Note cannot be left blank')
       isValid = false
     } else {
       setNoteError('')
     }
 
     if (type.trim() === '') {
-      setTypeError('Code cannot be blank')
+      setTypeError('Code cannot be left blank')
       isValid = false
     } else {
       setTypeError('')
@@ -136,7 +136,7 @@ const InfraPopupAdd = ({ open, onClose, onSuccess, id }) => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogTitle style={{ fontSize: '24px', fontWeight: 'bold' }}>Thêm cơ cấu tổ chức</DialogTitle>
+      <DialogTitle style={{ fontSize: '24px', fontWeight: 'bold' }}>Add Organizational</DialogTitle>
       <DialogContent>
         <CustomTextField
           label='Tên'

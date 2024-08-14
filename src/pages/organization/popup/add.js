@@ -60,8 +60,8 @@ const InfraPopupAdd = ({ open, onClose, onSuccess }) => {
       const response = await axios.post('https://sbs.basesystem.one/ivis/infrares/api/v0/regions', data, config)
       console.log(data)
       Swal.fire({
-        title: 'Thành công!',
-        text: 'Dữ liệu đã được Thêm thành công.',
+        title: 'Success!',
+        text: 'Data has been successfully add.',
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
@@ -101,7 +101,7 @@ const InfraPopupAdd = ({ open, onClose, onSuccess }) => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogTitle style={{ fontSize: '24px', fontWeight: 'bold' }}>Thêm cơ cấu tổ chức</DialogTitle>
+      <DialogTitle style={{ fontSize: '24px', fontWeight: 'bold' }}>Add Organizational</DialogTitle>
       <DialogContent>
         <CustomTextField
           label='Tên'

@@ -55,8 +55,8 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
 
       await axios.put(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${id}`, payload, config)
       Swal.fire({
-        title: 'Thành công!',
-        text: 'Dữ liệu đã được cập nhật thành công.',
+        title: 'Success!',
+        text: 'The data has been updated successfully.',
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
@@ -89,19 +89,21 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
     let isValid = true
 
     if (name.trim() === '') {
-      setNameError('Tên địa phương không được để trống')
+      setNameError('Local name cannot be left blank')
       isValid = false
     } else {
       setNameError('')
     }
+
     if (detail.trim() === '') {
-      setDetailError('Ghi chú địa phương không được để trống')
+      setDetailError('Local note cannot be left blank')
       isValid = false
     } else {
       setDetailError('')
     }
+
     if (type.trim() === '') {
-      setTypeError('Code local cannot be left blank')
+      setTypeError('Local code cannot be left blank')
       isValid = false
     } else {
       setTypeError('')

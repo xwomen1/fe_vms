@@ -316,12 +316,12 @@ const OrganizationalStructure = () => {
               <Box display='flex' alignItems='center'>
                 <Typography variant='body2' style={{ marginRight: '16px' }}>
                   <Button variant='contained' onClick={() => handleOpenAdd()}>
-                    Thêm
+                    Add
                   </Button>
                 </Typography>
                 <Typography variant='body2'>
                   <Button variant='contained' onClick={() => handleOpenPopup(infra[selectedTab]?.id)}>
-                    Xóa
+                    Delete
                   </Button>
                 </Typography>
               </Box>
@@ -396,7 +396,7 @@ const OrganizationalStructure = () => {
               <Grid item xs={7} style={{ display: 'flex', flexDirection: 'column' }}>
                 <Paper elevation={3} style={{ padding: '16px', marginBottom: '16px' }}>
                   <CustomTextField
-                    label='Tên'
+                    label='Name'
                     type='text'
                     value={info ? info.name : currentTabInfra.name || ''}
                     fullWidth
@@ -404,7 +404,7 @@ const OrganizationalStructure = () => {
                     onClick={() => handleOpenPopupDetail(getIdFromValue(info ? info.name : currentTabInfra.name || ''))}
                   />
                   <CustomTextField
-                    label='Mã'
+                    label='Code'
                     type='text'
                     value={info ? info.code : currentTabInfra.code || ''}
                     fullWidth
@@ -412,7 +412,7 @@ const OrganizationalStructure = () => {
                     onClick={() => handleOpenPopupDetail(getIdFromValue(info ? info.code : currentTabInfra.code || ''))}
                   />
                   <CustomTextField
-                    label='Ghi chú'
+                    label='Detail'
                     type='text'
                     value={info ? info.detail : currentTabInfra.detail || ''}
                     fullWidth
@@ -427,9 +427,9 @@ const OrganizationalStructure = () => {
                       <TableHead>
                         <TableRow>
                           <TableCell>STT</TableCell>
-                          <TableCell>Tên</TableCell>
-                          <TableCell>Mã</TableCell>
-                          <TableCell>Thao tác</TableCell>
+                          <TableCell>Name</TableCell>
+                          <TableCell>Code</TableCell>
+                          <TableCell>Action</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
