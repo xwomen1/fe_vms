@@ -5,14 +5,14 @@ import authConfig from 'src/configs/auth'
 import Swal from 'sweetalert2'
 import CustomTextField from 'src/@core/components/mui/text-field'
 
-const InfraPopupDetail = ({ open, id, onClose, setReload }) => {
+const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
   const [name, setName] = useState('')
   const [type, setType] = useState('')
   const [detail, setDetail] = useState('')
   const [nameError, setNameError] = useState('')
   const [typeError, setTypeError] = useState('')
   const [detailError, setDetailError] = useState('')
-
+  console.log(onClose)
   useEffect(() => {
     const fetchFiltered = async () => {
       try {
@@ -56,17 +56,17 @@ const InfraPopupDetail = ({ open, id, onClose, setReload }) => {
       await axios.put(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${id}`, payload, config)
       Swal.fire({
         title: 'Thành công!',
-        text: 'Dữ liệu đã được sửa thành công.',
+        text: 'Dữ liệu đã được cập nhật thành công.',
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
       })
-      setReload()
+      onSuccess()
       onClose()
     } catch (error) {
       console.error('Error updating', error)
@@ -77,7 +77,7 @@ const InfraPopupDetail = ({ open, id, onClose, setReload }) => {
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -89,13 +89,13 @@ const InfraPopupDetail = ({ open, id, onClose, setReload }) => {
     let isValid = true
 
     if (name.trim() === '') {
-      setNameError('Name địa phương không được để trống')
+      setNameError('Tên địa phương không được để trống')
       isValid = false
     } else {
       setNameError('')
     }
     if (detail.trim() === '') {
-      setDetailError('Note địa phương không được để trống')
+      setDetailError('Ghi chú địa phương không được để trống')
       isValid = false
     } else {
       setDetailError('')
@@ -123,7 +123,7 @@ const InfraPopupDetail = ({ open, id, onClose, setReload }) => {
         <Grid container spacing={2} alignItems='center'>
           <Grid item xs={6}>
             <CustomTextField
-              label='Name'
+              label='Tên'
               value={name}
               onChange={e => setName(e.target.value)}
               fullWidth
@@ -143,7 +143,7 @@ const InfraPopupDetail = ({ open, id, onClose, setReload }) => {
           </Grid>
           <Grid item xs={12}>
             <CustomTextField
-              label='Note'
+              label='Ghi chú'
               value={detail}
               onChange={e => setDetail(e.target.value)}
               fullWidth

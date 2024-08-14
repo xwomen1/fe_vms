@@ -7,7 +7,7 @@ import { router } from 'websocket'
 import { useRouter } from 'next/router'
 import CustomTextField from 'src/@core/components/mui/text-field'
 
-const InfraPopupAdd = ({ open, onClose, setReload }) => {
+const InfraPopupAdd = ({ open, onClose, onSuccess }) => {
   const [adults, setAdults] = useState([])
   const [name, setName] = useState('')
   const [note, setNote] = useState('')
@@ -61,18 +61,22 @@ const InfraPopupAdd = ({ open, onClose, setReload }) => {
       console.log(data)
       Swal.fire({
         title: 'Thành công!',
-        text: 'Dữ liệu đã được thêm thành công.',
+        text: 'Dữ liệu đã được Thêm thành công.',
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
       })
-      setReload()
+
       onClose()
+
+      if (onSuccess) {
+        onSuccess()
+      }
     } catch (error) {
       console.error('Error adding infra:', error)
 
@@ -83,7 +87,7 @@ const InfraPopupAdd = ({ open, onClose, setReload }) => {
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -97,10 +101,10 @@ const InfraPopupAdd = ({ open, onClose, setReload }) => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogTitle style={{ fontSize: '24px', fontWeight: 'bold' }}>Add</DialogTitle>
+      <DialogTitle style={{ fontSize: '24px', fontWeight: 'bold' }}>Thêm cơ cấu tổ chức</DialogTitle>
       <DialogContent>
         <CustomTextField
-          label='Name'
+          label='Tên'
           type='text'
           fullWidth
           style={{ marginBottom: '16px' }}
@@ -108,7 +112,7 @@ const InfraPopupAdd = ({ open, onClose, setReload }) => {
           onChange={e => setName(e.target.value)}
         />
         <CustomTextField
-          label='Code'
+          label='Mã định danh'
           type='text'
           fullWidth
           style={{ marginBottom: '16px' }}
@@ -116,7 +120,7 @@ const InfraPopupAdd = ({ open, onClose, setReload }) => {
           onChange={e => setType(e.target.value)}
         />
         <CustomTextField
-          label='Note'
+          label='Ghi chú'
           type='text'
           fullWidth
           style={{ marginBottom: '16px' }}
