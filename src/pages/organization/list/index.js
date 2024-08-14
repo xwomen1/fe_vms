@@ -320,7 +320,7 @@ const Organization = () => {
           >
             <Typography variant='h6'>List</Typography>
             {loadingChildren ? (
-              <Typography variant='body1'>Đang tải dữ liệu...</Typography>
+              <Typography variant='body1'>Loading data...</Typography>
             ) : (
               <Box sx={{ flexGrow: 1, width: '100%', height: '100%' }}>
                 <TreeView aria-label='treeview' sx={{ width: '100%', height: '100%' }} expanded={expandedNodes}>
@@ -354,7 +354,7 @@ const Organization = () => {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>STT</TableCell>
+                      <TableCell>NO.</TableCell>
                       <TableCell>Name</TableCell>
                       <TableCell>Code</TableCell>
                       <TableCell>Detail</TableCell>

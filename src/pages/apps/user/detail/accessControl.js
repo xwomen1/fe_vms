@@ -413,7 +413,7 @@ const AccessRight = () => {
                   {loading ? (
                     <TableRow>
                       <TableCell colSpan={columns.length + 2} align='center'>
-                        Đang tải dữ liệu...
+                        Loading data...
                       </TableCell>
                     </TableRow>
                   ) : errorMessage ? (
@@ -425,7 +425,7 @@ const AccessRight = () => {
                   ) : rows.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={columns.length + 2} align='center'>
-                        Không có dữ liệu
+                        Data is not available
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -498,7 +498,7 @@ const AccessRight = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsOpenDel(false)} color='primary'>
-           No
+            No
           </Button>
         </DialogActions>
       </Dialog>

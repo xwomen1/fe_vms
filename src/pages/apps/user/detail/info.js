@@ -331,6 +331,11 @@ const UserDetails = () => {
 
       return
     }
+    if (!gender) {
+      Swal.fire('error!', 'Gender cannot be blank', 'error')
+
+      return
+    }
     if (!email) {
       Swal.fire('error!', 'Email cannot be left blank', 'error')
 

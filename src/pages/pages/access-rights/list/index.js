@@ -501,16 +501,7 @@ const AccessRight = () => {
                   >
                     <Icon icon='tabler:file-export' />
                   </IconButton>
-                  <IconButton
-                    aria-label='Thêm mới'
-                    color='primary'
-                    onClick={() => {
-                      setIsOpenAdd(true)
-                    }}
-                    disabled={tab === 'setPermissions' ? false : true}
-                  >
-                    <Icon icon='tabler:square-plus' />
-                  </IconButton>
+
                   <IconButton
                     aria-label='Bộ lọc'
                     onClick={() => {
@@ -520,6 +511,17 @@ const AccessRight = () => {
                   >
                     <Icon icon='tabler:filter' />
                   </IconButton>
+                  <Button
+                    variant='contained'
+                    aria-label='Add'
+                    color='primary'
+                    onClick={() => {
+                      setIsOpenAdd(true)
+                    }}
+                    disabled={tab === 'setPermissions' ? false : true}
+                  >
+                    Add
+                  </Button>
                 </Box>
               </Grid>
               <Grid item>

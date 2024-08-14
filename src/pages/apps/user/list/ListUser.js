@@ -286,7 +286,7 @@ const UserList = ({ apiData }) => {
               <CustomTextField
                 value={valueGroup}
                 sx={{ mr: 4 }}
-                placeholder='Search Group'
+                placeholder='Search Department'
                 onChange={e => handleFilterGroup(e.target.value)}
               />
               <TreeView

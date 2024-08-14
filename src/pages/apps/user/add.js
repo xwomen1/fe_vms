@@ -74,6 +74,9 @@ const Add = () => {
   const [filteredRegionOptions, setFilteredRegionOptions] = useState(user?.level)
   const [filteredContractOptions, setFilteredContractOptions] = useState(user?.contractType)
   const [gender, setGender] = useState('')
+  const [isLeader, setIsLeader] = useState(false)
+  const [groups, setGroup] = useState([])
+
   let groupACIds = []
   const [regionOptions, setRegionOptions] = useState([])
 
@@ -219,6 +222,11 @@ const Add = () => {
     }
     if (!email) {
       Swal.fire('error!', 'Email cannot be blank', 'error')
+
+      return
+    }
+    if (!gender) {
+      Swal.fire('error!', 'Gender cannot be blank', 'error')
 
       return
     }
@@ -403,7 +411,7 @@ const Add = () => {
         const userGroup = {
           groupId: groupId,
           policyName: true,
-          isLeader: false
+          isLeader: row.isLeader
         }
         processedGroups.push(userGroup)
         console.log(userGroup)
@@ -769,15 +777,15 @@ const Add = () => {
               <TextField rows={4} multiline label='Note' onChange={handleNoteChange} fullWidth />
             </Grid>
             <Grid item xs={12}>
-              <Typography variant='h5'>Group</Typography>
+              <Typography variant='h5'>Department</Typography>
             </Grid>
             <Grid item xs={11.8}>
               <TableContainer>
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Group</TableCell>
-                      <TableCell>Group Code</TableCell>
+                      <TableCell>Department</TableCell>
+                      <TableCell>Department Code</TableCell>
                       <TableCell align='right'>Is Leader</TableCell>
                       <TableCell align='center'>
                         <IconButton size='small' onClick={handleAddRow} sx={{ marginLeft: '10px' }}>
@@ -802,12 +810,27 @@ const Add = () => {
                               // updatedRows[index].id = newValue.id
                               setRows(updatedRows)
                             }}
-                            renderInput={params => <TextField {...params} label='Group' />}
+                            renderInput={params => <TextField {...params} label='Department' />}
                           />
                         </TableCell>
                         {console.log(rows)}
                         <TableCell>{row.code}</TableCell>
-                        <TableCell align='right'>{formatIsLeader(row.isLeader)}</TableCell>
+                        <TableCell align='right'>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={row.isLeader}
+                                onChange={event => {
+                                  const updatedRows = [...rows]
+                                  updatedRows[index].isLeader = event.target.checked // Cập nhật giá trị isLeader
+                                  setRows(updatedRows)
+                                  setIsLeader(event.target.checked) // Cập nhật state isLeader
+                                }}
+                              />
+                            }
+                            label='Is Leader'
+                          />
+                        </TableCell>{' '}
                         <TableCell align='center'>
                           {index > 0 && (
                             <IconButton size='small' onClick={() => handleDeleteRow(index)}>
