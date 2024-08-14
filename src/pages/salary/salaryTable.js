@@ -408,7 +408,7 @@ const SalaryTable = ({ apiData }) => {
               <CustomTextField
                 value={valueGroup}
                 sx={{ mr: 4 }}
-                placeholder='Search Group'
+                placeholder='Search Department'
                 onChange={e => handleFilterGroup(e.target.value)}
               />
               <TreeView
@@ -430,7 +430,7 @@ const SalaryTable = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>No.</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Access Code</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Full Name</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Group</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Department</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Base Salary</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Salary Grade</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Responsibility Allowance</TableCell>

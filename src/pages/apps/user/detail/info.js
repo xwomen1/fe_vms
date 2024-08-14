@@ -1150,7 +1150,7 @@ const UserDetails = () => {
                                   setGroup(updatedRows)
                                   console.log(updatedRows, 'hihih')
                                 }}
-                                renderInput={params => <TextField {...params} label='Group' />}
+                                renderInput={params => <TextField {...params} label='Department' />}
                               />
                             </TableCell>
                             {console.log('Group:', group)}
