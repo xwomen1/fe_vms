@@ -446,40 +446,15 @@ const Add = ({ show, onClose, setReload }) => {
                   }}
                 />
               </Grid>
-              <Grid item xs={3}>
-                <DatePickerWrapper>
-                  <div>
-                    <DatePicker
-                      selected={start}
-                      id='basic-input'
-                      onChange={date => setStart(date)}
-                      placeholderText='Start Date'
-                      customInput={<CustomInput label='Start Date' />}
-                    />
-                  </div>
-                </DatePickerWrapper>
-              </Grid>
-              <Grid item xs={3}>
-                <DatePickerWrapper>
-                  <div>
-                    <DatePicker
-                      selected={end}
-                      id='basic-input'
-                      onChange={date => setEnd(date)}
-                      placeholderText='End Date'
-                      customInput={<CustomInput label='End Date' />}
-                      minDate={start}
-                    />
-                  </div>
-                </DatePickerWrapper>
-              </Grid>
+
               <Grid item xs={2}>
                 <FormControlLabel
                   control={<Checkbox onChange={handleCheckboxChange} />}
-                  label='Alway'
+                  label='Always'
                   style={{ marginTop: '25px' }}
                 />
               </Grid>
+              <Grid item xs={6}></Grid>
               <Grid item>Time Settings</Grid>
               <Grid item xs={12}>
                 <Controller

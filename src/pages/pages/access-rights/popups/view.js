@@ -132,24 +132,7 @@ const format_form = [
     require: true,
     width: 6
   },
-  {
-    name: 'startDate',
-    label: 'Start Date',
-    placeholder: 'Start Date',
-    type: 'TextField',
-    data: [],
-    require: false,
-    width: 6
-  },
-  {
-    name: 'endDate',
-    label: 'End Date',
-    placeholder: 'End Date',
-    type: 'TextField',
-    data: [],
-    require: false,
-    width: 6
-  },
+
   {
     name: 'calendarDays',
     label: '',
@@ -235,26 +218,25 @@ const View = ({ show, onClose, id, setReload, filter }) => {
       5: 'THURSDAY',
       6: 'FRIDAY',
       7: 'SATURDAY'
-    };
-    
+    }
+
     const transformCalendarDays = calendarDays => {
-      console.log('calendarDays', calendarDays);
-    
+      console.log('calendarDays', calendarDays)
+
       return calendarDays.map(day => {
-        const { dayOfWeek, timePeriods } = day;
-        const value = dataDailyDefault.find(item => item.dayOfWeek === dayOfWeek)?.value || 1;
-    
-        const label = dayMapping[value] || 'SUNDAY';
-    
+        const { dayOfWeek, timePeriods } = day
+        const value = dataDailyDefault.find(item => item.dayOfWeek === dayOfWeek)?.value || 1
+
+        const label = dayMapping[value] || 'SUNDAY'
+
         return {
           label,
           dayOfWeek,
           value,
           timePeriods
-        };
-      });
-    };
-    
+        }
+      })
+    }
 
     useEffect(() => {
       if (detail && detail.calendarDays) {
@@ -347,7 +329,7 @@ const View = ({ show, onClose, id, setReload, filter }) => {
           </CustomCloseButton>
           <Box sx={{ mb: 8, textAlign: 'left' }}>
             <Typography variant='h3' sx={{ mb: 3 }}>
-            Schedule Configuration
+              Schedule Configuration
             </Typography>
           </Box>
           <form>

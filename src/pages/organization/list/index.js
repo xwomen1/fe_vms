@@ -243,7 +243,11 @@ const OrganizationalStructure = () => {
               </IconButton>
             </Box>
           }
-          onClick={() => console.log(node.id)}
+          onClick={async () => {
+            // await handleChangeTab(selectedTab) // Thay đổi tab
+            await fetchChildData(node.id) // Fetch lại dữ liệu cho bảng
+            console.log(node.id)
+          }}
           sx={{ marginLeft: '3%', marginTop: '4%' }}
           icon={
             node.isParent ? (
@@ -319,11 +323,6 @@ const OrganizationalStructure = () => {
                     Add
                   </Button>
                 </Typography>
-                <Typography variant='body2'>
-                  <Button variant='contained' onClick={() => handleOpenPopup(infra[selectedTab]?.id)}>
-                    Delete
-                  </Button>
-                </Typography>
               </Box>
             </Grid>
           }
@@ -371,6 +370,15 @@ const OrganizationalStructure = () => {
                               onClick={() => handleAddPClick(infraItem.id)}
                             >
                               <Icon icon='tabler:plus' />
+                            </IconButton>
+                            <IconButton
+                              size='small'
+                              onClick={() => {
+                                handleOpenPopup(infraItem.id)
+                                console.log(infraItem.id)
+                              }}
+                            >
+                              <Icon icon='tabler:trash' />
                             </IconButton>
                           </Box>
                         </Button>
@@ -426,7 +434,7 @@ const OrganizationalStructure = () => {
                     <Table>
                       <TableHead>
                         <TableRow>
-                          <TableCell>STT</TableCell>
+                          <TableCell>NO.</TableCell>
                           <TableCell>Name</TableCell>
                           <TableCell>Code</TableCell>
                           <TableCell>Action</TableCell>

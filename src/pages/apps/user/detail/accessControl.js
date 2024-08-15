@@ -106,7 +106,7 @@ const AccessRight = () => {
       flex: 0.15,
       minWidth: 100,
       align: 'left',
-      label: 'Group',
+      label: 'Department',
       field: 'groupName'
     },
     {

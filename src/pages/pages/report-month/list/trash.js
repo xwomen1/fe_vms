@@ -349,7 +349,7 @@ function ReportMonth({ history }) {
                         ))}
                         {matchingTimes.length > 0 && (
                           <div>
-                            Tổng thời gian:
+                            Total time
                             <div style={{ color: '#e28743' }}>{formatDuration(totalDuration)}</div>
                           </div>
                         )}

@@ -103,7 +103,7 @@ const RolePopup = ({ open, onClose, onSelect, userId }) => {
           },
           config
         )
-        Swal.fire('Thêm thành công', '', 'success')
+        Swal.fire('Successfully', '', 'success')
 
         onSelect(selectedRole)
         onClose()

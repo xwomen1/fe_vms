@@ -72,7 +72,7 @@ function ReportMonth({ history }) {
 
   useEffect(() => {
     fetchDataSource()
-  }, [ valueFilter.groupId])
+  }, [valueFilter.groupId])
 
   const fetchDataSource = async () => {
     setLoading(true)
@@ -424,7 +424,7 @@ function ReportMonth({ history }) {
                         ))}
                         {matchingTimes.length > 0 && (
                           <div>
-                            Tổng thời gian:
+                            Total time
                             <div style={{ color: '#e28743' }}>{formatDuration(totalDuration)}</div>
                           </div>
                         )}
