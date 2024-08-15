@@ -1004,10 +1004,11 @@ const navigation = () => {
     //       title: 'Switch',
     //       path: '/forms/form-elements/switch'
     //     },
-    //     {
-    //       title: 'File Uploader',
-    //       path: '/forms/form-elements/file-uploader'
-    //     },
+    // {
+    //   title: 'File Uploader',
+    //   path: '/forms/form-elements/file-uploader'
+    // }
+
     //     {
     //       title: 'Editor',
     //       path: '/forms/form-elements/editor'

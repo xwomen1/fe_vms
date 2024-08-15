@@ -1,5 +1,5 @@
-// ** React Imports
 import { Fragment, useState } from 'react'
+import axios from 'axios'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
@@ -23,15 +23,15 @@ const FileUploaderMultiple = () => {
   const { getRootProps, getInputProps } = useDropzone({
     onDrop: acceptedFiles => {
       setFiles(acceptedFiles.map(file => Object.assign(file)))
+    },
+    accept: {
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+      'application/vnd.ms-excel': ['.xls']
     }
   })
 
   const renderFilePreview = file => {
-    if (file.type.startsWith('image')) {
-      return <img width={38} height={38} alt={file.name} src={URL.createObjectURL(file)} />
-    } else {
-      return <Icon icon='tabler:file-description' />
-    }
+    return <Icon icon='tabler:file-spreadsheet' fontSize='1.75rem' />
   }
 
   const handleRemoveFile = file => {
@@ -63,6 +63,25 @@ const FileUploaderMultiple = () => {
     setFiles([])
   }
 
+  // ** Hàm xử lý upload files
+  const handleUploadFiles = async () => {
+    const formData = new FormData()
+    files.forEach(file => {
+      formData.append('file', file)
+    })
+
+    try {
+      const response = await axios.post('https://dev-ivi.basesystem.one/smc/iam/api/v0/import-excel', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      console.log('Upload thành công:', response.data)
+    } catch (error) {
+      console.error('Lỗi khi upload:', error)
+    }
+  }
+
   return (
     <Fragment>
       <div {...getRootProps({ className: 'dropzone' })}>
@@ -85,9 +104,7 @@ const FileUploaderMultiple = () => {
           <Typography variant='h4' sx={{ mb: 2.5 }}>
             Drop files here or click to upload.
           </Typography>
-          <Typography sx={{ color: 'text.secondary' }}>
-            (This is just a demo drop zone. Selected files are not actually uploaded.)
-          </Typography>
+          <Typography sx={{ color: 'text.secondary' }}>(Only Excel files are accepted)</Typography>
         </Box>
       </div>
       {files.length ? (
@@ -97,7 +114,9 @@ const FileUploaderMultiple = () => {
             <Button color='error' variant='outlined' onClick={handleRemoveAllFiles}>
               Remove All
             </Button>
-            <Button variant='contained'>Upload Files</Button>
+            <Button variant='contained' onClick={handleUploadFiles}>
+              Upload Files
+            </Button>
           </div>
         </Fragment>
       ) : null}
