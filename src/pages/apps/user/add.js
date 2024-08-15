@@ -227,21 +227,7 @@ const Add = () => {
 
       return
     }
-    if (!identityNumber) {
-      Swal.fire('error!', 'Identify number cannot be blank', 'error')
 
-      return
-    }
-    if (!userCode) {
-      Swal.fire('error!', 'Code cannot be blank', 'error')
-
-      return
-    }
-    if (!syncCode) {
-      Swal.fire('error!', 'Synchronize code cannot be blank', 'error')
-
-      return
-    }
     if (!account) {
       Swal.fire('error!', 'Account Name cannot be blank', 'error')
 
