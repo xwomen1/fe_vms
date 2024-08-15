@@ -171,7 +171,6 @@ const TimeLine = [
   { id: '24', name: '24:00:00' },
 ];
 
-
 const Add = ({ open, onClose, id, setReload }) => {
   const [loading, setLoading] = useState(false)
   const [detail, setDetail] = useState(null)
@@ -437,7 +436,7 @@ const Add = ({ open, onClose, id, setReload }) => {
       </CustomCloseButton>
       <DialogContent>
         <Box sx={{ m: 5, textAlign: 'left' }}>
-          <Typography variant='h3' sx={{ mb: 3 }} color='#FF9F43'>
+          <Typography variant='h3' sx={{ mb: 3 }}>
             Chi tiết dịch vụ
           </Typography>
         </Box>
