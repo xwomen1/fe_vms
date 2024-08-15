@@ -209,7 +209,8 @@ const UserDetails = () => {
       customClass: {
         content: 'content-class',
         confirmButton: 'swal-btn-confirm'
-      }
+      },
+      confirmButtonColor: '#002060'
     }
 
     return Swal.fire({ ...defaultProps, ...options })
@@ -327,51 +328,141 @@ const UserDetails = () => {
     const genderMapping = { MALE: 'MALE', FEMALE: 'FEMALE', OTHER: 'OTHER' }
     const genderValue = genderMapping[gender]
     if (!fullNameValue || fullNameValue.length <= 3) {
-      Swal.fire('error!', 'Name cannot be blank and length must be >3', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error!, Name cannot be blank and length must be >3',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
     if (!gender) {
-      Swal.fire('error!', 'Gender cannot be blank', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Gender cannot be blank',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
     if (!email) {
-      Swal.fire('error!', 'Email cannot be left blank', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Email cannot be blank',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
     if (!phoneNumber) {
-      Swal.fire('error!', 'Phone Number cannot be left blank', 'error')
-
-      return
-    }
-    if (!identityNumber) {
-      Swal.fire('error!', 'Identify number cannot be left blank', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Phone Number  cannot be blank',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
 
     if (userGroups.length === 0) {
-      Swal.fire('error!', 'Group cannot be left blank', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Department cannot be blank',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
+
+      return
+    }
+    if (!userCode) {
+      Swal.fire({
+        title: 'error!',
+        text: 'error! userCode  cannot be blank',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
-      Swal.fire('error!', 'Invalid email address', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Invalid email address',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
 
     const phoneRegex = /^\d+$/
     if (!phoneRegex.test(phoneNumber)) {
-      Swal.fire('error!', 'Phone Number invalid', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Phone Number invalid',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
     if (!phoneNumber || phoneNumber.length <= 9) {
-      Swal.fire('error!', 'Phone Number invalid', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Phone Number invalid',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
@@ -379,7 +470,17 @@ const UserDetails = () => {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
       const processedGroups = await userGroups(groups) // Call the userGroups function passing rows
       if (processedGroups.length === 0) {
-        Swal.fire('error!', 'Group User cannot leave blank.', 'error')
+        Swal.fire({
+          title: 'error!',
+          text: 'error! Department User cannot leave blank.',
+          willOpen: () => {
+            const confirmButton = Swal.getConfirmButton()
+            if (confirmButton) {
+              confirmButton.style.backgroundColor = '#002060'
+              confirmButton.style.color = 'white'
+            }
+          }
+        })
 
         return
       }
@@ -427,7 +528,18 @@ const UserDetails = () => {
         console.error('There is no groupACId in the array')
       }
 
-      Swal.fire('Success!', 'Data has been updated successfully.', 'success')
+      Swal.fire({
+        title: 'Successful!',
+        text: 'Data has been updated successfully',
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
     } catch (error) {
       console.error('Error updating user details:', error)
       Swal.fire('error!', error?.response?.data?.message, 'error')
@@ -826,18 +938,18 @@ const UserDetails = () => {
               </Grid>
               <Grid container spacing={2}>
                 <Grid item xs={4}>
-                  <TextField label='Name' value={fullNameValue} onChange={handleFullNameChange} fullWidth />
+                  <TextField label='Name*' value={fullNameValue} onChange={handleFullNameChange} fullWidth />
                 </Grid>
                 {console.log(user.userAccount.accStatus)}
                 <Grid item xs={4}>
-                  <TextField label='Email' value={email} onChange={handleEmailChange} fullWidth />
+                  <TextField label='Email*' value={email} onChange={handleEmailChange} fullWidth />
                 </Grid>
 
                 <Grid item xs={3.8}>
                   {' '}
                   {/* Sửa đổi xs={4} thành xs={8} */}
                   <TextField
-                    label='Phone Number'
+                    label='Phone Number*'
                     value={phoneNumber}
                     onChange={handlePhoneNumberChange}
                     fullWidth // Thêm thuộc tính fullWidth vào đây
@@ -846,7 +958,7 @@ const UserDetails = () => {
                 <Grid item xs={4}>
                   {/* Update Select to use the gender state */}
                   <FormControl fullWidth>
-                    <InputLabel id='gender-label'>Gender</InputLabel>
+                    <InputLabel id='gender-label'>Gender*</InputLabel>
                     <Select
                       labelId='gender-label'
                       id='gender-select'
@@ -854,22 +966,22 @@ const UserDetails = () => {
                       onChange={handleGenderChange} // Update onChange handler
                     >
                       {/* MenuItems for gender options */}
-                      <MenuItem value='MALE'>Nam</MenuItem>
-                      <MenuItem value='FEMALE'>Nữ</MenuItem>
-                      <MenuItem value='OTHER'>Khác</MenuItem>
+                      <MenuItem value='MALE'>MALE</MenuItem>
+                      <MenuItem value='FEMALE'>FEMALE</MenuItem>
+                      <MenuItem value='OTHER'>OTHER</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
                 <Grid item xs={4}>
                   <TextField
-                    label='Identify number'
+                    label='Identify number*'
                     value={identityNumber}
                     onChange={handleIdentityNumberChange}
                     fullWidth
                   />
                 </Grid>
                 <Grid item xs={3.8}>
-                  <TextField label='Code' defaultValue={userCode} onChange={handleUserCodeChange} fullWidth />
+                  <TextField label='Code*' defaultValue={userCode} onChange={handleUserCodeChange} fullWidth />
                 </Grid>
                 <Grid item xs={4}>
                   <TextField
@@ -1096,7 +1208,7 @@ const UserDetails = () => {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <Typography variant='h5'>Department</Typography>
+                  <Typography variant='h5'>Department*</Typography>
                 </Grid>
                 <Grid item xs={11.8}>
                   <TableContainer>
@@ -1193,7 +1305,7 @@ const UserDetails = () => {
                 </Grid>
                 <Grid item xs={4}>
                   <TextField
-                    label='Account'
+                    label='Account*'
                     defaultValue={user?.userAccount.username}
                     onChange={handleUserNameChange}
                     id='form-props-read-only-input'

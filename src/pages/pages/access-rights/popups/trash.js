@@ -56,37 +56,37 @@ const dataDailyDefault = [
     value: 1
   },
   {
-    label: 'MONDAY',
+    label: 'Thứ 2',
     dayOfWeek: 'MONDAY',
     value: 2
   },
   {
-    label: 'TUESDAY',
+    label: 'Thứ 3',
     dayOfWeek: 'TUESDAY',
     value: 3
   },
   {
-    label: 'WEDNESDAY',
+    label: 'Thứ 4',
     dayOfWeek: 'WEDNESDAY',
     value: 4
   },
   {
-    label: 'THURSDAY',
+    label: 'Thứ 5',
     dayOfWeek: 'THURSDAY',
     value: 5
   },
   {
-    label: 'FRIDAY',
+    label: 'Thứ 6',
     dayOfWeek: 'FRIDAY',
     value: 6
   },
   {
-    label: 'SATURDAY',
+    label: 'Thứ 7',
     dayOfWeek: 'SATURDAY',
     value: 7
   },
   {
-    label: 'SUNDAY',
+    label: 'CN',
     dayOfWeek: 'SUNDAY',
     value: 8
   }
@@ -269,37 +269,104 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
     }
   }
 
-  const dayMapping = {
-    1: 'SUNDAY',
-    2: 'MONDAY',
-    3: 'TUESDAY',
-    4: 'WEDNESDAY',
-    5: 'THURSDAY',
-    6: 'FRIDAY',
-    7: 'SATURDAY'
-  }
-
-  const transformCalendarDays = calendarDays => {
-    return calendarDays.map(day => {
-      const { dayOfWeek, timePeriods } = day
-      const value = dataDailyDefault.find(item => item.dayOfWeek === dayOfWeek)?.value || 1
-
-      return {
-        label: dayMapping[value] || 'SUNDAY',
-        dayOfWeek,
-        value,
-        timePeriods
-      }
-    })
-  }
-
-  useEffect(() => {
-    if (detail && detail.calendarDays) {
-      const transformedData = transformCalendarDays(detail.calendarDays)
-      setDataDailyState(transformedData)
-      setDataDaily(transformedData)
+  const ViewContent = () => {
+    const dayMapping = {
+      1: 'SUNDAY',
+      2: 'MONDAY',
+      3: 'TUESDAY',
+      4: 'WEDNESDAY',
+      5: 'THURSDAY',
+      6: 'FRIDAY',
+      7: 'SATURDAY'
     }
-  }, [detail])
+
+    const transformCalendarDays = calendarDays => {
+      console.log('calendarDays', calendarDays)
+
+      return calendarDays.map(day => {
+        const { dayOfWeek, timePeriods } = day
+        const value = dataDailyDefault.find(item => item.dayOfWeek === dayOfWeek)?.value || 1
+
+        const label = dayMapping[value] || 'SUNDAY'
+
+        return {
+          label,
+          dayOfWeek,
+          value,
+          timePeriods
+        }
+      })
+    }
+
+    useEffect(() => {
+      if (detail && detail.calendarDays) {
+        const transformedData = transformCalendarDays(detail.calendarDays)
+        setDataDailyState(transformedData)
+        setDataDaily(transformedData)
+      }
+    }, [detail])
+
+    return (
+      <div>
+        <div
+          style={{
+            color: '#333',
+            margin: '20px 0 20px 0'
+          }}
+        >
+          <span>Time Settings</span>
+        </div>
+
+        <div
+          style={{
+            width: '100%'
+          }}
+        >
+          <div
+            style={{
+              marginLeft: 50,
+              width: 'calc(100% - 150px)',
+              position: 'relative',
+              color: 'rgba(0, 0, 0, 0.6)',
+              fontSize: 14,
+              display: 'flex'
+            }}
+          >
+            {['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'].map((time, index) => (
+              <div
+                key={index.toString()}
+                style={{
+                  width: `${100 / 6}%`,
+                  textAlign: 'center',
+                  padding: '8px 0'
+                }}
+              >
+                {time}
+              </div>
+            ))}
+            <div
+              style={{
+                position: 'absolute',
+                right: -70,
+                textAlign: 'center',
+                padding: '8px 0'
+              }}
+            >
+              24:00
+            </div>
+          </div>
+
+          <Daily
+            callbackOfDaily={v => {
+              setDataDaily(v)
+              setDataDailyState(v)
+            }}
+            dataDailyProps={dataDailyState}
+          />
+        </div>
+      </div>
+    )
+  }
 
   const handleSave = async () => {
     try {
@@ -503,30 +570,33 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
                     </Grid>
                   )
                 }
+
+                if (item.type == 'Schedule') {
+                  return (
+                    <Grid item xs={12} key={index}>
+                      <span style={{ color: '#f5963a', fontSize: 20, position: 'relative' }}>
+                        Operating Time Configuration
+                        <span
+                          style={{
+                            position: 'absolute',
+                            left: 0,
+                            bottom: -10,
+                            display: 'inline-block',
+                            content: '',
+                            width: '100%',
+                            height: '5px',
+                            background: '#7ebbfc',
+                            borderRadius: 25
+                          }}
+                        />
+                      </span>
+                      {ViewContent()}
+                    </Grid>
+                  )
+                }
               })}
 
-              <Grid item xs={12}>
-                {' '}
-                <Box>
-                  <Controller
-                    name='calendarDays'
-                    control={control}
-                    render={() => (
-                      <Daily
-                        callbackOfDaily={v => {
-                          setDataDaily(v)
-                          setDataDailyState(v)
-                        }}
-                        dataDailyProps={dataDailyState}
-                        disabled={isCheckboxChecked}
-                        error={Boolean(errors.calendarDays)}
-                        aria-describedby='validation-basic-last-name'
-                        {...(errors.calendarDays && { helperText: 'This field is required' })}
-                      />
-                    )}
-                  />
-                </Box>
-              </Grid>
+              <Grid item xs={12}></Grid>
             </Grid>
           </form>
         </DialogContent>
