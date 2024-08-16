@@ -538,7 +538,7 @@ const UserDetails = () => {
             confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
-        }
+        } 
       })
     } catch (error) {
       console.error('Error updating user details:', error)
