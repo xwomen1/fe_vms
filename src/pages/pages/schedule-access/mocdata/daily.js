@@ -214,7 +214,7 @@ const Daily = ({ dataDailyProps, callbackOfDaily, disabled }) => {
               }}
             >
               <div style={{ minWidth: 80 }}>{item.label}</div>
-              {index === 1 ? (
+              {index === 0 ? (
                 <div style={{ width: 35 }} />
               ) : (
                 <IconButton style={{ padding: 1, marginRight: 8, width: 22 }} onClick={() => onClickIconCopy(item)}>
