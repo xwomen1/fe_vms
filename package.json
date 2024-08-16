@@ -64,6 +64,7 @@
     "fabric": "^6.0.2",
     "fabric-pure-browser": "^5.1.0",
     "fabricjs-react": "^1.2.2",
+    "file-saver": "^2.0.5",
     "firebase": "^10.8.0",
     "i18next": "^22.4.15",
     "i18next-browser-languagedetector": "^7.0.1",

@@ -188,11 +188,31 @@ const Add = ({ show, onClose, setReload }) => {
 
   const handleSelectChangeGroup = async nameGroupUser => {
     try {
-      const res = await axios.get(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups/`, config)
+      let allUserGroups = []
+      let currentPage = 1
+      const limit = 50
 
-      const userGroups = res?.data?.rows
+      while (true) {
+        const res = await axios.get(
+          `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups/?page=${currentPage}&limit=${limit}`,
+          config
+        )
+        const userGroups = res?.data?.rows
 
-      const matchedGroup = userGroups.find(group => group.name === nameGroupUser.name)
+        if (userGroups.length === 0) {
+          break
+        }
+
+        allUserGroups = [...allUserGroups, ...userGroups]
+
+        if (userGroups.length < limit) {
+          break
+        }
+
+        currentPage++
+      }
+      const matchedGroup = allUserGroups.find(group => group.name === nameGroupUser.name)
+      console.log(matchedGroup, 'matchedGroup')
 
       if (matchedGroup) {
         setSelectedGroupId(matchedGroup.id)

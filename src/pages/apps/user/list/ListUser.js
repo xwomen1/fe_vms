@@ -115,6 +115,20 @@ const UserList = ({ apiData }) => {
         }
       })
       console.log('Upload thành công:', response.data)
+      setOpenImportDialog(false)
+      fetchFilteredOrAllUsers()
+      Swal.fire({
+        title: 'Successful!',
+        text: 'Import Successful',
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
     } catch (error) {
       console.error('Lỗi khi upload:', error)
     }
@@ -293,6 +307,37 @@ const UserList = ({ apiData }) => {
 
   console.log(total, 'totalpage')
 
+  const fetchFilteredOrAllUsers = async () => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        params: {
+          limit: pageSize,
+          page: page,
+          keyword: value
+        }
+      }
+      let url
+      if (selectedGroups.length > 0) {
+        url = `https://dev-ivi.basesystem.one/smc/iam/api/v0/users/search?groupIds=${selectedGroups
+          .map(g => g.groupId)
+          .join(',')}`
+      } else {
+        url = 'https://dev-ivi.basesystem.one/smc/iam/api/v0/users/search'
+      }
+      const response = await axios.get(url, config)
+      setUserData(response.data.rows)
+      setContractName(response.data.rows.contractType)
+      setTotal(response.data.totalPage)
+    } catch (error) {
+      console.error('Error fetching users:', error)
+    }
+  }
+
   const handleDelete = idDelete => {
     showAlertConfirm({
       text: 'Are you sure you want to delete?'
@@ -325,6 +370,7 @@ const UserList = ({ apiData }) => {
               }
             })
             const updatedData = userData.filter(user => user.userId !== idDelete)
+            fetchFilteredOrAllUsers()
             setUserData(updatedData)
             fetchData()
           })
