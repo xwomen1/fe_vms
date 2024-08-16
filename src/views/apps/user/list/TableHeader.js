@@ -50,7 +50,7 @@ const TableHeader = ({ handleFilter, exportValue, importValue, toggle, value, on
         </Button> */}
         <Button variant='contained' sx={{ '& svg': { mr: 1 }, mr: 1 }}>
           <a style={{ 'font-weight': 'initial', 'margin-left': 10 }} onClick={downloadFileExample}>
-            Tải file mẫu
+          Download sample file
           </a>{' '}
         </Button>
         <hr />
