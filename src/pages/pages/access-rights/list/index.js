@@ -536,7 +536,14 @@ const AccessRight = () => {
                       </Box>
                     ),
                     endAdornment: (
-                      <IconButton size='small' title='Clear' aria-label='Clear'>
+                      <IconButton
+                        size='small'
+                        title='Clear'
+                        aria-label='Clear'
+                        onClick={() => {
+                          setValue('') // Đặt giá trị thành '' khi bấm vào biểu tượng x
+                        }}
+                      >
                         <Icon fontSize='1.25rem' icon='tabler:x' />
                       </IconButton>
                     )

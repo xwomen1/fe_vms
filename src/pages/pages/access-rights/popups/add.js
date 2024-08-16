@@ -143,6 +143,7 @@ const Add = ({ show, onClose, setReload }) => {
   }
 
   const API_REGIONS = `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/`
+  const API_REGIONS_ID = `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/`
 
   const fetchDepartment = async () => {
     setLoading(true)
@@ -177,53 +178,66 @@ const Add = ({ show, onClose, setReload }) => {
 
   const handleSelectChange = async selectedValue => {
     try {
-      const selectedGroup = groupName.find(group => group.id === selectedValue)
-
-      if (!selectedGroup) {
-        console.error('Selected group not found:', selectedValue)
-
-        return
-      }
-
-      const postData = {
-        id: selectedGroup.id,
-        name: selectedGroup.name,
-        type: 'USER'
-      }
-
-      const response = await axios.post(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups`,
-        postData
-      )
-
-      console.log('POST request successful:', response.data)
+      const res = await axios.get(`${API_REGIONS_ID}/${selectedValue}`, config)
+      const nameGroup = res?.data
+      handleSelectChangeGroup(nameGroup)
     } catch (error) {
-      if (error.response && error.response.status === 400) {
-        try {
-          const selectedGroup = groupName.find(group => group.id === selectedValue)
+      console.error('Error fetching data: ', error)
+    }
+  }
 
-          const params = {
-            params: {
-              keyword: selectedGroup.name
-            }
-          }
+  const handleSelectChangeGroup = async nameGroupUser => {
+    try {
+      let allUserGroups = []
+      let currentPage = 1
+      const limit = 50
 
-          const res = await axios.get(
-            `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups/`,
-            params,
-            config
-          )
-          const userGroups = res.data.rows
-          const matchedGroup = userGroups.find(group => group.name === selectedGroup.name)
-          if (matchedGroup) {
-            setSelectedGroupId(matchedGroup.id)
-          } else {
-            console.error('Matched group not found in user groups:', selectedGroup.name)
-          }
-        } catch (error) {
-          console.error('Error fetching user groups:', error)
+      while (true) {
+        const res = await axios.get(
+          `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups/?page=${currentPage}&limit=${limit}`,
+          config
+        )
+        const userGroups = res?.data?.rows
+
+        if (userGroups.length === 0) {
+          break
         }
+
+        allUserGroups = [...allUserGroups, ...userGroups]
+
+        if (userGroups.length < limit) {
+          break
+        }
+
+        currentPage++
       }
+      const matchedGroup = allUserGroups.find(group => group.name === nameGroupUser.name)
+      console.log(matchedGroup, 'matchedGroup')
+
+      if (matchedGroup) {
+        setSelectedGroupId(matchedGroup.id)
+      } else if (matchedGroup === undefined) {
+        const selectedGroup = nameGroupUser.id
+        const selectedGroupName = nameGroupUser.name
+
+        if (!selectedGroup) {
+          return
+        }
+
+        const postData = {
+          id: selectedGroup,
+          name: selectedGroupName,
+          type: 'USER'
+        }
+
+        const response = await axios.post(
+          `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups`,
+          postData
+        )
+        setSelectedGroupId(response?.data?.id)
+      }
+    } catch (error) {
+      console.error('Error handling group change:', error)
     }
   }
 
@@ -276,8 +290,6 @@ const Add = ({ show, onClose, setReload }) => {
   const handleAdd = async values => {
     setLoading(true)
     try {
-      console.log(values)
-
       const params = {
         ...values,
         groupId: selectedGroupId
@@ -362,7 +374,6 @@ const Add = ({ show, onClose, setReload }) => {
                       value={value}
                       onChange={e => {
                         const selectedValue = e.target.value
-                        console.log(selectedValue)
                         onChange(selectedValue)
                         handleSelectChange(selectedValue)
                       }}

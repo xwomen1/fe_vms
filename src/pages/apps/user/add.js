@@ -213,50 +213,157 @@ const Add = () => {
       return
     }
     if (!fullNameValue || fullNameValue.length <= 3) {
-      Swal.fire('error!', 'Name cannot be empty and length must be >3', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error!, Name cannot be blank and length must be >3',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
+
+      return
+    }
+    if (!gender) {
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Gender cannot be blank',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
     if (!email) {
-      Swal.fire('error!', 'Email cannot be blank', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Email cannot be blank',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
     if (!phoneNumber) {
-      Swal.fire('error!', 'Phone Number cannot be blank', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Phone Number  cannot be blank',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
+
+      return
+    }
+
+    if (!userCode) {
+      Swal.fire({
+        title: 'error!',
+        text: 'error! userCode  cannot be blank',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
 
     if (!account) {
-      Swal.fire('error!', 'Account Name cannot be blank', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Account  cannot be blank',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
     if (userGroups.length === 0) {
-      Swal.fire('error!', 'User group cannot be left blank.', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Department cannot be blank',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
-      Swal.fire('error!', 'Invalid email address.', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Invalid email address',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
-
     if (password.length < 6) {
-      Swal.fire('error!', 'Password must contain at least 6 characters.', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Password must contain at least 6 characters.',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,}$/
     if (!passwordRegex.test(password)) {
-      Swal.fire(
-        'error!',
-        'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
-        'error'
-      )
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
+
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
@@ -266,7 +373,17 @@ const Add = () => {
       const genderMapping = { MALE: 'MALE', FEMALE: 'FEMALE', OTHER: 'OTHER' }
 
       if (processedGroups.length === 0) {
-        Swal.fire('error!', 'User group cannot be left blank.', 'error')
+        Swal.fire({
+          title: 'error!',
+          text: 'error! Department User cannot leave blank.',
+          willOpen: () => {
+            const confirmButton = Swal.getConfirmButton()
+            if (confirmButton) {
+              confirmButton.style.backgroundColor = '#002060'
+              confirmButton.style.color = 'white'
+            }
+          }
+        })
 
         return
       }
@@ -317,8 +434,18 @@ const Add = () => {
         console.error('There is no groupACId in the array.')
       }
 
-      Swal.fire('Success!', 'New user added successfully.', 'success')
-
+      Swal.fire({
+        title: 'Successful!',
+        text: 'Add user successfully',
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
       router.push(`/apps/user/detail/${response.data.userId}`)
     } catch (error) {
       console.error('Error updating user details:', error)
@@ -552,18 +679,18 @@ const Add = () => {
           </Grid>
           <Grid container spacing={2} style={{ marginLeft: 10 }}>
             <Grid item xs={4}>
-              <TextField label='Name' onChange={handleFullNameChange} fullWidth />
+              <TextField label='Name*' onChange={handleFullNameChange} fullWidth />
             </Grid>
             <Grid item xs={4}>
-              <TextField label='Email' onChange={handleEmailChange} fullWidth />
+              <TextField label='Email*' onChange={handleEmailChange} fullWidth />
             </Grid>
             <Grid item xs={3.8}>
-              <TextField label='Phone Number' onChange={handlePhoneNumberChange} fullWidth />
+              <TextField label='Phone Number*' onChange={handlePhoneNumberChange} fullWidth />
             </Grid>
             <Grid item xs={4}>
               {/* Update Select to use the gender state */}
               <FormControl fullWidth>
-                <InputLabel id='gender-label'>Gender</InputLabel>
+                <InputLabel id='gender-label'>Gender*</InputLabel>
                 <Select
                   labelId='gender-label'
                   id='gender-select'
@@ -578,10 +705,10 @@ const Add = () => {
               </FormControl>
             </Grid>
             <Grid item xs={4}>
-              <TextField label='Identify number' onChange={handleIdentityNumberChange} fullWidth />
+              <TextField label='Identify number*' onChange={handleIdentityNumberChange} fullWidth />
             </Grid>
             <Grid item xs={3.8}>
-              <TextField label='Code' onChange={handleUserCodeChange} fullWidth />
+              <TextField label='Code*' onChange={handleUserCodeChange} fullWidth />
             </Grid>
             <Grid item xs={4}>
               <TextField label='Synchronize code' onChange={handleSyncCodeChange} fullWidth />
@@ -755,7 +882,7 @@ const Add = () => {
               <TextField rows={4} multiline label='Note' onChange={handleNoteChange} fullWidth />
             </Grid>
             <Grid item xs={12}>
-              <Typography variant='h5'>Department</Typography>
+              <Typography variant='h5'>Department*</Typography>
             </Grid>
             <Grid item xs={11.8}>
               <TableContainer>
@@ -795,11 +922,9 @@ const Add = () => {
                         <TableCell>{row.code}</TableCell>
                         <TableCell align='right'>{formatIsLeader(row.isLeader)}</TableCell>
                         <TableCell align='center'>
-                          {index > 0 && (
-                            <IconButton size='small' onClick={() => handleDeleteRow(index)}>
-                              <Icon icon='bi:trash' />
-                            </IconButton>
-                          )}
+                          <IconButton size='small' onClick={() => handleDeleteRow(index)}>
+                            <Icon icon='bi:trash' />
+                          </IconButton>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -824,13 +949,13 @@ const Add = () => {
                 <Typography variant='h5'>Create Login Account</Typography>
               </Grid>
               <Grid item xs={4}>
-                <TextField label='Account' onChange={handleAccountChange} fullWidth />
+                <TextField label='Account*' onChange={handleAccountChange} fullWidth />
               </Grid>
               <Grid item xs={4}>
-                <TextField label='Password' type='password' onChange={handlePasswordChange} fullWidth />
+                <TextField label='Password*' type='password' onChange={handlePasswordChange} fullWidth />
               </Grid>
               <Grid item xs={3.8}>
-                <TextField label='Confirm password' type='password' onChange={handleConfirmPasswordChange} fullWidth />
+                <TextField label='Confirm password*' type='password' onChange={handleConfirmPasswordChange} fullWidth />
               </Grid>
               <Grid item xs={2} style={{ marginTop: '1.1%' }}>
                 <FormControlLabel
@@ -884,11 +1009,9 @@ const Add = () => {
                           </TableCell>
                           <TableCell>{row.description}</TableCell>
                           <TableCell align='center'>
-                            {index > 0 && (
-                              <IconButton size='small' onClick={() => handleDeleteRow(index)}>
-                                <Icon icon='bi:trash' />
-                              </IconButton>
-                            )}
+                            <IconButton size='small' onClick={() => handleDeleteRow(index)}>
+                              <Icon icon='bi:trash' />
+                            </IconButton>
                           </TableCell>
                         </TableRow>
                       ))}

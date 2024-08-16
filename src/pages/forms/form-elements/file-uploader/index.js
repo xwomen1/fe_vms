@@ -51,28 +51,6 @@ const FileUploader = () => {
             <FileUploaderMultiple />
           </CardSnippet>
         </Grid>
-        <Grid item xs={12}>
-          <CardSnippet
-            title='Upload Single Files'
-            code={{
-              tsx: null,
-              jsx: source.FileUploaderSingleJSXCode
-            }}
-          >
-            <FileUploaderSingle />
-          </CardSnippet>
-        </Grid>
-        <Grid item xs={12}>
-          <CardSnippet
-            title='Upload Files with Restrictions'
-            code={{
-              tsx: null,
-              jsx: source.FileUploaderRestrictionsJSXCode
-            }}
-          >
-            <FileUploaderRestrictions />
-          </CardSnippet>
-        </Grid>
       </Grid>
     </DropzoneWrapper>
   )
