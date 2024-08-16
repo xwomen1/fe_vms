@@ -9,7 +9,7 @@ const RolePopup = ({ open, onClose, onSelect, nvr }) => {
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Cấu hình hình ảnh</DialogTitle>
+      <DialogTitle>Image configuration </DialogTitle>
       <DialogContent>
         <div style={{ width: '100%' }}>
           <Grid container spacing={2}>

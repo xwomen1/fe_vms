@@ -239,7 +239,7 @@ const EventConfig = () => {
 
   useEffect(() => {
     if (websocket) {
-      websocket.addEventListener('open', event => {})
+      websocket.addEventListener('open', event => { })
 
       websocket.addEventListener('message', handleMessage)
 
@@ -636,7 +636,7 @@ const EventConfig = () => {
           <CardContent>
             <Typography variant='h5'></Typography>
             <Typography variant='body1' alignLeft={2}>
-              Độ nhạy: {alert?.sensitivity}
+              Sensitivity: {alert?.sensitivity}
             </Typography>
             <Typography variant='body1' alignLeft={2}>
               Object: {alert?.target}
@@ -667,23 +667,23 @@ const EventConfig = () => {
       <StyledTreeItem key={group.id} nodeId={group.id} labelText={group.name} labelIcon='tabler:folder'>
         {group.cameras && group.cameras.length > 0
           ? group.cameras.map(camera => {
-              const matchedEvent = eventsData.find(event => event.id === camera.id)
+            const matchedEvent = eventsData.find(event => event.id === camera.id)
 
-              const labelText = matchedEvent
-                ? `${camera.deviceName} (${matchedEvent.statusValue.name})`
-                : camera.deviceName
+            const labelText = matchedEvent
+              ? `${camera.deviceName} (${matchedEvent.statusValue.name})`
+              : camera.deviceName
 
-              return (
-                <StyledTreeItem
-                  key={camera.id}
-                  nodeId={camera.id}
-                  labelText={camera.deviceName}
-                  matchedEvent={matchedEvent ? matchedEvent : ''}
-                  labelIcon='tabler:camera'
-                  onClick={() => handleItemClick(camera.id, camera.deviceName)}
-                />
-              )
-            })
+            return (
+              <StyledTreeItem
+                key={camera.id}
+                nodeId={camera.id}
+                labelText={camera.deviceName}
+                matchedEvent={matchedEvent ? matchedEvent : ''}
+                labelIcon='tabler:camera'
+                onClick={() => handleItemClick(camera.id, camera.deviceName)}
+              />
+            )
+          })
           : null}
       </StyledTreeItem>
     )
@@ -694,7 +694,7 @@ const EventConfig = () => {
       <Grid container spacing={2}>
         <Grid item xs={12} sm={3}>
           <Card>
-            <CardHeader title='Danh sách Camera' />
+            <CardHeader title='Camera List ' />
             <CardContent>
               <CustomTextField
                 value={keyword}
@@ -790,7 +790,7 @@ const EventConfig = () => {
                             variant='outlined'
                             disabled={!eventSelect}
                           >
-                            Lưu
+                            Save
                           </Button>
                         </Grid>
                         {isDraw == 'line' && (
@@ -822,7 +822,7 @@ const EventConfig = () => {
                             variant='outlined'
                             disabled={!eventSelect}
                           >
-                            Khoanh vùng
+                            Khoanh Region
                           </Button>
                         </Grid>
                         <Grid item xs={12} sm={6}>

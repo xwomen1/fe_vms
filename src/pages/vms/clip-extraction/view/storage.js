@@ -139,7 +139,7 @@ const Storage = ({ id, name, channel }) => {
                 const videoDownloadUrl = res.data[0].videoDownLoad[0].video
                 await handleExportLinkDownload(videoDownloadUrl)
               } else {
-                toast.error('Không tìm thấy URL tải về video', { duration: 6000 })
+                toast.error('Download URL for the video not found', { duration: 6000 })
               }
             } catch (error) {
               if (error && error.response && error.response.data) {
@@ -161,7 +161,7 @@ const Storage = ({ id, name, channel }) => {
 
       setLoading(false)
     } else {
-      toast.error('Tổng thời gian không được vượt quá 30 phút', { duration: 6000 })
+      toast.error('The total duration must not exceed 30 minutes', { duration: 6000 })
     }
   }
 
@@ -270,7 +270,7 @@ const Storage = ({ id, name, channel }) => {
                 {(camera.id === '' || play === false) && (
                   <div style={{ height: '30vh', background: '#000', display: 'flex', justifyContent: 'center' }}>
                     <IconButton disabled>
-                      <Icon icon='tabler:player-play-filled' width='48' height='48' style={{ color: '#FF9F43' }} />
+                      <Icon icon='tabler:player-play-filled' width='48' height='48' style={{ color: '#002060' }} />
                     </IconButton>
                   </div>
                 )}

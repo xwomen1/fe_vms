@@ -683,7 +683,7 @@ const AccessRight = () => {
                   <Table stickyHeader aria-label='sticky table'>
                     <TableHead>
                       <TableRow>
-                        <TableCell>STT</TableCell>
+                        <TableCell>NO.</TableCell>
                         {columns1.map(column => (
                           <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
                             {column.label}

@@ -263,7 +263,7 @@ const AddModelAI = ({ show, onClose, setReload, data, id, typePopup }) => {
     axios
       .put(`https://sbs.basesystem.one/ivis/vms/api/v0/camera-model-ai/${data.id}`, { ...params }, config)
       .then(() => {
-        toast.success('Dữ liệu thay đổi thành công')
+        toast.success('Data saved successfully')
         setReload()
         onClose()
       })
@@ -326,7 +326,7 @@ const AddModelAI = ({ show, onClose, setReload, data, id, typePopup }) => {
                             placeholder={item.placeholder}
                             error={Boolean(errors[item.name])}
                             aria-describedby='validation-basic-last-name'
-                            {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
+                            {...(errors[item.name] && { helperText: 'This field is required' })}
                           />
                         )}
                       />
@@ -336,8 +336,8 @@ const AddModelAI = ({ show, onClose, setReload, data, id, typePopup }) => {
               })}
               {typePopup !== 'view' && (
                 <Grid item xs={12}>
-                  <Typography sx={{ mb: 3, fontSize: '16px', fontStyle: 'italic', color: '#FF9F43' }}>
-                     Add AI Model Parameters
+                  <Typography sx={{ mb: 3, fontSize: '16px', fontStyle: 'italic', color: '#002060' }}>
+                    Add AI Model Parameters
                   </Typography>
                   <Button variant='contained' color='primary' sx={{ margin: '10px' }} onClick={handleAddNewField}>
                     ADD
@@ -364,7 +364,7 @@ const AddModelAI = ({ show, onClose, setReload, data, id, typePopup }) => {
             color={typePopup === 'view' ? 'primary' : 'secondary'}
             onClick={onClose}
           >
-            {typePopup === 'view' ? 'Đóng' : 'Cancel'}
+            {typePopup === 'view' ? 'Close' : 'Cancel'}
           </Button>
           {typePopup === 'add' && (
             <Button type='submit' variant='contained' onClick={handleSubmit(onSubmit)}>

@@ -99,7 +99,7 @@ const UserDetails = () => {
 
   function showAlertConfirm(options, intl) {
     const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Accept',
       imageWidth: 213,
       showCancelButton: true,
       showCloseButton: true,
@@ -363,7 +363,7 @@ const UserDetails = () => {
         axios
           .delete(urlDelete, config)
           .then(() => {
-            Swal.fire('Xóa thành công', '', 'success')
+            Swal.fire('Deleted successfully', '', 'success')
             fetchUserData()
           })
           .catch(err => {
@@ -393,7 +393,7 @@ const UserDetails = () => {
         axios
           .delete(urlDelete, config)
           .then(() => {
-            Swal.fire('Xóa thành công', '', 'success')
+            Swal.fire('Deleted successfully', '', 'success')
 
             // Tùy chỉnh việc cập nhật dữ liệu sau khi xóa
             fetchUserData()

@@ -92,7 +92,7 @@ const Edit = ({ open, onClose, nvr }) => {
       <CustomCloseButton onClick={onClose}>
         <Icon icon='tabler:x' fontSize='1.25rem' />
       </CustomCloseButton>
-      <DialogTitle>Chỉnh sửa</DialogTitle>
+      <DialogTitle>Edit </DialogTitle>
       <DialogContent>
         <TabContext value={value}>
           <Grid>

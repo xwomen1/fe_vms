@@ -175,7 +175,7 @@ const ClipExtraction = () => {
 
   useEffect(() => {
     if (websocket) {
-      websocket.addEventListener('open', event => {})
+      websocket.addEventListener('open', event => { })
 
       websocket.addEventListener('message', handleMessage)
 
@@ -232,10 +232,10 @@ const ClipExtraction = () => {
                   matchedEvent?.status === camera?.status && matchedEvent?.status !== undefined
                     ? camera?.status
                     : matchedEvent?.status !== camera?.status && matchedEvent?.status !== undefined
-                    ? matchedEvent?.status
-                    : matchedEvent?.status !== camera?.status && matchedEvent?.status === undefined
-                    ? camera?.status
-                    : false
+                      ? matchedEvent?.status
+                      : matchedEvent?.status !== camera?.status && matchedEvent?.status === undefined
+                        ? camera?.status
+                        : false
               }
             })
           }
@@ -282,18 +282,18 @@ const ClipExtraction = () => {
       <StyledTreeItem key={group.id} nodeId={group.id} labelText={group.name} labelIcon='tabler:folder'>
         {group.cameras && group.cameras.length > 0
           ? group.cameras.map(camera => {
-              return (
-                <StyledTreeItem
-                  key={camera.id}
-                  nodeId={camera.id}
-                  color={camera?.status == true ? '#28c76f' : ''}
-                  textDirection={camera.id === idCameraSelected ? 'underline' : ''}
-                  labelText={camera.deviceName}
-                  labelIcon='tabler:camera'
-                  onClick={() => handleSetCamera(camera)}
-                />
-              )
-            })
+            return (
+              <StyledTreeItem
+                key={camera.id}
+                nodeId={camera.id}
+                color={camera?.status == true ? '#28c76f' : ''}
+                textDirection={camera.id === idCameraSelected ? 'underline' : ''}
+                labelText={camera.deviceName}
+                labelIcon='tabler:camera'
+                onClick={() => handleSetCamera(camera)}
+              />
+            )
+          })
           : null}
       </StyledTreeItem>
     )
@@ -307,7 +307,7 @@ const ClipExtraction = () => {
             <TabList onChange={handleChange} aria-label='customized tabs example'>
               <Tab value='1' label='Extract clip' key={1} />
               <Tab value='2' label='Playback' key={2} />
-              <Tab value='3' label='Trực tiếp' key={3} />
+              <Tab value='3' label='Live' key={3} />
             </TabList>
           </Grid>
           <Grid item xs={12} sm={4} lg={2}>

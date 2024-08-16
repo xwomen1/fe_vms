@@ -159,7 +159,7 @@ const Review = ({ id, name, channel, data }) => {
                     {camera.id === '' &&
                         <div style={{ height: '70vh', background: '#000', display: 'flex', justifyContent: 'center' }}>
                             <IconButton disabled>
-                                <Icon icon="tabler:player-play-filled" width='48' height='48' style={{ color: '#FF9F43' }} />
+                                <Icon icon="tabler:player-play-filled" width='48' height='48' style={{ color: '#002060' }} />
                             </IconButton>
                         </div>
                     }
@@ -231,7 +231,7 @@ const Review = ({ id, name, channel, data }) => {
                                     <Icon icon='tabler:minus' size='1em' color='#FFF' />
                                 </IconButton>
                                 <Typography style={{ color: '#fff', fontWeight: 'bold' }}>
-                                    {`${minutes} phút - ${seconds} giây`}
+                                    {`${minutes} Minute - ${seconds} Second`}
                                 </Typography>
                             </Box>
                             <Box className='w-100'>

@@ -92,17 +92,17 @@ const Edit = ({ open, onClose, nvr }) => {
       <CustomCloseButton onClick={onClose}>
         <Icon icon='tabler:x' fontSize='1.25rem' />
       </CustomCloseButton>
-      <DialogTitle>Chỉnh sửa</DialogTitle>
+      <DialogTitle>Edit </DialogTitle>
       <DialogContent>
         <TabContext value={value}>
           <Grid>
             <TabList onChange={handleChange} aria-label='customized tabs example'>
-              <Tab value='0' label='Thiết bị' />
-              <Tab value='1' label='Mật khẩu' />
-              <Tab value='2' label='Mạng' />
+              <Tab value='0' label='Edit ' />
+              <Tab value='1' label='Password' />
+              <Tab value='2' label='Network' />
               <Tab value='3' label='Video' />
-              <Tab value='4' label='Hình ảnh' />
-              <Tab value='5' label='Bộ nhớ' />
+              <Tab value='4' label='Image' />
+              <Tab value='5' label='Storage' />
             </TabList>
           </Grid>
           <StyledTabPanel value='0'>

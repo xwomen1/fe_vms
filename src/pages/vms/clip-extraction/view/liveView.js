@@ -19,7 +19,7 @@ const LiveView = ({ id, name, channel }) => {
                     {id === '' &&
                         <div style={{ height: '70vh', background: '#000', display: 'flex', justifyContent: 'center' }}>
                             <IconButton disabled>
-                                <Icon icon="tabler:player-play-filled" width='48' height='48' style={{ color: '#FF9F43' }} />
+                                <Icon icon="tabler:player-play-filled" width='48' height='48' style={{ color: '#002060' }} />
                             </IconButton>
                         </div>}
                     {id !== '' &&

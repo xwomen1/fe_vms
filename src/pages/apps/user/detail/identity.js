@@ -105,7 +105,7 @@ const UserDetails = () => {
 
   function showAlertConfirm(options, intl) {
     const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Accept',
       imageWidth: 213,
       showCancelButton: true,
       showCloseButton: true,
@@ -408,12 +408,12 @@ const UserDetails = () => {
             loaded
               ? { display: 'none' }
               : {
-                  width: '100px',
-                  height: '100px',
-                  display: 'grid',
-                  backgroundColor: '#C4C4C4',
-                  placeItems: 'center'
-                }
+                width: '100px',
+                height: '100px',
+                display: 'grid',
+                backgroundColor: '#C4C4C4',
+                placeItems: 'center'
+              }
           }
         >
           <CircularProgress size={20} />
@@ -449,7 +449,7 @@ const UserDetails = () => {
         axios
           .delete(urlDelete, config)
           .then(() => {
-            Swal.fire('Xóa thành công', '', 'success')
+            Swal.fire('Deleted successfully', '', 'success')
 
             // Tùy chỉnh việc cập nhật dữ liệu sau khi xóa
             fetchUserData()
@@ -570,13 +570,13 @@ const UserDetails = () => {
                         </div>
                       </>
                     )) || (
-                      <>
-                        <h4 style={{ fontSize: '16px' }}>Image</h4>
-                        <div style={{ display: 'flex' }}>
-                          <ImgCards data={[]} imgTitle='Image' />
-                        </div>
-                      </>
-                    )}
+                        <>
+                          <h4 style={{ fontSize: '16px' }}>Image</h4>
+                          <div style={{ display: 'flex' }}>
+                            <ImgCards data={[]} imgTitle='Image' />
+                          </div>
+                        </>
+                      )}
 
                     {isOpenUpdateImgUser && (
                       <ImageForm
@@ -633,7 +633,7 @@ const UserDetails = () => {
                     <Table>
                       <TableHead>
                         <TableRow>
-                          <TableCell>STT</TableCell>
+                          <TableCell>NO.</TableCell>
                           <TableCell>Date</TableCell>
                           <TableCell>Code</TableCell>
                           <TableCell>Status</TableCell>
@@ -791,7 +791,7 @@ const UserDetails = () => {
                     <Table>
                       <TableHead>
                         <TableRow>
-                          <TableCell>STT</TableCell>
+                          <TableCell>NO.</TableCell>
                           <TableCell>Date</TableCell>
                           <TableCell>Code</TableCell>
                           <TableCell>Status</TableCell>

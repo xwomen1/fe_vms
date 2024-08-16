@@ -69,9 +69,9 @@ const RolePopup = ({ open, onClose, onSelect, nvr }) => {
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Cấu hình luu tru</DialogTitle>
+      <DialogTitle>Storage configuration</DialogTitle>
       <DialogContent>
-        <Grid> Xem truc tiep</Grid>
+        <Grid> Live</Grid>
         <video width='320' height='240' controls>
           <source src='path/to/your/video.mp4' type='video/mp4' />
           Your browser does not support the video tag.
