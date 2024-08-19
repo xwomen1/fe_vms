@@ -206,13 +206,13 @@ const TCP = ({ onClose, mtu, nvr }) => {
       onClose()
 
       Swal.fire({
-        title: 'Thành công!',
-        text: 'Dữ liệu đã được Lưu thành công.',
+        title: 'Successfully!',
+        text: 'Data was saved successfully',
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -229,7 +229,7 @@ const TCP = ({ onClose, mtu, nvr }) => {
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -331,10 +331,10 @@ const TCP = ({ onClose, mtu, nvr }) => {
             pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
           }}
         >
-          <Button onClick={onClose}>Đóng</Button>
+          <Button onClick={onClose}>Close</Button>
 
           <Button type='submit' variant='contained' onClick={handleSaveClick}>
-            Lưu
+            Save
           </Button>
         </DialogActions>
       </Grid>

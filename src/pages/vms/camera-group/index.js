@@ -118,7 +118,7 @@ const CameraGroup = ({ apiData }) => {
     <>
       <Card>
         <CardHeader
-          title='Danh sách nhóm camera'
+          title='Camera group list'
           titleTypographyProps={{ sx: { mb: [2, 0] } }}
           sx={{
             py: 4,
@@ -131,7 +131,7 @@ const CameraGroup = ({ apiData }) => {
               <Grid item xs={6}>
                 <Button variant='contained' onClick={() => handleOpenPopupAdd()}>
                   <Icon icon='tabler:plus' />
-                  Thêm nhóm
+                  Add group
                 </Button>
               </Grid>
               <Grid item xs={6}>
@@ -151,11 +151,11 @@ const CameraGroup = ({ apiData }) => {
                 <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
                   <TableHead>
                     <TableRow>
-                      <TableCell align='center'>STT</TableCell>
-                      <TableCell align='center'>Tên nhóm</TableCell>
-                      <TableCell align='center'>Mô tả</TableCell>
-                      <TableCell align='center'>Số lượng camera</TableCell>
-                      <TableCell align='center'>Thao tác</TableCell>
+                      <TableCell align='center'>NO.</TableCell>
+                      <TableCell align='center'>Group name</TableCell>
+                      <TableCell align='center'>Description</TableCell>
+                      <TableCell align='center'>Numbers of cameras</TableCell>
+                      <TableCell align='center'>Active</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>

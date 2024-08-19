@@ -219,7 +219,7 @@ const View = ({ data }) => {
                             placeholder={item.placeholder}
                             error={Boolean(errors[item.name])}
                             aria-describedby='validation-basic-last-name'
-                            {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
+                            {...(errors[item.name] && { helperText: 'This field is required' })}
                           />
                         )}
                       />

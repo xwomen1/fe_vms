@@ -306,9 +306,9 @@ const AccessRight = () => {
       >
         <Box sx={{ mb: 4, textAlign: 'center' }}>
           <Typography variant='h3' sx={{ mb: 3 }}>
-            Xác nhận
+            Accept
           </Typography>
-          <Typography sx={{ color: 'text.secondary' }}>Bạn có chắc chắn muốn xóa không ?</Typography>
+          <Typography sx={{ color: 'text.secondary' }}>Do you want to delete it?</Typography>
         </Box>
       </DialogContent>
       <DialogActions
@@ -351,7 +351,7 @@ const AccessRight = () => {
           config
         )
         .then(() => {
-          toast.success('Xóa thành công')
+          toast.success('Deleted successfully')
           setIdDelete(null)
           setReload(reload + 1)
         })
@@ -400,7 +400,7 @@ const AccessRight = () => {
               <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
                 <TableHead>
                   <TableRow>
-                    <TableCell>STT</TableCell>
+                    <TableCell>NO.</TableCell>
                     {columns.map(column => (
                       <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
                         {column.label}

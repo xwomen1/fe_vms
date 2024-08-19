@@ -272,7 +272,7 @@ const AIConfig = () => {
     try {
       await putApi(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties/cameras`, params)
       setReload(reload + 1)
-      toast.success('Thao tác thành công')
+      toast.success('Updated successfully')
     } catch (error) {
       if (error?.response?.data) {
         console.error('error', error)

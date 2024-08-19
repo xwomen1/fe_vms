@@ -46,7 +46,7 @@ const PassWord = ({ onClose, nvr }) => {
     let errors = {}
 
     if (password !== confirmPassword) {
-      errors.confirmPassword = 'Mật khẩu và xác nhận mật khẩu không khớp nhau.'
+      errors.confirmPassword = 'Password and confirm password do not match.'
       isValid = false
     } else {
       errors.confirmPassword = ''
@@ -86,13 +86,13 @@ const PassWord = ({ onClose, nvr }) => {
         config
       )
       Swal.fire({
-        title: 'Thành công!',
+        title: 'Successfully!',
         text: 'Dữ liệu đã được cập nhật thành công.',
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -100,13 +100,13 @@ const PassWord = ({ onClose, nvr }) => {
     } catch (error) {
       console.error('Error updating user details:', error)
       Swal.fire({
-        title: 'Lỗi!',
+        title: 'Error!',
         text: error.response?.data?.message || 'Có lỗi xảy ra.',
         icon: 'error',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -149,7 +149,7 @@ const PassWord = ({ onClose, nvr }) => {
         <Grid container item style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
           <Grid item xs={12}>
             <CustomTextField
-              label='Mật khẩu cũ'
+              label='Old password '
               autoComplete='new-password' // Thay đổi giá trị thành 'new-password'
               form='off' // Thêm thuộc tính form với giá trị 'off'
               type={showPassword ? 'text' : 'password'}
@@ -168,7 +168,7 @@ const PassWord = ({ onClose, nvr }) => {
           </Grid>
           <Grid item xs={12}>
             <CustomTextField
-              label='Mật khẩu mới'
+              label='New password '
               type={showPassword ? 'text' : 'password'}
               onChange={handlePasswordChange}
               fullWidth
@@ -187,7 +187,7 @@ const PassWord = ({ onClose, nvr }) => {
           </Grid>
           <Grid item xs={12}>
             <CustomTextField
-              label='Xác nhận mật khẩu'
+              label='Confirm password '
               type={showPassword ? 'text' : 'password'}
               onChange={handleConfirmPasswordChange}
               fullWidth
@@ -207,9 +207,9 @@ const PassWord = ({ onClose, nvr }) => {
         </Grid>
       </Grid>
       <DialogActions>
-        <Button onClick={onClose}>Đóng</Button>
+        <Button onClick={onClose}>Close</Button>
         <Button onClick={saveChange} variant='contained'>
-          Lưu
+          Save
         </Button>
       </DialogActions>
     </div>

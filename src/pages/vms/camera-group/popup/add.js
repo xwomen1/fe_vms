@@ -93,14 +93,14 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
     let isValid = true
 
     if (groupName.trim() === '') {
-      setGroupNameError('Tên nhóm không được để trống')
+      setGroupNameError('Group name cannot be empty')
       isValid = false
     } else {
       setGroupNameError('')
     }
 
     if (description.trim() === '') {
-      setDescriptionError('Mô tả không được để trống')
+      setDescriptionError('Description cannot be empty')
       isValid = false
     } else {
       setDescriptionError('')
@@ -141,7 +141,7 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
       }
     }
     if (!validateInputs()) {
-      console.log('Dữ liệu không hợp lệ')
+      console.log('Invalid data')
 
       return
     }
@@ -163,32 +163,32 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
       )
       onClose()
       Swal.fire({
-        title: 'Thành công!',
-        text: 'Dữ liệu đã được Thêm thành công.',
+        title: 'Success!',
+        text: 'The data has been added successfully',
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
       })
       onSuccess()
     } catch (error) {
-      console.error('Lỗi khi tạo nhóm mới:', error)
-      setErrorMessage(error.response?.data?.message || 'Lỗi khi tạo nhóm mới')
+      console.error('Error fetch data:', error)
+      setErrorMessage(error.response?.data?.message || 'Error fetch data')
     }
   }
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth='x1' style={{ maxWidth: '80%', margin: 'auto' }}>
-      <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Sửa nhóm camera</DialogTitle>
+      <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Add camera groups</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} alignItems='center'>
           <Grid item xs={6}>
             <CustomTextField
-              label='Tên nhóm'
+              label='Group Name'
               value={groupName}
               onChange={e => setGroupName(e.target.value)}
               error={groupNameError !== ''}
@@ -198,7 +198,7 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
           </Grid>
           <Grid item xs={6}>
             <CustomTextField
-              label='Mô tả'
+              label='Description'
               value={description}
               onChange={e => setDescription(e.target.value)}
               error={descriptionError !== ''}
@@ -212,8 +212,8 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell style={{ fontSize: '12px', textTransform: 'none' }}>Tên camera</TableCell>
-                    <TableCell style={{ fontSize: '12px', textTransform: 'none' }}>Vị trí</TableCell>
+                    <TableCell style={{ fontSize: '12px', textTransform: 'none' }}>Camera name</TableCell>
+                    <TableCell style={{ fontSize: '12px', textTransform: 'none' }}>Location</TableCell>
                     <TableCell style={{ fontSize: '12px', textTransform: 'none' }}>IP Cam</TableCell>
                     <TableCell align='center' style={{ fontSize: 'small' }}>
                       <IconButton size='small' onClick={handleAddRow} sx={{ marginLeft: '10px' }}>
@@ -265,19 +265,17 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Hủy</Button>
+        <Button onClick={onClose}>Cancel</Button>
         <Button
           onClick={() => {
             if (validateInputs()) {
               handleAdd()
-              console.log('Tên nhóm:', groupName)
-              console.log('Mô tả:', description)
             } else {
-              console.log('Dữ liệu không hợp lệ')
+              console.log('Invalid data')
             }
           }}
         >
-          Thêm
+          Add
         </Button>
       </DialogActions>
     </Dialog>

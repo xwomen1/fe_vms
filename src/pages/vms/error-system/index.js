@@ -113,20 +113,20 @@ const EventList = () => {
 
   function showAlertConfirm(options, intl) {
     const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Accept',
       imageWidth: 213,
       showCancelButton: true,
       showCloseButton: true,
       showConfirmButton: true,
       focusCancel: true,
       reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
-      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Agree',
+      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Cancel',
       customClass: {
         content: 'content-class',
         confirmButton: 'swal-btn-confirm'
       },
-      confirmButtonColor: '#FF9F43'
+      confirmButtonColor: '#002060'
     }
 
     return Swal.fire({ ...defaultProps, ...options })
@@ -134,7 +134,7 @@ const EventList = () => {
 
   const handleDelete = id => {
     showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
+      text: 'Do you want to delete it?'
     }).then(({ value }) => {
       if (value) {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -152,13 +152,13 @@ const EventList = () => {
           .delete(urlDelete, config)
           .then(() => {
             Swal.fire({
-              title: 'Thành công!',
-              text: 'Xóa thành công',
+              title: 'Success!',
+              text: 'Deleted successfully',
               icon: 'success',
               willOpen: () => {
                 const confirmButton = Swal.getConfirmButton()
                 if (confirmButton) {
-                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.backgroundColor = '#002060'
                   confirmButton.style.color = 'white'
                 }
               }
@@ -175,7 +175,7 @@ const EventList = () => {
               willOpen: () => {
                 const confirmButton = Swal.getConfirmButton()
                 if (confirmButton) {
-                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.backgroundColor = '#002060'
                   confirmButton.style.color = 'white'
                 }
               }
@@ -212,13 +212,13 @@ const EventList = () => {
   }, [fetchDataList])
 
   const columns = [
-    { id: 1, flex: 0.25, minWidth: 50, align: 'center', field: 'eventName', label: 'Tên sự cố' },
-    { id: 2, flex: 0.15, minWidth: 150, align: 'center', field: 'severity', label: 'Mức độ' },
-    { id: 3, flex: 0.15, minWidth: 150, align: 'center', field: 'deviceType', label: 'Loại thiết bị' },
-    { id: 4, flex: 0.15, minWidth: 100, align: 'center', field: 'createdAt', label: 'Thời gian' },
-    { id: 5, flex: 0.15, minWidth: 100, align: 'center', field: 'location', label: 'Vị trí' },
-    { id: 6, flex: 0.25, minWidth: 50, align: 'center', field: 'status', label: 'Trạng thái' },
-    { id: 7, flex: 0.25, minWidth: 50, align: 'center', field: 'source', label: 'Nguồn' }
+    { id: 1, flex: 0.25, minWidth: 50, align: 'center', field: 'eventName', label: 'Issue name' },
+    { id: 2, flex: 0.15, minWidth: 150, align: 'center', field: 'severity', label: 'Level' },
+    { id: 3, flex: 0.15, minWidth: 150, align: 'center', field: 'deviceType', label: 'Device type' },
+    { id: 4, flex: 0.15, minWidth: 100, align: 'center', field: 'createdAt', label: 'Time ' },
+    { id: 5, flex: 0.15, minWidth: 100, align: 'center', field: 'location', label: 'Location' },
+    { id: 6, flex: 0.25, minWidth: 50, align: 'center', field: 'status', label: 'Status' },
+    { id: 7, flex: 0.25, minWidth: 50, align: 'center', field: 'source', label: 'Source' }
   ]
 
   const handleSetValueFilter = data => {
@@ -235,7 +235,7 @@ const EventList = () => {
     <>
       <Card>
         <CardHeader
-          title='Danh sách sự cố'
+          title='List of issues'
           titleTypographyProps={{ sx: { mb: [2, 0] } }}
           sx={{
             py: 4,
@@ -248,7 +248,7 @@ const EventList = () => {
               <Grid item>
                 <Box sx={{ float: 'right' }}>
                   <Button
-                    aria-label='Bộ lọc'
+                    aria-label='Filter '
                     onClick={() => {
                       setIsOpenFilter(true)
                     }}
@@ -262,7 +262,7 @@ const EventList = () => {
                 <CustomTextField
                   value={value}
                   onChange={e => handleFilter(e.target.value)}
-                  placeholder='Tìm kiếm sự kiện '
+                  placeholder='Search'
                   InputProps={{
                     startAdornment: (
                       <Box sx={{ mr: 2, display: 'flex' }}>
@@ -294,7 +294,7 @@ const EventList = () => {
             <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
               <TableHead>
                 <TableRow>
-                  <TableCell align='center'>STT</TableCell>
+                  <TableCell align='center'>NO.</TableCell>
                   {columns.map(column => (
                     <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
                       {column.label}
@@ -366,7 +366,7 @@ const EventList = () => {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={columns.length + 1}>Không có dữ liệu ...</TableCell>
+                    <TableCell colSpan={columns.length + 1}>No data ...</TableCell>
                   </TableRow>
                 )}
               </TableBody>

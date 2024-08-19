@@ -93,7 +93,7 @@ const Timeline = ({ data, minuteType, callback, startDate, endDate }) => {
     }
   }, [selectedTime])
 
-  useEffect(() => {}, [gaps])
+  useEffect(() => { }, [gaps])
 
   const timelineScrubberErrorHandler = ({ error }) => {
     setTimelineScrubberError(error)
@@ -240,8 +240,8 @@ const Timeline = ({ data, minuteType, callback, startDate, endDate }) => {
         <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center' }}>
           <Typography>
             Khoảng thời gian đã chọn:{' '}
-            <span style={{ color: '#FF9F43', fontWeight: 600 }}>{convertDateToString(selectedTime[0])}</span> đến{' '}
-            <span style={{ color: '#FF9F43', fontWeight: 600 }}>{convertDateToString(selectedTime[1])}</span>
+            <span style={{ color: '#002060', fontWeight: 600 }}>{convertDateToString(selectedTime[0])}</span> đến{' '}
+            <span style={{ color: '#002060', fontWeight: 600 }}>{convertDateToString(selectedTime[1])}</span>
           </Typography>
         </Grid>
       )}

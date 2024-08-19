@@ -96,7 +96,7 @@ const Add = ({
         config
       )
 
-      setMessage({ text: 'Thêm thành công', type: 'create', error: false })
+      setMessage({ text: 'Save successfully', type: 'create', error: false })
       setReload()
       fetchGroupDataNVR()
     } catch (error) {
@@ -121,7 +121,7 @@ const Add = ({
 
       await axios.delete(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${id}`, config)
 
-      setMessage({ text: 'Xóa thành công', type: 'delete', error: false })
+      setMessage({ text: 'Deleted successfully', type: 'delete', error: false })
       setReload()
       fetchGroupDataNVR()
     } catch (error) {
@@ -141,7 +141,7 @@ const Add = ({
       maxWidth='xl'
       style={{ maxWidth: '80%', margin: 'auto' }}
     >
-      <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Quét NVR</DialogTitle>
+      <DialogTitle style={{ fontSize: '16px', fontWeight: 'bold' }}>Scan NVR</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} alignItems='center'>
           {loadingDungIp && <CircularProgress style={{ marginLeft: '50%' }} />}
@@ -150,14 +150,14 @@ const Add = ({
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Tên thiết bị</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Loại thiết bị</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Địa chỉ IP</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Địa chỉ Mac</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Vị trí</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Trạng thái</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>NO.</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Device Name</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Device type</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>IP Address</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Mac Address</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Location</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Status</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Active</TableCell>
                   </TableRow>
                 </TableHead>
 
@@ -187,7 +187,7 @@ const Add = ({
                                   size='small'
                                   skin='light'
                                   sx={{ lineHeight: 1 }}
-                                  label={nvr.status === 'disconnected' ? 'Mất kết nối' : 'Đã kết nối'}
+                                  label={nvr.status === 'disconnected' ? 'Lost connection' : 'Connected'}
                                   color={nvr.status === 'disconnected' ? 'primary' : 'success'}
                                 />
                               </div>
@@ -212,19 +212,19 @@ const Add = ({
                     })
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={8}>Không có dữ liệu</TableCell>
+                      <TableCell colSpan={8}>No data</TableCell>
                     </TableRow>
                   )}
                 </TableBody>
               </Table>
               {message.type === 'general' && (
-                <Box style={{ color: message.error ? 'red' : '#ff9f43', textAlign: 'center' }}>{message.text}</Box>
+                <Box style={{ color: message.error ? 'red' : '#002060', textAlign: 'center' }}>{message.text}</Box>
               )}
               {message.type === 'create' && (
-                <Box style={{ color: message.error ? 'red' : '#ff9f43', textAlign: 'center' }}>{message.text}</Box>
+                <Box style={{ color: message.error ? 'red' : '#002060', textAlign: 'center' }}>{message.text}</Box>
               )}
               {message.type === 'delete' && (
-                <Box style={{ color: message.error ? 'red' : '#ff9f43', textAlign: 'center' }}>{message.text}</Box>
+                <Box style={{ color: message.error ? 'red' : '#002060', textAlign: 'center' }}>{message.text}</Box>
               )}
             </TableContainer>
           </Grid>
@@ -232,7 +232,7 @@ const Add = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} disabled={loadingDungIp} variant='contained'>
-          Hủy
+          Cancel
         </Button>
       </DialogActions>
     </Dialog>

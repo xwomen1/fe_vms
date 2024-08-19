@@ -172,7 +172,7 @@ const Schedule = ({ show, onClose, valueFilter, callback, direction, data }) => 
           </CustomCloseButton>
           <Box sx={{ mb: 8, textAlign: 'left' }}>
             <Typography variant='h3' sx={{ mb: 3 }}>
-              Cấu hình lịch
+              Calendar Configuration
             </Typography>
           </Box>
           <form>
@@ -192,7 +192,7 @@ const Schedule = ({ show, onClose, valueFilter, callback, direction, data }) => 
                         dataDailyProps={dataDailyState}
                         error={Boolean(errors.calendarDays)}
                         aria-describedby='validation-basic-last-name'
-                        {...(errors.calendarDays && { helperText: 'Trường này bắt buộc' })}
+                        {...(errors.calendarDays && { helperText: 'This field is required' })}
                       />
                     </div>
                   )}

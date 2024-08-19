@@ -239,20 +239,20 @@ const UserList = ({ apiData }) => {
   }
   function showAlertConfirm(options, intl) {
     const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Accept',
       imageWidth: 213,
       showCancelButton: true,
       showCloseButton: true,
       showConfirmButton: true,
       focusCancel: true,
       reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
-      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Agree',
+      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Cancel',
       customClass: {
         content: 'content-class',
         confirmButton: 'swal-btn-confirm'
       },
-      confirmButtonColor: '#FF9F43'
+      confirmButtonColor: '#002060'
     }
 
     return Swal.fire({ ...defaultProps, ...options })
@@ -286,7 +286,7 @@ const UserList = ({ apiData }) => {
 
   const handleDelete = idDelete => {
     showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
+      text: 'Do you want to delete it?'
     }).then(({ value }) => {
       if (value) {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -304,13 +304,13 @@ const UserList = ({ apiData }) => {
           .delete(urlDelete, config)
           .then(() => {
             Swal.fire({
-              title: 'Thành công!',
-              text: 'Xóa thành công',
+              title: 'Successfully!',
+              text: 'Deleted successfully',
               icon: 'success',
               willOpen: () => {
                 const confirmButton = Swal.getConfirmButton()
                 if (confirmButton) {
-                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.backgroundColor = '#002060'
                   confirmButton.style.color = 'white'
                 }
               }
@@ -327,7 +327,7 @@ const UserList = ({ apiData }) => {
               willOpen: () => {
                 const confirmButton = Swal.getConfirmButton()
                 if (confirmButton) {
-                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.backgroundColor = '#002060'
                   confirmButton.style.color = 'white'
                 }
               }
@@ -354,13 +354,13 @@ const UserList = ({ apiData }) => {
         config
       )
       Swal.fire({
-        title: 'Đồng bộ thành công!',
+        title: 'Synchronization successful!',
         text: response?.message,
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -374,7 +374,7 @@ const UserList = ({ apiData }) => {
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -391,7 +391,7 @@ const UserList = ({ apiData }) => {
       <Grid item xs={12}>
         <Card>
           <CardHeader
-            title='Danh sách NVR'
+            title='NVR List'
             titleTypographyProps={{ sx: { mb: [2, 0] } }}
             sx={{
               py: 4,
@@ -406,20 +406,20 @@ const UserList = ({ apiData }) => {
                     <Box></Box>
                   ) : (
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Button variant='contained' color='secondary' onClick={handleAddRoleClick}>
-                        Mật khẩu
+                      <Button variant='contained' color='primary' onClick={handleAddRoleClick}>
+                        Password
                       </Button>
-                      <Button variant='contained' color='secondary' onClick={handleAddNetworkClick}>
-                        Mạng
+                      <Button variant='contained' color='primary' onClick={handleAddNetworkClick}>
+                        Network
                       </Button>
-                      <Button variant='contained' color='secondary' onClick={handleAddVideoClick}>
+                      <Button variant='contained' color='primary' onClick={handleAddVideoClick}>
                         Video
                       </Button>
-                      <Button variant='contained' color='secondary' onClick={handleAddImageClick}>
-                        Hình ảnh
+                      <Button variant='contained' color='primary' onClick={handleAddImageClick}>
+                        Image
                       </Button>
-                      <Button variant='contained' color='secondary' onClick={handleAddCloudClick}>
-                        Bộ nhớ
+                      <Button variant='contained' color='primary' onClick={handleAddCloudClick}>
+                        Storage
                       </Button>
                     </Box>
                   )}
@@ -474,15 +474,15 @@ const UserList = ({ apiData }) => {
                         }}
                       />
                     </TableCell>
-                    <TableCell align='center'>STT</TableCell>
-                    <TableCell align='center'>Tên thiết bị</TableCell>
-                    <TableCell align='center'>Loại</TableCell>
-                    <TableCell align='center'>Địa chỉ IP</TableCell>
-                    <TableCell align='center'>Địa chỉ Mac</TableCell>
-                    <TableCell align='center'>Vị trí</TableCell>
-                    <TableCell align='center'>Trạng thái</TableCell>
+                    <TableCell align='center'>NO.</TableCell>
+                    <TableCell align='center'>Device Name</TableCell>
+                    <TableCell align='center'>Device Type</TableCell>
+                    <TableCell align='center'>IP Address</TableCell>
+                    <TableCell align='center'>Mac Address</TableCell>
+                    <TableCell align='center'>Location</TableCell>
+                    <TableCell align='center'>Status</TableCell>
 
-                    <TableCell align='center'>Hành động</TableCell>
+                    <TableCell align='center'>Active</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -508,7 +508,7 @@ const UserList = ({ apiData }) => {
                               size='small'
                               skin='light'
                               sx={{ lineHeight: 1 }}
-                              label={assetType.status.name === 'disconnected' ? 'Mất kết nối' : 'Đã kết nối'}
+                              label={assetType.status.name === 'disconnected' ? 'Lost connection' : 'Connected'}
                               color={assetType.status.name === 'disconnected' ? 'primary' : 'success'}
                             />
                           </div>

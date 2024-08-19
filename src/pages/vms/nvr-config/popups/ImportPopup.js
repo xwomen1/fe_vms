@@ -208,7 +208,7 @@ const ImportPopup = ({ open, handleClose }) => {
             >
               <input {...getInputProps()} />
               <Icon icon='tabler:arrow-bar-to-down' color='#ff9300' fontSize='3rem' />
-              <p>Kéo và thả file Excel vào đây, hoặc nhấn để chọn file</p>
+              <p>Drag and drop the Excel file here, or click to select the file</p>
             </div>
             <ul>
               {files.map(file => (
@@ -274,7 +274,7 @@ const ImportPopup = ({ open, handleClose }) => {
           Export
         </Button>
         <Button onClick={handleDownloadSampleFile} variant='contained'>
-          File mẫu
+          sample file
         </Button>
         <Button onClick={handleImport} variant='contained' disabled={loading}>
           {loading ? 'Importing...' : 'Import'}

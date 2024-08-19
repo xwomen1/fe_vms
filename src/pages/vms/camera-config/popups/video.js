@@ -295,7 +295,7 @@ const VideoConfig = ({ open, onClose, camera }) => {
       <DialogContent>
         <Box sx={{ textAlign: 'left' }}>
           <Typography variant='h5' sx={{ mb: 3 }}>
-            Cấu hình video
+            Video configuration
           </Typography>
         </Box>
         <Grid container spacing={3} sx={{ height: '300px', position: 'relative' }}>
@@ -325,7 +325,7 @@ const VideoConfig = ({ open, onClose, camera }) => {
                             placeholder={item.placeholder}
                             error={Boolean(errors[item.name])}
                             aria-describedby='validation-basic-last-name'
-                            {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
+                            {...(errors[item.name] && { helperText: 'This field is required' })}
                           />
                         )}
                       />
@@ -389,7 +389,7 @@ const VideoConfig = ({ open, onClose, camera }) => {
                                 fullWidth
                                 error={Boolean(errors[item.name])}
                                 aria-describedby='validation-basic-last-name'
-                                {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
+                                {...(errors[item.name] && { helperText: 'This field is required' })}
                               />
                             )}
                           />

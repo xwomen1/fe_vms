@@ -251,14 +251,14 @@ const RolesCards = () => {
           scopes: isChecked
             ? newScopes
             : [
-                ...newScopes,
-                {
-                  resourceName: resource,
-                  scope,
-                  tenantId: selectedResource.tenantId,
-                  resourceCode: selectedResource.resourceCode
-                }
-              ]
+              ...newScopes,
+              {
+                resourceName: resource,
+                scope,
+                tenantId: selectedResource.tenantId,
+                resourceCode: selectedResource.resourceCode
+              }
+            ]
         }))
       } else {
         console.error(`Resource not found: ${resource}`)
@@ -354,7 +354,7 @@ const RolesCards = () => {
       >
         <Box sx={{ mb: 4, textAlign: 'center' }}>
           <Typography variant='h3' sx={{ mb: 3 }}>
-            Xác nhận
+            Accept
           </Typography>
           <Typography sx={{ color: 'text.secondary' }}>Bạn có chắc chắn muốn Delete không ?</Typography>
         </Box>
@@ -373,7 +373,7 @@ const RolesCards = () => {
             setIsOpenDel(false)
           }}
         >
-          Đồng ý
+          Agree
         </Button>
         <Button variant='tonal' color='secondary' sx={{ mr: 1 }} onClick={() => setIsOpenDel(false)}>
           Cancel

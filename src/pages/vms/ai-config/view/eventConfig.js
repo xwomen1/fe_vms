@@ -106,15 +106,15 @@ const lineExample = [
 const data = [
   {
     value: '1',
-    name: 'Trái qua phải'
+    name: 'Left to right'
   },
   {
     value: '2',
-    name: 'Phải qua trái'
+    name: 'Right to left'
   },
   {
     value: '3',
-    name: 'Hai chiều'
+    name: 'Two way'
   }
 ]
 
@@ -137,7 +137,7 @@ const EventConfig = () => {
 
   const [direction, setDirection] = useState({
     value: '1',
-    name: 'Trái qua phải'
+    name: 'Left to right'
   })
 
   const [eventSelect, setEventSelect] = useState(null)
@@ -266,10 +266,10 @@ const EventConfig = () => {
                   matchedEvent?.status === camera?.status && matchedEvent?.status !== undefined
                     ? camera?.status
                     : matchedEvent?.status !== camera?.status && matchedEvent?.status !== undefined
-                    ? matchedEvent?.status
-                    : matchedEvent?.status !== camera?.status && matchedEvent?.status === undefined
-                    ? camera?.status
-                    : false
+                      ? matchedEvent?.status
+                      : matchedEvent?.status !== camera?.status && matchedEvent?.status === undefined
+                        ? camera?.status
+                        : false
               }
             })
           }
@@ -290,7 +290,7 @@ const EventConfig = () => {
 
   useEffect(() => {
     if (websocket) {
-      websocket.addEventListener('open', event => {})
+      websocket.addEventListener('open', event => { })
 
       websocket.addEventListener('message', handleMessage)
 
@@ -592,7 +592,7 @@ const EventConfig = () => {
         config
       )
       setReload(reload + 1)
-      toast.success('Thao tác thành công')
+      toast.success('Updated successfully')
     } catch (error) {
       if (error && error?.response?.data) {
         console.error('error', error)
@@ -693,11 +693,10 @@ const EventConfig = () => {
       >
         <Box sx={{ mb: 4, textAlign: 'center' }}>
           <Typography variant='h3' sx={{ mb: 3 }}>
-            Xác nhận
+            Accept
           </Typography>
           <Typography sx={{ color: 'text.secondary' }}>
-            Bạn có chắc chắn muốn xóa <strong style={{ fontStyle: 'italic', color: '#FF9F43' }}>{eventSelect}</strong>{' '}
-            không ?
+            Do you want to delete it?
           </Typography>
         </Box>
       </DialogContent>
@@ -715,7 +714,7 @@ const EventConfig = () => {
             setIsOpenDel(false)
           }}
         >
-          Đồng ý
+          Agree
         </Button>
         <Button variant='tonal' color='secondary' sx={{ mr: 1 }} onClick={() => setIsOpenDel(false)}>
           Cancel
@@ -757,10 +756,10 @@ const EventConfig = () => {
           <CardHeader title={alert?.cameraModelAI?.modelName} />
           <CardContent>
             <Typography variant='body1' alignLeft={2}>
-              Độ nhạy: {alert?.cameraModelAI?.characteristicValue}
+              Sensitivity: {alert?.cameraModelAI?.characteristicValue}
             </Typography>
             <Typography variant='body1' alignLeft={2}>
-              Đối tượng: {alert?.cameraModelAI?.characteristicName}
+              Object: {alert?.cameraModelAI?.characteristicName}
             </Typography>
           </CardContent>
           <Button
@@ -788,18 +787,18 @@ const EventConfig = () => {
       <StyledTreeItem key={group.id} nodeId={group.id} labelText={group.name} labelIcon='tabler:folder'>
         {group.cameras && group.cameras.length > 0
           ? group.cameras.map(camera => {
-              return (
-                <StyledTreeItem
-                  key={camera.id}
-                  nodeId={camera.id}
-                  color={camera?.status == true ? '#28c76f' : ''}
-                  textDirection={camera.id === idCameraSelect ? 'underline' : ''}
-                  labelText={camera.deviceName}
-                  labelIcon='tabler:camera'
-                  onClick={() => handleItemClick(camera.id, camera.deviceName)}
-                />
-              )
-            })
+            return (
+              <StyledTreeItem
+                key={camera.id}
+                nodeId={camera.id}
+                color={camera?.status == true ? '#28c76f' : ''}
+                textDirection={camera.id === idCameraSelect ? 'underline' : ''}
+                labelText={camera.deviceName}
+                labelIcon='tabler:camera'
+                onClick={() => handleItemClick(camera.id, camera.deviceName)}
+              />
+            )
+          })
           : null}
       </StyledTreeItem>
     )

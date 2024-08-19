@@ -165,7 +165,7 @@ const EventList = () => {
           <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
             <TableHead>
               <TableRow>
-                <TableCell>STT</TableCell>
+                <TableCell>NO.</TableCell>
                 {columns.map(column => (
                   <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
                     {column.label}
@@ -186,10 +186,10 @@ const EventList = () => {
                           {column.field === 'timeMin' || column.field === 'timeMax'
                             ? formatTime(value)
                             : column.field === 'date'
-                            ? formatDate(row.timeMin)
-                            : column.field === 'totalTime'
-                            ? calculateTotalTime(row.timeMin, row.timeMax)
-                            : value}
+                              ? formatDate(row.timeMin)
+                              : column.field === 'totalTime'
+                                ? calculateTotalTime(row.timeMin, row.timeMax)
+                                : value}
                         </TableCell>
                       )
                     })}

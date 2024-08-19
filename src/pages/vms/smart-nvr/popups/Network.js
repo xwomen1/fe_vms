@@ -111,7 +111,7 @@ const Network = ({ open, onClose, onSelect, nvr }) => {
       sx={{ '& .MuiDialog-paper': { overflow: 'visible' } }}
     >
       {' '}
-      <DialogTitle>Cấu hình mạng</DialogTitle>
+      <DialogTitle>Network Configuration </DialogTitle>
       <DialogContent>
         <CustomCloseButton onClick={onClose}>
           <Icon icon='tabler:x' fontSize='1.25rem' />

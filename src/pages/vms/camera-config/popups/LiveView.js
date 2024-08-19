@@ -55,7 +55,7 @@ const LiveView = ({ show, onClose, data }) => {
                     </CustomCloseButton>
                     <Box sx={{ mb: 8, textAlign: 'left' }}>
                         <Typography variant='h3' sx={{ mb: 3 }}>
-                            Xem trực tiếp
+                            Live
                         </Typography>
                     </Box>
 
@@ -84,7 +84,7 @@ const LiveView = ({ show, onClose, data }) => {
                         color='primary'
                         onClick={onClose}
                     >
-                        Đóng
+                        Close
                     </Button>
                 </DialogActions>
             </Dialog>

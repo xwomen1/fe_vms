@@ -506,7 +506,7 @@ const InforAll = ({ idInfor }) => {
                     {console.log({ ...params }, 'params')}
                     <CustomTextField
                       {...params}
-                      label='Vị trí'
+                      label='Location'
                       fullWidth
                       InputProps={{
                         ...params.InputProps,

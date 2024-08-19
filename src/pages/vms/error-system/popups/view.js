@@ -40,8 +40,8 @@ const initValues = {
 const format_form = [
     {
         name: 'imageObject',
-        label: 'Hình ảnh',
-        placeholder: 'Nhập hình ảnh',
+        label: 'Image',
+        placeholder: 'Nhập Image',
         type: 'ImageObject',
         data: [],
         require: true,
@@ -58,7 +58,7 @@ const format_form = [
     },
     {
         name: 'timestamp',
-        label: 'Thời gian',
+        label: 'Time ',
         placeholder: 'Nhập thời gian',
         type: 'TextField',
         data: [],
@@ -76,7 +76,7 @@ const format_form = [
     },
     {
         name: 'location',
-        label: 'Vị trí',
+        label: 'Location',
         placeholder: 'Nhập vị trí',
         type: 'VAutocomplete',
         data: [],
@@ -204,7 +204,7 @@ const View = ({ show, onClose, data, setReload }) => {
                                                                 placeholder={item.placeholder}
                                                                 error={Boolean(errors[item.name])}
                                                                 aria-describedby='validation-basic-last-name'
-                                                                {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
+                                                                {...(errors[item.name] && { helperText: 'This field is required' })}
                                                             />
                                                         )}
                                                     />
@@ -228,7 +228,7 @@ const View = ({ show, onClose, data, setReload }) => {
                                                                 placeholder={item.placeholder}
                                                                 error={Boolean(errors[item.name])}
                                                                 aria-describedby='validation-basic-last-name'
-                                                                {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
+                                                                {...(errors[item.name] && { helperText: 'This field is required' })}
                                                             />
                                                         )}
                                                     />
@@ -276,7 +276,7 @@ const View = ({ show, onClose, data, setReload }) => {
                         pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
                     }}
                 >
-                    <Button variant='contained' onClick={onClose}>Đóng</Button>
+                    <Button variant='contained' onClick={onClose}>Close</Button>
                 </DialogActions>
             </Dialog>
         </Card>

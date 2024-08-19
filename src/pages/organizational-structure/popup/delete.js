@@ -27,7 +27,7 @@ const InfraPopup = ({ open, id, onClose, onSuccess }) => {
       .delete(urlDelete, config)
       .then(() => {
         onClose()
-        Swal.fire('Xóa thành công', '', 'success')
+        Swal.fire('Deleted successfully', '', 'success')
         onSuccess()
       })
       .catch(error => {
@@ -45,8 +45,8 @@ const InfraPopup = ({ open, id, onClose, onSuccess }) => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogTitle style={{ fontSize: '24px', fontWeight: 'bold' }}>Xác nhận</DialogTitle>
-      <DialogContent>Bạn có chắc chắn muốn xóa ?</DialogContent>
+      <DialogTitle style={{ fontSize: '24px', fontWeight: 'bold' }}>Accept</DialogTitle>
+      <DialogContent>Do you want to delete it?</DialogContent>
       <DialogActions style={{ display: 'flex' }}>
         <Button onClick={onClose}>Cancel</Button>
         <Button onClick={handleDelete}>OK</Button>
