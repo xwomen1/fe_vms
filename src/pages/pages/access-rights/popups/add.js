@@ -211,7 +211,9 @@ const Add = ({ show, onClose, setReload }) => {
 
         currentPage++
       }
-      const matchedGroup = allUserGroups.find(group => group.name === nameGroupUser.name)
+
+      const normalizedInputName = nameGroupUser.name.trim().toLowerCase()
+      const matchedGroup = allUserGroups.find(group => group.name.trim().toLowerCase() === normalizedInputName)
       console.log(matchedGroup, 'matchedGroup')
 
       if (matchedGroup) {
@@ -252,7 +254,6 @@ const Add = ({ show, onClose, setReload }) => {
 
   const onSubmit = async values => {
     try {
-      // Kiểm tra và đặt giá trị mặc định cho start và end
       const currentDate = new Date()
       const startDate = start || currentDate
       const endDate = end || currentDate
