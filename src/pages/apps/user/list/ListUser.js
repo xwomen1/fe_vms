@@ -38,6 +38,8 @@ import { fetchChatsContacts } from 'src/store/apps/chat'
 import FileUploaderMultiple from 'src/views/forms/form-elements/file-uploader/FileUploaderMultiple'
 import ListItem from '@mui/material/ListItem'
 import { useDropzone } from 'react-dropzone'
+import { GROUP_API } from 'src/@core/components/api-url'
+import { getApi } from 'src/@core/utils/requestUltils'
 
 const UserList = ({ apiData }) => {
   const [value, setValue] = useState('')
@@ -235,18 +237,7 @@ const UserList = ({ apiData }) => {
   useEffect(() => {
     const fetchGroupData = async () => {
       try {
-        const token = localStorage.getItem(authConfig.storageTokenKeyName)
-        console.log('token', token)
-
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          params: {
-            keyword: valueGroup
-          }
-        }
-        const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search', config)
+        const response = await getApi(`${GROUP_API.SEARCH}?keyword=${valueGroup}`)
         const dataWithChildren = addChildrenField(response.data)
         const rootGroups = findRootGroups(dataWithChildren)
         setGroups(rootGroups)
@@ -323,9 +314,7 @@ const UserList = ({ apiData }) => {
       }
       let url
       if (selectedGroups.length > 0) {
-        url = `https://dev-ivi.basesystem.one/smc/iam/api/v0/users/search?groupIds=${selectedGroups
-          .map(g => g.groupId)
-          .join(',')}`
+        url = `https://dev-ivi.basesystem.one/smc/iam/api/v0/users/search?groupIds=${selectedGroups.map(g => g.groupId).join(',')}`
       } else {
         url = 'https://dev-ivi.basesystem.one/smc/iam/api/v0/users/search'
       }
