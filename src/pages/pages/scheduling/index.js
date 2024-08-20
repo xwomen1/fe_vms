@@ -1,13 +1,13 @@
 import { Grid } from '@mui/material'
 
-import Overview from './overview'
+import Simplelist from './simple-list'
 import Tab from '@mui/material/Tab'
 import TabPanel from '@mui/lab/TabPanel'
 import { styled } from '@mui/material/styles'
 import MuiTabList from '@mui/lab/TabList'
 import TabContext from '@mui/lab/TabContext'
 import { useState } from 'react'
-import PermissionSetUp from './permissionSetUp'
+import Approval from './approval'
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   borderBottom: '0 !important',
@@ -51,10 +51,10 @@ const Caller = () => {
           </TabList>
         </Grid>
         <TabPanel value='1'>
-          <Overview />
+          <Simplelist />
         </TabPanel>
         <TabPanel value='2'>
-          <PermissionSetUp />
+          <Approval />
         </TabPanel>
       </TabContext>
     </Grid>
