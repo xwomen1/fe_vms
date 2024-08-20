@@ -313,7 +313,7 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
         startDate: getValues('startDate') ? format(new Date(getValues('startDate')), 'yyyy-MM-dd') : null,
         endDate: getValues('endDate') ? format(new Date(getValues('endDate')), 'yyyy-MM-dd') : null,
         calendarDays: dataDaily.map(day => ({
-          ...day,
+          dayOfWeek: day.dayOfWeek,
           timePeriods: Array.isArray(day.timePeriods) ? (day.timePeriods.length > 0 ? day.timePeriods : []) : []
         })),
         scheduleId: idScheduleId,
