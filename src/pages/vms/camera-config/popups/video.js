@@ -204,7 +204,6 @@ const VideoConfig = ({ open, onClose, camera }) => {
       setResolution(videoConfigSub?.resolution)
       setVideoEncoding(videoConfigSub?.videoEncoding)
     }
-    console.log('streamType', streamType);
   }, [streamType, videoConfig])
 
   const fetchData = async () => {
@@ -262,7 +261,7 @@ const VideoConfig = ({ open, onClose, camera }) => {
 
     putApi(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/videoconfig/${camera}`, { ...params })
       .then(() => {
-        toast.success('Cập nhật thành công')
+        toast.success('Data has been updated successfully ')
       })
       .catch(error => {
         if (error && error?.response?.data) {
@@ -405,7 +404,7 @@ const VideoConfig = ({ open, onClose, camera }) => {
       </DialogContent>
       <DialogActions>
         <Button variant='contained' color='secondary' onClick={handleCancel}>Cancel</Button>
-        <Button variant='contained' color='primary' onClick={handleSubmit(onSubmit)}>OK</Button>
+        <Button variant='contained' color='primary' onClick={handleSubmit(onSubmit)}>Save</Button>
       </DialogActions>
     </Dialog>
   )

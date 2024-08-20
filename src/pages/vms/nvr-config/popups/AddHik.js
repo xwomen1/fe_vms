@@ -103,7 +103,7 @@ const Add = ({
         config
       )
 
-      setMessage({ text: 'Save successfully', type: 'create', error: false })
+      setMessage({ text: 'Data has been updated successfully', type: 'create', error: false })
       setReload()
       fetchGroupDataNVR()
     } catch (error) {
