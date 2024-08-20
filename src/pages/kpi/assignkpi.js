@@ -235,7 +235,7 @@ const AutocompleteAsynchronousRequest = () => {
           <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
             <TableHead>
               <TableRow>
-                <TableCell align='center'>STT</TableCell> {/* Căn giữa cột STT */}
+                <TableCell align='center'>NO.</TableCell> {/* Căn giữa cột NO. */}
                 {columns.map(({ id, label, field, renderCell, align, maxWidth }) => (
                   <TableCell key={id} align={align} sx={{ maxWidth }}>
                     {label}
@@ -247,7 +247,7 @@ const AutocompleteAsynchronousRequest = () => {
               {fakeData.map((row, index) => {
                 return (
                   <TableRow hover tabIndex={-1} key={index}>
-                    <TableCell align='center'>{index + 1}</TableCell> {/* Căn giữa cột STT */}
+                    <TableCell align='center'>{index + 1}</TableCell> {/* Căn giữa cột NO. */}
                     {columns.map(({ field, renderCell, align, maxWidth }) => {
                       const value = row[field]
 

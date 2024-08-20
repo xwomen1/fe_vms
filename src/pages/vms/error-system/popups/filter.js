@@ -118,7 +118,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
           </CustomCloseButton>
           <Box sx={{ mb: 8, textAlign: 'center' }}>
             <Typography variant='h3' sx={{ mb: 3 }}>
-              Bộ lọc
+              Filter
             </Typography>
           </Box>
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -131,7 +131,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                     <CustomTextField
                       select
                       fullWidth
-                      label='Loại thiết bị'
+                      label='Device type'
                       SelectProps={{
                         value: value,
                         onChange: e => onChange(e)
@@ -139,7 +139,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                       id='validation-basic-select'
                       error={Boolean(errors.device_type)}
                       aria-describedby='validation-basic-select'
-                      helperText={errors.device_type ? 'Trường này bắt buộc' : ''}
+                      helperText={errors.device_type ? 'This field is required' : ''}
                     >
                       {deviceTypes.map(item => (
                         <MenuItem key={item.id} value={item.name}>
@@ -159,7 +159,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                     <CustomTextField
                       select
                       fullWidth
-                      label='Trạng thái'
+                      label='Status'
                       SelectProps={{
                         value: value,
                         onChange: e => onChange(e)
@@ -167,7 +167,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                       id='validation-basic-select'
                       error={Boolean(errors.type)}
                       aria-describedby='validation-basic-select'
-                      helperText={errors.type ? 'Trường này bắt buộc' : ''}
+                      helperText={errors.type ? 'This field is required' : ''}
                     >
                       {statuses.map(item => (
                         <MenuItem key={item.id} value={item.name}>
@@ -190,13 +190,13 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                   }}
                 >
                   <Button type='submit' variant='contained' disabled={loading}>
-                    {loading ? 'Đang tải...' : 'Lọc'}
+                    {loading ? 'Loading...' : 'Filter'}
                   </Button>
                   <Button variant='tonal' onClick={onReset}>
-                    Mặc định
+                    Reset
                   </Button>
                   <Button variant='tonal' color='secondary' onClick={onClose}>
-                    Hủy
+                    Cancel
                   </Button>
                 </DialogActions>
               </Grid>

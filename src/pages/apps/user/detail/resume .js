@@ -220,12 +220,12 @@ const AccessRight = () => {
             loaded
               ? { display: 'none' }
               : {
-                  width: '100px',
-                  height: '100px',
-                  display: 'grid',
-                  backgroundColor: '#C4C4C4',
-                  placeItems: 'center'
-                }
+                width: '100px',
+                height: '100px',
+                display: 'grid',
+                backgroundColor: '#C4C4C4',
+                placeItems: 'center'
+              }
           }
         >
           <CircularProgress size={20} />
@@ -521,7 +521,7 @@ const AccessRight = () => {
                 <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
                   <TableHead>
                     <TableRow>
-                      <TableCell>STT</TableCell>
+                      <TableCell>NO.</TableCell>
                       {columns.map(column => (
                         <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
                           {column.label}
@@ -550,20 +550,20 @@ const AccessRight = () => {
                       </TableRow>
                     ) : (
                       (console.log(row, 'log'),
-                      row.data.map((row, index) => (
-                        <TableRow hover tabIndex={-1} key={index}>
-                          <TableCell>{index + 1}</TableCell>
-                          {columns.map(column => {
-                            const value = row[column.field]
+                        row.data.map((row, index) => (
+                          <TableRow hover tabIndex={-1} key={index}>
+                            <TableCell>{index + 1}</TableCell>
+                            {columns.map(column => {
+                              const value = row[column.field]
 
-                            return (
-                              <TableCell key={column.id} align={column.align}>
-                                {column.format && typeof value === 'number' ? column.format(value) : value}
-                              </TableCell>
-                            )
-                          })}
-                        </TableRow>
-                      )))
+                              return (
+                                <TableCell key={column.id} align={column.align}>
+                                  {column.format && typeof value === 'number' ? column.format(value) : value}
+                                </TableCell>
+                              )
+                            })}
+                          </TableRow>
+                        )))
                     )}
                   </TableBody>
                 </Table>
@@ -575,7 +575,7 @@ const AccessRight = () => {
                 <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
                   <TableHead>
                     <TableRow>
-                      <TableCell>STT</TableCell>
+                      <TableCell>NO.</TableCell>
                       {columns1.map(column => (
                         <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
                           {column.label}
@@ -604,20 +604,20 @@ const AccessRight = () => {
                       </TableRow>
                     ) : (
                       (console.log(row, 'log'),
-                      row.data.map((row, index) => (
-                        <TableRow hover tabIndex={-1} key={index}>
-                          <TableCell>{index + 1}</TableCell>
-                          {columns1.map(column => {
-                            const value = row[column.field]
+                        row.data.map((row, index) => (
+                          <TableRow hover tabIndex={-1} key={index}>
+                            <TableCell>{index + 1}</TableCell>
+                            {columns1.map(column => {
+                              const value = row[column.field]
 
-                            return (
-                              <TableCell key={column.id} align={column.align}>
-                                {column.format && typeof value === 'number' ? column.format(value) : value}
-                              </TableCell>
-                            )
-                          })}
-                        </TableRow>
-                      )))
+                              return (
+                                <TableCell key={column.id} align={column.align}>
+                                  {column.format && typeof value === 'number' ? column.format(value) : value}
+                                </TableCell>
+                              )
+                            })}
+                          </TableRow>
+                        )))
                     )}
                   </TableBody>
                 </Table>
@@ -629,7 +629,7 @@ const AccessRight = () => {
                 <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
                   <TableHead>
                     <TableRow>
-                      <TableCell>STT</TableCell>
+                      <TableCell>NO.</TableCell>
                       {columns2.map(column => (
                         <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
                           {column.label}
@@ -658,20 +658,20 @@ const AccessRight = () => {
                       </TableRow>
                     ) : (
                       (console.log(row, 'log'),
-                      row.data.map((row, index) => (
-                        <TableRow hover tabIndex={-1} key={index}>
-                          <TableCell>{index + 1}</TableCell>
-                          {columns2.map(column => {
-                            const value = row[column.field]
+                        row.data.map((row, index) => (
+                          <TableRow hover tabIndex={-1} key={index}>
+                            <TableCell>{index + 1}</TableCell>
+                            {columns2.map(column => {
+                              const value = row[column.field]
 
-                            return (
-                              <TableCell key={column.id} align={column.align}>
-                                {column.format && typeof value === 'number' ? column.format(value) : value}
-                              </TableCell>
-                            )
-                          })}
-                        </TableRow>
-                      )))
+                              return (
+                                <TableCell key={column.id} align={column.align}>
+                                  {column.format && typeof value === 'number' ? column.format(value) : value}
+                                </TableCell>
+                              )
+                            })}
+                          </TableRow>
+                        )))
                     )}
                   </TableBody>
                 </Table>

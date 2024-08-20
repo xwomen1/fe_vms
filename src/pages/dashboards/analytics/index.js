@@ -406,7 +406,7 @@ const EventList = () => {
                   <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
                     <TableHead>
                       <TableRow>
-                        <TableCell>STT</TableCell>
+                        <TableCell>NO.</TableCell>
                         {columns1.map(column => (
                           <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
                             {column.label}
@@ -447,7 +447,7 @@ const EventList = () => {
             </Grid>
             <Card>
               <div style={{ marginLeft: '25px' }}>
-                {chartData.length > 0 ? ( // Kiểm tra dữ liệu trước khi render
+                {chartData.length > 0 ? (
                   <PieChart width={400} height={400}>
                     <Pie
                       data={chartData}

@@ -322,7 +322,7 @@ const OrganizationalStructure = () => {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>STT</TableCell>
+                      <TableCell>NO.</TableCell>
                       <TableCell>Name</TableCell>
                       <TableCell>Code</TableCell>
                       <TableCell>Action</TableCell>

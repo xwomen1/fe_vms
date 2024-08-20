@@ -42,7 +42,7 @@ const initValueFilter = {
   page: 1
 }
 
-const EventList = ({}) => {
+const EventList = ({ }) => {
   const [keyword, setKeyword] = useState('')
   const [valueFilter, setValueFilter] = useState(initValueFilter)
   const [loading, setLoading] = useState(false)
@@ -153,7 +153,7 @@ const EventList = ({}) => {
 
   useEffect(() => {
     if (rtcPeerConnection) {
-      rtcPeerConnection.addEventListener('connectionstatechange', () => {})
+      rtcPeerConnection.addEventListener('connectionstatechange', () => { })
     }
   }, [rtcPeerConnection])
 
@@ -384,7 +384,7 @@ const EventList = ({}) => {
       axios
         .delete(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/${idDelete}`, config)
         .then(() => {
-          toast.success('Xóa thành công')
+          toast.success('Deleted successfully')
           setIdDelete(null)
           setReload(reload + 1)
         })

@@ -308,13 +308,13 @@ const EditFaceManagement = () => {
 
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${id}`, params, config)
       Swal.fire({
-        title: 'Thành công!',
+        title: 'Successfully!',
         text: 'Data has been updated successfully.',
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -328,7 +328,7 @@ const EditFaceManagement = () => {
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -348,14 +348,14 @@ const EditFaceManagement = () => {
       if (files.length + listFileUpload.length > 5) {
         // Handle maximum file limit exceeded
         Swal.fire({
-          text: 'Tối đa 5 file',
+          text: 'Up to 5 images',
           icon: 'error',
           showCancelButton: false,
           showCloseButton: false,
           showConfirmButton: true,
           focusConfirm: true,
           confirmButtonColor: '#40a574',
-          confirmButtonText: 'Đóng',
+          confirmButtonText: 'Close',
           customClass: {
             content: 'content-class'
           }
@@ -404,7 +404,7 @@ const EditFaceManagement = () => {
             text: 'Upload failed',
             icon: 'error',
             confirmButtonColor: '#40a574',
-            confirmButtonText: 'Đóng',
+            confirmButtonText: 'Close',
             customClass: {
               content: 'content-class'
             }
@@ -451,7 +451,7 @@ const EditFaceManagement = () => {
         <Grid item xs={12} style={{ position: 'relative', zIndex: '1' }}>
           <Card>
             <CardHeader
-              title='Đối tượng danh sách'
+              title='Details Object'
               titleTypographyProps={{ sx: { mb: [2, 0] } }}
               action={
                 <Grid container spacing={2}>
@@ -463,10 +463,10 @@ const EditFaceManagement = () => {
                         href={`/pages/face_management/list`}
                         sx={{ color: 'blue' }}
                       >
-                        Hủy
+                        Cancel
                       </Button>
                       <Button onClick={handleUpdate} variant='contained' disabled={loading}>
-                        {loading ? 'Updating...' : 'Cập nhật'}
+                        {loading ? 'Updating...' : 'Save'}
                       </Button>
                     </Box>
                   </Grid>
@@ -504,7 +504,7 @@ const EditFaceManagement = () => {
                         margin: '0px'
                       }}
                     >
-                      Ảnh đại diện
+                      Avatar
                     </p>
                     <div
                       style={{
@@ -539,7 +539,7 @@ const EditFaceManagement = () => {
                         disabled={loading == true}
                         id='eventName'
                         eventname='eventName'
-                        placeholder={`Tên đối tượng`}
+                        placeholder={`Name`}
                         defaultValue=''
                         value={name || ''}
                         onInput={e => {
@@ -563,7 +563,7 @@ const EditFaceManagement = () => {
                       margin: '0px'
                     }}
                   >
-                    Ghi chú
+                    Description
                   </p>
                   <TextField
                     disabled={loading == true}
@@ -576,7 +576,7 @@ const EditFaceManagement = () => {
                       width: '100%'
                     }}
                     defaultValue=''
-                    placeholder='  Nhập ghi chú ...!'
+                    placeholder='Description'
                     value={`${note}` || ''}
                     onInput={e => {
                       setNote(e.target.value)
@@ -591,7 +591,7 @@ const EditFaceManagement = () => {
                         margin: '0px'
                       }}
                     >
-                      Trạng thái hoạt động
+                      Status
                     </p>
                     <Switch checked={status1 === true} onChange={handleStatusChange} />
                   </div>
@@ -602,7 +602,7 @@ const EditFaceManagement = () => {
                       margin: '0px'
                     }}
                   >
-                    Loại đối tượng
+                    Object Type
                   </p>
 
                   <Autocomplete
@@ -613,15 +613,15 @@ const EditFaceManagement = () => {
                       <CustomTextField
                         {...params}
                         fullWidth
-                        placeholder={!title || Object.keys(title).length === 0 ? 'Không có dữ liệu' : ''}
+                        placeholder={!title || Object.keys(title).length === 0 ? 'No data' : ''}
                         error={errorType}
-                        helperText={errorType ? 'Hãy chọn loại đối tượng' : ''}
+                        helperText={errorType ? 'Please select object type' : ''}
                       />
                     )}
                     renderOption={renderOption}
                     onChange={handleOptionChange}
                     loading={loading}
-                    noOptionsText='Không có dữ liệu'
+                    noOptionsText='No data'
                   />
                 </div>
 
@@ -629,13 +629,13 @@ const EditFaceManagement = () => {
                   <p style={{ margin: '35px 0px 0px 0px', marginTop: '150px', marginLeft: '20px' }}>
                     <div></div>
 
-                    {`Ảnh của đối tượng : ( tối đa 5 ảnh)`}
+                    {`Photos of the object : ( Up to 5 photos)`}
                   </p>
                 )}
 
                 {listFileUpload.length > 0 && (
                   <p style={{ margin: '35px 0px 0px 0px', marginTop: '150px', marginLeft: '10px' }}>
-                    {`Ảnh của đối tượng: ${listFileUpload.length}/5`}
+                    {`Photos of the object: ${listFileUpload.length}/5`}
                   </p>
                 )}
                 <div

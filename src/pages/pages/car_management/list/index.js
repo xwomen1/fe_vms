@@ -114,7 +114,7 @@ const Car_management = () => {
 
   const handleDeleteSelected = () => {
     showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
+      text: 'Do you want to delete it?'
     }).then(({ value }) => {
       if (value) {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -132,14 +132,14 @@ const Car_management = () => {
           axios
             .delete(urlDelete, config)
             .then(() => {
-              setDialogTitle('Xóa biển số thành công')
+              setDialogTitle('Deleted successfully')
               setIsSuccess(true)
               const updatedData = userData.filter(user => user.id !== idDelete)
               setUserData(updatedData)
             })
             .catch(err => {
-              setDialogTitle('xóa không thành công')
-              setDialogMessage(err.message || 'xóa không thành công')
+              setDialogTitle('Delete failed')
+              setDialogMessage(err.message || 'Delete failed')
               setIsSuccess(false)
             })
             .finally(() => {
@@ -179,15 +179,15 @@ const Car_management = () => {
       }))
 
       const exportData = [
-        ['Mã ảnh', 'Biển số xe', 'Lần cuối xuất hiện'],
+        ['Image code', 'License plate', 'Last seen'],
         ...data.map(item => [item.mainImageId, item.name, item.time])
       ]
 
       const ws = XLSX.utils.aoa_to_sheet(exportData)
       const wb = XLSX.utils.book_new()
-      XLSX.utils.book_append_sheet(wb, ws, 'Danh biển số')
+      XLSX.utils.book_append_sheet(wb, ws, 'license plate list')
 
-      const fileName = 'Danh sách biển số.xlsx'
+      const fileName = 'license_plate_list.xlsx'
       XLSX.writeFile(wb, fileName)
     } catch (error) {
       console.error('Error exporting to Excel:', error)
@@ -199,15 +199,15 @@ const Car_management = () => {
 
   function showAlertConfirm(options, intl) {
     const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Accept',
       imageWidth: 213,
       showCancelButton: true,
       showCloseButton: true,
       showConfirmButton: true,
       focusCancel: true,
       reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
-      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Agree',
+      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Cancel',
       customClass: {
         content: 'content-class',
         confirmButton: 'swal-btn-confirm',
@@ -217,7 +217,7 @@ const Car_management = () => {
       didOpen: () => {
         const confirmButton = Swal.getConfirmButton()
         if (confirmButton) {
-          confirmButton.style.backgroundColor = '#ff9f43'
+          confirmButton.style.backgroundColor = '#002060'
         }
       }
     }
@@ -268,7 +268,7 @@ const Car_management = () => {
 
   const handleDelete = idDelete => {
     showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
+      text: 'Do you want to delete it?'
     }).then(({ value }) => {
       if (value) {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -286,13 +286,13 @@ const Car_management = () => {
           .delete(urlDelete, config)
           .then(() => {
             Swal.fire({
-              title: 'Thành công!',
-              text: 'Xóa dữ liệu thành công',
+              title: 'Successfully!',
+              text: 'Deleted successfully',
               icon: 'success',
               willOpen: () => {
                 const confirmButton = Swal.getConfirmButton()
                 if (confirmButton) {
-                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.backgroundColor = '#002060'
                   confirmButton.style.color = 'white'
                 }
               }
@@ -308,7 +308,7 @@ const Car_management = () => {
               willOpen: () => {
                 const confirmButton = Swal.getConfirmButton()
                 if (confirmButton) {
-                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.backgroundColor = '#002060'
                   confirmButton.style.color = 'white'
                 }
               }
@@ -346,12 +346,12 @@ const Car_management = () => {
             loaded
               ? { display: 'none' }
               : {
-                  width: '100px',
-                  height: '100px',
-                  display: 'grid',
-                  backgroundColor: '#C4C4C4',
-                  placeItems: 'center'
-                }
+                width: '100px',
+                height: '100px',
+                display: 'grid',
+                backgroundColor: '#C4C4C4',
+                placeItems: 'center'
+              }
           }
         >
           <CircularProgress size={20} />
@@ -359,7 +359,7 @@ const Car_management = () => {
         <img
           {...props}
           src={src}
-          alt='Ảnh'
+          alt='Image'
           onLoad={() => setLoaded(true)}
           style={loaded ? { width: '100px', height: '100px' } : { display: 'none' }}
         />
@@ -374,14 +374,14 @@ const Car_management = () => {
       ) : (
         <Card>
           <CardHeader
-            title='Danh sách biển số xe'
+            title='List of license plates'
             titleTypographyProps={{ sx: { mb: [2, 0] } }}
             action={
               <Grid container spacing={2}>
                 <Grid item>
                   <Box sx={{ float: 'right' }}>
                     <Button
-                      aria-label='Xóa'
+                      aria-label='Delete'
                       style={{
                         background: '#a9a9a9',
                         color: '#ffffff',
@@ -405,7 +405,7 @@ const Car_management = () => {
                     </Button>
                     <Button variant='contained' component={Link} href={`/pages/car_management/detail/add`}>
                       <Icon icon='tabler:plus' />
-                      Thêm mới
+                      Add new
                     </Button>
                   </Box>
                 </Grid>
@@ -454,15 +454,13 @@ const Car_management = () => {
                     <TableCell>
                       <Checkbox onChange={handleSelectAllChange} checked={selectAll} />
                     </TableCell>
-                    <TableCell align='center'>STT</TableCell>
-                    <TableCell align='center'>Ảnh xe</TableCell>
-                    <TableCell align='center'>Biển số xe</TableCell>
-                    <TableCell align='center'>Loại xe</TableCell>
-
-                    <TableCell align='center'>Lần cuối xuất hiện</TableCell>
-                    <TableCell align='center'>Trạng thái</TableCell>
-
-                    <TableCell align='center'>Hành động</TableCell>
+                    <TableCell align='center'>NO.</TableCell>
+                    <TableCell align='center'>Vehicle Photo</TableCell>
+                    <TableCell align='center'>License plate number</TableCell>
+                    <TableCell align='center'>Vehicle Type</TableCell>
+                    <TableCell align='center'>Last seen</TableCell>
+                    <TableCell align='center'>Status</TableCell>
+                    <TableCell align='center'>Active</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -502,7 +500,7 @@ const Car_management = () => {
                               size='small'
                               skin='light'
                               sx={{ lineHeight: 1 }}
-                              label={user.status === false ? 'Không hoạt động' : 'Đang hoạt động'}
+                              label={user.status === false ? 'Inactive' : 'Active'}
                               color={user.status === false ? 'primary' : 'success'}
                             />
                           </div>
@@ -521,7 +519,7 @@ const Car_management = () => {
                   ) : (
                     <TableRow>
                       <TableCell colSpan={7} align='center'>
-                        Không có dữ liệu
+                        No data
                       </TableCell>
                     </TableRow>
                   )}

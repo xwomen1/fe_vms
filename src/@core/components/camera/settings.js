@@ -255,19 +255,19 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
                       >
                         {group.cameras && group.cameras?.length > 0
                           ? group.cameras.map((camera, idx) => {
-                              // const matchedEvent = eventsData.find(event => event.id === camera.id)
-                              // const status = matchedEvent?.status
+                            // const matchedEvent = eventsData.find(event => event.id === camera.id)
+                            // const status = matchedEvent?.status
 
-                              return (
-                                <StyledTreeItem
-                                  disabled={true}
-                                  key={camera?.id}
-                                  nodeId={camera?.id}
-                                  labelText={camera?.deviceName}
-                                  labelIcon='tabler:camera'
-                                />
-                              )
-                            })
+                            return (
+                              <StyledTreeItem
+                                disabled={true}
+                                key={camera?.id}
+                                nodeId={camera?.id}
+                                labelText={camera?.deviceName}
+                                labelIcon='tabler:camera'
+                              />
+                            )
+                          })
                           : null}
                       </StyledTreeItem>
                     )
@@ -282,31 +282,31 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
               <Grid container spacing={2} sx={{ marginTop: '5px' }}>
                 {page1 > 1
                   ? pageList?.slice((page1 - 1) * 9, page1 * 9).map((page, index) => (
-                      <Grid item xs={4} key={index}>
-                        <Button
-                          variant='contained'
-                          onClick={() => handleButtonClick(index, page)}
-                          sx={{
-                            backgroundColor: selectedButton === index ? 'success.main' : 'primary.main'
-                          }}
-                        >
-                          {page}
-                        </Button>
-                      </Grid>
-                    ))
+                    <Grid item xs={4} key={index}>
+                      <Button
+                        variant='contained'
+                        onClick={() => handleButtonClick(index, page)}
+                        sx={{
+                          backgroundColor: selectedButton === index ? 'success.main' : 'primary.main'
+                        }}
+                      >
+                        {page}
+                      </Button>
+                    </Grid>
+                  ))
                   : pageList?.slice(0, 9).map((page, index) => (
-                      <Grid item xs={4} key={index}>
-                        <Button
-                          variant='contained'
-                          onClick={() => handleButtonClick(index, page)}
-                          sx={{
-                            backgroundColor: selectedButton === index ? 'success.main' : 'primary.main'
-                          }}
-                        >
-                          {page}
-                        </Button>
-                      </Grid>
-                    ))}
+                    <Grid item xs={4} key={index}>
+                      <Button
+                        variant='contained'
+                        onClick={() => handleButtonClick(index, page)}
+                        sx={{
+                          backgroundColor: selectedButton === index ? 'success.main' : 'primary.main'
+                        }}
+                      >
+                        {page}
+                      </Button>
+                    </Grid>
+                  ))}
               </Grid>
 
               <Pagination
@@ -335,8 +335,8 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
                   })
                 }}
               >
-                <FormControlLabel value='vertical' label='Chiều Dọc' control={<Radio />} />
-                <FormControlLabel value='horizontal' label='Chiều ngang' control={<Radio />} />
+                <FormControlLabel value='vertical' label='Vertical' control={<Radio />} />
+                <FormControlLabel value='horizontal' label='Horizontal' control={<Radio />} />
               </RadioGroup>
             </Box>
           </CustomizerSpacing>

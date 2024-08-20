@@ -281,14 +281,14 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
 
   const transformCalendarDays = calendarDays => {
     return calendarDays.map(day => {
-      const { dayOfWeek, timePeriods } = day
+      const { dayOfWeek, timePeriods = [] } = day
       const value = dataDailyDefault.find(item => item.dayOfWeek === dayOfWeek)?.value || 1
 
       return {
         label: dayMapping[value] || 'SUNDAY',
         dayOfWeek,
         value,
-        timePeriods
+        timePeriods: timePeriods.length > 0 ? timePeriods : []
       }
     })
   }
@@ -312,7 +312,10 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
         doorOutId: getValues('doorOutId') || '',
         startDate: getValues('startDate') ? format(new Date(getValues('startDate')), 'yyyy-MM-dd') : null,
         endDate: getValues('endDate') ? format(new Date(getValues('endDate')), 'yyyy-MM-dd') : null,
-        calendarDays: dataDaily,
+        calendarDays: dataDaily.map(day => ({
+          ...day,
+          timePeriods: Array.isArray(day.timePeriods) ? (day.timePeriods.length > 0 ? day.timePeriods : []) : []
+        })),
         scheduleId: idScheduleId,
         doorAccessId: idDoorAccessId,
         accessGroupId: idAccessGroupId
@@ -391,7 +394,7 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
                             placeholder={item.placeholder}
                             error={Boolean(errors[item.name])}
                             aria-describedby='validation-basic-last-name'
-                            {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
+                            {...(errors[item.name] && { helperText: 'This field is required' })}
                           />
                         )}
                       />
@@ -506,26 +509,81 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
               })}
 
               <Grid item xs={12}>
-                {' '}
-                <Box>
-                  <Controller
-                    name='calendarDays'
-                    control={control}
-                    render={() => (
-                      <Daily
-                        callbackOfDaily={v => {
-                          setDataDaily(v)
-                          setDataDailyState(v)
+                <div>
+                  <div
+                    style={{
+                      color: '#333',
+                      margin: '20px 0'
+                    }}
+                  >
+                    <span>Time Settings</span>
+                  </div>
+
+                  <div
+                    style={{
+                      width: '100%'
+                    }}
+                  >
+                    {!loading && (
+                      <div
+                        style={{
+                          marginLeft: 70,
+                          width: 'calc(100% - 150px)',
+                          position: 'relative',
+                          color: 'rgba(0, 0, 0, 0.6)',
+                          fontSize: 14,
+                          display: 'flex'
                         }}
-                        dataDailyProps={dataDailyState}
-                        disabled={isCheckboxChecked}
-                        error={Boolean(errors.calendarDays)}
-                        aria-describedby='validation-basic-last-name'
-                        {...(errors.calendarDays && { helperText: 'This field is required' })}
-                      />
+                      >
+                        {['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'].map((time, index) => (
+                          <div
+                            key={index.toString()}
+                            style={{
+                              width: `${100 / 6}%`,
+                              textAlign: 'center',
+                              padding: '8px 0'
+                            }}
+                          >
+                            {time}
+                          </div>
+                        ))}
+                        <div
+                          style={{
+                            position: 'absolute',
+                            right: -70,
+                            textAlign: 'center',
+                            padding: '8px 0'
+                          }}
+                        >
+                          24:00
+                        </div>
+                      </div>
                     )}
-                  />
-                </Box>
+
+                    <Box>
+                      <Controller
+                        name='calendarDays'
+                        control={control}
+                        render={() => (
+                          console.log(dataDaily, dataDailyState, 'dđ'),
+                          (
+                            <Daily
+                              callbackOfDaily={v => {
+                                setDataDaily(v)
+                                setDataDailyState(v)
+                              }}
+                              dataDailyProps={dataDailyState}
+                              disabled={isCheckboxChecked}
+                              error={Boolean(errors.calendarDays)}
+                              aria-describedby='validation-basic-last-name'
+                              {...(errors.calendarDays && { helperText: 'This field is required' })}
+                            />
+                          )
+                        )}
+                      />
+                    </Box>
+                  </div>
+                </div>
               </Grid>
             </Grid>
           </form>

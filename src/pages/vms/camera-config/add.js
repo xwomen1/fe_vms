@@ -81,15 +81,15 @@ const Add = ({ apiData }) => {
 
   function showAlertConfirm(options, intl) {
     const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Accept',
       imageWidth: 213,
       showCancelButton: true,
       showCloseButton: true,
       showConfirmButton: true,
       focusCancel: true,
       reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
-      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Agree',
+      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Cancel',
       customClass: {
         content: 'content-class',
         confirmButton: 'swal-btn-confirm',
@@ -99,7 +99,7 @@ const Add = ({ apiData }) => {
       didOpen: () => {
         const confirmButton = Swal.getConfirmButton()
         if (confirmButton) {
-          confirmButton.style.backgroundColor = '#ff9f43'
+          confirmButton.style.backgroundColor = '#002060'
         }
       }
     }
@@ -234,7 +234,7 @@ const Add = ({ apiData }) => {
 
       setResponse(response.data)
       setLoading(false)
-      setPopupMessage('Quét thành công')
+      setPopupMessage('Scan Successfully')
       setIsError(false) // Không phải lỗi
     } catch (error) {
       if (
@@ -242,7 +242,7 @@ const Add = ({ apiData }) => {
         error.response.data &&
         error.response.data.message === 'No response from the server device, timeout: scan_device_ip'
       ) {
-        setPopupMessage('Thiết bị chưa phản hồi')
+        setPopupMessage('Device not responding')
       } else {
         setPopupMessage(`${error.message}`)
       }
@@ -304,7 +304,7 @@ const Add = ({ apiData }) => {
 
   const handleDelete = idDelete => {
     showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
+      text: 'Do you want to delete it?'
     }).then(({ value }) => {
       if (value) {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -321,15 +321,15 @@ const Add = ({ apiData }) => {
         axios
           .delete(urlDelete, config)
           .then(() => {
-            setDialogTitle('Xóa camera thành công')
+            setDialogTitle('Deleted Successfully')
             setIsSuccess(true)
             const updatedData = assettype.filter(assettype => assettype.id !== idDelete)
             setAssetType(updatedData)
             fetchFilteredOrAllUsers()
           })
           .catch(err => {
-            setDialogTitle('xóa không thành công')
-            setDialogMessage(err.message || 'xóa không thành công')
+            setDialogTitle('Delete failed')
+            setDialogMessage(err.message || 'Delete failed')
             setIsSuccess(false)
           })
           .finally(() => {
@@ -400,12 +400,12 @@ const Add = ({ apiData }) => {
     if (!selectedTitle) {
       Swal.fire({
         title: 'Error',
-        text: 'Hãy chọn loại giao thức',
+        text: 'Please select protocol type',
         icon: 'error',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -441,9 +441,9 @@ const Add = ({ apiData }) => {
       setResponse(response.data)
       setLoading(false)
 
-      toast.success('Thành công')
+      toast.success('Successfully')
 
-      setPopupMessage('Quét thành công')
+      setPopupMessage('Scan Successfully')
       setIsError(false) // Không phải lỗi
     } catch (error) {
       if (
@@ -451,7 +451,7 @@ const Add = ({ apiData }) => {
         error.response.data &&
         error.response.data.message === 'No response from the server device, timeout: scan_device'
       ) {
-        setPopupMessage('Thiết bị chưa phản hồi')
+        setPopupMessage('Device not responding')
       } else {
         setPopupMessage(`${error.response.data.message}`)
       }
@@ -494,9 +494,9 @@ const Add = ({ apiData }) => {
       setResponse(response.data)
       setLoading(false)
 
-      toast.success('Thành công')
+      toast.success('Successfully')
 
-      setPopupMessage('Quét thành công')
+      setPopupMessage('Scan Successfully')
       setIsError(false) // Không phải lỗi
     } catch (error) {
       if (
@@ -504,7 +504,7 @@ const Add = ({ apiData }) => {
         error.response.data &&
         error.response.data.message === 'No response from the server device, timeout: scan_device_ip'
       ) {
-        setPopupMessage('Thiết bị chưa phản hồi')
+        setPopupMessage('Device not responding')
       } else {
         setPopupMessage(`${error.message}`)
       }
@@ -604,13 +604,13 @@ const Add = ({ apiData }) => {
         config
       )
       Swal.fire({
-        title: 'Đồng bộ thành công!',
+        title: 'Synchronization successful!',
         text: response?.message,
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -624,7 +624,7 @@ const Add = ({ apiData }) => {
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -656,7 +656,7 @@ const Add = ({ apiData }) => {
         <Grid item xs={12}>
           <Card>
             <CardHeader
-              title='Danh sách camera'
+              title='Camera List '
               titleTypographyProps={{ sx: { mb: [2, 0] } }}
               sx={{
                 py: 4,
@@ -671,13 +671,13 @@ const Add = ({ apiData }) => {
                   <RadioGroup value={selectedValue} onChange={handleRadioChange} style={{ marginLeft: 50 }}>
                     <Grid container spacing={2}>
                       <Grid item>
-                        <FormControlLabel value='dungIp' control={<Radio />} label='Dùng IP' />
+                        <FormControlLabel value='dungIp' control={<Radio />} label='Use IP' />
                       </Grid>
                       <Grid item>
-                        <FormControlLabel value='daiIp' control={<Radio />} label='Dải IP' />
+                        <FormControlLabel value='daiIp' control={<Radio />} label='IP range' />
                       </Grid>
                       <Grid item>
-                        <FormControlLabel value='LoaiGT' control={<Radio />} label='Loại giao thức' />
+                        <FormControlLabel value='LoaiGT' control={<Radio />} label='Protocol type' />
                       </Grid>
                       <Grid item xs={3}>
                         <Autocomplete
@@ -687,7 +687,7 @@ const Add = ({ apiData }) => {
                           getOptionLabel={option => option.name || ''}
                           renderInput={params => (
                             <CustomTextField
-                              placeholder='Khác'
+                              placeholder='Other'
                               {...params}
                               InputProps={{
                                 ...params.InputProps,
@@ -763,7 +763,7 @@ const Add = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                        // loading={loading}
+                      // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.1}></Grid>
@@ -772,20 +772,20 @@ const Add = ({ apiData }) => {
                       <CustomTextField
                         value={url}
                         onChange={e => setUrl(e.target.value)}
-                        label='Địa chỉ IP'
+                        label='IP Address'
                         fullWidth
                       />
                     </Grid>
                     <Grid item xs={0.1}></Grid>
                     <Grid item xs={1.8}>
-                      <CustomTextField value={host} onChange={e => setHost(e.target.value)} label='Cổng' fullWidth />
+                      <CustomTextField value={host} onChange={e => setHost(e.target.value)} label='Port' fullWidth />
                     </Grid>
                     <Grid item xs={0.1}></Grid>
                     <Grid item xs={1.8}>
                       <CustomTextField
                         value={userName}
                         onChange={e => setUsername(e.target.value)}
-                        label='Đăng nhập'
+                        label='Username'
                         fullWidth
                       />
                     </Grid>
@@ -794,7 +794,7 @@ const Add = ({ apiData }) => {
                       <CustomTextField
                         value={passWord}
                         onChange={e => setPassWord(e.target.value)}
-                        label='Mật khẩu'
+                        label='Password'
                         type='password'
                         fullWidth
                       />
@@ -804,7 +804,7 @@ const Add = ({ apiData }) => {
                     <Grid item xs={2} style={{ marginTop: '2%' }}>
                       <Button>Cancel</Button>
                       <Button onClick={handleScan} variant='contained'>
-                        Quét
+                        Scan
                       </Button>
                     </Grid>
                     {loading && <CircularProgress />}
@@ -849,7 +849,7 @@ const Add = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                        // loading={loading}
+                      // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.4}></Grid>
@@ -857,7 +857,7 @@ const Add = ({ apiData }) => {
                       <CustomTextField
                         value={startURL}
                         onChange={e => setStartUrl(e.target.value)}
-                        label='Địa chỉ IP bắt đầu'
+                        label='Starting IP Address'
                         fullWidth
                       />
                     </Grid>
@@ -870,7 +870,7 @@ const Add = ({ apiData }) => {
                       <CustomTextField
                         value={endURL}
                         onChange={e => setEndUrl(e.target.value)}
-                        label='Địa chỉ IP kết thúc'
+                        label='End IP Address'
                         fullWidth
                       />
                     </Grid>
@@ -880,7 +880,7 @@ const Add = ({ apiData }) => {
                       <CustomTextField
                         value={startHost}
                         onChange={e => setStartHost(e.target.value)}
-                        label='Cổng bắt đầu'
+                        label='start Port'
                         fullWidth
                       />
                     </Grid>
@@ -893,7 +893,7 @@ const Add = ({ apiData }) => {
                       <CustomTextField
                         value={endHost}
                         onChange={e => setEndHost(e.target.value)}
-                        label='Cổng kết thúc'
+                        label='End Port'
                         fullWidth
                       />
                     </Grid>
@@ -901,7 +901,7 @@ const Add = ({ apiData }) => {
                       <CustomTextField
                         value={userName}
                         onChange={e => setUsername(e.target.value)}
-                        label='Đăng nhập'
+                        label='Username'
                         fullWidth
                       />
                     </Grid>
@@ -911,7 +911,7 @@ const Add = ({ apiData }) => {
                       <CustomTextField
                         value={passWord}
                         onChange={e => setPassWord(e.target.value)}
-                        label='Mật khẩu'
+                        label='Password'
                         type='password'
                         fullWidth
                       />
@@ -921,7 +921,7 @@ const Add = ({ apiData }) => {
                     <Grid item xs={4} style={{ marginTop: '1%' }}>
                       <Button>Cancel</Button>
                       <Button onClick={handleScanDaiIP} variant='contained'>
-                        Quét
+                        Scan
                       </Button>
                     </Grid>
                     <Grid item xs={0.1} style={{ marginTop: '1%', marginLeft: '-20%' }}>
@@ -967,7 +967,7 @@ const Add = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                        // loading={loading}
+                      // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.1}></Grid>
@@ -978,7 +978,7 @@ const Add = ({ apiData }) => {
                         form='off'
                         value={userName}
                         onChange={e => setUsername(e.target.value)}
-                        label='Đăng nhập'
+                        label='Username'
                         fullWidth
                       />
                     </Grid>
@@ -989,7 +989,7 @@ const Add = ({ apiData }) => {
                         autoComplete='new-password' // Thay đổi giá trị thành 'new-password'
                         form='off'
                         onChange={e => setPassWord(e.target.value)}
-                        label='Mật khẩu'
+                        label='Password'
                         type='password'
                         fullWidth
                       />
@@ -999,7 +999,7 @@ const Add = ({ apiData }) => {
                     <Grid item xs={4} style={{ marginTop: '1%' }}>
                       <Button>Cancel</Button>
                       <Button variant='contained' onClick={handleScanLGT}>
-                        Quét
+                        Scan
                       </Button>
                     </Grid>
                   </Grid>
@@ -1046,15 +1046,15 @@ const Add = ({ apiData }) => {
                           }}
                         />
                       </TableCell>
-                      <TableCell align='center'>STT</TableCell>
-                      <TableCell align='center'>Tên thiết bị</TableCell>
-                      <TableCell align='center'>Loại</TableCell>
-                      <TableCell align='center'>Địa chỉ IP</TableCell>
-                      <TableCell align='center'>Địa chỉ Mac</TableCell>
-                      <TableCell align='center'>Vị trí</TableCell>
-                      <TableCell align='center'>Trạng thái</TableCell>
+                      <TableCell align='center'>NO.</TableCell>
+                      <TableCell align='center'>Device Name</TableCell>
+                      <TableCell align='center'>Device Type</TableCell>
+                      <TableCell align='center'>IP Address</TableCell>
+                      <TableCell align='center'>Mac Address</TableCell>
+                      <TableCell align='center'>Location</TableCell>
+                      <TableCell align='center'>Status</TableCell>
 
-                      <TableCell align='center'>Hành động</TableCell>
+                      <TableCell align='center'>Active</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -1080,7 +1080,7 @@ const Add = ({ apiData }) => {
                                 size='small'
                                 skin='light'
                                 sx={{ lineHeight: 1 }}
-                                label={assetType.status.name === 'disconnected' ? 'Mất kết nối' : 'Đã kết nối'}
+                                label={assetType.status.name === 'disconnected' ? 'Lost connection' : 'Connected'}
                                 color={assetType.status.name === 'disconnected' ? 'primary' : 'success'}
                               />
                             </div>

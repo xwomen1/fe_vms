@@ -162,7 +162,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                       id='validation-basic-select'
                       error={Boolean(errors.location)}
                       aria-describedby='validation-basic-select'
-                      {...(errors.location && { helperText: 'Trường này bắt buộc' })}
+                      {...(errors.location && { helperText: 'This field is required' })}
                     >
                       {locations.map(item => (
                         <MenuItem key={item.id} value={item.name}>
@@ -191,7 +191,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                       id='validation-basic-select'
                       error={Boolean(errors.cameraName)}
                       aria-describedby='validation-basic-select'
-                      {...(errors.cameraName && { helperText: 'Trường này bắt buộc' })}
+                      {...(errors.cameraName && { helperText: 'This field is required' })}
                     >
                       {cameras.map(item => (
                         <MenuItem key={item.id} value={item.name}>

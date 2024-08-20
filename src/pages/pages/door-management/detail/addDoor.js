@@ -297,7 +297,7 @@ const AddDoor = () => {
                 options={flattenedDeviceGroups}
                 getOptionLabel={option => option.name}
                 onChange={(event, newValue) => setSelectedGroup(newValue)}
-                renderInput={params => <CustomTextField {...params} label='Loại thiết bị' fullWidth />}
+                renderInput={params => <CustomTextField {...params} label='Device type' fullWidth />}
                 loading={loading}
                 disabled
               />

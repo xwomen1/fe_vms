@@ -249,7 +249,7 @@ const AccessControlDevice = () => {
         `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/device-groups/${selectedNode}`,
         config
       )
-      toast.success('Xóa thành công')
+      toast.success('Deleted successfully')
       fetchDataList() // Làm mới dữ liệu sau khi xóa
     } catch (error) {
       console.error('Error deleting data:', error)
@@ -454,10 +454,10 @@ const AccessControlDevice = () => {
           <div>
             {' '}
             <p style={{ color: 'red', textAlign: 'center', display: nameNull ? 'block' : 'none' }}>
-            Please enter the group name            
+              Please enter the group name
             </p>
             <p style={{ color: 'red', textAlign: 'center', display: name50 ? 'block' : 'none' }}>
-            The group name must not exceed 50 characters
+              The group name must not exceed 50 characters
             </p>
           </div>
         </DialogContent>
@@ -473,7 +473,7 @@ const AccessControlDevice = () => {
       <Dialog open={openDelete} onClose={handleCloseDelete} fullWidth>
         <DialogTitle style={{ fontSize: '20px' }}>Delete Device Group</DialogTitle>
         <DialogContent>
-        You need to remove all devices from the group before you can proceed with deleting the group
+          You need to remove all devices from the group before you can proceed with deleting the group
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDelete} variant='contained'>

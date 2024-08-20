@@ -70,8 +70,8 @@ const RolePopup = ({ open, onClose, onSelect, nvr, name, ip }) => {
       <DialogContent>
         <TabContext value={value}>
           <TabList onChange={handleChange} aria-label='customized tabs example'>
-            <Tab value='1' label='Gắn camera' />
-            <Tab value='2' label='Danh sách camera của NVR' />
+            <Tab value='1' label='add camera to NVr' />
+            <Tab value='2' label='Camera list of nvr' />
           </TabList>
           <TabPanel value='1'>
             <Quet nvr={nvr} onClose={onClose} />
@@ -87,7 +87,7 @@ const RolePopup = ({ open, onClose, onSelect, nvr, name, ip }) => {
 
         // onClick={}
         >
-          Quét
+          Scan
         </Button> */}
         <Button variant='contained' onClick={onClose}>
           OK

@@ -204,7 +204,6 @@ const VideoConfig = ({ open, onClose, camera }) => {
       setResolution(videoConfigSub?.resolution)
       setVideoEncoding(videoConfigSub?.videoEncoding)
     }
-    console.log('streamType', streamType);
   }, [streamType, videoConfig])
 
   const fetchData = async () => {
@@ -262,7 +261,7 @@ const VideoConfig = ({ open, onClose, camera }) => {
 
     putApi(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/videoconfig/${camera}`, { ...params })
       .then(() => {
-        toast.success('Cập nhật thành công')
+        toast.success('Data has been updated successfully ')
       })
       .catch(error => {
         if (error && error?.response?.data) {
@@ -295,7 +294,7 @@ const VideoConfig = ({ open, onClose, camera }) => {
       <DialogContent>
         <Box sx={{ textAlign: 'left' }}>
           <Typography variant='h5' sx={{ mb: 3 }}>
-            Cấu hình video
+            Video configuration
           </Typography>
         </Box>
         <Grid container spacing={3} sx={{ height: '300px', position: 'relative' }}>
@@ -325,7 +324,7 @@ const VideoConfig = ({ open, onClose, camera }) => {
                             placeholder={item.placeholder}
                             error={Boolean(errors[item.name])}
                             aria-describedby='validation-basic-last-name'
-                            {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
+                            {...(errors[item.name] && { helperText: 'This field is required' })}
                           />
                         )}
                       />
@@ -389,7 +388,7 @@ const VideoConfig = ({ open, onClose, camera }) => {
                                 fullWidth
                                 error={Boolean(errors[item.name])}
                                 aria-describedby='validation-basic-last-name'
-                                {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
+                                {...(errors[item.name] && { helperText: 'This field is required' })}
                               />
                             )}
                           />
@@ -405,7 +404,7 @@ const VideoConfig = ({ open, onClose, camera }) => {
       </DialogContent>
       <DialogActions>
         <Button variant='contained' color='secondary' onClick={handleCancel}>Cancel</Button>
-        <Button variant='contained' color='primary' onClick={handleSubmit(onSubmit)}>OK</Button>
+        <Button variant='contained' color='primary' onClick={handleSubmit(onSubmit)}>Save</Button>
       </DialogActions>
     </Dialog>
   )

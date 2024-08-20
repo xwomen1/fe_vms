@@ -106,12 +106,12 @@ const UpDateCar = () => {
             loaded
               ? { display: 'none' }
               : {
-                  width: '100%',
-                  height: '100%',
-                  display: 'grid',
-                  backgroundColor: '#C4C4C4',
-                  placeItems: 'center'
-                }
+                width: '100%',
+                height: '100%',
+                display: 'grid',
+                backgroundColor: '#C4C4C4',
+                placeItems: 'center'
+              }
           }
         >
           <CircularProgress size={20} />
@@ -119,7 +119,7 @@ const UpDateCar = () => {
         <img
           {...props}
           src={src}
-          alt='Ảnh'
+          alt='Image'
           onLoad={() => setLoaded(true)}
           style={loaded ? { width: '100%', height: '100%' } : { display: 'none' }}
         />
@@ -131,7 +131,7 @@ const UpDateCar = () => {
     if (e.value.length > 0) {
       if (e.value.length + listFileUpload.length > 5) {
         Swal.fire({
-          text: 'Tối đa 5 file',
+          text: 'Up to 5 photos',
           icon: 'error',
           showCancelButton: false,
           showCloseButton: false,
@@ -345,13 +345,13 @@ const UpDateCar = () => {
 
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates/${id}`, params, config)
       Swal.fire({
-        title: 'Thành công!',
+        title: 'Successfully!',
         text: 'Data has been updated successfully.',
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -365,7 +365,7 @@ const UpDateCar = () => {
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -393,7 +393,7 @@ const UpDateCar = () => {
         <Grid item xs={12} style={{ position: 'relative', zIndex: '1' }}>
           <Card>
             <CardHeader
-              title='Đối tượng danh sách'
+              title='Details'
               titleTypographyProps={{ sx: { mb: [2, 0] } }}
               action={
                 <Grid container spacing={2}>
@@ -405,10 +405,10 @@ const UpDateCar = () => {
                         href={`/pages/car_management/list`}
                         sx={{ color: 'blue' }}
                       >
-                        Hủy
+                        Cancel
                       </Button>
                       <Button onClick={handleUpdate} variant='contained'>
-                        {loading ? 'Updating...' : 'Cập nhật'}
+                        {loading ? 'Updating...' : 'Save'}
                       </Button>
                     </Box>
                   </Grid>
@@ -447,7 +447,7 @@ const UpDateCar = () => {
                           margin: '0px'
                         }}
                       >
-                        Ảnh đại diện
+                        Avatar
                       </p>
                       <div
                         style={{
@@ -493,7 +493,7 @@ const UpDateCar = () => {
                         <CustomTextField
                           id='eventName'
                           eventname='eventName'
-                          placeholder={`Tên đối tượng`}
+                          placeholder={`Name`}
                           defaultValue=''
                           value={name || ''}
                           onInput={e => {
@@ -517,7 +517,7 @@ const UpDateCar = () => {
                         margin: '0px'
                       }}
                     >
-                      Loại xe
+                      Vehicle Type
                     </p>
                     <TextField
                       variant='standard'
@@ -527,7 +527,7 @@ const UpDateCar = () => {
                         width: '100%'
                       }}
                       defaultValue=''
-                      placeholder='  Nhập Loại xe ...!'
+                      placeholder='Vehicle type'
                       value={`${type}` || ''}
                       onInput={e => {
                         setType(e.target.value)
@@ -541,7 +541,7 @@ const UpDateCar = () => {
                           margin: '0px'
                         }}
                       >
-                        Trạng thái hoạt động
+                        Status active
                       </p>
                       <Switch checked={status1 === true} onChange={handleStatusChange} />
                     </div>
@@ -552,7 +552,7 @@ const UpDateCar = () => {
                         margin: '0px'
                       }}
                     >
-                      Ghi chú
+                      Description
                     </p>
 
                     <TextField
@@ -565,7 +565,7 @@ const UpDateCar = () => {
                         width: '100%'
                       }}
                       defaultValue=''
-                      placeholder='  Nhập ghi chú ...!'
+                      placeholder='Description'
                       value={`${note}` || ''}
                       onInput={e => {
                         setNote(e.target.value)
@@ -577,12 +577,12 @@ const UpDateCar = () => {
                     <p style={{ margin: '35px 0px 0px 0px', marginTop: '250px', marginLeft: '20px' }}>
                       <div></div>
 
-                      {`Ảnh của đối tượng : ( tối đa 5 ảnh)`}
+                      {`Photo of object: ( Up to 5 photos)`}
                     </p>
                   )}
                   {listFileUpload.length > 0 && (
                     <p style={{ margin: '35px 0px 0px 0px', marginTop: '200px', marginLeft: '10px' }}>
-                      {`Ảnh của đối tượng: ${listFileUpload.length}/5`}
+                      {`Photo of object: ${listFileUpload.length}/5`}
                     </p>
                   )}
                   <div
@@ -618,7 +618,7 @@ const UpDateCar = () => {
                                 lineHeight: '19px'
                               }}
                             >
-                              {`Kéo thả ảnh`}
+                              {`Drag and drop photos`}
                             </p>
                             <p
                               style={{
@@ -626,7 +626,7 @@ const UpDateCar = () => {
                                 lineHeight: '19px'
                               }}
                             >
-                              {`Hoặc`}
+                              {`Or`}
                             </p>
                             <Button
                               style={{
@@ -636,7 +636,7 @@ const UpDateCar = () => {
                               variant='contained'
                               color='primary'
                             >
-                              {`Tải ảnh lên`}
+                              {`Upload photos`}
                             </Button>
                           </div>
                         </div>

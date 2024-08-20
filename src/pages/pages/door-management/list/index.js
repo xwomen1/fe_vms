@@ -234,14 +234,14 @@ const DoorManagement = () => {
 
   function showAlertConfirm(options, intl) {
     const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Accept',
       imageWidth: 213,
       showCancelButton: true,
       showCloseButton: true,
       showConfirmButton: true,
       focusCancel: true,
       reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Agree',
       cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
       customClass: {
         content: 'content-class',
@@ -270,7 +270,7 @@ const DoorManagement = () => {
           .then(() => {
             Swal.fire({
               title: 'Thành công!',
-              text: 'Xóa thành công',
+              text: 'Deleted successfully',
               icon: 'success',
               willOpen: () => {
                 const confirmButton = Swal.getConfirmButton()
@@ -306,11 +306,11 @@ const DoorManagement = () => {
 
   const Doorlock = async () => {
     const confirmResult = await Swal.fire({
-      title: 'Xác nhận',
+      title: 'Accept',
       text: 'Khóa cửa sẽ dừng hoạt động của cửa trong tòa nhà, bạn có chắc chắn khóa cửa này?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Đồng ý',
+      confirmButtonText: 'Agree',
       cancelButtonText: 'Hủy',
       customClass: {
         confirmButton: 'swal-btn-confirm',
@@ -348,11 +348,11 @@ const DoorManagement = () => {
 
   const FreeLock = async () => {
     const confirmResult = await Swal.fire({
-      title: 'Xác nhận',
+      title: 'Accept',
       text: 'Xả cửa sẽ cho phép người dùng vào bất kỳ phòng nào trong tòa nhà, bạn có chắc chắn xả cửa này?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Đồng ý',
+      confirmButtonText: 'Agree',
       cancelButtonText: 'Hủy',
       customClass: {
         confirmButton: 'swal-btn-confirm',
@@ -390,11 +390,11 @@ const DoorManagement = () => {
 
   const SetUp = async () => {
     const confirmResult = await Swal.fire({
-      title: 'Xác nhận',
+      title: 'Accept',
       text: 'Đặt lại chế độ sẽ thay đổi cài đặt trước đó, bạn có chắc chắn muốn đặt lại chế độ cửa này?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Đồng ý',
+      confirmButtonText: 'Agree',
       cancelButtonText: 'Hủy',
       customClass: {
         confirmButton: 'swal-btn-confirm',

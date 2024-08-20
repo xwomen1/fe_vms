@@ -459,7 +459,7 @@ const Add = ({ open, onClose, id, setReload }) => {
                           placeholder={item.placeholder}
                           error={Boolean(errors[item.name])}
                           aria-describedby='validation-basic-last-name'
-                          {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
+                          {...(errors[item.name] && { helperText: 'This field is required' })}
                         />
                       )}
                     />
@@ -500,7 +500,7 @@ const Add = ({ open, onClose, id, setReload }) => {
                               fullWidth
                               error={Boolean(errors[item.name])}
                               aria-describedby='validation-basic-last-name'
-                              {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
+                              {...(errors[item.name] && { helperText: 'This field is required' })}
                             />
                           )}
                         />
@@ -549,7 +549,7 @@ const Add = ({ open, onClose, id, setReload }) => {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>STT</TableCell>
+                      <TableCell>NO.</TableCell>
                       <TableCell width={200}>Giờ bắt đầu</TableCell>
                       <TableCell width={200}>Giờ kết thúc</TableCell>
                       <TableCell>Giá ngày thường</TableCell>
@@ -627,7 +627,7 @@ const Add = ({ open, onClose, id, setReload }) => {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>STT</TableCell>
+                      <TableCell>NO.</TableCell>
                       <TableCell>Mã bãi đỗ xe</TableCell>
                       <TableCell>Tên bãi đỗ xe</TableCell>
                       <TableCell>Khu vực</TableCell>

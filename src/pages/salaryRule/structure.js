@@ -58,14 +58,14 @@ const UserList = ({ apiData }) => {
 
   function showAlertConfirm(options, intl) {
     const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Accept',
       imageWidth: 213,
       showCancelButton: true,
       showCloseButton: true,
       showConfirmButton: true,
       focusCancel: true,
       reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Agree',
       cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
       customClass: {
         content: 'content-class',
@@ -253,7 +253,7 @@ const UserList = ({ apiData }) => {
         axios
           .delete(urlDelete, config)
           .then(() => {
-            Swal.fire('Xóa thành công', '', 'success')
+            Swal.fire('Deleted successfully', '', 'success')
             const updatedData = userData.filter(user => user.userId !== idDelete)
 
             // setUserData(updatedData)
@@ -279,7 +279,7 @@ const UserList = ({ apiData }) => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ padding: '16px' }}>STT</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>NO.</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Tên group</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Công thức áp dụng</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Lương cơ bản</TableCell>
@@ -296,7 +296,7 @@ const UserList = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{'A+B+C+D'}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{user?.salaryBase}</TableCell>
 
-                      <TableCell sx={{ padding: '16px' }}>{}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{ }</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

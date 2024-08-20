@@ -19,7 +19,7 @@ import authConfig from 'src/configs/auth'
 import axios from 'axios'
 import { Controller, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
-import { TreeItem, TreeView } from '@mui/lab'
+import { Autocomplete } from '@mui/lab'
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Fade ref={ref} {...props} />
@@ -68,11 +68,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
 
   const fetchDoorList = async () => {
     try {
-      const res = await axios.get(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/doors
-            `,
-        config
-      )
+      const res = await axios.get(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/doors`, config)
       setDoorList(res.data.rows)
     } catch (error) {
       console.error('Error fetching data: ', error)
@@ -102,7 +98,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
   }
 
   useEffect(() => {
-    reset(valueFilter) // Cập nhật giá trị mặc định mỗi khi valueFilter thay đổi
+    reset(valueFilter)
   }, [valueFilter, reset])
 
   useEffect(() => {
@@ -121,7 +117,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
   }
 
   const onSubmit = values => {
-    var detail = { ...values } // Thêm selectedGroupId vào object detail trước khi callback
+    var detail = { ...values }
     callback(detail)
     onClose()
   }
@@ -169,43 +165,23 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                   name='groupId'
                   control={control}
                   render={({ field: { value, onChange } }) => (
-                    <Box position='relative'>
-                      <CustomTextField
-                        select
-                        fullWidth
-                        label='Department'
-                        SelectProps={{
-                          value: value || '',
-                          onChange: e => onChange(e.target.value),
-                          MenuProps: {
-                            PaperProps: {
-                              style: {
-                                maxHeight: 200 // Đặt chiều cao tối đa của menu
-                              }
-                            }
-                          }
-                        }}
-                        id='validation-basic-select'
-                        error={Boolean(errors.groupId)}
-                        aria-describedby='validation-basic-select'
-                        helperText={errors.groupId ? 'This field is required' : ''}
-                      >
-                        {groupName.map(item => (
-                          <MenuItem key={item.id} value={item.id}>
-                            {item.name}
-                          </MenuItem>
-                        ))}
-                      </CustomTextField>
-                      {value && (
-                        <IconButton
-                          size='small'
-                          style={{ position: 'absolute', right: 25, top: 30 }}
-                          onClick={() => handleClear(onChange, 'groupId')}
-                        >
-                          <Icon icon='tabler:x' fontSize='1rem' />
-                        </IconButton>
+                    <Autocomplete
+                      options={groupName}
+                      getOptionLabel={option => option.name}
+                      onChange={(event, newValue) => onChange(newValue ? newValue.id : '')}
+                      value={groupName.find(option => option.id === value) || null}
+                      renderInput={params => (
+                        <CustomTextField
+                          {...params}
+                          label='Department'
+                          error={Boolean(errors.groupId)}
+                          helperText={errors.groupId ? 'This field is required' : ''}
+                          InputProps={{
+                            ...params.InputProps
+                          }}
+                        />
                       )}
-                    </Box>
+                    />
                   )}
                 />
               </Grid>
@@ -215,79 +191,53 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                   name='doorInId'
                   control={control}
                   render={({ field: { value, onChange } }) => (
-                    <Box position='relative'>
-                      <CustomTextField
-                        select
-                        fullWidth
-                        defaultValue=''
-                        label='Door In'
-                        SelectProps={{
-                          value: value,
-                          onChange: e => onChange(e)
-                        }}
-                        id='validation-basic-select'
-                        error={Boolean(errors.doorInId)}
-                        aria-describedby='validation-basic-select'
-                        {...(errors.doorInId && { helperText: 'This field is required' })}
-                      >
-                        {doorList.map(door => (
-                          <MenuItem key={door.id} value={door.id}>
-                            {door.name}
-                          </MenuItem>
-                        ))}
-                      </CustomTextField>
-                      {value && (
-                        <IconButton
-                          size='small'
-                          style={{ position: 'absolute', right: 25, top: 30 }}
-                          onClick={() => handleClear(onChange, 'doorInId')}
-                        >
-                          <Icon icon='tabler:x' fontSize='1rem' />
-                        </IconButton>
+                    <Autocomplete
+                      options={doorList}
+                      getOptionLabel={option => option.name}
+                      onChange={(event, newValue) => onChange(newValue ? newValue.id : '')}
+                      value={doorList.find(option => option.id === value) || null}
+                      renderInput={params => (
+                        <CustomTextField
+                          {...params}
+                          label='Door In'
+                          error={Boolean(errors.doorInId)}
+                          helperText={errors.doorInId ? 'This field is required' : ''}
+                          InputProps={{
+                            ...params.InputProps
+                          }}
+                        />
                       )}
-                    </Box>
+                    />
                   )}
                 />
               </Grid>
+
               <Grid item xs={12} sm={4}>
                 <Controller
                   name='doorOutId'
                   control={control}
                   render={({ field: { value, onChange } }) => (
-                    <Box position='relative'>
-                      <CustomTextField
-                        select
-                        fullWidth
-                        defaultValue=''
-                        label='Door Out'
-                        SelectProps={{
-                          value: value,
-                          onChange: e => onChange(e)
-                        }}
-                        id='validation-basic-select'
-                        error={Boolean(errors.doorOutId)}
-                        aria-describedby='validation-basic-select'
-                        {...(errors.doorOutId && { helperText: 'This field is required' })}
-                      >
-                        {doorList.map(door => (
-                          <MenuItem key={door.id} value={door.id}>
-                            {door.name}
-                          </MenuItem>
-                        ))}
-                      </CustomTextField>
-                      {value && (
-                        <IconButton
-                          size='small'
-                          style={{ position: 'absolute', right: 25, top: 30 }}
-                          onClick={() => handleClear(onChange, 'doorOutId')}
-                        >
-                          <Icon icon='tabler:x' fontSize='1rem' />
-                        </IconButton>
+                    <Autocomplete
+                      options={doorList}
+                      getOptionLabel={option => option.name}
+                      onChange={(event, newValue) => onChange(newValue ? newValue.id : '')}
+                      value={doorList.find(option => option.id === value) || null}
+                      renderInput={params => (
+                        <CustomTextField
+                          {...params}
+                          label='Door Out'
+                          error={Boolean(errors.doorOutId)}
+                          helperText={errors.doorOutId ? 'This field is required' : ''}
+                          InputProps={{
+                            ...params.InputProps
+                          }}
+                        />
                       )}
-                    </Box>
+                    />
                   )}
                 />
               </Grid>
+
               <Grid item xs={12}>
                 <DialogActions
                   sx={{

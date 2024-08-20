@@ -1,4 +1,4 @@
-import { forwardRef, useState } from 'react'
+import { forwardRef, useEffect, useState } from 'react'
 import { Fade, Grid, IconButton, Dialog, DialogTitle, DialogContent } from '@mui/material'
 import Tab from '@mui/material/Tab'
 import TabPanel from '@mui/lab/TabPanel'
@@ -59,7 +59,7 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
 }))
 
 const StyledTabPanel = styled(TabPanel)(({ theme }) => ({
-  height: 1000, // Fixed height for the tab content
+  height: 'auto', // Fixed height for the tab content
   width: '100%', // Adjust to 100% of the dialog's width
   overflow: 'auto' // Enable scrolling if content exceeds the height
 }))
@@ -96,17 +96,17 @@ const Edit = ({ open, onClose, camera }) => {
       <CustomCloseButton onClick={onClose}>
         <Icon icon='tabler:x' fontSize='1.25rem' />
       </CustomCloseButton>
-      <DialogTitle>Chỉnh sửa</DialogTitle>
+      <DialogTitle>Edit </DialogTitle>
       <DialogContent>
         <TabContext value={value}>
           <Grid>
             <TabList onChange={handleChange} aria-label='customized tabs example'>
-              <Tab value='0' label='Thiết bị' />
-              <Tab value='1' label='Mật khẩu' />
-              <Tab value='2' label='Mạng' />
+              <Tab value='0' label='Device ' />
+              <Tab value='1' label='Password' />
+              <Tab value='2' label='Network' />
               <Tab value='3' label='Video' />
-              <Tab value='4' label='Hình ảnh' />
-              <Tab value='5' label='Bộ nhớ' />
+              <Tab value='4' label='Image' />
+              <Tab value='5' label='Storage' />
             </TabList>
           </Grid>
           <StyledTabPanel value='0'>
@@ -119,10 +119,10 @@ const Edit = ({ open, onClose, camera }) => {
             <Networks camera={camera} onClose={handleCancel} />
           </StyledTabPanel>
           <StyledTabPanel value='3'>
-            <Video nvrs={cameras} onClose={handleCancel} />
+            <Video onClose={handleCancel} camera={camera} />
           </StyledTabPanel>
           <StyledTabPanel value='4'>
-            <Images nvrs={cameras} onClose={handleCancel} />
+            <Images cameraId={camera} onClose={handleCancel} />
           </StyledTabPanel>
           <StyledTabPanel value='5'>
             <Cloud nvrs={cameras} onClose={handleCancel} />

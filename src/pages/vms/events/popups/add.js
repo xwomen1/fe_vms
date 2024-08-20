@@ -55,7 +55,7 @@ const format_form = [
   {
     name: 'imageObject',
     label: 'Image',
-    placeholder: 'Nhập Image',
+    placeholder: 'Image',
     type: 'ImageObject',
     data: [],
     require: true,
@@ -63,8 +63,8 @@ const format_form = [
   },
   {
     name: 'result',
-    label: 'Biển số xe',
-    placeholder: 'Biển số xe',
+    label: 'Result',
+    placeholder: 'Result',
     type: 'TextField',
     data: [],
     require: true,
@@ -73,7 +73,7 @@ const format_form = [
   {
     name: 'description',
     label: 'Object',
-    placeholder: 'Nhập Object Name',
+    placeholder: 'Object Name',
     type: 'TextField',
     data: [],
     require: true,
@@ -82,7 +82,7 @@ const format_form = [
   {
     name: 'timestamp',
     label: 'Date',
-    placeholder: 'Nhập Date',
+    placeholder: 'Date',
     type: 'TextField',
     data: [],
     require: true,
@@ -91,7 +91,7 @@ const format_form = [
   {
     name: 'cameraId',
     label: 'Camera',
-    placeholder: 'Nhập Camera',
+    placeholder: 'Camera',
     type: 'VAutocomplete',
     data: [],
     require: true,
@@ -100,7 +100,7 @@ const format_form = [
   {
     name: 'location',
     label: 'Location',
-    placeholder: 'Nhập Location',
+    placeholder: 'Location',
     type: 'TextField',
     data: [],
     require: true,
@@ -109,7 +109,7 @@ const format_form = [
   {
     name: 'imageResult',
     label: 'Full Screen',
-    placeholder: 'Nhập ảnh toán cảnh',
+    placeholder: 'Full Screen',
     type: 'ImageResult',
     data: [],
     require: true,
@@ -177,7 +177,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
         toast.error(error)
       }
     } finally {
-      ;() => {
+      ; () => {
         setLoading(false)
       }
     }
@@ -199,7 +199,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
         toast.error(error)
       }
     } finally {
-      ;() => {
+      ; () => {
         setLoading(false)
       }
     }
@@ -223,7 +223,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
     axios
       .put(`https://sbs.basesystem.one/ivis/cmsgo/api/v0/aievents/update/${data.id}`, { ...params }, config)
       .then(() => {
-        toast.success('Thay đổi thành công')
+        toast.success('Updated success')
         onClose()
       })
       .catch(err => {
@@ -323,7 +323,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
                                   placeholder={item.placeholder}
                                   error={Boolean(errors[item.name])}
                                   aria-describedby='validation-basic-last-name'
-                                  {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
+                                  {...(errors[item.name] && { helperText: 'This field is required' })}
                                 />
                               )}
                             />
@@ -356,7 +356,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
                                     id='validation-basic-select'
                                     error={Boolean(errors[item.name])}
                                     aria-describedby='validation-basic-select'
-                                    {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
+                                    {...(errors[item.name] && { helperText: 'This field is required' })}
                                   >
                                     {item.name === 'cameraId' &&
                                       cameraList.map(x => (

@@ -90,7 +90,7 @@ const EventDetails = ({ show, onClose, data, setReload }) => {
         if (videoDownloadUrl) {
           await handleExportLinkDownload(videoDownloadUrl)
         } else {
-          toast.error('Không tìm thấy URL tải về video')
+          toast.error('Download URL for the video not found')
         }
       } catch (error) {
         if (error && error?.response?.data) {

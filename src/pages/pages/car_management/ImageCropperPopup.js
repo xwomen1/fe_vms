@@ -7,7 +7,7 @@ import {
   Slider,
 } from "@mui/material"
 import Cropper from 'react-cropper'
-import { makeStyles} from '@material-ui/core/styles'
+import { makeStyles } from '@material-ui/core/styles'
 import styled from 'styled-components'
 
 function ImageCropper({ onClose, fileAvatar, setFileAvatar, setAvatarImage }) {
@@ -109,7 +109,7 @@ function ImageCropper({ onClose, fileAvatar, setFileAvatar, setAvatarImage }) {
           }}
         />
         <div className={classes.vertical}>
-          <Slider  color='primary' orientation='vertical' defaultValue={0} onChange={handleSliderChange} />
+          <Slider color='primary' orientation='vertical' defaultValue={0} onChange={handleSliderChange} />
         </div>
         <Button
           id='btnSaveAndContinue'
@@ -119,7 +119,7 @@ function ImageCropper({ onClose, fileAvatar, setFileAvatar, setAvatarImage }) {
           }}
           style={{
             height: '40px',
-            width:'28%',
+            width: '28%',
             right: '30px',
             background: '#FFFFFF',
             boxShadow: '0px 4px 10px rgba(16, 156, 241, 0.24)',
@@ -130,8 +130,8 @@ function ImageCropper({ onClose, fileAvatar, setFileAvatar, setAvatarImage }) {
             color: '#00695C'
           }}
         >
-          Đặt làm ảnh đại diện
-          </Button>
+          Set as profile picture
+        </Button>
       </div>
     </Modal>
   )

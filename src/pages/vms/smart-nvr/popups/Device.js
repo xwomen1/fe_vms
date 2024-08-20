@@ -192,13 +192,13 @@ const Device = ({ onClose, nvr }) => {
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/device/${nvr}`, data, config)
       setLoading(false)
       Swal.fire({
-        title: 'Thành công!',
-        text: 'Dữ liệu đã được Lưu thành công.',
+        title: 'Successfully!',
+        text: 'Data was saved successfully',
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -217,7 +217,7 @@ const Device = ({ onClose, nvr }) => {
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -297,7 +297,7 @@ const Device = ({ onClose, nvr }) => {
         <Grid container item style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
           <Grid item xs={3.9}>
             <CustomTextField
-              label='Tên thiết bị'
+              label='Device Name'
               type='text'
               value={cameraName}
               onChange={handleCameraNameChange}
@@ -307,7 +307,7 @@ const Device = ({ onClose, nvr }) => {
           <Grid item xs={0.1}></Grid>
           <Grid item xs={3.9}>
             <CustomTextField
-              label='Tên người dùng'
+              label='Username'
               type='text'
               value={userName}
               onChange={handleUserNameChange}
@@ -316,12 +316,12 @@ const Device = ({ onClose, nvr }) => {
           </Grid>
           <Grid item xs={0.1}></Grid>
           <Grid item xs={4}>
-            <CustomTextField label='Mật khẩu' type='text' value={password} onChange={handlePasswordChange} fullWidth />
+            <CustomTextField label='Password' type='text' value={password} onChange={handlePasswordChange} fullWidth />
           </Grid>
 
           <Grid item xs={3.9}>
             <CustomTextField
-              label='Địa chỉ IP'
+              label='IP Address'
               type='text'
               value={ipAddress}
               onChange={handleIpAddressChange}
@@ -330,16 +330,16 @@ const Device = ({ onClose, nvr }) => {
           </Grid>
           <Grid item xs={0.1}></Grid>
           <Grid item xs={3.9}>
-            <CustomTextField label='Cổng http' type='text' value={http} onChange={handleHttpChange} fullWidth />
+            <CustomTextField label='Http Port' type='text' value={http} onChange={handleHttpChange} fullWidth />
           </Grid>
           <Grid item xs={0.1}></Grid>
 
           <Grid item xs={4}>
-            <CustomTextField label='Cổng onvif ' type='text' value={onvif} onChange={handleOnvifChange} fullWidth />
+            <CustomTextField label='Onvif Port ' type='text' value={onvif} onChange={handleOnvifChange} fullWidth />
           </Grid>
           <Grid item xs={3.9}>
             <CustomTextField
-              label='Phiên bản app '
+              label='Version '
               type='text'
               value={appVersion}
               onChange={handleVersionChange}
@@ -354,7 +354,7 @@ const Device = ({ onClose, nvr }) => {
               onChange={handleRegionsChange}
               options={regions}
               getOptionLabel={option => option.label}
-              renderInput={params => <CustomTextField {...params} label='Vùng' fullWidth />}
+              renderInput={params => <CustomTextField {...params} label='Region' fullWidth />}
               onFocus={handleComboboxFocusRegions}
             />{' '}
           </Grid>
@@ -370,15 +370,15 @@ const Device = ({ onClose, nvr }) => {
             />
           </Grid>
           <Grid item xs={4}>
-            {formatDDNS(isOfflineSetting)} thiết bị đang ngoại tuyến
+            {formatDDNS(isOfflineSetting)} The device is offline
           </Grid>
           <Grid item xs={7}>
-            Khôi phục cài đặt thiết bị
+            Restore device settings
             <br></br>
             <Button variant='contained' style={{ marginRight: '2%' }}>
-              Toàn bộ
+              All
             </Button>
-            <Button variant='contained'>Khôi phục cài đặt mạng</Button>
+            <Button variant='contained'>Restore network settings</Button>
           </Grid>
         </Grid>
       </Grid>
@@ -392,9 +392,9 @@ const Device = ({ onClose, nvr }) => {
           }}
         >
           <Button type='submit' variant='contained' onClick={handleSaveClick}>
-            Lưu
+            Save
           </Button>
-          <Button onClick={onClose}>Đóng</Button>
+          <Button onClick={onClose}>Close</Button>
         </DialogActions>
       </Grid>
     </div>

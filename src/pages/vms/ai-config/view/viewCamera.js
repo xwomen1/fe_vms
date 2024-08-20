@@ -210,7 +210,7 @@ const Review = ({ id, name, channel }) => {
                     {camera.id === '' &&
                         <div style={{ height: '70vh', background: '#000', display: 'flex', justifyContent: 'center' }}>
                             <IconButton disabled>
-                                <Icon icon="tabler:player-play-filled" width='48' height='48' style={{ color: '#FF9F43' }} />
+                                <Icon icon="tabler:player-play-filled" width='48' height='48' style={{ color: '#002060' }} />
                             </IconButton>
                         </div>
                     }
@@ -235,7 +235,7 @@ const Review = ({ id, name, channel }) => {
                 <Grid item xs={12}>
                     <div className='bottom-controls' style={{ background: '#000' }}>
                         <div className='left-controls'>
-                            <Box className='w-100' sx={{ px: 2 }}>
+                            {/* <Box className='w-100' sx={{ px: 2 }}>
                                 <Slider
                                     defaultValue={1}
                                     min={0.5}
@@ -277,7 +277,7 @@ const Review = ({ id, name, channel }) => {
                                         }
                                     }}
                                 />
-                            </Box>
+                            </Box> */}
                             <div className='w-100' style={{ display: 'flex', justifyContent: 'space-between' }}>
                                 {timeFilter && (
                                     <IconButton
@@ -336,8 +336,8 @@ const Review = ({ id, name, channel }) => {
                                     <Icon icon='tabler:minus' size='1em' color='#FFF' />
                                 </IconButton>
                                 <Typography style={{ color: '#fff', fontWeight: 'bold' }}>
-                                    {`${Math.floor(valueRange / (60 * 60 * 1000))} giờ -  ${(valueRange - 60 * 60 * 1000 * Math.floor(valueRange / (60 * 60 * 1000))) / (60 * 1000)
-                                        } phút `}
+                                    {`${Math.floor(valueRange / (60 * 60 * 1000))} Hour -  ${(valueRange - 60 * 60 * 1000 * Math.floor(valueRange / (60 * 60 * 1000))) / (60 * 1000)
+                                        } Minute `}
                                 </Typography>
                             </Box>
                             <Box className='w-100'>
