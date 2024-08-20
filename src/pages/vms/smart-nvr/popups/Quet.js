@@ -132,7 +132,7 @@ const AddCamera = ({ nvr, onClose }) => {
         }
       }
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/camera/${nvr}`, params, config)
-      setNotification({ message: 'Save successfully', type: 'success' })
+      setNotification({ message: 'Data has been updated successfully', type: 'success' })
     } catch (error) {
       setNotification({ message: `Device not responding: ${error.message}`, type: 'error' })
       console.error('Error adding member to group:', error)
