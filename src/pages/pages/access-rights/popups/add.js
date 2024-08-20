@@ -252,29 +252,51 @@ const Add = ({ show, onClose, setReload }) => {
     setIsCheckboxChecked(event.target.checked)
   }
 
+  const dayOfWeekMapping = {
+    1: 'MONDAY',
+    2: 'TUESDAY',
+    3: 'WEDNESDAY',
+    4: 'THURSDAY',
+    5: 'FRIDAY',
+    6: 'SATURDAY',
+    7: 'SUNDAY'
+  }
+
+  const createDefaultCalendarDays = () => {
+    return Object.keys(dayOfWeekMapping).map(key => ({
+      dayOfWeek: dayOfWeekMapping[key],
+      timePeriods: []
+    }))
+  }
+
   const onSubmit = async values => {
     try {
       const currentDate = new Date()
       const startDate = start || currentDate
       const endDate = end || currentDate
 
+      const defaultCalendarDays = createDefaultCalendarDays()
+
       if (values.calendarDays && Array.isArray(values.calendarDays)) {
-        const validCalendarDays = values.calendarDays
-          .filter(day => day.dayOfWeek && day.timePeriods && Array.isArray(day.timePeriods))
-          .map(day => {
-            return {
-              dayOfWeek: day.dayOfWeek,
-              timePeriods: day.timePeriods.map(timePeriod => {
-                return {
-                  endTimeInMinute: timePeriod.endTimeInMinute,
-                  startTimeInMinute: timePeriod.startTimeInMinute
-                }
-              })
-            }
-          })
+        const validCalendarDays = defaultCalendarDays.map(defaultDay => {
+          const existingDay = values.calendarDays.find(day => day.dayOfWeek === defaultDay.dayOfWeek)
+
+          return existingDay
+            ? {
+                dayOfWeek: existingDay.dayOfWeek,
+                timePeriods: Array.isArray(existingDay.timePeriods)
+                  ? existingDay.timePeriods.map(timePeriod => ({
+                      endTimeInMinute: timePeriod.endTimeInMinute,
+                      startTimeInMinute: timePeriod.startTimeInMinute
+                    }))
+                  : []
+              }
+            : defaultDay
+        })
+
         values.calendarDays = validCalendarDays
       } else {
-        values.calendarDays = []
+        values.calendarDays = defaultCalendarDays
       }
 
       values['startDate'] = format(startDate, 'yyyy-MM-dd')

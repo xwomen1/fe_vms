@@ -80,7 +80,8 @@ const InforAll = ({ idInfor }) => {
       // Fetch regions and set Autocomplete value if doorName matches any region name
       await fetchRegions() // Ensure fetchRegions updates regions before proceeding
       setRegions(currentRegions => {
-        const matchingRegion = currentRegions.find(region => region.name === deviceData.doorName)
+        const matchingRegion = currentRegions.find(region => region.name.trim() === deviceData.doorName.trim())
+
         console.log(matchingRegion, 'match')
 
         if (matchingRegion) {

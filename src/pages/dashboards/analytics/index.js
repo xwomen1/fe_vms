@@ -447,7 +447,7 @@ const EventList = () => {
             </Grid>
             <Card>
               <div style={{ marginLeft: '25px' }}>
-                {chartData.length > 0 ? ( // Kiểm tra dữ liệu trước khi render
+                {chartData.length > 0 ? (
                   <PieChart width={400} height={400}>
                     <Pie
                       data={chartData}
