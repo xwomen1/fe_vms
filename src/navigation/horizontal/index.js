@@ -15,6 +15,12 @@ const navigation = () => {
           path: '/access-control/event-management',
           icon: 'tabler:calendar-event'
         },
+
+        // {
+        //   title: 'Scheduling',
+        //   path: '/pages/scheduling',
+        //   icon: 'tabler:calendar-plus'
+        // },
         {
           title: 'Device Management',
           path: '/device-management',
