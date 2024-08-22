@@ -50,7 +50,7 @@ const TableHeader = ({ handleFilter, exportValue, importValue, toggle, value, on
         </Button> */}
         <Button variant='contained' sx={{ '& svg': { mr: 1 }, mr: 1 }}>
           <a style={{ 'font-weight': 'initial', 'margin-left': 10 }} onClick={downloadFileExample}>
-          Download sample file
+            Download sample file
           </a>{' '}
         </Button>
         <hr />
@@ -63,14 +63,14 @@ const TableHeader = ({ handleFilter, exportValue, importValue, toggle, value, on
           Add
         </Button>
 
-        <Button
+        {/* <Button
           variant='contained'
           onClick={onFilterClick} // Gọi hàm lọc từ UserList
           sx={{ '& svg': { mr: 1 }, mr: 1 }}
         >
           <Icon fontSize='1.125rem' icon='tabler:filter' />
           Filter
-        </Button>
+        </Button> */}
 
         <CustomTextField
           value={value}
