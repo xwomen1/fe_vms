@@ -149,6 +149,7 @@ const ImageCamera = ({ cameraId, onClose }) => {
       setLoading(false)
     }
   }
+
   const handleCancel = () => {
     onClose()
   }

@@ -210,7 +210,7 @@ const VideoConfig = ({ open, onClose, nvr }) => {
     setLoading(true)
     try {
       const response = await getApi(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/videoconfig/${camera}`
+        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/videoconfig/${nvr}`
       )
       setVideoConfig(response.data?.videoConfig)
     } catch (error) {
@@ -247,8 +247,8 @@ const VideoConfig = ({ open, onClose, nvr }) => {
       ]
     }
 
-    if (camera) {
-      handleUpdate(params)
+    if (nvr) {
+      // handleUpdate(params)
     }
   }
 
@@ -259,7 +259,7 @@ const VideoConfig = ({ open, onClose, nvr }) => {
       ...values
     }
 
-    putApi(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/videoconfig/${camera}`, { ...params })
+    putApi(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/videoconfig/${nvr}`, { ...params })
       .then(() => {
         toast.success('Data has been updated successfully ')
       })

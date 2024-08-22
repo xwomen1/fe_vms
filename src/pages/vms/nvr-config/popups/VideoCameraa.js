@@ -159,7 +159,6 @@ const VideoCamera = ({ nvr, onClose }) => {
 
   useEffect(() => {
     fetchData()
-    // console.log('nvr', nvr);
   }, [])
 
   useEffect(() => {
@@ -173,45 +172,37 @@ const VideoCamera = ({ nvr, onClose }) => {
   }
 
   useEffect(() => {
-    console.log('videoConfig', videoConfig);
-    console.log('cameraList', cameraList);
     setCameraList(videoConfig)
-    if (camNameSelected) {
-      const videoConfigFilter = videoConfig.filter(item => item.cameraName === camNameSelected)
-      console.log('videoConfigFilter', videoConfigFilter);
-    }
-  }, [videoConfig])
+    const videoConfigFilter = videoConfig.filter(item => item.cameraName === camNameSelected)
 
-  // useEffect(() => {
-  //   if (streamType === 'main') {
-  //     const videoConfigMain = videoConfig?.find(item => item?.dataStreamType === 'main')
-  //     setDetail(videoConfigMain)
-  //     setBitrateType(videoConfigMain?.bitrateType)
-  //     setFrameRate(videoConfigMain?.frameRate)
-  //     setH265(videoConfigMain?.h265)
-  //     setVideoQuality(videoConfigMain?.videoQuality)
-  //     setResolution(videoConfigMain?.resolution)
-  //     setVideoEncoding(videoConfigMain?.videoEncoding)
-  //   }
-  //   if (streamType === 'sub') {
-  //     const videoConfigSub = videoConfig?.find(item => item?.dataStreamType === 'sub')
-  //     setDetail(videoConfigSub)
-  //     setBitrateType(videoConfigSub?.bitrateType)
-  //     setFrameRate(videoConfigSub?.frameRate)
-  //     setH265(videoConfigSub?.h265)
-  //     setVideoQuality(videoConfigSub?.videoQuality)
-  //     setResolution(videoConfigSub?.resolution)
-  //     setVideoEncoding(videoConfigSub?.videoEncoding)
-  //   }
-  // }, [streamType, videoConfig])
+    if (streamType === 'main') {
+      const videoConfigMain = videoConfigFilter?.find(item => item?.dataStreamType === 'main')
+      setDetail(videoConfigMain)
+      setBitrateType(videoConfigMain?.bitrateType)
+      setFrameRate(videoConfigMain?.frameRate)
+      setH265(videoConfigMain?.h265)
+      setVideoQuality(videoConfigMain?.videoQuality)
+      setResolution(videoConfigMain?.resolution)
+      setVideoEncoding(videoConfigMain?.videoEncoding)
+    }
+    if (streamType === 'sub') {
+      const videoConfigSub = videoConfigFilter?.find(item => item?.dataStreamType === 'sub')
+      setDetail(videoConfigSub)
+      setBitrateType(videoConfigSub?.bitrateType)
+      setFrameRate(videoConfigSub?.frameRate)
+      setH265(videoConfigSub?.h265)
+      setVideoQuality(videoConfigSub?.videoQuality)
+      setResolution(videoConfigSub?.resolution)
+      setVideoEncoding(videoConfigSub?.videoEncoding)
+    }
+  }, [streamType, videoConfig, camNameSelected])
 
   const fetchData = async () => {
     setLoading(true)
     try {
       const response = await getApi(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/config/videoconfigNVR/07622a6c-7b6b-40d9-ba47-8a0f024521b7`
+        `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/config/videoconfigNVR/${nvr}`
       )
-      console.log('responsive', response.data);
       setVideoConfig(response.data?.videoConfig)
     } catch (error) {
       if (error && error?.response?.data) {
@@ -229,6 +220,7 @@ const VideoCamera = ({ nvr, onClose }) => {
   const onSubmit = values => {
     const valuesChange = {
       ...values,
+      cameraName: camNameSelected,
       dataStreamType: streamType,
       bitrateType: bitrateType,
       frameRate: frameRate,
@@ -238,16 +230,19 @@ const VideoCamera = ({ nvr, onClose }) => {
       videoEncoding: videoEncoding
     }
 
-    const valuesNotChange = videoConfig.find(item => item?.dataStreamType != streamType)
+    const videoConfigFilter = videoConfig.filter(item => item.cameraName !== camNameSelected)
+
+    const valuesNotChange = videoConfig.find(item => item?.dataStreamType != streamType && item.cameraName === camNameSelected)
 
     const params = {
       videoConfig: [
         valuesNotChange,
+        ...videoConfigFilter,
         valuesChange
       ]
     }
 
-    if (camera) {
+    if (nvr) {
       handleUpdate(params)
     }
   }
@@ -259,7 +254,7 @@ const VideoCamera = ({ nvr, onClose }) => {
       ...values
     }
 
-    putApi(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/videoconfig/${camera}`, { ...params })
+    putApi(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/videoconfig/${nvr}`, { ...params })
       .then(() => {
         toast.success('Data has been updated successfully ')
       })
@@ -325,15 +320,15 @@ const VideoCamera = ({ nvr, onClose }) => {
                         render={({ field: { value, onChange } }) => (
                           <Autocomplete
                             fullWidth
-                            value={value || null}
+                            value={camNameSelected || null}
                             onChange={(event, selectedItem) => {
                               onChange(selectedItem)
                               if (item.name === 'cameraName') {
-                                setCamNameSelected(selectedItem.cameraName)
+                                setCamNameSelected(selectedItem?.cameraName)
                               }
                             }}
                             options={videoConfig}
-                            getOptionLabel={option => option?.cameraName || ""}
+                            getOptionLabel={option => option?.cameraName || camNameSelected}
                             renderInput={(params) => (
                               <CustomTextField
                                 {...params}
@@ -373,28 +368,25 @@ const VideoCamera = ({ nvr, onClose }) => {
                           onChange={(event, selectedItem) => {
                             onChange(selectedItem)
                             if (item.name === 'dataStreamType') {
-                              setStreamType(selectedItem.id)
+                              setStreamType(selectedItem?.id)
                             }
                             if (item.name === 'bitrateType') {
-                              setBitrateType(selectedItem.id)
+                              setBitrateType(selectedItem?.id)
                             }
                             if (item.name === 'frameRate') {
-                              setFrameRate(selectedItem.id)
+                              setFrameRate(selectedItem?.id)
                             }
                             if (item.name === 'h265') {
-                              setH265(selectedItem.id)
+                              setH265(selectedItem?.id)
                             }
                             if (item.name === 'videoQuality') {
-                              setVideoQuality(selectedItem.id)
+                              setVideoQuality(selectedItem?.id)
                             }
                             if (item.name === 'resolution') {
-                              setResolution(selectedItem.id)
+                              setResolution(selectedItem?.id)
                             }
                             if (item.name === 'videoEncoding') {
-                              setVideoEncoding(selectedItem.id)
-                            }
-                            if (item.name === 'cameraName') {
-                              setCamNameSelected(selectedItem.cameraName)
+                              setVideoEncoding(selectedItem?.id)
                             }
                           }}
                           options={
