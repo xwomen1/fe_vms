@@ -4966,6 +4966,11 @@ js-yaml@^4.1.0:
   dependencies:
     argparse "^2.0.1"
 
+jsbarcode@^3.8.0:
+  version "3.11.6"
+  resolved "https://registry.npmjs.org/jsbarcode/-/jsbarcode-3.11.6.tgz"
+  integrity sha512-G5TKGyKY1zJo0ZQKFM1IIMfy0nF2rs92BLlCz+cU4/TazIc4ZH+X1GYeDRt7TKjrYqmPfTjwTBkU/QnQlsYiuA==
+
 jsdom@^19.0.0:
   version "19.0.0"
   resolved "https://registry.npmjs.org/jsdom/-/jsdom-19.0.0.tgz"
@@ -6102,6 +6107,14 @@ react-apexcharts@^1.4.0:
   integrity sha512-DrcMV4aAMrUG+n6412yzyATWEyCDWlpPBBhVbpzBC4PDeuYU6iF84SmExbck+jx5MUm4U5PM3/T307Mc3kzc9Q==
   dependencies:
     prop-types "^15.5.7"
+
+react-barcode@^1.5.3:
+  version "1.5.3"
+  resolved "https://registry.npmjs.org/react-barcode/-/react-barcode-1.5.3.tgz"
+  integrity sha512-EJPUwuERKpApcQ9qXzdVZzddFYRT7+3R/jJ3OrTfW6m2iq+WT+CBaVB7DsQazhPRXDfMcx9+dmMmzjsmveOViQ==
+  dependencies:
+    jsbarcode "^3.8.0"
+    prop-types "^15.6.2"
 
 react-calendar@^4.6.0:
   version "4.8.0"

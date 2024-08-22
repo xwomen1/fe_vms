@@ -127,7 +127,7 @@ const Simplelist = () => {
                       <Button
                         size='small'
                         component={Link}
-                        href={`/device-management/Update/${device.id}`}
+                        href={`/pages/scheduling/detail/${Guests.id}`}
                         sx={{ color: 'blue', right: '10px' }}
                       >
                         {Guests.code}
