@@ -61,7 +61,7 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
 }))
 
 const StyledTabPanel = styled(TabPanel)(({ theme }) => ({
-  height: 700, // Fixed height for the tab content
+  height: 'auto', // Fixed height for the tab content
   overflow: 'auto' // Enable scrolling if content exceeds the height
 }))
 
@@ -72,8 +72,6 @@ const Edit = ({ open, onClose, nvr }) => {
   const handleChange = (event, newValue) => {
     setValue(newValue)
   }
-
-  console.log(nvr, 'cameraid')
 
   const handleCancel = () => {
     onClose()

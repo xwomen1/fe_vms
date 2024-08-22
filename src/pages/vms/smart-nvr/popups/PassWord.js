@@ -100,7 +100,7 @@ const PassWord = ({ onClose, nvr }) => {
       )
       Swal.fire({
         title: 'Successfully!',
-        text: 'Dữ liệu đã được cập nhật thành công.',
+        text: 'Data has been updated successfully.',
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()

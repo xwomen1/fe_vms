@@ -1,4 +1,4 @@
-import { forwardRef, useState } from 'react'
+import { forwardRef, useEffect, useState } from 'react'
 import { Fade, Grid, IconButton, Dialog, DialogTitle, DialogContent } from '@mui/material'
 import Tab from '@mui/material/Tab'
 import TabPanel from '@mui/lab/TabPanel'
@@ -59,7 +59,7 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
 }))
 
 const StyledTabPanel = styled(TabPanel)(({ theme }) => ({
-  height: 1000, // Fixed height for the tab content
+  height: 'auto', // Fixed height for the tab content
   width: '100%', // Adjust to 100% of the dialog's width
   overflow: 'auto' // Enable scrolling if content exceeds the height
 }))
@@ -119,10 +119,10 @@ const Edit = ({ open, onClose, camera }) => {
             <Networks camera={camera} onClose={handleCancel} />
           </StyledTabPanel>
           <StyledTabPanel value='3'>
-            <Video nvrs={cameras} onClose={handleCancel} />
+            <Video onClose={handleCancel} camera={camera} />
           </StyledTabPanel>
           <StyledTabPanel value='4'>
-            <Images nvrs={cameras} onClose={handleCancel} />
+            <Images cameraId={camera} onClose={handleCancel} />
           </StyledTabPanel>
           <StyledTabPanel value='5'>
             <Cloud nvrs={cameras} onClose={handleCancel} />
