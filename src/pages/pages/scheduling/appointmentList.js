@@ -27,32 +27,26 @@ import { getApi } from 'src/@core/utils/requestUltils'
 const statusAppointment = [
   {
     id: 'WAITING',
-    name: '',
     color: 'primary'
   },
   {
     id: 'CANCELLED',
-    name: '',
     color: 'Secondary'
   },
   {
     id: 'COMPLETE',
-    name: '',
     color: 'success'
   },
   {
     id: 'APPROVED',
-    name: '',
     color: 'info'
   },
   {
     id: 'UNSUCCESSFUL',
-    name: '',
     color: 'error'
   },
   {
     id: 'OUT_OF_DATE',
-    name: '',
     color: 'warning'
   },
 ]
@@ -101,6 +95,7 @@ const AppointmentList = ({ keyword, valueFilter }) => {
         limit: pageSize,
         ...valueFilter
       }
+
       const response = await getApi(
         `https://dev-ivi.basesystem.one/smc/access-control/api/v0/registrations`,
         params
@@ -185,7 +180,10 @@ const AppointmentList = ({ keyword, valueFilter }) => {
                         <CustomChip label={statusGuests.id} skin='light' color={statusGuests.color} />
                       </TableCell>
                       <TableCell>
-                        <IconButton>
+                        <IconButton
+                          component={Link}
+                          href={`/pages/scheduling/detail/${Guests.id}`}
+                        >
                           <Icon icon='tabler:info-circle' />
                         </IconButton>
                       </TableCell>
