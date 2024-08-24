@@ -543,7 +543,7 @@ const Camera = ({ apiData }) => {
         )}
         {openPopupImage && (
           <>
-            <Images open={openPopupImage} onClose={handleCloseImagePopup} camera={selectedIds} />
+            <Images open={openPopupImage} onClose={handleCloseImagePopup} cameraId={selectedIds} />
           </>
         )}
         {openPopupCloud && (

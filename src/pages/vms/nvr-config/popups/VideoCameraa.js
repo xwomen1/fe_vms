@@ -6,7 +6,7 @@ import { getApi, putApi } from 'src/@core/utils/requestUltils'
 import toast from 'react-hot-toast'
 import { Controller, useForm } from 'react-hook-form'
 
-const VideoCamera = ({ camera, onClose }) => {
+const VideoCamera = ({ nvr, onClose }) => {
   const [loading, setLoading] = useState(false)
   const [detail, setDetail] = useState(null)
   const [streamType, setStreamType] = useState('main')
@@ -17,12 +17,25 @@ const VideoCamera = ({ camera, onClose }) => {
   const [resolution, setResolution] = useState(null)
   const [videoEncoding, setVideoEncoding] = useState(null)
   const [videoConfig, setVideoConfig] = useState([])
+  const [cameraList, setCameraList] = useState([])
+  const [camNameSelected, setCamNameSelected] = useState(null)
 
   const format_form = [
     {
+      name: 'cameraName',
+      label: 'Camera Name',
+      placeholder: 'Camera Name',
+      type: 'Autocomplete',
+      data: [
+      ],
+      disabled: false,
+      require: true,
+      width: 4
+    },
+    {
       name: 'dataStreamType',
-      label: 'Stream type',
-      placeholder: 'Stream type',
+      label: 'Stream Type',
+      placeholder: 'Stream Type',
       type: 'Autocomplete',
       data: [
         { id: 'main', name: 'Main Stream(Normal)' },
@@ -34,7 +47,7 @@ const VideoCamera = ({ camera, onClose }) => {
     },
     {
       name: 'bitrateType',
-      label: 'Bitrate type',
+      label: 'Bitrate Type',
       placeholder: 'Bitrate type',
       type: 'Autocomplete',
       data: [
@@ -46,7 +59,7 @@ const VideoCamera = ({ camera, onClose }) => {
     },
     {
       name: 'frameRate',
-      label: 'Frame rate',
+      label: 'Frame Rate',
       placeholder: 'Frame rate',
       type: 'Autocomplete',
       data: [
@@ -58,8 +71,8 @@ const VideoCamera = ({ camera, onClose }) => {
     },
     {
       name: 'h265',
-      label: 'h265',
-      placeholder: 'h265',
+      label: 'H265',
+      placeholder: 'H265',
       type: 'Autocomplete',
       data: [
         { id: 'Main', name: 'Main' },
@@ -71,8 +84,8 @@ const VideoCamera = ({ camera, onClose }) => {
     },
     {
       name: 'maxBitrate',
-      label: 'Max bitrate',
-      placeholder: 'Max bitrate',
+      label: 'Max Bitrate',
+      placeholder: 'Max Bitrate',
       type: 'TextField',
       data: [],
       disabled: false,
@@ -81,8 +94,8 @@ const VideoCamera = ({ camera, onClose }) => {
     },
     {
       name: 'videoQuality',
-      label: 'Video quality',
-      placeholder: 'Video quality',
+      label: 'Video Quality',
+      placeholder: 'Video Quality',
       type: 'Autocomplete',
       data: [
         { id: '20', name: 'Lowest' },
@@ -123,8 +136,8 @@ const VideoCamera = ({ camera, onClose }) => {
     },
     {
       name: 'videoEncoding',
-      label: 'Video encoding',
-      placeholder: 'Video encoding',
+      label: 'Video Encoding',
+      placeholder: 'Video Encoding',
       type: 'Autocomplete',
       data: [
         { id: 'H264', name: 'H264' },
@@ -135,7 +148,6 @@ const VideoCamera = ({ camera, onClose }) => {
       width: 4
     },
   ]
-
   const [form, setForm] = useState(format_form)
 
   const {
@@ -159,38 +171,39 @@ const VideoCamera = ({ camera, onClose }) => {
     reset(detail)
   }
 
-  // useEffect(() => {
-  //   if (streamType === 'main') {
-  //     const videoConfigMain = videoConfig?.find(item => item?.dataStreamType === 'main')
-  //     setDetail(videoConfigMain)
-  //     setBitrateType(videoConfigMain?.bitrateType)
-  //     setFrameRate(videoConfigMain?.frameRate)
-  //     setH265(videoConfigMain?.h265)
-  //     setVideoQuality(videoConfigMain?.videoQuality)
-  //     setResolution(videoConfigMain?.resolution)
-  //     setVideoEncoding(videoConfigMain?.videoEncoding)
-  //   }
-  //   if (streamType === 'sub') {
-  //     const videoConfigSub = videoConfig?.find(item => item?.dataStreamType === 'sub')
-  //     setDetail(videoConfigSub)
-  //     setBitrateType(videoConfigSub?.bitrateType)
-  //     setFrameRate(videoConfigSub?.frameRate)
-  //     setH265(videoConfigSub?.h265)
-  //     setVideoQuality(videoConfigSub?.videoQuality)
-  //     setResolution(videoConfigSub?.resolution)
-  //     setVideoEncoding(videoConfigSub?.videoEncoding)
-  //   }
-  // }, [streamType, videoConfig])
+  useEffect(() => {
+    setCameraList(videoConfig)
+    const videoConfigFilter = videoConfig.filter(item => item.cameraName === camNameSelected)
+
+    if (streamType === 'main') {
+      const videoConfigMain = videoConfigFilter?.find(item => item?.dataStreamType === 'main')
+      setDetail(videoConfigMain)
+      setBitrateType(videoConfigMain?.bitrateType)
+      setFrameRate(videoConfigMain?.frameRate)
+      setH265(videoConfigMain?.h265)
+      setVideoQuality(videoConfigMain?.videoQuality)
+      setResolution(videoConfigMain?.resolution)
+      setVideoEncoding(videoConfigMain?.videoEncoding)
+    }
+    if (streamType === 'sub') {
+      const videoConfigSub = videoConfigFilter?.find(item => item?.dataStreamType === 'sub')
+      setDetail(videoConfigSub)
+      setBitrateType(videoConfigSub?.bitrateType)
+      setFrameRate(videoConfigSub?.frameRate)
+      setH265(videoConfigSub?.h265)
+      setVideoQuality(videoConfigSub?.videoQuality)
+      setResolution(videoConfigSub?.resolution)
+      setVideoEncoding(videoConfigSub?.videoEncoding)
+    }
+  }, [streamType, videoConfig, camNameSelected])
 
   const fetchData = async () => {
     setLoading(true)
     try {
       const response = await getApi(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/config/videoconfigNVR/07622a6c-7b6b-40d9-ba47-8a0f024521b7`
+        `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/config/videoconfigNVR/${nvr}`
       )
-      console.log('responsive', response.data);
-
-      // setVideoConfig(response.data?.videoConfig)
+      setVideoConfig(response.data?.videoConfig)
     } catch (error) {
       if (error && error?.response?.data) {
         console.error('error', error)
@@ -207,6 +220,7 @@ const VideoCamera = ({ camera, onClose }) => {
   const onSubmit = values => {
     const valuesChange = {
       ...values,
+      cameraName: camNameSelected,
       dataStreamType: streamType,
       bitrateType: bitrateType,
       frameRate: frameRate,
@@ -216,16 +230,19 @@ const VideoCamera = ({ camera, onClose }) => {
       videoEncoding: videoEncoding
     }
 
-    const valuesNotChange = videoConfig.find(item => item?.dataStreamType != streamType)
+    const videoConfigFilter = videoConfig.filter(item => item.cameraName !== camNameSelected)
+
+    const valuesNotChange = videoConfig.find(item => item?.dataStreamType != streamType && item.cameraName === camNameSelected)
 
     const params = {
       videoConfig: [
         valuesNotChange,
+        ...videoConfigFilter,
         valuesChange
       ]
     }
 
-    if (camera) {
+    if (nvr) {
       handleUpdate(params)
     }
   }
@@ -237,7 +254,7 @@ const VideoCamera = ({ camera, onClose }) => {
       ...values
     }
 
-    putApi(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/videoconfig/${camera}`, { ...params })
+    putApi(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/videoconfig/${nvr}`, { ...params })
       .then(() => {
         toast.success('Data has been updated successfully ')
       })
@@ -265,105 +282,144 @@ const VideoCamera = ({ camera, onClose }) => {
           <CircularProgress />
         </Box>
       )}
-      <Grid container spacing={3}>
-        {
-          form.map((item, index) => {
-            if (item.type === 'TextField') {
-              return (
-                <Grid item xs={item.width} key={item.name} sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Controller
-                    name={item.name}
-                    control={control}
-                    rules={{ required: item.require }}
-                    render={({ field: { value, onChange } }) => (
-                      <CustomTextField
-                        fullWidth
-                        value={value || ''}
-                        label={item.label}
-                        onChange={onChange}
-                        placeholder={item.placeholder}
-                        error={Boolean(errors[item.name])}
-                        aria-describedby='validation-basic-last-name'
-                        {...(errors[item.name] && { helperText: 'This field is required' })}
-                      />
-                    )}
-                  />
-                </Grid>
-              )
-            }
-            if (item.type === 'Autocomplete') {
-              return (
-                <Grid item xs={item.width} key={item.name} sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Controller
-                    name={item.name}
-                    control={control}
-                    rules={{ required: item.require }}
-                    render={({ field: { value, onChange } }) => (
-                      <Autocomplete
-                        fullWidth
-                        value={
-                          item.name === 'videoQuality' && value === '20' ? 'Lowest'
-                            : item.name === 'videoQuality' && value === '30' ? 'Lower'
-                              : item.name === 'videoQuality' && value === '45' ? 'Low'
-                                : item.name === 'videoQuality' && value === '60' ? 'Medium'
-                                  : item.name === 'videoQuality' && value === '75' ? 'High'
-                                    : item.name === 'videoQuality' && value === '90' ? 'Highest'
-                                      : value || null
-                        }
-                        onChange={(event, selectedItem) => {
-                          onChange(selectedItem)
-                          if (item.name === 'dataStreamType') {
-                            setStreamType(selectedItem.id)
-                          }
-                          if (item.name === 'bitrateType') {
-                            setBitrateType(selectedItem.id)
-                          }
-                          if (item.name === 'frameRate') {
-                            setFrameRate(selectedItem.id)
-                          }
-                          if (item.name === 'h265') {
-                            setH265(selectedItem.id)
-                          }
-                          if (item.name === 'videoQuality') {
-                            setVideoQuality(selectedItem.id)
-                          }
-                          if (item.name === 'resolution') {
-                            setResolution(selectedItem.id)
-                          }
-                          if (item.name === 'videoEncoding') {
-                            setVideoEncoding(selectedItem.id)
-                          }
-                        }}
-                        options={
-                          item.name === 'resolution' && streamType === 'main' ? item?.dataOfMain
-                            : item.name === 'resolution' && streamType === 'sub' ? item?.dataOfSub
-                              : item.data
-                        }
-                        getOptionLabel={option => option?.name || option}
-                        renderInput={(params) => (
-                          <CustomTextField
-                            {...params}
-                            label={item.label}
-                            variant='outlined'
+      <Grid container spacing={2}>
+        <Grid container item xs={12} spacing={3}>
+          {
+            form.map((item, index) => {
+              if (item.type === 'TextField') {
+                return (
+                  <Grid item xs={item.width} key={item.name} sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Controller
+                      name={item.name}
+                      control={control}
+                      rules={{ required: item.require }}
+                      render={({ field: { value, onChange } }) => (
+                        <CustomTextField
+                          fullWidth
+                          value={value || ''}
+                          label={item.label}
+                          onChange={onChange}
+                          placeholder={item.placeholder}
+                          error={Boolean(errors[item.name])}
+                          aria-describedby='validation-basic-last-name'
+                          {...(errors[item.name] && { helperText: 'This field is required' })}
+                        />
+                      )}
+                    />
+                  </Grid>
+                )
+              }
+              if (item.type === 'Autocomplete') {
+                if (item.name === 'cameraName') {
+                  return (
+                    <Grid item xs={item.width} key={item.name} sx={{ display: 'flex', alignItems: 'center' }}>
+                      <Controller
+                        name={item.name}
+                        control={control}
+                        rules={{ required: item.require }}
+                        render={({ field: { value, onChange } }) => (
+                          <Autocomplete
                             fullWidth
-                            error={Boolean(errors[item.name])}
-                            aria-describedby='validation-basic-last-name'
-                            {...(errors[item.name] && { helperText: 'This field is required' })}
+                            value={camNameSelected || null}
+                            onChange={(event, selectedItem) => {
+                              onChange(selectedItem)
+                              if (item.name === 'cameraName') {
+                                setCamNameSelected(selectedItem?.cameraName)
+                              }
+                            }}
+                            options={videoConfig}
+                            getOptionLabel={option => option?.cameraName || camNameSelected}
+                            renderInput={(params) => (
+                              <CustomTextField
+                                {...params}
+                                label={item.label}
+                                variant='outlined'
+                                fullWidth
+                                error={Boolean(errors[item.name])}
+                                aria-describedby='validation-basic-last-name'
+                                {...(errors[item.name] && { helperText: 'This field is required' })}
+                              />
+                            )}
                           />
                         )}
                       />
-                    )}
-                  />
-                </Grid>
-              )
-            }
-          })
-        }
+                    </Grid>
+                  )
+                }
 
-      </Grid>
-      <Grid container item xs={12} display={'flex'} justifyContent={'flex-end'}>
-        <Button variant='contained' color='secondary' onClick={onClose} sx={{ marginRight: '10px' }}>Cancel</Button>
-        <Button variant='contained' color='primary' onClick={handleSubmit(onSubmit)}>Save</Button>
+                return (
+                  <Grid item xs={item.width} key={item.name} sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Controller
+                      name={item.name}
+                      control={control}
+                      rules={{ required: item.require }}
+                      render={({ field: { value, onChange } }) => (
+                        <Autocomplete
+                          fullWidth
+                          value={
+                            item.name === 'videoQuality' && value === '20' ? 'Lowest'
+                              : item.name === 'videoQuality' && value === '30' ? 'Lower'
+                                : item.name === 'videoQuality' && value === '45' ? 'Low'
+                                  : item.name === 'videoQuality' && value === '60' ? 'Medium'
+                                    : item.name === 'videoQuality' && value === '75' ? 'High'
+                                      : item.name === 'videoQuality' && value === '90' ? 'Highest'
+                                        : value || null
+                          }
+                          onChange={(event, selectedItem) => {
+                            onChange(selectedItem)
+                            if (item.name === 'dataStreamType') {
+                              setStreamType(selectedItem?.id)
+                            }
+                            if (item.name === 'bitrateType') {
+                              setBitrateType(selectedItem?.id)
+                            }
+                            if (item.name === 'frameRate') {
+                              setFrameRate(selectedItem?.id)
+                            }
+                            if (item.name === 'h265') {
+                              setH265(selectedItem?.id)
+                            }
+                            if (item.name === 'videoQuality') {
+                              setVideoQuality(selectedItem?.id)
+                            }
+                            if (item.name === 'resolution') {
+                              setResolution(selectedItem?.id)
+                            }
+                            if (item.name === 'videoEncoding') {
+                              setVideoEncoding(selectedItem?.id)
+                            }
+                          }}
+                          options={
+                            item.name === 'resolution' && streamType === 'main' ? item?.dataOfMain
+                              : item.name === 'resolution' && streamType === 'sub' ? item?.dataOfSub
+                                : item.data
+                          }
+                          getOptionLabel={option => option?.name || option}
+                          renderInput={(params) => (
+                            <CustomTextField
+                              {...params}
+                              label={item.label}
+                              variant='outlined'
+                              fullWidth
+                              error={Boolean(errors[item.name])}
+                              aria-describedby='validation-basic-last-name'
+                              {...(errors[item.name] && { helperText: 'This field is required' })}
+                            />
+                          )}
+                        />
+                      )}
+                    />
+                  </Grid>
+                )
+              }
+            })
+          }
+
+        </Grid>
+        <Grid container item xs={12} display={'flex'} justifyContent={'flex-end'}>
+          <Button variant='contained' color='secondary' onClick={onClose} sx={{ marginRight: '10px' }}>Cancel</Button>
+          <Button variant='contained' color='primary' onClick={handleSubmit(onSubmit)}>Save</Button>
+        </Grid>
       </Grid>
     </div>
   )

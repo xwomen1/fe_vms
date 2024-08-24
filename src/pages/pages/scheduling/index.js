@@ -1,6 +1,6 @@
-import { Grid } from '@mui/material'
+import { Button, Grid, IconButton, InputAdornment, Typography } from '@mui/material'
 
-import Simplelist from './simple-list'
+import AppointmentList from './appointmentList'
 import Tab from '@mui/material/Tab'
 import TabPanel from '@mui/lab/TabPanel'
 import { styled } from '@mui/material/styles'
@@ -8,6 +8,10 @@ import MuiTabList from '@mui/lab/TabList'
 import TabContext from '@mui/lab/TabContext'
 import { useState } from 'react'
 import Approval from './approval'
+import CustomTextField from 'src/@core/components/mui/text-field'
+import Icon from 'src/@core/components/icon'
+import Filter from './popups/Filter'
+import Link from 'next/link'
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   borderBottom: '0 !important',
@@ -33,30 +37,95 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
   }
 }))
 
+const initValueFilter = {
+  createdUserIds: null,
+  startDate: null,
+  endDate: null,
+  startTimeInMinute: null,
+  endTimeInMinute: null,
+  statues: null,
+  repeatType: null,
+  createdAt: null
+}
+
 const Caller = () => {
   const [value, setValue] = useState('1')
+  const [keyword, setKeyword] = useState('')
+  const [valueFilter, setValueFilter] = useState(initValueFilter)
+  const [isOpenFilter, setIsOpenFilter] = useState(false)
+  const [isOpenAdd, setIsOpenAdd] = useState(false)
 
   const handleChange = (event, newValue) => {
     setValue(newValue)
   }
 
+  const handleSetValueFilter = data => {
+    const newDto = {
+      ...valueFilter,
+      ...data,
+    }
+
+    setValueFilter(newDto)
+    setIsOpenFilter(false)
+  }
+
+
   return (
-    <Grid style={{ minWidth: '1000px' }}>
-      <TabContext value={value}>
-        <Grid>
-          {' '}
-          <TabList onChange={handleChange} aria-label='customized tabs example'>
-            <Tab value='1' label='Overview' />
-            <Tab value='2' label='Permission SetUp' />
-          </TabList>
+    <Grid container spacing={2} style={{ minWidth: '1000px' }}>
+      <Grid item xs={12} container spacing={2}>
+        <Grid item xs={3}>
+          <Button variant='contained'>Manage visitors to the office</Button>
         </Grid>
-        <TabPanel value='1'>
-          <Simplelist />
-        </TabPanel>
-        <TabPanel value='2'>
-          <Approval />
-        </TabPanel>
-      </TabContext>
+        <Grid item xs={6}>
+          <CustomTextField
+            id='input-with-icon-adornment'
+            fullWidth
+            onChange={e => setKeyword(e.target.value)}
+            placeholder='Search for registrant, name and ID of registrant, order number'
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position='start'>
+                  <Icon icon="tabler:search" />
+                </InputAdornment>
+              )
+            }}
+          />
+        </Grid>
+        <Grid item xs={3} sx={{ display: 'flex' }}>
+          <Button
+            variant='contained'
+            size='small'
+            component={Link}
+            href={`/pages/scheduling/register`}
+            sx={{ color: 'blue', right: '10px' }}
+          >
+            Add
+          </Button>
+          <Button variant='contained' sx={{ marginLeft: 5 }} onClick={() => setIsOpenFilter(true)}>
+            <Icon icon='tabler:filter' />
+          </Button>
+        </Grid>
+      </Grid>
+      <Grid item xs={12} marginTop={'25px'}>
+        <TabContext value={value}>
+          <Grid>
+            {' '}
+            <TabList onChange={handleChange} aria-label='customized tabs example'>
+              <Tab value='1' label='Appointment List' />
+              <Tab value='2' label='Approve' />
+            </TabList>
+          </Grid>
+          <TabPanel value='1'>
+            <AppointmentList keyword={keyword} valueFilter={valueFilter} />
+          </TabPanel>
+          <TabPanel value='2'>
+            <Approval keyword={keyword} valueFilter={valueFilter} />
+          </TabPanel>
+        </TabContext>
+      </Grid>
+      {isOpenFilter &&
+        <Filter show={isOpenFilter} onClose={() => setIsOpenFilter(false)} valueFilter={valueFilter} callback={handleSetValueFilter} />
+      }
     </Grid>
   )
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Box,
   Button,
@@ -13,20 +13,45 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
-  Typography,
-  Paper
+  CircularProgress
 } from '@mui/material'
 import Icon from 'src/@core/components/icon'
 import authConfig from 'src/configs/auth'
-import axios from 'axios'
 import CustomChip from 'src/@core/components/mui/chip'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
+import { getApi } from 'src/@core/utils/requestUltils'
 
-const Simplelist = () => {
+const statusAppointment = [
+  {
+    id: 'WAITING',
+    color: 'primary'
+  },
+  {
+    id: 'CANCELLED',
+    color: 'Secondary'
+  },
+  {
+    id: 'COMPLETE',
+    color: 'success'
+  },
+  {
+    id: 'APPROVED',
+    color: 'info'
+  },
+  {
+    id: 'UNSUCCESSFUL',
+    color: 'error'
+  },
+  {
+    id: 'OUT_OF_DATE',
+    color: 'warning'
+  },
+]
+
+const AppointmentList = ({ keyword, valueFilter }) => {
   const [loading, setLoading] = useState(false)
   const [dataList, setDataList] = useState([])
   const [pageSize, setPageSize] = useState(25)
@@ -42,7 +67,6 @@ const Simplelist = () => {
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage)
-    fetchDataList(newPage, pageSize)
   }
 
   const handleCloseMenu = () => {
@@ -52,7 +76,6 @@ const Simplelist = () => {
   const handleSelectPageSize = size => {
     setPageSize(size)
     setPage(1)
-    fetchDataList(1, size)
     handleCloseMenu()
   }
 
@@ -63,42 +86,49 @@ const Simplelist = () => {
     return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`
   }
 
-  const fetchDataList = useCallback(
-    async (currentPage = page, size = pageSize) => {
-      setLoading(true)
-      try {
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          params: {
-            keyword: '',
-            page: currentPage,
-            limit: size
-          }
-        }
-
-        const response = await axios.get(
-          `https://dev-ivi.basesystem.one/smc/access-control/api/v0/registrations`,
-          config
-        )
-        setDataList(response.data?.rows)
-        setTotal(Math.ceil(response.data?.count / size)) // Tính tổng số trang dựa trên tổng số mục và kích thước trang
-      } catch (error) {
-        toast.error(error.message)
-      } finally {
-        setLoading(false)
+  const fetchData = async () => {
+    setLoading(true)
+    try {
+      const params = {
+        keyword: keyword,
+        page: page,
+        limit: pageSize,
+        ...valueFilter
       }
-    },
-    [page, pageSize, token]
-  )
+
+      const response = await getApi(
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/registrations`,
+        params
+      )
+      setDataList(response.data?.rows)
+      setTotal(Math.ceil(response.data?.count / pageSize)) // Tính tổng số trang dựa trên tổng số mục và kích thước trang
+    } catch (error) {
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    fetchDataList()
-  }, [fetchDataList])
+    fetchData()
+  }, [keyword, page, pageSize, valueFilter])
+
 
   return (
     <>
+      {loading === true && (
+        <Box
+          sx={{ width: '100%', height: ' 100%', position: 'absolute', zIndex: 10, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+        >
+          <CircularProgress />
+        </Box>
+      )}
       <Card sx={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
         <CardContent sx={{ flex: 1, overflow: 'auto' }}>
           <Table>
@@ -120,37 +150,46 @@ const Simplelist = () => {
             </TableHead>
             <TableBody>
               {Array.isArray(dataList) && dataList.length > 0 ? (
-                dataList.map((Guests, index) => (
-                  <TableRow key={Guests.id}>
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell>
-                      <Button
-                        size='small'
-                        component={Link}
-                        href={`/device-management/Update/${device.id}`}
-                        sx={{ color: 'blue', right: '10px' }}
-                      >
-                        {Guests.code}
-                      </Button>
-                    </TableCell>
-                    <TableCell>{Guests.startDate}</TableCell>
-                    <TableCell>
-                      {convertMinutesToTime(Guests.startTimeInMinute)} - {convertMinutesToTime(Guests.endTimeInMinute)}
-                    </TableCell>
-                    <TableCell></TableCell>
-                    <TableCell></TableCell>
-                    <TableCell>{Guests.guestInfo?.guestCount}</TableCell>
-                    <TableCell>{Guests.repeatType}</TableCell>
-                    <TableCell>{Guests.approverInfo?.fullName}</TableCell>
-                    <TableCell>{Guests.guestInfo?.identityNumber}</TableCell>
-                    <TableCell>{Guests.status}</TableCell>
-                    <TableCell>
-                      <IconButton>
-                        <Icon icon='tabler:info-circle' />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))
+                dataList.map((Guests, index) => {
+                  const statusGuests = statusAppointment.find(status => status.id === Guests?.status)
+
+                  return (
+                    <TableRow key={Guests.id}>
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>
+                        <Button
+                          size='small'
+                          component={Link}
+                          href={`/pages/scheduling/detail/${Guests.id}`}
+                          sx={{ color: 'blue', right: '10px' }}
+                        >
+                          {Guests.code}
+                        </Button>
+                      </TableCell>
+                      <TableCell>{Guests.startDate}</TableCell>
+                      <TableCell>
+                        {convertMinutesToTime(Guests.startTimeInMinute)} - {convertMinutesToTime(Guests.endTimeInMinute)}
+                      </TableCell>
+                      <TableCell></TableCell>
+                      <TableCell></TableCell>
+                      <TableCell>{Guests.guestInfo?.guestCount}</TableCell>
+                      <TableCell>{Guests.repeatType}</TableCell>
+                      <TableCell>{Guests.approverInfo?.fullName}</TableCell>
+                      <TableCell>{Guests.guestInfo?.identityNumber}</TableCell>
+                      <TableCell>
+                        <CustomChip label={statusGuests.id} skin='light' color={statusGuests.color} />
+                      </TableCell>
+                      <TableCell>
+                        <IconButton
+                          component={Link}
+                          href={`/pages/scheduling/detail/${Guests.id}`}
+                        >
+                          <Icon icon='tabler:info-circle' />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })
               ) : (
                 <TableRow>
                   <TableCell colSpan={11} align='center'>
@@ -192,4 +231,4 @@ const Simplelist = () => {
   )
 }
 
-export default Simplelist
+export default AppointmentList
