@@ -55,7 +55,7 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode, fetchUserD
       setImageDataNew(imageDataUrl)
     } catch (error) {
       console.error('Error uploading image:', error)
-      Swal.fire('Đã xảy ra lỗi', error?.response?.data?.message, 'error')
+      Swal.fire('Error', error?.response?.data?.message, 'error')
     }
   }
 
@@ -144,9 +144,9 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode, fetchUserD
           console.log('API Response 2:', response2.data)
           fetchUserData()
 
-          Swal.fire('Thêm thành công', '', 'success')
+          Swal.fire('Successfully', '', 'success')
         } catch (error) {
-          Swal.fire('Đã xảy ra lỗi', error.response.data.message, 'error')
+          Swal.fire('Error', error.response.data.message, 'error')
 
           console.error('Error saving data:', error)
         } finally {
@@ -166,12 +166,12 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode, fetchUserD
               }
             }
           )
-          Swal.fire('Sửa thành công', '', 'success')
+          Swal.fire('Successfully', '', 'success')
           fetchUserData() // Gọi lại hàm fetchUserData
 
           onClose()
         } catch (error) {
-          Swal.fire('Đã xảy ra lỗi', error.response.data.message, 'error')
+          Swal.fire('Error', error.response.data.message, 'error')
           onClose()
 
           console.error('Error saving data:', error)
@@ -183,7 +183,7 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode, fetchUserD
       // Đóng dialog sau khi Save thành công
       onClose()
     } catch (error) {
-      Swal.fire('Đã xảy ra lỗi', error.response.data.message, 'error')
+      Swal.fire('Error', error.response.data.message, 'error')
       onClose()
 
       console.error('Error saving data:', error)
@@ -194,6 +194,8 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode, fetchUserD
   useEffect(() => {
     fetchUserData()
   }, [])
+
+
 
   return (
     <Dialog open={true} onClose={onClose}>
@@ -216,7 +218,7 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode, fetchUserD
               <div>
                 <img src={imageNew} alt='Image' style={{ height: '200px', width: '200px' }} />
                 <Button component='label'>
-                  Đổi Image
+                  Change Image
                   <input type='file' onChange={handleFileChange} style={{ display: 'none' }} />
                 </Button>
               </div>
@@ -240,7 +242,7 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode, fetchUserD
                   style={{ display: 'none' }}
                 />
                 <Button component='label'>
-                  Chọn Image
+                  Select Image
                   <input type='file' onChange={handleFileChange} style={{ display: 'none' }} />
                 </Button>
               </div>
@@ -248,7 +250,7 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode, fetchUserD
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '60px' }}>
             <Button variant='contained' color='secondary' onClick={onClose}>
-              Đóng
+              Close
             </Button>
             <div style={{ width: 20 }}></div>
 

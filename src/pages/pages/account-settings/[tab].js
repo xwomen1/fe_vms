@@ -59,7 +59,7 @@ const UserList = ({ apiData }) => {
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -77,12 +77,11 @@ const UserList = ({ apiData }) => {
           Authorization: `Bearer ${token}`
         }
       }
-      await axios.put(
-        `https://dev-ivi.basesystem.one/smc/iam/api/v0/users/update-password`,
+      await axios.patch(
+        `https://dev-ivi.basesystem.one/smc/iam/api/v0/me/password`,
         {
           newPassword: password,
-          token: token,
-          curPassword: passwordOld
+          currentPassword: passwordOld
         },
         config
       )
@@ -93,7 +92,7 @@ const UserList = ({ apiData }) => {
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -107,7 +106,7 @@ const UserList = ({ apiData }) => {
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -120,7 +119,7 @@ const UserList = ({ apiData }) => {
   return (
     <Grid container spacing={2} component={Paper}>
       <Grid item xs={6}>
-        <CustomTextField label='Tên người dùng' value={username || ''} onChange={handleNameChange} fullWidth />
+        <CustomTextField label='UserName' value={username || ''} onChange={handleNameChange} fullWidth />
       </Grid>
       <Grid item xs={6}>
         <CustomTextField
@@ -128,7 +127,7 @@ const UserList = ({ apiData }) => {
             shrink: true
           }}
           autoComplete='old-password'
-          label='Mật khẩu cũ'
+          label='Old Password'
           type={showPassword ? 'text' : 'password'}
           onChange={handlePasswordOldChange}
           fullWidth
@@ -148,7 +147,7 @@ const UserList = ({ apiData }) => {
           InputLabelProps={{
             shrink: true
           }}
-          label='Mật khẩu mới'
+          label='New Password'
           autoComplete='new-password'
           type={showPassword1 ? 'text' : 'password'}
           onChange={handlePasswordChange}
@@ -166,7 +165,7 @@ const UserList = ({ apiData }) => {
       </Grid>
       <Grid item xs={6}>
         <CustomTextField
-          label='Xác nhận mật khẩu'
+          label='Confirm Password'
           autoComplete='off'
           type={showPassword2 ? 'text' : 'password'}
           onChange={handleConfirmPasswordChange}
@@ -185,7 +184,7 @@ const UserList = ({ apiData }) => {
       <Grid item xs={12}>
         <Box display='flex' justifyContent='center' mt={2}>
           <Button variant='contained' color='primary' onClick={saveChange} disabled={loading}>
-            {loading ? <CircularProgress size={24} /> : 'Đổi mật khẩu'}
+            {loading ? <CircularProgress size={24} /> : 'Change Password'}
           </Button>
         </Box>
       </Grid>

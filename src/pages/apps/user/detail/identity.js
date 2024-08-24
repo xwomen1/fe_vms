@@ -79,7 +79,7 @@ const UserDetails = () => {
   const [policies, setPolicies] = useState(null)
   const [piId, setPiId] = useState(null)
   const [ava1, setAva1] = useState(null)
-  const [ava2, setAva2] = useState(null)
+  const [face, setFaces] = useState([])
   const [isFaceEnabled, setIsFaceEnabled] = useState(false)
   const [fingerIdentifyUpdatedAt, setFingerIdentifyUpdatedAt] = useState(false)
   const [imageUrl, setImageUrl] = useState(null)
@@ -213,28 +213,6 @@ const UserDetails = () => {
     }
   }, [userId])
 
-  useEffect(() => {
-    if (user) {
-      accessCodeUser.current = user.accessCode
-      if (user.cards) {
-        user.cards = user.cards.map((item, index) => ({
-          ...item,
-          key: index,
-          isDisable: true
-        }))
-      } else {
-        user.cards = []
-      }
-    } else {
-      let user = {
-        cards: []
-      }
-    }
-
-    setIdentityData(user)
-    originIdentityData.current = user
-  }, [user])
-
   const fetchUserData = async () => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -249,93 +227,135 @@ const UserDetails = () => {
         `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-access/${userId}/authentications`,
         config
       )
-
       setStatus1(response.data.isEnableFace)
       setFingerIdentifyUpdatedAt(response.data.fingerIdentifyUpdatedAt)
       setUser(response.data)
+      console.log(response.data, 'face')
+      console.log(response.data.faces, 'face')
+      const faces = response.data.faces
+
+      const order = ['LEFT', 'RIGHT', 'CENTER', 'ABOVE', 'BOTTOM']
+
+      faces.sort((a, b) => {
+        return order.indexOf(a.faceType) - order.indexOf(b.faceType)
+      })
+
+      setFaces(faces)
+      if (response.data) {
+        accessCodeUser.current = response.data.accessCode
+        if (response.data.cards) {
+          response.data.cards = response.data.cards.map((item, index) => ({
+            ...item,
+            key: index,
+            isDisable: true
+          }))
+        } else {
+          response.data.cards = []
+        }
+      } else {
+        let user = {
+          cards: []
+        }
+      }
     } catch (error) {
       console.error('Error fetching user details:', error)
     }
   }
 
   const ImgCards = ({ data, imgTitle }) => {
-    const emptyImages = Array.from({ length: 5 }, (_, index) => ({
-      // Tạo dữ liệu mẫu cho 5 ô Image trống
-      imageFileUrl: '/images/user.jpg',
-      imageBase64: null,
-      faceType: index === 0 ? 'LEFT' : index === 1 ? 'RIGHT' : index === 2 ? 'CENTER' : index === 3 ? 'ABOVE' : 'BOTTOM'
-    }))
-    const hasFaceImages = data && data.length > 0
+    const emptyImages = [
+      { faceType: 'LEFT', imageFileUrl: '/images/user.jpg', imageBase64: null },
+      { faceType: 'RIGHT', imageFileUrl: '/images/user.jpg', imageBase64: null },
+      { faceType: 'CENTER', imageFileUrl: '/images/user.jpg', imageBase64: null },
+      { faceType: 'ABOVE', imageFileUrl: '/images/user.jpg', imageBase64: null },
+      { faceType: 'BOTTOM', imageFileUrl: '/images/user.jpg', imageBase64: null }
+    ]
 
     const buildUrlWithToken = url => {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
-      if (token) {
-        return `${url}?token=${token}`
-      }
 
-      return url
+      return `${url}?token=${token}`
     }
 
-    // Tạo dữ liệu cho các Image từ API trả về hoặc dùng dữ liệu mẫu
-    const imagesToShow = useMemo(() => {
-      if (data.length === 0) {
-        return emptyImages
-      } else {
-        const filledImages = data.map((item, index) => ({
-          ...item,
-          faceType:
-            item.faceType ||
-            (index === 0 ? 'LEFT' : index === 1 ? 'RIGHT' : index === 2 ? 'CENTER' : index === 3 ? 'ABOVE' : 'BOTTOM')
-        }))
-
-        // Nếu dữ liệu ít hơn 5 Image, thêm các ô Image trống vào
-        while (filledImages.length < 5) {
-          filledImages.push(emptyImages[filledImages.length])
-        }
-
-        return filledImages
-      }
-    }, [data, emptyImages])
+    const imageData = data.length === 0 ? emptyImages : data
 
     return (
       <div style={{ display: 'flex', gap: '34px' }}>
-        {imagesToShow.map((item, index) => (
-          <div
-            key={index} // Đảm bảo mỗi ô Image có một key duy nhất
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center'
-            }}
-          >
-            <Img
-              src={
-                item
-                  ? item.imageFileUrl
-                    ? buildUrlWithToken(item.imageFileUrl)
-                    : `data:image/jpeg;base64,${item.imageBase64}`
-                  : null
-              }
-            />
-            <p style={{ margin: 0, marginTop: '5px', whiteSpace: 'nowrap' }}>
-              {imgTitle} {index + 1}
-            </p>
-            {editing && ( // Hiển thị nút chỉ khi đang ở chế độ Edit
-              <IconButton
-                size='small'
-                onClick={() => {
-                  setOpenPopup(true)
-                  handleEditImageButtonClick(item.faceType, item.imageFileUrl)
-                  setIsOpenUpdateImgUser(true)
-                  setFaceType(item.faceType)
-                  setImageUrl(item.imageFileUrl)
-                }}
-              >
-                <EditIcon />
-              </IconButton>
-            )}
-          </div>
-        ))}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Img src={imageData[0].imageFileUrl ? buildUrlWithToken(imageData[0].imageFileUrl) : null} />
+          <p style={{ margin: 0, marginTop: '5px', whiteSpace: 'nowrap' }}>{imgTitle} 1</p>
+          {editing && (
+            <IconButton
+              size='small'
+              onClick={() => {
+                setOpenPopup(true)
+                handleEditImageButtonClick(imageData[0].faceType, imageData[0].imageFileUrl)
+              }}
+            >
+              <EditIcon />
+            </IconButton>
+          )}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Img src={imageData[1].imageFileUrl ? buildUrlWithToken(imageData[1].imageFileUrl) : null} />
+          <p style={{ margin: 0, marginTop: '5px', whiteSpace: 'nowrap' }}>{imgTitle} 2</p>
+          {editing && (
+            <IconButton
+              size='small'
+              onClick={() => {
+                setOpenPopup(true)
+                handleEditImageButtonClick(imageData[1].faceType, imageData[1].imageFileUrl)
+              }}
+            >
+              <EditIcon />
+            </IconButton>
+          )}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Img src={imageData[2].imageFileUrl ? buildUrlWithToken(imageData[2].imageFileUrl) : null} />
+          <p style={{ margin: 0, marginTop: '5px', whiteSpace: 'nowrap' }}>{imgTitle} 3</p>
+          {editing && (
+            <IconButton
+              size='small'
+              onClick={() => {
+                setOpenPopup(true)
+                handleEditImageButtonClick(imageData[2].faceType, imageData[2].imageFileUrl)
+              }}
+            >
+              <EditIcon />
+            </IconButton>
+          )}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Img src={imageData[3].imageFileUrl ? buildUrlWithToken(imageData[3].imageFileUrl) : null} />
+          <p style={{ margin: 0, marginTop: '5px', whiteSpace: 'nowrap' }}>{imgTitle} 4</p>
+          {editing && (
+            <IconButton
+              size='small'
+              onClick={() => {
+                setOpenPopup(true)
+                handleEditImageButtonClick(imageData[3].faceType, imageData[3].imageFileUrl)
+              }}
+            >
+              <EditIcon />
+            </IconButton>
+          )}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Img src={imageData[4].imageFileUrl ? buildUrlWithToken(imageData[4].imageFileUrl) : null} />
+          <p style={{ margin: 0, marginTop: '5px', whiteSpace: 'nowrap' }}>{imgTitle} 5</p>
+          {editing && (
+            <IconButton
+              size='small'
+              onClick={() => {
+                setOpenPopup(true)
+                handleEditImageButtonClick(imageData[4].faceType, imageData[4].imageFileUrl)
+              }}
+            >
+              <EditIcon />
+            </IconButton>
+          )}
+        </div>
       </div>
     )
   }
@@ -394,7 +414,7 @@ const UserDetails = () => {
 
   // Sử dụng useMemo để gọi hàm processImageData mỗi khi user thay đổi
 
-  const processedImages = useMemo(() => processImageData(identityData?.faces), [identityData?.faces])
+  const processedImages = processImageData(face)
 
   const Img = React.memo(props => {
     const [loaded, setLoaded] = useState(false)
@@ -408,12 +428,12 @@ const UserDetails = () => {
             loaded
               ? { display: 'none' }
               : {
-                width: '100px',
-                height: '100px',
-                display: 'grid',
-                backgroundColor: '#C4C4C4',
-                placeItems: 'center'
-              }
+                  width: '100px',
+                  height: '100px',
+                  display: 'grid',
+                  backgroundColor: '#C4C4C4',
+                  placeItems: 'center'
+                }
           }
         >
           <CircularProgress size={20} />
@@ -476,9 +496,36 @@ const UserDetails = () => {
           `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-access/${userId}/authentications`,
           config
         )
-        setUser(response.data)
         setStatus1(response.data.isEnableFace)
         setFingerIdentifyUpdatedAt(response.data.fingerIdentifyUpdatedAt)
+        setUser(response.data)
+        console.log(response.data, 'face')
+        console.log(response.data.faces, 'face')
+        const faces = response.data.faces
+
+        const order = ['LEFT', 'RIGHT', 'CENTER', 'ABOVE', 'BOTTOM']
+
+        faces.sort((a, b) => {
+          return order.indexOf(a.faceType) - order.indexOf(b.faceType)
+        })
+
+        setFaces(faces)
+        if (response.data) {
+          accessCodeUser.current = response.data.accessCode
+          if (response.data.cards) {
+            response.data.cards = response.data.cards.map((item, index) => ({
+              ...item,
+              key: index,
+              isDisable: true
+            }))
+          } else {
+            response.data.cards = []
+          }
+        } else {
+          let user = {
+            cards: []
+          }
+        }
       } catch (error) {
         console.error('Error fetching user details:', error)
       }
@@ -486,7 +533,7 @@ const UserDetails = () => {
     if (userId) {
       fetchUserData()
     }
-  }, [userId, leaderOfUnit])
+  }, [])
 
   const handleCancel = () => {
     fetchUserData()
@@ -495,9 +542,11 @@ const UserDetails = () => {
     setEditing(false)
     setShowPlusColumn(!showPlusColumn)
   }
-  useEffect(() => {
+
+  const handleClose = () => {
+    setIsOpenUpdateImgUser(false)
     fetchUserData()
-  }, [])
+  }
 
   return (
     <div>
@@ -563,24 +612,24 @@ const UserDetails = () => {
                     <h2 style={{ color: 'black', marginLeft: '15%' }}> Image</h2>
                   </Grid>
                   <div>
-                    {(identityData?.faces?.length && (
+                    {(face?.length && (
                       <>
                         <div style={{ display: 'flex' }}>
                           <ImgCards data={processedImages} imgTitle='Image' />
                         </div>
                       </>
                     )) || (
-                        <>
-                          <h4 style={{ fontSize: '16px' }}>Image</h4>
-                          <div style={{ display: 'flex' }}>
-                            <ImgCards data={[]} imgTitle='Image' />
-                          </div>
-                        </>
-                      )}
+                      <>
+                        <h4 style={{ fontSize: '16px' }}>Image</h4>
+                        <div style={{ display: 'flex' }}>
+                          <ImgCards data={[]} imgTitle='Image' />
+                        </div>
+                      </>
+                    )}
 
                     {isOpenUpdateImgUser && (
                       <ImageForm
-                        onClose={() => setIsOpenUpdateImgUser(false)}
+                        onClose={() => handleClose()}
                         open={openPopup}
                         userId={userId}
                         faceType={faceType}
