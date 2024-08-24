@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Box,
   Button,
@@ -21,9 +21,10 @@ import {
 } from '@mui/material'
 import Icon from 'src/@core/components/icon'
 import authConfig from 'src/configs/auth'
-import axios from 'axios'
+import Link from 'next/link'
 import CustomChip from 'src/@core/components/mui/chip'
 import toast from 'react-hot-toast'
+import { getApi } from 'src/@core/utils/requestUltils'
 
 const statusAppointment = [
   {
@@ -53,7 +54,7 @@ const statusAppointment = [
 ]
 
 
-const Approval = () => {
+const Approval = ({ keyword, valueFilter }) => {
   const [loading, setLoading] = useState(false)
   const [dataList, setDataList] = useState([])
   const [pageSize, setPageSize] = useState(25)
@@ -90,39 +91,39 @@ const Approval = () => {
     return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`
   }
 
-  const fetchDataList = useCallback(
-    async (currentPage = page, size = pageSize) => {
-      setLoading(true)
-      try {
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          params: {
-            keyword: '',
-            page: currentPage,
-            limit: size
-          }
-        }
-
-        const response = await axios.get(
-          `https://dev-ivi.basesystem.one/smc/access-control/api/v0/registrations`,
-          config
-        )
-        setDataList(response.data?.rows)
-        setTotal(Math.ceil(response.data?.count / size)) // Tính tổng số trang dựa trên tổng số mục và kích thước trang
-      } catch (error) {
-        toast.error(error.message)
-      } finally {
-        setLoading(false)
+  const fetchData = async () => {
+    setLoading(true)
+    try {
+      const params = {
+        keyword: keyword,
+        page: page,
+        limit: pageSize,
+        ...valueFilter
       }
-    },
-    [page, pageSize, token]
-  )
+
+      const response = await getApi(
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/registrations`,
+        params
+      )
+      setDataList(response.data?.rows)
+      setTotal(Math.ceil(response.data?.count / pageSize)) // Tính tổng số trang dựa trên tổng số mục và kích thước trang
+    } catch (error) {
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    fetchDataList()
-  }, [fetchDataList])
+    fetchData()
+  }, [keyword, page, pageSize, valueFilter])
+
 
   return (
     <>

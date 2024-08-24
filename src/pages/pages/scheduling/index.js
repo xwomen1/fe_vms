@@ -11,6 +11,7 @@ import Approval from './approval'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import Icon from 'src/@core/components/icon'
 import Filter from './popups/Filter'
+import Link from 'next/link'
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   borderBottom: '0 !important',
@@ -52,6 +53,7 @@ const Caller = () => {
   const [keyword, setKeyword] = useState('')
   const [valueFilter, setValueFilter] = useState(initValueFilter)
   const [isOpenFilter, setIsOpenFilter] = useState(false)
+  const [isOpenAdd, setIsOpenAdd] = useState(false)
 
   const handleChange = (event, newValue) => {
     setValue(newValue)
@@ -90,7 +92,15 @@ const Caller = () => {
           />
         </Grid>
         <Grid item xs={3} sx={{ display: 'flex' }}>
-          <Button variant='contained'>Add</Button>
+          <Button
+            variant='contained'
+            size='small'
+            component={Link}
+            href={`/pages/scheduling/register`}
+            sx={{ color: 'blue', right: '10px' }}
+          >
+            Add
+          </Button>
           <Button variant='contained' sx={{ marginLeft: 5 }} onClick={() => setIsOpenFilter(true)}>
             <Icon icon='tabler:filter' />
           </Button>
@@ -109,7 +119,7 @@ const Caller = () => {
             <AppointmentList keyword={keyword} valueFilter={valueFilter} />
           </TabPanel>
           <TabPanel value='2'>
-            <Approval />
+            <Approval keyword={keyword} valueFilter={valueFilter} />
           </TabPanel>
         </TabContext>
       </Grid>
