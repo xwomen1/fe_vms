@@ -4,6 +4,7 @@ import {
   Card,
   CardContent,
   CardHeader,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -124,19 +125,27 @@ const Blacklist = () => {
   const [image, setImage] = useState(null)
 
   const [keyword, setKeyword] = useState('')
-
+  const [detail, setDetail] = useState(null)
   const [form, setForm] = useState(form_filter)
-
-  const initValueFilter = {
-    threshold: null,
-    topk: null
-  }
+  const [typeDel, setTypeDel] = useState(null)
+  const [valueFilter, setValueFilter] = useState({ image: null, threshold: null, topk: null })
 
   const {
+    reset,
     control,
     handleSubmit,
     formState: { errors }
-  } = useForm({ defaultValues: initValueFilter })
+  } = useForm({})
+
+  useEffect(() => {
+    if (detail) {
+      setDetailFormValue()
+    }
+  }, [detail])
+
+  const setDetailFormValue = () => {
+    reset(detail)
+  }
 
   const handleImageChange = e => {
     const file = e.target.files[0]
@@ -150,8 +159,14 @@ const Blacklist = () => {
     reader.readAsDataURL(file)
   }
 
+  useEffect(() => {
+    if (valueFilter.image !== null, valueFilter.threshold !== null, valueFilter.topk !== null) {
+      fetchData(valueFilter)
+    }
+  }, [valueFilter, reload])
+
   const fetchData = async values => {
-    setLoading(false)
+    setLoading(true)
 
     const params = {
       ...values
@@ -172,7 +187,7 @@ const Blacklist = () => {
         toast.error(error)
       }
     } finally {
-      setLoading(true)
+      setLoading(false)
     }
   }
 
@@ -187,7 +202,7 @@ const Blacklist = () => {
       topk: parseInt(values?.topk)
     }
 
-    fetchData(detail)
+    setValueFilter({ image: detail.image, threshold: detail.threshold, topk: detail.topk })
   }
 
   const handlePageChange = (event, newPage) => {
@@ -209,13 +224,13 @@ const Blacklist = () => {
   }
 
   const handleDelete = async () => {
-    if (deleteId !== null) {
+    if (deleteId !== null && typeDel !== null) {
       setLoading(true)
 
       const id = deleteId
 
       try {
-        await delApi(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${id}`)
+        await delApi(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${id}?type=${typeDel}`)
         toast.success('Delete Successful')
       } catch (error) {
         if (error && error?.response?.data) {
@@ -228,6 +243,8 @@ const Blacklist = () => {
       } finally {
         setLoading(false)
         setDeleteId(null)
+        setTypeDel(null)
+        setReload(reload + 1)
       }
     }
   }
@@ -279,6 +296,13 @@ const Blacklist = () => {
 
   return (
     <>
+      {loading === true && (
+        <Box
+          sx={{ width: '100%', height: ' 100%', position: 'absolute', zIndex: 10, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+        >
+          <CircularProgress />
+        </Box>
+      )}
       <div style={{ padding: '30px' }}>
         <Typography variant='h3' sx={{ marginBottom: '30px' }}>
           Blacklist
@@ -307,7 +331,7 @@ const Blacklist = () => {
                           <Controller
                             name={item.name}
                             control={control}
-                            rules={{ required: true }}
+                            rules={{ required: item.require }}
                             render={({ field: { value, onChange } }) => (
                               <CustomTextField
                                 fullWidth
@@ -315,9 +339,9 @@ const Blacklist = () => {
                                 label={item.label}
                                 onChange={onChange}
                                 placeholder={item.placeholder}
-                                error={Boolean(errors.firstName)}
+                                error={Boolean(errors[item.name])}
                                 aria-describedby='validation-basic-first-name'
-                                {...(errors.firstName && { helperText: 'This field is required' })}
+                                {...(errors[item.name] && { helperText: 'This field is required' })}
                               />
                             )}
                           />
@@ -415,6 +439,7 @@ const Blacklist = () => {
                                 onClick={() => {
                                   setDeleteId(row?.member_id)
                                   setIsOpenDel(true)
+                                  setTypeDel('blacklist')
                                 }}
                               >
                                 <Icon icon='tabler:trash' />
