@@ -46,7 +46,7 @@ export const ViewCameraPause = ({
   const [status, setStatus] = useState('')
   const [reload, setReload] = useState(0)
   const [selectedChannel, setSelectedChannel] = useState('Sub')
-  const intervalRef = useRef(null);
+  const intervalRef = useRef(null)
 
   useEffect(() => {
     const heightCaculator = Math.floor((window.innerHeight - 192) / sizeScreen.split('x')[1])
@@ -117,7 +117,7 @@ export const ViewCameraPause = ({
       // listen for remote tracks and add them to remote stream
 
       rtcPeerConnection.addEventListener('connectionstatechange', () => {
-        // console.log('RTCPeerConnection state:', rtcPeerConnection.connectionState)
+        console.log('RTCPeerConnection state:', rtcPeerConnection.connectionState)
         setStatus(rtcPeerConnection.connectionState)
       })
     }
@@ -130,16 +130,24 @@ export const ViewCameraPause = ({
   //   }
   // }, [startTime])
 
+  const closeConnections = () => {
+    if (websocket) {
+      websocket.close()
+      setWebsocket(null)
+    }
+    if (rtcPeerConnection) {
+      rtcPeerConnection.close()
+      setRtcPeerConnection(null)
+    }
+  }
   useEffect(() => {
+    console.log('Change time ', websocket, rtcPeerConnection)
+    closeConnections()
     createWsConnection()
 
     return () => {
-      if (websocket) {
-        websocket.close()
-      }
-      if (rtcPeerConnection) {
-        rtcPeerConnection.close()
-      }
+      console.log('Close all', websocket, rtcPeerConnection)
+      closeConnections()
     }
   }, [id, channel])
 
@@ -176,17 +184,13 @@ export const ViewCameraPause = ({
   // }, [status]);
 
   useEffect(() => {
+    closeConnections()
     setRtcPeerConnection(null)
     setWebsocket(null)
     createWsConnection()
 
     return () => {
-      if (websocket) {
-        websocket.close()
-      }
-      if (rtcPeerConnection) {
-        rtcPeerConnection.close()
-      }
+      closeConnections()
     }
   }, [reload])
 
@@ -274,7 +278,15 @@ export const ViewCameraPause = ({
   return (
     <div className='portlet portlet-video live' style={{ width: '100%' }}>
       {loading && (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: heightDiv - 26 }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            height: heightDiv - 26
+          }}
+        >
           <Box sx={{ display: 'flex' }}>
             <CircularProgress />
           </Box>

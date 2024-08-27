@@ -44,7 +44,7 @@ export const ViewCameraPause = ({
   const [heightDiv, setHeightDiv] = useState(100)
   const [status, setStatus] = useState('')
   const [reload, setReload] = useState(0)
-  const intervalRef = useRef(null);
+  const intervalRef = useRef(null)
 
   useEffect(() => {
     const heightCaculator = Math.floor((window.innerHeight - 192) / sizeScreen.split('x')[1])
@@ -156,8 +156,16 @@ export const ViewCameraPause = ({
   }, [rtcPeerConnection])
 
   useEffect(() => {
+    console.log('Change time ', websocket, rtcPeerConnection)
     if (websocket) {
       websocket.close()
+
+      // Đóng kết nối RTC trước khi tạo kết nối WebSocket mới
+      if (rtcPeerConnection) {
+        console.log('have old rtc', rtcPeerConnection)
+        rtcPeerConnection.close()
+        setRtcPeerConnection(null)
+      }
       createWsConnection()
     }
   }, [startTime])
@@ -270,7 +278,15 @@ export const ViewCameraPause = ({
     <>
       <div className='portlet portlet-video live' style={{ width: '100%' }}>
         {loading && (
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: heightDiv - 26 }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: '100%',
+              height: heightDiv - 26
+            }}
+          >
             <Box sx={{ display: 'flex' }}>
               <CircularProgress />
             </Box>
@@ -340,7 +356,6 @@ export const ViewCameraPause = ({
         )}
       </div>
     </>
-
   )
 }
 
