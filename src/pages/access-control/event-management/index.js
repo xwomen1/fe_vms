@@ -262,7 +262,7 @@ const EventList = () => {
                       <TableCell>{row.fullName}</TableCell>
                       <TableCell>{row.accessCode}</TableCell>
                       <TableCell>{row.deviceDirection}</TableCell>
-                      <TableCell>{formatDate(row.dateEvent)}</TableCell>
+                      <TableCell>{formatTime(row.dateEvent)}</TableCell>
 
                       <TableCell>{row.hostName}</TableCell>
                       <TableCell>{row.deviceName}</TableCell>
