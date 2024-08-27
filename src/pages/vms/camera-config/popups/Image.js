@@ -121,35 +121,6 @@ const ImageCamera = ({ cameraId, onClose }) => {
     reset(detail)
   }
 
-  useEffect(() => {
-    fetchData()
-  }, [])
-
-  const fetchData = async () => {
-    setLoading(true)
-    try {
-      const response = await getApi(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/imageconfig/${cameraId}?channel=1&protocolType=HIKVISION`
-      )
-
-      const data = response.data
-      setDetail(data)
-      setDisableName(data?.disableName)
-      setDisableDate(data?.disableDate)
-      setDisableWeek(data?.disableWeek)
-    } catch (error) {
-      if (error && error?.response?.data) {
-        console.error('error', error)
-        toast.error(error?.response?.data?.message)
-      } else {
-        console.error('Error fetching data:', error)
-        toast.error(error)
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
-
   const handleCancel = () => {
     onClose()
   }
@@ -164,9 +135,11 @@ const ImageCamera = ({ cameraId, onClose }) => {
       disableName: disableName,
     }
 
-    if (cameraId) {
-      handleUpdate(params)
-    }
+    // if (cameraId) {
+    //   handleUpdate(params)
+    // }
+
+    onClose()
   }
 
   const handleUpdate = values => {
@@ -218,10 +191,7 @@ const ImageCamera = ({ cameraId, onClose }) => {
             </Box>
           )}
           <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <img height='200' alt='error-illustration' src='/images/avatars/1.png' />
-            </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12}>
               <Grid container spacing={2}>
                 {
                   form.map((item, index) => {
@@ -329,7 +299,7 @@ const ImageCamera = ({ cameraId, onClose }) => {
       </DialogContent>
       <DialogActions>
         <Button variant='contained' color='secondary' onClick={handleCancel}>Cancel</Button>
-        <Button variant='contained' color='primary' onClick={handleSubmit(onSubmit)}>Save</Button>
+        <Button variant='contained' color='primary' onClick={handleCancel}>Save</Button>
       </DialogActions>
     </Dialog>
   )

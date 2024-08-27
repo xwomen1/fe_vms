@@ -83,6 +83,7 @@ const ImageCamera = ({ cameraId, onClose }) => {
   const [disableWeek, setDisableWeek] = useState(false)
   const [disableName, setDisableName] = useState(false)
   const [form, setForm] = useState(format_form)
+  const [image, setImage] = useState(null)
 
   const {
     control,
@@ -103,6 +104,7 @@ const ImageCamera = ({ cameraId, onClose }) => {
 
   useEffect(() => {
     fetchData()
+    fetchDataImage()
   }, [])
 
   const fetchData = async () => {
@@ -117,6 +119,48 @@ const ImageCamera = ({ cameraId, onClose }) => {
       setDisableName(data?.disableName)
       setDisableDate(data?.disableDate)
       setDisableWeek(data?.disableWeek)
+    } catch (error) {
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchDataImage = async () => {
+    setLoading(true)
+    try {
+      const response = await getApi(
+        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/snapshot/${cameraId}?channel=1`
+      )
+
+      const data = response.data
+      if (data?.hikvisionImageData) {
+        console.log('hikvisionImageData')
+
+        const base64String = data?.hikvisionImageData
+
+        const mimeType = base64String.substring(0, 15).includes('svg+xml')
+          ? 'image/svg+xml'
+          : base64String.substring(0, 10).includes('jpeg')
+            ? 'image/jpeg'
+            : base64String.substring(0, 10).includes('gif')
+              ? 'image/gif'
+              : 'image/png'
+
+        const fullBase64 = `data:${mimeType};base64,${base64String}`
+        setImage(fullBase64)
+      }
+      if (data?.onvifSnapshotUri) {
+        const url = data?.onvifSnapshotUri?.uri
+        setImage(url)
+      }
+
     } catch (error) {
       if (error && error?.response?.data) {
         console.error('error', error)
@@ -182,7 +226,7 @@ const ImageCamera = ({ cameraId, onClose }) => {
       )}
       <Grid container spacing={2}>
         <Grid item xs={6}>
-          <img height='200' alt='error-illustration' src='/images/avatars/1.png' />
+          <img width={'100%'} alt='camera image configuration' src={image} />
         </Grid>
         <Grid item xs={6}>
           <Grid container spacing={2}>

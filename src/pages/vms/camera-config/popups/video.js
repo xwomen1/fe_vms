@@ -166,10 +166,6 @@ const VideoConfig = ({ open, onClose, camera }) => {
   } = useForm({})
 
   useEffect(() => {
-    fetchData()
-  }, [])
-
-  useEffect(() => {
     if (detail) {
       setDetailFormValue()
     }
@@ -206,26 +202,6 @@ const VideoConfig = ({ open, onClose, camera }) => {
     }
   }, [streamType, videoConfig])
 
-  const fetchData = async () => {
-    setLoading(true)
-    try {
-      const response = await getApi(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/videoconfig/${camera}`
-      )
-      setVideoConfig(response.data?.videoConfig)
-    } catch (error) {
-      if (error && error?.response?.data) {
-        console.error('error', error)
-        toast.error(error?.response?.data?.message)
-      } else {
-        console.error('Error fetching data:', error)
-        toast.error(error)
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
-
   const onSubmit = values => {
     const valuesChange = {
       ...values,
@@ -247,35 +223,40 @@ const VideoConfig = ({ open, onClose, camera }) => {
       ]
     }
 
-    if (camera) {
+    if (camera?.length > 0) {
       handleUpdate(params)
+    } else {
+      onClose()
     }
   }
 
   const handleUpdate = values => {
-    setLoading(true)
+    // setLoading(true)
 
     const params = {
       ...values
     }
 
-    putApi(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/videoconfig/${camera}`, { ...params })
-      .then(() => {
-        toast.success('Data has been updated successfully ')
-      })
-      .catch(error => {
-        if (error && error?.response?.data) {
-          console.error('error', error)
-          toast.error(error?.response?.data?.message)
-        } else {
-          console.error('Error fetching data:', error)
-          toast.error(error)
-        }
-      })
-      .finally(() => {
-        setLoading(false)
-        onClose()
-      })
+    // putApi(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/videoconfig/${camera}`, { ...params })
+    //   .then(() => {
+    //     toast.success('Data has been updated successfully ')
+    //   })
+    //   .catch(error => {
+    //     if (error && error?.response?.data) {
+    //       console.error('error', error)
+    //       toast.error(error?.response?.data?.message)
+    //     } else {
+    //       console.error('Error fetching data:', error)
+    //       toast.error(error)
+    //     }
+    //   })
+    //   .finally(() => {
+    //     setLoading(false)
+    //     onClose()
+    //   })
+
+    onClose()
+
   }
 
   return (
