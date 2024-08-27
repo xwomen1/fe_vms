@@ -125,7 +125,7 @@ const EventList = () => {
   }, [page, pageSize])
   useEffect(() => {
     if (searchKeyword === '') {
-      fetchDataList()
+      fetchDataList1()
     }
   }, [searchKeyword])
   function isoToEpoch(isoDateString) {
@@ -134,6 +134,34 @@ const EventList = () => {
 
     return epochSeconds
   }
+
+  const fetchDataList1 = useCallback(async () => {
+    setLoading(true)
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        params: {
+          page: page,
+          limit: pageSize,
+          deviceName: filterValues.deviceName,
+          hostName: filterValues.hostName,
+          startDate: isoToEpoch(filterValues.startDate) || null,
+          endDate: isoToEpoch(filterValues.endDate) || null
+        }
+      }
+
+      const response = await axios.get(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/event/search`, config)
+      setDevices(response.data.rows)
+      setTotalPage(Math.ceil(response.data.count / pageSize))
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      toast.error('Error fetching data')
+    } finally {
+      setLoading(false)
+    }
+  }, [token, page, pageSize, filterValues])
 
   const fetchDataList = useCallback(async () => {
     setLoading(true)
