@@ -21,7 +21,7 @@ const Daily = ({ dataDailyProps, callbackOfDaily, disabled }) => {
     }
   }, [dataDailyProps])
 
-  // Mảng Date mặc định
+  // Mảng thời gian mặc định
   const defaultTimePeriods = [
     {
       endTimeInMinute: 240,
@@ -62,43 +62,43 @@ const Daily = ({ dataDailyProps, callbackOfDaily, disabled }) => {
       value: 1
     },
     {
-      label: 'Thứ 2',
+      label: 'MONDAY',
       dayOfWeek: 'MONDAY',
       value: 2
     },
     {
-      label: 'Thứ 3',
+      label: 'TUESDAY',
       dayOfWeek: 'TUESDAY',
       value: 3
     },
     {
-      label: 'Thứ 4',
+      label: 'WEDNESDAY',
       dayOfWeek: 'WEDNESDAY',
       value: 4
     },
     {
-      label: 'Thứ 5',
+      label: 'THURSDAY',
       dayOfWeek: 'THURSDAY',
       value: 5
     },
     {
-      label: 'Thứ 6',
+      label: 'FRIDAY',
       dayOfWeek: 'FRIDAY',
       value: 6
     },
     {
-      label: 'Thứ 7',
+      label: 'SATURDAY',
       dayOfWeek: 'SATURDAY',
       value: 7
     },
     {
-      label: 'CN',
+      label: 'SUNDAY',
       dayOfWeek: 'SUNDAY',
       value: 8
     }
   ]
 
-  // Kiểm tra Status của checkbox
+  // Kiểm tra trạng thái của checkbox
   useEffect(() => {
     if (disabled) {
       // Nếu checkbox đã được chọn, thiết lập giá trị mặc định cho dataDaily
@@ -120,7 +120,7 @@ const Daily = ({ dataDailyProps, callbackOfDaily, disabled }) => {
   }, [disabled])
 
   const onClickChoiceItem = (data, type) => {
-    // Kiểm tra Status của checkbox
+    // Kiểm tra trạng thái của checkbox
     if (disabled) {
       return // Nếu checkbox chưa được tích, không làm gì cả
     }
@@ -136,7 +136,11 @@ const Daily = ({ dataDailyProps, callbackOfDaily, disabled }) => {
     if (disabled) {
       return // Nếu checkbox chưa được tích, không làm gì cả
     }
-    const newTime = date.timePeriods.filter(i => i.type !== time.type)
+
+    const newTime = date.timePeriods.filter(i => {
+      return i.startTimeInMinute !== time.startTimeInMinute || i.endTimeInMinute !== time.endTimeInMinute
+    })
+
     setDataDaily([...dataDaily.filter(e => e.value !== date.value), { ...date, timePeriods: newTime || [] }])
   }
 
@@ -181,7 +185,7 @@ const Daily = ({ dataDailyProps, callbackOfDaily, disabled }) => {
     >
       {dataDaily
         .sort(function (a, b) {
-          return a.value - b.value
+          return a.value - b.value - 1
         })
         .map((item, index) => {
           if (item.value === 1) {
@@ -236,12 +240,12 @@ const Daily = ({ dataDailyProps, callbackOfDaily, disabled }) => {
               }}
             >
               <div style={{ minWidth: 80 }}>{item.label}</div>
-              {index === 1 ? (
-                <div style={{ width: 35 }} />
-              ) : (
-                <IconButton style={{ padding: 1, marginRight: 8, width: 22 }} onClick={() => onClickIconCopy(item)}>
+              {item.dayOfWeek !== 'MONDAY' ? (
+                <IconButton style={{ padding: 1, marginRight: 8, width: 18 }} onClick={() => onClickIconCopy(item)}>
                   <Icon icon='tabler:copy' />
                 </IconButton>
+              ) : (
+                <div style={{ padding: 1, marginRight: 8, width: 22 }}></div>
               )}
               <div
                 style={{
