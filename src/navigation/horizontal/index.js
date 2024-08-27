@@ -1,17 +1,17 @@
 const navigation = () => {
   return [
     {
-      title: 'Home',
+      title: 'Trang chủ',
       icon: 'tabler:smart-home',
       path: '/dashboards/analytics'
     },
     {
       path: '/asset',
-      title: 'VMS System',
+      title: 'Hệ thống VMS',
       icon: 'tabler:camera',
       children: [
         {
-          title: 'Live View',
+          title: 'Xem trực tiếp',
           path: '/vms/live-view',
           icon: 'tabler:video'
         },
@@ -21,27 +21,27 @@ const navigation = () => {
         //   path: '/vms/live-view-p2p-private'
         // },
         {
-          title: 'Playback',
+          title: 'Xem lại',
           path: '/vms/playback-camera',
           icon: 'tabler:video-minus'
         },
         {
-          title: 'Extract Clip',
+          title: 'Trích xuất clip',
           path: '/vms/clip-extraction',
           icon: 'tabler:file-export'
         },
         {
-          title: 'AI Event',
+          title: 'Sự kiện AI',
           path: '/vms/events/view/eventList',
           icon: 'tabler:timeline-event-exclamation'
         },
         {
-          title: 'Face',
+          title: 'Danh sách khuôn mặt',
           path: '/vms/events/view/eventFace',
           icon: 'tabler:timeline-event-exclamation'
         },
         {
-          title: 'License Plate',
+          title: 'Danh sách biển số',
           path: '/vms/events/view/eventCar',
           icon: 'tabler:timeline-event-exclamation'
         },
@@ -53,22 +53,22 @@ const navigation = () => {
         // },
 
         {
-          title: 'AI Map',
+          title: 'Bản đồ AI',
           path: '/vms/events/view/eventMap',
           icon: 'tabler:timeline-event-exclamation'
         },
         {
-          title: 'AI Overview',
+          title: 'Tổng quan AI',
           path: '/vms/ai-config/view/eventOverview',
           icon: 'tabler:settings'
         },
         {
-          title: 'AI Configuration List',
+          title: 'Cấu hình AI',
           path: '/vms/ai-config/view/aiConfig',
           icon: 'tabler:settings'
         },
         {
-          title: 'AI Region',
+          title: 'Khoang vùng AI',
           path: '/vms/ai-config/view/eventConfig',
           icon: 'tabler:settings'
         },
@@ -78,32 +78,32 @@ const navigation = () => {
           icon: 'tabler:settings'
         },
         {
-          title: 'System Incident',
+          title: 'Sự cố hệ thống',
           path: '/vms/error-system',
           icon: 'tabler:id-badge-off'
         },
         {
-          title: 'Camera Group',
+          title: 'Nhóm camera',
           path: '/vms/camera-group',
           icon: 'tabler:schema'
         },
         {
-          title: 'Camera List',
+          title: 'Danh sách camera',
           path: '/vms/camera-config/table',
           icon: 'tabler:device-cctv'
         },
         {
-          title: 'Add Camera',
+          title: 'Thêm camera',
           path: '/vms/camera-config/add',
           icon: 'tabler:device-cctv'
         },
         {
-          title: 'NVR List',
+          title: 'Danh sách NVR',
           path: '/vms/nvr-config/table',
           icon: 'tabler:server-2'
         },
         {
-          title: 'Add NVR',
+          title: 'Thêm NVR',
           path: '/vms/nvr-config/add',
           icon: 'tabler:server-2'
         },
@@ -114,12 +114,12 @@ const navigation = () => {
         },
         {
           path: '/pages/face_management/list',
-          title: 'Face Management',
+          title: 'Quản lý khuôn mặt',
           icon: 'tabler:face-id'
         },
         {
           path: '/pages/car_management/list',
-          title: 'License Plate Management',
+          title: 'Quản lý Biển số',
           icon: 'tabler:id-badge-2'
         }
 
@@ -208,98 +208,24 @@ const navigation = () => {
     // },
 
     {
-      title: 'User',
+      title: 'Người dùng',
       icon: 'tabler:user',
       children: [
         {
-          title: 'User',
+          title: 'Người dùng',
           icon: 'tabler:user',
           path: '/apps/user/list'
         },
         {
-          title: 'Organizational Structure',
+          title: 'Cơ cấu tổ chức',
           icon: 'tabler:building',
           path: '/organization/list'
         },
         {
-          title: 'Role',
+          title: 'Vai trò',
           icon: 'tabler:users',
           path: '/apps/roles'
         }
-      ]
-    },
-    {
-      path: '/',
-      title: 'Smart Parking',
-      icon: 'tabler:lock-access',
-      children: [
-        {
-          path: '/smart-parking/caller',
-          title: 'Subscription',
-          icon: 'tabler:phone'
-        },
-        {
-          path: '/smart-parking/caller-type',
-          title: 'Subscription Type',
-          icon: 'tabler:phone'
-        },
-        {
-          path: '/smart-parking/cards',
-          title: 'Card',
-          icon: 'tabler:cards'
-        },
-        {
-          path: '/smart-parking/vehicle',
-          title: 'Vehicle',
-          icon: 'tabler:car'
-        },
-        {
-          path: '/smart-parking/vehicle-type',
-          title: 'Vehicle Type',
-          icon: 'tabler:parking'
-        },
-        {
-          path: '/smart-parking/service',
-          title: 'Service',
-          icon: 'tabler:zoom-money'
-        },
-        {
-          path: '/smart-parking/parking',
-          title: 'Parking Lot',
-          icon: 'tabler:parking'
-        },
-
-        {
-          path: '/smart-parking/asset',
-          title: 'Asset Management',
-          icon: 'tabler:moneybag',
-          children: [
-            {
-              title: 'Asset Type',
-              path: '/smart-parking/assetType'
-            },
-            {
-              title: 'Asset',
-              path: '/smart-parking/asset'
-            }
-          ]
-        }
-
-        // {
-        //   path: '/pages/access-rights/list',
-        //   title: 'Quyền truy cập',
-        //   icon: 'tabler:shield'
-        // },
-        // {
-        //   path: '/pages/access-rights/list',
-        //   title: 'Thống kê',
-        //   icon: 'tabler:statistics/time?tab=%2Fstatistics%2Ftime'
-        // },
-        // {
-        //   path: '/pages/access-rights/list',
-        //   title: 'Hẹn lịch',
-        //   icon: 'tabler:guest-registrations'
-        // }
       ]
     }
 
