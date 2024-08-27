@@ -43,7 +43,7 @@ const RolePopup = ({ open, onClose, onSelect, nvr }) => {
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Cấu hình luu tru</DialogTitle>
+      <DialogTitle>Storage configuration</DialogTitle>
       <DialogContent>
         <TabContext value={value}>
           <Grid>

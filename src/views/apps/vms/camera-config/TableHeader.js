@@ -24,7 +24,7 @@ const TableHeader = props => {
         variant='contained'
         sx={{ '& svg': { mr: 1 } }}
       >
-        <Icon fontSize='1rem' icon='tabler:key' /> Mật khẩu
+        <Icon fontSize='1rem' icon='tabler:key' /> Password
       </Button>
       <Button
         style={{ backgroundColor: '#A9A9A9', flex: '0 0 auto', margin: '0 4px' }} // Adjusted button size and spacing
@@ -32,7 +32,7 @@ const TableHeader = props => {
         variant='contained'
         sx={{ '& svg': { mr: 1 } }}
       >
-        <Icon fontSize='1rem' icon='tabler:network' /> Mạng
+        <Icon fontSize='1rem' icon='tabler:network' /> Network
       </Button>
       <Button
         style={{ backgroundColor: '#A9A9A9', flex: '0 0 auto', margin: '0 4px' }} // Adjusted button size and spacing
@@ -48,7 +48,7 @@ const TableHeader = props => {
         variant='contained'
         sx={{ '& svg': { mr: 1 } }}
       >
-        <Icon fontSize='1rem' icon='tabler:camera' /> Hình ảnh
+        <Icon fontSize='1rem' icon='tabler:camera' /> Image
       </Button>
       <Button
         style={{ backgroundColor: '#A9A9A9', flex: '0 0 auto', margin: '0 4px' }} // Adjusted button size and spacing
@@ -56,7 +56,7 @@ const TableHeader = props => {
         variant='contained'
         sx={{ '& svg': { mr: 1 } }}
       >
-        <Icon fontSize='1rem' icon='tabler:cloud' /> Bộ nhớ
+        <Icon fontSize='1rem' icon='tabler:cloud' /> Storage
       </Button>
     </Box>
   )

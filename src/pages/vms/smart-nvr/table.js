@@ -4,6 +4,7 @@ import Menu from '@mui/material/Menu'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
 import TreeView from '@mui/lab/TreeView'
+import CustomChip from 'src/@core/components/mui/chip'
 import TreeItem from '@mui/lab/TreeItem'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -13,7 +14,7 @@ import authConfig from 'src/configs/auth'
 import Table from '@mui/material/Table'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
-import { IconButton, Box } from '@mui/material'
+import { IconButton, Box, CardHeader, Button } from '@mui/material'
 import Swal from 'sweetalert2'
 import { fetchData } from 'src/store/apps/user'
 import { useRouter } from 'next/router'
@@ -148,20 +149,20 @@ const UserList = ({ apiData }) => {
   }
   function showAlertConfirm(options, intl) {
     const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Accept',
       imageWidth: 213,
       showCancelButton: true,
       showCloseButton: true,
       showConfirmButton: true,
       focusCancel: true,
       reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
-      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Agree',
+      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Cancel',
       customClass: {
         content: 'content-class',
         confirmButton: 'swal-btn-confirm'
       },
-      confirmButtonColor: '#FF9F43'
+      confirmButtonColor: '#002060'
     }
 
     return Swal.fire({ ...defaultProps, ...options })
@@ -195,7 +196,7 @@ const UserList = ({ apiData }) => {
 
   const handleDelete = idDelete => {
     showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
+      text: 'Do you want to delete it?'
     }).then(({ value }) => {
       if (value) {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -213,13 +214,13 @@ const UserList = ({ apiData }) => {
           .delete(urlDelete, config)
           .then(() => {
             Swal.fire({
-              title: 'Thành công!',
-              text: 'Xóa thành công',
+              title: 'Successfully!',
+              text: 'Deleted successfully',
               icon: 'success',
               willOpen: () => {
                 const confirmButton = Swal.getConfirmButton()
                 if (confirmButton) {
-                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.backgroundColor = '#002060'
                   confirmButton.style.color = 'white'
                 }
               }
@@ -236,7 +237,7 @@ const UserList = ({ apiData }) => {
               willOpen: () => {
                 const confirmButton = Swal.getConfirmButton()
                 if (confirmButton) {
-                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.backgroundColor = '#002060'
                   confirmButton.style.color = 'white'
                 }
               }
@@ -287,51 +288,64 @@ const UserList = ({ apiData }) => {
     <Grid container spacing={6.5}>
       <Grid item xs={12}>
         <Card>
-          <Grid container spacing={1}>
-            <Grid item xs={9}>
-              {selectedIds === null ? <TableHeader /> : <TableHeader value={value} />}
-            </Grid>
-            <Grid item xs={3} style={{ marginTop: '1%' }}>
-              <CustomTextField
-                value={value}
-                autoComplete='new-password' // Thay đổi giá trị thành 'new-password'
-                form='off' // Thêm thuộc tính form với giá trị 'off'
-                onChange={e => handleFilter(e.target.value)}
-                placeholder='Search…'
-                InputProps={{
-                  startAdornment: (
-                    <Box sx={{ mr: 2, display: 'flex' }}>
-                      <Icon fontSize='1.25rem' icon='tabler:search' />
-                    </Box>
-                  ),
-                  endAdornment: (
-                    <IconButton size='small' title='Clear' aria-label='Clear'>
-                      <Icon fontSize='1.25rem' icon='tabler:x' />
-                    </IconButton>
-                  )
-                }}
-                sx={{
-                  width: {
-                    xs: 1,
-                    sm: 'auto'
-                  },
-                  '& .MuiInputBase-root > svg': {
-                    mr: 2
-                  }
-                }}
-              />
-            </Grid>
-          </Grid>
+          <CardHeader
+            title={
+              <>
+                <Button variant='contained'>Smart Nvr list</Button>
+              </>
+            }
+            titleTypographyProps={{ sx: { mb: [2, 0] } }}
+            sx={{
+              py: 4,
+              flexDirection: ['column', 'row'],
+              '& .MuiCardHeader-action': { m: 0 },
+              alignItems: ['flex-start', 'center']
+            }}
+            action={
+              <Grid container spacing={1}>
+                {/* <Grid item xs={9}>
+                  {selectedIds === null ? <TableHeader /> : <TableHeader value={value} />}
+                </Grid> */}
+                <Grid item xs={12} style={{ marginTop: '1%' }}>
+                  <CustomTextField
+                    value={value}
+                    autoComplete='new-password' // Thay đổi giá trị thành 'new-password'
+                    form='off' // Thêm thuộc tính form với giá trị 'off'
+                    onChange={e => handleFilter(e.target.value)}
+                    placeholder='Search…'
+                    InputProps={{
+                      startAdornment: (
+                        <Box sx={{ mr: 2, display: 'flex' }}>
+                          <Icon fontSize='1.25rem' icon='tabler:search' />
+                        </Box>
+                      ),
+                      endAdornment: (
+                        <IconButton size='small' title='Clear' aria-label='Clear'>
+                          <Icon fontSize='1.25rem' icon='tabler:x' />
+                        </IconButton>
+                      )
+                    }}
+                    sx={{
+                      width: {
+                        xs: 1,
+                        sm: 'auto'
+                      },
+                      '& .MuiInputBase-root > svg': {
+                        mr: 2
+                      }
+                    }}
+                  />
+                </Grid>
+              </Grid>
+            }
+          />
+
           <Grid container spacing={2}>
-            <Grid item xs={0.1}></Grid>
-
             <Grid item xs={12}>
-              <div></div>
-
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ padding: '16px' }}>
+                    <TableCell align='center'>
                       <Checkbox
                         checked={selectedIds.length === assettype.length}
                         onChange={e => {
@@ -344,51 +358,50 @@ const UserList = ({ apiData }) => {
                         }}
                       />
                     </TableCell>
-                    <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Tên thiết bị</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Loại</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Địa chỉ IP</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Địa chỉ Mac</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Vị trí</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Trạng thái</TableCell>
+                    <TableCell align='center'>NO.</TableCell>
+                    <TableCell align='center'>Device Name</TableCell>
+                    <TableCell align='center'>Device Type</TableCell>
+                    <TableCell align='center'>IP Address</TableCell>
+                    <TableCell align='center'>Mac Address</TableCell>
+                    <TableCell align='center'>Location</TableCell>
+                    <TableCell align='center'>Status</TableCell>
 
-                    <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
+                    <TableCell align='center'>Active</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {assettype.map((assetType, index) => (
                     <TableRow key={assetType.id}>
-                      <TableCell sx={{ padding: '16px' }}>
+                      <TableCell align='center'>
                         <Checkbox
                           checked={selectedIds.includes(assetType.id)}
                           onChange={() => handleCheckboxChange(assetType.id)}
                         />
                       </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType?.nameDevice}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType?.deviceType}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType?.ipAddress}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType?.macAddress}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType?.location}</TableCell>
-                      <TableCell
-                        sx={{
-                          padding: '16px'
-                        }}
-                      >
-                        <span
-                          style={{
-                            borderRadius: '10px',
-                            padding: '5px 10px',
-                            width: '70%',
-                            display: 'inline-block',
-                            backgroundColor: assetType.status === 'connect' ? 'green' : 'orange'
-                          }}
-                        >
-                          {assetType.status === 'connect' ? 'Đang hoạt động' : 'Không hoạt động'}
-                        </span>
+                      <TableCell align='center'>{(page - 1) * pageSize + index + 1} </TableCell>
+                      <TableCell align='center'>{assetType?.nameDevice}</TableCell>
+                      <TableCell align='center'>{assetType?.deviceType}</TableCell>
+                      <TableCell align='center'>{assetType?.ipAddress}</TableCell>
+                      <TableCell align='center'>{assetType?.macAddress}</TableCell>
+                      <TableCell align='center'>{assetType?.location}</TableCell>
+                      <TableCell align='center'>
+                        {assetType.status ? (
+                          <div>
+                            <CustomChip
+                              rounded
+                              size='small'
+                              skin='light'
+                              sx={{ lineHeight: 1 }}
+                              label={assetType.status === 'disconnected' ? 'Lost connection' : 'Connected'}
+                              color={assetType.status === 'disconnected' ? 'primary' : 'success'}
+                            />
+                          </div>
+                        ) : (
+                          assetType.status
+                        )}
                       </TableCell>
 
-                      <TableCell sx={{ padding: '16px' }}>
+                      <TableCell align='center'>
                         <IconButton size='small' onClick={() => handleAddPClick(assetType.id)}>
                           <Icon icon='tabler:edit' />
                         </IconButton>
@@ -417,7 +430,7 @@ const UserList = ({ apiData }) => {
                 <Grid item xs={1.5} style={{ padding: 0 }}>
                   <IconButton onClick={handleOpenMenu}>
                     <Icon icon='tabler:selector' />
-                    <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
+                    <p style={{ fontSize: 15 }}>{pageSize} line/page</p>
                   </IconButton>
                   <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
                     {pageSizeOptions.map(size => (

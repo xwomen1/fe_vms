@@ -74,11 +74,14 @@ const Add = () => {
   const [filteredRegionOptions, setFilteredRegionOptions] = useState(user?.level)
   const [filteredContractOptions, setFilteredContractOptions] = useState(user?.contractType)
   const [gender, setGender] = useState('')
+  const [isLeader, setIsLeader] = useState(false)
+  const [groups, setGroup] = useState([])
+
   let groupACIds = []
   const [regionOptions, setRegionOptions] = useState([])
 
   const handleAddRow = () => {
-    const newRow = { groupName: '', code: '', id: '' } // Thêm groupId vào đây
+    const newRow = { groupName: '', code: '', id: '', isLeader: '' } // Thêm groupId vào đây
     setRows([...rows, newRow])
   }
 
@@ -208,69 +211,162 @@ const Add = () => {
 
   const saveChanges = async () => {
     if (password !== confirmPassword) {
-      Swal.fire('Lỗi!', 'Mật khẩu và xác nhận mật khẩu không khớp nhau.', 'error')
+      Swal.fire('error!', 'Password and confirm password do not match.', 'error')
 
       return
     }
     if (!fullNameValue || fullNameValue.length <= 3) {
-      Swal.fire('Lỗi!', 'Tên không được để trống và độ dài phải >3', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error!, Name cannot be blank and length must be >3',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
+
+      return
+    }
+    if (!gender) {
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Gender cannot be blank',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
     if (!email) {
-      Swal.fire('Lỗi!', 'Email không được để trống', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Email cannot be blank',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
     if (!phoneNumber) {
-      Swal.fire('Lỗi!', 'Số điện thoại không được để trống', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Phone Number  cannot be blank',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
-    if (!identityNumber) {
-      Swal.fire('Lỗi!', 'Số giấy tờ không được để trống', 'error')
 
-      return
-    }
     if (!userCode) {
-      Swal.fire('Lỗi!', 'Mã người dùng không được để trống', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error! userCode  cannot be blank',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
-    if (!syncCode) {
-      Swal.fire('Lỗi!', 'Mã đồng bộ không được để trống', 'error')
 
-      return
-    }
     if (!account) {
-      Swal.fire('Lỗi!', 'Tên tài khoản không được để trống', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Account  cannot be blank',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
     if (userGroups.length === 0) {
-      Swal.fire('Lỗi!', 'Nhóm người dùng không được để trống.', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Department cannot be blank',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
-      Swal.fire('Lỗi!', 'Địa chỉ email không hợp lệ.', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Invalid email address',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
-
     if (password.length < 6) {
-      Swal.fire('Lỗi!', 'Mật khẩu phải chứa ít nhất 6 ký tự.', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Password must contain at least 6 characters.',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,}$/
     if (!passwordRegex.test(password)) {
-      Swal.fire(
-        'Lỗi!',
-        'Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt.',
-        'error'
-      )
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
+
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
@@ -280,7 +376,17 @@ const Add = () => {
       const genderMapping = { MALE: 'MALE', FEMALE: 'FEMALE', OTHER: 'OTHER' }
 
       if (processedGroups.length === 0) {
-        Swal.fire('Lỗi!', 'Nhóm người dùng không được để trống.', 'error')
+        Swal.fire({
+          title: 'error!',
+          text: 'error! Department User cannot leave blank.',
+          willOpen: () => {
+            const confirmButton = Swal.getConfirmButton()
+            if (confirmButton) {
+              confirmButton.style.backgroundColor = '#002060'
+              confirmButton.style.color = 'white'
+            }
+          }
+        })
 
         return
       }
@@ -328,15 +434,25 @@ const Add = () => {
       if (groupACIds.length > 0) {
         await addMemberToGroup(groupACIds, response.data.userId)
       } else {
-        console.error('Không có groupACId nào trong mảng')
+        console.error('There is no groupACId in the array.')
       }
 
-      Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
-
+      Swal.fire({
+        title: 'Successful!',
+        text: 'Add user successfully',
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
       router.push(`/apps/user/detail/${response.data.userId}`)
     } catch (error) {
       console.error('Error updating user details:', error)
-      Swal.fire('Lỗi!', error?.response?.data?.message, 'error')
+      Swal.fire('error!', error?.response?.data?.message, 'error')
     }
   }
 
@@ -362,7 +478,7 @@ const Add = () => {
       if (response.data && response.data.groupACId) {
         groupACIds.push(response.data.groupACId)
       } else {
-        throw new Error('Không lấy được groupACId từ API')
+        throw new Error('Unable to get groupACId from API')
       }
 
       return response.data.groupId
@@ -403,7 +519,7 @@ const Add = () => {
         const userGroup = {
           groupId: groupId,
           policyName: true,
-          isLeader: false
+          isLeader: row.isLeader
         }
         processedGroups.push(userGroup)
         console.log(userGroup)
@@ -548,16 +664,16 @@ const Add = () => {
               <Icon icon='tabler:chevron-left' />
             </IconButton>
 
-            <h2 style={{ color: 'black' }}>Thêm mới người dùng: </h2>
+            <h2 style={{ color: 'black' }}>Add New User</h2>
           </Grid>
           <Grid container spacing={2}>
             <div style={{ width: '80%' }}></div>
             <>
               <Button variant='contained' component={Link} href={`/apps/user/list`}>
-                Huỷ
+                Cancel
               </Button>
               <Button variant='contained' onClick={saveChanges} sx={{ marginLeft: '10px' }}>
-                Lưu
+                Save
               </Button>
             </>
           </Grid>
@@ -566,18 +682,18 @@ const Add = () => {
           </Grid>
           <Grid container spacing={2} style={{ marginLeft: 10 }}>
             <Grid item xs={4}>
-              <TextField label='Tên' onChange={handleFullNameChange} fullWidth />
+              <TextField label='Name*' onChange={handleFullNameChange} fullWidth />
             </Grid>
             <Grid item xs={4}>
-              <TextField label='Email' onChange={handleEmailChange} fullWidth />
+              <TextField label='Email*' onChange={handleEmailChange} fullWidth />
             </Grid>
             <Grid item xs={3.8}>
-              <TextField label='Số điện thoại' onChange={handlePhoneNumberChange} fullWidth />
+              <TextField label='Phone Number*' onChange={handlePhoneNumberChange} fullWidth />
             </Grid>
             <Grid item xs={4}>
               {/* Update Select to use the gender state */}
               <FormControl fullWidth>
-                <InputLabel id='gender-label'>Giới tính</InputLabel>
+                <InputLabel id='gender-label'>Gender*</InputLabel>
                 <Select
                   labelId='gender-label'
                   id='gender-select'
@@ -585,35 +701,200 @@ const Add = () => {
                   onChange={handleGenderChange} // Update onChange handler
                 >
                   {/* MenuItems for gender options */}
-                  <MenuItem value='MALE'>Nam</MenuItem>
-                  <MenuItem value='FEMALE'>Nữ</MenuItem>
-                  <MenuItem value='OTHER'>Khác</MenuItem>
+                  <MenuItem value='MALE'>MALE</MenuItem>
+                  <MenuItem value='FEMALE'>FEMALE</MenuItem>
+                  <MenuItem value='OTHER'>OTHER</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
             <Grid item xs={4}>
-              <TextField label='Số giấy tờ' onChange={handleIdentityNumberChange} fullWidth />
+              <TextField label='Identify number*' onChange={handleIdentityNumberChange} fullWidth />
             </Grid>
-
+            <Grid item xs={3.8}>
+              <TextField label='Code*' onChange={handleUserCodeChange} fullWidth />
+            </Grid>
+            <Grid item xs={4}>
+              <TextField label='Synchronize code' onChange={handleSyncCodeChange} fullWidth />
+            </Grid>
+            <Grid item xs={4}>
+              <FormControl fullWidth>
+                <InputLabel id='region-label'>Level</InputLabel>
+                <Select
+                  labelId='region-label'
+                  id='region-select'
+                  value={selectedRegion ? selectedRegion.id : ''}
+                  onChange={e => handleRegionChange(regionOptions.find(opt => opt.id === e.target.value))}
+                >
+                  {regionOptions.map(option => (
+                    <MenuItem key={option.id} value={option.id}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={3.8}>
+              <FormControl fullWidth>
+                <InputLabel id='region-label'>Contract Type</InputLabel>
+                <Select
+                  labelId='region-label'
+                  id='region-select'
+                  value={selectContract ? selectContract.id : ''}
+                  onChange={e => handleContractChange(contractOptions.find(opt => opt.id === e.target.value))}
+                >
+                  {contractOptions.map(option => (
+                    <MenuItem key={option.id} value={option.id}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>{' '}
+            </Grid>
             <Grid item xs={2} style={{ marginTop: '1.1%' }}>
-              Trạng thái
-              <Switch checked={status1 === 'ACTIVE'} onChange={handleStatusChange} color='primary' label='Trạng thái' />
+              Status
+              <Switch checked={status1 === 'ACTIVE'} onChange={handleStatusChange} color='primary' label='Status' />
+            </Grid>
+            <Grid item xs={1} style={{ marginTop: '2%' }}>
+              Morning shift:
             </Grid>
 
+            <Grid item xs={1}>
+              <DatePickerWrapper>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                  <div>
+                    <DatePicker
+                      showTimeSelect
+                      selected={dateTime}
+                      timeIntervals={15}
+                      showTimeSelectOnly
+                      dateFormat='h:mm '
+                      id='time-only-picker'
+                      onChange={date => handleTimeChange(date)}
+                      customInput={<CustomInput />}
+                    />
+                  </div>
+                </Box>
+              </DatePickerWrapper>
+            </Grid>
+            <Grid item xs={1}>
+              <DatePickerWrapper>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                  <div>
+                    <DatePicker
+                      showTimeSelect
+                      selected={timeEndMorning}
+                      timeIntervals={15}
+                      showTimeSelectOnly
+                      dateFormat='h:mm '
+                      id='time-only-picker'
+                      onChange={date => handleTimeEndMorningChange(date)}
+                      customInput={<CustomInput />}
+                    />
+                  </div>
+                </Box>
+              </DatePickerWrapper>
+            </Grid>
+            <Grid item xs={1} style={{ marginTop: '2%' }}>
+              Afternoon shift:
+            </Grid>
+            <Grid item xs={1}>
+              <DatePickerWrapper>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                  <div>
+                    <DatePicker
+                      showTimeSelect
+                      selected={timeStartAfternoon}
+                      timeIntervals={15}
+                      showTimeSelectOnly
+                      dateFormat='h:mm '
+                      id='time-only-picker'
+                      onChange={date => handleTimeStartAfetrnoonChange(date)}
+                      customInput={<CustomInput />}
+                    />
+                  </div>
+                </Box>
+              </DatePickerWrapper>
+            </Grid>
+            <Grid item xs={1}>
+              <DatePickerWrapper>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                  <div>
+                    <DatePicker
+                      showTimeSelect
+                      selected={timeEndAfternoon}
+                      timeIntervals={15}
+                      showTimeSelectOnly
+                      dateFormat='h:mm '
+                      id='time-only-picker'
+                      onChange={date => handleTimeEndAfternoonChange(date)}
+                      customInput={<CustomInput />}
+                    />
+                  </div>
+                </Box>
+              </DatePickerWrapper>
+            </Grid>
+            <Grid item xs={3.8}>
+              <FormControl fullWidth>
+                <InputLabel id='time-validity-label'>Validity period</InputLabel>
+                <Select
+                  labelId='time-validity-label'
+                  id='time-validity-select'
+                  value={timeValidity}
+                  onChange={handleTimeValidityChange}
+                >
+                  <MenuItem value='Custom'>Custom</MenuItem>
+                  <MenuItem value='Undefined'>None</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={8}>
+              {timeValidity === 'Custom' && (
+                <Grid container spacing={2}>
+                  <Grid item xs={4}>
+                    <DatePickerWrapper>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                        <div>
+                          <DatePicker
+                            selected={availableAt}
+                            onChange={handleStartDateChange}
+                            dateFormat='MM/dd/yyyy'
+                            customInput={<CustomInput label='Start date' />}
+                          />
+                        </div>
+                      </Box>
+                    </DatePickerWrapper>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <DatePickerWrapper>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                        <div>
+                          <DatePicker
+                            selected={expiredAt}
+                            onChange={handleEndDateChange}
+                            dateFormat='MM/dd/yyyy'
+                            customInput={<CustomInput label='End date' />}
+                          />
+                        </div>
+                      </Box>
+                    </DatePickerWrapper>
+                  </Grid>
+                </Grid>
+              )}
+            </Grid>
             <Grid item xs={11.8}>
-              <TextField rows={4} multiline label='Ghi chú' onChange={handleNoteChange} fullWidth />
+              <TextField rows={4} multiline label='Note' onChange={handleNoteChange} fullWidth />
             </Grid>
             <Grid item xs={12}>
-              <Typography variant='h5'>Đơn vị</Typography>
+              <Typography variant='h5'>Department*</Typography>
             </Grid>
             <Grid item xs={11.8}>
               <TableContainer>
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Đơn vị</TableCell>
-                      <TableCell>Mã đơn vị</TableCell>
-                      <TableCell align='right'>Là lãnh đạo đơn vị</TableCell>
+                      <TableCell>Department</TableCell>
+                      <TableCell>Department Code</TableCell>
+                      <TableCell align='right'>Is Leader</TableCell>
                       <TableCell align='center'>
                         <IconButton size='small' onClick={handleAddRow} sx={{ marginLeft: '10px' }}>
                           <Icon icon='bi:plus' />
@@ -637,18 +918,31 @@ const Add = () => {
                               // updatedRows[index].id = newValue.id
                               setRows(updatedRows)
                             }}
-                            renderInput={params => <TextField {...params} label='Đơn vị' />}
+                            renderInput={params => <TextField {...params} label='Department' />}
                           />
                         </TableCell>
                         {console.log(rows)}
                         <TableCell>{row.code}</TableCell>
-                        <TableCell align='right'>{formatIsLeader(row.isLeader)}</TableCell>
+                        <TableCell align='right'>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={row.isLeader}
+                                onChange={event => {
+                                  const updatedRows = [...rows]
+                                  updatedRows[index].isLeader = event.target.checked // Cập nhật giá trị isLeader
+                                  setRows(updatedRows)
+                                  setIsLeader(event.target.checked) // Cập nhật state isLeader
+                                }}
+                              />
+                            }
+                            label='Is Leader'
+                          />
+                        </TableCell>{' '}
                         <TableCell align='center'>
-                          {index > 0 && (
-                            <IconButton size='small' onClick={() => handleDeleteRow(index)}>
-                              <Icon icon='bi:trash' />
-                            </IconButton>
-                          )}
+                          <IconButton size='small' onClick={() => handleDeleteRow(index)}>
+                            <Icon icon='bi:trash' />
+                          </IconButton>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -663,23 +957,23 @@ const Add = () => {
           <Grid item xs={12}>
             <FormControlLabel
               control={<Checkbox checked={createAccount} onChange={handleCreateAccountChange} color='primary' />}
-              label='Tạo tài khoản đăng nhập'
+              label='Create Login Account'
               labelPlacement='start'
             />
           </Grid>
           {createAccount && (
             <Grid container spacing={2} style={{ marginLeft: 10 }}>
               <Grid item xs={12}>
-                <Typography variant='h5'>Thông tin tài khoản</Typography>
+                <Typography variant='h5'>Create Login Account</Typography>
               </Grid>
               <Grid item xs={4}>
-                <TextField label='Tài khoản' onChange={handleAccountChange} fullWidth />
+                <TextField label='Account*' onChange={handleAccountChange} fullWidth />
               </Grid>
               <Grid item xs={4}>
-                <TextField label='Mật khẩu' type='password' onChange={handlePasswordChange} fullWidth />
+                <TextField label='Password*' type='password' onChange={handlePasswordChange} fullWidth />
               </Grid>
               <Grid item xs={3.8}>
-                <TextField label='Xác nhận mật khẩu' type='password' onChange={handleConfirmPasswordChange} fullWidth />
+                <TextField label='Confirm password*' type='password' onChange={handleConfirmPasswordChange} fullWidth />
               </Grid>
               <Grid item xs={2} style={{ marginTop: '1.1%' }}>
                 <FormControlLabel
@@ -692,20 +986,20 @@ const Add = () => {
                       color='primary'
                     />
                   }
-                  label='Trạng thái'
+                  label='Status'
                   labelPlacement='start'
                 />
               </Grid>
               <Grid item xs={12}>
-                <Typography variant='h5'>Vai trò</Typography>
+                <Typography variant='h5'>Role</Typography>
               </Grid>
               <Grid item xs={11.8}>
                 <TableContainer>
                   <Table>
                     <TableHead>
                       <TableRow>
-                        <TableCell>Tên vai trò</TableCell>
-                        <TableCell>Mô tả</TableCell>
+                        <TableCell>Name</TableCell>
+                        <TableCell>Description</TableCell>
                         <TableCell align='center'>
                           <IconButton onClick={handleAddRow1} size='small' sx={{ marginLeft: '10px' }}>
                             <Icon icon='bi:plus' />
@@ -728,16 +1022,14 @@ const Add = () => {
                                 updatedRows[index].policyId = newValue.policyId
                                 setRows1(updatedRows)
                               }}
-                              renderInput={params => <TextField {...params} label='Vai trò' />}
+                              renderInput={params => <TextField {...params} label='Role' />}
                             />
                           </TableCell>
                           <TableCell>{row.description}</TableCell>
                           <TableCell align='center'>
-                            {index > 0 && (
-                              <IconButton size='small' onClick={() => handleDeleteRow(index)}>
-                                <Icon icon='bi:trash' />
-                              </IconButton>
-                            )}
+                            <IconButton size='small' onClick={() => handleDeleteRow(index)}>
+                              <Icon icon='bi:trash' />
+                            </IconButton>
                           </TableCell>
                         </TableRow>
                       ))}

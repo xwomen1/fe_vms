@@ -80,7 +80,10 @@ const InforAll = ({ idInfor }) => {
       // Fetch regions and set Autocomplete value if doorName matches any region name
       await fetchRegions() // Ensure fetchRegions updates regions before proceeding
       setRegions(currentRegions => {
-        const matchingRegion = currentRegions.find(region => region.name === deviceData.doorName)
+        const matchingRegion = currentRegions.find(region => region.name.trim() === deviceData.doorName.trim())
+
+        console.log(matchingRegion, 'match')
+
         if (matchingRegion) {
           setSelectedRegion(matchingRegion)
         }
@@ -179,8 +182,8 @@ const InforAll = ({ idInfor }) => {
 
       setLoading(false)
       Swal.fire({
-        title: 'Thành công!',
-        text: 'Dữ liệu đã được cập nhật thành công.',
+        title: 'Success',
+        text: 'Data has been updated successfully.',
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
@@ -205,22 +208,12 @@ const InforAll = ({ idInfor }) => {
       console.error('Error updating user details:', error)
       setLoading(false)
 
-      Swal.fire({
-        title: 'Error!',
-        text: error.response?.data?.message || error.message,
-        icon: 'error',
-        willOpen: () => {
-          const confirmButton = Swal.getConfirmButton()
-          if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
-            confirmButton.style.color = 'white'
-          }
-        }
-      })
+      toast.error(error.response?.data?.message || error.message)
     }
   }
 
-  console.log(idDoor, 'idDoor')
+  console.log(selectedRegion, 'selectedRegion')
+  console.log(regions, 'regions')
 
   const handleInputChange = (field, value) => {
     setDevice(prevDevice => ({
@@ -239,9 +232,10 @@ const InforAll = ({ idInfor }) => {
         }
       })
       const data = response.data
+      console.log(data, 'data')
 
-      const parentRegion = data.find(region => region.id === parentIdToFilter)
-
+      const parentRegion = data.find(region => region.parentID === parentIdToFilter)
+      console.log(parentRegion, 'data')
       if (parentRegion) {
         const childResponse = await axios.get(
           `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentIdToFilter}`,
@@ -251,13 +245,16 @@ const InforAll = ({ idInfor }) => {
             }
           }
         )
+
+        console.log(childResponse, 'childResponse')
+
         const childData = childResponse.data
 
-        // Chỉ lấy dữ liệu của "child regions"
         const combinedData = childData.map(child => ({
           id: child.id,
           name: child.name
         }))
+        console.log(combinedData, 'combinedData')
 
         setRegions(combinedData)
       }
@@ -363,7 +360,7 @@ const InforAll = ({ idInfor }) => {
       <div>
         <Card>
           <CardHeader
-            title='Thông tin thiết bị'
+            title='Device Information'
             titleTypographyProps={{ sx: { mb: [2, 0] } }}
             sx={{
               py: 4,
@@ -376,14 +373,14 @@ const InforAll = ({ idInfor }) => {
                 <Grid item>
                   <Box sx={{ float: 'right' }}>
                     <Button variant='contained' component={Link} href={`/device-management`}>
-                      Hủy
+                      Cancel
                     </Button>
                   </Box>
                 </Grid>
                 <Grid item>
                   <Box sx={{ float: 'right', marginLeft: '2%' }}>
                     <Button aria-label='Bộ lọc' variant='contained' onClick={handleUpdateDevice}>
-                      Lưu
+                      Save
                     </Button>
                   </Box>
                 </Grid>
@@ -401,7 +398,7 @@ const InforAll = ({ idInfor }) => {
           >
             <Grid item xs={2.8}>
               <CustomTextField
-                label='Tên'
+                label='Name'
                 value={device ? device.name : ''}
                 onChange={e => handleInputChange('name', e.target.value)}
                 fullWidth
@@ -426,14 +423,14 @@ const InforAll = ({ idInfor }) => {
                     }))
                   }
                 }}
-                renderInput={params => <CustomTextField {...params} label='Nhóm thiết bị' fullWidth />}
+                renderInput={params => <CustomTextField {...params} label='Device Group' fullWidth />}
                 loading={loading}
               />
             </Grid>
             <Grid item xs={0.1}></Grid>
             <Grid item xs={2.8}>
               <CustomTextField
-                label='ID thiết bị '
+                label='Device ID '
                 onChange={e => handleInputChange('serialNumber', e.target.value)}
                 value={device ? device.serialNumber : ''}
                 fullWidth
@@ -450,13 +447,13 @@ const InforAll = ({ idInfor }) => {
                     handleInputChange('deviceType', newValue.value)
                   }
                 }}
-                renderInput={params => <CustomTextField {...params} label='loại thiết bị' fullWidth />}
+                renderInput={params => <CustomTextField {...params} label='Device Type' fullWidth />}
               />
             </Grid>
             <Grid item xs={0.1}></Grid>
             <Grid item xs={2.8} style={{ marginTop: 20 }}>
               <CustomTextField
-                label='Nâng cấp phiên bản app'
+                label='Upgrade App Version'
                 value={device ? device.firmware : ''}
                 onChange={e => handleInputChange('firmware', e.target.value)}
                 fullWidth
@@ -465,7 +462,7 @@ const InforAll = ({ idInfor }) => {
             <Grid item xs={0.1}></Grid>
             <Grid item xs={2.8} style={{ marginTop: 20 }}>
               <CustomTextField
-                label='Tên sản phẩm '
+                label='Product Name'
                 value={device ? device.model : ''}
                 onChange={e => handleInputChange('model', e.target.value)}
                 fullWidth
@@ -482,13 +479,13 @@ const InforAll = ({ idInfor }) => {
                     setDevice(prevDevice => ({ ...prevDevice, direction: newValue.value }))
                   }
                 }}
-                renderInput={params => <CustomTextField {...params} label='Chiều định danh' fullWidth />}
+                renderInput={params => <CustomTextField {...params} label='Identifier Dimension' fullWidth />}
               />{' '}
             </Grid>
             <Grid item xs={0.1}></Grid>
             <Grid item xs={2.8} style={{ marginTop: 20 }}>
               <CustomTextField
-                placeholder='  Nhập loại Hardware Version...'
+                placeholder='Enter Hardware Version Type...'
                 disabled
                 label='Hardware Version'
                 fullWidth
@@ -496,7 +493,7 @@ const InforAll = ({ idInfor }) => {
             </Grid>
             <Grid item xs={0.1}></Grid>
             <Grid item xs={2.8} style={{ marginTop: 20 }}>
-              <CustomTextField placeholder='  Nhập loại năng lượng...' disabled label='Loại năng lượng' fullWidth />
+              <CustomTextField placeholder='Enter Energy Type...' disabled label='Energy Type' fullWidth />
             </Grid>
             <Grid item xs={0.1}></Grid>
             <Grid item xs={2.8} style={{ marginTop: 20 }}>
@@ -510,7 +507,7 @@ const InforAll = ({ idInfor }) => {
                     {console.log({ ...params }, 'params')}
                     <CustomTextField
                       {...params}
-                      label='Vị trí'
+                      label='Location'
                       fullWidth
                       InputProps={{
                         ...params.InputProps,
@@ -531,22 +528,22 @@ const InforAll = ({ idInfor }) => {
             <Grid item xs={0.1}></Grid>
             <Grid item xs={2.8} style={{ marginTop: 20 }}>
               <CustomTextField
-                label='Ghi chú'
+                label='Note'
                 value={device ? device.description : ''}
                 onChange={e => handleInputChange('description', e.target.value)}
                 fullWidth
               />
             </Grid>
             <Grid item xs={0.1}></Grid>
-            <p style={{ fontSize: '0.8rem' }}>Khôi phục cài đặt thiết bị</p>
+            <p style={{ fontSize: '0.8rem' }}>Restore Device Settings</p>
             <Grid item xs={2.8} style={{ marginTop: 39, display: 'inline-flex', marginLeft: '-145px' }}>
               <Grid>
                 <Button fullWidth variant='contained'>
-                  Toàn bộ
+                  All
                 </Button>
               </Grid>
               <Grid fullWidth style={{ marginLeft: '3%' }}>
-                <Button variant='contained'>Khôi phục cài đặt mạng </Button>
+                <Button variant='contained'>Restore Network</Button>
               </Grid>
             </Grid>
           </Grid>

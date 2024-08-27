@@ -3,7 +3,7 @@ import { Box, Button, CardHeader, DialogActions, Grid, Typography } from '@mui/m
 import IconButton from '@mui/material/IconButton'
 import Icon from 'src/@core/components/icon'
 import { Card, CardContent } from '@mui/material'
-import { callApi } from 'src/@core/utils/requestUltils'
+import { getApi } from 'src/@core/utils/requestUltils'
 import Timeline from '../mocdata/timeline'
 import axios from 'axios'
 import toast from 'react-hot-toast'
@@ -29,12 +29,9 @@ const Storage = ({ id, name, channel }) => {
   const [loading, setLoading] = useState(false)
   const [duration, setDuration] = useState(0)
   const [volume, setVolume] = useState(30)
-
   const [minuteType, setMinuteType] = useState(null)
-
-  const [startTime, setStartTime] = useState(new Date().getTime() - 60 * 60 * 1000)
-
-  const [endTime, setEndTime] = useState(new Date().getTime())
+  const [startTime, setStartTime] = useState(new Date())
+  const [endTime, setEndTime] = useState(new Date())
 
   const [startDate, setStartDate] = useState(() => {
     const today = new Date()
@@ -58,15 +55,13 @@ const Storage = ({ id, name, channel }) => {
   const [dataList, setDataList] = useState([])
 
   useEffect(() => {
-    if (camera.id !== '') {
-      setCamera({ id: camera?.id, name: camera?.name, channel: camera?.channel })
-    }
-  }, [camera])
+    setCamera({ id, name, channel })
+  }, [id, name, channel])
 
   useEffect(() => {
-    setCamera({ id: id, name: name, channel: channel })
-  }, [])
-
+    setStartTime(startDate.getTime())
+    setEndTime(endDate.getTime())
+  }, [startDate, endDate])
 
   const fetchDateList = async () => {
     if (camera.id !== '') {
@@ -78,7 +73,7 @@ const Storage = ({ id, name, channel }) => {
       }
 
       try {
-        const res = await callApi(
+        const res = await getApi(
           `https://sbs.basesystem.one/ivis/vms/api/v0/playback/camera/${camera.id}?startTime=${params.startTime}&endTime=${params.endTime}`
         )
 
@@ -144,7 +139,7 @@ const Storage = ({ id, name, channel }) => {
                 const videoDownloadUrl = res.data[0].videoDownLoad[0].video
                 await handleExportLinkDownload(videoDownloadUrl)
               } else {
-                toast.error('Không tìm thấy URL tải về video', { duration: 6000 })
+                toast.error('Download URL for the video not found', { duration: 6000 })
               }
             } catch (error) {
               if (error && error.response && error.response.data) {
@@ -166,7 +161,7 @@ const Storage = ({ id, name, channel }) => {
 
       setLoading(false)
     } else {
-      toast.error('Tổng thời gian không được vượt quá 30 phút', { duration: 6000 })
+      toast.error('The total duration must not exceed 30 minutes', { duration: 6000 })
     }
   }
 
@@ -206,124 +201,122 @@ const Storage = ({ id, name, channel }) => {
   }
 
   return (
-    <Grid container spacing={2}>
-      <Grid item xs={12}>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={9}>
-            <Card>
-              <CardHeader
-                title='Trích clip'
-                action={
-                  <Grid container spacing={2}>
-                    <Grid item xs={3}></Grid>
-                    <Grid item xs={3}>
-                      <DatePickerWrapper>
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
-                          <div>
-                            <DatePicker
-                              selected={startDate}
-                              maxDate={endDate}
-                              onChange={date => setStartDate(date)}
-                              dateFormat='dd/MM/yyyy'
-                              customInput={<CustomInput label='Ngày bắt đầu' />}
-                            />
-                          </div>
-                        </Box>
-                      </DatePickerWrapper>
-                    </Grid>
-                    <Grid item xs={3}>
-                      <DatePickerWrapper>
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
-                          <div>
-                            <DatePicker
-                              selected={endDate}
-                              maxDate={new Date()}
-                              onChange={date => setEndDate(date)}
-                              dateFormat='dd/MM/yyyy'
-                              customInput={<CustomInput label='Ngày kết thúc' />}
-                            />
-                          </div>
-                        </Box>
-                      </DatePickerWrapper>
-                    </Grid>
-
-                    <Grid item xs={3} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end' }}>
-                      <Button variant='contained' onClick={() => fetchDateList()}>
-                        Tìm kiếm
-                      </Button>
-                    </Grid>
+    <>
+      <Grid container spacing={2}>
+        <Grid item xs={12} sm={9}>
+          <Card>
+            <CardHeader
+              title='Extract clip'
+              action={
+                <Grid container spacing={2}>
+                  <Grid item xs={3}></Grid>
+                  <Grid item xs={3}>
+                    <DatePickerWrapper>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                        <div>
+                          <DatePicker
+                            selected={startDate}
+                            maxDate={endDate}
+                            onChange={date => setStartDate(date)}
+                            dateFormat='dd/MM/yyyy'
+                            customInput={<CustomInput label='Start date' />}
+                          />
+                        </div>
+                      </Box>
+                    </DatePickerWrapper>
                   </Grid>
-                }
-              />
-              <CardContent>
-                {loading && <Typography>Loading...</Typography>}
-                {dataList.length > 0 && (
-                  <Timeline
-                    data={dataList}
-                    minuteType={minuteType}
-                    startDate={startDate}
-                    endDate={endDate}
-                    callback={handleSetTimeSelected}
+                  <Grid item xs={3}>
+                    <DatePickerWrapper>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                        <div>
+                          <DatePicker
+                            selected={endDate}
+                            maxDate={new Date()}
+                            onChange={date => setEndDate(date)}
+                            dateFormat='dd/MM/yyyy'
+                            customInput={<CustomInput label='End date' />}
+                          />
+                        </div>
+                      </Box>
+                    </DatePickerWrapper>
+                  </Grid>
+
+                  <Grid item xs={3} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end' }}>
+                    <Button variant='contained' onClick={() => fetchDateList()}>
+                      Search
+                    </Button>
+                  </Grid>
+                </Grid>
+              }
+            />
+            <CardContent>
+              {loading && <Typography>Loading...</Typography>}
+              {dataList.length > 0 && (
+                <Timeline
+                  data={dataList}
+                  minuteType={minuteType}
+                  startDate={startDate}
+                  endDate={endDate}
+                  callback={handleSetTimeSelected}
+                />
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={3}>
+          <Card>
+            <Grid container spacing={2} sx={{ marginBottom: 5 }}>
+              <Grid item xs={12}>
+                {(camera.id === '' || play === false) && (
+                  <div style={{ height: '30vh', background: '#000', display: 'flex', justifyContent: 'center' }}>
+                    <IconButton disabled>
+                      <Icon icon='tabler:player-play-filled' width='48' height='48' style={{ color: '#002060' }} />
+                    </IconButton>
+                  </div>
+                )}
+                {camera.id !== '' && play && (
+                  <ViewCameraPause
+                    name={camera.name}
+                    id={camera.id}
+                    channel={camera.channel}
+                    play={play}
+                    startTime={startTime}
+                    endTime={endTime}
+                    duration={duration}
+                    onChangeDuration={setDuration}
+                    onChangeCurrentTime={time => {
+                      setCurrentTime(1000 * time)
+                    }}
+                    sizeScreen={'1x1.8'}
+                    handSetChanel={handSetChanel}
+                    volume={volume}
                   />
                 )}
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <Card>
-              <Grid container spacing={2} sx={{ marginBottom: 5 }}>
-                <Grid item xs={12}>
-                  {(camera.id === '' || play === false) && (
-                    <div style={{ height: '30vh', background: '#000', display: 'flex', justifyContent: 'center' }}>
-                      <IconButton disabled>
-                        <Icon icon='tabler:player-play-filled' width='48' height='48' style={{ color: '#FF9F43' }} />
-                      </IconButton>
-                    </div>
-                  )}
-                  {camera.id !== '' && play && (
-                    <ViewCameraPause
-                      name={camera.name}
-                      id={camera.id}
-                      channel={camera.channel}
-                      play={play}
-                      startTime={startTime}
-                      endTime={endTime}
-                      duration={duration}
-                      onChangeDuration={setDuration}
-                      onChangeCurrentTime={time => {
-                        setCurrentTime(1000 * time)
-                      }}
-                      sizeScreen={'1x1.8'}
-                      handSetChanel={handSetChanel}
-                      volume={volume}
-                    />
-                  )}
-                </Grid>
-                <Grid item xs={12}></Grid>
               </Grid>
-              <DialogActions
-                sx={{
-                  justifyContent: 'center',
-                  px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
-                  pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
-                }}
-              >
-                <IconButton onClick={() => onClickPlay(!play)} style={{ padding: 5, margin: '0 8px 0 8px' }}>
-                  {play === false ? (
-                    <Icon icon='ph:play-light' size='1.2em' color='#000' />
-                  ) : (
-                    <Icon icon='ic:twotone-pause' size='1.2em' color='#000' />
-                  )}
-                </IconButton>
-                <Button type='submit' variant='contained' onClick={() => handleDownloadFile()}>
-                  Xuất file
-                </Button>
-              </DialogActions>
-            </Card>
-          </Grid>
+              <Grid item xs={12}></Grid>
+            </Grid>
+            <DialogActions
+              sx={{
+                justifyContent: 'center',
+                px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
+                pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
+              }}
+            >
+              <IconButton onClick={() => onClickPlay(!play)} style={{ padding: 5, margin: '0 8px 0 8px' }}>
+                {play === false ? (
+                  <Icon icon='ph:play-light' size='1.2em' color='#000' />
+                ) : (
+                  <Icon icon='ic:twotone-pause' size='1.2em' color='#000' />
+                )}
+              </IconButton>
+              <Button type='submit' variant='contained' onClick={() => handleDownloadFile()}>
+                Export
+              </Button>
+            </DialogActions>
+          </Card>
         </Grid>
       </Grid>
-    </Grid>
+    </>
   )
 }
 

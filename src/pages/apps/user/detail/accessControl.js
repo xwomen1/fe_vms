@@ -89,49 +89,49 @@ const AccessRight = () => {
       id: 1,
       flex: 0.25,
       minWidth: 50,
-      align: 'right',
+      align: 'left',
       field: 'nameCalendar',
-      label: 'Tên lịch'
+      label: 'Name Schedule'
     },
     {
       id: 2,
       flex: 0.25,
       minWidth: 50,
-      align: 'right',
+      align: 'left',
       field: 'name',
-      label: 'Họ tên'
+      label: 'Name'
     },
     {
       id: 3,
       flex: 0.15,
       minWidth: 100,
-      align: 'right',
-      label: 'Phòng ban',
+      align: 'left',
+      label: 'Department',
       field: 'groupName'
     },
     {
       id: 4,
       flex: 0.15,
       minWidth: 200,
-      align: 'right',
+      align: 'left',
       field: 'doorInName',
-      label: 'Cửa vào'
+      label: 'Door in'
     },
     {
       id: 5,
       flex: 0.15,
       minWidth: 200,
-      align: 'right',
+      align: 'left',
       field: 'doorOutName',
-      label: 'Cửa ra'
+      label: 'Door out'
     },
     {
       id: 6,
       flex: 0.15,
       type: 'date',
       minWidth: 130,
-      align: 'right',
-      label: 'Ngày bắt đầu',
+      align: 'left',
+      label: 'Start date',
       field: 'startDate',
       valueGetter: params => new Date(params.value)
     },
@@ -140,8 +140,8 @@ const AccessRight = () => {
       flex: 0.15,
       type: 'date',
       minWidth: 130,
-      align: 'right',
-      label: 'Ngày kết thúc',
+      align: 'left',
+      label: 'End date',
       field: 'endDate',
       valueGetter: params => new Date(params.value)
     }
@@ -263,15 +263,15 @@ const AccessRight = () => {
       if (row.calendarDays && Array.isArray(row.calendarDays)) {
         row.calendarDays.forEach(calendarDay => {
           acc.push({
-            'Tên lịch': row.nameCalendar,
+            Name: row.nameCalendar,
             'Phòng ban': row.groupName,
             'Ngày trong tuần': calendarDay.dayOfWeek,
             'Giờ bắt đầu': calendarDay.timePeriods[0]?.startTimeInMinute,
             'Giờ kết thúc': calendarDay.timePeriods[0]?.endTimeInMinute,
             'Cửa vào': row.doorInName,
             'Cửa ra': row.doorOutName,
-            'Ngày bắt đầu': row.startDate,
-            'Ngày kết thúc': row.endDate,
+            'Start date': row.startDate,
+            'End date': row.endDate,
             'Số lượng người': row.sizeUser
           })
         })
@@ -306,9 +306,9 @@ const AccessRight = () => {
       >
         <Box sx={{ mb: 4, textAlign: 'center' }}>
           <Typography variant='h3' sx={{ mb: 3 }}>
-            Xác nhận
+            Accept
           </Typography>
-          <Typography sx={{ color: 'text.secondary' }}>Bạn có chắc chắn muốn xóa không ?</Typography>
+          <Typography sx={{ color: 'text.secondary' }}>Do you want to delete it?</Typography>
         </Box>
       </DialogContent>
       <DialogActions
@@ -325,10 +325,10 @@ const AccessRight = () => {
             setIsOpenDel(false)
           }}
         >
-          Đồng ý
+          Yes
         </Button>
         <Button variant='tonal' color='secondary' sx={{ mr: 1 }} onClick={() => setIsOpenDel(false)}>
-          Hủy
+          No
         </Button>
       </DialogActions>
     </Dialog>
@@ -351,7 +351,7 @@ const AccessRight = () => {
           config
         )
         .then(() => {
-          toast.success('Xóa thành công')
+          toast.success('Deleted successfully')
           setIdDelete(null)
           setReload(reload + 1)
         })
@@ -377,7 +377,7 @@ const AccessRight = () => {
                 <CustomTextField
                   value={value}
                   sx={{ mr: 2 }}
-                  placeholder='Tìm lịch'
+                  placeholder='Search schedule'
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position='start'>
@@ -400,20 +400,20 @@ const AccessRight = () => {
               <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
                 <TableHead>
                   <TableRow>
-                    <TableCell>STT</TableCell>
+                    <TableCell>NO.</TableCell>
                     {columns.map(column => (
                       <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
                         {column.label}
                       </TableCell>
                     ))}
-                    <TableCell>Thao tác</TableCell>
+                    <TableCell>Action</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {loading ? (
                     <TableRow>
                       <TableCell colSpan={columns.length + 2} align='center'>
-                        Đang tải dữ liệu...
+                        Loading data...
                       </TableCell>
                     </TableRow>
                   ) : errorMessage ? (
@@ -425,7 +425,7 @@ const AccessRight = () => {
                   ) : rows.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={columns.length + 2} align='center'>
-                        Không có dữ liệu
+                        Data is not available
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -494,11 +494,11 @@ const AccessRight = () => {
       {/* Delete Confirmation Dialog */}
       <Dialog open={isOpenDel} onClose={() => setIsOpenDel(false)}>
         <DialogContent>
-          <Typography>Bạn có chắc chắn muốn xóa không?</Typography>
+          <Typography>Do you want to delete it?</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsOpenDel(false)} color='primary'>
-            Hủy bỏ
+            No
           </Button>
         </DialogActions>
       </Dialog>

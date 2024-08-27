@@ -9,7 +9,7 @@ import { TabContext, TabPanel } from '@mui/lab'
 import { Grid, Tab, styled } from '@mui/material'
 
 // ** Demo Components Imports
-import Table from 'src/views/apps/roles/Table'
+import Table from 'src/views/apps/roles/Resources'
 import RoleCards from 'src/views/apps/roles/RoleCards'
 import { Button } from '@mui/material'
 
@@ -50,8 +50,8 @@ const RolesComponent = () => {
       <TabContext value={value}>
         <Grid item xs={12}>
           <TabList onChange={handleChange} aria-label='customized tabs example'>
-            <Tab value='1' label='Vai trò' key={1} />
-            <Tab value='2' label='Thiết lập tài nguyên' key={2} />
+            <Tab value='1' label='Role' key={1} />
+            <Tab value='2' label='Resource Setup' key={2} />
           </TabList>
         </Grid>
         <Grid item xs={12}>

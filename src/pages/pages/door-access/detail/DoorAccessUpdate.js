@@ -294,7 +294,7 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
       )
 
       // Handle successful response
-      toast.success('Cập nhật thành công')
+      toast.success('Update Successful')
       setReload()
       handleClose()
     } catch (error) {
@@ -315,20 +315,20 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
             <Icon icon='tabler:x' />
           </IconButton>
           <Typography variant='h3' gutterBottom>
-            Chi tiết quản lý truy cập cửa
+            Access Door Management Details
           </Typography>
           <Grid container spacing={2}>
             <Grid item xs={6}>
               <CustomTextField
                 onChange={e => handleInputChange('name', e.target.value)}
-                label='Tên cấp truy cập'
+                label='Access Level Name'
                 value={door ? door.name : ''}
                 fullWidth
               />
             </Grid>
             <Grid item xs={6}>
               <CustomTextField
-                label='Mô tả'
+                label='Desciption'
                 onChange={e => handleInputChange('description', e.target.value)}
                 value={door ? door.description : ''}
                 fullWidth
@@ -339,9 +339,9 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Nhóm</TableCell>
-                      <TableCell>Cửa</TableCell>
-                      <TableCell>Lịch hoạt động</TableCell>
+                      <TableCell>Group</TableCell>
+                      <TableCell>Door</TableCell>
+                      <TableCell>Operational Schedule</TableCell>
                       <TableCell align='center'>
                         <IconButton size='small' onClick={handleAddPolicy}>
                           <Icon icon='bi:plus' />
@@ -412,10 +412,10 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
           }}
         >
           <Button onClick={onClose} variant='contained' color='primary'>
-            Hủy
+            Cancel
           </Button>
           <Button variant='contained' color='primary' onClick={handleSave}>
-            Lưu
+            Ok
           </Button>
         </DialogActions>
       </Dialog>

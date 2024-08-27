@@ -65,14 +65,14 @@ const UserList = ({ apiData }) => {
 
   function showAlertConfirm(options, intl) {
     const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Accept',
       imageWidth: 213,
       showCancelButton: true,
       showCloseButton: true,
       showConfirmButton: true,
       focusCancel: true,
       reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Agree',
       cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
       customClass: {
         content: 'content-class',
@@ -710,54 +710,56 @@ const UserList = ({ apiData }) => {
                   <Table stickyHeader aria-label='sticky table'>
                     <TableHead>
                       <TableRow>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>STT</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Họ tên</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Tên gọi khác</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Ngày sinh</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Nơi sinh</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Quê quán</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Giới tính</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Dân tộc</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Tôn giáo</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>NO.</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Full Name</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Other Name</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Day of birth</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Place of birth</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Hometown</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Gender</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Nation</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Religion</TableCell>
                         <TableCell sx={{ whiteSpace: 'nowrap' }}>Nghề nghiệp</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Đăng ký hộ khẩu thường chú</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Nơi ở hiện nay</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Ngày tuyển dụng</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Cơ quan tuyển dụng</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Chức vụ</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Công việc được giao</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Ngạch công chức</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Mã ngách</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Bậc lương</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Hệ số</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Ngày hưởng</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Phụ cấp chức vụ</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Phụ cấp khác</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Trình độ giáo dục phổ thông</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Trình độ chuyên môn cao nhất</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Lý luận chính trị</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Quản lý nhà nước</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Ngoại ngữ</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Tin học</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Ngày vào Đảng</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Ngày chính thức</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Ngày tham gia tổ chức chính trị - xã hội</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Ngày nhập ngũ</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Ngày xuất ngũ</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Quân hàm cao nhất</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Danh hiệu được phân cao nhất</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Sở trường công tác</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Khen thưởng</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Kỷ luật</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Tình trạng sức khoẻ</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Chiều cao</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Cân nặng</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Nhóm máu</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Là thương binh hạng</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Là con gia đình chính sách</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Số CMND</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Ngày cấp</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Số BHXH</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Permanent residence</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Current residence</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Recruitment date</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Recruitment agency</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Position</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Assigned work</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Civil servant rank</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Code</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Salary level</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Coefficient</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Date received</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Position allowance</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Other allowance</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>General education level</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Highest level of expertise</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Political theory</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>State management</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Language</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Computer Science</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>State Party Day</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Date</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                          Date of joining political-social organization
+                        </TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Date of enlistment</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Date of discharge</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Highest military rank</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Highest awarded title</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Area of expertise</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Awards</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Disciplinary actions</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Health status</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Height</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Weight</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Blood type</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Is a war invalid</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Is a child of a policy family</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>ID number</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Date of issuance</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>Social insurance number</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -825,7 +827,7 @@ const UserList = ({ apiData }) => {
               <Grid item xs={1.5} style={{ padding: 0 }}>
                 <IconButton onClick={handleOpenMenu}>
                   <Icon icon='tabler:selector' />
-                  <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
+                  <p style={{ fontSize: 15 }}>{pageSize} line/page</p>
                 </IconButton>
                 <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
                   {pageSizeOptions.map(size => (

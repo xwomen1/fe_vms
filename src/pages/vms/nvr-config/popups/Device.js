@@ -51,7 +51,8 @@ const Device = ({ onClose, nvr }) => {
     label: cameras?.regions?.name || '',
     value: cameras?.regions?.name || ''
   })
-
+  const [selectNVR, setSelectedNVR] = useState('')
+  const [nvrs, setNVR] = useState([])
   const [isOfflineSetting, setisOfflineSetting] = useState(false)
   const [lat, setLat] = useState(null)
   const [lng, setLng] = useState(null)
@@ -60,6 +61,8 @@ const Device = ({ onClose, nvr }) => {
   const [ipAddress, setIpAddress] = useState(null)
   const [http, setHttp] = useState(null)
   const [onvif, setOnvif] = useState(null)
+  const [idBox, setIdBox] = useState(null)
+  const [errorNVR, setErrorNVR] = useState(false)
 
   const [viewport, setViewport] = React.useState({
     longitude: 105.83416,
@@ -121,6 +124,44 @@ const Device = ({ onClose, nvr }) => {
   }
 
   console.log(nvr)
+
+  const fetchNicTypesDevice = async () => {
+    try {
+      // setLoading(true)
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.get(
+        'https://sbs.basesystem.one/ivis/vms/api/v0/device/active?status=connected',
+        config
+      )
+
+      const nicTypes = response.data.map(item => ({
+        label: item.nameDevice,
+        value: item.id
+      }))
+      setNVR(nicTypes)
+
+      // Set selectedNicType here based on your business logic
+      if (nicTypes.length > 0) {
+        setSelectedNVR(nicTypes[0].id) // Set it to the first value in the array, or adjust as needed
+      }
+    } catch (error) {
+      console.error('Error fetching NIC types:', error)
+    } finally {
+      // setLoading(false)
+    }
+  }
+
+  const handleComboboxFocusDevice = () => {
+    fetchNicTypesDevice()
+  }
+
   useEffect(() => {
     const fetchGroupData = async () => {
       try {
@@ -141,8 +182,16 @@ const Device = ({ onClose, nvr }) => {
           setUserName(response.data.username)
           setPassword(response.data.password)
           setIpAddress(response.data.ipAddress)
+          setSelectedNVR({
+            value: response.data.box?.id || '',
+            label: response.data.box?.name || ''
+          })
           setSelectedProtocol({
             name: response.data.protocol || ''
+          })
+          setIdBox({
+            value: response.data.box?.id || '',
+            label: response.data.box?.name || ''
           })
           setHttp(response.data.httpPort)
           setOnvif(response.data.onvif)
@@ -162,7 +211,16 @@ const Device = ({ onClose, nvr }) => {
   console.log(selectedProtocol, 'selectprotocol')
 
   const handleSaveClick = async () => {
-    handleSave() // Gọi hàm handleSave truyền từ props
+    // Kiểm tra nếu chưa chọn giá trị từ Autocomplete
+    if (!selectNVR) {
+      setErrorNVR(true) // Hiển thị thông báo lỗi
+
+      return // Ngừng thực hiện nếu không có giá trị
+    }
+
+    // Nếu đã chọn giá trị, đặt lại lỗi và gọi handleSave
+    setErrorNVR(false)
+    await handleSave()
   }
 
   const handleSave = async () => {
@@ -184,6 +242,10 @@ const Device = ({ onClose, nvr }) => {
         ipAddress: ipAddress,
         http: http,
         onvif: onvif,
+        box: {
+          id: idBox.value,
+          name: idBox.label
+        },
         protocol: selectedProtocol.name || '',
         isOfflineSetting: isOfflineSetting
       }
@@ -191,13 +253,13 @@ const Device = ({ onClose, nvr }) => {
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${nvr}`, data, config)
       setLoading(false)
       Swal.fire({
-        title: 'Thành công!',
-        text: 'Dữ liệu đã được Lưu thành công.',
+        title: 'Successfully!',
+        text: 'Data was saved successfully',
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -216,7 +278,7 @@ const Device = ({ onClose, nvr }) => {
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -269,6 +331,11 @@ const Device = ({ onClose, nvr }) => {
     }
   }
 
+  const handleDDNSChange = (event, newValue) => {
+    setSelectedNVR(newValue)
+    setIdBox(newValue)
+  }
+
   const handleRegionsChange = (event, newValue) => {
     setRegionsSelect(newValue)
   }
@@ -308,9 +375,9 @@ const Device = ({ onClose, nvr }) => {
         <Grid container item style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
           <Grid item xs={3.9}>
             <CustomTextField
-              label='Tên thiết bị'
+              label='Device Name'
               type='text'
-              value={cameraName}
+              value={cameraName || ''}
               onChange={handleCameraNameChange}
               fullWidth
             />
@@ -318,21 +385,21 @@ const Device = ({ onClose, nvr }) => {
           <Grid item xs={0.1}></Grid>
           <Grid item xs={3.9}>
             <CustomTextField
-              label='Tên người dùng'
+              label='Username'
               type='text'
-              value={userName}
+              value={userName || ''}
               onChange={handleUserNameChange}
               fullWidth
             />
           </Grid>
           <Grid item xs={0.1}></Grid>
           <Grid item xs={4}>
-            <CustomTextField label='Mật khẩu' type='text' value={password} onChange={handlePasswordChange} fullWidth />
+            <CustomTextField label='Password' type='text' value={password} onChange={handlePasswordChange} fullWidth />
           </Grid>
 
           <Grid item xs={3.9}>
             <CustomTextField
-              label='Địa chỉ IP'
+              label='IP Address'
               type='text'
               value={ipAddress}
               onChange={handleIpAddressChange}
@@ -341,38 +408,64 @@ const Device = ({ onClose, nvr }) => {
           </Grid>
           <Grid item xs={0.1}></Grid>
           <Grid item xs={3.9}>
-            <CustomTextField label='Cổng http' type='text' value={http} onChange={handleHttpChange} fullWidth />
+            <CustomTextField label='Http Port' type='text' value={http} onChange={handleHttpChange} fullWidth />
           </Grid>
           <Grid item xs={0.1}></Grid>
 
           <Grid item xs={4}>
-            <CustomTextField label='Cổng onvif ' type='text' value={onvif} onChange={handleOnvifChange} fullWidth />
+            <CustomTextField label='Onvif Port ' type='text' value={onvif} onChange={handleOnvifChange} fullWidth />
           </Grid>
           <Grid item xs={3.9}>
             <Autocomplete
-              value={selectedProtocol}
+              value={selectedProtocol || ''}
               onChange={handleProtocolChange}
-              options={protocol}
+              options={protocol || ''}
               getOptionLabel={option => option.name}
-              renderInput={params => <CustomTextField {...params} label='Giao thức' fullWidth />}
+              renderInput={params => (
+                <CustomTextField
+                  error={errorNVR}
+                  helperText={errorNVR ? 'Hãy chọn Giao thức' : ''}
+                  {...params}
+                  label='Protocols'
+                  fullWidth
+                />
+              )}
             />
           </Grid>
 
           <Grid item xs={0.1}></Grid>
           <Grid item xs={3.9}>
             <Autocomplete
-              value={regionsSelect}
+              value={regionsSelect || ''}
               onChange={handleRegionsChange}
               options={regions}
               getOptionLabel={option => option.label}
-              renderInput={params => <CustomTextField {...params} label='Vùng' fullWidth />}
+              renderInput={params => <CustomTextField {...params} label='Region' fullWidth />}
               onFocus={handleComboboxFocusRegions}
             />{' '}
           </Grid>
 
           <Grid item xs={0.1}></Grid>
           <Grid item xs={4}>
-            {formatDDNS(isOfflineSetting)} thiết bị đang ngoại tuyến
+            <Autocomplete
+              value={selectNVR || ''}
+              onChange={handleDDNSChange}
+              options={nvrs || []}
+              getOptionLabel={option => option.label}
+              renderInput={params => (
+                <CustomTextField
+                  error={errorNVR}
+                  helperText={errorNVR ? 'Hãy chọn Smart NVR' : ''}
+                  {...params}
+                  label='Smart NVR'
+                  fullWidth
+                />
+              )}
+              onFocus={handleComboboxFocusDevice}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            {formatDDNS(isOfflineSetting)} The device is offline
           </Grid>
         </Grid>
       </Grid>
@@ -386,9 +479,9 @@ const Device = ({ onClose, nvr }) => {
           }}
         >
           <Button type='submit' variant='contained' onClick={handleSaveClick}>
-            Lưu
+            Save
           </Button>
-          <Button onClick={onClose}>Đóng</Button>
+          <Button onClick={onClose}>Close</Button>
         </DialogActions>
       </Grid>
     </div>

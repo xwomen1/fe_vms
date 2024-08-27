@@ -1,4 +1,5 @@
 import React from 'react'
+import { useRouter } from 'next/router'
 import {
   Box,
   Button,
@@ -28,9 +29,9 @@ import FileUploader from 'devextreme-react/file-uploader'
 import ModalImage from '../ModalImage'
 import ImageCropper from '../ImageCropperPopup'
 import Link from 'next/link'
-import CustomDialog from '../CustomDialog/CustomDialog'
 
 const AddFaceManagement = () => {
+  const router = useRouter()
   const classes = useStyles()
   const [person, setPerson] = useState([])
   const [loading, setLoading] = useState(false)
@@ -54,9 +55,11 @@ const AddFaceManagement = () => {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [dialogTitle, setDialogTitle] = useState('')
   const [dialogMessage, setDialogMessage] = useState('')
-  const [status1, setStatus1] = useState('')
+  const [status1, setStatus1] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [selectedOption, setSelectedOption] = useState('')
   const [redirectUrl, setRedirectUrl] = useState('')
+  const [errorType, setErrorType] = useState(false)
 
   const handleInputChange = e => {
     const value = e.target.value
@@ -170,14 +173,14 @@ const AddFaceManagement = () => {
     if (e.value.length > 0) {
       if (e.value.length + listFileUpload.length > 5) {
         Swal.fire({
-          text: 'Tối đa 5 file',
+          text: 'Up to 5 images',
           icon: 'error',
           showCancelButton: false,
           showCloseButton: false,
           showConfirmButton: true,
           focusConfirm: true,
           confirmButtonColor: '#40a574',
-          confirmButtonText: 'Đóng',
+          confirmButtonText: 'Close',
           customClass: {
             content: 'content-class'
           }
@@ -228,16 +231,18 @@ const AddFaceManagement = () => {
     }
   }
 
-  const handleDialogClose = () => {
-    setDialogOpen(false)
-    if (isSuccess && redirectUrl) {
-      window.location.href = redirectUrl
-    }
-  }
-
   const handleAddBlacklist = async () => {
     setLoading(true)
     setShowLoading(true)
+
+    if (!selectedOption) {
+      setErrorType(true)
+      setLoading(false)
+      setShowLoading(false)
+
+      return
+    }
+
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -249,31 +254,38 @@ const AddFaceManagement = () => {
 
       const params = {
         name: name,
+        status: status1,
         mainImageId: fileAvatarId,
         imgs: listFileId.map((id, index) => ({
           id: id,
           urlImage: listFileUrl[id]
         })),
-        note: note
+        note: note,
+        type: {
+          id: selectedOption.id,
+          code: selectedOption.code
+        }
       }
 
       const response = await axios.post(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist`, params, config)
       const newId = response.data.id
-      Swal.fire(
-        Swal.fire({
-          title: 'Thành công!',
-          text: 'Dữ liệu đã được Thêm thành công.',
-          icon: 'success',
-          willOpen: () => {
-            const confirmButton = Swal.getConfirmButton()
-            if (confirmButton) {
-              confirmButton.style.backgroundColor = '#FF9F43'
-              confirmButton.style.color = 'white'
-            }
+
+      Swal.fire({
+        title: 'Successfully!',
+        text: 'Data saved successfully',
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
           }
-        })
-      )
-      setRedirectUrl(`/pages/face_management/detail/${newId}`)
+        }
+      }).then(result => {
+        if (result.isConfirmed) {
+          router.push(`/pages/face_management/detail/${newId}`)
+        }
+      })
     } catch (error) {
       Swal.fire({
         title: 'Error!',
@@ -282,7 +294,7 @@ const AddFaceManagement = () => {
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -290,6 +302,7 @@ const AddFaceManagement = () => {
       console.error('Error adding member to group:', error)
     } finally {
       setLoading(false)
+      setShowLoading(false)
     }
   }
 
@@ -315,7 +328,7 @@ const AddFaceManagement = () => {
       const recurseFetch = async (parentId, level) => {
         const childData = await fetchChildData(parentId)
         for (const child of childData) {
-          result.push({ label: child.name, id: child.id, level })
+          result.push({ code: child.code, name: child.name, id: child.id, level })
           if (child.isParent) {
             await recurseFetch(child.id, level + 1)
           }
@@ -338,7 +351,7 @@ const AddFaceManagement = () => {
   const fetchInitialData = useCallback(async () => {
     try {
       const response = await axios.get(
-        'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/code?Code=person_specify&sort=%2Bcreated_at&page=1'
+        'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/code?code=person_specify&sort=%2Bcreated_at&page=1'
       )
       const parentData = response.data[0]
       if (parentData.isParent) {
@@ -356,12 +369,18 @@ const AddFaceManagement = () => {
 
   const renderOption = (props, option) => (
     <li {...props} style={{ paddingLeft: `${option.level * 20}px` }}>
-      {option.label}
+      {option.name}
     </li>
   )
 
   const handleStatusChange = () => {
-    setStatus1(status1 === 'true' ? 'false' : 'true')
+    setStatus1(status1 === true ? false : true)
+  }
+
+  const handleOptionChange = (event, newValue) => {
+    setSelectedOption(newValue)
+    setErrorType(!newValue)
+    console.log(newValue)
   }
 
   return (
@@ -372,7 +391,7 @@ const AddFaceManagement = () => {
           <Grid item xs={12}>
             <Card>
               <CardHeader
-                title='Thêm mới đối tượng'
+                title='Add new object'
                 titleTypographyProps={{ sx: { mb: [2, 0] } }}
                 action={
                   <Grid container spacing={2}>
@@ -384,10 +403,10 @@ const AddFaceManagement = () => {
                           href={`/pages/face_management/list`}
                           sx={{ color: 'blue' }}
                         >
-                          Hủy
+                          Cancel
                         </Button>
-                        <Button disabled={!isNameEntered} onClick={handleAddBlacklist} variant='contained'>
-                          Thêm mới
+                        <Button disabled={!isNameEntered} onClick={handleAddBlacklist} variant='contained' color='primary'>
+                          Save
                         </Button>
                       </Box>
                     </Grid>
@@ -399,13 +418,6 @@ const AddFaceManagement = () => {
                   '& .MuiCardHeader-action': { m: 0 },
                   alignItems: ['flex-start', 'center']
                 }}
-              />
-              <CustomDialog
-                open={dialogOpen}
-                handleClose={handleDialogClose}
-                title={dialogTitle}
-                message={dialogMessage}
-                isSuccess={isSuccess}
               />
               <Grid item xs={12}>
                 {showLoading || loading}
@@ -443,7 +455,7 @@ const AddFaceManagement = () => {
                           margin: '0px'
                         }}
                       >
-                        {`Ảnh đại diện`}
+                        {`Avatar`}
                       </p>
                       <div
                         style={{
@@ -469,7 +481,7 @@ const AddFaceManagement = () => {
                       <Input
                         id='eventName'
                         eventname='eventName'
-                        placeholder={`      Nhập tên đối tượng`}
+                        placeholder={`Name`}
                         stylingmode='outlined'
                         defaultValue=''
                         mode='text'
@@ -498,7 +510,7 @@ const AddFaceManagement = () => {
                           margin: '0px'
                         }}
                       >
-                        Ghi chú
+                        Description
                       </p>
                       <TextField
                         rows={4}
@@ -510,7 +522,7 @@ const AddFaceManagement = () => {
                           width: '100%'
                         }}
                         defaultValue=''
-                        placeholder='  Nhập ghi chú ...!'
+                        placeholder='Description'
                         onInput={e => {
                           setNote(e.target.value)
                         }}
@@ -524,16 +536,34 @@ const AddFaceManagement = () => {
                             margin: '0px'
                           }}
                         >
-                          Trạng thái hoạt động
+                          Status
                         </p>
-                        <Switch checked={status1 === 'true'} onChange={handleStatusChange} />
+                        <Switch checked={status1 === true} onChange={handleStatusChange} />
                       </div>
+                      <p
+                        style={{
+                          fontSize: '18px',
+                          lineHeight: '22px',
+                          margin: '0px'
+                        }}
+                      >
+                        Object Type
+                      </p>
+                      {console.log(person)}
                       <Autocomplete
                         options={person}
-                        getOptionLabel={option => option.label}
-                        renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
+                        getOptionLabel={option => option.name}
+                        renderInput={params => (
+                          <CustomTextField
+                            {...params}
+                            fullWidth
+                            error={errorType}
+                            helperText={errorType ? 'Please select object type' : ''}
+                          />
+                        )}
                         renderOption={renderOption}
                         loading={loading}
+                        onChange={handleOptionChange}
                       />{' '}
                     </div>
 
@@ -547,7 +577,7 @@ const AddFaceManagement = () => {
                         fontSize: 20
                       }}
                     >
-                      {`Nhấn đúp chuột vào ảnh để tạo Avatar`}
+                      {`Double click on the image to create Avatar`}
                     </div>
 
                     <div
@@ -560,7 +590,7 @@ const AddFaceManagement = () => {
                         fontSize: 20
                       }}
                     >
-                      {`Tên đối tượng bắt buộc phải nhập`}
+                      {`Object name must be entered`}
                     </div>
                   </div>
 
@@ -568,12 +598,12 @@ const AddFaceManagement = () => {
                     <p style={{ margin: '35px 0px 0px 0px', marginTop: '250px', marginLeft: '10px' }}>
                       <div></div>
 
-                      {`Ảnh của đối tượng : (Tối đa 5 ảnh)`}
+                      {`Photos of the object : (Up to 5 photos)`}
                     </p>
                   )}
                   {listFileUpload.length > 0 && (
                     <p style={{ margin: '35px 0px 0px 0px', marginTop: '250px', marginLeft: '10px' }}>
-                      {`Ảnh của đối tượng ${listFileUpload.length}/5)`}
+                      {`Photos of the object ${listFileUpload.length}/5)`}
                     </p>
                   )}
                   <div
@@ -609,7 +639,7 @@ const AddFaceManagement = () => {
                                 lineHeight: '19px'
                               }}
                             >
-                              {`Kéo thả ảnh`}
+                              {`Drag and drop photos`}
                             </p>
                             <p
                               style={{
@@ -617,7 +647,7 @@ const AddFaceManagement = () => {
                                 lineHeight: '19px'
                               }}
                             >
-                              {`Hoặc`}
+                              {`Or`}
                             </p>
                             <Button
                               style={{
@@ -629,7 +659,7 @@ const AddFaceManagement = () => {
                               variant='contained'
                               color='primary'
                             >
-                              {`Tải ảnh lên`}
+                              {`Upload photos`}
                             </Button>
                           </div>
                         </div>

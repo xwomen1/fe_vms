@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Grid, Typography } from '@mui/material'
+import { Grid, InputAdornment, Typography } from '@mui/material'
 import IconButton from '@mui/material/IconButton'
 import Icon from 'src/@core/components/icon'
 import useDebounce from './useDebounce'
@@ -66,6 +66,8 @@ const Review = ({ id, name, channel }) => {
 
         try {
             const res = await postApi(`https://sbs.basesystem.one/ivis/vms/api/v0/playback/camera/${camera.id}`, params)
+            console.log('res', res.data);
+
             const dataList = [...res.data.DayList?.Days]
             const dateList = []
             dataList.forEach((item) => {
@@ -148,6 +150,10 @@ const Review = ({ id, name, channel }) => {
         setCamera({ id: '', name: '', channel: '' })
     }
 
+    const handleColorTime = (time) => {
+        return time.getHours() > 12 ? "highlight-success" : "highlight-error";
+    };
+
     return (
         <Grid container spacing={2}>
             <Grid item xs={12}>
@@ -157,7 +163,7 @@ const Review = ({ id, name, channel }) => {
                             {camera.id === '' &&
                                 <div style={{ height: '70vh', background: '#000', display: 'flex', justifyContent: 'center' }}>
                                     <IconButton disabled>
-                                        <Icon icon="tabler:player-play-filled" width='48' height='48' style={{ color: '#FF9F43' }} />
+                                        <Icon icon="tabler:player-play-filled" width='48' height='48' style={{ color: '#002060' }} />
                                     </IconButton>
                                 </div>
                             }
@@ -255,8 +261,8 @@ const Review = ({ id, name, channel }) => {
                                             <Icon icon='tabler:minus' size='1em' color='#FFF' />
                                         </IconButton>
                                         <Typography style={{ color: '#fff', fontWeight: 'bold' }}>
-                                            {`${Math.floor(valueRange / (60 * 60 * 1000))} giờ -  ${(valueRange - 60 * 60 * 1000 * Math.floor(valueRange / (60 * 60 * 1000))) / (60 * 1000)
-                                                } phút `}
+                                            {`${Math.floor(valueRange / (60 * 60 * 1000))} Hour -  ${(valueRange - 60 * 60 * 1000 * Math.floor(valueRange / (60 * 60 * 1000))) / (60 * 1000)
+                                                } Minute `}
                                         </Typography>
                                     </Box>
                                     <Box className='w-100'>
@@ -338,15 +344,17 @@ const Review = ({ id, name, channel }) => {
                                         <Icon icon='formkit:volumeup' size='1rem' color='#fff' />
                                     </Stack>
                                     <Box sx={{ mt: 1, ml: 4, display: 'flex', alignItems: 'center' }}>
-                                        <IconButton size='small' title='date' onClick={handleIconClick}>
+
+                                        {/* <IconButton size='small' title='date' onClick={handleIconClick}>
                                             <Icon color='#fff' fontSize='1.5rem' icon='fluent-mdl2:date-time-12' />
-                                        </IconButton>
+                                        </IconButton> */}
+
                                         <DatePickerWrapper sx={{ '& .react-datepicker-wrapper': { width: 'auto' } }}>
                                             <DatePicker
                                                 ref={datePickerRef}
                                                 showTimeSelect
                                                 timeFormat='HH:mm'
-                                                timeIntervals={15}
+                                                timeIntervals={30}
                                                 selected={dateTime}
                                                 id='date-time-picker'
                                                 dateFormat='MM/dd/yyyy h:mm aa'
@@ -363,6 +371,7 @@ const Review = ({ id, name, channel }) => {
                                                 }}
                                                 onInputClick={fetchEventDates}
                                                 highlightDates={eventDates}
+                                                timeClassName={handleColorTime}
                                                 popperPlacement='bottom-start'
                                                 customInput={
                                                     <CustomInput
@@ -371,6 +380,13 @@ const Review = ({ id, name, channel }) => {
                                                                 color: '#fff',
                                                                 fontWeight: 'bold'
                                                             }
+                                                        }}
+                                                        InputProps={{
+                                                            startAdornment: (
+                                                                <InputAdornment position='start'>
+                                                                    <Icon color='#fff' fontSize='1.5rem' icon='fluent-mdl2:date-time-12' />
+                                                                </InputAdornment>
+                                                            )
                                                         }}
                                                     />
                                                 }

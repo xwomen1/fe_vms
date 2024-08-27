@@ -88,7 +88,6 @@ const AccountSettings = ({ tab, apiPricingPlanData }) => {
       <Grid item xs={12}>
         <TabContext value={activeTab}>
           <Grid container spacing={6}>
-           
             <Grid item xs={12}>
               {isLoading ? (
                 <Box sx={{ mt: 6, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>

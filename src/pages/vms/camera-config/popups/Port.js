@@ -48,10 +48,10 @@ const UserDetails = ({ cameras, onClose }) => {
       }
 
       const data = {
-        http: http || cameras?.http,
-        rtsp: rtsp || cameras?.rtsp,
-        https: https || cameras?.https,
-        server: server || cameras?.server
+        http: http || '',
+        rtsp: rtsp || '',
+        https: https || '',
+        server: server || ''
       }
 
       await axios.put(
@@ -62,13 +62,13 @@ const UserDetails = ({ cameras, onClose }) => {
       console.log(cameras)
       setLoading(false)
       Swal.fire({
-        title: 'Thành công!',
-        text: 'Dữ liệu đã được Lưu thành công.',
+        title: 'Successfully!',
+        text: 'Data was saved successfully',
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -87,7 +87,7 @@ const UserDetails = ({ cameras, onClose }) => {
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -128,10 +128,10 @@ const UserDetails = ({ cameras, onClose }) => {
               pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
             }}
           >
-            <Button onClick={onClose}>Đóng</Button>
+            <Button onClick={onClose}>Close</Button>
 
             <Button type='submit' variant='contained' onClick={handleSaveClick}>
-              Lưu
+              Save
             </Button>
           </DialogActions>
         </Grid>

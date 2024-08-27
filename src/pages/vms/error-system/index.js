@@ -30,6 +30,7 @@ import {
 import Filter from './popups/filter'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import { format } from 'date-fns'
+import CustomChip from 'src/@core/components/mui/chip'
 
 const EventList = () => {
   const [anchorEl, setAnchorEl] = useState(null)
@@ -112,20 +113,20 @@ const EventList = () => {
 
   function showAlertConfirm(options, intl) {
     const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Accept',
       imageWidth: 213,
       showCancelButton: true,
       showCloseButton: true,
       showConfirmButton: true,
       focusCancel: true,
       reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
-      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Agree',
+      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Cancel',
       customClass: {
         content: 'content-class',
         confirmButton: 'swal-btn-confirm'
       },
-      confirmButtonColor: '#FF9F43'
+      confirmButtonColor: '#002060'
     }
 
     return Swal.fire({ ...defaultProps, ...options })
@@ -133,7 +134,7 @@ const EventList = () => {
 
   const handleDelete = id => {
     showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
+      text: 'Do you want to delete it?'
     }).then(({ value }) => {
       if (value) {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -151,13 +152,13 @@ const EventList = () => {
           .delete(urlDelete, config)
           .then(() => {
             Swal.fire({
-              title: 'Thành công!',
-              text: 'Xóa thành công',
+              title: 'Success!',
+              text: 'Deleted successfully',
               icon: 'success',
               willOpen: () => {
                 const confirmButton = Swal.getConfirmButton()
                 if (confirmButton) {
-                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.backgroundColor = '#002060'
                   confirmButton.style.color = 'white'
                 }
               }
@@ -174,7 +175,7 @@ const EventList = () => {
               willOpen: () => {
                 const confirmButton = Swal.getConfirmButton()
                 if (confirmButton) {
-                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.backgroundColor = '#002060'
                   confirmButton.style.color = 'white'
                 }
               }
@@ -199,32 +200,8 @@ const EventList = () => {
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/incidents/logs/status/${id}`, config)
       setLoading()
       fetchDataList()
-      Swal.fire({
-        title: 'Thành công!',
-        text: 'Thay đổi trạng thái thành công',
-        icon: 'success',
-        willOpen: () => {
-          const confirmButton = Swal.getConfirmButton()
-          if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
-            confirmButton.style.color = 'white'
-          }
-        }
-      })
     } catch (error) {
       console.error('Error status:', error)
-      Swal.fire({
-        title: 'Error!',
-        text: error.response?.data?.message || error.message,
-        icon: 'error',
-        willOpen: () => {
-          const confirmButton = Swal.getConfirmButton()
-          if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
-            confirmButton.style.color = 'white'
-          }
-        }
-      })
     } finally {
       setLoading(false)
     }
@@ -235,13 +212,13 @@ const EventList = () => {
   }, [fetchDataList])
 
   const columns = [
-    { id: 1, flex: 0.25, minWidth: 50, align: 'left', field: 'eventName', label: 'Tên sự cố' },
-    { id: 2, flex: 0.15, minWidth: 150, align: 'left', field: 'severity', label: 'Mức độ' },
-    { id: 3, flex: 0.15, minWidth: 150, align: 'left', field: 'deviceType', label: 'Loại thiết bị' },
-    { id: 4, flex: 0.15, minWidth: 100, align: 'left', field: 'createdAt', label: 'Thời gian' },
-    { id: 5, flex: 0.15, minWidth: 100, align: 'left', field: 'location', label: 'Vị trí' },
-    { id: 6, flex: 0.25, minWidth: 50, align: 'left', field: 'status', label: 'Trạng thái' },
-    { id: 7, flex: 0.25, minWidth: 50, align: 'left', field: 'source', label: 'Nguồn' }
+    { id: 1, flex: 0.25, minWidth: 50, align: 'center', field: 'eventName', label: 'Issue name' },
+    { id: 2, flex: 0.15, minWidth: 150, align: 'center', field: 'severity', label: 'Level' },
+    { id: 3, flex: 0.15, minWidth: 150, align: 'center', field: 'deviceType', label: 'Device type' },
+    { id: 4, flex: 0.15, minWidth: 100, align: 'center', field: 'createdAt', label: 'Time ' },
+    { id: 5, flex: 0.15, minWidth: 100, align: 'center', field: 'location', label: 'Location' },
+    { id: 6, flex: 0.25, minWidth: 50, align: 'center', field: 'status', label: 'Status' },
+    { id: 7, flex: 0.25, minWidth: 50, align: 'center', field: 'source', label: 'Source' }
   ]
 
   const handleSetValueFilter = data => {
@@ -256,12 +233,9 @@ const EventList = () => {
 
   return (
     <>
-      <Grid>
-        <Button variant='contained'> Danh sách sự cố</Button>
-      </Grid>
-      <br></br>
       <Card>
         <CardHeader
+          title='List of issues'
           titleTypographyProps={{ sx: { mb: [2, 0] } }}
           sx={{
             py: 4,
@@ -274,7 +248,7 @@ const EventList = () => {
               <Grid item>
                 <Box sx={{ float: 'right' }}>
                   <Button
-                    aria-label='Bộ lọc'
+                    aria-label='Filter '
                     onClick={() => {
                       setIsOpenFilter(true)
                     }}
@@ -288,7 +262,7 @@ const EventList = () => {
                 <CustomTextField
                   value={value}
                   onChange={e => handleFilter(e.target.value)}
-                  placeholder='Tìm kiếm sự kiện '
+                  placeholder='Search'
                   InputProps={{
                     startAdornment: (
                       <Box sx={{ mr: 2, display: 'flex' }}>
@@ -320,7 +294,7 @@ const EventList = () => {
             <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
               <TableHead>
                 <TableRow>
-                  <TableCell>STT</TableCell>
+                  <TableCell align='center'>NO.</TableCell>
                   {columns.map(column => (
                     <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
                       {column.label}
@@ -333,17 +307,34 @@ const EventList = () => {
                 {Array.isArray(devices) && devices.length > 0 ? (
                   devices.map((row, index) => (
                     <TableRow hover tabIndex={-1} key={index}>
-                      <TableCell>{(page - 1) * pageSize + index + 1}</TableCell>
+                      <TableCell align='center'>{(page - 1) * pageSize + index + 1}</TableCell>
                       {columns.map(column => {
                         const value = row[column.field]
 
                         return (
                           <TableCell key={column.id} align={column.align}>
-                            {column.field === 'createdAt' ? formatDateTime(value) : value}
+                            {column.field === 'createdAt' ? (
+                              formatDateTime(value)
+                            ) : column.field === 'status' ? (
+                              row.status ? (
+                                <CustomChip
+                                  rounded
+                                  size='small'
+                                  skin='light'
+                                  sx={{ lineHeight: 1, padding: '16px', textAlign: 'center' }}
+                                  label={row.status === 'Chưa xử lý' ? 'Chưa xử lý' : 'Đã kết nối'}
+                                  color={row.status === 'Chưa xử lý' ? 'primary' : 'success'}
+                                />
+                              ) : (
+                                row.status
+                              )
+                            ) : (
+                              value
+                            )}
                           </TableCell>
                         )
                       })}
-                      <TableCell>
+                      <TableCell align='center'>
                         <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center' }}>
                           {row.eventName === 'Đã kết nối' ? (
                             <IconButton
@@ -375,7 +366,7 @@ const EventList = () => {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={columns.length + 1}>Không có dữ liệu ...</TableCell>
+                    <TableCell colSpan={columns.length + 1}>No data ...</TableCell>
                   </TableRow>
                 )}
               </TableBody>
@@ -385,14 +376,13 @@ const EventList = () => {
         <br />
         <Grid container spacing={2} style={{ padding: 10 }}>
           <Grid item xs={3}></Grid>
-          <Grid item xs={1}>
-            <span style={{ fontSize: 15 }}> dòng/trang</span>
-          </Grid>
+
           <Grid item xs={1} style={{ padding: 0 }}>
             <Box>
-              <Button onClick={handleOpenMenu} endIcon={<Icon icon='tabler:selector' />}>
-                {pageSize}
-              </Button>
+              <IconButton onClick={handleOpenMenu}>
+                <Icon icon='tabler:selector' />
+                <p style={{ fontSize: 15 }}>{pageSize} line/page</p>
+              </IconButton>
               <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
                 {pageSizeOptions.map(size => (
                   <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>

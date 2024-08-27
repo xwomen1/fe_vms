@@ -55,17 +55,17 @@ const UserDetails = () => {
               href={`/apps/user/list`}
               startIcon={<Icon icon='tabler:chevron-left' />}
             >
-              Quay lại
+              Back
             </Button>
           </Grid>
           <Grid item xs={8} container={2}>
             <Grid item xs={4}></Grid>
             <Grid item xs={8}>
               <TabList onChange={handleChange} aria-label='customized tabs example'>
-                <Tab value='1' label='Thông tin cá nhân' />
-                <Tab value='2' label='Thông tin định danh' />
-                {/* <Tab value='3' label='Kiểm soát vào ra' /> */}
-                {/* <Tab value='4' label='Thông tin gửi xe' /> */}
+                <Tab value='1' label='Information' />
+                <Tab value='2' label='Identify' />
+                <Tab value='3' label='Access control' />
+                <Tab value='4' label='Parking information' />
               </TabList>
             </Grid>
           </Grid>

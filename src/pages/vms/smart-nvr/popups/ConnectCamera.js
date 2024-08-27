@@ -70,8 +70,8 @@ const RolePopup = ({ open, onClose, onSelect, nvr, name, ip }) => {
       <DialogContent>
         <TabContext value={value}>
           <TabList onChange={handleChange} aria-label='customized tabs example'>
-            <Tab value='1' label='Quét' />
-            <Tab value='2' label='Nhập' />
+            <Tab value='1' label='Scan' />
+            <Tab value='2' label='Enter manually' />
           </TabList>
           <TabPanel value='1'>
             <Quet nvr={nvr} onClose={onClose} />

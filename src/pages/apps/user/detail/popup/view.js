@@ -101,8 +101,8 @@ const defaultValues = {
 const format_form = [
   {
     name: 'nameCalendar',
-    label: 'Tên lịch',
-    placeholder: 'Tên lịch',
+    label: 'Name',
+    placeholder: 'Name',
     type: 'TextField',
     data: [],
     require: true,
@@ -134,8 +134,8 @@ const format_form = [
   },
   {
     name: 'startDate',
-    label: 'Ngày bắt đầu',
-    placeholder: 'Ngày bắt đầu',
+    label: 'Start date',
+    placeholder: 'Start date',
     type: 'TextField',
     data: [],
     require: false,
@@ -143,8 +143,8 @@ const format_form = [
   },
   {
     name: 'endDate',
-    label: 'Ngày Kết thúc',
-    placeholder: 'Ngày kết thúc',
+    label: 'End date',
+    placeholder: 'End date',
     type: 'TextField',
     data: [],
     require: false,
@@ -269,7 +269,7 @@ const View = ({ show, onClose, id, setReload, filter }) => {
             margin: '20px 0 20px 0'
           }}
         >
-          <span>Bảng cấu hình thời gian</span>
+          <span>Bảng cấu hình Date</span>
         </div>
 
         <div
@@ -366,7 +366,7 @@ const View = ({ show, onClose, id, setReload, filter }) => {
                             placeholder={item.placeholder}
                             error={Boolean(errors[item.name])}
                             aria-describedby='validation-basic-last-name'
-                            {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
+                            {...(errors[item.name] && { helperText: 'This field is required' })}
                           />
                         )}
                       />
@@ -377,7 +377,7 @@ const View = ({ show, onClose, id, setReload, filter }) => {
                   return (
                     <Grid item xs={12} key={index}>
                       <span style={{ color: '#f5963a', fontSize: 20, position: 'relative' }}>
-                        Cấu hình thời gian hoạt động
+                        Cấu hình Date hoạt động
                         <span
                           style={{
                             position: 'absolute',

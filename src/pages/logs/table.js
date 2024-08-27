@@ -40,14 +40,14 @@ const Logs = ({ apiData }) => {
 
   function showAlertConfirm(options, intl) {
     const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Accept',
       imageWidth: 213,
       showCancelButton: true,
       showCloseButton: true,
       showConfirmButton: true,
       focusCancel: true,
       reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Agree',
       cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
       customClass: {
         content: 'content-class',
@@ -97,7 +97,7 @@ const Logs = ({ apiData }) => {
         axios
           .delete(urlDelete, config)
           .then(() => {
-            Swal.fire('Xóa thành công', '', 'success')
+            Swal.fire('Deleted successfully', '', 'success')
             const updatedData = assettype.filter(assettype => assettype.id !== idDelete)
             setAssetType(updatedData)
             fetchData()
@@ -150,8 +150,8 @@ const Logs = ({ apiData }) => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Thời gian</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>NO.</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Time </TableCell>
                     <TableCell sx={{ padding: '16px' }}>Phương thức</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Status code</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Hoạt động</TableCell>
@@ -163,19 +163,24 @@ const Logs = ({ apiData }) => {
                   {assettype.map((assetType, index) => (
                     <TableRow key={assetType.id}>
                       <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>
-                        {new Date(assetType.timestamp).toLocaleString()}
-                      </TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{new Date(assetType.timestamp).toLocaleString()}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.method}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>
-                        <span style={{ backgroundColor: '#C8E6C9', color: 'green', padding: '4px 8px', borderRadius: '40px' }}>
+                        <span
+                          style={{
+                            backgroundColor: '#C8E6C9',
+                            color: 'green',
+                            padding: '4px 8px',
+                            borderRadius: '40px'
+                          }}
+                        >
                           {assetType.status}
                         </span>
-                      </TableCell>                      <TableCell sx={{ padding: '16px' }}>{assetType.detail}</TableCell>
+                      </TableCell>{' '}
+                      <TableCell sx={{ padding: '16px' }}>{assetType.detail}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{assetType.userName}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>
                         <Grid container spacing={2}>
-                          
                           <IconButton onClick={() => handleDelete(assetType.id)}>
                             <Icon icon='tabler:trash' />
                           </IconButton>
@@ -191,7 +196,7 @@ const Logs = ({ apiData }) => {
                 <Grid item xs={1.5} style={{ padding: 0 }}>
                   <IconButton onClick={handleOpenMenu}>
                     <Icon icon='tabler:selector' />
-                    <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
+                    <p style={{ fontSize: 15 }}>{pageSize} line/page</p>
                   </IconButton>
                   <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
                     {pageSizeOptions.map(size => (

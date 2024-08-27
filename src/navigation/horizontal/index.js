@@ -1,18 +1,17 @@
 const navigation = () => {
   return [
     {
-      title: 'Trang chủ',
+      title: 'Home',
       icon: 'tabler:smart-home',
       path: '/dashboards/analytics'
     },
-
     {
       path: '/asset',
-      title: 'Hệ thống VMS',
+      title: 'VMS System',
       icon: 'tabler:camera',
       children: [
         {
-          title: 'Xem trực tiếp',
+          title: 'Live View',
           path: '/vms/live-view',
           icon: 'tabler:video'
         },
@@ -22,58 +21,105 @@ const navigation = () => {
         //   path: '/vms/live-view-p2p-private'
         // },
         {
-          title: 'Xem lại',
+          title: 'Playback',
           path: '/vms/playback-camera',
           icon: 'tabler:video-minus'
         },
         {
-          title: 'Trích xuất clip',
+          title: 'Extract Clip',
           path: '/vms/clip-extraction',
           icon: 'tabler:file-export'
         },
         {
-          title: 'Nhóm camera',
-          path: '/vms/camera-group',
-          icon: 'tabler:schema'
-        },
-        {
-          title: 'Sự kiện AI',
-          path: '/vms/events',
+          title: 'AI Event',
+          path: '/vms/events/view/eventList',
           icon: 'tabler:timeline-event-exclamation'
         },
         {
-          title: 'Cấu hình AI',
-          path: '/vms/ai-config',
+          title: 'Face',
+          path: '/vms/events/view/eventFace',
+          icon: 'tabler:timeline-event-exclamation'
+        },
+        {
+          title: 'License Plate',
+          path: '/vms/events/view/eventCar',
+          icon: 'tabler:timeline-event-exclamation'
+        },
+
+        // {
+        //   title: 'Phát hiện đám đông',
+        //   path: '/vms/events',
+        //   icon: 'tabler:timeline-event-exclamation'
+        // },
+
+        {
+          title: 'AI Map',
+          path: '/vms/events/view/eventMap',
+          icon: 'tabler:timeline-event-exclamation'
+        },
+        {
+          title: 'AI Overview',
+          path: '/vms/ai-config/view/eventOverview',
           icon: 'tabler:settings'
         },
         {
-          title: 'Sự cố hệ thống',
+          title: 'AI Configuration List',
+          path: '/vms/ai-config/view/aiConfig',
+          icon: 'tabler:settings'
+        },
+        {
+          title: 'AI Region',
+          path: '/vms/ai-config/view/eventConfig',
+          icon: 'tabler:settings'
+        },
+        {
+          title: 'Model AI',
+          path: '/vms/ai-config/view/modelAIList',
+          icon: 'tabler:settings'
+        },
+        {
+          title: 'System Incident',
           path: '/vms/error-system',
           icon: 'tabler:id-badge-off'
         },
         {
-          title: 'Danh sách Camera',
-          path: '/vms/camera-config',
+          title: 'Camera Group',
+          path: '/vms/camera-group',
+          icon: 'tabler:schema'
+        },
+        {
+          title: 'Camera List',
+          path: '/vms/camera-config/table',
           icon: 'tabler:device-cctv'
         },
         {
-          title: 'Danh sách NVR',
-          path: '/vms/nvr-config',
+          title: 'Add Camera',
+          path: '/vms/camera-config/add',
+          icon: 'tabler:device-cctv'
+        },
+        {
+          title: 'NVR List',
+          path: '/vms/nvr-config/table',
+          icon: 'tabler:server-2'
+        },
+        {
+          title: 'Add NVR',
+          path: '/vms/nvr-config/add',
           icon: 'tabler:server-2'
         },
         {
           title: 'Smart NVR',
-          path: '/vms/smart-nvr',
-          icon: 'tabler:server-2'
+          path: '/vms/smart-nvr/table',
+          icon: 'tabler:accessible'
         },
         {
           path: '/pages/face_management/list',
-          title: 'Quản lý khuôn mặt',
+          title: 'Face Management',
           icon: 'tabler:face-id'
         },
         {
           path: '/pages/car_management/list',
-          title: 'Quản lý Biển số',
+          title: 'License Plate Management',
           icon: 'tabler:id-badge-2'
         }
 
@@ -92,44 +138,6 @@ const navigation = () => {
       ]
     },
 
-    // {
-    //   path: '/caller',
-    //   title: 'Thuê bao',
-    //   icon: 'tabler:phone'
-    // },
-    // {
-    //   path: '/cards',
-    //   title: 'Thẻ',
-    //   icon: 'tabler:cards'
-    // },
-    // {
-    //   path: '/vehicle',
-    //   title: 'Phương tiện',
-    //   icon: 'tabler:car'
-    // },
-    // {
-    //   path: '/service',
-    //   title: 'Dịch vụ',
-    //   icon: 'tabler:zoom-money'
-    // },
-    // {
-    //   path: '/parking',
-    //   title: 'Bãi đỗ xe',
-    //   icon: 'tabler:parking'
-    // },
-    // {
-    //   path: '/asset',
-    //   title: 'Tài sản',
-    //   icon: 'tabler:moneybag',
-    //   children: [
-    //     {
-    //       title: 'Loại tài sản',
-    //       path: '/assetType'
-    //     },
-    //     {
-    //       title: 'Tài sản',
-    //       path: '/asset'
-    //     }
     //   ]
     // },
     // {
@@ -204,20 +212,94 @@ const navigation = () => {
       icon: 'tabler:user',
       children: [
         {
-          title: 'Người dùng',
+          title: 'User',
           icon: 'tabler:user',
           path: '/apps/user/list'
         },
         {
-          title: 'Cơ cấu tổ chức',
+          title: 'Organizational Structure',
           icon: 'tabler:building',
-          path: '/organizational-structure'
+          path: '/organization/list'
         },
         {
-          title: 'Vai Trò',
+          title: 'Role',
           icon: 'tabler:users',
           path: '/apps/roles'
         }
+      ]
+    },
+    {
+      path: '/',
+      title: 'Smart Parking',
+      icon: 'tabler:lock-access',
+      children: [
+        {
+          path: '/smart-parking/caller',
+          title: 'Subscription',
+          icon: 'tabler:phone'
+        },
+        {
+          path: '/smart-parking/caller-type',
+          title: 'Subscription Type',
+          icon: 'tabler:phone'
+        },
+        {
+          path: '/smart-parking/cards',
+          title: 'Card',
+          icon: 'tabler:cards'
+        },
+        {
+          path: '/smart-parking/vehicle',
+          title: 'Vehicle',
+          icon: 'tabler:car'
+        },
+        {
+          path: '/smart-parking/vehicle-type',
+          title: 'Vehicle Type',
+          icon: 'tabler:parking'
+        },
+        {
+          path: '/smart-parking/service',
+          title: 'Service',
+          icon: 'tabler:zoom-money'
+        },
+        {
+          path: '/smart-parking/parking',
+          title: 'Parking Lot',
+          icon: 'tabler:parking'
+        },
+
+        {
+          path: '/smart-parking/asset',
+          title: 'Asset Management',
+          icon: 'tabler:moneybag',
+          children: [
+            {
+              title: 'Asset Type',
+              path: '/smart-parking/assetType'
+            },
+            {
+              title: 'Asset',
+              path: '/smart-parking/asset'
+            }
+          ]
+        }
+
+        // {
+        //   path: '/pages/access-rights/list',
+        //   title: 'Quyền truy cập',
+        //   icon: 'tabler:shield'
+        // },
+        // {
+        //   path: '/pages/access-rights/list',
+        //   title: 'Thống kê',
+        //   icon: 'tabler:statistics/time?tab=%2Fstatistics%2Ftime'
+        // },
+        // {
+        //   path: '/pages/access-rights/list',
+        //   title: 'Hẹn lịch',
+        //   icon: 'tabler:guest-registrations'
+        // }
       ]
     }
 

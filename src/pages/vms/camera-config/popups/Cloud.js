@@ -47,14 +47,14 @@ const RolePopup = ({ open, onClose }) => {
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Cấu hình luu tru</DialogTitle>
+      <DialogTitle>Storage configuration</DialogTitle>
       <DialogContent>
         <TabContext value={value}>
           <Grid>
             {' '}
             <TabList onChange={handleChange} aria-label='customized tabs example'>
-              <Tab value='1' label='Lich ghi' />
-              <Tab value='2' label='Chat luong ghi' />
+              <Tab value='1' label='recording schedule' />
+              <Tab value='2' label='recording quality' />
             </TabList>
           </Grid>
           <TabPanel value='1'>

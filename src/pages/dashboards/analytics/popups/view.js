@@ -51,17 +51,26 @@ const initValues = {
 const format_form = [
   {
     name: 'imageObject',
-    label: 'Hình ảnh',
-    placeholder: 'Nhập hình ảnh',
+    label: 'Image',
+    placeholder: 'Image',
     type: 'ImageObject',
     data: [],
     require: true,
     width: 12
   },
   {
+    name: 'result',
+    label: 'result',
+    placeholder: 'Nhập kết quả',
+    type: 'TextField',
+    data: [],
+    require: true,
+    width: 12
+  },
+  {
     name: 'description',
-    label: 'Đối tượng',
-    placeholder: 'Nhập tên đối tượng',
+    label: 'Object',
+    placeholder: 'Object',
     type: 'TextField',
     data: [],
     require: true,
@@ -69,8 +78,8 @@ const format_form = [
   },
   {
     name: 'timestamp',
-    label: 'Thời gian',
-    placeholder: 'Nhập thời gian',
+    label: 'Time',
+    placeholder: 'Time',
     type: 'TextField',
     data: [],
     require: true,
@@ -79,7 +88,7 @@ const format_form = [
   {
     name: 'camName',
     label: 'Camera',
-    placeholder: 'Nhập Camera',
+    placeholder: 'Camera',
     type: 'VAutocomplete',
     data: [],
     require: true,
@@ -87,8 +96,8 @@ const format_form = [
   },
   {
     name: 'location',
-    label: 'Vị trí',
-    placeholder: 'Nhập vị trí',
+    label: 'Location',
+    placeholder: 'Location',
     type: 'VAutocomplete',
     data: [],
     require: true,
@@ -96,8 +105,8 @@ const format_form = [
   },
   {
     name: 'imageResult',
-    label: 'Ảnh toàn cảnh',
-    placeholder: 'Nhập ảnh toán cảnh',
+    label: 'Panoramic Image',
+    placeholder: 'Panoramic Image',
     type: 'ImageResult',
     data: [],
     require: true,
@@ -175,7 +184,7 @@ const View = ({ data }) => {
                         rules={{ required: true }}
                         render={({ field: { value, onChange } }) => (
                           <Box>
-                            <Typography sx={{ mb: 1 }}>Ảnh đối tượng</Typography>
+                            <Typography sx={{ mb: 1 }}>Object Image</Typography>
                             <CustomAvatar
                               src={value}
                               variant='rounded'
@@ -207,7 +216,7 @@ const View = ({ data }) => {
                             placeholder={item.placeholder}
                             error={Boolean(errors[item.name])}
                             aria-describedby='validation-basic-last-name'
-                            {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
+                            {...(errors[item.name] && { helperText: '"This field is required' })}
                           />
                         )}
                       />
@@ -231,7 +240,7 @@ const View = ({ data }) => {
                             placeholder={item.placeholder}
                             error={Boolean(errors[item.name])}
                             aria-describedby='validation-basic-last-name'
-                            {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
+                            {...(errors[item.name] && { helperText: '"This field is required' })}
                           />
                         )}
                       />
@@ -253,7 +262,7 @@ const View = ({ data }) => {
                         rules={{ required: true }}
                         render={({ field: { value, onChange } }) => (
                           <Box sx={getBoxStyles()}>
-                            <Typography sx={{ mb: 1 }}>Ảnh toàn cảnh</Typography>
+                            <Typography sx={{ mb: 1 }}>Panoramic Image</Typography>
                             <CustomAvatar
                               src={value}
                               onLoad={handleImageLoad}

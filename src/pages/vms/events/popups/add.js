@@ -21,6 +21,7 @@ import Icon from 'src/@core/components/icon'
 import toast from 'react-hot-toast'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 import moment from 'moment'
+import { getApi } from 'src/@core/utils/requestUltils'
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Fade ref={ref} {...props} />
@@ -53,17 +54,26 @@ const initValues = {
 const format_form = [
   {
     name: 'imageObject',
-    label: 'Hình ảnh',
-    placeholder: 'Nhập hình ảnh',
+    label: 'Image',
+    placeholder: 'Image',
     type: 'ImageObject',
     data: [],
     require: true,
     width: 12
   },
   {
+    name: 'result',
+    label: 'Result',
+    placeholder: 'Result',
+    type: 'TextField',
+    data: [],
+    require: true,
+    width: 12
+  },
+  {
     name: 'description',
-    label: 'Đối tượng',
-    placeholder: 'Nhập tên đối tượng',
+    label: 'Object',
+    placeholder: 'Object Name',
     type: 'TextField',
     data: [],
     require: true,
@@ -71,17 +81,17 @@ const format_form = [
   },
   {
     name: 'timestamp',
-    label: 'Thời gian',
-    placeholder: 'Nhập thời gian',
+    label: 'Date',
+    placeholder: 'Date',
     type: 'TextField',
     data: [],
     require: true,
     width: 12
   },
   {
-    name: 'camName',
+    name: 'cameraId',
     label: 'Camera',
-    placeholder: 'Nhập Camera',
+    placeholder: 'Camera',
     type: 'VAutocomplete',
     data: [],
     require: true,
@@ -89,17 +99,17 @@ const format_form = [
   },
   {
     name: 'location',
-    label: 'Vị trí',
-    placeholder: 'Nhập vị trí',
-    type: 'VAutocomplete',
+    label: 'Location',
+    placeholder: 'Location',
+    type: 'TextField',
     data: [],
     require: true,
     width: 12
   },
   {
     name: 'imageResult',
-    label: 'Ảnh toàn cảnh',
-    placeholder: 'Nhập ảnh toán cảnh',
+    label: 'Full Screen',
+    placeholder: 'Full Screen',
     type: 'ImageResult',
     data: [],
     require: true,
@@ -110,6 +120,7 @@ const format_form = [
 const Add = ({ show, onClose, id, data, setReload, filter }) => {
   const [loading, setLoading] = useState(false)
   const [cameraId, setCameraId] = useState(null)
+  const [cameraName, setCameraName] = useState('')
   const [cameraList, setCameraList] = useState([])
   const [locationList, setLocationList] = useState([])
   const API_REGIONS = `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/`
@@ -137,26 +148,11 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
     defaultValues: initValues
   })
 
-  const fetchCameraList = async () => {
-    try {
-      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras?sort=%2Bcreated_at`, config)
-      setCameraList(res.data)
-    } catch (error) {
-      console.error('Error fetching data: ', error)
-    }
-  }
-
-  const fetchLocationList = async () => {
-    try {
-      const res = await axios.get(
-        `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/parentsID?parentID=7cac40af-6b9e-47e6-9aba-8d458722d5a4`,
-        config
-      )
-      setLocationList(res.data)
-    } catch (error) {
-      console.error('Error fetching data: ', error)
-    }
-  }
+  useEffect(() => {
+    setDetail(data)
+    fetchCameraList()
+    fetchLocationList()
+  }, [])
 
   useEffect(() => {
     if (detail) {
@@ -168,11 +164,46 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
     reset(detail)
   }
 
-  useEffect(() => {
-    setDetail(data)
-    fetchCameraList()
-    fetchLocationList()
-  }, [])
+  const fetchCameraList = async () => {
+    try {
+      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras?sort=%2Bcreated_at`, config)
+      setCameraList(res.data)
+    } catch (error) {
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
+    } finally {
+      ; () => {
+        setLoading(false)
+      }
+    }
+  }
+
+  const fetchLocationList = async () => {
+    try {
+      const res = await axios.get(
+        `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/parentsID?parentID=7cac40af-6b9e-47e6-9aba-8d458722d5a4`,
+        config
+      )
+      setLocationList(res.data)
+    } catch (error) {
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
+    } finally {
+      ; () => {
+        setLoading(false)
+      }
+    }
+  }
 
   const onSubmit = values => {
     const detail = {
@@ -183,8 +214,6 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
     handleUpdate(detail)
   }
 
-  const handleAdd = values => {}
-
   const handleUpdate = values => {
     const params = {
       ...values
@@ -194,7 +223,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
     axios
       .put(`https://sbs.basesystem.one/ivis/cmsgo/api/v0/aievents/update/${data.id}`, { ...params }, config)
       .then(() => {
-        toast.success('Thay đổi thành công')
+        toast.success('Updated success')
         onClose()
       })
       .catch(err => {
@@ -243,7 +272,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
             </CustomCloseButton>
             <Box sx={{ mb: 8, textAlign: 'left' }}>
               <Typography variant='h3' sx={{ mb: 3 }}>
-                Chi tiết sự kiện
+                Event Detail
               </Typography>
             </Box>
             <form>
@@ -260,7 +289,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
                               rules={{ required: true }}
                               render={({ field: { value, onChange } }) => (
                                 <Box>
-                                  <Typography sx={{ mb: 1 }}>Ảnh đối tượng</Typography>
+                                  <Typography sx={{ mb: 1 }}>Object Image</Typography>
                                   <CustomAvatar
                                     src={value}
                                     variant='rounded'
@@ -294,7 +323,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
                                   placeholder={item.placeholder}
                                   error={Boolean(errors[item.name])}
                                   aria-describedby='validation-basic-last-name'
-                                  {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
+                                  {...(errors[item.name] && { helperText: 'This field is required' })}
                                 />
                               )}
                             />
@@ -327,9 +356,9 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
                                     id='validation-basic-select'
                                     error={Boolean(errors[item.name])}
                                     aria-describedby='validation-basic-select'
-                                    {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
+                                    {...(errors[item.name] && { helperText: 'This field is required' })}
                                   >
-                                    {item.name === 'camName' &&
+                                    {item.name === 'cameraId' &&
                                       cameraList.map(x => (
                                         <MenuItem key={x.id} value={x.name}>
                                           {x.name}
@@ -363,7 +392,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
                               rules={{ required: true }}
                               render={({ field: { value, onChange } }) => (
                                 <Box sx={getBoxStyles()}>
-                                  <Typography sx={{ mb: 1 }}>Ảnh toàn cảnh</Typography>
+                                  <Typography sx={{ mb: 1 }}>Full Screen</Typography>
                                   <CustomAvatar
                                     src={value}
                                     onLoad={handleImageLoad}
@@ -391,10 +420,10 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
             }}
           >
             <Button variant='tonal' color='secondary' onClick={onClose}>
-              Hủy
+              Cancel
             </Button>
             <Button variant='contained' onClick={handleSubmit(onSubmit)}>
-              Sửa
+              Save
             </Button>
           </DialogActions>
         </Dialog>

@@ -24,6 +24,7 @@ import {
   Typography
 } from '@mui/material'
 import Icon from 'src/@core/components/icon'
+import CustomChip from 'src/@core/components/mui/chip'
 import Swal from 'sweetalert2'
 import { CircularProgress } from '@material-ui/core'
 import CustomTextField from 'src/@core/components/mui/text-field'
@@ -32,7 +33,6 @@ import axios from 'axios'
 import toast from 'react-hot-toast'
 import * as XLSX from 'xlsx'
 import Checkbox from '@mui/material/Checkbox'
-import CustomDialog from '../../face_management/CustomDialog/CustomDialog'
 import Link from 'next/link'
 
 const Car_management = () => {
@@ -114,7 +114,7 @@ const Car_management = () => {
 
   const handleDeleteSelected = () => {
     showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
+      text: 'Do you want to delete it?'
     }).then(({ value }) => {
       if (value) {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -132,14 +132,14 @@ const Car_management = () => {
           axios
             .delete(urlDelete, config)
             .then(() => {
-              setDialogTitle('Xóa biển số thành công')
+              setDialogTitle('Deleted successfully')
               setIsSuccess(true)
               const updatedData = userData.filter(user => user.id !== idDelete)
               setUserData(updatedData)
             })
             .catch(err => {
-              setDialogTitle('xóa không thành công')
-              setDialogMessage(err.message || 'xóa không thành công')
+              setDialogTitle('Delete failed')
+              setDialogMessage(err.message || 'Delete failed')
               setIsSuccess(false)
             })
             .finally(() => {
@@ -179,15 +179,15 @@ const Car_management = () => {
       }))
 
       const exportData = [
-        ['Mã ảnh', 'Biển số xe', 'Lần cuối xuất hiện'],
+        ['Image code', 'License plate', 'Last seen'],
         ...data.map(item => [item.mainImageId, item.name, item.time])
       ]
 
       const ws = XLSX.utils.aoa_to_sheet(exportData)
       const wb = XLSX.utils.book_new()
-      XLSX.utils.book_append_sheet(wb, ws, 'Danh biển số')
+      XLSX.utils.book_append_sheet(wb, ws, 'license plate list')
 
-      const fileName = 'Danh sách biển số.xlsx'
+      const fileName = 'license_plate_list.xlsx'
       XLSX.writeFile(wb, fileName)
     } catch (error) {
       console.error('Error exporting to Excel:', error)
@@ -199,15 +199,15 @@ const Car_management = () => {
 
   function showAlertConfirm(options, intl) {
     const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Accept',
       imageWidth: 213,
       showCancelButton: true,
       showCloseButton: true,
       showConfirmButton: true,
       focusCancel: true,
       reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
-      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Agree',
+      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Cancel',
       customClass: {
         content: 'content-class',
         confirmButton: 'swal-btn-confirm',
@@ -217,7 +217,7 @@ const Car_management = () => {
       didOpen: () => {
         const confirmButton = Swal.getConfirmButton()
         if (confirmButton) {
-          confirmButton.style.backgroundColor = '#ff9f43'
+          confirmButton.style.backgroundColor = '#002060'
         }
       }
     }
@@ -268,7 +268,7 @@ const Car_management = () => {
 
   const handleDelete = idDelete => {
     showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
+      text: 'Do you want to delete it?'
     }).then(({ value }) => {
       if (value) {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -286,13 +286,13 @@ const Car_management = () => {
           .delete(urlDelete, config)
           .then(() => {
             Swal.fire({
-              title: 'Thành công!',
-              text: 'Xóa dữ liệu thành công',
+              title: 'Successfully!',
+              text: 'Deleted successfully',
               icon: 'success',
               willOpen: () => {
                 const confirmButton = Swal.getConfirmButton()
                 if (confirmButton) {
-                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.backgroundColor = '#002060'
                   confirmButton.style.color = 'white'
                 }
               }
@@ -308,7 +308,7 @@ const Car_management = () => {
               willOpen: () => {
                 const confirmButton = Swal.getConfirmButton()
                 if (confirmButton) {
-                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.backgroundColor = '#002060'
                   confirmButton.style.color = 'white'
                 }
               }
@@ -330,6 +330,10 @@ const Car_management = () => {
     return url
   }
 
+  const handlePageChange = newPage => {
+    setPage(newPage)
+  }
+
   const Img = React.memo(props => {
     const [loaded, setLoaded] = useState(false)
 
@@ -342,12 +346,12 @@ const Car_management = () => {
             loaded
               ? { display: 'none' }
               : {
-                  width: '100px',
-                  height: '100px',
-                  display: 'grid',
-                  backgroundColor: '#C4C4C4',
-                  placeItems: 'center'
-                }
+                width: '100px',
+                height: '100px',
+                display: 'grid',
+                backgroundColor: '#C4C4C4',
+                placeItems: 'center'
+              }
           }
         >
           <CircularProgress size={20} />
@@ -355,7 +359,7 @@ const Car_management = () => {
         <img
           {...props}
           src={src}
-          alt='Ảnh'
+          alt='Image'
           onLoad={() => setLoaded(true)}
           style={loaded ? { width: '100px', height: '100px' } : { display: 'none' }}
         />
@@ -368,170 +372,168 @@ const Car_management = () => {
       {loading ? (
         <div>Loading...</div>
       ) : (
-        <Grid container spacing={6.5}>
-          <Grid item xs={12}>
-            <Grid style={{ marginBottom: '1%' }}>
-              <Button variant='contained'> Danh sách biển số</Button>
-            </Grid>
-            <Card>
-              <CardHeader
-                titleTypographyProps={{ sx: { mb: [2, 0] } }}
-                action={
-                  <Grid container spacing={2}>
-                    <Grid item>
-                      <Box sx={{ float: 'right' }}>
-                        <Button
-                          aria-label='Xóa'
-                          style={{
-                            background: '#a9a9a9',
-                            color: '#ffffff',
-                            marginRight: '5px'
-                          }}
-                          disabled={isDeleteDisabled}
-                          onClick={handleDeleteSelected}
-                        >
-                          <Icon icon='tabler:trash' />
-                        </Button>
-                        <Button
-                          aria-label='export file'
-                          style={{
-                            background: '#a9a9a9',
-                            color: '#ffffff',
-                            marginRight: '5px'
-                          }}
-                          onClick={exportToExcel}
-                        >
-                          <Icon icon='tabler:file-export' />
-                        </Button>
-                        <Button variant='contained' component={Link} href={`/pages/car_management/detail/add`}>
-                          <Icon icon='tabler:plus' />
-                          Thêm mới
-                        </Button>
-                      </Box>
-                    </Grid>
-                    <Grid item>
-                      <CustomTextField
-                        value={value}
-                        onChange={e => handleFilter(e.target.value)}
-                        placeholder='Search…'
-                        InputProps={{
-                          startAdornment: (
-                            <Box sx={{ mr: 2, display: 'flex' }}>
-                              <Icon fontSize='1.25rem' icon='tabler:search' />
-                            </Box>
-                          ),
-                          endAdornment: (
-                            <IconButton size='small' title='Clear' aria-label='Clear'>
-                              <Icon fontSize='1.25rem' icon='tabler:x' />
-                            </IconButton>
-                          )
-                        }}
-                        sx={{
-                          width: {
-                            xs: 1,
-                            sm: 'auto'
-                          },
-                          '& .MuiInputBase-root > svg': {
-                            mr: 2
-                          }
-                        }}
-                      />
-                    </Grid>
-                  </Grid>
-                }
-                sx={{
-                  py: 4,
-                  flexDirection: ['column', 'row'],
-                  '& .MuiCardHeader-action': { m: 0 },
-                  alignItems: ['flex-start', 'center']
-                }}
-              />
-              <Grid item xs={12}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>
-                        <Checkbox onChange={handleSelectAllChange} checked={selectAll} />
-                      </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>Ảnh xe</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>Biển số xe</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>Loại xe</TableCell>
-
-                      <TableCell sx={{ padding: '16px' }}>Lần cuối xuất hiện</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>Trạng thái</TableCell>
-
-                      <TableCell sx={{ padding: '16px' }}>Chi tiết</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>Xóa</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {Array.isArray(userData) && userData.length > 0 ? (
-                      userData.map((user, index) => (
-                        <TableRow key={user.id}>
-                          <TableCell>
-                            <Checkbox
-                              onChange={event => handleCheckboxChange(event, user.id)}
-                              checked={selectedIds.includes(user.id)}
+        <Card>
+          <CardHeader
+            title='List of license plates'
+            titleTypographyProps={{ sx: { mb: [2, 0] } }}
+            action={
+              <Grid container spacing={2}>
+                <Grid item>
+                  <Box sx={{ float: 'right' }}>
+                    <Button
+                      aria-label='Delete'
+                      style={{
+                        background: '#a9a9a9',
+                        color: '#ffffff',
+                        marginRight: '5px'
+                      }}
+                      disabled={isDeleteDisabled}
+                      onClick={handleDeleteSelected}
+                    >
+                      <Icon icon='tabler:trash' />
+                    </Button>
+                    <Button
+                      aria-label='export file'
+                      style={{
+                        background: '#a9a9a9',
+                        color: '#ffffff',
+                        marginRight: '5px'
+                      }}
+                      onClick={exportToExcel}
+                    >
+                      <Icon icon='tabler:file-export' />
+                    </Button>
+                    <Button variant='contained' component={Link} href={`/pages/car_management/detail/add`}>
+                      <Icon icon='tabler:plus' />
+                      Add new
+                    </Button>
+                  </Box>
+                </Grid>
+                <Grid item>
+                  <CustomTextField
+                    value={value}
+                    onChange={e => handleFilter(e.target.value)}
+                    placeholder='Search…'
+                    InputProps={{
+                      startAdornment: (
+                        <Box sx={{ mr: 2, display: 'flex' }}>
+                          <Icon fontSize='1.25rem' icon='tabler:search' />
+                        </Box>
+                      ),
+                      endAdornment: (
+                        <IconButton size='small' title='Clear' aria-label='Clear'>
+                          <Icon fontSize='1.25rem' icon='tabler:x' />
+                        </IconButton>
+                      )
+                    }}
+                    sx={{
+                      width: {
+                        xs: 1,
+                        sm: 'auto'
+                      },
+                      '& .MuiInputBase-root > svg': {
+                        mr: 2
+                      }
+                    }}
+                  />
+                </Grid>
+              </Grid>
+            }
+            sx={{
+              py: 4,
+              flexDirection: ['column', 'row'],
+              '& .MuiCardHeader-action': { m: 0 },
+              alignItems: ['flex-start', 'center']
+            }}
+          />
+          <CardContent>
+            <Grid item xs={12}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>
+                      <Checkbox onChange={handleSelectAllChange} checked={selectAll} />
+                    </TableCell>
+                    <TableCell align='center'>NO.</TableCell>
+                    <TableCell align='center'>Vehicle Photo</TableCell>
+                    <TableCell align='center'>License plate number</TableCell>
+                    <TableCell align='center'>Vehicle Type</TableCell>
+                    <TableCell align='center'>Last seen</TableCell>
+                    <TableCell align='center'>Status</TableCell>
+                    <TableCell align='center'>Active</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {Array.isArray(userData) && userData.length > 0 ? (
+                    userData.map((user, index) => (
+                      <TableRow key={user.id}>
+                        <TableCell align='center'>
+                          <Checkbox
+                            onChange={event => handleCheckboxChange(event, user.id)}
+                            checked={selectedIds.includes(user.id)}
+                          />
+                        </TableCell>
+                        <TableCell align='center'>{index + 1}</TableCell>
+                        <TableCell align='center'>
+                          {user && user.mainImageId.length > 0 ? (
+                            <Img
+                              src={buildUrlWithToken(
+                                `https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${user.mainImageId}`
+                              )}
+                              style={{ maxWidth: '91px', height: '56px', minWidth: '56px' }}
                             />
-                          </TableCell>
-                          <TableCell>{index + 1}</TableCell>
-                          <TableCell>
-                            {user && user.mainImageId.length > 0 ? (
-                              <Img
-                                src={buildUrlWithToken(
-                                  `https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${user.mainImageId}`
-                                )}
-                                style={{ maxWidth: '91px', height: '56px', minWidth: '56px' }}
-                              />
-                            ) : (
-                              <Img
-                                src={`data:image/svg+xml;utf8,${encodeURIComponent(MaskGroup)}`}
-                                alt='Placeholder Image'
-                              />
-                            )}
-                          </TableCell>
-                          <TableCell>{user.name}</TableCell>
-                          <TableCell>{user.note}</TableCell>
+                          ) : (
+                            <Img
+                              src={`data:image/svg+xml;utf8,${encodeURIComponent(MaskGroup)}`}
+                              alt='Placeholder Image'
+                            />
+                          )}
+                        </TableCell>
+                        <TableCell align='center'>{user.name}</TableCell>
+                        <TableCell align='center'>{user.vehicleType}</TableCell>
 
-                          <TableCell>{user.lastAppearance}</TableCell>
-                          <TableCell>{user.status}</TableCell>
-
-                          <TableCell>
-                            <Button
+                        <TableCell align='center'>{user.lastAppearance}</TableCell>
+                        <TableCell align='center'>
+                          <div>
+                            <CustomChip
+                              rounded
                               size='small'
-                              component={Link}
-                              href={`/pages/car_management/detail/${user.id}`}
-                              sx={{ color: 'blue', right: '10px' }}
-                            >
-                              Xem chi tiết
-                            </Button>
-                          </TableCell>
-                          <TableCell sx={{ padding: '16px' }}>
-                            <Grid container spacing={2}>
-                              <IconButton onClick={() => handleDelete(user.id)}>
-                                <Icon icon='tabler:trash' />
-                              </IconButton>
-                            </Grid>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={7} align='center'>
-                          Không có dữ liệu
+                              skin='light'
+                              sx={{ lineHeight: 1 }}
+                              label={user.status === false ? 'Inactive' : 'Active'}
+                              color={user.status === false ? 'primary' : 'success'}
+                            />
+                          </div>
+                        </TableCell>
+                        <TableCell align='center'>
+                          <IconButton component={Link} href={`/pages/car_management/detail/${user.id}`}>
+                            <Icon icon='tabler:info-circle' />
+                          </IconButton>
+
+                          <IconButton onClick={() => handleDelete(user.id)}>
+                            <Icon icon='tabler:trash' />
+                          </IconButton>
                         </TableCell>
                       </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-                <br></br>
-                <Grid container spacing={2} style={{ padding: 10 }}>
-                  <Grid item xs={3}></Grid>
-                  <Grid item xs={1.5} style={{ padding: 0, marginLeft: '12%' }}>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={7} align='center'>
+                        No data
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+              <br></br>
+              <Grid container spacing={2} style={{ padding: 10 }}>
+                <Grid item xs={3}></Grid>
+
+                <Grid item xs={1} style={{ padding: 0 }}>
+                  <Box>
                     <IconButton onClick={handleOpenMenu}>
                       <Icon icon='tabler:selector' />
-                      <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
+                      <p style={{ fontSize: 15 }}>{pageSize} line/page</p>
                     </IconButton>
                     <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
                       {pageSizeOptions.map(size => (
@@ -540,23 +542,16 @@ const Car_management = () => {
                         </MenuItem>
                       ))}
                     </Menu>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Pagination count={total} color='primary' onChange={(event, page) => handlePageChange(page)} />
-                  </Grid>
+                  </Box>
+                </Grid>
+                <Grid item xs={6}>
+                  <Pagination count={total} page={page} color='primary' onChange={handlePageChange} />
                 </Grid>
               </Grid>
-            </Card>
-          </Grid>
-        </Grid>
+            </Grid>
+          </CardContent>
+        </Card>
       )}
-      <CustomDialog
-        open={dialogOpen}
-        handleClose={handleDialogClose}
-        title={dialogTitle}
-        message={dialogMessage}
-        isSuccess={isSuccess}
-      />
     </>
   )
 }

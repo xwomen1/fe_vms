@@ -192,9 +192,9 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
           }}
         >
           <Typography variant='h6' sx={{ fontWeight: 600, textTransform: 'uppercase' }}>
-            Hiển thị cctv
+            CCTV Display
           </Typography>
-          <Typography sx={{ color: 'text.secondary' }}>Tùy chỉnh hiển thị cctv</Typography>
+          <Typography sx={{ color: 'text.secondary' }}>Customize CCTV Display</Typography>
           <IconButton
             onClick={() => setOpen(false)}
             sx={{
@@ -214,7 +214,7 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
           <CustomizerSpacing sx={{ py: 1 }} className='customizer-body'>
             {/* Skin */}
             <Box sx={{ mb: 5 }}>
-              <Typography>Lưới</Typography>
+              <Typography>Net</Typography>
               <RadioGroup
                 value={sizeScreen}
                 row
@@ -236,7 +236,7 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
           <Divider sx={{ m: '0 !important' }} />
           <CustomizerSpacing sx={{ py: 1 }} className='customizer-body'>
             <Box sx={{ mb: 5 }}>
-              <Typography>Nhóm Camera hiển thị</Typography>
+              <Typography>Displayed Camera Group</Typography>
               <TreeView
                 expanded={expanded}
                 onNodeToggle={handleNodeToggle}
@@ -248,7 +248,7 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
                     return (
                       <StyledTreeItem
                         key={index}
-                        labelText={`(${group.cameras?.length}) ${group.name} `}
+                        labelText={`(${group.cameras?.length > 0 ? group.cameras?.length : 0}) ${group.name} `}
                         nodeId={index + ''}
                         labelIcon='tabler:folder'
                         disabled={group.cameras?.length == 0}
@@ -278,7 +278,7 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
           <Divider sx={{ m: '0 !important' }} />
           <CustomizerSpacing>
             <Box sx={{ mb: 5 }}>
-              <Typography>Trang </Typography>
+              <Typography>Page </Typography>
               <Grid container spacing={2} sx={{ marginTop: '5px' }}>
                 {page1 > 1
                   ? pageList?.slice((page1 - 1) * 9, page1 * 9).map((page, index) => (
@@ -335,8 +335,8 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
                   })
                 }}
               >
-                <FormControlLabel value='vertical' label='Chiều Dọc' control={<Radio />} />
-                <FormControlLabel value='horizontal' label='Chiều ngang' control={<Radio />} />
+                <FormControlLabel value='vertical' label='Vertical' control={<Radio />} />
+                <FormControlLabel value='horizontal' label='Horizontal' control={<Radio />} />
               </RadioGroup>
             </Box>
           </CustomizerSpacing>

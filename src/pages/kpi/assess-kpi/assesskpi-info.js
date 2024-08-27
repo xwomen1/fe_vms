@@ -65,7 +65,7 @@ const EmployeeTable = () => {
           <TableHead>
             <TableRow>
               <TableCell align='center' rowSpan={2} sx={{ border: 1 }}>
-                STT
+                NO.
               </TableCell>
               <TableCell align='center' rowSpan={2} sx={{ border: 1 }}>
                 Mã đăng nhập

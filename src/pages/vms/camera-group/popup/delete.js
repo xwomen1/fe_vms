@@ -27,13 +27,13 @@ const CameraPopup = ({ open, id, onClose, onSuccess }) => {
       .then(() => {
         onClose()
         Swal.fire({
-          title: 'Thành công!',
-          text: 'Xóa Thành công',
+          title: 'Success!',
+          text: 'Deleted successfully',
           icon: 'success',
           willOpen: () => {
             const confirmButton = Swal.getConfirmButton()
             if (confirmButton) {
-              confirmButton.style.backgroundColor = '#FF9F43'
+              confirmButton.style.backgroundColor = '#002060'
               confirmButton.style.color = 'white'
             }
           }
@@ -48,7 +48,7 @@ const CameraPopup = ({ open, id, onClose, onSuccess }) => {
           willOpen: () => {
             const confirmButton = Swal.getConfirmButton()
             if (confirmButton) {
-              confirmButton.style.backgroundColor = '#FF9F43'
+              confirmButton.style.backgroundColor = '#002060'
               confirmButton.style.color = 'white'
             }
           }
@@ -58,8 +58,8 @@ const CameraPopup = ({ open, id, onClose, onSuccess }) => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogTitle style={{ fontSize: '24px', fontWeight: 'bold' }}>Xác nhận</DialogTitle>
-      <DialogContent>Bạn có chắc chắn muốn xóa ?</DialogContent>
+      <DialogTitle style={{ fontSize: '24px', fontWeight: 'bold' }}>Accept</DialogTitle>
+      <DialogContent>Do you want to delete it?</DialogContent>
       <DialogActions style={{ display: 'flex' }}>
         <Button onClick={onClose}>Cancel</Button>
         <Button onClick={handleDelete}>OK</Button>

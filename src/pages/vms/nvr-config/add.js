@@ -4,6 +4,7 @@ import Menu from '@mui/material/Menu'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
 import TreeView from '@mui/lab/TreeView'
+import CustomChip from 'src/@core/components/mui/chip'
 import TreeItem from '@mui/lab/TreeItem'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -13,7 +14,7 @@ import authConfig from 'src/configs/auth'
 import Table from '@mui/material/Table'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
-import { Autocomplete, Button, CircularProgress, IconButton, Paper, Box } from '@mui/material'
+import { Autocomplete, Button, CircularProgress, IconButton, Paper, Box, CardHeader, CardContent } from '@mui/material'
 import Swal from 'sweetalert2'
 import { fetchData } from 'src/store/apps/user'
 import { useRouter } from 'next/router'
@@ -41,7 +42,7 @@ import Edit from './popups/Edit'
 import toast from 'react-hot-toast'
 import AddDevice from './popups/AddDevice'
 
-const UserList = ({ apiData, assettypeStatus }) => {
+const UserList = ({ apiData }) => {
   const [value, setValue] = useState('')
   const [selectedIds, setSelectedIds] = useState([])
   const [idNVR, setId] = useState([])
@@ -98,6 +99,60 @@ const UserList = ({ apiData, assettypeStatus }) => {
   const [selectedAuto, setSelectedAuto] = useState('')
   const [isOpenAddDevice, setIsOpenAddDevice] = useState(false)
 
+  const defaultNvrID = '0eb23593-a9b1-4278-9fb1-4d18f30ed6ff'
+  const [assettypeStatus, setAssetTypeStatus] = useState([])
+
+  useEffect(() => {
+    const ws = new WebSocket(`wss://sbs.basesystem.one/ivis/vms/api/v0/websocket/topic/nvrStatus/${defaultNvrID}`)
+
+    ws.onmessage = event => {
+      const { dataType, data } = JSON.parse(event.data)
+      if (dataType === 'nvrStatus') {
+        const cameraStatusUpdates = JSON.parse(data)
+        updateNVRStatus(cameraStatusUpdates)
+      }
+    }
+
+    return () => {
+      ws.close()
+    }
+  }, [])
+
+  const updateNVRStatus = useCallback(NVRStatusUpdates => {
+    const NVRStatusMap = new Map(
+      NVRStatusUpdates?.map(status => [status.id, { status: status.statusValue.name, ip: status.ip }])
+    )
+
+    setAssetTypeStatus(prevStatus => {
+      const newStatus = [...prevStatus]
+      NVRStatusMap.forEach((value, key) => {
+        const index = newStatus.findIndex(item => item.id === key)
+        if (index !== -1) {
+          newStatus[index] = { ...newStatus[index], ...value }
+        } else {
+          newStatus.push({ id: key, ...value })
+        }
+      })
+
+      return newStatus
+    })
+  }, [])
+
+  useEffect(() => {
+    if (assettypeStatus.length) {
+      setAssetType(prevAssettype => {
+        return prevAssettype.map(asset => {
+          const statusUpdate = assettypeStatus.find(status => status.id === asset.id)
+          if (statusUpdate) {
+            return { ...asset, status: { name: statusUpdate.status } }
+          }
+
+          return asset
+        })
+      })
+    }
+  }, [assettypeStatus])
+
   const handlePageChange = newPage => {
     setPage(newPage)
   }
@@ -132,7 +187,7 @@ const UserList = ({ apiData, assettypeStatus }) => {
 
       setResponse(response.data)
       setLoading(false)
-      setPopupMessage('Quét thành công')
+      setPopupMessage('Scan successfully')
       setIsError(false) // Không phải lỗi
     } catch (error) {
       if (
@@ -140,7 +195,7 @@ const UserList = ({ apiData, assettypeStatus }) => {
         error.response.data &&
         error.response.data.message === 'No response from the server device, timeout: scan_device_ip'
       ) {
-        setPopupMessage('Thiết bị chưa phản hồi')
+        setPopupMessage('Device not responding')
       } else {
         setPopupMessage(`${error.response.data.message}`)
       }
@@ -155,12 +210,12 @@ const UserList = ({ apiData, assettypeStatus }) => {
     if (!selectedTitle) {
       Swal.fire({
         title: 'Error',
-        text: 'Hãy chọn loại giao thức',
+        text: 'Please select protocol type',
         icon: 'error',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -196,9 +251,9 @@ const UserList = ({ apiData, assettypeStatus }) => {
       setResponse(response.data)
       setLoading(false)
 
-      toast.success('Thành công')
+      toast.success('Successfully')
 
-      setPopupMessage('Quét thành công')
+      setPopupMessage('Scan successfully')
       setIsError(false) // Không phải lỗi
     } catch (error) {
       if (
@@ -206,7 +261,7 @@ const UserList = ({ apiData, assettypeStatus }) => {
         error.response.data &&
         error.response.data.message === 'No response from the server device, timeout: scan_device'
       ) {
-        setPopupMessage('Thiết bị chưa phản hồi')
+        setPopupMessage('Device not responding')
       } else {
         setPopupMessage(`${error.response.data.message}`)
       }
@@ -253,9 +308,9 @@ const UserList = ({ apiData, assettypeStatus }) => {
       setResponse(response.data)
       setLoading(false)
 
-      toast.success('Thành công')
+      toast.success('Successfully')
 
-      setPopupMessage('Quét thành công')
+      setPopupMessage('Scan successfully')
       setIsError(false) // Không phải lỗi
     } catch (error) {
       if (
@@ -263,7 +318,7 @@ const UserList = ({ apiData, assettypeStatus }) => {
         error.response.data &&
         error.response.data.message === 'No response from the server device, timeout: scan_device_ip'
       ) {
-        setPopupMessage('Thiết bị chưa phản hồi')
+        setPopupMessage('Device not responding')
       } else {
         setPopupMessage(`${error.response.data.message}`)
       }
@@ -302,7 +357,6 @@ const UserList = ({ apiData, assettypeStatus }) => {
 
   const handleAddPClick = selectedNvrId => {
     setOpenPopupP(true)
-    setIdBox(cameraId)
     setSelectedNvrId(selectedNvrId)
   }
 
@@ -359,20 +413,20 @@ const UserList = ({ apiData, assettypeStatus }) => {
   }
   function showAlertConfirm(options, intl) {
     const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Accept',
       imageWidth: 213,
       showCancelButton: true,
       showCloseButton: true,
       showConfirmButton: true,
       focusCancel: true,
       reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
-      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Agree',
+      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Cancel',
       customClass: {
         content: 'content-class',
         confirmButton: 'swal-btn-confirm'
       },
-      confirmButtonColor: '#FF9F43'
+      confirmButtonColor: '#002060'
     }
 
     return Swal.fire({ ...defaultProps, ...options })
@@ -400,7 +454,7 @@ const UserList = ({ apiData, assettypeStatus }) => {
 
   const handleDelete = idDelete => {
     showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
+      text: 'Do you want to delete it?'
     }).then(({ value }) => {
       if (value) {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -418,13 +472,13 @@ const UserList = ({ apiData, assettypeStatus }) => {
           .delete(urlDelete, config)
           .then(() => {
             Swal.fire({
-              title: 'Thành công!',
-              text: 'Xóa thành công',
+              title: 'Successfully!',
+              text: 'Deleted successfully',
               icon: 'success',
               willOpen: () => {
                 const confirmButton = Swal.getConfirmButton()
                 if (confirmButton) {
-                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.backgroundColor = '#002060'
                   confirmButton.style.color = 'white'
                 }
               }
@@ -441,7 +495,7 @@ const UserList = ({ apiData, assettypeStatus }) => {
               willOpen: () => {
                 const confirmButton = Swal.getConfirmButton()
                 if (confirmButton) {
-                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.backgroundColor = '#002060'
                   confirmButton.style.color = 'white'
                 }
               }
@@ -590,30 +644,81 @@ const UserList = ({ apiData, assettypeStatus }) => {
     setLoading(false)
   }
 
-  useEffect(() => {
-    if (assettypeStatus.length) {
-      setAssetType(assettypeStatus)
+  const fetchDataReload = async id => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.get(
+        `https://sbs.basesystem.one/ivis/vms/api/v0/device/nvr/synchronize?nvr_id=${id}`,
+        config
+      )
+      Swal.fire({
+        title: 'Synchronize successfully!',
+        text: response?.message,
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
+    } catch (error) {
+      console.error('Error fetching users:', error)
+      Swal.fire({
+        title: 'Error!',
+        text: error.response?.data?.message,
+        icon: 'error',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
     }
-  }, [assettypeStatus])
+  }
+
+  const handleReloadClick = id => {
+    fetchDataReload(id)
+  }
 
   return (
     <Grid container spacing={6.5}>
       <Grid item xs={12}>
         <Card>
-          <Grid container spacing={0} style={{ marginTop: '1%' }}>
-            <Grid container spacing={0}>
+          <CardHeader
+            title='NVR List'
+            titleTypographyProps={{ sx: { mb: [2, 0] } }}
+            sx={{
+              py: 4,
+              flexDirection: ['column', 'row'],
+              '& .MuiCardHeader-action': { m: 0 },
+              alignItems: ['flex-start', 'center']
+            }}
+          />
+          <CardContent>
+            <Grid container spacing={4}>
               <Grid item xs={8}>
                 <div>
                   <RadioGroup value={selectedValue} onChange={handleRadioChange} style={{ marginLeft: 50 }}>
                     <Grid container spacing={2}>
                       <Grid item>
-                        <FormControlLabel value='dungIp' control={<Radio />} label='Dùng IP' />
+                        <FormControlLabel value='dungIp' control={<Radio />} label='Use IP' />
                       </Grid>
                       <Grid item>
-                        <FormControlLabel value='daiIp' control={<Radio />} label='Dải IP' />
+                        <FormControlLabel value='daiIp' control={<Radio />} label='IP Range' />
                       </Grid>
                       <Grid item>
-                        <FormControlLabel value='LoaiGT' control={<Radio />} label='Loại giao thức' />
+                        <FormControlLabel value='LoaiGT' control={<Radio />} label='Protocol Type' />
                       </Grid>
                       <Grid item xs={3}>
                         <Autocomplete
@@ -621,9 +726,19 @@ const UserList = ({ apiData, assettypeStatus }) => {
                           options={protocol}
                           id='autocomplete-custom'
                           getOptionLabel={option => option.name || ''}
-                          renderInput={params => <CustomTextField placeholder='Khác' {...params} />}
+                          renderInput={params => (
+                            <CustomTextField
+                              placeholder='Other'
+                              {...params}
+                              InputProps={{
+                                ...params.InputProps,
+                                style: { cursor: protocolSelected ? 'pointer' : 'not-allowed' }
+                              }}
+                            />
+                          )}
                           onChange={handleDDNSChangeTitle}
                           disabled={!protocolSelected}
+                          style={{ pointerEvents: protocolSelected ? 'auto' : 'none' }}
                         />
                       </Grid>
                     </Grid>
@@ -690,7 +805,7 @@ const UserList = ({ apiData, assettypeStatus }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                        // loading={loading}
+                      // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.1}></Grid>
@@ -698,20 +813,20 @@ const UserList = ({ apiData, assettypeStatus }) => {
                       <CustomTextField
                         value={url}
                         onChange={e => setUrl(e.target.value)}
-                        label='Địa chỉ IP'
+                        label='IP Address'
                         fullWidth
                       />
                     </Grid>
                     <Grid item xs={0.1}></Grid>
                     <Grid item xs={2.4}>
-                      <CustomTextField value={host} onChange={e => setHost(e.target.value)} label='Cổng' fullWidth />
+                      <CustomTextField value={host} onChange={e => setHost(e.target.value)} label='Connection Port' fullWidth />
                     </Grid>
                     <Grid item xs={0.1}></Grid>
                     <Grid item xs={2.4}>
                       <CustomTextField
                         value={userName}
                         onChange={e => setUsername(e.target.value)}
-                        label='Đăng nhập'
+                        label='User Name'
                         fullWidth
                       />
                     </Grid>
@@ -720,7 +835,7 @@ const UserList = ({ apiData, assettypeStatus }) => {
                       <CustomTextField
                         value={passWord}
                         onChange={e => setPassWord(e.target.value)}
-                        label='Mật khẩu'
+                        label='Password'
                         type='password'
                         fullWidth
                       />
@@ -728,7 +843,7 @@ const UserList = ({ apiData, assettypeStatus }) => {
                     <Grid item xs={2} style={{ marginTop: '1%' }}>
                       <Button style={{ marginLeft: '5%' }}>Cancel</Button>
                       <Button style={{ marginLeft: '5%' }} onClick={handleScan} variant='contained'>
-                        Quét
+                        Scan
                       </Button>
                     </Grid>
                     <Grid item xs={0.1} style={{ marginTop: '1%' }}>
@@ -773,7 +888,7 @@ const UserList = ({ apiData, assettypeStatus }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                        // loading={loading}
+                      // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.4}></Grid>
@@ -781,7 +896,7 @@ const UserList = ({ apiData, assettypeStatus }) => {
                       <CustomTextField
                         value={startURL}
                         onChange={e => setStartUrl(e.target.value)}
-                        label='Địa chỉ IP bắt đầu'
+                        label='Start IP Address'
                         fullWidth
                       />
                     </Grid>
@@ -794,7 +909,7 @@ const UserList = ({ apiData, assettypeStatus }) => {
                       <CustomTextField
                         value={endURL}
                         onChange={e => setEndUrl(e.target.value)}
-                        label='Địa chỉ IP kết thúc'
+                        label='End IP Address'
                         fullWidth
                       />
                     </Grid>
@@ -804,7 +919,7 @@ const UserList = ({ apiData, assettypeStatus }) => {
                       <CustomTextField
                         value={startHost}
                         onChange={e => setStartHost(e.target.value)}
-                        label='Cổng bắt đầu'
+                        label='Start Port'
                         fullWidth
                       />
                     </Grid>
@@ -817,7 +932,7 @@ const UserList = ({ apiData, assettypeStatus }) => {
                       <CustomTextField
                         value={endHost}
                         onChange={e => setEndHost(e.target.value)}
-                        label='Cổng kết thúc'
+                        label='End Port'
                         fullWidth
                       />
                     </Grid>
@@ -825,7 +940,7 @@ const UserList = ({ apiData, assettypeStatus }) => {
                       <CustomTextField
                         value={userName}
                         onChange={e => setUsername(e.target.value)}
-                        label='Đăng nhập'
+                        label='User Name'
                         fullWidth
                       />
                     </Grid>
@@ -835,7 +950,7 @@ const UserList = ({ apiData, assettypeStatus }) => {
                       <CustomTextField
                         value={passWord}
                         onChange={e => setPassWord(e.target.value)}
-                        label='Mật khẩu'
+                        label='Password'
                         type='password'
                         fullWidth
                       />
@@ -845,7 +960,7 @@ const UserList = ({ apiData, assettypeStatus }) => {
                     <Grid item xs={4} style={{ marginTop: '1%' }}>
                       <Button>Cancel</Button>
                       <Button onClick={handleScanDaiIP} variant='contained'>
-                        Quét
+                        Scan
                       </Button>
                     </Grid>
                     <Grid item xs={0.1} style={{ marginTop: '1%', marginLeft: '-20%' }}>
@@ -888,7 +1003,7 @@ const UserList = ({ apiData, assettypeStatus }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                        // loading={loading}
+                      // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.1}></Grid>
@@ -897,7 +1012,7 @@ const UserList = ({ apiData, assettypeStatus }) => {
                       <CustomTextField
                         value={userName}
                         onChange={e => setUsername(e.target.value)}
-                        label='Đăng nhập'
+                        label='User Name'
                         fullWidth
                       />
                     </Grid>
@@ -906,7 +1021,7 @@ const UserList = ({ apiData, assettypeStatus }) => {
                       <CustomTextField
                         value={passWord}
                         onChange={e => setPassWord(e.target.value)}
-                        label='Mật khẩu'
+                        label='Password'
                         type='password'
                         fullWidth
                       />
@@ -916,7 +1031,7 @@ const UserList = ({ apiData, assettypeStatus }) => {
                     <Grid item xs={4} style={{ marginTop: '1%' }}>
                       <Button>Cancel</Button>
                       <Button variant='contained' onClick={handleScanLGT}>
-                        Quét
+                        Scan
                       </Button>
                     </Grid>
                   </Grid>
@@ -945,54 +1060,46 @@ const UserList = ({ apiData, assettypeStatus }) => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Tên thiết bị</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Loại</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Địa chỉ IP</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Địa chỉ Mac</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Vị trí</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Trạng thái</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
+                    <TableCell align='center'>NO.</TableCell>
+                    <TableCell align='center'>Device Name</TableCell>
+                    <TableCell align='center'>Device Type</TableCell>
+                    <TableCell align='center'>IP Address</TableCell>
+                    <TableCell align='center'>Mac Address</TableCell>
+                    <TableCell align='center'>Location</TableCell>
+                    <TableCell align='center'>Status</TableCell>
+                    <TableCell align='center'>Active</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {assettype.map((assetType, index) => (
                     <TableRow key={assetType.id}>
-                      <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.name}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.type.name}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.ipAddress}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.macAddress}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.location}</TableCell>
-                      <TableCell sx={{ padding: '16px', textAlign: 'center' }}>
+                      <TableCell align='center'>{(page - 1) * pageSize + index + 1} </TableCell>
+                      <TableCell align='center'>{assetType.name}</TableCell>
+                      <TableCell align='center'>{assetType.type.name}</TableCell>
+                      <TableCell align='center'>{assetType.ipAddress}</TableCell>
+                      <TableCell align='center'>{assetType.macAddress}</TableCell>
+                      <TableCell align='center'>{assetType.location}</TableCell>
+                      <TableCell align='center'>
                         {assetType.status && assetType.status.name ? (
-                          <div
-                            style={{
-                              backgroundColor:
-                                assetType.status.name === 'connected'
-                                  ? 'lightgreen'
-                                  : assetType.status.name === 'disconnected'
-                                  ? '#FF9F43'
-                                  : 'orange',
-                              borderRadius: '10px',
-                              padding: '5px 10px',
-                              width: '70%',
-                              display: 'inline-block',
-                              color: 'white'
-                            }}
-                          >
-                            {assetType.status.name === 'connected'
-                              ? 'Đã kết nối'
-                              : assetType.status.name === 'disconnected'
-                              ? 'Mất kết nối'
-                              : assetType.status.name}
+                          <div>
+                            <CustomChip
+                              rounded
+                              size='small'
+                              skin='light'
+                              sx={{ lineHeight: 1 }}
+                              label={assetType.status.name === 'disconnected' ? 'Lost connection' : 'Connected'}
+                              color={assetType.status.name === 'disconnected' ? 'primary' : 'success'}
+                            />
                           </div>
                         ) : (
                           assetType.status.name
                         )}
                       </TableCell>
 
-                      <TableCell sx={{ padding: '16px' }}>
+                      <TableCell align='center'>
+                        <IconButton onClick={() => handleReloadClick(assetType.id)}>
+                          <Icon icon='tabler:reload' />
+                        </IconButton>
                         <IconButton size='small' onClick={() => handleAddPClick(assetType.id)}>
                           <Icon icon='tabler:edit' />
                         </IconButton>
@@ -1018,25 +1125,28 @@ const UserList = ({ apiData, assettypeStatus }) => {
               <br></br>
               <Grid container spacing={2} style={{ padding: 10 }}>
                 <Grid item xs={3}></Grid>
-                <Grid item xs={1.5} style={{ padding: 0 }}>
-                  <IconButton onClick={handleOpenMenu}>
-                    <Icon icon='tabler:selector' />
-                    <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
-                  </IconButton>
-                  <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
-                    {pageSizeOptions.map(size => (
-                      <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
-                        {size}
-                      </MenuItem>
-                    ))}
-                  </Menu>
+
+                <Grid item xs={1} style={{ padding: 0 }}>
+                  <Box>
+                    <IconButton onClick={handleOpenMenu}>
+                      <Icon icon='tabler:selector' />
+                      <p style={{ fontSize: 15 }}>{pageSize} line/page</p>
+                    </IconButton>
+                    <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+                      {pageSizeOptions.map(size => (
+                        <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
+                          {size}
+                        </MenuItem>
+                      ))}
+                    </Menu>
+                  </Box>
                 </Grid>
                 <Grid item xs={6}>
-                  <Pagination count={total} color='primary' onChange={(event, page) => handlePageChange(page)} />
+                  <Pagination count={total} page={page} color='primary' onChange={handlePageChange} />
                 </Grid>
               </Grid>
             </Grid>
-          </Grid>
+          </CardContent>
         </Card>
         {openPopupNetwork && (
           <>

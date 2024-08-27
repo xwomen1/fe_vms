@@ -36,7 +36,7 @@ import { fetchData } from 'src/store/apps/permissions'
 const colors = {
   support: 'info',
   users: 'success',
-  manager: 'warning',
+  manager: 'info',
   administrator: 'primary',
   'restricted-user': 'error'
 }

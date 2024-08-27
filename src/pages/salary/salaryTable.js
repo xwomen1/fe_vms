@@ -28,7 +28,7 @@ import SalaryRulePage from '../salaryRule/salaryRule'
 import toast from 'react-hot-toast'
 import httpStatusMessages from 'src/message'
 
-const UserList = ({ apiData }) => {
+const SalaryTable = ({ apiData }) => {
   const [value, setValue] = useState('')
   const [valueGroup, setValueGroup] = useState('')
   const [editRow, setEditRow] = useState(null) // New state for edit mode
@@ -74,18 +74,15 @@ const UserList = ({ apiData }) => {
   const handleChange = (field, value) => {
     setEditData({
       ...editData,
-      salary: {
-        ...editData.salary,
-        ...editData.salaryLevel,
+      salary: parseFloat(editData.salary) || 0,
+      salaryLevel: parseFloat(editData.salaryLevel) || 0,
+      responsibilityAllowance: parseFloat(editData.responsibilityAllowance) || 0,
+      lunchAllowance: parseFloat(editData.lunchAllowance) || 0,
+      carAllowance: parseFloat(editData.carAllowance) || 0,
+      phoneAllowance: parseFloat(editData.phoneAllowance) || 0,
+      brandAllowance: parseFloat(editData.brandAllowance) || 0,
 
-        ...editData.responsibilityAllowance,
-        ...editData.lunchAllowance,
-        ...editData.carAllowance,
-        ...editData.phoneAllowance,
-        ...editData.brandAllowance,
-
-        [field]: value
-      }
+      [field]: parseFloat(value) || 0
     })
   }
 
@@ -108,7 +105,7 @@ const UserList = ({ apiData }) => {
       const statusMessage = getHttpStatusMessage(response.status)
       setHttpMessage(statusMessage)
 
-      toast.success('Sửa thành công')
+      toast.success('Update Successful')
 
       // Refresh user data
     } catch (error) {
@@ -146,14 +143,14 @@ const UserList = ({ apiData }) => {
   }, [])
   function showAlertConfirm(options, intl) {
     const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Accept',
       imageWidth: 213,
       showCancelButton: true,
       showCloseButton: true,
       showConfirmButton: true,
       focusCancel: true,
       reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Agree',
       cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
       customClass: {
         content: 'content-class',
@@ -319,7 +316,7 @@ const UserList = ({ apiData }) => {
         axios
           .delete(urlDelete, config)
           .then(() => {
-            Swal.fire('Xóa thành công', '', 'success')
+            Swal.fire('Deleted successfully', '', 'success')
             const updatedData = userData.filter(user => user.userId !== idDelete)
             setUserData(updatedData)
             fetchData()
@@ -402,16 +399,16 @@ const UserList = ({ apiData }) => {
       <Card>
         <TableHeader value={value} handleFilter={handleFilter} toggle={toggleSalaryRule} />
 
-        <Grid container spacing={2}>
+        <Grid container spacing={3}>
           {/* <Grid item xs={0.1}></Grid> */}
-          <Grid item xs={0.2}></Grid>
+          <Grid item xs={0.1}></Grid>
 
-          <Grid item xs={1.5} component={Paper}>
+          <Grid item xs={2} component={Paper}>
             <div>
               <CustomTextField
                 value={valueGroup}
                 sx={{ mr: 4 }}
-                placeholder='Search Group'
+                placeholder='Search Department'
                 onChange={e => handleFilterGroup(e.target.value)}
               />
               <TreeView
@@ -423,29 +420,28 @@ const UserList = ({ apiData }) => {
               </TreeView>
             </div>
           </Grid>
-          <Grid item xs={10.3}>
+          <Grid item xs={9.7}>
             <Paper elevation={3}>
               <TableContainer component={Paper} style={{ maxWidth: '100%', overflowX: 'auto' }}>
                 <Table stickyHeader aria-label='sticky table'>
                   {' '}
                   <TableHead>
                     <TableRow>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>STT</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Mã định danh</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>No.</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Access Code</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Full Name</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Đơn vị</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Lương cơ bản</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Bậc lương</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phụ cấp trách nhiệm</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phụ cấp ăn trưa</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phụ cấp xăng xe</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phụ cấp điện thoại</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phụ cấp khác</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>KPCĐ</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Department</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Base Salary</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Salary Grade</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Responsibility Allowance</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Lunch Allowance</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Car Allowance</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Phone Allowance</TableCell>
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Other Allowances</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>BHXH</TableCell>
                       <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>BHYT</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>BHTN</TableCell>
-                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Hành động</TableCell>{' '}
+                      {/* <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>BHTN</TableCell> */}
+                      <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>Actions</TableCell>{' '}
                       {/* Add this line */}
                     </TableRow>
                   </TableHead>
@@ -460,11 +456,11 @@ const UserList = ({ apiData }) => {
                         <TableCell sx={{ whiteSpace: 'nowrap' }}>
                           {editRow === user.userId ? (
                             <CustomTextField
-                              value={editData.salary?.salaryLevel}
+                              value={editData?.salaryLevel}
                               onChange={e => handleChange('salaryLevel', e.target.value)}
                             />
                           ) : (
-                            user?.salary?.salaryLevel || '0'
+                            user?.salaryLevel || '0'
                           )}
                         </TableCell>
 
@@ -475,7 +471,7 @@ const UserList = ({ apiData }) => {
                               onChange={e => handleChange('responsibilityAllowance', e.target.value)}
                             />
                           ) : (
-                            user?.salary?.responsibilityAllowance || '0'
+                            user?.responsibilityAllowance || '0'
                           )}
                         </TableCell>
                         <TableCell sx={{ whiteSpace: 'nowrap' }}>
@@ -485,7 +481,7 @@ const UserList = ({ apiData }) => {
                               onChange={e => handleChange('lunchAllowance', e.target.value)}
                             />
                           ) : (
-                            user?.salary?.lunchAllowance || '0'
+                            user?.lunchAllowance || '0'
                           )}
                         </TableCell>
                         <TableCell sx={{ whiteSpace: 'nowrap' }}>
@@ -495,7 +491,7 @@ const UserList = ({ apiData }) => {
                               onChange={e => handleChange('carAllowance', e.target.value)}
                             />
                           ) : (
-                            user?.salary?.carAllowance || '0'
+                            user?.carAllowance || '0'
                           )}
                         </TableCell>
                         <TableCell sx={{ whiteSpace: 'nowrap' }}>
@@ -505,7 +501,7 @@ const UserList = ({ apiData }) => {
                               onChange={e => handleChange('phoneAllowance', e.target.value)}
                             />
                           ) : (
-                            user?.salary?.phoneAllowance || '0'
+                            user?.phoneAllowance || '0'
                           )}
                         </TableCell>
                         <TableCell sx={{ whiteSpace: 'nowrap' }}>
@@ -515,13 +511,13 @@ const UserList = ({ apiData }) => {
                               onChange={e => handleChange('brandAllowance', e.target.value)}
                             />
                           ) : (
-                            user?.salary?.brandAllowance || '0'
+                            user?.brandAllowance || '0'
                           )}
                         </TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{user.salary?.salary * KPCD || '0'}</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{user.salary?.salary * BHXH || '0'}</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{user.salary?.salary * BHYT || '0'}</TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{user.salary?.salary * BHTN || '0'}</TableCell>
+                        {/* <TableCell sx={{ whiteSpace: 'nowrap' }}>{salary * KPCD || '0'}</TableCell> */}
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{salary * BHXH || '0'}</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{salary * BHYT || '0'}</TableCell>
+                        {/* <TableCell sx={{ whiteSpace: 'nowrap' }}>{salary * BHTN || '0'}</TableCell> */}
                         <TableCell sx={{ whiteSpace: 'nowrap' }}>
                           {editRow === user.userId ? (
                             <IconButton onClick={() => handleSave(user.userId)}>
@@ -546,7 +542,7 @@ const UserList = ({ apiData }) => {
               <Grid item xs={1.5} style={{ padding: 0 }}>
                 <IconButton onClick={handleOpenMenu}>
                   <Icon icon='tabler:selector' />
-                  <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
+                  <p style={{ fontSize: 15 }}>{pageSize} line/page</p>
                 </IconButton>
                 <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
                   {pageSizeOptions.map(size => (
@@ -567,15 +563,4 @@ const UserList = ({ apiData }) => {
   )
 }
 
-export const getStaticProps = async () => {
-  const res = await axios.get('/cards/statistics')
-  const apiData = res.data
-
-  return {
-    props: {
-      apiData
-    }
-  }
-}
-
-export default UserList
+export default SalaryTable

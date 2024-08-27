@@ -54,63 +54,63 @@ const EmployeeTable = () => {
           <TableHead>
             <TableRow>
               <TableCell align='center' rowSpan={2} sx={{ border: 1 }}>
-                STT
+                NO.
               </TableCell>
               <TableCell align='center' rowSpan={2} sx={{ border: 1 }}>
-                Mã đăng nhập
+                Code
               </TableCell>
               <TableCell align='center' rowSpan={2} sx={{ border: 1 }}>
-                Tên nhân viên
+                Name
               </TableCell>
               <TableCell align='center' rowSpan={2} sx={{ border: 1 }}>
-                Vị trí
+                Location
               </TableCell>
               <TableCell align='center' rowSpan={2} sx={{ border: 1 }}>
-                Điểm KPI
+                KPI Score
               </TableCell>
               <TableCell align='center' rowSpan={2} sx={{ border: 1 }}>
-                Quy đổi
+                Convert
               </TableCell>
               <TableCell align='center' colSpan={2} sx={{ border: 1 }}>
-                Tổng số email gửi cho khách hàng trong tháng (Email)
+                Total number of emails sent to customers in the month (Email)
               </TableCell>
               <TableCell align='center' colSpan={2} sx={{ border: 1 }}>
-                Tổng số lần gặp mặt khách hàng trong tháng (Lượt)
+                Total number of customer meetings per month (Views){' '}
               </TableCell>
               <TableCell align='center' colSpan={2} sx={{ border: 1 }}>
-                Tổng số cơ hội khách hàng mới chuyển đổi thành khách hàng tiềm năng trong tháng (Cơ hội)
+                Total new customer opportunities converted to leads in the month (Opportunities){' '}
               </TableCell>
               <TableCell align='center' colSpan={2} sx={{ border: 1 }}>
-                Tổng số hợp đồng đã ký trong tháng (Hợp đồng)
+                Total number of contracts signed in the month (Contracts){' '}
               </TableCell>
               <TableCell align='center' colSpan={2} sx={{ border: 1 }}>
-                Hành động{' '}
+                Action{' '}
               </TableCell>
             </TableRow>
             <TableRow>
               <TableCell align='center' sx={{ border: 1 }}>
-                Độ quan trọng (%)
+                Importance (%)
               </TableCell>
               <TableCell align='center' sx={{ border: 1 }}>
-                Chỉ tiêu giao
+                Target
               </TableCell>
               <TableCell align='center' sx={{ border: 1 }}>
-                Độ quan trọng (%)
+                Importance (%)
               </TableCell>
               <TableCell align='center' sx={{ border: 1 }}>
-                Chỉ tiêu giao
+                Target
               </TableCell>{' '}
               <TableCell align='center' sx={{ border: 1 }}>
-                Độ quan trọng (%)
+                Importance (%)
               </TableCell>
               <TableCell align='center' sx={{ border: 1 }}>
-                Chỉ tiêu giao
+                Target
               </TableCell>
               <TableCell align='center' sx={{ border: 1 }}>
-                Độ quan trọng (%)
+                Importance (%)
               </TableCell>
               <TableCell align='center' sx={{ border: 1 }}>
-                Chỉ tiêu giao
+                Target
               </TableCell>
               <TableCell align='center' sx={{ border: 1 }}></TableCell>
             </TableRow>

@@ -322,10 +322,10 @@ const OrganizationalStructure = () => {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>STT</TableCell>
-                      <TableCell>Tên</TableCell>
-                      <TableCell>Mã</TableCell>
-                      <TableCell>Thao tác</TableCell>
+                      <TableCell>NO.</TableCell>
+                      <TableCell>Name</TableCell>
+                      <TableCell>Code</TableCell>
+                      <TableCell>Action</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>

@@ -16,7 +16,7 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 import { IconButton, Typography, Box } from '@mui/material'
 import Edit from '../detail/popup/editGroup'
 
-const UserList = ({ apiData }) => {
+const GroupSynchronization = ({ apiData }) => {
   const [valueGroup, setValueGroup] = useState('')
   const [valueGroupIn, setValueGroupIn] = useState('')
 
@@ -41,14 +41,14 @@ const UserList = ({ apiData }) => {
 
   function showAlertConfirm(options, intl) {
     const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Accept',
       imageWidth: 213,
       showCancelButton: true,
       showCloseButton: true,
       showConfirmButton: true,
       focusCancel: true,
       reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Yes',
       cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
       customClass: {
         content: 'content-class',
@@ -61,7 +61,7 @@ const UserList = ({ apiData }) => {
 
   const handleDelete = idDelete => {
     showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
+      text: 'Do you agree to delete it?'
     }).then(({ value }) => {
       if (value) {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -78,7 +78,7 @@ const UserList = ({ apiData }) => {
         axios
           .delete(urlDelete, config)
           .then(() => {
-            Swal.fire('Xóa thành công', '', 'success')
+            Swal.fire('Deleted successfully', '', 'success')
             fetchGroupData()
           })
           .catch(err => {
@@ -295,7 +295,7 @@ const UserList = ({ apiData }) => {
 
   const handleDeleteInf = id => {
     showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
+      text: 'Do you agree to delete it?'
     }).then(({ value }) => {
       if (value) {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -312,7 +312,7 @@ const UserList = ({ apiData }) => {
         axios
           .delete(urlDelete, config)
           .then(() => {
-            Swal.fire('Xóa thành công', '', 'success')
+            Swal.fire('Deleted successfully', '', 'success')
             fetchGroupDataIn()
           })
           .catch(err => {
@@ -365,11 +365,11 @@ const UserList = ({ apiData }) => {
 
           <Grid item xs={3} component={Paper}>
             <div>
-              <h2>Nhóm người dùng</h2>
+              <h2>User Department</h2>
               <CustomTextField
                 value={valueGroup}
                 sx={{ mr: 4 }}
-                placeholder='Tìm kiếm Phòng ban'
+                placeholder='Search'
                 onChange={e => handleFilterGroup(e.target.value)}
               />
               <TreeView
@@ -384,12 +384,12 @@ const UserList = ({ apiData }) => {
           <Grid item xs={1}></Grid>
           <Grid item xs={3} component={Paper}>
             <div>
-              <h2>Nhóm cơ cấu tổ chức</h2>
+              <h2>Organizational Structure Department</h2>
 
               <CustomTextField
                 value={valueGroupIn}
                 sx={{ mr: 4 }}
-                placeholder='Tìm kiếm cơ cấu tổ chức'
+                placeholder='Search'
                 onChange={e => handleFilterGroupIn(e.target.value)}
               />
               <TreeView
@@ -429,4 +429,4 @@ export const getStaticProps = async () => {
   }
 }
 
-export default UserList
+export default GroupSynchronization

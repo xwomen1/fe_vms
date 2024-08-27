@@ -49,7 +49,7 @@ const columns = [
     maxWidth: 50,
     align: 'center',
     field: 'imageObject',
-    label: 'Hình ảnh',
+    label: 'Image',
     renderCell: value => (
       <Box sx={{ display: 'flex', justifyContent: 'center' }}>
         <img src={value} alt='' style={{ maxWidth: '60%', height: 'auto', objectFit: 'contain' }} />
@@ -62,19 +62,19 @@ const columns = [
     type: 'timestamp',
     maxWidth: 70,
     align: 'center',
-    label: 'Ngày giờ',
+    label: 'Date',
     field: 'timestamp',
     valueGetter: params => new Date(params.field)
   },
   {
     id: 2,
     flex: 0.15,
-    type: 'eventTypeString',
+    type: 'result',
     maxWidth: 70,
     align: 'center',
     field: 'event',
-    label: 'Sự kiện',
-    field: 'eventTypeString'
+    label: 'Result',
+    field: 'result'
   },
   {
     id: 3,
@@ -248,7 +248,7 @@ const EventMap = () => {
     const { longitude: lon1, latitude: lat1 } = point1
     const { longitude: lon2, latitude: lat2 } = point2
 
-    // Nếu cả hai điểm đều có tọa độ, thì nối chúng trên bản đồ
+    // Nếu cả hai điểm đều có tọa độ, thì nối chúng trên Map
     if (lon1 && lat1 && lon2 && lat2) {
       drawLineOnMap(point1, point2)
     }
@@ -270,7 +270,7 @@ const EventMap = () => {
   }
 
   const drawLineOnMap = (point1, point2) => {
-    // Tạo một đường thẳng trên bản đồ từ point1 đến point2
+    // Tạo một đường thẳng trên Map từ point1 đến point2
     const newConnection = {
       type: 'Feature',
       geometry: {
@@ -325,15 +325,15 @@ const EventMap = () => {
       const sortedRows = rows.sort((a, b) => a.timestamp - b.timestamp)
 
       const newSelectedPoints = sortedRows
-        .filter(row => row.LongtitudeOfCam && row.LatitudeOfCam) // Lọc ra các điểm có tọa độ
+        .filter(row => row.longtitudeOfCam && row.latitudeOfCam) // Lọc ra các điểm có tọa độ
         .map(row => ({
-          longitude: row.LongtitudeOfCam,
-          latitude: row.LatitudeOfCam,
+          longitude: row.longtitudeOfCam,
+          latitude: row.latitudeOfCam,
           timestamp: row.timestamp
         }))
       setSelectedPoints(newSelectedPoints)
 
-      // Gọi hàm handleTimeSelect với các điểm mới được chọn
+      // Gọi hàm handleTimeSelect với các điểm mới được Select
     } else {
       setSelectedCameraIds([])
       setSelectedPoints([])
@@ -341,24 +341,24 @@ const EventMap = () => {
     }
   }
 
-  const handleCameraSelect = (event, cameraId, LongitudeOfCam, LatitudeOfCam, timestamp) => {
-    if (event.target.checked && LongitudeOfCam && LatitudeOfCam) {
+  const handleCameraSelect = (event, cameraId, longitudeOfCam, latitudeOfCam, timestamp) => {
+    if (event.target.checked && longitudeOfCam && latitudeOfCam) {
       // Kiểm tra xem điểm đã tồn tại chưa trước khi thêm mới
       const pointExists = selectedPoints.some(
-        point => point.longitude === LongitudeOfCam && point.latitude === LatitudeOfCam && point.timestamp === timestamp
+        point => point.longitude === longitudeOfCam && point.latitude === latitudeOfCam && point.timestamp === timestamp
       )
 
       if (!pointExists) {
         setSelectedCameraIds(prevIds => [...prevIds, cameraId])
         setSelectedPoints(prevPoints => [
           ...prevPoints,
-          { longitude: LongitudeOfCam, latitude: LatitudeOfCam, timestamp }
+          { longitude: longitudeOfCam, latitude: latitudeOfCam, timestamp }
         ])
       }
     } else {
       setSelectedCameraIds(prevIds => prevIds.filter(id => id !== cameraId))
       setSelectedPoints(prevPoints =>
-        prevPoints.filter(point => point.longitude !== LongitudeOfCam || point.latitude !== LatitudeOfCam)
+        prevPoints.filter(point => point.longitude !== longitudeOfCam || point.latitude !== latitudeOfCam)
       )
       setSelectedTimes(prevTimes => prevTimes.filter(time => time.time !== timestamp))
     }
@@ -367,7 +367,7 @@ const EventMap = () => {
   const handleExport = async () => {
     const excelData = rows.reduce((acc, row) => {
       acc.push({
-        'Ngày giờ': row.time,
+        Date: row.time,
         'Sự kiện': row.event,
         Camera: row.camera
       })
@@ -479,7 +479,7 @@ const EventMap = () => {
 
   const calculateCenter = () => {
     if (selectedPoints.length === 0) {
-      // Trả về giá trị mặc định nếu không có điểm nào được chọn
+      // Trả về giá trị mặc định nếu không có điểm nào được Select
       return {
         latitude: 21.027763,
         longitude: 105.83416,
@@ -487,11 +487,11 @@ const EventMap = () => {
       }
     }
 
-    // Tính tổng tất cả các vị trí
+    // Tính tổng tất cả các Location
     const totalLatitude = selectedPoints.reduce((acc, point) => acc + parseFloat(point.latitude), 0)
     const totalLongitude = selectedPoints.reduce((acc, point) => acc + parseFloat(point.longitude), 0)
 
-    // Tính trung bình vị trí của các điểm được chọn
+    // Tính trung bình Location của các điểm được Select
     const averageLatitude = totalLatitude / selectedPoints.length
     const averageLongitude = totalLongitude / selectedPoints.length
 
@@ -553,7 +553,7 @@ const EventMap = () => {
                   <Checkbox
                     checked={isItemSelected}
                     onChange={event =>
-                      handleCameraSelect(event, row.id, row.LongtitudeOfCam, row.LatitudeOfCam, row.timestamp)
+                      handleCameraSelect(event, row.id, row.longtitudeOfCam, row.latitudeOfCam, row.timestamp)
                     }
                     inputProps={{ 'aria-labelledby': labelId }}
                   />
@@ -586,7 +586,7 @@ const EventMap = () => {
         <Grid item xs={12}>
           <Card>
             <CardHeader
-              title='Bản đồ'
+              title='Map'
               sx={{
                 py: 4,
                 flexDirection: ['column', 'row'],
@@ -599,7 +599,7 @@ const EventMap = () => {
                     <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
                       <CustomTextField
                         value={keyword}
-                        placeholder='Tìm đối tượng'
+                        placeholder='Find Object'
                         InputProps={{
                           startAdornment: (
                             <Box sx={{ mr: 2, display: 'flex' }}>
@@ -628,7 +628,7 @@ const EventMap = () => {
                   <Grid item>
                     <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
                       <Button variant='outlined' onClick={handleSearch}>
-                        Tìm kiếm
+                        Search
                       </Button>
                     </Box>
                   </Grid>
@@ -639,8 +639,8 @@ const EventMap = () => {
                           selected={startTime}
                           id='basic-input'
                           onChange={date => setStartTime(date)}
-                          placeholderText='Chọn ngày bắt đầu'
-                          customInput={<CustomInput label='Ngày bắt đầu' />}
+                          placeholderText='Select Start date'
+                          customInput={<CustomInput label='Start date' />}
                         />
                       </div>
                     </DatePickerWrapper>
@@ -652,8 +652,8 @@ const EventMap = () => {
                           selected={endTime}
                           id='basic-input'
                           onChange={date => setEndTime(date)}
-                          placeholderText='Chọn ngày kết thúc'
-                          customInput={<CustomInput label='Ngày kết thúc' />}
+                          placeholderText='Select End date'
+                          customInput={<CustomInput label='End date' />}
                         />
                       </div>
                     </DatePickerWrapper>
@@ -676,7 +676,7 @@ const EventMap = () => {
                 <Grid container spacing={2}>
                   <Grid item xs={5}>
                     <Button variant='contained' onClick={handleDeleteList}>
-                      Xóa danh sách
+                      Delete
                     </Button>
                   </Grid>
                   <Grid item xs={5}>
@@ -688,7 +688,7 @@ const EventMap = () => {
                         setSelectedPoints([])
                       }}
                     >
-                      Đóng bảng
+                      Close
                     </Button>
                   </Grid>
                 </Grid>

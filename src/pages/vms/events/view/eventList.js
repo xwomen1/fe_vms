@@ -35,7 +35,7 @@ const initValueFilter = {
   page: 1
 }
 
-const EventList = ({ eventData }) => {
+const EventList = ({ }) => {
   const [keyword, setKeyword] = useState('')
   const [valueFilter, setValueFilter] = useState(initValueFilter)
   const [loading, setLoading] = useState(false)
@@ -45,7 +45,7 @@ const EventList = ({ eventData }) => {
   const [isOpenEdit, setIsOpenEdit] = useState(false)
   const [eventDetail, setEventDetail] = useState(null)
   const [idDelete, setIdDelete] = useState(null)
-  const [deviceList, setDeviceList] = useState(null)
+  const [deviceList, setDeviceList] = useState([])
   const [reload, setReload] = useState(0)
   const [count, setCount] = useState('')
   const [total, setTotalPage] = useState(0)
@@ -53,8 +53,99 @@ const EventList = ({ eventData }) => {
   const [pageSize, setPageSize] = useState(25)
   const pageSizeOptions = [25, 50, 100]
   const [anchorEl, setAnchorEl] = useState(null)
-
+  const [rtcPeerConnection, setRtcPeerConnection] = useState(null)
+  const [websocket, setWebsocket] = useState(null)
+  const [eventData, setEventData] = useState(null)
+  const defaultCameraID = '0eb23593-a9b1-4278-9fb1-4d18f30ed6ff'
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+  const config = {
+    bundlePolicy: 'max-bundle',
+    iceServers: [
+      {
+        urls: 'stun:dev-ivis-camera-api.basesystem.one:3478'
+      },
+      {
+        urls: 'turn:dev-ivis-camera-api.basesystem.one:3478',
+        username: 'demo',
+        credential: 'demo'
+      }
+    ]
+  }
+
+  useEffect(() => {
+    // create WebSocket connection
+
+    const ws = new WebSocket(
+      `wss://sbs.basesystem.one/ivis/vms/api/v0/websocket/topic/list_ai_event/be571c00-41cf-4878-a1de-b782625da62a`
+    )
+
+    setWebsocket(ws)
+
+    // create RTCPeerConnection
+
+    const pc = new RTCPeerConnection(config)
+    setRtcPeerConnection(pc)
+
+    // listen for remote tracks and add them to remote stream
+
+    pc.ontrack = event => {
+      const stream = event.streams[0]
+      if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {
+        setRemoteStream(stream)
+        remoteVideoRef.current.srcObject = stream
+      }
+    }
+
+    // close WebSocket and RTCPeerConnection on component unmount
+
+    return () => {
+      if (websocket) {
+        websocket.close()
+      }
+      if (rtcPeerConnection) {
+        rtcPeerConnection.close()
+      }
+    }
+  }, [])
+
+  const handleMessage = async event => {
+    const message = JSON.parse(event.data)
+    const newMessage = JSON.parse(message?.data)
+    setEventData(newMessage)
+  }
+
+  useEffect(() => {
+    if (websocket) {
+      websocket.addEventListener('open', () => {
+        websocket.send(
+          JSON.stringify({
+            id: defaultCameraID,
+            type: 'request'
+          })
+        )
+      })
+      websocket.addEventListener('message', handleMessage)
+
+      websocket.addEventListener('error', error => {
+        console.error('WebSocket error:', error)
+      })
+
+      websocket.addEventListener('close', handleClose)
+    }
+  }, [websocket])
+
+  const handleClose = async event => {
+    if (websocket) {
+      websocket.close()
+    }
+  }
+
+  useEffect(() => {
+    if (rtcPeerConnection) {
+      rtcPeerConnection.addEventListener('connectionstatechange', () => { })
+    }
+  }, [rtcPeerConnection])
 
   const config1 = {
     headers: {
@@ -63,10 +154,10 @@ const EventList = ({ eventData }) => {
   }
 
   const eventTypeColors = {
-    'Phát hiện sự kiện AI': 'success',
-    'Phát hiện đối tượng nguy hiểm': 'error',
+    'Phát hiện Event AI': 'success',
+    'Phát hiện Object nguy hiểm': 'error',
     'Phát hiện hành vi bất thường': 'warning',
-    'Phát hiện đối tượng danh sách đen': 'secondary'
+    'Phát hiện Object danh sách đen': 'secondary'
   }
 
   useEffect(() => {
@@ -102,7 +193,7 @@ const EventList = ({ eventData }) => {
     const params = {
       ...config1,
       params: {
-        camName: keyword || '',
+        keyword: keyword || '',
         limit: pageSize,
         page: parseInt(page),
         location: valueFilter?.location || '',
@@ -114,7 +205,7 @@ const EventList = ({ eventData }) => {
     setLoading(true)
     try {
       const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/routine`, params)
-      setDeviceList(res.data)
+      setDeviceList(res?.data)
       setCount(res.count)
       setTotalPage(Math.ceil(res.count / pageSize))
     } catch (error) {
@@ -175,9 +266,9 @@ const EventList = ({ eventData }) => {
       >
         <Box sx={{ mb: 4, textAlign: 'center' }}>
           <Typography variant='h3' sx={{ mb: 3 }}>
-            Xác nhận
+            Accept
           </Typography>
-          <Typography sx={{ color: 'text.secondary' }}>Bạn có chắc chắn muốn xóa không ?</Typography>
+          <Typography sx={{ color: 'text.secondary' }}>Do you want to delete it?</Typography>
         </Box>
       </DialogContent>
       <DialogActions
@@ -194,10 +285,10 @@ const EventList = ({ eventData }) => {
             setIsOpenDel(false)
           }}
         >
-          Đồng ý
+          Accept
         </Button>
         <Button variant='tonal' color='secondary' sx={{ mr: 1 }} onClick={() => setIsOpenDel(false)}>
-          Hủy
+          Cancel
         </Button>
       </DialogActions>
     </Dialog>
@@ -214,15 +305,15 @@ const EventList = ({ eventData }) => {
       }
 
       axios
-        .delete(`https://sbs.basesystem.one/ivis/vms/api/v0/ai-events/${idDelete}`, config)
+        .delete(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/${idDelete}`, config)
         .then(() => {
-          toast.success('Xóa thành công')
+          toast.success('Deleted successfully')
           setIdDelete(null)
           setReload(reload + 1)
         })
         .catch(error => {
           console.error('Error fetching data:', error)
-          toast.error(error.response.data)
+          toast.error(error?.response?.data || '')
         })
         .finally(() => {
           setLoading(false)
@@ -234,7 +325,7 @@ const EventList = ({ eventData }) => {
     <>
       <Card>
         <CardHeader
-          title='Danh sách sự kiện AI'
+          title='Event list'
           titleTypographyProps={{ sx: { mb: [2, 0] } }}
           sx={{
             py: 4,
@@ -247,7 +338,7 @@ const EventList = ({ eventData }) => {
               <Grid item>
                 <Box sx={{ float: 'right' }}>
                   <IconButton
-                    aria-label='Bộ lọc'
+                    aria-label='Filter'
                     onClick={() => {
                       setIsOpenFilter(true)
                     }}
@@ -260,7 +351,7 @@ const EventList = ({ eventData }) => {
               <Grid item>
                 <CustomTextField
                   value={keyword}
-                  placeholder='Tìm kiếm sự kiện '
+                  placeholder='Search '
                   InputProps={{
                     startAdornment: (
                       <Box sx={{ mr: 2, display: 'flex' }}>
@@ -329,9 +420,8 @@ const EventList = ({ eventData }) => {
                         />
                       </Box>
                       <Typography sx={{ marginTop: '10px' }}>
-                        {item?.timestamp ? new Date(item?.timestamp).toLocaleString() : 'Thời gian'}
+                        {item?.timestamp ? new Date(item?.timestamp).toLocaleString() : 'Date'}
                       </Typography>
-                      <Typography sx={{ marginTop: '10px' }}>{item?.location ? item?.location : 'Vị trí'}</Typography>
                       <Typography
                         sx={{
                           marginTop: '10px',
@@ -341,8 +431,10 @@ const EventList = ({ eventData }) => {
                           textOverflow: 'ellipsis'
                         }}
                       >
-                        {item?.description ? item?.description : 'Tên đối tượng'}
+                        {item?.result}
                       </Typography>
+                      <Typography sx={{ marginTop: '10px' }}>{item?.location ? item?.location : 'Location'}</Typography>
+
                       <IconButton
                         size='small'
                         sx={{ color: 'text.secondary' }}
@@ -380,14 +472,13 @@ const EventList = ({ eventData }) => {
         </CardContent>
         <Grid container spacing={2} style={{ padding: 10 }}>
           <Grid item xs={3}></Grid>
-          <Grid item xs={1}>
-            <span style={{ fontSize: 15 }}> dòng/trang</span>
-          </Grid>
+
           <Grid item xs={1} style={{ padding: 0 }}>
             <Box>
-              <Button onClick={handleOpenMenu} endIcon={<Icon icon='tabler:selector' />}>
-                {pageSize}
-              </Button>
+              <IconButton onClick={handleOpenMenu}>
+                <Icon icon='tabler:selector' />
+                <p style={{ fontSize: 15 }}>{pageSize} line/page</p>
+              </IconButton>
               <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
                 {pageSizeOptions.map(size => (
                   <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>

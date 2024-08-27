@@ -99,14 +99,14 @@ const UserDetails = () => {
 
   function showAlertConfirm(options, intl) {
     const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Accept',
       imageWidth: 213,
       showCancelButton: true,
       showCloseButton: true,
       showConfirmButton: true,
       focusCancel: true,
       reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Yes',
       cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
       customClass: {
         content: 'content-class',
@@ -341,7 +341,7 @@ const UserDetails = () => {
 
   const handleDeleteRowPolicy = (piId, policyId) => {
     showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
+      text: 'Do you agree to delete it?'
     }).then(({ value }) => {
       if (value) {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -363,7 +363,7 @@ const UserDetails = () => {
         axios
           .delete(urlDelete, config)
           .then(() => {
-            Swal.fire('Xóa thành công', '', 'success')
+            Swal.fire('Deleted successfully', '', 'success')
             fetchUserData()
           })
           .catch(err => {
@@ -375,7 +375,7 @@ const UserDetails = () => {
 
   const handleDeleteRow = (userId, groupId) => {
     showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
+      text: 'Do you agree to delete it?'
     }).then(({ value }) => {
       if (value) {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -393,7 +393,7 @@ const UserDetails = () => {
         axios
           .delete(urlDelete, config)
           .then(() => {
-            Swal.fire('Xóa thành công', '', 'success')
+            Swal.fire('Deleted successfully', '', 'success')
 
             // Tùy chỉnh việc cập nhật dữ liệu sau khi xóa
             fetchUserData()
@@ -500,29 +500,29 @@ const UserDetails = () => {
           <Grid container spacing={3}>
             <Grid style={{ borderRadius: '0.05%', marginLeft: 10 }}>
               <Grid container spacing={2}>
-                <h3 style={{ color: 'black', marginLeft: '1%' }}> Thông tin người dùng</h3>
+                <h3 style={{ color: 'black', marginLeft: '1%' }}> Information</h3>
               </Grid>
               <Grid container spacing={2}>
                 <div style={{ width: '80%' }}></div>
                 {editing ? (
                   <>
                     <Button variant='contained' onClick={saveChanges} sx={{ marginRight: '10px' }}>
-                      Lưu
+                      Save
                     </Button>
                     <Button variant='contained' onClick={handleCancel}>
-                      Huỷ
+                      Cancel
                     </Button>
                   </>
                 ) : (
                   <Button variant='contained' onClick={toggleEdit}>
-                    Chỉnh sửa
+                    Edit
                   </Button>
                 )}
               </Grid>
               <Grid container spacing={2}>
                 <Grid item xs={4}>
                   <CustomTextField
-                    label='Tên'
+                    label='Name'
                     value={fullNameValue}
                     InputProps={{ readOnly: readOnly }}
                     onChange={handleFullNameChange}
@@ -543,7 +543,7 @@ const UserDetails = () => {
                   {' '}
                   {/* Sửa đổi xs={4} thành xs={8} */}
                   <CustomTextField
-                    label='Số điện thoại'
+                    label='Phone Number'
                     value={phoneNumber}
                     onChange={handlePhoneNumberChange}
                     InputProps={{ readOnly: readOnly }}
@@ -552,7 +552,7 @@ const UserDetails = () => {
                 </Grid>
                 <Grid item xs={4}>
                   <CustomTextField
-                    label='Số giấy tờ'
+                    label='Identify number'
                     value={identityNumber}
                     onChange={handleIdentityNumberChange}
                     InputProps={{ readOnly: readOnly }}
@@ -561,7 +561,7 @@ const UserDetails = () => {
                 </Grid>
                 <Grid item xs={4}>
                   <CustomTextField
-                    label='Mã người dùng'
+                    label='Code'
                     defaultValue={userCode}
                     onChange={handleUserCodeChange}
                     InputProps={{ readOnly: readOnly }}
@@ -570,7 +570,7 @@ const UserDetails = () => {
                 </Grid>
                 <Grid item xs={3.8}>
                   <CustomTextField
-                    label='Mã đồng bộ'
+                    label='Synchronize code'
                     defaultValue={syncCode}
                     onChange={handleSyncCodeChange}
                     InputProps={{ readOnly: readOnly }}
@@ -579,18 +579,18 @@ const UserDetails = () => {
                 </Grid>
 
                 <Grid item xs={2} style={{ marginTop: '1.1%' }}>
-                  Trạng thái
+                  Status
                   <Switch
                     checked={status1 === 'ACTIVE'}
                     onChange={handleStatusChange}
                     color='primary'
-                    label='Trạng thái'
+                    label='Status'
                     disabled={readOnly}
                   />
                 </Grid>
 
                 <Grid item xs={1} style={{ marginTop: '2%' }}>
-                  Ca sáng:
+                  Morning shift:
                 </Grid>
 
                 <Grid item xs={1}>
@@ -632,7 +632,7 @@ const UserDetails = () => {
                   </DatePickerWrapper>
                 </Grid>
                 <Grid item xs={1} style={{ marginTop: '2%' }}>
-                  Ca chiều:
+                  Afternoon shift:
                 </Grid>
                 <Grid item xs={1}>
                   <DatePickerWrapper>
@@ -675,7 +675,7 @@ const UserDetails = () => {
                 {/* <Grid item ={1} style={{ marginTop: '2%' }}></Grid> */}
                 <Grid item xs={3.8}>
                   <FormControl fullWidth>
-                    <InputLabel id='time-validity-label'>Thời gian hiệu lực</InputLabel>
+                    <InputLabel id='time-validity-label'>Validity period</InputLabel>
                     <Select
                       labelId='time-validity-label'
                       id='time-validity-select'
@@ -683,8 +683,8 @@ const UserDetails = () => {
                       disabled={readOnly}
                       onChange={handleTimeValidityChange}
                     >
-                      <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
-                      <MenuItem value='Undefined'>Không xác định</MenuItem>
+                      <MenuItem value='Custom'>Custom</MenuItem>
+                      <MenuItem value='Undefined'>None</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -701,7 +701,7 @@ const UserDetails = () => {
                             timeCaption='Time'
                             dateFormat='MMMM d, yyyy '
                             disabled={readOnly}
-                            customInput={<CustomInput label='Ngày bắt đầu' />}
+                            customInput={<CustomInput label='Start date' />}
                           />
                         </Grid>
                       )}
@@ -715,7 +715,7 @@ const UserDetails = () => {
                             timeCaption='Time'
                             disabled={readOnly}
                             dateFormat='MMMM d, yyyy '
-                            customInput={<CustomInput label='Ngày kết thúc' />}
+                            customInput={<CustomInput label='End date' />}
                           />
                         </Grid>
                       )}
@@ -726,7 +726,7 @@ const UserDetails = () => {
                   <CustomTextField
                     rows={4}
                     multiline
-                    label='Ghi chú'
+                    label='Note'
                     value={note}
                     onChange={handleNoteChange}
                     id='textarea-outlined-static'
@@ -735,16 +735,16 @@ const UserDetails = () => {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <Typography variant='h5'>Đơn vị</Typography>
+                  <Typography variant='h5'>Group</Typography>
                 </Grid>
                 <Grid item xs={11.8}>
                   <TableContainer>
                     <Table>
                       <TableHead>
                         <TableRow>
-                          <TableCell>Đơn vị</TableCell>
-                          <TableCell>Mã đơn vị</TableCell>
-                          <TableCell align='right'>Là lãnh đạo đơn vị</TableCell>
+                          <TableCell>Group</TableCell>
+                          <TableCell>Group Code</TableCell>
+                          <TableCell align='right'>Is Leader</TableCell>
                           {showPlusColumn && (
                             <TableCell align='center'>
                               <IconButton onClick={handleAddRoleClick} size='small' sx={{ marginLeft: '10px' }}>
@@ -787,11 +787,11 @@ const UserDetails = () => {
               <br></br>
               <Grid container spacing={2}>
                 <Grid item xs={12}>
-                  <Typography variant='h5'>Thông tin tài khoản</Typography>
+                  <Typography variant='h5'>Account Information</Typography>
                 </Grid>
                 <Grid item xs={4}>
                   <CustomTextField
-                    label='Tài khoản'
+                    label='Account'
                     defaultValue={user?.userAccount.username}
                     id='form-props-read-only-input'
                     InputProps={{ readOnly: readOnly }}
@@ -800,7 +800,7 @@ const UserDetails = () => {
                 </Grid>
                 <Grid item xs={4}>
                   <CustomTextField
-                    label='Loại tài khoản'
+                    label='Account Type'
                     defaultValue={user?.userAccount.identityProviderType}
                     id='form-props-read-only-input'
                     InputProps={{ readOnly: readOnly }}
@@ -844,20 +844,20 @@ const UserDetails = () => {
                         disabled={readOnly}
                       />
                     }
-                    label='Trạng thái'
+                    label='Status'
                     labelPlacement='start'
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <Typography variant='h5'>Vai trò</Typography>
+                  <Typography variant='h5'>Role</Typography>
                 </Grid>
                 <Grid item xs={11.8}>
                   <TableContainer>
                     <Table>
                       <TableHead>
                         <TableRow>
-                          <TableCell>Tên vai trò</TableCell>
-                          <TableCell>Mô tả</TableCell>
+                          <TableCell>Name</TableCell>
+                          <TableCell>Description</TableCell>
                           {showPlusColumn && (
                             <TableCell align='center'>
                               <IconButton onClick={handleAddRoleClickPolicy} size='small' sx={{ marginLeft: '10px' }}>

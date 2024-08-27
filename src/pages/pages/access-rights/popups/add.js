@@ -143,6 +143,7 @@ const Add = ({ show, onClose, setReload }) => {
   }
 
   const API_REGIONS = `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/`
+  const API_REGIONS_ID = `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/`
 
   const fetchDepartment = async () => {
     setLoading(true)
@@ -177,53 +178,68 @@ const Add = ({ show, onClose, setReload }) => {
 
   const handleSelectChange = async selectedValue => {
     try {
-      const selectedGroup = groupName.find(group => group.id === selectedValue)
-
-      if (!selectedGroup) {
-        console.error('Selected group not found:', selectedValue)
-
-        return
-      }
-
-      const postData = {
-        id: selectedGroup.id,
-        name: selectedGroup.name,
-        type: 'USER'
-      }
-
-      const response = await axios.post(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups`,
-        postData
-      )
-
-      console.log('POST request successful:', response.data)
+      const res = await axios.get(`${API_REGIONS_ID}/${selectedValue}`, config)
+      const nameGroup = res?.data
+      handleSelectChangeGroup(nameGroup)
     } catch (error) {
-      if (error.response && error.response.status === 400) {
-        try {
-          const selectedGroup = groupName.find(group => group.id === selectedValue)
+      console.error('Error fetching data: ', error)
+    }
+  }
 
-          const params = {
-            params: {
-              keyword: selectedGroup.name
-            }
-          }
+  const handleSelectChangeGroup = async nameGroupUser => {
+    try {
+      let allUserGroups = []
+      let currentPage = 1
+      const limit = 50
 
-          const res = await axios.get(
-            `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups/`,
-            params,
-            config
-          )
-          const userGroups = res.data.rows
-          const matchedGroup = userGroups.find(group => group.name === selectedGroup.name)
-          if (matchedGroup) {
-            setSelectedGroupId(matchedGroup.id)
-          } else {
-            console.error('Matched group not found in user groups:', selectedGroup.name)
-          }
-        } catch (error) {
-          console.error('Error fetching user groups:', error)
+      while (true) {
+        const res = await axios.get(
+          `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups/?page=${currentPage}&limit=${limit}`,
+          config
+        )
+        const userGroups = res?.data?.rows
+
+        if (userGroups.length === 0) {
+          break
         }
+
+        allUserGroups = [...allUserGroups, ...userGroups]
+
+        if (userGroups.length < limit) {
+          break
+        }
+
+        currentPage++
       }
+
+      const normalizedInputName = nameGroupUser.name.trim().toLowerCase()
+      const matchedGroup = allUserGroups.find(group => group.name.trim().toLowerCase() === normalizedInputName)
+      console.log(matchedGroup, 'matchedGroup')
+
+      if (matchedGroup) {
+        setSelectedGroupId(matchedGroup.id)
+      } else if (matchedGroup === undefined) {
+        const selectedGroup = nameGroupUser.id
+        const selectedGroupName = nameGroupUser.name
+
+        if (!selectedGroup) {
+          return
+        }
+
+        const postData = {
+          id: selectedGroup,
+          name: selectedGroupName,
+          type: 'USER'
+        }
+
+        const response = await axios.post(
+          `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups`,
+          postData
+        )
+        setSelectedGroupId(response?.data?.id)
+      }
+    } catch (error) {
+      console.error('Error handling group change:', error)
     }
   }
 
@@ -236,30 +252,51 @@ const Add = ({ show, onClose, setReload }) => {
     setIsCheckboxChecked(event.target.checked)
   }
 
+  const dayOfWeekMapping = {
+    1: 'MONDAY',
+    2: 'TUESDAY',
+    3: 'WEDNESDAY',
+    4: 'THURSDAY',
+    5: 'FRIDAY',
+    6: 'SATURDAY',
+    7: 'SUNDAY'
+  }
+
+  const createDefaultCalendarDays = () => {
+    return Object.keys(dayOfWeekMapping).map(key => ({
+      dayOfWeek: dayOfWeekMapping[key],
+      timePeriods: []
+    }))
+  }
+
   const onSubmit = async values => {
     try {
-      // Kiểm tra và đặt giá trị mặc định cho start và end
       const currentDate = new Date()
       const startDate = start || currentDate
       const endDate = end || currentDate
 
+      const defaultCalendarDays = createDefaultCalendarDays()
+
       if (values.calendarDays && Array.isArray(values.calendarDays)) {
-        const validCalendarDays = values.calendarDays
-          .filter(day => day.dayOfWeek && day.timePeriods && Array.isArray(day.timePeriods))
-          .map(day => {
-            return {
-              dayOfWeek: day.dayOfWeek,
-              timePeriods: day.timePeriods.map(timePeriod => {
-                return {
-                  endTimeInMinute: timePeriod.endTimeInMinute,
-                  startTimeInMinute: timePeriod.startTimeInMinute
-                }
-              })
-            }
-          })
+        const validCalendarDays = defaultCalendarDays.map(defaultDay => {
+          const existingDay = values.calendarDays.find(day => day.dayOfWeek === defaultDay.dayOfWeek)
+
+          return existingDay
+            ? {
+                dayOfWeek: existingDay.dayOfWeek,
+                timePeriods: Array.isArray(existingDay.timePeriods)
+                  ? existingDay.timePeriods.map(timePeriod => ({
+                      endTimeInMinute: timePeriod.endTimeInMinute,
+                      startTimeInMinute: timePeriod.startTimeInMinute
+                    }))
+                  : []
+              }
+            : defaultDay
+        })
+
         values.calendarDays = validCalendarDays
       } else {
-        values.calendarDays = []
+        values.calendarDays = defaultCalendarDays
       }
 
       values['startDate'] = format(startDate, 'yyyy-MM-dd')
@@ -276,8 +313,6 @@ const Add = ({ show, onClose, setReload }) => {
   const handleAdd = async values => {
     setLoading(true)
     try {
-      console.log(values)
-
       const params = {
         ...values,
         groupId: selectedGroupId
@@ -288,7 +323,7 @@ const Add = ({ show, onClose, setReload }) => {
         { ...params },
         config
       )
-      toast.success('Thêm mới thành công')
+      toast.success('Create Successful')
       setReload()
       onClose()
     } catch (err) {
@@ -326,7 +361,7 @@ const Add = ({ show, onClose, setReload }) => {
             </CustomCloseButton>
             <Box sx={{ mb: 8, textAlign: 'left' }}>
               <Typography variant='h3' sx={{ mb: 3 }}>
-                Cấu hình lịch
+                Schedule Configuration
               </Typography>
             </Box>
             <Grid container spacing={3}>
@@ -339,12 +374,12 @@ const Add = ({ show, onClose, setReload }) => {
                     <CustomTextField
                       fullWidth
                       value={value}
-                      label='Tên Lịch'
+                      label='Schedule Name'
                       onChange={onChange}
-                      placeholder='Tên lịch'
+                      placeholder='Schedule Name'
                       error={Boolean(errors.nameCalendar)}
                       aria-describedby='validation-basic-last-name'
-                      {...(errors.nameCalendar && { helperText: 'Trường này bắt buộc' })}
+                      {...(errors.nameCalendar && { helperText: 'This field is required' })}
                     />
                   )}
                 />
@@ -358,18 +393,17 @@ const Add = ({ show, onClose, setReload }) => {
                     <CustomTextField
                       select
                       fullWidth
-                      label='Công ty'
+                      label='Department'
                       value={value}
                       onChange={e => {
                         const selectedValue = e.target.value
-                        console.log(selectedValue)
                         onChange(selectedValue)
                         handleSelectChange(selectedValue)
                       }}
                       id='validation-basic-select'
                       error={Boolean(errors.groupId)}
                       aria-describedby='validation-basic-select'
-                      {...(errors.groupId && { helperText: 'Trường này bắt buộc' })}
+                      {...(errors.groupId && { helperText: 'This field is required' })}
                     >
                       {groupName.map(item => (
                         <MenuItem key={item.id} value={item.id}>
@@ -390,7 +424,7 @@ const Add = ({ show, onClose, setReload }) => {
                       select
                       fullWidth
                       defaultValue=''
-                      label='Cửa vào'
+                      label='Door In'
                       SelectProps={{
                         value: value,
                         onChange: e => {
@@ -401,7 +435,7 @@ const Add = ({ show, onClose, setReload }) => {
                       id='validation-basic-select'
                       error={Boolean(errors.doorInId)}
                       aria-describedby='validation-basic-select'
-                      {...(errors.doorInId && { helperText: 'Trường này bắt buộc' })}
+                      {...(errors.doorInId && { helperText: 'This field is required' })}
                     >
                       {doorList.map(door => (
                         <MenuItem key={door.id} value={door.id}>
@@ -426,7 +460,7 @@ const Add = ({ show, onClose, setReload }) => {
                         select
                         fullWidth
                         defaultValue=''
-                        label='Cửa ra'
+                        label='Door Out'
                         SelectProps={{
                           value: value,
                           onChange: e => onChange(e)
@@ -434,7 +468,7 @@ const Add = ({ show, onClose, setReload }) => {
                         id='validation-basic-select'
                         error={Boolean(errors.doorOutId)}
                         aria-describedby='validation-basic-select'
-                        {...(errors.doorOutId && { helperText: 'Trường này bắt buộc' })}
+                        {...(errors.doorOutId && { helperText: 'This field is required' })}
                       >
                         {filteredDoorList.map(door => (
                           <MenuItem key={door.id} value={door.id}>
@@ -446,41 +480,16 @@ const Add = ({ show, onClose, setReload }) => {
                   }}
                 />
               </Grid>
-              <Grid item xs={3}>
-                <DatePickerWrapper>
-                  <div>
-                    <DatePicker
-                      selected={start}
-                      id='basic-input'
-                      onChange={date => setStart(date)}
-                      placeholderText='Ngày bắt đầu'
-                      customInput={<CustomInput label='Ngày bắt đầu' />}
-                    />
-                  </div>
-                </DatePickerWrapper>
-              </Grid>
-              <Grid item xs={3}>
-                <DatePickerWrapper>
-                  <div>
-                    <DatePicker
-                      selected={end}
-                      id='basic-input'
-                      onChange={date => setEnd(date)}
-                      placeholderText='Ngày kết thúc'
-                      customInput={<CustomInput label='Ngày kết thúc' />}
-                      minDate={start}
-                    />
-                  </div>
-                </DatePickerWrapper>
-              </Grid>
+
               <Grid item xs={2}>
                 <FormControlLabel
                   control={<Checkbox onChange={handleCheckboxChange} />}
-                  label='Luôn luôn'
+                  label='Always'
                   style={{ marginTop: '25px' }}
                 />
               </Grid>
-              <Grid item>Bảng cấu hình thời gian</Grid>
+              <Grid item xs={6}></Grid>
+              <Grid item>Time Settings</Grid>
               <Grid item xs={12}>
                 <Controller
                   name='calendarDays'
@@ -493,10 +502,10 @@ const Add = ({ show, onClose, setReload }) => {
                         setDataDailyState(v)
                       }}
                       dataDailyProps={dataDailyState}
-                      disabled={!isCheckboxChecked} // Truyền giá trị disabled từ checkbox vào Daily
+                      disabled={isCheckboxChecked} // Truyền giá trị disabled từ checkbox vào Daily
                       error={Boolean(errors.calendarDays)}
                       aria-describedby='validation-basic-last-name'
-                      {...(errors.calendarDays && { helperText: 'Trường này bắt buộc' })}
+                      {...(errors.calendarDays && { helperText: 'This field is required' })}
                     />
                   )}
                 />
@@ -518,10 +527,10 @@ const Add = ({ show, onClose, setReload }) => {
               </Box>
             )}
             <Button variant='tonal' color='secondary' onClick={onClose}>
-              Hủy
+              Cancel
             </Button>
             <Button variant='contained' onClick={handleSubmit(onSubmit)}>
-              Thêm
+              Ok
             </Button>
           </DialogActions>
         </Dialog>

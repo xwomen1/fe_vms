@@ -18,6 +18,7 @@ import {
 import authConfig from 'src/configs/auth'
 import { makeStyles } from '@material-ui/core/styles'
 import Icon from 'src/@core/components/icon'
+import CustomChip from 'src/@core/components/mui/chip'
 import Swal from 'sweetalert2'
 import { useRouter } from 'next/router'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -97,11 +98,11 @@ const AddCamera = ({ nvr, onClose }) => {
       .then(() => {
         const updatedData = camera.filter(cam => cam.id !== idDelete)
         setCamera(updatedData)
-        setNotification({ message: 'Xoá thành công', type: 'success' })
+        setNotification({ message: 'Deleted successfully', type: 'success' })
         setLoading(false)
       })
       .catch(err => {
-        setNotification({ message: `Xoá thất bại: ${err.message}`, type: 'error' })
+        setNotification({ message: `Delete failed: ${err.message}`, type: 'error' })
         setLoading(false)
       })
   }
@@ -131,9 +132,9 @@ const AddCamera = ({ nvr, onClose }) => {
         }
       }
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/camera/${nvr}`, params, config)
-      setNotification({ message: 'Thêm thành công', type: 'success' })
+      setNotification({ message: 'Data has been updated successfully', type: 'success' })
     } catch (error) {
-      setNotification({ message: `Thiết bị chưa phản hồi: ${error.message}`, type: 'error' })
+      setNotification({ message: `Device not responding: ${error.message}`, type: 'error' })
       console.error('Error adding member to group:', error)
     } finally {
       setLoading(false)
@@ -149,13 +150,13 @@ const AddCamera = ({ nvr, onClose }) => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                  <TableCell sx={{ padding: '16px' }}>Tên camera</TableCell>
-                  <TableCell sx={{ padding: '16px' }}>Địa chỉ IP</TableCell>
-                  <TableCell sx={{ padding: '16px' }}>Địa chỉ Mac</TableCell>
-                  <TableCell sx={{ padding: '16px' }}>Vị trí</TableCell>
-                  <TableCell sx={{ padding: '16px' }}>Trạng thái</TableCell>
-                  <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
+                  <TableCell sx={{ padding: '16px' }}>NO.</TableCell>
+                  <TableCell sx={{ padding: '16px' }}>Camera Name</TableCell>
+                  <TableCell sx={{ padding: '16px' }}>IP Address</TableCell>
+                  <TableCell sx={{ padding: '16px' }}>Mac Address</TableCell>
+                  <TableCell sx={{ padding: '16px' }}>Location</TableCell>
+                  <TableCell sx={{ padding: '16px' }}>Status</TableCell>
+                  <TableCell sx={{ padding: '16px' }}>Active</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -167,23 +168,23 @@ const AddCamera = ({ nvr, onClose }) => {
                       <TableCell>{camera.ipAddress}</TableCell>
                       <TableCell></TableCell>
                       <TableCell>{camera.location}</TableCell>
-                      <TableCell
-                        sx={{
-                          padding: '16px'
-                        }}
-                      >
-                        <span
-                          style={{
-                            borderRadius: '10px',
-                            padding: '5px 10px',
-                            width: '70%',
-                            display: 'inline-block',
-                            backgroundColor: camera.status === 'connect' ? 'green' : 'orange'
-                          }}
-                        >
-                          {camera.status === 'connect' ? 'Đang hoạt động' : 'Không hoạt động'}
-                        </span>
+                      <TableCell sx={{ padding: '16px', textAlign: 'center' }}>
+                        {camera.status ? (
+                          <div>
+                            <CustomChip
+                              rounded
+                              size='small'
+                              skin='light'
+                              sx={{ lineHeight: 1 }}
+                              label={camera.status === 'disconnected' ? 'Lost connection' : 'Connected'}
+                              color={camera.status === 'disconnected' ? 'primary' : 'success'}
+                            />
+                          </div>
+                        ) : (
+                          camera.status
+                        )}
                       </TableCell>
+
                       <TableCell sx={{ padding: '16px' }}>
                         <IconButton disabled={loading} onClick={() => handleDelete(camera.id)}>
                           <Icon icon='tabler:trash' />
@@ -194,7 +195,7 @@ const AddCamera = ({ nvr, onClose }) => {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={7} align='center'>
-                      Không có dữ liệu
+                      No data
                     </TableCell>
                   </TableRow>
                 )}
@@ -205,7 +206,7 @@ const AddCamera = ({ nvr, onClose }) => {
       </Grid>
 
       {notification.message && (
-        <Box mt={2} textAlign='center' style={{ color: notification.type === 'success' ? '#ff9f43' : 'red' }}>
+        <Box mt={2} textAlign='center' style={{ color: notification.type === 'success' ? '#002060' : 'red' }}>
           {notification.message}
         </Box>
       )}

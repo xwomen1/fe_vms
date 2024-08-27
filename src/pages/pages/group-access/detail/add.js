@@ -200,7 +200,7 @@ const AddGroupAccess = () => {
     <>
       <Card>
         <CardHeader
-          title='Thêm mới quản lý nhóm quyền truy cập'
+          title='Add new'
           titleTypographyProps={{ sx: { mb: [2, 0] } }}
           sx={{
             py: 4,
@@ -213,14 +213,14 @@ const AddGroupAccess = () => {
               <Grid item>
                 <Box sx={{ float: 'right' }}>
                   <Button variant='contained' component={Link} href={`/pages/group-access/list`}>
-                    Hủy
+                    Cancel
                   </Button>
                 </Box>
               </Grid>
               <Grid item>
                 <Box sx={{ float: 'right', marginLeft: '2%' }}>
                   <Button aria-label='Bộ lọc' variant='contained' onClick={AddAccessGroup}>
-                    Lưu
+                    Save
                   </Button>
                 </Box>
               </Grid>
@@ -237,8 +237,8 @@ const AddGroupAccess = () => {
           >
             <Grid item xs={3.8}>
               <CustomTextField
-                label='Tên nhóm quyền truy cập'
-                placeholder='Nhập tên nhóm quyền truy cập'
+                label='Group Name'
+                placeholder='Insert group name'
                 onChange={e => handleInputChange('name', e.target.value)}
                 fullWidth
               />
@@ -260,7 +260,7 @@ const AddGroupAccess = () => {
                 renderTags={(value, getTagProps) =>
                   value.map((option, index) => <Chip key={option.id} label={option.name} {...getTagProps({ index })} />)
                 }
-                renderInput={params => <CustomTextField {...params} label='Cấp quyền truy cập cửa' fullWidth />}
+                renderInput={params => <CustomTextField {...params} label='Door Access' fullWidth />}
                 loading={loading}
               />
             </Grid>
@@ -280,7 +280,7 @@ const AddGroupAccess = () => {
                 renderTags={(value, getTagProps) =>
                   value.map((option, index) => <Chip key={option.id} label={option.name} {...getTagProps({ index })} />)
                 }
-                renderInput={params => <CustomTextField {...params} label='Nhóm người' fullWidth />}
+                renderInput={params => <CustomTextField {...params} label='Member Group ' fullWidth />}
                 loading={loading}
               />
             </Grid>
@@ -297,15 +297,15 @@ const AddGroupAccess = () => {
                     handleInputChange('deviceKGroupId', null)
                   }
                 }}
-                renderInput={params => <CustomTextField {...params} label='Nhóm khách' fullWidth />}
+                renderInput={params => <CustomTextField {...params} label='Guest Group' fullWidth />}
                 loading={loading}
               />
             </Grid>
             <Grid item xs={0.1}></Grid>
             <Grid item xs={3.8}>
               <CustomTextField
-                label='Mô tả'
-                placeholder='Nhập mô tả'
+                label='Description'
+                placeholder='Insert description '
                 onChange={e => handleInputChange('description', e.target.value)}
                 fullWidth
               />

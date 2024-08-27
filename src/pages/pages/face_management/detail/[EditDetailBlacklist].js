@@ -9,7 +9,6 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 import FileUploader from 'devextreme-react/file-uploader'
 import Icon from 'src/@core/components/icon'
 import ModalImage from '../ModalImage'
-import CustomDialog from '../CustomDialog/CustomDialog'
 import Link from 'next/link'
 import {
   Box,
@@ -49,11 +48,9 @@ const EditFaceManagement = () => {
   const [img2, setImg2] = useState(null)
   const [img3, setImg3] = useState(null)
   const [img4, setImg4] = useState(null)
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [dialogTitle, setDialogTitle] = useState('')
-  const [dialogMessage, setDialogMessage] = useState('')
-  const [isSuccess, setIsSuccess] = useState(false)
-  const imageTypes = ['BOTTOM', 'LEFT', 'RIGHT', 'CENTER', 'ABOVE']
+  const [title1, setTitle1] = useState('')
+  const [title, setTitle] = useState('')
+  const [errorType, setErrorType] = useState(false)
 
   const buildUrlWithToken = url => {
     const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -76,7 +73,7 @@ const EditFaceManagement = () => {
   }, [listFileId])
 
   const handleStatusChange = () => {
-    setStatus1(status1 === 'true' ? 'false' : 'true')
+    setStatus1(status1 === true ? false : true)
   }
 
   const fetchFilteredOrAllUserss = async () => {
@@ -153,8 +150,8 @@ const EditFaceManagement = () => {
         if (id) {
           const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${id}`, config)
           const imgs = [...response.data.imgs]
-          console.log(response, 'respon')
           setStatus1(response.data.status)
+          setTitle1(response.data?.type)
           setFileAvatarId(response.data.mainImageId)
           setListFileUpload(
             imgs.map(img =>
@@ -191,12 +188,99 @@ const EditFaceManagement = () => {
     fetchFilteredOrAllUsers()
   }, [id])
 
-  const handleDialogClose = () => {
-    setDialogOpen(false)
+  const fetchChildData = useCallback(async parentId => {
+    try {
+      const response = await axios.get(
+        `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`
+      )
+
+      return response.data
+    } catch (error) {
+      console.error('Error fetching child data:', error)
+
+      return []
+    }
+  }, [])
+
+  const fetchAllChildData = useCallback(
+    async (parentId, level = 0) => {
+      let result = []
+      setLoading(true)
+
+      const recurseFetch = async (parentId, level) => {
+        const childData = await fetchChildData(parentId)
+        for (const child of childData) {
+          result.push({ code: child.code, name: child.name, id: child.id, level })
+          if (child.isParent) {
+            await recurseFetch(child.id, level + 1)
+          }
+        }
+      }
+
+      try {
+        await recurseFetch(parentId, level)
+      } catch (error) {
+        console.error('Error fetching all child data:', error)
+      } finally {
+        setLoading(false)
+      }
+
+      return result
+    },
+    [fetchChildData]
+  )
+
+  const fetchInitialData = useCallback(async () => {
+    try {
+      const response = await axios.get(
+        'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/code?code=person_specify&sort=%2Bcreated_at&page=1'
+      )
+      const parentData = response.data[0]
+      if (parentData.isParent) {
+        const allChildData = await fetchAllChildData(parentData.id, 0)
+        setPerson(allChildData)
+      }
+      if (parentData.id === title1.id) {
+        setTitle(parentData.name)
+        console.log(parentData.name, 'name')
+      } else if (parentData.isParent) {
+        const allChildData = await fetchAllChildData(parentData.id, 0)
+        const matchingChild = allChildData.find(child => child.id === title1.id)
+        if (matchingChild) {
+          setTitle(matchingChild.name)
+          console.log(matchingChild.name, 'name')
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching initial data:', error)
+    }
+  }, [fetchAllChildData, title1])
+
+  useEffect(() => {
+    fetchInitialData()
+  }, [fetchInitialData])
+
+  const renderOption = (props, option) => (
+    <li {...props} style={{ paddingLeft: `${option.level * 20}px` }}>
+      {option.name}
+    </li>
+  )
+
+  const handleOptionChange = (event, newValue) => {
+    console.log(newValue, 'newvalue')
+    setErrorType(!newValue)
+    setTitle(newValue)
   }
 
   const handleUpdate = async () => {
     setLoading(true)
+    if (!selectedOption) {
+      setErrorType(true)
+      setLoading(false)
+      setShowLoading(false)
+
+      return
+    }
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -214,18 +298,23 @@ const EditFaceManagement = () => {
         imgs: listFileId.map(id => ({
           id: id,
           urlImage: listFileUrl[id]
-        }))
+        })),
+        type: {
+          id: title.id,
+          code: title.code,
+          name: title.name
+        }
       }
 
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${id}`, params, config)
       Swal.fire({
-        title: 'Thành công!',
-        text: 'Dữ liệu đã được cập nhật thành công.',
+        title: 'Successfully!',
+        text: 'Data has been updated successfully.',
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -239,7 +328,7 @@ const EditFaceManagement = () => {
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -259,14 +348,14 @@ const EditFaceManagement = () => {
       if (files.length + listFileUpload.length > 5) {
         // Handle maximum file limit exceeded
         Swal.fire({
-          text: 'Tối đa 5 file',
+          text: 'Up to 5 images',
           icon: 'error',
           showCancelButton: false,
           showCloseButton: false,
           showConfirmButton: true,
           focusConfirm: true,
           confirmButtonColor: '#40a574',
-          confirmButtonText: 'Đóng',
+          confirmButtonText: 'Close',
           customClass: {
             content: 'content-class'
           }
@@ -315,7 +404,7 @@ const EditFaceManagement = () => {
             text: 'Upload failed',
             icon: 'error',
             confirmButtonColor: '#40a574',
-            confirmButtonText: 'Đóng',
+            confirmButtonText: 'Close',
             customClass: {
               content: 'content-class'
             }
@@ -344,72 +433,7 @@ const EditFaceManagement = () => {
     })
   }
 
-  const fetchChildData = useCallback(async parentId => {
-    try {
-      const response = await axios.get(
-        `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`
-      )
-
-      return response.data
-    } catch (error) {
-      console.error('Error fetching child data:', error)
-
-      return []
-    }
-  }, [])
-
-  const fetchAllChildData = useCallback(
-    async (parentId, level = 0) => {
-      let result = []
-      setLoading(true)
-
-      const recurseFetch = async (parentId, level) => {
-        const childData = await fetchChildData(parentId)
-        for (const child of childData) {
-          result.push({ label: child.name, id: child.id, level })
-          if (child.isParent) {
-            await recurseFetch(child.id, level + 1)
-          }
-        }
-      }
-
-      try {
-        await recurseFetch(parentId, level)
-      } catch (error) {
-        console.error('Error fetching all child data:', error)
-      } finally {
-        setLoading(false)
-      }
-
-      return result
-    },
-    [fetchChildData]
-  )
-
-  const fetchInitialData = useCallback(async () => {
-    try {
-      const response = await axios.get(
-        'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/code?Code=person_specify&sort=%2Bcreated_at&page=1'
-      )
-      const parentData = response.data[0]
-      if (parentData.isParent) {
-        const allChildData = await fetchAllChildData(parentData.id, 0)
-        setPerson(allChildData)
-      }
-    } catch (error) {
-      console.error('Error fetching initial data:', error)
-    }
-  }, [fetchAllChildData])
-
-  useEffect(() => {
-    fetchInitialData()
-  }, [fetchInitialData])
-
-  const renderOption = (props, option) => (
-    <li {...props} style={{ paddingLeft: `${option.level * 20}px` }}>
-      {option.label}
-    </li>
-  )
+  const selectedOption = person.find(option => option.id === title?.id)
 
   return (
     <>
@@ -427,7 +451,7 @@ const EditFaceManagement = () => {
         <Grid item xs={12} style={{ position: 'relative', zIndex: '1' }}>
           <Card>
             <CardHeader
-              title='Đối tượng danh sách'
+              title='Details Object'
               titleTypographyProps={{ sx: { mb: [2, 0] } }}
               action={
                 <Grid container spacing={2}>
@@ -439,10 +463,10 @@ const EditFaceManagement = () => {
                         href={`/pages/face_management/list`}
                         sx={{ color: 'blue' }}
                       >
-                        Hủy
+                        Cancel
                       </Button>
                       <Button onClick={handleUpdate} variant='contained' disabled={loading}>
-                        {loading ? 'Updating...' : 'Cập nhật'}
+                        {loading ? 'Updating...' : 'Save'}
                       </Button>
                     </Box>
                   </Grid>
@@ -455,13 +479,7 @@ const EditFaceManagement = () => {
                 alignItems: ['flex-start', 'center']
               }}
             />
-            <CustomDialog
-              open={dialogOpen}
-              handleClose={handleDialogClose}
-              title={dialogTitle}
-              message={dialogMessage}
-              isSuccess={isSuccess}
-            />
+
             <Grid item xs={12}>
               {modalImage && (
                 <ModalImage
@@ -486,7 +504,7 @@ const EditFaceManagement = () => {
                         margin: '0px'
                       }}
                     >
-                      Ảnh đại diện
+                      Avatar
                     </p>
                     <div
                       style={{
@@ -521,7 +539,7 @@ const EditFaceManagement = () => {
                         disabled={loading == true}
                         id='eventName'
                         eventname='eventName'
-                        placeholder={`Tên đối tượng`}
+                        placeholder={`Name`}
                         defaultValue=''
                         value={name || ''}
                         onInput={e => {
@@ -545,7 +563,7 @@ const EditFaceManagement = () => {
                       margin: '0px'
                     }}
                   >
-                    Ghi chú
+                    Description
                   </p>
                   <TextField
                     disabled={loading == true}
@@ -558,7 +576,7 @@ const EditFaceManagement = () => {
                       width: '100%'
                     }}
                     defaultValue=''
-                    placeholder='  Nhập ghi chú ...!'
+                    placeholder='Description'
                     value={`${note}` || ''}
                     onInput={e => {
                       setNote(e.target.value)
@@ -573,30 +591,51 @@ const EditFaceManagement = () => {
                         margin: '0px'
                       }}
                     >
-                      Trạng thái hoạt động
+                      Status
                     </p>
-                    <Switch checked={status1 === 'true'} onChange={handleStatusChange} />
+                    <Switch checked={status1 === true} onChange={handleStatusChange} />
                   </div>
+                  <p
+                    style={{
+                      fontSize: '18px',
+                      lineHeight: '22px',
+                      margin: '0px'
+                    }}
+                  >
+                    Object Type
+                  </p>
+
                   <Autocomplete
+                    value={title}
                     options={person}
-                    getOptionLabel={option => option.label}
-                    renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
+                    getOptionLabel={option => option.name || title}
+                    renderInput={params => (
+                      <CustomTextField
+                        {...params}
+                        fullWidth
+                        placeholder={!title || Object.keys(title).length === 0 ? 'No data' : ''}
+                        error={errorType}
+                        helperText={errorType ? 'Please select object type' : ''}
+                      />
+                    )}
                     renderOption={renderOption}
+                    onChange={handleOptionChange}
                     loading={loading}
-                  />{' '}
+                    noOptionsText='No data'
+                  />
                 </div>
 
                 {listFileUpload.length === 0 && (
                   <p style={{ margin: '35px 0px 0px 0px', marginTop: '150px', marginLeft: '20px' }}>
                     <div></div>
 
-                    {`Ảnh của đối tượng : ( tối đa 5 ảnh)`}
+                    {`Photos of the object : ( Up to 5 photos)`}
                   </p>
                 )}
 
                 {listFileUpload.length > 0 && (
                   <p style={{ margin: '35px 0px 0px 0px', marginTop: '150px', marginLeft: '10px' }}>
-                    {`Ảnh của đối tượng: ${listFileUpload.length}/5`}
+                    {`Photos of the object: ${listFileUpload.length}/5`}
                   </p>
                 )}
                 <div

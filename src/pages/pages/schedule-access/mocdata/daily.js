@@ -110,7 +110,9 @@ const Daily = ({ dataDailyProps, callbackOfDaily, disabled }) => {
 
   const onClickDeleteItem = (date, time) => {
     if (!disabled) {
-      const newTime = date.times.filter(i => i.type !== time.type)
+      const newTime = date.times.filter(i => {
+        return i.startTimeInMinute !== time.startTimeInMinute || i.endTimeInMinute !== time.endTimeInMinute
+      })
       setDataDaily([...dataDaily.filter(e => e.value !== date.value), { ...date, times: newTime || [] }])
     }
   }
@@ -212,12 +214,12 @@ const Daily = ({ dataDailyProps, callbackOfDaily, disabled }) => {
               }}
             >
               <div style={{ minWidth: 80 }}>{item.label}</div>
-              {index === 1 ? (
-                <div style={{ width: 35 }} />
-              ) : (
-                <IconButton style={{ padding: 1, marginRight: 8, width: 22 }} onClick={() => onClickIconCopy(item)}>
+              {item.dayOfWeek !== 'MONDAY' ? (
+                <IconButton style={{ padding: 1, marginRight: 8, width: 18 }} onClick={() => onClickIconCopy(item)}>
                   <Icon icon='tabler:copy' />
                 </IconButton>
+              ) : (
+                <div style={{ padding: 1, marginRight: 8, width: 22 }}></div>
               )}
               <div
                 style={{

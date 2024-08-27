@@ -82,8 +82,8 @@ const initValues = {
 const format_form = [
   {
     name: 'name',
-    label: 'Tên thiết bị',
-    placeholder: 'Tên thiết bị',
+    label: 'Device Name',
+    placeholder: 'Device Name',
     type: 'TextField',
     data: [],
     require: true,
@@ -91,8 +91,8 @@ const format_form = [
   },
   {
     name: 'username',
-    label: 'Tên người dùng',
-    placeholder: 'Tên người dùng',
+    label: 'Username',
+    placeholder: 'Username',
     type: 'TextField',
     data: [],
     require: true,
@@ -100,8 +100,8 @@ const format_form = [
   },
   {
     name: 'password',
-    label: 'Mật khẩu',
-    placeholder: 'Mật khẩu',
+    label: 'Password',
+    placeholder: 'Password',
     type: 'TextField',
     data: [],
     require: true,
@@ -109,8 +109,8 @@ const format_form = [
   },
   {
     name: 'ipAddress',
-    label: 'Địa chỉ IP',
-    placeholder: 'Địa chỉ IP',
+    label: 'IP Address',
+    placeholder: 'IP Address',
     type: 'TextField',
     data: [],
     require: false,
@@ -118,8 +118,8 @@ const format_form = [
   },
   {
     name: 'httpPort',
-    label: 'Cổng http',
-    placeholder: 'Cổng http',
+    label: 'Http Port',
+    placeholder: 'Http Port',
     type: 'TextField',
     data: [],
     require: false,
@@ -127,8 +127,8 @@ const format_form = [
   },
   {
     name: 'onvifPort',
-    label: 'Cổng onvif',
-    placeholder: 'Cổng onvif',
+    label: 'Onvif Port',
+    placeholder: 'Onvif Port',
     type: 'TextField',
     data: [],
     require: false,
@@ -150,8 +150,8 @@ const format_form = [
   // },
   {
     name: 'protocol',
-    label: 'Giao thức',
-    placeholder: 'Giao thức',
+    label: 'Protocols',
+    placeholder: 'Protocols',
     type: 'VAutocomplete',
     data: [],
     option: {
@@ -163,8 +163,8 @@ const format_form = [
   },
   {
     name: 'siteInfo',
-    label: 'Vùng',
-    placeholder: 'Vùng',
+    label: 'Region',
+    placeholder: 'Region',
     type: 'VAutocomplete',
     data: [],
     option: {
@@ -237,7 +237,11 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
   const [protocols, setProtocols] = useState([])
 
   const [selectedProtocol, setSelectedProtocol] = useState(null)
-  const [rows, setRows] = useState([])
+
+  const [rows, setRows] = useState([
+    { name: '', isProxied: false, url: '', codec: '' },
+    { name: '', isProxied: false, url: '', codec: '' }
+  ])
   const [lat, setLat] = useState(null)
   const [lng, setLng] = useState(null)
 
@@ -418,7 +422,7 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
   }
 
   const handleAddRow = () => {
-    const newRow = { name: '', isProxied: false, url: '', type: '' } // Ensure isProxied is a boolean
+    const newRow = { name: '', isProxied: false, url: '', codec: '' } // Ensure isProxied is a boolean
     setRows([...rows, newRow])
   }
 
@@ -442,7 +446,7 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
 
   const handleStreamTypeChange = (index, event) => {
     const newRows = [...rows]
-    newRows[index].type = event.target.value
+    newRows[index].codec = event.target.value
     setRows(newRows)
   }
 
@@ -531,7 +535,7 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
           </CustomCloseButton>
           <Box sx={{ mb: 5, textAlign: 'left' }}>
             <Typography variant='h3' sx={{ mb: 3 }}>
-              Thêm thiết bị
+              Add a device
             </Typography>
           </Box>
           <form>
@@ -571,7 +575,7 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
                                 placeholder={item.placeholder}
                                 error={Boolean(errors[item.name])}
                                 aria-describedby='validation-basic-last-name'
-                                {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
+                                {...(errors[item.name] && { helperText: 'This field is required' })}
                               />
                             )}
                           />
@@ -656,7 +660,7 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
                               handleCheckboxChange(e.target.checked)
                             }}
                           />
-                          Thiết bị đang ngoại tuyến
+                          The device is offline
                         </Grid>
                       )
                     }
@@ -664,38 +668,15 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
                 </Grid>
               </Grid>
               <Grid item xs={12} sx={{ marginTop: 5 }}>
-                {viewport && (
-                  <Grid item xs={12}>
-                    <ReactMapGL
-                      {...viewport}
-                      width='100%'
-                      height='30vh'
-                      onViewportChange={setViewport}
-                      goongApiAccessToken={GOONG_MAP_KEY}
-                      onClick={handleMapClick}
-                    >
-                      {lat && lng && (
-                        <Marker latitude={parseFloat(lat)} longitude={parseFloat(lng)} offsetLeft={-20} offsetTop={-20}>
-                          <div>
-                            <CustomMapPin />{' '}
-                          </div>
-                        </Marker>
-                      )}
-                    </ReactMapGL>
-                  </Grid>
-                )}
-              </Grid>
-              <Grid item xs={12} sx={{ marginTop: 5 }}>
-                <Typography variant='h5'>Kênh</Typography>
+                <Typography variant='h5'>Channel</Typography>
                 <TableContainer>
                   <Table>
                     <TableHead>
                       <TableRow>
-                        <TableCell>Tên Kênh</TableCell>
+                        <TableCell>Channel Name</TableCell>
                         <TableCell>Proxied</TableCell>
                         <TableCell align='right'>Channel URL </TableCell>
                         <TableCell align='right'>StreamType </TableCell>
-
                         <TableCell align='center'>
                           <IconButton size='small' onClick={handleAddRow}>
                             <Icon icon='tabler:plus' />
@@ -730,7 +711,7 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
                             <TableCell align='right'>
                               <CustomTextField
                                 type='text'
-                                value={row.type}
+                                value={row.codec}
                                 onChange={event => handleStreamTypeChange(index, event)}
                                 fullWidth
                               />
@@ -747,6 +728,28 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
                   </Table>
                 </TableContainer>
               </Grid>
+              <Grid item xs={12} sx={{ marginTop: 5 }}>
+                {viewport && (
+                  <Grid item xs={12}>
+                    <ReactMapGL
+                      {...viewport}
+                      width='100%'
+                      height='30vh'
+                      onViewportChange={setViewport}
+                      goongApiAccessToken={GOONG_MAP_KEY}
+                      onClick={handleMapClick}
+                    >
+                      {lat && lng && (
+                        <Marker latitude={parseFloat(lat)} longitude={parseFloat(lng)} offsetLeft={-20} offsetTop={-20}>
+                          <div>
+                            <CustomMapPin />{' '}
+                          </div>
+                        </Marker>
+                      )}
+                    </ReactMapGL>
+                  </Grid>
+                )}
+              </Grid>
             </Grid>
           </form>
         </DialogContent>
@@ -758,10 +761,10 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
           }}
         >
           <Button variant='tonal' color='secondary' onClick={onClose}>
-            Hủy
+            Cancel
           </Button>
           <Button variant='contained' onClick={handleSubmit(onSubmit)}>
-            Lưu
+            Save
           </Button>
         </DialogActions>
       </Dialog>

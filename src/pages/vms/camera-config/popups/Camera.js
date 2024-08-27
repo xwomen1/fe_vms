@@ -70,14 +70,14 @@ const UserList = ({ apiData }) => {
         <Grid item xs={0.4}></Grid>
         <Grid item xs={5.8}>
           <FormControl fullWidth>
-            <InputLabel id='time-validity-label'>Kenh</InputLabel>
+            <InputLabel id='time-validity-label'>Channel</InputLabel>
             <Select labelId='time-validity-label' id='time-validity-select'>
               <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
               <MenuItem value='Undefined'>Không xác định</MenuItem>
             </Select>
           </FormControl>
         </Grid>
-        <Grid>Bảng cấu hình thời gian</Grid>
+        <Grid>Time configuration table</Grid>
         <Daily
           callbackOfDaily={v => {
             setDataDaily(v)

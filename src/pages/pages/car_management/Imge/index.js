@@ -6,7 +6,7 @@ const Img = props => {
   const [loaded, setLoaded] = useState(false);
   const { src, style } = props;
   const [url, setUrl] = useState(null);
-  
+
   useEffect(() => {
     if (src) {
       setUrl(src);
@@ -22,13 +22,13 @@ const Img = props => {
           loaded
             ? { display: 'none' }
             : {
-                ...style,
-                width: '100%',
-                height: '100%',
-                display: 'grid',
-                backgroundColor: '#C4C4C4',
-                placeItems: 'center',
-              }
+              ...style,
+              width: '100%',
+              height: '100%',
+              display: 'grid',
+              backgroundColor: '#C4C4C4',
+              placeItems: 'center',
+            }
         }
       >
         <CircularProgress size={20} />
@@ -36,7 +36,7 @@ const Img = props => {
       <img
         {...props}
         src={url}
-        alt="Ảnh"
+        alt="Image"
         onLoad={() => setLoaded(true)}
         onError={() => setUrl(MaskGroup)}
         style={loaded ? { ...style, width: 'unset' } : { display: 'none' }}

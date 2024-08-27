@@ -22,7 +22,7 @@ const CrmSalesWithRadarChart = () => {
       parentHeightOffset: 0,
       toolbar: { show: false }
     },
-    colors: [theme.palette.primary.main, theme.palette.info.main],
+    colors: [theme.palette.primary.main, theme.palette.info.dark],
     plotOptions: {
       radar: {
         size: 110,

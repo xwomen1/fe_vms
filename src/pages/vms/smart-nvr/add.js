@@ -137,7 +137,7 @@ const UserList = ({ apiData }) => {
         error.response.data &&
         error.response.data.message === 'No response from the server device, timeout: scan_device_ip'
       ) {
-        setPopupMessage('Thiết bị chưa phản hồi')
+        setPopupMessage('Device not responding')
       } else {
         setPopupMessage(`${error.response.data.message}`)
       }
@@ -177,7 +177,7 @@ const UserList = ({ apiData }) => {
       setResponse(response.data)
       setLoading(false)
 
-      toast.success('Thành công')
+      toast.success('Successfully')
 
       setPopupMessage('Quét thành công')
       setIsError(false) // Không phải lỗi
@@ -187,7 +187,7 @@ const UserList = ({ apiData }) => {
         error.response.data &&
         error.response.data.message === 'No response from the server device, timeout: scan_device'
       ) {
-        setPopupMessage('Thiết bị chưa phản hồi')
+        setPopupMessage('Device not responding')
       } else {
         setPopupMessage(`${error.response.data.message}`)
       }
@@ -233,7 +233,7 @@ const UserList = ({ apiData }) => {
       setResponse(response.data)
       setLoading(false)
 
-      toast.success('Thành công')
+      toast.success('Successfully')
 
       setPopupMessage('Quét thành công')
       setIsError(false) // Không phải lỗi
@@ -243,7 +243,7 @@ const UserList = ({ apiData }) => {
         error.response.data &&
         error.response.data.message === 'No response from the server device, timeout: scan_device_ip'
       ) {
-        setPopupMessage('Thiết bị chưa phản hồi')
+        setPopupMessage('Device not responding')
       } else {
         setPopupMessage(`${error.response.data.message}`)
       }
@@ -282,7 +282,7 @@ const UserList = ({ apiData }) => {
       setResponse(response.data)
       setLoading(false)
 
-      toast.success('Thành công')
+      toast.success('Successfully')
 
       setPopupMessage('Quét thành công')
       setIsError(false) // Không phải lỗi
@@ -292,7 +292,7 @@ const UserList = ({ apiData }) => {
         error.response.data &&
         error.response.data.message === 'No response from the server device, timeout: scan_device'
       ) {
-        setPopupMessage('Thiết bị chưa phản hồi')
+        setPopupMessage('Device not responding')
       } else {
         setPopupMessage(`${error.response.data.message}`)
       }
@@ -388,20 +388,20 @@ const UserList = ({ apiData }) => {
   }
   function showAlertConfirm(options, intl) {
     const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Accept',
       imageWidth: 213,
       showCancelButton: true,
       showCloseButton: true,
       showConfirmButton: true,
       focusCancel: true,
       reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
-      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Agree',
+      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Cancel',
       customClass: {
         content: 'content-class',
         confirmButton: 'swal-btn-confirm'
       },
-      confirmButtonColor: '#FF9F43'
+      confirmButtonColor: '#002060'
     }
 
     return Swal.fire({ ...defaultProps, ...options })
@@ -431,7 +431,7 @@ const UserList = ({ apiData }) => {
 
   const handleDelete = idDelete => {
     showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
+      text: 'Do you want to delete it?'
     }).then(({ value }) => {
       if (value) {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -449,13 +449,13 @@ const UserList = ({ apiData }) => {
           .delete(urlDelete, config)
           .then(() => {
             Swal.fire({
-              title: 'Thành công!',
-              text: 'Xóa thành công',
+              title: 'Successfully!',
+              text: 'Deleted successfully',
               icon: 'success',
               willOpen: () => {
                 const confirmButton = Swal.getConfirmButton()
                 if (confirmButton) {
-                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.backgroundColor = '#002060'
                   confirmButton.style.color = 'white'
                 }
               }
@@ -472,7 +472,7 @@ const UserList = ({ apiData }) => {
               willOpen: () => {
                 const confirmButton = Swal.getConfirmButton()
                 if (confirmButton) {
-                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.backgroundColor = '#002060'
                   confirmButton.style.color = 'white'
                 }
               }
@@ -591,19 +591,19 @@ const UserList = ({ apiData }) => {
                   <RadioGroup value={selectedValue} onChange={handleRadioChange} style={{ marginLeft: 50 }}>
                     <Grid container spacing={2}>
                       <Grid item>
-                        <FormControlLabel value='dungIp' control={<Radio />} label='Dùng IP' />
+                        <FormControlLabel value='dungIp' control={<Radio />} label='Use IP' />
                       </Grid>
                       <Grid item>
-                        <FormControlLabel value='daiIp' control={<Radio />} label='Dải IP' />
+                        <FormControlLabel value='daiIp' control={<Radio />} label='IP Range' />
                       </Grid>
-                      <p>Loại giao thức :</p>
+                      <p>Loại Protocols :</p>
                       <Grid item xs={3}>
                         <Autocomplete
                           fullWidth
                           options={top100Films}
                           id='autocomplete-custom'
                           getOptionLabel={option => option.title || ''}
-                          renderInput={params => <CustomTextField placeholder='Khác' {...params} />}
+                          renderInput={params => <CustomTextField placeholder='Other' {...params} />}
                           onChange={(event, value) => setSelectedAuto(value ? value.title.toLowerCase() : '')}
                         />
                       </Grid>
@@ -664,7 +664,7 @@ const UserList = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                        // loading={loading}
+                      // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.1}></Grid>
@@ -672,20 +672,20 @@ const UserList = ({ apiData }) => {
                       <CustomTextField
                         value={url}
                         onChange={e => setUrl(e.target.value)}
-                        label='Địa chỉ IP'
+                        label='IP Address'
                         fullWidth
                       />
                     </Grid>
                     <Grid item xs={0.1}></Grid>
                     <Grid item xs={2.4}>
-                      <CustomTextField value={host} onChange={e => setHost(e.target.value)} label='Cổng' fullWidth />
+                      <CustomTextField value={host} onChange={e => setHost(e.target.value)} label='Connection Port' fullWidth />
                     </Grid>
                     <Grid item xs={0.1}></Grid>
                     <Grid item xs={2.4}>
                       <CustomTextField
                         value={userName}
                         onChange={e => setUsername(e.target.value)}
-                        label='Đăng nhập'
+                        label='User Name'
                         fullWidth
                       />
                     </Grid>
@@ -694,7 +694,7 @@ const UserList = ({ apiData }) => {
                       <CustomTextField
                         value={passWord}
                         onChange={e => setPassWord(e.target.value)}
-                        label='Mật khẩu'
+                        label='Password'
                         type='password'
                         fullWidth
                       />
@@ -702,7 +702,7 @@ const UserList = ({ apiData }) => {
                     <Grid item xs={2} style={{ marginTop: '1%' }}>
                       <Button style={{ marginLeft: '5%' }}>Cancel</Button>
                       <Button style={{ marginLeft: '5%' }} onClick={handleScan} variant='contained'>
-                        Quét
+                        Scan
                       </Button>
                     </Grid>
                     <Grid item xs={0.1} style={{ marginTop: '1%' }}>
@@ -744,7 +744,7 @@ const UserList = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                        // loading={loading}
+                      // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.4}></Grid>
@@ -752,7 +752,7 @@ const UserList = ({ apiData }) => {
                       <CustomTextField
                         value={startURL}
                         onChange={e => setStartUrl(e.target.value)}
-                        label='Địa chỉ IP bắt đầu'
+                        label='Start IP Address'
                         fullWidth
                       />
                     </Grid>
@@ -765,7 +765,7 @@ const UserList = ({ apiData }) => {
                       <CustomTextField
                         value={endURL}
                         onChange={e => setEndUrl(e.target.value)}
-                        label='Địa chỉ IP kết thúc'
+                        label='End IP Address'
                         fullWidth
                       />
                     </Grid>
@@ -775,7 +775,7 @@ const UserList = ({ apiData }) => {
                       <CustomTextField
                         value={startHost}
                         onChange={e => setStartHost(e.target.value)}
-                        label='Cổng bắt đầu'
+                        label='Start Port'
                         fullWidth
                       />
                     </Grid>
@@ -788,7 +788,7 @@ const UserList = ({ apiData }) => {
                       <CustomTextField
                         value={endHost}
                         onChange={e => setEndHost(e.target.value)}
-                        label='Cổng kết thúc'
+                        label='End Port'
                         fullWidth
                       />
                     </Grid>
@@ -796,7 +796,7 @@ const UserList = ({ apiData }) => {
                       <CustomTextField
                         value={userName}
                         onChange={e => setUsername(e.target.value)}
-                        label='Đăng nhập'
+                        label='User Name'
                         fullWidth
                       />
                     </Grid>
@@ -806,7 +806,7 @@ const UserList = ({ apiData }) => {
                       <CustomTextField
                         value={passWord}
                         onChange={e => setPassWord(e.target.value)}
-                        label='Mật khẩu'
+                        label='Password'
                         type='password'
                         fullWidth
                       />
@@ -816,7 +816,7 @@ const UserList = ({ apiData }) => {
                     <Grid item xs={4} style={{ marginTop: '1%' }}>
                       <Button>Cancel</Button>
                       <Button onClick={handleScanDaiIP} variant='contained'>
-                        Quét
+                        Scan
                       </Button>
                     </Grid>
                     <Grid item xs={0.1} style={{ marginTop: '1%', marginLeft: '-20%' }}>
@@ -856,7 +856,7 @@ const UserList = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                        // loading={loading}
+                      // loading={loading}
                       />{' '}
                     </Grid>
 
@@ -865,7 +865,7 @@ const UserList = ({ apiData }) => {
                       <CustomTextField
                         value={userName}
                         onChange={e => setUsername(e.target.value)}
-                        label='Đăng nhập'
+                        label='User Name'
                         fullWidth
                       />
                     </Grid>
@@ -874,7 +874,7 @@ const UserList = ({ apiData }) => {
                       <CustomTextField
                         value={passWord}
                         onChange={e => setPassWord(e.target.value)}
-                        label='Mật khẩu'
+                        label='Password'
                         type='password'
                         fullWidth
                       />
@@ -884,7 +884,7 @@ const UserList = ({ apiData }) => {
                     <Grid item xs={4} style={{ marginTop: '1%' }}>
                       <Button>Cancel</Button>
                       <Button variant='contained' onClick={handleScanOnvif}>
-                        Quét
+                        Scan
                       </Button>
                     </Grid>
                   </Grid>
@@ -921,7 +921,7 @@ const UserList = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                        // loading={loading}
+                      // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.1}></Grid>
@@ -930,7 +930,7 @@ const UserList = ({ apiData }) => {
                       <CustomTextField
                         value={userName}
                         onChange={e => setUsername(e.target.value)}
-                        label='Đăng nhập'
+                        label='User Name'
                         fullWidth
                       />
                     </Grid>
@@ -939,7 +939,7 @@ const UserList = ({ apiData }) => {
                       <CustomTextField
                         value={passWord}
                         onChange={e => setPassWord(e.target.value)}
-                        label='Mật khẩu'
+                        label='Password'
                         type='password'
                         fullWidth
                       />
@@ -949,7 +949,7 @@ const UserList = ({ apiData }) => {
                     <Grid item xs={4} style={{ marginTop: '1%' }}>
                       <Button>Cancel</Button>
                       <Button variant='contained' onClick={handleScanHik}>
-                        Quét
+                        Scan
                       </Button>
                     </Grid>
                   </Grid>
@@ -974,15 +974,15 @@ const UserList = ({ apiData }) => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Tên thiết bị</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Loại</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Địa chỉ IP</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Địa chỉ Mac</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Vị trí</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Trạng thái</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>NO.</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Device Name</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Device Type</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>IP Address</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Mac Address</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Location</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Status</TableCell>
 
-                    <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Active</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -1027,7 +1027,7 @@ const UserList = ({ apiData }) => {
                 <Grid item xs={1.5} style={{ padding: 0 }}>
                   <IconButton onClick={handleOpenMenu}>
                     <Icon icon='tabler:selector' />
-                    <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
+                    <p style={{ fontSize: 15 }}>{pageSize} line/page</p>
                   </IconButton>
                   <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
                     {pageSizeOptions.map(size => (

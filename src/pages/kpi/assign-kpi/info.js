@@ -193,21 +193,21 @@ const AccessRight = () => {
         <Grid container spacing={2}>
           <Grid container spacing={1} style={{ marginTop: '2%' }}>
             <Grid item xs={6}>
-              <TextField label='Tên phiếu giao KPI' fullWidth />
+              <TextField label='Name' fullWidth />
             </Grid>
 
             <Grid item xs={6}>
               <FormControl fullWidth>
-                <InputLabel id='time-validity-label'>Bộ phận nhân viên áp dụng</InputLabel>
+                <InputLabel id='time-validity-label'>Applicable staff department</InputLabel>
                 <Select labelId='time-validity-label' id='time-validity-select'>
-                  <MenuItem value='Custom'>Nhân viên kinh doanh</MenuItem>
-                  <MenuItem value='Undefined'>Nhân viên kỹ thuật</MenuItem>
+                  <MenuItem value='Custom'>Sale</MenuItem>
+                  <MenuItem value='Undefined'>Technical</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
             <Grid item xs={6}>
               <FormControl fullWidth>
-                <InputLabel id='select-item-label'>Bộ phận được đánh giá</InputLabel>
+                <InputLabel id='select-item-label'>Appreciated Group</InputLabel>
                 <Select labelId='select-item-label' value='' onChange={handleSelectChange2}>
                   {items1.map(item => (
                     <MenuItem key={item.name} value={item.name}>
@@ -224,7 +224,7 @@ const AccessRight = () => {
             </Grid>
             <Grid item xs={6}>
               <FormControl fullWidth>
-                <InputLabel id='select-item-label'>Danh sách nhân viên được đánh giá</InputLabel>
+                <InputLabel id='select-item-label'>Appreciated Employee</InputLabel>
                 <Select labelId='select-item-label' value='' onChange={handleSelectChange}>
                   {items.map(item => (
                     <MenuItem key={item.name} value={item.name}>
@@ -240,32 +240,32 @@ const AccessRight = () => {
               })}
             </Grid>
             <Grid item xs={6}>
-              <TextField label='Năm đánh giá' fullWidth />
+              <TextField label='Appreciated year' fullWidth />
             </Grid>
             <Grid item xs={6}>
-              <TextField label='Tháng áp dụng' fullWidth />
+              <TextField label='Appreciated month' fullWidth />
             </Grid>
             <Grid item xs={6}>
-              <TextField label='Ngày đầu kỳ đánh giá' fullWidth />
+              <TextField label='Appreciated day' fullWidth />
             </Grid>
             <Grid item xs={6}>
               <FormControl fullWidth>
-                <InputLabel id='time-validity-label'>Trạng thái</InputLabel>
+                <InputLabel id='time-validity-label'>Status</InputLabel>
                 <Select labelId='time-validity-label' id='time-validity-select'>
-                  <MenuItem value='actiive'>Đang áp dụng</MenuItem>
-                  <MenuItem value='inactive'>Không áp dụng</MenuItem>
+                  <MenuItem value='actiive'>True</MenuItem>
+                  <MenuItem value='inactive'>False</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
             <Grid item xs={6}>
-              <TextField label='Người báo cáo' fullWidth />
+              <TextField label='Reporter' fullWidth />
             </Grid>
 
             <Grid item xs={6}>
-              <TextField label='Người thẩm định' fullWidth />
+              <TextField label='Appraiser' fullWidth />
             </Grid>
             <Grid item xs={6}>
-              <TextField label='Người phê duyệt' fullWidth />
+              <TextField label='Appover' fullWidth />
             </Grid>
             <Grid item xs={2}>
               <DatePickerWrapper>
@@ -274,7 +274,7 @@ const AccessRight = () => {
                     <DatePicker
                       selected={new Date()}
                       dateFormat='MM/dd/yyyy'
-                      customInput={<CustomInput label='Hạn báo cáo' />}
+                      customInput={<CustomInput label='Reporting deadline' />}
                     />
                   </div>
                 </Box>
@@ -287,7 +287,7 @@ const AccessRight = () => {
                     <DatePicker
                       selected={new Date()}
                       dateFormat='MM/dd/yyyy'
-                      customInput={<CustomInput label='Hạn thẩm định' />}
+                      customInput={<CustomInput label='Appraisal deadline' />}
                     />
                   </div>
                 </Box>
@@ -300,7 +300,7 @@ const AccessRight = () => {
                     <DatePicker
                       selected={new Date()}
                       dateFormat='MM/dd/yyyy'
-                      customInput={<CustomInput label='Hạn phê duyệt' />}
+                      customInput={<CustomInput label='Appover deadline' />}
                     />
                   </div>
                 </Box>

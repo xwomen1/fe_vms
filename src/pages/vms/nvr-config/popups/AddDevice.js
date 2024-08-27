@@ -82,8 +82,8 @@ const initValues = {
 const format_form = [
     {
         name: 'name',
-        label: 'Tên thiết bị',
-        placeholder: 'Tên thiết bị',
+        label: 'Device Name',
+        placeholder: 'Device Name',
         type: 'TextField',
         data: [],
         require: true,
@@ -91,8 +91,8 @@ const format_form = [
     },
     {
         name: 'username',
-        label: 'Tên người dùng',
-        placeholder: 'Tên người dùng',
+        label: 'Username',
+        placeholder: 'Username',
         type: 'TextField',
         data: [],
         require: true,
@@ -100,8 +100,8 @@ const format_form = [
     },
     {
         name: 'password',
-        label: 'Mật khẩu',
-        placeholder: 'Mật khẩu',
+        label: 'Password',
+        placeholder: 'Password',
         type: 'TextField',
         data: [],
         require: true,
@@ -109,8 +109,8 @@ const format_form = [
     },
     {
         name: 'ipAddress',
-        label: 'Địa chỉ IP',
-        placeholder: 'Địa chỉ IP',
+        label: 'IP Address',
+        placeholder: 'IP Address',
         type: 'TextField',
         data: [],
         require: false,
@@ -118,8 +118,8 @@ const format_form = [
     },
     {
         name: 'httpPort',
-        label: 'Cổng http',
-        placeholder: 'Cổng http',
+        label: 'Http Port',
+        placeholder: 'Http Port',
         type: 'TextField',
         data: [],
         require: false,
@@ -127,8 +127,8 @@ const format_form = [
     },
     {
         name: 'onvifPort',
-        label: 'Cổng onvif',
-        placeholder: 'Cổng onvif',
+        label: 'Onvif Port',
+        placeholder: 'Onvif Port',
         type: 'TextField',
         data: [],
         require: false,
@@ -151,8 +151,8 @@ const format_form = [
 
     {
         name: 'protocol',
-        label: 'Giao thức',
-        placeholder: 'Giao thức',
+        label: 'Protocols',
+        placeholder: 'Protocols',
         type: 'VAutocomplete',
         data: [],
         option: {
@@ -164,8 +164,8 @@ const format_form = [
     },
     {
         name: 'siteInfo',
-        label: 'Vùng',
-        placeholder: 'Vùng',
+        label: 'Region',
+        placeholder: 'Region',
         type: 'VAutocomplete',
         data: [],
         option: {
@@ -532,7 +532,7 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
                     </CustomCloseButton>
                     <Box sx={{ mb: 5, textAlign: 'left' }}>
                         <Typography variant='h3' sx={{ mb: 3 }}>
-                            Thêm thiết bị
+                            Add a device
                         </Typography>
                     </Box>
                     <form>
@@ -572,7 +572,7 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
                                                                 placeholder={item.placeholder}
                                                                 error={Boolean(errors[item.name])}
                                                                 aria-describedby='validation-basic-last-name'
-                                                                {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
+                                                                {...(errors[item.name] && { helperText: 'This field is required' })}
                                                             />
                                                         )}
                                                     />
@@ -650,7 +650,7 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
                                                     <Checkbox checked={isOfflineSetting} onChange={e => {
                                                         handleCheckboxChange(e.target.checked)
                                                     }} />
-                                                    Thiết bị đang ngoại tuyến
+                                                    The device is offline
                                                 </Grid>
                                             );
                                         }
@@ -681,12 +681,12 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
                                 )}
                             </Grid>
                             <Grid item xs={12} sx={{ marginTop: 5 }}>
-                                <Typography variant='h5'>Kênh</Typography>
+                                <Typography variant='h5'>Channel</Typography>
                                 <TableContainer>
                                     <Table>
                                         <TableHead>
                                             <TableRow>
-                                                <TableCell>Tên Kênh</TableCell>
+                                                <TableCell>Channel Name</TableCell>
                                                 <TableCell>Proxied</TableCell>
                                                 <TableCell align='right'>Channel URL </TableCell>
                                                 <TableCell align='right'>StreamType </TableCell>
@@ -754,10 +754,10 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
                     }}
                 >
                     <Button variant='tonal' color='secondary' onClick={onClose}>
-                        Hủy
+                        Cancel
                     </Button>
                     <Button variant='contained' onClick={handleSubmit(onSubmit)}>
-                        Lưu
+                        Save
                     </Button>
                 </DialogActions>
             </Dialog>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import authConfig from 'src/configs/auth'
 import axios from 'axios'
 import toast from 'react-hot-toast'
@@ -16,6 +16,8 @@ import {
   DialogContent,
   Grid,
   IconButton,
+  CardContent,
+  CardActions,
   Menu,
   MenuItem,
   Pagination,
@@ -33,6 +35,7 @@ import UpdateSchedule from '../detail/scheduleUpdate'
 import Add from '../detail/add'
 
 const ScheduleAccess = () => {
+  const [searchKeyword, setSearchKeyword] = useState('')
   const [reload, setReload] = useState(0)
   const [loading, setLoading] = useState(false)
   const [dataList, setDataList] = useState([])
@@ -73,7 +76,7 @@ const ScheduleAccess = () => {
     fetchDataList() // Fetch lại dữ liệu khi page hoặc pageSize thay đổi
   }, [page, pageSize])
 
-  const fetchDataList = async () => {
+  const fetchDataList = useCallback(async () => {
     setLoading(true)
     try {
       const config = {
@@ -81,6 +84,7 @@ const ScheduleAccess = () => {
           Authorization: `Bearer ${token}`
         },
         params: {
+          keyword: searchKeyword,
           page: page,
           limit: pageSize
         }
@@ -95,16 +99,22 @@ const ScheduleAccess = () => {
     } finally {
       setLoading(false)
     }
+  }, [token, page, pageSize, searchKeyword])
+
+  const handleSearch = () => {
+    setPage(1)
+    fetchDataList()
   }
 
   return (
     <>
-      <Grid>
-        <Button variant='contained'> Lịch hoạt động</Button>
-      </Grid>
-      <br></br>
-      <Card>
+      <Card sx={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
         <CardHeader
+          title={
+            <>
+              <Button variant='contained'>Schedule</Button>
+            </>
+          }
           titleTypographyProps={{ sx: { mb: [2, 0] } }}
           sx={{
             py: 4,
@@ -115,15 +125,43 @@ const ScheduleAccess = () => {
           action={
             <Grid container spacing={2}>
               <Grid item>
-                <Box sx={{ float: 'right' }}>
-                  <Button
-                    aria-label='Thêm mới'
-                    variant='contained'
-                    onClick={() => {
-                      setIsOpenAdd(true)
-                    }}
-                  >
-                    thêm mới
+                <CustomTextField
+                  placeholder='Enter data ...! '
+                  value={searchKeyword}
+                  onChange={e => setSearchKeyword(e.target.value)}
+                  InputProps={{
+                    endAdornment: (
+                      <IconButton
+                        size='small'
+                        title='Clear'
+                        aria-label='Clear'
+                        onClick={() => {
+                          setSearchKeyword('')
+                          fetchDataList()
+                        }}
+                      >
+                        <Icon fontSize='1.25rem' icon='tabler:x' />
+                      </IconButton>
+                    )
+                  }}
+                  sx={{
+                    width: {
+                      xs: 1,
+                      sm: 'auto'
+                    },
+                    '& .MuiInputBase-root > svg': {
+                      mr: 2
+                    }
+                  }}
+                />
+                <Button variant='contained' style={{ marginLeft: '10px' }} onClick={handleSearch}>
+                  Search <Icon fontSize='1.25rem' icon='tabler:search' />
+                </Button>
+              </Grid>
+              <Grid item>
+                <Box sx={{ textAlign: 'right' }}>
+                  <Button aria-label='Add' variant='contained' onClick={() => setIsOpenAdd(true)}>
+                    Add
                     <Icon icon='tabler:plus' />
                   </Button>
                 </Box>
@@ -131,15 +169,15 @@ const ScheduleAccess = () => {
             </Grid>
           }
         />
-        <Grid item xs={12}>
+        <CardContent sx={{ flex: 1, overflow: 'auto' }}>
           <Table>
-            <TableHead>
+            <TableHead style={{ background: '#F6F6F7' }}>
               <TableRow>
-                <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Tên</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Mô tả</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Người tạo</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Thao tác</TableCell>
+                <TableCell sx={{ padding: '16px' }}>No.</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Name</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Description</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Create By</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -154,7 +192,7 @@ const ScheduleAccess = () => {
                           setIsOpenUpdate(true)
                         }}
                         size='small'
-                        sx={{ color: 'blue', right: '10px' }}
+                        sx={{ color: 'blue' }}
                       >
                         {user.name}
                       </Button>
@@ -162,10 +200,9 @@ const ScheduleAccess = () => {
                     <TableCell>{user.description}</TableCell>
                     <TableCell>{user.createdByUser?.fullName}</TableCell>
                     <TableCell>
-                      {' '}
                       <Box>
                         <Button
-                          aria-label='Thêm mới'
+                          aria-label='Sửa'
                           onClick={() => {
                             setIdUpdate(user.id)
                             setIsOpenUpdate(true)
@@ -179,20 +216,20 @@ const ScheduleAccess = () => {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={7} align='center'>
+                  <TableCell colSpan={5} align='center'>
                     Không có dữ liệu
                   </TableCell>
                 </TableRow>
               )}
             </TableBody>
           </Table>
-          <br></br>
-          <Grid container spacing={2} style={{ padding: 10 }}>
-            <Grid item xs={3}></Grid>
-            <Grid item xs={1.5} style={{ padding: 0, marginLeft: '12%' }}>
+        </CardContent>
+        <CardActions sx={{ backgroundColor: 'white', padding: '8px' }}>
+          <Grid container spacing={2} alignItems='center'>
+            <Grid item xs={12} sm={6} md={4} sx={{ textAlign: 'right', marginBottom: '8px' }}>
               <IconButton onClick={handleOpenMenu}>
                 <Icon icon='tabler:selector' />
-                <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
+                <p style={{ fontSize: 15 }}>{pageSize} line/page</p>
               </IconButton>
               <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
                 {pageSizeOptions.map(size => (
@@ -202,16 +239,17 @@ const ScheduleAccess = () => {
                 ))}
               </Menu>
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} sm={6} md={5}>
               <Pagination
                 count={total}
                 color='primary'
                 page={page}
                 onChange={(event, newPage) => handlePageChange(event, newPage)}
+                sx={{ display: 'flex', justifyContent: 'center' }}
               />
             </Grid>
           </Grid>
-        </Grid>
+        </CardActions>
       </Card>
       {isOpenUpdate && (
         <UpdateSchedule

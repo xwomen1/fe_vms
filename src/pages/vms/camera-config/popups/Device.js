@@ -60,6 +60,9 @@ const Device = ({ onClose, camera }) => {
   const [protocol, setProtocol] = useState()
   const defaultValue = cameras?.type?.name || ''
   const [idBox, setIdBox] = useState(null)
+  const [errorNVR, setErrorNVR] = useState(false)
+  const [errorProtocol, setErrorProtocol] = useState(false)
+  const [errorType, setErrorType] = useState(false)
 
   const [cameraGroupSelect, setCameraGroupSelect] = useState({
     label: cameras?.type?.name || '',
@@ -158,6 +161,7 @@ const Device = ({ onClose, camera }) => {
 
   const handleProtocolChange = (event, newValue) => {
     setSelectedProtocol(newValue)
+    setErrorProtocol(false) // Reset the error state when a protocol is selected
   }
 
   const handleUserNameChange = event => {
@@ -184,7 +188,7 @@ const Device = ({ onClose, camera }) => {
 
   const handleStreamTypeChange = (index, event) => {
     const newRows = [...rows]
-    newRows[index].type = event.target.value
+    newRows[index].codec = event.target.value
     setRows(newRows)
   }
 
@@ -199,7 +203,7 @@ const Device = ({ onClose, camera }) => {
   }
 
   const handleAddRow = () => {
-    const newRow = { name: '', isProxied: false, url: '', type: '' } // Ensure isProxied is a boolean
+    const newRow = { name: '', isProxied: false, url: '', codec: '' } // Ensure isProxied is a boolean
     setRows([...rows, newRow])
   }
 
@@ -217,6 +221,7 @@ const Device = ({ onClose, camera }) => {
           }
 
           const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${camera}`, config)
+          console.log(response.data.box, 'r')
           setCamera(response.data)
           setCameraName(response.data.name)
           setUserName(response.data.username)
@@ -225,7 +230,10 @@ const Device = ({ onClose, camera }) => {
           setHttp(response.data.httpPort)
           setRows(response.data.streams || [])
           setOnvif(response.data.onvif)
-
+          setIdBox({
+            value: response.data.box?.id || '',
+            label: response.data.box?.name || ''
+          })
           setLat(response.data.lat)
           setLng(response.data.long)
           setisOfflineSetting(response.data.isOfflineSetting)
@@ -287,7 +295,31 @@ const Device = ({ onClose, camera }) => {
   }, [defaultValue])
 
   const handleSaveClick = async () => {
-    handleSave() // Gọi hàm handleSave truyền từ props
+    // Validate selectedNVR and selectedProtocol
+    if (!selectNVR) {
+      setErrorNVR(true)
+    } else {
+      setErrorNVR(false)
+    }
+
+    if (!selectedProtocol) {
+      setErrorProtocol(true)
+    } else {
+      setErrorProtocol(false)
+    }
+    if (!cameraGroupSelect) {
+      setErrorType(true)
+    } else {
+      setErrorType(false)
+    }
+
+    // If either field has an error, do not proceed with save
+    if (!selectNVR || !selectedProtocol || !cameraGroupSelect) {
+      return
+    }
+
+    // Proceed with save if validation passes
+    handleSave()
   }
 
   const handleSave = async () => {
@@ -308,7 +340,8 @@ const Device = ({ onClose, camera }) => {
         password: password,
         ipAddress: ipAddress,
         httpPort: http,
-        type: cameraGroupSelect,
+
+        // type: cameraGroupSelect,
         onvif: onvif,
         lat: lat.toString(),
         long: lng.toString(),
@@ -329,13 +362,13 @@ const Device = ({ onClose, camera }) => {
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${camera}`, data, config)
       setLoading(false)
       Swal.fire({
-        title: 'Thành công!',
-        text: 'Dữ liệu đã được Lưu thành công.',
+        title: 'Success!',
+        text: 'Updated successfully',
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -353,7 +386,7 @@ const Device = ({ onClose, camera }) => {
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -459,6 +492,7 @@ const Device = ({ onClose, camera }) => {
 
   const handleCameraGroupChange = (event, newValue) => {
     setCameraGroupSelect(newValue)
+    setErrorType(false) // Reset the error state when a protocol is selected
   }
 
   const handleRegionsChange = (event, newValue) => {
@@ -500,7 +534,7 @@ const Device = ({ onClose, camera }) => {
         <Grid container item style={{ backgroundColor: 'white', width: '100%', padding: '10px' }}>
           <Grid item xs={3.9}>
             <CustomTextField
-              label='Tên thiết bị'
+              label='Device Name'
               type='text'
               value={cameraName}
               onChange={handleCameraNameChange}
@@ -510,7 +544,7 @@ const Device = ({ onClose, camera }) => {
           <Grid item xs={0.1}></Grid>
           <Grid item xs={3.9}>
             <CustomTextField
-              label='Tên người dùng'
+              label='Username'
               type='text'
               value={userName}
               onChange={handleUserNameChange}
@@ -519,7 +553,7 @@ const Device = ({ onClose, camera }) => {
           </Grid>
           <Grid item xs={0.1}></Grid>
           <Grid item xs={4}>
-            <CustomTextField label='Mật khẩu' type='text' value={password} onChange={handlePasswordChange} fullWidth />
+            <CustomTextField label='Password' type='text' value={password} onChange={handlePasswordChange} fullWidth />
           </Grid>
           <Grid item xs={3.9}>
             <Autocomplete
@@ -527,14 +561,22 @@ const Device = ({ onClose, camera }) => {
               onChange={handleCameraGroupChange}
               options={cameraGroup || []}
               getOptionLabel={option => option.label}
-              renderInput={params => <CustomTextField {...params} label='Nhóm Camera' fullWidth />}
+              renderInput={params => (
+                <CustomTextField
+                  {...params}
+                  label='Camera Type'
+                  fullWidth
+                  error={errorType}
+                  helperText={errorType ? 'This field is required' : ''}
+                />
+              )}
               onFocus={handleComboboxFocus}
             />{' '}
           </Grid>
           <Grid item xs={0.1}></Grid>
           <Grid item xs={3.9}>
             <CustomTextField
-              label='Địa chỉ IP'
+              label='IP Address'
               type='text'
               value={ipAddress}
               onChange={handleIpAddressChange}
@@ -543,10 +585,10 @@ const Device = ({ onClose, camera }) => {
           </Grid>
           <Grid item xs={0.1}></Grid>
           <Grid item xs={4}>
-            <CustomTextField label='Cổng http' type='text' value={http} onChange={handleHttpChange} fullWidth />
+            <CustomTextField label='Http port' type='text' value={http} onChange={handleHttpChange} fullWidth />
           </Grid>
           <Grid item xs={3.9}>
-            <CustomTextField label='Cổng onvif ' type='text' value={onvif} onChange={handleOnvifChange} fullWidth />
+            <CustomTextField label='OnVif port' type='text' value={onvif} onChange={handleOnvifChange} fullWidth />
           </Grid>
           <Grid item xs={0.1}></Grid>
           <Grid item xs={3.9}>
@@ -555,7 +597,15 @@ const Device = ({ onClose, camera }) => {
               onChange={handleProtocolChange}
               options={protocol || []}
               getOptionLabel={option => option.name}
-              renderInput={params => <CustomTextField {...params} label='Giao thức' fullWidth />}
+              renderInput={params => (
+                <CustomTextField
+                  {...params}
+                  label='Protocol'
+                  fullWidth
+                  error={errorProtocol}
+                  helperText={errorProtocol ? 'This field is required' : ''}
+                />
+              )}
             />
           </Grid>
           <Grid item xs={0.1}></Grid>
@@ -565,19 +615,26 @@ const Device = ({ onClose, camera }) => {
               onChange={handleDDNSChange}
               options={nvrs || []}
               getOptionLabel={option => option.label}
-              renderInput={params => <CustomTextField {...params} label='Smart NVR' fullWidth />}
+              renderInput={params => (
+                <CustomTextField
+                  {...params}
+                  label='Smart NVR'
+                  fullWidth
+                  error={errorNVR}
+                  helperText={errorNVR ? 'This field is required' : ''}
+                />
+              )}
               onFocus={handleComboboxFocusDevice}
-
-              // loading={loading}
-            />{' '}
+            />
           </Grid>
+
           <Grid item xs={3.9}>
             <Autocomplete
               value={regionsSelect}
               onChange={handleRegionsChange}
               options={regions || []}
               getOptionLabel={option => option.label}
-              renderInput={params => <CustomTextField {...params} label='Vùng' fullWidth />}
+              renderInput={params => <CustomTextField {...params} label='Region' fullWidth />}
               onFocus={handleComboboxFocusRegions}
             />{' '}
           </Grid>
@@ -597,21 +654,21 @@ const Device = ({ onClose, camera }) => {
           </Grid>
           <Grid item xs={0.1}></Grid>
           <Grid item xs={4}>
-            {formatDDNS(isOfflineSetting)} thiết bị đang ngoại tuyến
+            {formatDDNS(isOfflineSetting)} device is offline
           </Grid>
         </Grid>
         <Grid item xs={12}>
-          <Typography variant='h5'>Kênh</Typography>
+          <Typography variant='h5'>Channel</Typography>
         </Grid>
         <Grid item xs={11.8} component={Paper}>
           <TableContainer>
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Tên Kênh</TableCell>
+                  <TableCell>Channel Name</TableCell>
                   <TableCell>Proxied</TableCell>
-                  <TableCell align='right'>Channel URL </TableCell>
-                  <TableCell align='right'>StreamType </TableCell>
+                  <TableCell align='center'>Channel URL </TableCell>
+                  <TableCell align='center'>StreamType </TableCell>
 
                   <TableCell align='center'>
                     <IconButton size='small' onClick={handleAddRow}>
@@ -624,19 +681,18 @@ const Device = ({ onClose, camera }) => {
                 {rows &&
                   rows.map((row, index) => (
                     <TableRow key={index}>
-                      <TableCell>
+                      <TableCell style={{ width: '30%' }}>
                         <CustomTextField
                           type='text'
                           value={row.name}
                           onChange={event => handleChannelNameChange(index, event)}
-                          fullWidth
                         />{' '}
                       </TableCell>
                       <TableCell>
                         {' '}
                         <Checkbox checked={row.isProxied} onChange={event => handleProxiedChange(index, event)} />
                       </TableCell>
-                      <TableCell align='right'>
+                      <TableCell align='right' style={{ width: '50%' }}>
                         <CustomTextField
                           type='text'
                           value={row.url}
@@ -644,15 +700,14 @@ const Device = ({ onClose, camera }) => {
                           fullWidth
                         />
                       </TableCell>
-                      <TableCell align='right'>
+                      <TableCell align='right' style={{ width: '20%' }}>
                         <CustomTextField
                           type='text'
-                          value={row.type}
+                          value={row.codec}
                           onChange={event => handleStreamTypeChange(index, event)}
                           fullWidth
                         />
                       </TableCell>
-
                       <TableCell align='center'>
                         <IconButton size='small' onClick={() => handleDeleteRow(index)}>
                           <Icon icon='bi:trash' />
@@ -695,9 +750,9 @@ const Device = ({ onClose, camera }) => {
           }}
         >
           <Button type='submit' variant='contained' onClick={handleSaveClick}>
-            Lưu
+            Save
           </Button>
-          <Button onClick={onClose}>Đóng</Button>
+          <Button onClick={onClose}>Close</Button>
         </DialogActions>
       </Grid>
     </div>

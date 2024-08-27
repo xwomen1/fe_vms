@@ -11,7 +11,7 @@ const USER_API = {
 }
 
 const GROUP_API = {
-  SEARCH: `${API_HOST}/group/search`,
+  SEARCH: `${API_IAM}/groups/search`,
   ADD: `${API_HOST}/group`
 }
 

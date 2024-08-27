@@ -4,6 +4,7 @@ import Menu from '@mui/material/Menu'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
 import TreeView from '@mui/lab/TreeView'
+import CustomChip from 'src/@core/components/mui/chip'
 import TreeItem from '@mui/lab/TreeItem'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -13,7 +14,7 @@ import authConfig from 'src/configs/auth'
 import Table from '@mui/material/Table'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
-import { IconButton, Box } from '@mui/material'
+import { IconButton, Box, Button, CardHeader } from '@mui/material'
 import Swal from 'sweetalert2'
 import { fetchData } from 'src/store/apps/user'
 import { useRouter } from 'next/router'
@@ -34,7 +35,7 @@ import VideoConnectCamera from './popups/VideoConnectCamera'
 import { Password } from '@mui/icons-material'
 import Edit from './popups/Edit'
 
-const UserList = ({ apiData, assettypeStatus }) => {
+const UserList = ({ apiData }) => {
   const [value, setValue] = useState('')
   const [selectedIds, setSelectedIds] = useState([])
   const [idNVR, setId] = useState([])
@@ -62,6 +63,96 @@ const UserList = ({ apiData, assettypeStatus }) => {
 
   const pageSizeOptions = [25, 50, 100]
   const [anchorEl, setAnchorEl] = useState(null)
+
+  const defaultNvrID = '0eb23593-a9b1-4278-9fb1-4d18f30ed6ff'
+  const [assettypeStatus, setAssetTypeStatus] = useState([])
+
+  useEffect(() => {
+    const ws = new WebSocket(`wss://sbs.basesystem.one/ivis/vms/api/v0/websocket/topic/nvrStatus/${defaultNvrID}`)
+
+    ws.onmessage = event => {
+      const { dataType, data } = JSON.parse(event.data)
+      if (dataType === 'nvrStatus') {
+        const NVRStatusUpdates = JSON.parse(data)
+        updateNVRStatus(NVRStatusUpdates)
+      }
+    }
+
+    return () => {
+      ws.close()
+    }
+  }, [])
+
+  const updateNVRStatus = useCallback(NVRStatusUpdates => {
+    const NVRStatusMap = new Map(
+      NVRStatusUpdates?.map(status => [status.id, { status: status.statusValue.name, ip: status.ip }])
+    )
+
+    setAssetTypeStatus(prevStatus => {
+      const newStatus = [...prevStatus]
+      NVRStatusMap.forEach((value, key) => {
+        const index = newStatus.findIndex(item => item.id === key)
+        if (index !== -1) {
+          newStatus[index] = { ...newStatus[index], ...value }
+        } else {
+          newStatus.push({ id: key, ...value })
+        }
+      })
+
+      return newStatus
+    })
+  }, [])
+
+  useEffect(() => {
+    if (assettypeStatus.length) {
+      setAssetType(prevAssettype => {
+        return prevAssettype.map(asset => {
+          const statusUpdate = assettypeStatus.find(status => status.id === asset.id)
+          if (statusUpdate) {
+            return { ...asset, status: { name: statusUpdate.status } }
+          }
+
+          return asset
+        })
+      })
+    }
+  }, [assettypeStatus])
+
+  useEffect(() => {
+    const fetchFilteredOrAllUsers = async () => {
+      try {
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          params: {
+            limit: pageSize,
+            page: page,
+            keyword: value
+          }
+        }
+        const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/nvrs', config)
+        if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+          setStatus1(response.data.isOfflineSetting || false)
+          setNvr(response.data[0].id)
+          setAssetType(response.data)
+          setTotal(response.data.page)
+          console.log(response.data[0].id)
+        } else {
+          setStatus1(false)
+          setNvr(null)
+          setAssetType([])
+          setTotal(0)
+          console.warn('Response data is empty or invalid')
+        }
+      } catch (error) {
+        console.error('Error fetching users:', error)
+      }
+    }
+    fetchFilteredOrAllUsers()
+  }, [page, pageSize, total, value])
 
   const handlePageChange = newPage => {
     setPage(newPage)
@@ -148,20 +239,20 @@ const UserList = ({ apiData, assettypeStatus }) => {
   }
   function showAlertConfirm(options, intl) {
     const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Accept',
       imageWidth: 213,
       showCancelButton: true,
       showCloseButton: true,
       showConfirmButton: true,
       focusCancel: true,
       reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
-      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Agree',
+      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Cancel',
       customClass: {
         content: 'content-class',
         confirmButton: 'swal-btn-confirm'
       },
-      confirmButtonColor: '#FF9F43'
+      confirmButtonColor: '#002060'
     }
 
     return Swal.fire({ ...defaultProps, ...options })
@@ -195,7 +286,7 @@ const UserList = ({ apiData, assettypeStatus }) => {
 
   const handleDelete = idDelete => {
     showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
+      text: 'Do you want to delete it?'
     }).then(({ value }) => {
       if (value) {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -213,13 +304,13 @@ const UserList = ({ apiData, assettypeStatus }) => {
           .delete(urlDelete, config)
           .then(() => {
             Swal.fire({
-              title: 'Thành công!',
-              text: 'Xóa thành công',
+              title: 'Successfully!',
+              text: 'Deleted successfully',
               icon: 'success',
               willOpen: () => {
                 const confirmButton = Swal.getConfirmButton()
                 if (confirmButton) {
-                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.backgroundColor = '#002060'
                   confirmButton.style.color = 'white'
                 }
               }
@@ -236,7 +327,7 @@ const UserList = ({ apiData, assettypeStatus }) => {
               willOpen: () => {
                 const confirmButton = Swal.getConfirmButton()
                 if (confirmButton) {
-                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.backgroundColor = '#002060'
                   confirmButton.style.color = 'white'
                 }
               }
@@ -247,108 +338,130 @@ const UserList = ({ apiData, assettypeStatus }) => {
   }
 
   const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen)
-  useEffect(() => {
-    const fetchFilteredOrAllUsers = async () => {
-      try {
-        const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          params: {
-            limit: pageSize,
-            page: page,
-            keyword: value
+  const fetchDataReload = async id => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.get(
+        `https://sbs.basesystem.one/ivis/vms/api/v0/device/nvr/synchronize?nvr_id=${id}`,
+        config
+      )
+      Swal.fire({
+        title: 'Synchronization successful!',
+        text: response?.message,
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
           }
         }
-        const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/nvrs', config)
-        if (response.data && Array.isArray(response.data) && response.data.length > 0) {
-          setStatus1(response.data.isOfflineSetting || false)
-          setNvr(response.data[0].id)
-          setAssetType(response.data)
-          setTotal(response.data.page)
-          console.log(response.data[0].id)
-        } else {
-          setStatus1(false)
-          setNvr(null)
-          setAssetType([])
-          setTotal(0)
-          console.warn('Response data is empty or invalid')
+      })
+    } catch (error) {
+      console.error('Error fetching users:', error)
+      Swal.fire({
+        title: 'Error!',
+        text: error.response?.data?.message,
+        icon: 'error',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
         }
-      } catch (error) {
-        console.error('Error fetching users:', error)
-      }
+      })
     }
-    fetchFilteredOrAllUsers()
-  }, [page, pageSize, total, value])
+  }
 
-  useEffect(() => {
-    if (assettypeStatus.length) {
-      setAssetType(assettypeStatus)
-    }
-  }, [assettypeStatus])
+  const handleReloadClick = id => {
+    fetchDataReload(id)
+  }
 
   return (
     <Grid container spacing={6.5}>
       <Grid item xs={12}>
         <Card>
-          <Grid container spacing={1}>
-            <Grid item xs={9}>
-              {selectedIds === null ? (
-                <TableHeader />
-              ) : (
-                <TableHeader
-                  value={value}
-                  passwords={handleAddRoleClick}
-                  networks={handleAddNetworkClick}
-                  images={handleAddImageClick}
-                  videos={handleAddVideoClick}
-                  cloud={handleAddCloudClick}
-                />
-              )}
-            </Grid>
-            <Grid item xs={3} style={{ marginTop: '1%' }}>
-              <CustomTextField
-                value={value}
-                autoComplete='new-password' // Thay đổi giá trị thành 'new-password'
-                form='off' // Thêm thuộc tính form với giá trị 'off'
-                onChange={e => handleFilter(e.target.value)}
-                placeholder='Search…'
-                InputProps={{
-                  startAdornment: (
-                    <Box sx={{ mr: 2, display: 'flex' }}>
-                      <Icon fontSize='1.25rem' icon='tabler:search' />
+          <CardHeader
+            title='NVR List'
+            titleTypographyProps={{ sx: { mb: [2, 0] } }}
+            sx={{
+              py: 4,
+              flexDirection: ['column', 'row'],
+              '& .MuiCardHeader-action': { m: 0 },
+              alignItems: ['flex-start', 'center']
+            }}
+            action={
+              <Grid container spacing={5}>
+                <Grid item xs={9}>
+                  {selectedIds === null ? (
+                    <Box></Box>
+                  ) : (
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Button variant='contained' color='primary' onClick={handleAddRoleClick}>
+                        Password
+                      </Button>
+                      <Button variant='contained' color='primary' onClick={handleAddNetworkClick}>
+                        Network
+                      </Button>
+                      <Button variant='contained' color='primary' onClick={handleAddVideoClick}>
+                        Video
+                      </Button>
+                      <Button variant='contained' color='primary' onClick={handleAddImageClick}>
+                        Image
+                      </Button>
+                      <Button variant='contained' color='primary' onClick={handleAddCloudClick}>
+                        Storage
+                      </Button>
                     </Box>
-                  ),
-                  endAdornment: (
-                    <IconButton size='small' title='Clear' aria-label='Clear'>
-                      <Icon fontSize='1.25rem' icon='tabler:x' />
-                    </IconButton>
-                  )
-                }}
-                sx={{
-                  width: {
-                    xs: 1,
-                    sm: 'auto'
-                  },
-                  '& .MuiInputBase-root > svg': {
-                    mr: 2
-                  }
-                }}
-              />
-            </Grid>
-          </Grid>
+                  )}
+                </Grid>
+                <Grid item xs={3}>
+                  <CustomTextField
+                    value={value}
+                    autoComplete='off'
+                    onChange={e => handleFilter(e.target.value)}
+                    placeholder='Search…'
+                    InputProps={{
+                      startAdornment: (
+                        <Box sx={{ mr: 2, display: 'flex' }}>
+                          <Icon fontSize='1.25rem' icon='tabler:search' />
+                        </Box>
+                      ),
+                      endAdornment: (
+                        <IconButton size='small' title='Clear' aria-label='Clear'>
+                          <Icon fontSize='1.25rem' icon='tabler:x' />
+                        </IconButton>
+                      )
+                    }}
+                    sx={{
+                      width: {
+                        xs: 1,
+                        sm: 'auto'
+                      },
+                      '& .MuiInputBase-root > svg': {
+                        mr: 2
+                      }
+                    }}
+                  />
+                </Grid>
+              </Grid>
+            }
+          />
           <Grid container spacing={2}>
-            <Grid item xs={0.1}></Grid>
-
             <Grid item xs={12}>
-              <div></div>
-
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ padding: '16px' }}>
+                    <TableCell align='center'>
                       <Checkbox
                         checked={selectedIds.length === assettype.length}
                         onChange={e => {
@@ -361,61 +474,53 @@ const UserList = ({ apiData, assettypeStatus }) => {
                         }}
                       />
                     </TableCell>
-                    <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Tên thiết bị</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Loại</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Địa chỉ IP</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Địa chỉ Mac</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Vị trí</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Trạng thái</TableCell>
+                    <TableCell align='center'>NO.</TableCell>
+                    <TableCell align='center'>Device Name</TableCell>
+                    <TableCell align='center'>Device Type</TableCell>
+                    <TableCell align='center'>IP Address</TableCell>
+                    <TableCell align='center'>Mac Address</TableCell>
+                    <TableCell align='center'>Location</TableCell>
+                    <TableCell align='center'>Status</TableCell>
 
-                    <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
+                    <TableCell align='center'>Active</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {assettype.map((assetType, index) => (
                     <TableRow key={assetType.id}>
-                      <TableCell sx={{ padding: '16px' }}>
+                      <TableCell align='center'>
                         <Checkbox
                           checked={selectedIds.includes(assetType.id)}
                           onChange={() => handleCheckboxChange(assetType.id)}
                         />
                       </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.name}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.type.name}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.ipAddress}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.macAddress}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.location}</TableCell>
-                      <TableCell sx={{ padding: '16px', textAlign: 'center' }}>
+                      <TableCell align='center'>{(page - 1) * pageSize + index + 1} </TableCell>
+                      <TableCell align='center'>{assetType.name}</TableCell>
+                      <TableCell align='center'>{assetType.type?.name}</TableCell>
+                      <TableCell align='center'>{assetType.ipAddress}</TableCell>
+                      <TableCell align='center'>{assetType.macAddress}</TableCell>
+                      <TableCell align='center'>{assetType.location}</TableCell>
+                      <TableCell align='center'>
                         {assetType.status && assetType.status.name ? (
-                          <div
-                            style={{
-                              backgroundColor:
-                                assetType.status.name === 'connected'
-                                  ? 'lightgreen'
-                                  : assetType.status.name === 'disconnected'
-                                  ? '#FF9F43'
-                                  : 'orange',
-                              borderRadius: '10px',
-                              padding: '5px 10px',
-                              width: '70%',
-                              display: 'inline-block',
-                              color: 'white'
-                            }}
-                          >
-                            {assetType.status.name === 'connected'
-                              ? 'Đã kết nối'
-                              : assetType.status.name === 'disconnected'
-                              ? 'Mất kết nối'
-                              : assetType.status.name}
+                          <div>
+                            <CustomChip
+                              rounded
+                              size='small'
+                              skin='light'
+                              sx={{ lineHeight: 1 }}
+                              label={assetType.status.name === 'disconnected' ? 'Lost connection' : 'Connected'}
+                              color={assetType.status.name === 'disconnected' ? 'primary' : 'success'}
+                            />
                           </div>
                         ) : (
                           assetType.status.name
                         )}
                       </TableCell>
 
-                      <TableCell sx={{ padding: '16px' }}>
+                      <TableCell align='center'>
+                        <IconButton onClick={() => handleReloadClick(assetType.id)}>
+                          <Icon icon='tabler:reload' />
+                        </IconButton>
                         <IconButton size='small' onClick={() => handleAddPClick(assetType.id)}>
                           <Icon icon='tabler:edit' />
                         </IconButton>
@@ -441,21 +546,24 @@ const UserList = ({ apiData, assettypeStatus }) => {
               <br></br>
               <Grid container spacing={2} style={{ padding: 10 }}>
                 <Grid item xs={3}></Grid>
-                <Grid item xs={1.5} style={{ padding: 0 }}>
-                  <IconButton onClick={handleOpenMenu}>
-                    <Icon icon='tabler:selector' />
-                    <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
-                  </IconButton>
-                  <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
-                    {pageSizeOptions.map(size => (
-                      <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
-                        {size}
-                      </MenuItem>
-                    ))}
-                  </Menu>
+
+                <Grid item xs={1} style={{ padding: 0 }}>
+                  <Box>
+                    <IconButton onClick={handleOpenMenu}>
+                      <Icon icon='tabler:selector' />
+                      <p style={{ fontSize: 15 }}>{pageSize} line/page</p>
+                    </IconButton>
+                    <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+                      {pageSizeOptions.map(size => (
+                        <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
+                          {size}
+                        </MenuItem>
+                      ))}
+                    </Menu>
+                  </Box>
                 </Grid>
                 <Grid item xs={6}>
-                  <Pagination count={total} color='primary' onChange={(event, page) => handlePageChange(page)} />
+                  <Pagination count={total} page={page} color='primary' onChange={handlePageChange} />
                 </Grid>
               </Grid>
             </Grid>

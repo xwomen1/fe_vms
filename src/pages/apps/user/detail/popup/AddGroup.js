@@ -8,7 +8,7 @@ const RolePopup = ({ open, onClose, onSelect, userId }) => {
   const [selectedRole, setSelectedRole] = useState(null)
   const [groupName, setGroupName] = useState([])
   const [defaultGroup, setDefaultGroup] = useState(null)
-  const [selectedGroupId, setSelectedGroupId] = useState(null) // Thêm trạng thái để lưu trữ id của nhóm được chọn
+  const [selectedGroupId, setSelectedGroupId] = useState(null) // Thêm Status để Save trữ id của nhóm được chọn
   const [groupOptions, setGroupOptions] = useState([])
   const [groupCode, setGroupCode] = useState([])
 
@@ -103,7 +103,7 @@ const RolePopup = ({ open, onClose, onSelect, userId }) => {
           },
           config
         )
-        Swal.fire('Thêm thành công', '', 'success')
+        Swal.fire('Successfully', '', 'success')
 
         onSelect(selectedRole)
         onClose()

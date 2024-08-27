@@ -1,4 +1,5 @@
 import React from 'react'
+import { useRouter } from 'next/router'
 import {
   Box,
   Button,
@@ -23,6 +24,7 @@ import {
   DialogActions,
   Typography,
   TextField,
+  Switch,
   Input
 } from '@mui/material'
 import { Fragment, useState, useEffect, useRef } from 'react'
@@ -30,7 +32,6 @@ import axios from 'axios'
 import { makeStyles } from '@material-ui/core/styles'
 import authConfig from 'src/configs/auth'
 import Swal from 'sweetalert2'
-import CustomDialog from '../../face_management/CustomDialog/CustomDialog'
 import FileUploader from 'devextreme-react/file-uploader'
 import CircularProgress from '@mui/material/CircularProgress'
 import ModalImage from '../ModalImage'
@@ -40,6 +41,7 @@ import Link from 'next/link'
 
 const AddFaceManagement = () => {
   const classes = useStyles()
+  const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [showLoading, setShowLoading] = useState(false)
   const [modalImage, setModalImage] = useState(null)
@@ -50,6 +52,7 @@ const AddFaceManagement = () => {
   const [listFileUpload, setListFileUpload] = useState([])
   const [name, setName] = useState(null)
   const [note, setNote] = useState(null)
+  const [type, setType] = useState('')
   const [showCropper, setShowCopper] = useState(false)
   const [isNameEntered, setIsNameEntered] = useState(false)
   const fileUploader1 = useRef(null)
@@ -63,6 +66,7 @@ const AddFaceManagement = () => {
   const [dialogMessage, setDialogMessage] = useState('')
   const [isSuccess, setIsSuccess] = useState(false)
   const [redirectUrl, setRedirectUrl] = useState('')
+  const [status1, setStatus1] = useState('')
 
   const handleInputChange = e => {
     const value = e.target.value
@@ -176,14 +180,14 @@ const AddFaceManagement = () => {
     if (e.value.length > 0) {
       if (e.value.length + listFileUpload.length > 5) {
         Swal.fire({
-          text: 'Tối đa 5 file',
+          text: 'Up to 5 images',
           icon: 'error',
           showCancelButton: false,
           showCloseButton: false,
           showConfirmButton: true,
           focusConfirm: true,
           confirmButtonColor: '#40a574',
-          confirmButtonText: 'Đóng',
+          confirmButtonText: 'Close',
           customClass: {
             content: 'content-class'
           }
@@ -234,13 +238,6 @@ const AddFaceManagement = () => {
     }
   }
 
-  const handleDialogClose = () => {
-    setDialogOpen(false)
-    if (isSuccess && redirectUrl) {
-      window.location.href = redirectUrl
-    }
-  }
-
   const handleAddBlacklist = async () => {
     setLoading(true)
     setShowLoading(true)
@@ -255,6 +252,8 @@ const AddFaceManagement = () => {
 
       const params = {
         name: name,
+        vehicleType: type,
+        status: status1,
         mainImageId: fileAvatarId,
         imgs: listFileId.map((id, index) => ({
           id: id,
@@ -262,23 +261,25 @@ const AddFaceManagement = () => {
         })),
         note: note
       }
+
       const response = await axios.post(`https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates`, params, config)
       const newId = response.data.id
-      Swal.fire(
-        Swal.fire({
-          title: 'Thành công!',
-          text: 'Dữ liệu đã được Thêm thành công.',
-          icon: 'success',
-          willOpen: () => {
-            const confirmButton = Swal.getConfirmButton()
-            if (confirmButton) {
-              confirmButton.style.backgroundColor = '#FF9F43'
-              confirmButton.style.color = 'white'
-            }
+      Swal.fire({
+        title: 'Successfully!',
+        text: 'Data Saved Successfully',
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
           }
-        })
-      )
-      setRedirectUrl(`/pages/car_management/detail/${newId}`)
+        }
+      }).then(result => {
+        if (result.isConfirmed) {
+          router.push(`/pages/car_management/detail/${newId}`)
+        }
+      })
     } catch (error) {
       Swal.fire({
         title: 'Error!',
@@ -287,7 +288,7 @@ const AddFaceManagement = () => {
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -295,8 +296,11 @@ const AddFaceManagement = () => {
       console.error('Error adding member to group:', error)
     } finally {
       setLoading(false)
-      setDialogOpen(true)
     }
+  }
+
+  const handleStatusChange = () => {
+    setStatus1(status1 === true ? false : true)
   }
 
   return (
@@ -307,7 +311,7 @@ const AddFaceManagement = () => {
           <Grid item xs={12}>
             <Card>
               <CardHeader
-                title='Thêm mới biển số xe'
+                title='Add new license plate number'
                 titleTypographyProps={{ sx: { mb: [2, 0] } }}
                 action={
                   <Grid container spacing={2}>
@@ -319,10 +323,10 @@ const AddFaceManagement = () => {
                           href={`/pages/car_management/list`}
                           sx={{ color: 'blue' }}
                         >
-                          Hủy
+                          Cancel
                         </Button>
-                        <Button disabled={!isNameEntered} onClick={handleAddBlacklist} variant='contained'>
-                          Thêm mới
+                        <Button disabled={!isNameEntered} onClick={handleAddBlacklist} variant='contained' color='primary'>
+                          Save
                         </Button>
                       </Box>
                     </Grid>
@@ -334,13 +338,6 @@ const AddFaceManagement = () => {
                   '& .MuiCardHeader-action': { m: 0 },
                   alignItems: ['flex-start', 'center']
                 }}
-              />
-              <CustomDialog
-                open={dialogOpen}
-                handleClose={handleDialogClose}
-                title={dialogTitle}
-                message={dialogMessage}
-                isSuccess={isSuccess}
               />
               <Grid item xs={12}>
                 {showLoading || loading}
@@ -378,7 +375,7 @@ const AddFaceManagement = () => {
                           margin: '0px'
                         }}
                       >
-                        {`Ảnh đại diện`}
+                        {`Avatar`}
                       </p>
                       <div
                         style={{
@@ -404,7 +401,7 @@ const AddFaceManagement = () => {
                       <Input
                         id='eventName'
                         eventname='eventName'
-                        placeholder={`      Nhập tên đối tượng`}
+                        placeholder={`Name`}
                         stylingmode='outlined'
                         defaultValue=''
                         mode='text'
@@ -434,7 +431,29 @@ const AddFaceManagement = () => {
                           margin: '0px'
                         }}
                       >
-                        Ghi chú
+                        Vehicle Type
+                      </p>
+                      <TextField
+                        variant='standard'
+                        style={{
+                          border: '1px solid rgba(0, 0, 0, 0.12)',
+                          borderRadius: '10px',
+                          width: '100%'
+                        }}
+                        defaultValue=''
+                        placeholder='vehicle type'
+                        onInput={e => {
+                          setType(e.target.value)
+                        }}
+                      />
+                      <p
+                        style={{
+                          fontSize: '18px',
+                          lineHeight: '22px',
+                          margin: '0px'
+                        }}
+                      >
+                        Description
                       </p>
 
                       <TextField
@@ -447,13 +466,26 @@ const AddFaceManagement = () => {
                           width: '100%'
                         }}
                         defaultValue=''
-                        placeholder='  Nhập ghi chú ...!'
+                        placeholder='Description'
                         onInput={e => {
                           setNote(e.target.value)
                         }}
                         id='textarea-standard-static'
                       />
+                      <div>
+                        <p
+                          style={{
+                            fontSize: '18px',
+                            lineHeight: '22px',
+                            margin: '0px'
+                          }}
+                        >
+                          Status
+                        </p>
+                        <Switch checked={status1 === true} onChange={handleStatusChange} />
+                      </div>
                     </div>
+
                     <div
                       style={{
                         color: 'red',
@@ -464,7 +496,7 @@ const AddFaceManagement = () => {
                         fontSize: 20
                       }}
                     >
-                      {`Nhấn đúp chuột vào ảnh để tạo Avatar`}
+                      {`Double click on the image to create Avatar`}
                     </div>
                     <div
                       style={{
@@ -476,19 +508,19 @@ const AddFaceManagement = () => {
                         fontSize: 20
                       }}
                     >
-                      {`Tên đối tượng bắt buộc phải nhập`}
+                      {`Object name must be entered`}
                     </div>
                   </div>
                   {listFileUpload.length === 0 && (
                     <p style={{ margin: '35px 0px 0px 0px', marginTop: '250px', marginLeft: '10px' }}>
                       <div></div>
 
-                      {`Ảnh của đối tượng : (Tối đa 5 ảnh)`}
+                      {`Photo of the object: (Up to 5 photos)`}
                     </p>
                   )}
                   {listFileUpload.length > 0 && (
                     <p style={{ margin: '35px 0px 0px 0px', marginTop: '250px', marginLeft: '10px' }}>
-                      {`Ảnh của đối tượng ${listFileUpload.length}/5)`}
+                      {`Photo of the object ${listFileUpload.length}/5)`}
                     </p>
                   )}
                   <div
@@ -524,7 +556,7 @@ const AddFaceManagement = () => {
                                 lineHeight: '19px'
                               }}
                             >
-                              {`Kéo thả ảnh`}
+                              {`Drag and drop photos`}
                             </p>
                             <p
                               style={{
@@ -532,7 +564,7 @@ const AddFaceManagement = () => {
                                 lineHeight: '19px'
                               }}
                             >
-                              {`Hoặc`}
+                              {`Or`}
                             </p>
                             <Button
                               style={{
@@ -543,7 +575,7 @@ const AddFaceManagement = () => {
                               color='primary'
                               variant='contained'
                             >
-                              {`Tải ảnh lên`}
+                              {`Upload photos`}
                             </Button>
                           </div>
                         </div>

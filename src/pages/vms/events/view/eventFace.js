@@ -28,7 +28,6 @@ import {
 } from '@mui/material'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import Filter from '../popups/filter'
-import View from '../popups/view'
 import Add from '../popups/add'
 import EventDetails from '../popups/eventDetails'
 
@@ -42,7 +41,7 @@ const initValueFilter = {
   page: 1
 }
 
-const EventList = ({ eventData }) => {
+const EventList = ({ }) => {
   const [keyword, setKeyword] = useState('')
   const [valueFilter, setValueFilter] = useState(initValueFilter)
   const [loading, setLoading] = useState(false)
@@ -63,6 +62,10 @@ const EventList = ({ eventData }) => {
   const [anchorEl, setAnchorEl] = useState(null)
 
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
+  const [rtcPeerConnection, setRtcPeerConnection] = useState(null)
+  const [websocket, setWebsocket] = useState(null)
+  const [eventData, setEventData] = useState(null)
+  const defaultCameraID = '0eb23593-a9b1-4278-9fb1-4d18f30ed6ff'
 
   const config1 = {
     headers: {
@@ -70,11 +73,101 @@ const EventList = ({ eventData }) => {
     }
   }
 
+  const config = {
+    bundlePolicy: 'max-bundle',
+    iceServers: [
+      {
+        urls: 'stun:dev-ivis-camera-api.basesystem.one:3478'
+      },
+      {
+        urls: 'turn:dev-ivis-camera-api.basesystem.one:3478',
+        username: 'demo',
+        credential: 'demo'
+      }
+    ]
+  }
+
+  useEffect(() => {
+    // create WebSocket connection
+
+    const ws = new WebSocket(
+      `wss://sbs.basesystem.one/ivis/vms/api/v0/websocket/topic/list_ai_event/be571c00-41cf-4878-a1de-b782625da62a`
+    )
+
+    setWebsocket(ws)
+
+    // create RTCPeerConnection
+
+    const pc = new RTCPeerConnection(config)
+    setRtcPeerConnection(pc)
+
+    // listen for remote tracks and add them to remote stream
+
+    pc.ontrack = event => {
+      const stream = event.streams[0]
+      if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {
+        setRemoteStream(stream)
+        remoteVideoRef.current.srcObject = stream
+      }
+    }
+
+    // close WebSocket and RTCPeerConnection on component unmount
+
+    return () => {
+      if (websocket) {
+        websocket.close()
+      }
+      if (rtcPeerConnection) {
+        rtcPeerConnection.close()
+      }
+    }
+  }, [])
+
+  const handleMessage = async event => {
+    const message = JSON.parse(event.data)
+    const newMessage = JSON.parse(message?.data)
+    if (newMessage.eventType === 'AI_EVENT_BLACKLIST_FACE_RECOGNITION') {
+      setEventData(newMessage)
+    }
+  }
+
+  useEffect(() => {
+    if (websocket) {
+      websocket.addEventListener('open', () => {
+        websocket.send(
+          JSON.stringify({
+            id: defaultCameraID,
+            type: 'request'
+          })
+        )
+      })
+      websocket.addEventListener('message', handleMessage)
+
+      websocket.addEventListener('error', error => {
+        console.error('WebSocket error:', error)
+      })
+
+      websocket.addEventListener('close', handleClose)
+    }
+  }, [websocket])
+
+  const handleClose = async event => {
+    if (websocket) {
+      websocket.close()
+    }
+  }
+
+  useEffect(() => {
+    if (rtcPeerConnection) {
+      rtcPeerConnection.addEventListener('connectionstatechange', () => { })
+    }
+  }, [rtcPeerConnection])
+
   const eventTypeColors = {
-    'Phát hiện sự kiện AI': 'success',
-    'Phát hiện đối tượng nguy hiểm': 'error',
+    'Phát hiện Event AI': 'success',
+    'Phát hiện Object nguy hiểm': 'error',
     'Phát hiện hành vi bất thường': 'warning',
-    'Phát hiện đối tượng danh sách đen': 'secondary'
+    'Phát hiện Object danh sách đen': 'secondary'
   }
 
   const columns = [
@@ -84,7 +177,7 @@ const EventList = ({ eventData }) => {
       maxWidth: 70,
       align: 'center',
       field: 'imageObject',
-      label: 'Hình ảnh',
+      label: 'Image',
       renderCell: value => (
         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
           <img src={value} alt='' style={{ maxWidth: '40%', height: 'auto', objectFit: 'contain' }} />
@@ -96,9 +189,17 @@ const EventList = ({ eventData }) => {
       flex: 0.15,
       maxWidth: 180,
       align: 'center',
-      label: 'Sự kiện',
+      label: 'Event',
       field: 'eventTypeString',
       renderCell: value => <Chip label={value} color={eventTypeColors[value]} />
+    },
+    {
+      id: 7,
+      flex: 0.15,
+      maxWidth: 150,
+      align: 'center',
+      label: 'Result',
+      field: 'result'
     },
     {
       id: 3,
@@ -106,7 +207,7 @@ const EventList = ({ eventData }) => {
       maxWidth: 70,
       align: 'center',
       field: 'description',
-      label: 'Tên đối tượng'
+      label: 'Object Name'
     },
     {
       id: 4,
@@ -114,7 +215,7 @@ const EventList = ({ eventData }) => {
       maxWidth: 50,
       align: 'center',
       field: 'timestamp',
-      label: 'Thời gian',
+      label: 'Date',
       renderCell: value => new Date(value).toLocaleString()
     },
     {
@@ -131,7 +232,7 @@ const EventList = ({ eventData }) => {
       maxWidth: 50,
       align: 'center',
       field: 'location',
-      label: 'Khu vực'
+      label: 'Location'
     }
   ]
 
@@ -168,7 +269,7 @@ const EventList = ({ eventData }) => {
     const params = {
       ...config1,
       params: {
-        camName: keyword || '',
+        keyword: keyword || '',
         limit: pageSize,
         page: parseInt(page),
         location: valueFilter?.location || '',
@@ -180,7 +281,7 @@ const EventList = ({ eventData }) => {
     }
     setLoading(true)
     try {
-      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/genimage?`, params)
+      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/routine`, params)
       setDeviceList(res.data)
       setCount(res.count)
       setTotalPage(Math.ceil(res.count / pageSize))
@@ -242,9 +343,9 @@ const EventList = ({ eventData }) => {
       >
         <Box sx={{ mb: 4, textAlign: 'center' }}>
           <Typography variant='h3' sx={{ mb: 3 }}>
-            Xác nhận
+            Accept
           </Typography>
-          <Typography sx={{ color: 'text.secondary' }}>Bạn có chắc chắn muốn xóa không ?</Typography>
+          <Typography sx={{ color: 'text.secondary' }}>Do you want to delete it?</Typography>
         </Box>
       </DialogContent>
       <DialogActions
@@ -261,10 +362,10 @@ const EventList = ({ eventData }) => {
             setIsOpenDel(false)
           }}
         >
-          Đồng ý
+          Accept
         </Button>
         <Button variant='tonal' color='secondary' sx={{ mr: 1 }} onClick={() => setIsOpenDel(false)}>
-          Hủy
+          Cancel
         </Button>
       </DialogActions>
     </Dialog>
@@ -281,15 +382,15 @@ const EventList = ({ eventData }) => {
       }
 
       axios
-        .delete(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/delete/${idDelete}`, config)
+        .delete(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/${idDelete}`, config)
         .then(() => {
-          toast.success('Xóa thành công')
+          toast.success('Deleted successfully')
           setIdDelete(null)
           setReload(reload + 1)
         })
         .catch(error => {
           console.error('Error fetching data:', error)
-          toast.error(error)
+          toast.error(error?.response?.data?.message || '')
         })
         .finally(() => {
           setLoading(false)
@@ -301,7 +402,7 @@ const EventList = ({ eventData }) => {
     <>
       <Card>
         <CardHeader
-          title='Danh sách sự kiện AI'
+          title='Faces'
           titleTypographyProps={{ sx: { mb: [2, 0] } }}
           sx={{
             py: 4,
@@ -314,7 +415,7 @@ const EventList = ({ eventData }) => {
               <Grid item>
                 <Box sx={{ float: 'right' }}>
                   <IconButton
-                    aria-label='Bộ lọc'
+                    aria-label='Filter'
                     onClick={() => {
                       setIsOpenFilter(true)
                     }}
@@ -327,7 +428,7 @@ const EventList = ({ eventData }) => {
               <Grid item>
                 <CustomTextField
                   value={keyword}
-                  placeholder='Tìm kiếm sự kiện '
+                  placeholder='Search '
                   InputProps={{
                     startAdornment: (
                       <Box sx={{ mr: 2, display: 'flex' }}>
@@ -360,13 +461,13 @@ const EventList = ({ eventData }) => {
             <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
               <TableHead>
                 <TableRow>
-                  <TableCell style={{ width: '20px' }}>STT</TableCell>
+                  <TableCell style={{ width: '20px' }}>NO.</TableCell>
                   {columns.map(({ id, label, field, renderCell, align, maxWidth }) => (
                     <TableCell key={id} align={align} sx={{ maxWidth }}>
                       {label}
                     </TableCell>
                   ))}
-                  <TableCell style={{ width: '30px' }}>Thao tác</TableCell>
+                  <TableCell style={{ width: '30px' }}>Action</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -375,7 +476,7 @@ const EventList = ({ eventData }) => {
                     <TableRow hover tabIndex={-1} key={index}>
                       <TableCell>{index + 1}</TableCell>
                       {columns.map(({ field, renderCell, align, maxWidth }) => {
-                        const value = row[field]
+                        const value = row[field] || ''
 
                         return (
                           <TableCell
@@ -429,14 +530,13 @@ const EventList = ({ eventData }) => {
         <br />
         <Grid container spacing={2} style={{ padding: 10 }}>
           <Grid item xs={3}></Grid>
-          <Grid item xs={1}>
-            <span style={{ fontSize: 15 }}> dòng/trang</span>
-          </Grid>
+
           <Grid item xs={1} style={{ padding: 0 }}>
             <Box>
-              <Button onClick={handleOpenMenu} endIcon={<Icon icon='tabler:selector' />}>
-                {pageSize}
-              </Button>
+              <IconButton onClick={handleOpenMenu}>
+                <Icon icon='tabler:selector' />
+                <p style={{ fontSize: 15 }}>{pageSize} line/page</p>
+              </IconButton>
               <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
                 {pageSizeOptions.map(size => (
                   <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>

@@ -6,6 +6,7 @@ import IconButton from '@mui/material/IconButton'
 import Icon from 'src/@core/components/icon'
 import { convertDateToString } from 'src/@core/utils/format'
 import { PlayArrow } from '@material-ui/icons'
+import { Box, CircularProgress } from '@mui/material'
 
 const config = {
   bundlePolicy: 'max-bundle',
@@ -45,6 +46,7 @@ export const ViewCameraPause = ({
   const [status, setStatus] = useState('')
   const [reload, setReload] = useState(0)
   const [selectedChannel, setSelectedChannel] = useState('Sub')
+  const intervalRef = useRef(null);
 
   useEffect(() => {
     const heightCaculator = Math.floor((window.innerHeight - 192) / sizeScreen.split('x')[1])
@@ -94,7 +96,6 @@ export const ViewCameraPause = ({
       setLoading(false)
       const stream = event.streams[0]
       try {
-
         // if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {0
         // }
 
@@ -143,17 +144,51 @@ export const ViewCameraPause = ({
   }, [id, channel])
 
   // useEffect(() => {
-  //   createWsConnection()
+  //   const checkStatus = () => {
+  //     if (status === 'disconnected' || status === 'failed' || status === '') {
+  //       console.log('Status is', status, 'at:', new Date().toLocaleTimeString());
+
+  //       if (intervalRef.current) {
+  //         clearInterval(intervalRef.current);
+  //       }
+  //       intervalRef.current = setInterval(() => {
+  //         console.log('Recreating WebSocket connection due to status:', status, 'at:', new Date().toLocaleTimeString());
+  //         setRtcPeerConnection(null)
+  //         setWebsocket(null)
+  //         createWsConnection();
+  //       }, 5000);
+  //     } else {
+  //       console.log('Status is connected, no need to retry at:', new Date().toLocaleTimeString());
+
+  //       if (intervalRef.current) {
+  //         clearInterval(intervalRef.current);
+  //       }
+  //     }
+  //   };
+
+  //   checkStatus();
 
   //   return () => {
-  //     if (websocket) {
-  //       websocket.close()
+  //     if (intervalRef.current) {
+  //       clearInterval(intervalRef.current);
   //     }
-  //     if (rtcPeerConnection) {
-  //       rtcPeerConnection.close()
-  //     }
-  //   }
-  // }, [reload])
+  //   };
+  // }, [status]);
+
+  useEffect(() => {
+    setRtcPeerConnection(null)
+    setWebsocket(null)
+    createWsConnection()
+
+    return () => {
+      if (websocket) {
+        websocket.close()
+      }
+      if (rtcPeerConnection) {
+        rtcPeerConnection.close()
+      }
+    }
+  }, [reload])
 
   // send message to WebSocket server
   const sendMessage = message => {
@@ -201,6 +236,7 @@ export const ViewCameraPause = ({
         break
     }
     setText(message?.content)
+    setLoading(false)
 
     // console.log('message', message)
   }
@@ -217,7 +253,7 @@ export const ViewCameraPause = ({
             viewType: 'playback',
             startTime: convertDateToString(startTime),
             endTime: convertDateToString(endTime),
-            channel: channel,
+            channel: channel
           })
         )
       })
@@ -232,85 +268,98 @@ export const ViewCameraPause = ({
   }, [websocket])
 
   useEffect(() => {
-    console.log('heightDiv', heightDiv);
+    console.log('heightDiv', heightDiv)
   }, [heightDiv])
 
   return (
     <div className='portlet portlet-video live' style={{ width: '100%' }}>
-      <div className='portlet-title'>
-        <div className='caption'>
-          <span className='label label-sm'
-            style={{ backgroundColor: status === 'connected' ? 'green' : 'red', color: 'white' }}>
-            {status ? status.toUpperCase() : 'PLAYBACK'}
-          </span>
-          <span className='caption-subject font-dark sbold uppercase'>{name}</span>
+      {loading && (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: heightDiv - 26 }}>
+          <Box sx={{ display: 'flex' }}>
+            <CircularProgress />
+          </Box>
         </div>
-        <div className='media-top-controls'>
+      )}
+      {!loading && (
+        <div>
+          <div className='portlet-title'>
+            <div className='caption'>
+              <span
+                className='label label-sm'
+                style={{ backgroundColor: status === 'connected' ? 'green' : 'red', color: 'white' }}
+              >
+                {status ? status.toUpperCase() : 'PLAYBACK'}
+              </span>
+              <span className='caption-subject font-dark sbold uppercase'>{name}</span>
+            </div>
+            <div className='media-top-controls'>
+              <div>
+                <Button
+                  sx={{
+                    backgroundColor: selectedChannel === 'Sub' ? '#fff' : 'default',
+                    height: '20px',
+                    color: selectedChannel === 'Sub' ? '#FF2C00' : '#ffffff',
+                    '&:hover': {
+                      backgroundColor: '#fff',
+                      color: '#FF2C00'
+                    }
+                  }}
+                  onClick={() => {
+                    handSetChanel(id, 'Sub')
+                    setSelectedChannel('Sub')
+
+                    // createWsConnection()
+                  }}
+                >
+                  SD
+                </Button>
+                <Button
+                  sx={{
+                    backgroundColor: selectedChannel === 'Main' ? '#fff' : 'default',
+                    height: '15px',
+                    color: selectedChannel === 'Main' ? '#FF2C00' : '#ffffff',
+                    '&:hover': {
+                      backgroundColor: '#fff',
+                      color: '#FF2C00'
+                    }
+                  }}
+                  onClick={() => {
+                    handSetChanel(id, 'Main')
+                    setSelectedChannel('Main')
+
+                    // createWsConnection()
+                  }}
+                >
+                  HD
+                </Button>
+              </div>
+            </div>
+          </div>
           <div>
-            <Button
-              sx={{
-                backgroundColor: selectedChannel === 'Sub' ? '#fff' : 'default',
-                height: '20px',
-                color: selectedChannel === 'Sub' ? '#FF2C00' : '#ffffff',
-                '&:hover': {
-                  backgroundColor: '#fff',
-                  color: '#FF2C00'
-                }
-              }}
-              onClick={() => {
-                handSetChanel(id, 'Sub')
-                setSelectedChannel('Sub')
-
-                // createWsConnection()
-              }}
-            >
-              SD
-            </Button>
-            <Button
-              sx={{
-                backgroundColor: selectedChannel === 'Main' ? '#fff' : 'default',
-                height: '15px',
-                color: selectedChannel === 'Main' ? '#FF2C00' : '#ffffff',
-                '&:hover': {
-                  backgroundColor: '#fff',
-                  color: '#FF2C00'
-                }
-              }}
-              onClick={() => {
-                handSetChanel(id, 'Main')
-                setSelectedChannel('Main')
-
-                // createWsConnection()
-              }}
-            >
-              HD
-            </Button>
+            <video
+              style={{ width: '100%', height: heightDiv - 26 }}
+              ref={remoteVideoRef}
+              playsInline
+              autoPlay
+              srcObject={remoteStream}
+            />
+            {(status === 'failed' || status === 'disconnected' || status === '') && (
+              <IconButton
+                sx={{
+                  left: '50%',
+                  top: '50%',
+                  position: 'absolute',
+                  color: '#efefef',
+                  transform: 'translateY(-50%)'
+                }}
+                onClick={() => setReload(reload + 1)}
+              >
+                <Icon icon='tabler:reload' fontSize={30} />
+              </IconButton>
+            )}
           </div>
         </div>
-      </div>
-      <div>
-        <video
-          style={{ width: '100%', height: heightDiv - 26 }}
-          ref={remoteVideoRef}
-          playsInline
-          autoPlay
-          srcObject={remoteStream}
-        />
-        {(status === 'failed' || status == 'disconnected') && (
-          <IconButton
-            sx={{
-              left: '30%',
-              top: '50%',
-              position: 'absolute',
-              color: '#efefef',
-              transform: 'translateY(-50%)'
-            }}
-            onClick={() => setReload(reload + 1)}
-          >
-            <Icon icon='tabler:reload' fontSize={30} />
-          </IconButton>
-        )}
-      </div>
+      )}
     </div>
   )
 }

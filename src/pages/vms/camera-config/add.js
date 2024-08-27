@@ -11,34 +11,24 @@ import authConfig from 'src/configs/auth'
 import Table from '@mui/material/Table'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
-import { Box, Autocomplete, Button, FormControl, IconButton, InputLabel, Paper, Select } from '@mui/material'
+import { Box, Autocomplete, Button, IconButton, Paper, CardHeader } from '@mui/material'
 import Swal from 'sweetalert2'
 import axios from 'axios'
 import CustomTextField from 'src/@core/components/mui/text-field'
-import RolePopup from './popups/ChangePassword'
-import Passwords from './popups/PassWord'
 import { Radio, RadioGroup, FormControlLabel } from '@mui/material'
 import toast from 'react-hot-toast'
-
-import Network from './popups/Network'
-import Video from './popups/video'
-import Image from './popups/Image'
+import CustomChip from 'src/@core/components/mui/chip'
 import Checkbox from '@mui/material/Checkbox'
-import Cloud from './popups/Cloud'
-import ConnectCamera from './popups/ConnectCamera'
-import VideoConnectCamera from './popups/VideoConnectCamera'
-import PopupScanOnvif from './popups/AddOnvif'
 import PopupScanHik from './popups/AddHik'
 import PopupScanDungIP from './popups/AddDungIP'
 import PopupScan from './popups/Add'
 import CircularProgress from '@mui/material/CircularProgress'
 import Edit from './popups/Edit'
-import CustomDialog from '../../pages/face_management/CustomDialog/CustomDialog'
 import ImportPopup from './popups/ImportPopup'
 import AddDevice from './popups/AddDevice'
 import LiveView from './popups/LiveView'
 
-const Add = ({ apiData, assettypeStatus }) => {
+const Add = ({ apiData }) => {
   const [value, setValue] = useState('')
   const [selectedIds, setSelectedIds] = useState([])
   const [openPopup, setOpenPopup] = useState(false)
@@ -86,17 +76,20 @@ const Add = ({ apiData, assettypeStatus }) => {
   const [isOpenLiveView, setIsOpenLiveView] = useState(false)
   const [camera, setCamera] = useState(null)
 
+  const defaultCameraID = '0eb23593-a9b1-4278-9fb1-4d18f30ed6ff'
+  const [assettypeStatus, setAssetTypeStatus] = useState([])
+
   function showAlertConfirm(options, intl) {
     const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Accept',
       imageWidth: 213,
       showCancelButton: true,
       showCloseButton: true,
       showConfirmButton: true,
       focusCancel: true,
       reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
-      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Agree',
+      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Cancel',
       customClass: {
         content: 'content-class',
         confirmButton: 'swal-btn-confirm',
@@ -106,13 +99,69 @@ const Add = ({ apiData, assettypeStatus }) => {
       didOpen: () => {
         const confirmButton = Swal.getConfirmButton()
         if (confirmButton) {
-          confirmButton.style.backgroundColor = '#ff9f43'
+          confirmButton.style.backgroundColor = '#002060'
         }
       }
     }
 
     return Swal.fire({ ...defaultProps, ...options })
   }
+
+  useEffect(() => {
+    const ws = new WebSocket(`wss://sbs.basesystem.one/ivis/vms/api/v0/websocket/topic/cameraStatus/${defaultCameraID}`)
+
+    ws.onmessage = event => {
+      const { dataType, data } = JSON.parse(event.data)
+      if (dataType === 'cameraStatus') {
+        const cameraStatusUpdates = JSON.parse(data)
+        updateCameraStatus(cameraStatusUpdates)
+      }
+    }
+
+    return () => {
+      ws.close()
+    }
+  }, [])
+
+  const updateCameraStatus = useCallback(
+    cameraStatusUpdates => {
+      const cameraStatusMap = new Map(
+        cameraStatusUpdates.map(status => [status.id, status.statusValue.name, status.ip])
+      )
+
+      // Lặp qua các mục trong Map sử dụng for...of
+      for (const entry of cameraStatusMap.entries()) {
+        const [id, status, ip] = entry
+
+        const entry1 = {
+          id: id,
+          status: status,
+          ip: ip
+        }
+
+        setAssetTypeStatus(prevAssetType => {
+          const newAssetType = prevAssetType.map(camera => {
+            if (camera.id === entry1.id) {
+              if (camera.status.name !== entry1.status) {
+                // console.log('AssetType with ID', entry1.id, 'has changed status.')
+                // console.log('Previous status:', camera.status.name)
+                // console.log('New status:', entry1.status)
+              }
+
+              return { ...camera, status: { name: entry1.status } }
+            }
+
+            return camera
+          })
+
+          // console.log('New Asset Type:', newAssetType) // Log updated asset type
+
+          return newAssetType
+        })
+      }
+    },
+    [assettypeStatus]
+  )
 
   const handleDialogClose = () => {
     setDialogOpen(false)
@@ -185,7 +234,7 @@ const Add = ({ apiData, assettypeStatus }) => {
 
       setResponse(response.data)
       setLoading(false)
-      setPopupMessage('Quét thành công')
+      setPopupMessage('Scan Successfully')
       setIsError(false) // Không phải lỗi
     } catch (error) {
       if (
@@ -193,7 +242,7 @@ const Add = ({ apiData, assettypeStatus }) => {
         error.response.data &&
         error.response.data.message === 'No response from the server device, timeout: scan_device_ip'
       ) {
-        setPopupMessage('Thiết bị chưa phản hồi')
+        setPopupMessage('Device not responding')
       } else {
         setPopupMessage(`${error.message}`)
       }
@@ -201,15 +250,6 @@ const Add = ({ apiData, assettypeStatus }) => {
       // // setOpenPopupResponseDungIP(false)
       setIsError(true) // Đánh dấu là lỗi
       setLoading(false)
-    }
-  }
-
-  const handleRadioChange = event => {
-    setSelectedValue(event.target.value)
-    if (event.target.value === 'LoaiGT') {
-      setProtocolSelected(true)
-    } else {
-      setProtocolSelected(false)
     }
   }
 
@@ -264,7 +304,7 @@ const Add = ({ apiData, assettypeStatus }) => {
 
   const handleDelete = idDelete => {
     showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
+      text: 'Do you want to delete it?'
     }).then(({ value }) => {
       if (value) {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -281,15 +321,15 @@ const Add = ({ apiData, assettypeStatus }) => {
         axios
           .delete(urlDelete, config)
           .then(() => {
-            setDialogTitle('Xóa camera thành công')
+            setDialogTitle('Deleted Successfully')
             setIsSuccess(true)
             const updatedData = assettype.filter(assettype => assettype.id !== idDelete)
             setAssetType(updatedData)
             fetchFilteredOrAllUsers()
           })
           .catch(err => {
-            setDialogTitle('xóa không thành công')
-            setDialogMessage(err.message || 'xóa không thành công')
+            setDialogTitle('Delete failed')
+            setDialogMessage(err.message || 'Delete failed')
             setIsSuccess(false)
           })
           .finally(() => {
@@ -317,18 +357,6 @@ const Add = ({ apiData, assettypeStatus }) => {
 
   const handleCloseNetWorkPopup = () => {
     setOpenPopupNetwork(false)
-  }
-
-  const handleCloseVideoPopup = () => {
-    setOpenPopupVideo(false)
-  }
-
-  const handleCloseImagePopup = () => {
-    setOpenPopupImage(false)
-  }
-
-  const handleCloseCloudPopup = () => {
-    setOpenPopupCloud(false)
   }
 
   const handleAddConnectCameraClick = () => {
@@ -372,12 +400,12 @@ const Add = ({ apiData, assettypeStatus }) => {
     if (!selectedTitle) {
       Swal.fire({
         title: 'Error',
-        text: 'Hãy chọn loại giao thức',
+        text: 'Please select protocol type',
         icon: 'error',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -413,9 +441,9 @@ const Add = ({ apiData, assettypeStatus }) => {
       setResponse(response.data)
       setLoading(false)
 
-      toast.success('Thành công')
+      toast.success('Successfully')
 
-      setPopupMessage('Quét thành công')
+      setPopupMessage('Scan Successfully')
       setIsError(false) // Không phải lỗi
     } catch (error) {
       if (
@@ -423,7 +451,7 @@ const Add = ({ apiData, assettypeStatus }) => {
         error.response.data &&
         error.response.data.message === 'No response from the server device, timeout: scan_device'
       ) {
-        setPopupMessage('Thiết bị chưa phản hồi')
+        setPopupMessage('Device not responding')
       } else {
         setPopupMessage(`${error.response.data.message}`)
       }
@@ -466,9 +494,9 @@ const Add = ({ apiData, assettypeStatus }) => {
       setResponse(response.data)
       setLoading(false)
 
-      toast.success('Thành công')
+      toast.success('Successfully')
 
-      setPopupMessage('Quét thành công')
+      setPopupMessage('Scan Successfully')
       setIsError(false) // Không phải lỗi
     } catch (error) {
       if (
@@ -476,7 +504,7 @@ const Add = ({ apiData, assettypeStatus }) => {
         error.response.data &&
         error.response.data.message === 'No response from the server device, timeout: scan_device_ip'
       ) {
-        setPopupMessage('Thiết bị chưa phản hồi')
+        setPopupMessage('Device not responding')
       } else {
         setPopupMessage(`${error.message}`)
       }
@@ -548,10 +576,6 @@ const Add = ({ apiData, assettypeStatus }) => {
     setIdBox(newValue.value)
   }
 
-  const handleDDNSChangeTitle = (event, newValue) => {
-    setSelectedTitle(newValue.name)
-  }
-
   const resetPopupState = () => {
     setResponse(null)
     setIsError(false)
@@ -565,24 +589,95 @@ const Add = ({ apiData, assettypeStatus }) => {
     }
   }, [assettypeStatus])
 
+  const fetchDataReload = async id => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.get(
+        `https://sbs.basesystem.one/ivis/vms/api/v0/device/camera/synchronize?camera_id=${id}`,
+        config
+      )
+      Swal.fire({
+        title: 'Synchronization successful!',
+        text: response?.message,
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
+    } catch (error) {
+      console.error('Error fetching users:', error)
+      Swal.fire({
+        title: 'Error!',
+        text: error.response?.data?.message,
+        icon: 'error',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
+    }
+  }
+
+  const handleReloadClick = id => {
+    fetchDataReload(id)
+  }
+
+  const handleRadioChange = event => {
+    setSelectedValue(event.target.value)
+    if (event.target.value === 'LoaiGT') {
+      setProtocolSelected(true)
+    } else {
+      setProtocolSelected(false)
+    }
+  }
+  console.log(protocolSelected)
+
+  const handleDDNSChangeTitle = (event, newValue) => {
+    setSelectedTitle(newValue.name)
+  }
+
   return (
     <>
       <Grid container spacing={6.5}>
         <Grid item xs={12}>
           <Card>
+            <CardHeader
+              title='Camera List '
+              titleTypographyProps={{ sx: { mb: [2, 0] } }}
+              sx={{
+                py: 4,
+                flexDirection: ['column', 'row'],
+                '& .MuiCardHeader-action': { m: 0 },
+                alignItems: ['flex-start', 'center']
+              }}
+            />
             <Grid container spacing={2} style={{ marginTop: '1%' }}>
               <Grid item xs={8}>
                 <div>
                   <RadioGroup value={selectedValue} onChange={handleRadioChange} style={{ marginLeft: 50 }}>
                     <Grid container spacing={2}>
                       <Grid item>
-                        <FormControlLabel value='dungIp' control={<Radio />} label='Dùng IP' />
+                        <FormControlLabel value='dungIp' control={<Radio />} label='Use IP' />
                       </Grid>
                       <Grid item>
-                        <FormControlLabel value='daiIp' control={<Radio />} label='Dải IP' />
+                        <FormControlLabel value='daiIp' control={<Radio />} label='IP range' />
                       </Grid>
                       <Grid item>
-                        <FormControlLabel value='LoaiGT' control={<Radio />} label='Loại giao thức' />
+                        <FormControlLabel value='LoaiGT' control={<Radio />} label='Protocol type' />
                       </Grid>
                       <Grid item xs={3}>
                         <Autocomplete
@@ -590,9 +685,19 @@ const Add = ({ apiData, assettypeStatus }) => {
                           options={protocol}
                           id='autocomplete-custom'
                           getOptionLabel={option => option.name || ''}
-                          renderInput={params => <CustomTextField placeholder='Khác' {...params} />}
+                          renderInput={params => (
+                            <CustomTextField
+                              placeholder='Other'
+                              {...params}
+                              InputProps={{
+                                ...params.InputProps,
+                                style: { cursor: protocolSelected ? 'pointer' : 'not-allowed' }
+                              }}
+                            />
+                          )}
                           onChange={handleDDNSChangeTitle}
                           disabled={!protocolSelected}
+                          style={{ pointerEvents: protocolSelected ? 'auto' : 'none' }}
                         />
                       </Grid>
                     </Grid>
@@ -658,7 +763,7 @@ const Add = ({ apiData, assettypeStatus }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                        // loading={loading}
+                      // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.1}></Grid>
@@ -667,20 +772,20 @@ const Add = ({ apiData, assettypeStatus }) => {
                       <CustomTextField
                         value={url}
                         onChange={e => setUrl(e.target.value)}
-                        label='Địa chỉ IP'
+                        label='IP Address'
                         fullWidth
                       />
                     </Grid>
                     <Grid item xs={0.1}></Grid>
                     <Grid item xs={1.8}>
-                      <CustomTextField value={host} onChange={e => setHost(e.target.value)} label='Cổng' fullWidth />
+                      <CustomTextField value={host} onChange={e => setHost(e.target.value)} label='Port' fullWidth />
                     </Grid>
                     <Grid item xs={0.1}></Grid>
                     <Grid item xs={1.8}>
                       <CustomTextField
                         value={userName}
                         onChange={e => setUsername(e.target.value)}
-                        label='Đăng nhập'
+                        label='Username'
                         fullWidth
                       />
                     </Grid>
@@ -689,7 +794,7 @@ const Add = ({ apiData, assettypeStatus }) => {
                       <CustomTextField
                         value={passWord}
                         onChange={e => setPassWord(e.target.value)}
-                        label='Mật khẩu'
+                        label='Password'
                         type='password'
                         fullWidth
                       />
@@ -699,7 +804,7 @@ const Add = ({ apiData, assettypeStatus }) => {
                     <Grid item xs={2} style={{ marginTop: '2%' }}>
                       <Button>Cancel</Button>
                       <Button onClick={handleScan} variant='contained'>
-                        Quét
+                        Scan
                       </Button>
                     </Grid>
                     {loading && <CircularProgress />}
@@ -744,7 +849,7 @@ const Add = ({ apiData, assettypeStatus }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                        // loading={loading}
+                      // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.4}></Grid>
@@ -752,7 +857,7 @@ const Add = ({ apiData, assettypeStatus }) => {
                       <CustomTextField
                         value={startURL}
                         onChange={e => setStartUrl(e.target.value)}
-                        label='Địa chỉ IP bắt đầu'
+                        label='Starting IP Address'
                         fullWidth
                       />
                     </Grid>
@@ -765,7 +870,7 @@ const Add = ({ apiData, assettypeStatus }) => {
                       <CustomTextField
                         value={endURL}
                         onChange={e => setEndUrl(e.target.value)}
-                        label='Địa chỉ IP kết thúc'
+                        label='End IP Address'
                         fullWidth
                       />
                     </Grid>
@@ -775,7 +880,7 @@ const Add = ({ apiData, assettypeStatus }) => {
                       <CustomTextField
                         value={startHost}
                         onChange={e => setStartHost(e.target.value)}
-                        label='Cổng bắt đầu'
+                        label='start Port'
                         fullWidth
                       />
                     </Grid>
@@ -788,7 +893,7 @@ const Add = ({ apiData, assettypeStatus }) => {
                       <CustomTextField
                         value={endHost}
                         onChange={e => setEndHost(e.target.value)}
-                        label='Cổng kết thúc'
+                        label='End Port'
                         fullWidth
                       />
                     </Grid>
@@ -796,7 +901,7 @@ const Add = ({ apiData, assettypeStatus }) => {
                       <CustomTextField
                         value={userName}
                         onChange={e => setUsername(e.target.value)}
-                        label='Đăng nhập'
+                        label='Username'
                         fullWidth
                       />
                     </Grid>
@@ -806,7 +911,7 @@ const Add = ({ apiData, assettypeStatus }) => {
                       <CustomTextField
                         value={passWord}
                         onChange={e => setPassWord(e.target.value)}
-                        label='Mật khẩu'
+                        label='Password'
                         type='password'
                         fullWidth
                       />
@@ -816,7 +921,7 @@ const Add = ({ apiData, assettypeStatus }) => {
                     <Grid item xs={4} style={{ marginTop: '1%' }}>
                       <Button>Cancel</Button>
                       <Button onClick={handleScanDaiIP} variant='contained'>
-                        Quét
+                        Scan
                       </Button>
                     </Grid>
                     <Grid item xs={0.1} style={{ marginTop: '1%', marginLeft: '-20%' }}>
@@ -862,7 +967,7 @@ const Add = ({ apiData, assettypeStatus }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                        // loading={loading}
+                      // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.1}></Grid>
@@ -873,7 +978,7 @@ const Add = ({ apiData, assettypeStatus }) => {
                         form='off'
                         value={userName}
                         onChange={e => setUsername(e.target.value)}
-                        label='Đăng nhập'
+                        label='Username'
                         fullWidth
                       />
                     </Grid>
@@ -884,7 +989,7 @@ const Add = ({ apiData, assettypeStatus }) => {
                         autoComplete='new-password' // Thay đổi giá trị thành 'new-password'
                         form='off'
                         onChange={e => setPassWord(e.target.value)}
-                        label='Mật khẩu'
+                        label='Password'
                         type='password'
                         fullWidth
                       />
@@ -894,7 +999,7 @@ const Add = ({ apiData, assettypeStatus }) => {
                     <Grid item xs={4} style={{ marginTop: '1%' }}>
                       <Button>Cancel</Button>
                       <Button variant='contained' onClick={handleScanLGT}>
-                        Quét
+                        Scan
                       </Button>
                     </Grid>
                   </Grid>
@@ -928,7 +1033,7 @@ const Add = ({ apiData, assettypeStatus }) => {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell sx={{ padding: '16px' }}>
+                      <TableCell align='center'>
                         <Checkbox
                           checked={selectedIds.length === assettype.length}
                           onChange={e => {
@@ -941,61 +1046,53 @@ const Add = ({ apiData, assettypeStatus }) => {
                           }}
                         />
                       </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>Tên thiết bị</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>Loại</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>Địa chỉ IP</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>Địa chỉ Mac</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>Vị trí</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>Trạng thái</TableCell>
+                      <TableCell align='center'>NO.</TableCell>
+                      <TableCell align='center'>Device Name</TableCell>
+                      <TableCell align='center'>Device Type</TableCell>
+                      <TableCell align='center'>IP Address</TableCell>
+                      <TableCell align='center'>Mac Address</TableCell>
+                      <TableCell align='center'>Location</TableCell>
+                      <TableCell align='center'>Status</TableCell>
 
-                      <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
+                      <TableCell align='center'>Active</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {assettype.map((assetType, index) => (
                       <TableRow key={assetType.id}>
-                        <TableCell sx={{ padding: '16px' }}>
+                        <TableCell align='center'>
                           <Checkbox
                             checked={selectedIds.includes(assetType.id)}
                             onChange={() => handleCheckboxChange(assetType.id)}
                           />
                         </TableCell>
-                        <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
-                        <TableCell sx={{ padding: '16px' }}>{assetType.name}</TableCell>
-                        <TableCell sx={{ padding: '16px' }}>{assetType.type.name}</TableCell>
-                        <TableCell sx={{ padding: '16px' }}>{assetType.ipAddress}</TableCell>
-                        <TableCell sx={{ padding: '16px' }}>{assetType.macAddress}</TableCell>
-                        <TableCell sx={{ padding: '16px' }}>{assetType.location}</TableCell>
-                        <TableCell sx={{ padding: '16px', textAlign: 'center' }}>
+                        <TableCell align='center'>{(page - 1) * pageSize + index + 1} </TableCell>
+                        <TableCell align='center'>{assetType.name}</TableCell>
+                        <TableCell align='center'>{assetType.type.name}</TableCell>
+                        <TableCell align='center'>{assetType.ipAddress}</TableCell>
+                        <TableCell align='center'>{assetType.macAddress}</TableCell>
+                        <TableCell align='center'>{assetType.location}</TableCell>
+                        <TableCell align='center'>
                           {assetType.status && assetType.status.name ? (
-                            <div
-                              style={{
-                                backgroundColor:
-                                  assetType.status.name === 'connected'
-                                    ? 'lightgreen'
-                                    : assetType.status.name === 'disconnected'
-                                    ? '#FF9F43'
-                                    : 'orange',
-                                borderRadius: '10px',
-                                padding: '5px 10px',
-                                width: '70%',
-                                display: 'inline-block',
-                                color: 'white'
-                              }}
-                            >
-                              {assetType.status.name === 'connected'
-                                ? 'Đã kết nối'
-                                : assetType.status.name === 'disconnected'
-                                ? 'Mất kết nối'
-                                : assetType.status.name}
+                            <div>
+                              <CustomChip
+                                rounded
+                                size='small'
+                                skin='light'
+                                sx={{ lineHeight: 1 }}
+                                label={assetType.status.name === 'disconnected' ? 'Lost connection' : 'Connected'}
+                                color={assetType.status.name === 'disconnected' ? 'primary' : 'success'}
+                              />
                             </div>
                           ) : (
                             assetType.status.name
                           )}
                         </TableCell>
 
-                        <TableCell sx={{ padding: '16px' }}>
+                        <TableCell align='center'>
+                          <IconButton onClick={() => handleReloadClick(assetType.id)}>
+                            <Icon icon='tabler:reload' />
+                          </IconButton>
                           <IconButton onClick={() => handleOpenLiveView(assetType)}>
                             <Icon icon='tabler:video' />
                           </IconButton>
@@ -1013,21 +1110,24 @@ const Add = ({ apiData, assettypeStatus }) => {
                 <br></br>
                 <Grid container spacing={2} style={{ padding: 10 }}>
                   <Grid item xs={3}></Grid>
-                  <Grid item xs={1.5} style={{ padding: 0 }}>
-                    <IconButton onClick={handleOpenMenu}>
-                      <Icon icon='tabler:selector' />
-                      <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
-                    </IconButton>
-                    <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
-                      {pageSizeOptions.map(size => (
-                        <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
-                          {size}
-                        </MenuItem>
-                      ))}
-                    </Menu>
+
+                  <Grid item xs={1} style={{ padding: 0 }}>
+                    <Box>
+                      <IconButton onClick={handleOpenMenu}>
+                        <Icon icon='tabler:selector' />
+                        <p style={{ fontSize: 15 }}>{pageSize} line/page</p>
+                      </IconButton>
+                      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+                        {pageSizeOptions.map(size => (
+                          <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
+                            {size}
+                          </MenuItem>
+                        ))}
+                      </Menu>
+                    </Box>
                   </Grid>
                   <Grid item xs={6}>
-                    <Pagination count={total} color='primary' onChange={(event, page) => handlePageChange(page)} />
+                    <Pagination count={total} page={page} color='primary' onChange={handlePageChange} />
                   </Grid>
                 </Grid>
               </Grid>
@@ -1049,13 +1149,6 @@ const Add = ({ apiData, assettypeStatus }) => {
         {isOpenLiveView && <LiveView show={isOpenLiveView} onClose={() => setIsOpenLiveView(false)} data={camera} />}
       </Grid>
       <ImportPopup open={openPopup} handleClose={handleClosePopup} />
-      <CustomDialog
-        open={dialogOpen}
-        handleClose={handleDialogClose}
-        title={dialogTitle}
-        message={dialogMessage}
-        isSuccess={isSuccess}
-      />
     </>
   )
 }

@@ -19,6 +19,7 @@ import authConfig from 'src/configs/auth'
 import { makeStyles } from '@material-ui/core/styles'
 import Icon from 'src/@core/components/icon'
 import Swal from 'sweetalert2'
+import CustomChip from 'src/@core/components/mui/chip'
 import { useRouter } from 'next/router'
 import CircularProgress from '@mui/material/CircularProgress'
 import axios from 'axios'
@@ -31,8 +32,6 @@ const AddCamera = ({ nvr, onClose }) => {
   const [camera, setCamera] = useState([])
   const [nvrCameraList, setNVRCameraList] = useState([])
   const [notification, setNotification] = useState({ message: '', type: '' })
-
-  console.log(nvr, 'nvr')
 
   useEffect(() => {
     const fetchGroupData = async () => {
@@ -94,9 +93,9 @@ const AddCamera = ({ nvr, onClose }) => {
 
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${nvr}`, { cameras: updatedCameras }, config)
 
-      setNotification({ message: 'Xóa camera thành công', type: 'success' })
+      setNotification({ message: 'Deleted successfully', type: 'success' })
     } catch (error) {
-      setNotification({ message: `Đã xảy ra lỗi: ${error.message}`, type: 'error' })
+      setNotification({ message: `An error occurred: ${error.message}`, type: 'error' })
       console.error('Error deleting camera:', error)
     } finally {
       setLoading(false)
@@ -124,9 +123,9 @@ const AddCamera = ({ nvr, onClose }) => {
         ]
       }
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/camera/${nvr}`, params, config)
-      setNotification({ message: 'Thêm thành công', type: 'success' })
+      setNotification({ message: 'Added successfully', type: 'success' })
     } catch (error) {
-      setNotification({ message: `Thiết bị chưa phản hồi: ${error.message}`, type: 'error' })
+      setNotification({ message: `Device not responding: ${error.message}`, type: 'error' })
       console.error('Error adding member to group:', error)
     } finally {
       setLoading(false)
@@ -137,71 +136,84 @@ const AddCamera = ({ nvr, onClose }) => {
     <div className={classes.loadingContainer}>
       {loading && <CircularProgress className={classes.circularProgress} />}
       <Grid container spacing={1}>
-        <Card>
-          <Grid item xs={12}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={{ padding: '16px' }}>STT</TableCell>
-                  <TableCell sx={{ padding: '16px' }}>Tên camera</TableCell>
-                  <TableCell sx={{ padding: '16px' }}>Loại</TableCell>
-                  <TableCell sx={{ padding: '16px' }}>Địa chỉ IP</TableCell>
-                  <TableCell sx={{ padding: '16px' }}>Kết nối NVR/AI Box</TableCell>
-                  <TableCell sx={{ padding: '16px' }}>Địa chỉ Mac</TableCell>
-                  <TableCell sx={{ padding: '16px' }}>Vị trí</TableCell>
-                  <TableCell sx={{ padding: '16px' }}>Trạng thái</TableCell>
-                  <TableCell sx={{ padding: '16px' }}>Hành động</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {Array.isArray(camera) && camera.length > 0 ? (
-                  camera.map((camera, index) => (
-                    <TableRow key={camera.id}>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell>{camera.name}</TableCell>
-                      <TableCell></TableCell>
-                      <TableCell>{camera.ipAddress}</TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                      <TableCell>{camera.location}</TableCell>
-                      <TableCell>{camera.status.name}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>
-                        <Grid container spacing={2}>
-                          {Array.isArray(nvrCameraList) && nvrCameraList.length > 0 ? (
-                            nvrCameraList.some(nvrCamera => nvrCamera.id === camera.id) ? (
-                              <IconButton disabled={loading} onClick={() => handleDelete(camera.id)}>
-                                <Icon icon='tabler:minus' />
-                              </IconButton>
-                            ) : (
-                              <IconButton disabled={loading} onClick={() => handleUpdate(camera.id, camera.name)}>
-                                <Icon icon='tabler:plus' />
-                              </IconButton>
-                            )
+        <Grid item xs={12}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ padding: '16px' }}>NO.</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Camera Name</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Device Type</TableCell>
+                <TableCell sx={{ padding: '16px' }}>IP Address</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Connect NVR/AI Box </TableCell>
+                <TableCell sx={{ padding: '16px' }}>Mac Address</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Location</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Status</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Active</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {Array.isArray(camera) && camera.length > 0 ? (
+                camera.map((camera, index) => (
+                  <TableRow key={camera.id}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{camera.name}</TableCell>
+                    <TableCell></TableCell>
+                    <TableCell>{camera.ipAddress}</TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    <TableCell>{camera.location}</TableCell>
+                    <TableCell sx={{ padding: '16px', textAlign: 'center' }}>
+                      {camera.status.name ? (
+                        <div>
+                          <CustomChip
+                            rounded
+                            size='small'
+                            skin='light'
+                            sx={{ lineHeight: 1 }}
+                            label={camera.status.name === 'disconnected' ? 'Lost connection' : 'Connected'}
+                            color={camera.status.name === 'disconnected' ? 'primary' : 'success'}
+                          />
+                        </div>
+                      ) : (
+                        camera.status.name
+                      )}
+                    </TableCell>
+                    <TableCell sx={{ padding: '16px' }}>
+                      <Grid container spacing={2}>
+                        {Array.isArray(nvrCameraList) && nvrCameraList.length > 0 ? (
+                          nvrCameraList.some(nvrCamera => nvrCamera.id === camera.id) ? (
+                            <IconButton disabled={loading} onClick={() => handleDelete(camera.id)}>
+                              <Icon icon='tabler:minus' />
+                            </IconButton>
                           ) : (
                             <IconButton disabled={loading} onClick={() => handleUpdate(camera.id, camera.name)}>
                               <Icon icon='tabler:plus' />
                             </IconButton>
-                          )}
-                        </Grid>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={7} align='center'>
-                      Không có dữ liệu
+                          )
+                        ) : (
+                          <IconButton disabled={loading} onClick={() => handleUpdate(camera.id, camera.name)}>
+                            <Icon icon='tabler:plus' />
+                          </IconButton>
+                        )}
+                      </Grid>
                     </TableCell>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
-            {notification.message && (
-              <div style={{ color: notification.type === 'success' ? '#ff9f43' : 'red', textAlign: 'center' }}>
-                {notification.message}
-              </div>
-            )}
-          </Grid>
-        </Card>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={7} align='center'>
+                    No data
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+          {notification.message && (
+            <div style={{ color: notification.type === 'success' ? '#002060' : 'red', textAlign: 'center' }}>
+              {notification.message}
+            </div>
+          )}
+        </Grid>
       </Grid>
     </div>
   )

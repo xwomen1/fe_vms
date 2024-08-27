@@ -48,10 +48,10 @@ const Caller = () => {
         <Grid>
           {' '}
           <TabList onChange={handleChange} aria-label='customized tabs example'>
-            <Tab value='1' label='Bảng lương' />
-            <Tab value='2' label='OT-Công tác' />
+            <Tab value='1' label='Salary' />
+            <Tab value='2' label='OT-Work Travel' />
             {/* <Tab value='3' label='Công thức' /> */}
-            <Tab value='3' label='Tổng hợp lương' />
+            <Tab value='3' label='Salary Summary' />
           </TabList>
         </Grid>
         <TabPanel value='1'>

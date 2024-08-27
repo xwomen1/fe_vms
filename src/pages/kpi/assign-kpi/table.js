@@ -42,7 +42,7 @@ const columns = [
     maxWidth: 50,
     align: 'center',
     field: 'name',
-    label: 'Tên phiếu'
+    label: 'Name'
   },
   {
     id: 2,
@@ -50,7 +50,7 @@ const columns = [
     maxWidth: 50,
     align: 'center',
     field: 'type',
-    label: 'Tên bộ KPI'
+    label: 'KPI set name'
   },
   {
     id: 3,
@@ -58,7 +58,7 @@ const columns = [
     maxWidth: 50,
     align: 'center',
     field: 'status',
-    label: 'Trạng thái'
+    label: 'Status'
   },
   {
     id: 32,
@@ -66,7 +66,7 @@ const columns = [
     maxWidth: 50,
     align: 'center',
     field: 'year',
-    label: 'Năm đánh giá'
+    label: 'Date Appreciate'
   },
   {
     id: 31,
@@ -74,7 +74,7 @@ const columns = [
     maxWidth: 50,
     align: 'center',
     field: 'userreport',
-    label: 'Người báo cáo'
+    label: 'Reporter'
   },
   {
     id: 34,
@@ -82,7 +82,7 @@ const columns = [
     maxWidth: 50,
     align: 'center',
     field: 'username',
-    label: 'Người thẩm định'
+    label: 'Appraiser'
   }
 ]
 
@@ -212,7 +212,7 @@ const AutocompleteAsynchronousRequest = () => {
           <Grid item xs={8} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
             <CustomTextField
               sx={{ mr: 2 }}
-              placeholder='Tìm kiếm'
+              placeholder='Search'
               InputProps={{
                 startAdornment: (
                   <InputAdornment position='start'>
@@ -225,7 +225,7 @@ const AutocompleteAsynchronousRequest = () => {
               onChange={e => handleFilter(e.target.value)}
             />
             <Button variant='contained' onClick={() => handleOpenAdd()}>
-              Thêm mới
+              Add
             </Button>
           </Grid>
         }
@@ -235,7 +235,7 @@ const AutocompleteAsynchronousRequest = () => {
           <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
             <TableHead>
               <TableRow>
-                <TableCell align='center'>STT</TableCell> {/* Căn giữa cột STT */}
+                <TableCell align='center'>NO.</TableCell> {/* Căn giữa cột NO. */}
                 {columns.map(({ id, label, field, renderCell, align, maxWidth }) => (
                   <TableCell key={id} align={align} sx={{ maxWidth }}>
                     {label}
@@ -247,7 +247,7 @@ const AutocompleteAsynchronousRequest = () => {
               {fakeData.map((row, index) => {
                 return (
                   <TableRow hover tabIndex={-1} key={index}>
-                    <TableCell align='center'>{index + 1}</TableCell> {/* Căn giữa cột STT */}
+                    <TableCell align='center'>{index + 1}</TableCell> {/* Căn giữa cột NO. */}
                     {columns.map(({ field, renderCell, align, maxWidth }) => {
                       const value = row[field]
 

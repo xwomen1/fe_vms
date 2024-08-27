@@ -34,7 +34,7 @@ const TableHeader = props => {
       }}
     >
       <Box>
-        <Grid style={{ fontSize: 30, color: 'black' }}>Tổng hợp lương</Grid>
+        <Grid style={{ fontSize: 30, color: 'black' }}>Salary Summary</Grid>
       </Box>
       <Box sx={{ rowGap: 2, display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
         <CustomTextField

@@ -1,12 +1,13 @@
-import { Grid, Paper } from '@mui/material'
+import { Grid } from '@mui/material'
 
-import TableStickyHeader from './access-right'
+import Overview from './overview'
 import Tab from '@mui/material/Tab'
 import TabPanel from '@mui/lab/TabPanel'
 import { styled } from '@mui/material/styles'
 import MuiTabList from '@mui/lab/TabList'
 import TabContext from '@mui/lab/TabContext'
 import { useState } from 'react'
+import PermissionSetUp from './permissionSetUp'
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   borderBottom: '0 !important',
@@ -45,11 +46,15 @@ const Caller = () => {
         <Grid>
           {' '}
           <TabList onChange={handleChange} aria-label='customized tabs example'>
-            <Tab value='1' label='Quyền truy cập' />
+            <Tab value='1' label='Overview' />
+            <Tab value='2' label='Permission SetUp' />
           </TabList>
         </Grid>
         <TabPanel value='1'>
-          <TableStickyHeader />
+          <Overview />
+        </TabPanel>
+        <TabPanel value='2'>
+          <PermissionSetUp />
         </TabPanel>
       </TabContext>
     </Grid>

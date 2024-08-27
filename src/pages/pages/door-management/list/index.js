@@ -234,20 +234,20 @@ const DoorManagement = () => {
 
   function showAlertConfirm(options, intl) {
     const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Accept',
       imageWidth: 213,
       showCancelButton: true,
       showCloseButton: true,
       showConfirmButton: true,
       focusCancel: true,
       reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Agree',
       cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
       customClass: {
         content: 'content-class',
         confirmButton: 'swal-btn-confirm'
       },
-      confirmButtonColor: '#FF9F43'
+      confirmButtonColor: '#002060'
     }
 
     return Swal.fire({ ...defaultProps, ...options })
@@ -270,12 +270,12 @@ const DoorManagement = () => {
           .then(() => {
             Swal.fire({
               title: 'Thành công!',
-              text: 'Xóa thành công',
+              text: 'Deleted successfully',
               icon: 'success',
               willOpen: () => {
                 const confirmButton = Swal.getConfirmButton()
                 if (confirmButton) {
-                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.backgroundColor = '#002060'
                   confirmButton.style.color = 'white'
                 }
               }
@@ -294,7 +294,7 @@ const DoorManagement = () => {
               willOpen: () => {
                 const confirmButton = Swal.getConfirmButton()
                 if (confirmButton) {
-                  confirmButton.style.backgroundColor = '#FF9F43'
+                  confirmButton.style.backgroundColor = '#002060'
                   confirmButton.style.color = 'white'
                 }
               }
@@ -306,16 +306,17 @@ const DoorManagement = () => {
 
   const Doorlock = async () => {
     const confirmResult = await Swal.fire({
-      title: 'Xác nhận',
+      title: 'Accept',
       text: 'Khóa cửa sẽ dừng hoạt động của cửa trong tòa nhà, bạn có chắc chắn khóa cửa này?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Đồng ý',
+      confirmButtonText: 'Agree',
       cancelButtonText: 'Hủy',
       customClass: {
         confirmButton: 'swal-btn-confirm',
         cancelButton: 'swal-btn-cancel'
-      }
+      },
+      confirmButtonColor: '#002060'
     })
 
     if (confirmResult.isConfirmed) {
@@ -347,16 +348,17 @@ const DoorManagement = () => {
 
   const FreeLock = async () => {
     const confirmResult = await Swal.fire({
-      title: 'Xác nhận',
+      title: 'Accept',
       text: 'Xả cửa sẽ cho phép người dùng vào bất kỳ phòng nào trong tòa nhà, bạn có chắc chắn xả cửa này?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Đồng ý',
+      confirmButtonText: 'Agree',
       cancelButtonText: 'Hủy',
       customClass: {
         confirmButton: 'swal-btn-confirm',
         cancelButton: 'swal-btn-cancel'
-      }
+      },
+      confirmButtonColor: '#002060'
     })
 
     if (confirmResult.isConfirmed) {
@@ -388,16 +390,17 @@ const DoorManagement = () => {
 
   const SetUp = async () => {
     const confirmResult = await Swal.fire({
-      title: 'Xác nhận',
+      title: 'Accept',
       text: 'Đặt lại chế độ sẽ thay đổi cài đặt trước đó, bạn có chắc chắn muốn đặt lại chế độ cửa này?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Đồng ý',
+      confirmButtonText: 'Agree',
       cancelButtonText: 'Hủy',
       customClass: {
         confirmButton: 'swal-btn-confirm',
         cancelButton: 'swal-btn-cancel'
-      }
+      },
+      confirmButtonColor: '#002060'
     })
 
     if (confirmResult.isConfirmed) {
@@ -473,7 +476,7 @@ const DoorManagement = () => {
     <>
       <Card>
         <CardHeader
-          title={<Button variant='contained'>Danh sách cửa</Button>}
+          title={<Button variant='contained'>Door</Button>}
           titleTypographyProps={{ sx: { mb: [2, 0] } }}
           sx={{
             py: 4,
@@ -524,7 +527,7 @@ const DoorManagement = () => {
                     variant='contained'
                     disabled={selectedIds.length === 0}
                   >
-                    Khóa cửa
+                    Lock
                   </Button>
                 </Box>
               </Grid>
@@ -536,7 +539,7 @@ const DoorManagement = () => {
                     variant='contained'
                     disabled={selectedIds.length === 0}
                   >
-                    Xả cửa
+                    Discharge
                   </Button>
                 </Box>
               </Grid>
@@ -548,7 +551,7 @@ const DoorManagement = () => {
                     variant='contained'
                     disabled={selectedIds.length === 0}
                   >
-                    Đặt lại chế độ
+                    Reset
                   </Button>
                 </Box>
               </Grid>
@@ -556,7 +559,7 @@ const DoorManagement = () => {
                 <CustomTextField
                   value={value}
                   onChange={e => handleFilter(e.target.value)}
-                  placeholder='Tìm kiếm sự kiện '
+                  placeholder='Search '
                   InputProps={{
                     startAdornment: (
                       <Box sx={{ mr: 2, display: 'flex' }}>
@@ -602,17 +605,17 @@ const DoorManagement = () => {
           <Paper elevation={3} style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
             <TableContainer>
               <Table>
-                <TableHead>
+                <TableHead style={{ background: '#F6F6F7' }}>
                   <TableRow>
                     <TableCell>
                       <Checkbox checked={selectedIds.length > 0} onChange={handleSelectAllChange} />
                     </TableCell>
-                    <TableCell>Tên Cửa</TableCell>
-                    <TableCell>Tên thiết bị</TableCell>
-                    <TableCell>Miêu tả</TableCell>
-                    <TableCell>Trạng thái</TableCell>
-                    <TableCell>Người chỉnh sửa cuối</TableCell>
-                    <TableCell>Thao tác</TableCell>
+                    <TableCell>Door Name</TableCell>
+                    <TableCell>Device Name</TableCell>
+                    <TableCell>Description</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell>Last editor</TableCell>
+                    <TableCell>Action</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -657,7 +660,7 @@ const DoorManagement = () => {
                 <Grid item xs={1.5} style={{ padding: 0, marginLeft: '12%' }}>
                   <IconButton onClick={handleOpenMenu}>
                     <Icon icon='tabler:selector' />
-                    <p style={{ fontSize: 15 }}>{pageSize} dòng/trang</p>
+                    <p style={{ fontSize: 15 }}>{pageSize} line/page</p>
                   </IconButton>
                   <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
                     {pageSizeOptions.map(size => (

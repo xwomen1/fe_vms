@@ -51,11 +51,11 @@ const UseBgColor = () => {
     },
     infoFilled: {
       color: theme.palette.info.contrastText,
-      backgroundColor: theme.palette.info.main
+      backgroundColor: theme.palette.info.dark
     },
     infoLight: {
-      color: theme.palette.info.main,
-      backgroundColor: hexToRGBA(theme.palette.info.main, 0.16)
+      color: theme.palette.info.dark,
+      backgroundColor: hexToRGBA(theme.palette.info.dark, 0.16)
     }
   }
 }

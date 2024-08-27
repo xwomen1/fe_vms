@@ -1,7 +1,20 @@
 import { useState, forwardRef, useEffect } from 'react'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import Icon from 'src/@core/components/icon'
-import { Box, Button, Card, Dialog, DialogActions, DialogContent, Fade, Grid, IconButton, MenuItem, Typography, styled } from '@mui/material'
+import {
+  Box,
+  Button,
+  Card,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  Fade,
+  Grid,
+  IconButton,
+  MenuItem,
+  Typography,
+  styled
+} from '@mui/material'
 import authConfig from 'src/configs/auth'
 import axios from 'axios'
 import { Controller, useForm } from 'react-hook-form'
@@ -29,43 +42,43 @@ const CustomCloseButton = styled(IconButton)(({ theme }) => ({
 const dataDailyDefault = [
   {
     label: '',
-    value: 1,
+    value: 1
   },
   {
     label: 'Thứ 2',
     dayOfWeek: 'MONDAY',
-    value: 2,
+    value: 2
   },
   {
     label: 'Thứ 3',
     dayOfWeek: 'TUESDAY',
-    value: 3,
+    value: 3
   },
   {
     label: 'Thứ 4',
     dayOfWeek: 'WEDNESDAY',
-    value: 4,
+    value: 4
   },
   {
     label: 'Thứ 5',
     dayOfWeek: 'THURSDAY',
-    value: 5,
+    value: 5
   },
   {
     label: 'Thứ 6',
     dayOfWeek: 'FRIDAY',
-    value: 6,
+    value: 6
   },
   {
     label: 'Thứ 7',
     dayOfWeek: 'SATURDAY',
-    value: 7,
+    value: 7
   },
   {
     label: 'CN',
     dayOfWeek: 'SUNDAY',
-    value: 8,
-  },
+    value: 8
+  }
 ]
 
 const Schedule = ({ show, onClose, valueFilter, callback, direction, data }) => {
@@ -80,8 +93,7 @@ const Schedule = ({ show, onClose, valueFilter, callback, direction, data }) => 
     headers: {
       Authorization: `Bearer ${token}`
     },
-    params: {
-    }
+    params: {}
   }
 
   const {
@@ -105,17 +117,16 @@ const Schedule = ({ show, onClose, valueFilter, callback, direction, data }) => 
     reset(detail)
   }
 
-  const transformCalendarDays = (calendarDays) => {
-
-    return calendarDays.map((day) => {
+  const transformCalendarDays = calendarDays => {
+    return calendarDays.map(day => {
       const { dayOfWeek, timePeriods } = day
-      const value = dataDailyDefault.find((item) => item.dayOfWeek === dayOfWeek)?.value || 1
+      const value = dataDailyDefault.find(item => item.dayOfWeek === dayOfWeek)?.value || 1
 
       return {
         label: value === 1 ? '' : value === 8 ? 'CN' : `Thứ ${value}`,
         dayOfWeek,
         value,
-        timePeriods,
+        timePeriods
       }
     })
   }
@@ -128,14 +139,13 @@ const Schedule = ({ show, onClose, valueFilter, callback, direction, data }) => 
     }
   }, [detail])
 
-  const onReset = (values) => {
+  const onReset = values => {
     var detail = {}
     callback(detail)
     onClose()
   }
 
-  const onSubmit = (values) => {
-
+  const onSubmit = values => {
     callback(values)
     onClose()
   }
@@ -162,7 +172,7 @@ const Schedule = ({ show, onClose, valueFilter, callback, direction, data }) => 
           </CustomCloseButton>
           <Box sx={{ mb: 8, textAlign: 'left' }}>
             <Typography variant='h3' sx={{ mb: 3 }}>
-              Cấu hình lịch
+              Calendar Configuration
             </Typography>
           </Box>
           <form>
@@ -174,7 +184,7 @@ const Schedule = ({ show, onClose, valueFilter, callback, direction, data }) => 
                   render={({ field: { value, onChange } }) => (
                     <div>
                       <Daily
-                        callbackOfDaily={(v) => {
+                        callbackOfDaily={v => {
                           onChange(v)
                           setDataDaily(v)
                           setDataDailyState(v)
@@ -182,7 +192,7 @@ const Schedule = ({ show, onClose, valueFilter, callback, direction, data }) => 
                         dataDailyProps={dataDailyState}
                         error={Boolean(errors.calendarDays)}
                         aria-describedby='validation-basic-last-name'
-                        {...(errors.calendarDays && { helperText: 'Trường này bắt buộc' })}
+                        {...(errors.calendarDays && { helperText: 'This field is required' })}
                       />
                     </div>
                   )}
@@ -199,7 +209,7 @@ const Schedule = ({ show, onClose, valueFilter, callback, direction, data }) => 
           }}
         >
           <Button variant='tonal' color='secondary' onClick={onClose}>
-            Hủy
+            Cancel
           </Button>
           <Button type='submit' variant='contained' onClick={handleSubmit(onSubmit)}>
             Thêm

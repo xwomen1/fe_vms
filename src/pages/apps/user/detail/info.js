@@ -94,6 +94,7 @@ const UserDetails = () => {
   const [ava2, setAva2] = useState(null)
   const [data, setData] = useState(null)
   let groupACIds = []
+  const [isLeader, setIsLeader] = useState(false)
 
   const handleAddRoleClickPolicy = () => {
     setOpenPopupPolicy(true)
@@ -196,19 +197,20 @@ const UserDetails = () => {
   }
   function showAlertConfirm(options, intl) {
     const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Confirm',
       imageWidth: 213,
       showCancelButton: true,
       showCloseButton: true,
       showConfirmButton: true,
       focusCancel: true,
       reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
-      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Ok',
+      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Cancle',
       customClass: {
         content: 'content-class',
         confirmButton: 'swal-btn-confirm'
-      }
+      },
+      confirmButtonColor: '#002060'
     }
 
     return Swal.fire({ ...defaultProps, ...options })
@@ -326,46 +328,141 @@ const UserDetails = () => {
     const genderMapping = { MALE: 'MALE', FEMALE: 'FEMALE', OTHER: 'OTHER' }
     const genderValue = genderMapping[gender]
     if (!fullNameValue || fullNameValue.length <= 3) {
-      Swal.fire('Lỗi!', 'Tên không được để trống và độ dài phải >3', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error!, Name cannot be blank and length must be >3',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
+
+      return
+    }
+    if (!gender) {
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Gender cannot be blank',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
     if (!email) {
-      Swal.fire('Lỗi!', 'Email không được để trống', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Email cannot be blank',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
     if (!phoneNumber) {
-      Swal.fire('Lỗi!', 'Số điện thoại không được để trống ', 'error')
-
-      return
-    }
-    if (!identityNumber) {
-      Swal.fire('Lỗi!', 'Số giấy tờ không được để trống', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Phone Number  cannot be blank',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
 
     if (userGroups.length === 0) {
-      Swal.fire('Lỗi!', 'Đơn vị người dùng không được để trống.', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Department cannot be blank',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
+
+      return
+    }
+    if (!userCode) {
+      Swal.fire({
+        title: 'error!',
+        text: 'error! userCode  cannot be blank',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
-      Swal.fire('Lỗi!', 'Địa chỉ email không hợp lệ.', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Invalid email address',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
 
     const phoneRegex = /^\d+$/
     if (!phoneRegex.test(phoneNumber)) {
-      Swal.fire('Lỗi!', 'Số điện thoại không hợp lệ.', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Phone Number invalid',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
     if (!phoneNumber || phoneNumber.length <= 9) {
-      Swal.fire('Lỗi!', 'Số điện thoại không hợp lệ', 'error')
+      Swal.fire({
+        title: 'error!',
+        text: 'error! Phone Number invalid',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
 
       return
     }
@@ -373,7 +470,17 @@ const UserDetails = () => {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
       const processedGroups = await userGroups(groups) // Call the userGroups function passing rows
       if (processedGroups.length === 0) {
-        Swal.fire('Lỗi!', 'Đơn vị người dùng không được để trống.', 'error')
+        Swal.fire({
+          title: 'error!',
+          text: 'error! Department User cannot leave blank.',
+          willOpen: () => {
+            const confirmButton = Swal.getConfirmButton()
+            if (confirmButton) {
+              confirmButton.style.backgroundColor = '#002060'
+              confirmButton.style.color = 'white'
+            }
+          }
+        })
 
         return
       }
@@ -418,13 +525,24 @@ const UserDetails = () => {
       if (groupACIds.length > 0) {
         await addMemberToGroup(groupACIds, userId)
       } else {
-        console.error('Không có groupACId nào trong mảng')
+        console.error('There is no groupACId in the array')
       }
 
-      Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
+      Swal.fire({
+        title: 'Successful!',
+        text: 'Data has been updated successfully',
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
     } catch (error) {
       console.error('Error updating user details:', error)
-      Swal.fire('Lỗi!', error?.response?.data?.message, 'error')
+      Swal.fire('error!', error?.response?.data?.message, 'error')
     }
     fetchUserData()
   }
@@ -472,7 +590,7 @@ const UserDetails = () => {
 
     fetchGroupData()
   }, [])
-  const formatIsLeader = isLeader => <Checkbox checked={isLeader} disabled />
+  const formatIsLeader = isLeader => <Checkbox checked={isLeader} />
 
   const policyList = policies.map(row => row.policyId)
 
@@ -489,7 +607,13 @@ const UserDetails = () => {
         const response = await axios.get(`https://dev-ivi.basesystem.one/smc/iam/api/v0/users/${userId}`, config)
         const userData = response.data
         setData(userData)
-        setGroup(userData.userGroups)
+        if (userData.userGroups && userData.userGroups.length > 0) {
+          const userGroupsData = userData.userGroups.map(group => ({
+            ...group,
+            isLeader: group.isLeader || false // Đảm bảo có giá trị mặc định
+          }))
+          setGroup(userGroupsData)
+        }
 
         setPolicies(response.data.policies)
         setPiId(response.data.piId)
@@ -545,40 +669,6 @@ const UserDetails = () => {
 
   const handleTimeEndAfternoonChange = newValue => {
     setTimeEndAfternoon(newValue)
-  }
-
-  const handleDeleteRowPolicy = (piId, policyId) => {
-    showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
-    }).then(({ value }) => {
-      if (value) {
-        const token = localStorage.getItem(authConfig.storageTokenKeyName)
-        if (!token) {
-          return
-        }
-
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          data: {
-            piId: piId,
-            policyId: policyId
-          }
-        }
-
-        let urlDelete = `https://dev-ivi.basesystem.one/smc/iam/api/v0/pi-policies`
-        axios
-          .delete(urlDelete, config)
-          .then(() => {
-            Swal.fire('Xóa thành công', '', 'success')
-            fetchUserData(userId)
-          })
-          .catch(err => {
-            Swal.fire('Đã xảy ra lỗi', err.response.data.message, 'error')
-          })
-      }
-    })
   }
 
   const handleDeleteRow = index => {
@@ -690,7 +780,7 @@ const UserDetails = () => {
         const userGroup = {
           groupId: groupId,
           policyName: true,
-          isLeader: false
+          isLeader: row.isLeader
         }
         processedGroups.push(userGroup)
         console.log(userGroup)
@@ -826,17 +916,17 @@ const UserDetails = () => {
           <Grid container spacing={3} component={Paper}>
             <Grid style={{ borderRadius: '0.05%', marginLeft: 10 }}>
               <Grid container spacing={2}>
-                <h2 style={{ color: 'black', marginLeft: '1%' }}> Thông tin người dùng</h2>
+                <h2 style={{ color: 'black', marginLeft: '1%' }}> Information</h2>
               </Grid>
               <Grid container spacing={2}>
                 <div style={{ width: '80%' }}></div>
                 {/* {editing ? ( */}
                 <>
                   <Button variant='contained' onClick={handleCancel} sx={{ marginRight: '10px' }}>
-                    Huỷ
+                    Cancel
                   </Button>
                   <Button variant='contained' onClick={saveChanges}>
-                    Lưu
+                    Save
                   </Button>
                 </>
 
@@ -848,18 +938,18 @@ const UserDetails = () => {
               </Grid>
               <Grid container spacing={2}>
                 <Grid item xs={4}>
-                  <TextField label='Tên' value={fullNameValue} onChange={handleFullNameChange} fullWidth />
+                  <TextField label='Name*' value={fullNameValue} onChange={handleFullNameChange} fullWidth />
                 </Grid>
                 {console.log(user.userAccount.accStatus)}
                 <Grid item xs={4}>
-                  <TextField label='Email' value={email} onChange={handleEmailChange} fullWidth />
+                  <TextField label='Email*' value={email} onChange={handleEmailChange} fullWidth />
                 </Grid>
 
                 <Grid item xs={3.8}>
                   {' '}
                   {/* Sửa đổi xs={4} thành xs={8} */}
                   <TextField
-                    label='Số điện thoại'
+                    label='Phone Number*'
                     value={phoneNumber}
                     onChange={handlePhoneNumberChange}
                     fullWidth // Thêm thuộc tính fullWidth vào đây
@@ -868,7 +958,7 @@ const UserDetails = () => {
                 <Grid item xs={4}>
                   {/* Update Select to use the gender state */}
                   <FormControl fullWidth>
-                    <InputLabel id='gender-label'>Giới tính</InputLabel>
+                    <InputLabel id='gender-label'>Gender*</InputLabel>
                     <Select
                       labelId='gender-label'
                       id='gender-select'
@@ -876,41 +966,241 @@ const UserDetails = () => {
                       onChange={handleGenderChange} // Update onChange handler
                     >
                       {/* MenuItems for gender options */}
-                      <MenuItem value='MALE'>Nam</MenuItem>
-                      <MenuItem value='FEMALE'>Nữ</MenuItem>
-                      <MenuItem value='OTHER'>Khác</MenuItem>
+                      <MenuItem value='MALE'>MALE</MenuItem>
+                      <MenuItem value='FEMALE'>FEMALE</MenuItem>
+                      <MenuItem value='OTHER'>OTHER</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
                 <Grid item xs={4}>
                   <TextField
-                    label='Số giấy tờ'
+                    label='Identify number*'
                     value={identityNumber}
                     onChange={handleIdentityNumberChange}
                     fullWidth
                   />
                 </Grid>
                 <Grid item xs={3.8}>
-                  <TextField label='Mã người dùng' defaultValue={userCode} onChange={handleUserCodeChange} fullWidth />
+                  <TextField label='Code*' defaultValue={userCode} onChange={handleUserCodeChange} fullWidth />
                 </Grid>
-
-                <Grid item xs={2} style={{ marginTop: '1.1%' }}>
-                  Trạng thái
-                  <Switch
-                    checked={status1 === 'ACTIVE'}
-                    onChange={handleStatusChange}
-                    color='primary'
-                    label='Trạng thái'
+                <Grid item xs={4}>
+                  <TextField
+                    label='Synchronize code'
+                    defaultValue={syncCode}
+                    onChange={handleSyncCodeChange}
+                    fullWidth
                   />
                 </Grid>
+                <Grid item xs={4}>
+                  <FormControl fullWidth>
+                    <InputLabel id='region-label'>Level</InputLabel>
+                    <Select
+                      labelId='region-label'
+                      id='region-select'
+                      value={selectedRegion ? selectedRegion.id : ''}
+                      onChange={e => handleRegionChange(regionOptions.find(opt => opt.id === e.target.value))}
+                    >
+                      {regionOptions.map(option => (
+                        <MenuItem key={option.id} value={option.id}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={3.8}>
+                  <FormControl fullWidth>
+                    <InputLabel id='region-label'>Contract Type</InputLabel>
+                    <Select
+                      labelId='region-label'
+                      id='region-select'
+                      value={selectContract ? selectContract.id : ''}
+                      onChange={e => handleContractChange(contractOptions.find(opt => opt.id === e.target.value))}
+                    >
+                      {contractOptions.map(option => (
+                        <MenuItem key={option.id} value={option.id}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>{' '}
+                </Grid>
+                <Grid item xs={2} style={{ marginTop: '1.1%' }}>
+                  Status
+                  <Switch checked={status1 === 'ACTIVE'} onChange={handleStatusChange} color='primary' label='Status' />
+                </Grid>
 
+                <Grid item xs={1} style={{ marginTop: '2%' }}>
+                  Morning shift:
+                </Grid>
+
+                <Grid item xs={1}>
+                  <DatePickerWrapper>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                      <div>
+                        <DatePicker
+                          showTimeSelect
+                          selected={dateTime}
+                          timeIntervals={15}
+                          showTimeSelectOnly
+                          dateFormat='h:mm a' // Thay đổi định dạng giờ
+                          id='time-only-picker'
+                          onChange={date => handleTimeChange(date)}
+                          customInput={<CustomInput />}
+                          filterTime={time => time.getHours() < 12} // Chỉ cho phép giờ AM
+                        />
+                      </div>
+                    </Box>
+                  </DatePickerWrapper>
+                </Grid>
+                <Grid item xs={1}>
+                  <DatePickerWrapper>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                      <div>
+                        <DatePicker
+                          showTimeSelect
+                          selected={timeEndMorning}
+                          timeIntervals={15}
+                          showTimeSelectOnly
+                          dateFormat='h:mm '
+                          id='time-only-picker'
+                          onChange={date => handleTimeEndMorningChange(date)}
+                          customInput={<CustomInput />}
+                        />
+                      </div>
+                    </Box>
+                  </DatePickerWrapper>
+                </Grid>
+                <Grid item xs={1} style={{ marginTop: '2%' }}>
+                  Afternoon shift:
+                </Grid>
+                <Grid item xs={1}>
+                  <DatePickerWrapper>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                      <div>
+                        <DatePicker
+                          showTimeSelect
+                          selected={timeStartAfternoon}
+                          timeIntervals={15}
+                          showTimeSelectOnly
+                          dateFormat='h:mm '
+                          id='time-only-picker'
+                          onChange={date => handleTimeStartAfetrnoonChange(date)}
+                          customInput={<CustomInput />}
+                        />
+                      </div>
+                    </Box>
+                  </DatePickerWrapper>
+                </Grid>
+                <Grid item xs={1}>
+                  <DatePickerWrapper>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                      <div>
+                        <DatePicker
+                          showTimeSelect
+                          selected={timeEndAfternoon}
+                          timeIntervals={15}
+                          showTimeSelectOnly
+                          dateFormat='h:mm '
+                          id='time-only-picker'
+                          onChange={date => handleTimeEndAfternoonChange(date)}
+                          customInput={<CustomInput />}
+                        />
+                      </div>
+                    </Box>
+                  </DatePickerWrapper>
+                </Grid>
                 {/* <Grid item ={1} style={{ marginTop: '2%' }}></Grid> */}
+                <Grid item xs={3.8}>
+                  <FormControl fullWidth>
+                    <InputLabel id='time-validity-label'>Validity period</InputLabel>
+                    <Select
+                      labelId='time-validity-label'
+                      id='time-validity-select'
+                      value={timeValidity}
+                      onChange={handleTimeValidityChange}
+                    >
+                      <MenuItem value='Custom'>Custom</MenuItem>
+                      <MenuItem value='Undefined'>None</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                {timeValidity === 'Custom' &&
+                  (user.availableAt ? (
+                    <Grid item xs={8}>
+                      <Grid container spacing={2}>
+                        <Grid item xs={2}>
+                          <DatePickerWrapper>
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                              <div>
+                                <DatePicker
+                                  selected={availableAt}
+                                  onChange={handleStartDateChange}
+                                  dateFormat='dd/MM/yyyy'
+                                  customInput={<CustomInput label='Start date' />}
+                                />
+                              </div>
+                            </Box>
+                          </DatePickerWrapper>
+                        </Grid>
+                        {user.expiredAt && (
+                          <Grid item xs={8}>
+                            <DatePickerWrapper>
+                              <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                                <div>
+                                  <DatePicker
+                                    selected={expiredAt}
+                                    onChange={handleEndDateChange}
+                                    dateFormat='dd/MM/yyyy'
+                                    customInput={<CustomInput label='End date' />}
+                                  />
+                                </div>
+                              </Box>
+                            </DatePickerWrapper>
+                          </Grid>
+                        )}
+                      </Grid>
+                    </Grid>
+                  ) : (
+                    <Grid container spacing={2}>
+                      <Grid item xs={0.1}></Grid>
+                      <Grid item xs={2}>
+                        <DatePickerWrapper>
+                          <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                            <div>
+                              <DatePicker
+                                selected={availableAt}
+                                onChange={handleStartDateChange}
+                                dateFormat='dd/MM/yyyy'
+                                customInput={<CustomInput label='Start date' />}
+                              />
+                            </div>
+                          </Box>
+                        </DatePickerWrapper>
+                      </Grid>
+                      <Grid item xs={4}>
+                        <DatePickerWrapper>
+                          <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+                            <div>
+                              <DatePicker
+                                selected={expiredAt}
+                                onChange={handleEndDateChange}
+                                dateFormat='dd/MM/yyyy'
+                                customInput={<CustomInput label='End date' />}
+                              />
+                            </div>
+                          </Box>
+                        </DatePickerWrapper>
+                      </Grid>
+                    </Grid>
+                  ))}
 
                 <Grid item xs={11.8}>
                   <TextField
                     rows={4}
                     multiline
-                    label='Ghi chú'
+                    label='Note'
                     value={note}
                     onChange={handleNoteChange}
                     id='textarea-outlined-static'
@@ -918,16 +1208,16 @@ const UserDetails = () => {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <Typography variant='h5'>Đơn vị</Typography>
+                  <Typography variant='h5'>Department*</Typography>
                 </Grid>
                 <Grid item xs={11.8}>
                   <TableContainer>
                     <Table>
                       <TableHead>
                         <TableRow>
-                          <TableCell>Đơn vị</TableCell>
-                          <TableCell>Mã đơn vị</TableCell>
-                          <TableCell align='right'>Là lãnh đạo đơn vị</TableCell>
+                          <TableCell>Department</TableCell>
+                          <TableCell>Department Code</TableCell>
+                          <TableCell align='right'>Is Leader</TableCell>
                           {showPlusColumn && (
                             <TableCell align='center'>
                               <IconButton onClick={handleAddRow} size='small' sx={{ marginLeft: '10px' }}>
@@ -972,15 +1262,28 @@ const UserDetails = () => {
                                   setGroup(updatedRows)
                                   console.log(updatedRows, 'hihih')
                                 }}
-                                renderInput={params => <TextField {...params} label='Đơn vị' />}
+                                renderInput={params => <TextField {...params} label='Department' />}
                               />
                             </TableCell>
                             {console.log('Group:', group)}
                             <TableCell>{group.groupCode}</TableCell>
                             <TableCell align='right'>
-                              {/* Render formatted content in isLeader column */}
-                              {formatIsLeader(group.isLeader)}
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={group.isLeader}
+                                    onChange={event => {
+                                      const updatedRows = [...groups]
+                                      updatedRows[index].isLeader = event.target.checked // Cập nhật giá trị isLeader
+                                      setGroup(updatedRows)
+                                      setIsLeader(event.target.checked) // Cập nhật state isLeader
+                                    }}
+                                  />
+                                }
+                                label='Is Leader'
+                              />
                             </TableCell>
+
                             {showPlusColumn && (
                               <TableCell align='center'>
                                 <IconButton onClick={() => handleDeleteRow(index)}>
@@ -998,11 +1301,11 @@ const UserDetails = () => {
               <br></br>
               <Grid container spacing={2}>
                 <Grid item xs={12}>
-                  <Typography variant='h5'>Thông tin tài khoản</Typography>
+                  <Typography variant='h5'>Account Information</Typography>
                 </Grid>
                 <Grid item xs={4}>
                   <TextField
-                    label='Tài khoản'
+                    label='Account*'
                     defaultValue={user?.userAccount.username}
                     onChange={handleUserNameChange}
                     id='form-props-read-only-input'
@@ -1012,7 +1315,7 @@ const UserDetails = () => {
                 </Grid>
                 <Grid item xs={4}>
                   <TextField
-                    label='Loại tài khoản'
+                    label='Account Type'
                     defaultValue={user?.userAccount.identityProviderType}
                     id='form-props-read-only-input'
                     InputProps={{ readOnly: readOnlys }}
@@ -1055,21 +1358,21 @@ const UserDetails = () => {
                         color='primary'
                       />
                     }
-                    label='Trạng thái'
+                    label='Status'
                     labelPlacement='start'
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <Typography variant='h5'>Vai trò</Typography>
+                  <Typography variant='h5'>Role</Typography>
                 </Grid>
                 <Grid item xs={11.8}>
                   <TableContainer>
                     <Table>
                       <TableHead>
                         <TableRow>
-                          <TableCell>Tên vai trò</TableCell>
-                          <TableCell>Mã vai trò</TableCell>
-                          <TableCell>Mô tả</TableCell>
+                          <TableCell>Name</TableCell>
+                          <TableCell>Code</TableCell>
+                          <TableCell>Description</TableCell>
                           {/* {showPlusColumn && ( */}
                           <TableCell align='center'>
                             <IconButton onClick={handleAddRow1} size='small' sx={{ marginLeft: '10px' }}>
@@ -1098,7 +1401,7 @@ const UserDetails = () => {
                                   // updatedRows[index].id = newValue.id
                                   setPolicies(updatedRows)
                                 }}
-                                renderInput={params => <TextField {...params} label='Vai trò' />}
+                                renderInput={params => <TextField {...params} label='Role' />}
                               />
                             </TableCell>
                             <TableCell>{policy.policyCode}</TableCell>

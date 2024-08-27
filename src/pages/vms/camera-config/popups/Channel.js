@@ -99,9 +99,9 @@ const UserList = ({ apiData }) => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ padding: '16px' }}>Tên</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Cấu hình 1</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Cấu hình 2</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Name</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Configuration 1</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Configuration 2</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>

@@ -79,7 +79,7 @@ const UserDetails = () => {
   const [policies, setPolicies] = useState(null)
   const [piId, setPiId] = useState(null)
   const [ava1, setAva1] = useState(null)
-  const [ava2, setAva2] = useState(null)
+  const [face, setFaces] = useState([])
   const [isFaceEnabled, setIsFaceEnabled] = useState(false)
   const [fingerIdentifyUpdatedAt, setFingerIdentifyUpdatedAt] = useState(false)
   const [imageUrl, setImageUrl] = useState(null)
@@ -89,7 +89,7 @@ const UserDetails = () => {
 
   const [rows1, setRows1] = useState([])
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
-  const [faceType, setFaceType] = useState(null) // State để lưu faceType của ảnh được chọn
+  const [faceType, setFaceType] = useState(null) // State để Save faceType của Image được chọn
 
   const config = {
     headers: {
@@ -105,14 +105,14 @@ const UserDetails = () => {
 
   function showAlertConfirm(options, intl) {
     const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Accept',
       imageWidth: 213,
       showCancelButton: true,
       showCloseButton: true,
       showConfirmButton: true,
       focusCancel: true,
       reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Yes',
       cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
       customClass: {
         content: 'content-class',
@@ -162,10 +162,10 @@ const UserDetails = () => {
         },
         config
       )
-      Swal.fire('Thành công!', 'Dữ liệu đã được cập nhật thành công.', 'success')
+      Swal.fire('Success!', 'Data has been updated successfully', 'success')
     } catch (error) {
       console.error('Error updating user details:', error)
-      Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi cập nhật dữ liệu.', 'error')
+      Swal.fire('error!', 'An error occurred while updating data', 'error')
     }
   }
 
@@ -213,28 +213,6 @@ const UserDetails = () => {
     }
   }, [userId])
 
-  useEffect(() => {
-    if (user) {
-      accessCodeUser.current = user.accessCode
-      if (user.cards) {
-        user.cards = user.cards.map((item, index) => ({
-          ...item,
-          key: index,
-          isDisable: true
-        }))
-      } else {
-        user.cards = []
-      }
-    } else {
-      let user = {
-        cards: []
-      }
-    }
-
-    setIdentityData(user)
-    originIdentityData.current = user
-  }, [user])
-
   const fetchUserData = async () => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -249,93 +227,135 @@ const UserDetails = () => {
         `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-access/${userId}/authentications`,
         config
       )
-
       setStatus1(response.data.isEnableFace)
       setFingerIdentifyUpdatedAt(response.data.fingerIdentifyUpdatedAt)
       setUser(response.data)
+      console.log(response.data, 'face')
+      console.log(response.data.faces, 'face')
+      const faces = response.data.faces
+
+      const order = ['LEFT', 'RIGHT', 'CENTER', 'ABOVE', 'BOTTOM']
+
+      faces.sort((a, b) => {
+        return order.indexOf(a.faceType) - order.indexOf(b.faceType)
+      })
+
+      setFaces(faces)
+      if (response.data) {
+        accessCodeUser.current = response.data.accessCode
+        if (response.data.cards) {
+          response.data.cards = response.data.cards.map((item, index) => ({
+            ...item,
+            key: index,
+            isDisable: true
+          }))
+        } else {
+          response.data.cards = []
+        }
+      } else {
+        let user = {
+          cards: []
+        }
+      }
     } catch (error) {
       console.error('Error fetching user details:', error)
     }
   }
 
   const ImgCards = ({ data, imgTitle }) => {
-    const emptyImages = Array.from({ length: 5 }, (_, index) => ({
-      // Tạo dữ liệu mẫu cho 5 ô ảnh trống
-      imageFileUrl: '/images/user.jpg',
-      imageBase64: null,
-      faceType: index === 0 ? 'LEFT' : index === 1 ? 'RIGHT' : index === 2 ? 'CENTER' : index === 3 ? 'ABOVE' : 'BOTTOM'
-    }))
-    const hasFaceImages = data && data.length > 0
+    const emptyImages = [
+      { faceType: 'LEFT', imageFileUrl: '/images/user.jpg', imageBase64: null },
+      { faceType: 'RIGHT', imageFileUrl: '/images/user.jpg', imageBase64: null },
+      { faceType: 'CENTER', imageFileUrl: '/images/user.jpg', imageBase64: null },
+      { faceType: 'ABOVE', imageFileUrl: '/images/user.jpg', imageBase64: null },
+      { faceType: 'BOTTOM', imageFileUrl: '/images/user.jpg', imageBase64: null }
+    ]
 
     const buildUrlWithToken = url => {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
-      if (token) {
-        return `${url}?token=${token}`
-      }
 
-      return url
+      return `${url}?token=${token}`
     }
 
-    // Tạo dữ liệu cho các ảnh từ API trả về hoặc dùng dữ liệu mẫu
-    const imagesToShow = useMemo(() => {
-      if (data.length === 0) {
-        return emptyImages
-      } else {
-        const filledImages = data.map((item, index) => ({
-          ...item,
-          faceType:
-            item.faceType ||
-            (index === 0 ? 'LEFT' : index === 1 ? 'RIGHT' : index === 2 ? 'CENTER' : index === 3 ? 'ABOVE' : 'BOTTOM')
-        }))
-
-        // Nếu dữ liệu ít hơn 5 ảnh, thêm các ô ảnh trống vào
-        while (filledImages.length < 5) {
-          filledImages.push(emptyImages[filledImages.length])
-        }
-
-        return filledImages
-      }
-    }, [data, emptyImages])
+    const imageData = data.length === 0 ? emptyImages : data
 
     return (
       <div style={{ display: 'flex', gap: '34px' }}>
-        {imagesToShow.map((item, index) => (
-          <div
-            key={index} // Đảm bảo mỗi ô ảnh có một key duy nhất
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center'
-            }}
-          >
-            <Img
-              src={
-                item
-                  ? item.imageFileUrl
-                    ? buildUrlWithToken(item.imageFileUrl)
-                    : `data:image/jpeg;base64,${item.imageBase64}`
-                  : null
-              }
-            />
-            <p style={{ margin: 0, marginTop: '5px', whiteSpace: 'nowrap' }}>
-              {imgTitle} {index + 1}
-            </p>
-            {editing && ( // Hiển thị nút chỉ khi đang ở chế độ chỉnh sửa
-              <IconButton
-                size='small'
-                onClick={() => {
-                  setOpenPopup(true)
-                  handleEditImageButtonClick(item.faceType, item.imageFileUrl)
-                  setIsOpenUpdateImgUser(true)
-                  setFaceType(item.faceType)
-                  setImageUrl(item.imageFileUrl)
-                }}
-              >
-                <EditIcon />
-              </IconButton>
-            )}
-          </div>
-        ))}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Img src={imageData[0].imageFileUrl ? buildUrlWithToken(imageData[0].imageFileUrl) : null} />
+          <p style={{ margin: 0, marginTop: '5px', whiteSpace: 'nowrap' }}>{imgTitle} 1</p>
+          {editing && (
+            <IconButton
+              size='small'
+              onClick={() => {
+                setOpenPopup(true)
+                handleEditImageButtonClick(imageData[0].faceType, imageData[0].imageFileUrl)
+              }}
+            >
+              <EditIcon />
+            </IconButton>
+          )}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Img src={imageData[1].imageFileUrl ? buildUrlWithToken(imageData[1].imageFileUrl) : null} />
+          <p style={{ margin: 0, marginTop: '5px', whiteSpace: 'nowrap' }}>{imgTitle} 2</p>
+          {editing && (
+            <IconButton
+              size='small'
+              onClick={() => {
+                setOpenPopup(true)
+                handleEditImageButtonClick(imageData[1].faceType, imageData[1].imageFileUrl)
+              }}
+            >
+              <EditIcon />
+            </IconButton>
+          )}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Img src={imageData[2].imageFileUrl ? buildUrlWithToken(imageData[2].imageFileUrl) : null} />
+          <p style={{ margin: 0, marginTop: '5px', whiteSpace: 'nowrap' }}>{imgTitle} 3</p>
+          {editing && (
+            <IconButton
+              size='small'
+              onClick={() => {
+                setOpenPopup(true)
+                handleEditImageButtonClick(imageData[2].faceType, imageData[2].imageFileUrl)
+              }}
+            >
+              <EditIcon />
+            </IconButton>
+          )}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Img src={imageData[3].imageFileUrl ? buildUrlWithToken(imageData[3].imageFileUrl) : null} />
+          <p style={{ margin: 0, marginTop: '5px', whiteSpace: 'nowrap' }}>{imgTitle} 4</p>
+          {editing && (
+            <IconButton
+              size='small'
+              onClick={() => {
+                setOpenPopup(true)
+                handleEditImageButtonClick(imageData[3].faceType, imageData[3].imageFileUrl)
+              }}
+            >
+              <EditIcon />
+            </IconButton>
+          )}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Img src={imageData[4].imageFileUrl ? buildUrlWithToken(imageData[4].imageFileUrl) : null} />
+          <p style={{ margin: 0, marginTop: '5px', whiteSpace: 'nowrap' }}>{imgTitle} 5</p>
+          {editing && (
+            <IconButton
+              size='small'
+              onClick={() => {
+                setOpenPopup(true)
+                handleEditImageButtonClick(imageData[4].faceType, imageData[4].imageFileUrl)
+              }}
+            >
+              <EditIcon />
+            </IconButton>
+          )}
+        </div>
       </div>
     )
   }
@@ -344,25 +364,25 @@ const UserDetails = () => {
     // Nếu data trống hoặc không tồn tại, trả về mảng rỗng
     if (!data || data.length === 0) {
       return Array.from({ length: 5 }, (_, index) => ({
-        imageFileUrl: '/images/user.jpg', // Đường dẫn ảnh mặc định
+        imageFileUrl: '/images/user.jpg', // Đường dẫn Image mặc định
         imageBase64: null,
         faceType: getFaceTypeFromIndex(index)
       }))
     }
 
-    // Nếu data có ít hơn 5 ảnh, thêm các ô ảnh trống vào để đạt được 5 ảnh
+    // Nếu data có ít hơn 5 Image, thêm các ô Image trống vào để đạt được 5 Image
     while (data.length < 5) {
       data.push({
-        imageFileUrl: '/images/user.jpg', // Đường dẫn ảnh mặc định
+        imageFileUrl: '/images/user.jpg', // Đường dẫn Image mặc định
         imageBase64: null,
         faceType: null
       })
     }
 
-    // Lấy giá trị faceType từ ảnh đầu tiên của API
+    // Lấy giá trị faceType từ Image đầu tiên của API
     const firstImageFaceType = data[0].faceType
 
-    // Tạo một mảng chứa các giá trị faceType có thể được sử dụng cho các ảnh còn lại
+    // Tạo một mảng chứa các giá trị faceType có thể được sử dụng cho các Image còn lại
     const availableFaceTypes = ['LEFT', 'RIGHT', 'CENTER', 'ABOVE', 'BOTTOM'].filter(
       type => type !== firstImageFaceType
     )
@@ -377,7 +397,7 @@ const UserDetails = () => {
   }
 
   const getFaceTypeFromIndex = index => {
-    // Xác định faceType dựa trên index của ảnh
+    // Xác định faceType dựa trên index của Image
     switch (index) {
       case 0:
         return 'LEFT'
@@ -394,7 +414,7 @@ const UserDetails = () => {
 
   // Sử dụng useMemo để gọi hàm processImageData mỗi khi user thay đổi
 
-  const processedImages = useMemo(() => processImageData(identityData?.faces), [identityData?.faces])
+  const processedImages = processImageData(face)
 
   const Img = React.memo(props => {
     const [loaded, setLoaded] = useState(false)
@@ -421,7 +441,7 @@ const UserDetails = () => {
         <img
           {...props}
           src={src}
-          alt='Ảnh'
+          alt='Image'
           onLoad={() => setLoaded(true)}
           style={loaded ? { width: '100px', height: '100px' } : { display: 'none' }}
         />
@@ -431,7 +451,7 @@ const UserDetails = () => {
 
   const handleDeleteRow = (userId, groupId) => {
     showAlertConfirm({
-      text: 'Bạn có chắc chắn muốn xóa?'
+      text: 'Do you agree to delete it?'
     }).then(({ value }) => {
       if (value) {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -449,7 +469,7 @@ const UserDetails = () => {
         axios
           .delete(urlDelete, config)
           .then(() => {
-            Swal.fire('Xóa thành công', '', 'success')
+            Swal.fire('Deleted successfully', '', 'success')
 
             // Tùy chỉnh việc cập nhật dữ liệu sau khi xóa
             fetchUserData()
@@ -476,9 +496,36 @@ const UserDetails = () => {
           `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-access/${userId}/authentications`,
           config
         )
-        setUser(response.data)
         setStatus1(response.data.isEnableFace)
         setFingerIdentifyUpdatedAt(response.data.fingerIdentifyUpdatedAt)
+        setUser(response.data)
+        console.log(response.data, 'face')
+        console.log(response.data.faces, 'face')
+        const faces = response.data.faces
+
+        const order = ['LEFT', 'RIGHT', 'CENTER', 'ABOVE', 'BOTTOM']
+
+        faces.sort((a, b) => {
+          return order.indexOf(a.faceType) - order.indexOf(b.faceType)
+        })
+
+        setFaces(faces)
+        if (response.data) {
+          accessCodeUser.current = response.data.accessCode
+          if (response.data.cards) {
+            response.data.cards = response.data.cards.map((item, index) => ({
+              ...item,
+              key: index,
+              isDisable: true
+            }))
+          } else {
+            response.data.cards = []
+          }
+        } else {
+          let user = {
+            cards: []
+          }
+        }
       } catch (error) {
         console.error('Error fetching user details:', error)
       }
@@ -486,7 +533,7 @@ const UserDetails = () => {
     if (userId) {
       fetchUserData()
     }
-  }, [userId, leaderOfUnit])
+  }, [])
 
   const handleCancel = () => {
     fetchUserData()
@@ -495,9 +542,11 @@ const UserDetails = () => {
     setEditing(false)
     setShowPlusColumn(!showPlusColumn)
   }
-  useEffect(() => {
+
+  const handleClose = () => {
+    setIsOpenUpdateImgUser(false)
     fetchUserData()
-  }, [])
+  }
 
   return (
     <div>
@@ -506,29 +555,29 @@ const UserDetails = () => {
           <Grid container spacing={3} component={Paper}>
             <Grid style={{ borderRadius: '0.05%' }}>
               {/* <Grid container spacing={2}>
-                <h3 style={{ color: 'black', marginLeft: '1%' }}> Thông tin người dùng</h3>
+                <h3 style={{ color: 'black', marginLeft: '1%' }}> Information</h3>
               </Grid> */}
 
               <Grid container spacing={2} style={{ color: 'black', marginLeft: '1%' }}>
                 <Grid container spacing={2}>
                   {' '}
                   <Grid item xs={3}>
-                    <h2 style={{ color: 'black', marginLeft: '1%' }}> Thông tin định danh khuôn mặt</h2>
+                    <h2 style={{ color: 'black', marginLeft: '1%' }}> Face Identify</h2>
                   </Grid>
                   <Grid container spacing={2}>
                     <div style={{ width: '80%' }}></div>
                     {editing ? (
                       <>
-                        <Button variant='contained' onClick={saveChanges} sx={{ marginRight: '1%' }}>
-                          Lưu
+                        <Button variant='contained' onClick={handleCancel} sx={{ marginRight: '1%' }}>
+                          Cancel
                         </Button>
-                        <Button variant='contained' onClick={handleCancel}>
-                          Huỷ
+                        <Button variant='contained' onClick={saveChanges}>
+                          Save
                         </Button>
                       </>
                     ) : (
                       <Button variant='contained' onClick={toggleEdit}>
-                        Chỉnh sửa
+                        Edit
                       </Button>
                     )}
                   </Grid>
@@ -542,50 +591,45 @@ const UserDetails = () => {
                       timeCaption='Time'
                       dateFormat='hh:mm dd/MM/yyyy'
                       disabled={true}
-                      customInput={<CustomInput label='Thời gian cập nhật' />}
+                      customInput={<CustomInput label='Date Update' />}
                       fullWidth
                     />
                   </Grid>
                   <Grid item xs={4}>
-                    <CustomTextField
-                      label='Trạng thái'
-                      value={statusText}
-                      InputProps={{ readOnly: readOnly }}
-                      fullWidth
-                    />
+                    <CustomTextField label='Status' value={statusText} InputProps={{ readOnly: readOnly }} fullWidth />
                   </Grid>
                   <Grid item xs={4} style={{ marginTop: '1.1%' }}>
                     <Switch
                       checked={status1 === true}
                       onChange={handleStatusChange}
                       color='primary'
-                      label='Trạng thái'
+                      label='Status'
                       disabled={readOnly}
                     />
                   </Grid>
                   <Grid item xs={4}></Grid>
                   <Grid item xs={12}>
-                    <h2 style={{ color: 'black', marginLeft: '15%' }}> Hình ảnh khuôn mặt</h2>
+                    <h2 style={{ color: 'black', marginLeft: '15%' }}> Image</h2>
                   </Grid>
                   <div>
-                    {(identityData?.faces?.length && (
+                    {(face?.length && (
                       <>
                         <div style={{ display: 'flex' }}>
-                          <ImgCards data={processedImages} imgTitle='Ảnh' />
+                          <ImgCards data={processedImages} imgTitle='Image' />
                         </div>
                       </>
                     )) || (
                       <>
-                        <h4 style={{ fontSize: '16px' }}>Hình ảnh khuôn mặt</h4>
+                        <h4 style={{ fontSize: '16px' }}>Image</h4>
                         <div style={{ display: 'flex' }}>
-                          <ImgCards data={[]} imgTitle='Ảnh' />
+                          <ImgCards data={[]} imgTitle='Image' />
                         </div>
                       </>
                     )}
 
                     {isOpenUpdateImgUser && (
                       <ImageForm
-                        onClose={() => setIsOpenUpdateImgUser(false)}
+                        onClose={() => handleClose()}
                         open={openPopup}
                         userId={userId}
                         faceType={faceType}
@@ -596,7 +640,7 @@ const UserDetails = () => {
                     )}
                   </div>
                   <Grid item xs={12}>
-                    <h2 style={{ color: 'black', marginLeft: '1%' }}> Thông tin định danh vân tay</h2>
+                    <h2 style={{ color: 'black', marginLeft: '1%' }}> Identify fingerprint</h2>
                   </Grid>
                   <Grid item xs={3}>
                     <DatePicker
@@ -606,17 +650,12 @@ const UserDetails = () => {
                       timeCaption='Time'
                       dateFormat='hh:mm dd/MM/yyyy'
                       disabled={true}
-                      customInput={<CustomInput label='Thời gian cập nhật' />}
+                      customInput={<CustomInput label='Date Update' />}
                       fullWidth
                     />
                   </Grid>
                   <Grid item xs={4}>
-                    <CustomTextField
-                      label='Trạng thái'
-                      value={statusText1}
-                      InputProps={{ readOnly: readOnly }}
-                      fullWidth
-                    />
+                    <CustomTextField label='Status' value={statusText1} InputProps={{ readOnly: readOnly }} fullWidth />
                   </Grid>
                   <Grid item xs={12} style={{ height: 20 }}></Grid>
                   {user.fingerprints.length === 0 && (
@@ -626,7 +665,7 @@ const UserDetails = () => {
                         alt='Fingerprint'
                         style={{ width: '15%', height: '100%', marginLeft: '20%' }}
                       />
-                      <p style={{ color: 'black', marginLeft: '20%' }}> Người dùng chưa được định danh vân tay</p>
+                      <p style={{ color: 'black', marginLeft: '20%' }}> Fingerprint is not available</p>
                     </Grid>
                   )}
                   <Grid item xs={4}></Grid>
@@ -636,21 +675,21 @@ const UserDetails = () => {
               <br></br>
               <Grid container spacing={2} style={{ marginLeft: 10 }}>
                 <Grid item xs={12}>
-                  <h2 style={{ color: 'black', marginLeft: '1%' }}> Danh sách thẻ</h2>
+                  <h2 style={{ color: 'black', marginLeft: '1%' }}> Cards</h2>
                 </Grid>
                 <Grid item xs={11.8}>
                   <TableContainer>
                     <Table>
                       <TableHead>
                         <TableRow>
-                          <TableCell>STT</TableCell>
-                          <TableCell>Thời gian</TableCell>
-                          <TableCell>Mã số thẻ</TableCell>
-                          <TableCell>Trạng thái</TableCell>
+                          <TableCell>NO.</TableCell>
+                          <TableCell>Date</TableCell>
+                          <TableCell>Code</TableCell>
+                          <TableCell>Status</TableCell>
 
                           <TableCell align='center'>
                             <Button variant='contained' size='small'>
-                              Thêm thẻ <Icon icon='bi:plus' />
+                              Add <Icon icon='bi:plus' />
                             </Button>
                           </TableCell>
                         </TableRow>
@@ -670,7 +709,7 @@ const UserDetails = () => {
                                   updatedRows[index].policyId = newValue.policyId
                                   setRows(updatedRows)
                                 }}
-                                renderInput={params => <TextField {...params} label='Đơn vị' />}
+                                renderInput={params => <TextField {...params} label='Group' />}
                               />
                             </TableCell>
                             <TableCell>{row.description}</TableCell>
@@ -697,22 +736,22 @@ const UserDetails = () => {
           <Grid container spacing={3}>
             <Grid style={{ borderRadius: '0.05%' }}>
               <Grid container spacing={2}>
-                {/* <h3 style={{ color: 'black', marginLeft: '1%' }}> Thông tin người dùng</h3> */}
+                {/* <h3 style={{ color: 'black', marginLeft: '1%' }}> Information</h3> */}
               </Grid>
               <Grid container spacing={2}>
                 <div style={{ width: '80%' }}></div>
                 {editing ? (
                   <>
                     <Button variant='contained' onClick={saveChanges} sx={{ marginRight: '10px' }}>
-                      Lưu
+                      Save
                     </Button>
                     <Button variant='contained' onClick={handleCancel}>
-                      Huỷ
+                      Cancel
                     </Button>
                   </>
                 ) : (
                   <Button variant='contained' onClick={toggleEdit}>
-                    Chỉnh sửa
+                    Edit
                   </Button>
                 )}
               </Grid>
@@ -720,7 +759,7 @@ const UserDetails = () => {
               <Grid container spacing={2} style={{ marginLeft: 10 }}>
                 <Grid container spacing={2}>
                   <Grid item xs={9}>
-                    <h2 style={{ color: 'black', marginLeft: '1%' }}> Thông tin định danh khuôn mặt</h2>
+                    <h2 style={{ color: 'black', marginLeft: '1%' }}> Face Identify</h2>
                   </Grid>
                 </Grid>
                 <Grid item xs={12} container spacing={2}>
@@ -731,13 +770,13 @@ const UserDetails = () => {
                       timeCaption='Time'
                       dateFormat='hh:mm dd/MM/yyyy'
                       disabled={true}
-                      customInput={<CustomInput label='Thời gian cập nhật' />}
+                      customInput={<CustomInput label='Date Update' />}
                       fullWidth
                     />
                   </Grid>
                   <Grid item xs={4}>
                     <CustomTextField
-                      label='Trạng thái'
+                      label='Status'
                       value={'Không hoạt động'}
                       InputProps={{ readOnly: readOnly }}
                       fullWidth
@@ -745,7 +784,7 @@ const UserDetails = () => {
                   </Grid>
                   <Grid item xs={4}></Grid>
                   <Grid item xs={12}>
-                    <h2 style={{ color: 'black', marginLeft: '1%' }}> Hình ảnh khuôn mặt</h2>
+                    <h2 style={{ color: 'black', marginLeft: '1%' }}> Image</h2>
                   </Grid>
                   <Grid item xs={12} style={{ alignContent: 'center' }}>
                     <img
@@ -757,7 +796,7 @@ const UserDetails = () => {
                   </Grid>
 
                   <Grid item xs={12}>
-                    <h2 style={{ color: 'black', marginLeft: '1%' }}> Thông tin định danh vân tay</h2>
+                    <h2 style={{ color: 'black', marginLeft: '1%' }}> Identify fingerprint</h2>
                   </Grid>
                   <Grid item xs={3}>
                     <DatePicker
@@ -766,13 +805,13 @@ const UserDetails = () => {
                       timeCaption='Time'
                       dateFormat='hh:mm dd/MM/yyyy'
                       disabled={true}
-                      customInput={<CustomInput label='Thời gian cập nhật' />}
+                      customInput={<CustomInput label='Date Update' />}
                       fullWidth
                     />
                   </Grid>
                   <Grid item xs={4}>
                     <CustomTextField
-                      label='Trạng thái'
+                      label='Status'
                       value={'Chưa định danh'}
                       InputProps={{ readOnly: readOnly }}
                       fullWidth
@@ -785,7 +824,7 @@ const UserDetails = () => {
                       alt='Fingerprint'
                       style={{ width: '15%', height: '100%', marginLeft: '20%' }}
                     />
-                    <p style={{ color: 'black', marginLeft: '20%' }}> Người dùng chưa được định danh vân tay</p>
+                    <p style={{ color: 'black', marginLeft: '20%' }}> Fingerprint is not available</p>
                   </Grid>
                   <Grid item xs={4}></Grid>
                 </Grid>
@@ -794,21 +833,21 @@ const UserDetails = () => {
               <br></br>
               <Grid container spacing={2} style={{ marginLeft: 10 }}>
                 <Grid item xs={12}>
-                  <h2 style={{ color: 'black', marginLeft: '1%' }}> Danh sách thẻ</h2>
+                  <h2 style={{ color: 'black', marginLeft: '1%' }}> Cards</h2>
                 </Grid>
                 <Grid item xs={11.8}>
                   <TableContainer>
                     <Table>
                       <TableHead>
                         <TableRow>
-                          <TableCell>STT</TableCell>
-                          <TableCell>Thời gian</TableCell>
-                          <TableCell>Mã số thẻ</TableCell>
-                          <TableCell>Trạng thái</TableCell>
+                          <TableCell>NO.</TableCell>
+                          <TableCell>Date</TableCell>
+                          <TableCell>Code</TableCell>
+                          <TableCell>Status</TableCell>
 
                           <TableCell align='center'>
                             <IconButton size='small' sx={{ marginLeft: '10px', color: 'blue' }}>
-                              Thêm thẻ <Icon icon='bi:plus' />
+                              Add <Icon icon='bi:plus' />
                             </IconButton>
                           </TableCell>
                         </TableRow>

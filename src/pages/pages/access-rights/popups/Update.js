@@ -56,37 +56,37 @@ const dataDailyDefault = [
     value: 1
   },
   {
-    label: 'Thứ 2',
+    label: 'MONDAY',
     dayOfWeek: 'MONDAY',
     value: 2
   },
   {
-    label: 'Thứ 3',
+    label: 'TUESDAY',
     dayOfWeek: 'TUESDAY',
     value: 3
   },
   {
-    label: 'Thứ 4',
+    label: 'WEDNESDAY',
     dayOfWeek: 'WEDNESDAY',
     value: 4
   },
   {
-    label: 'Thứ 5',
+    label: 'THURSDAY',
     dayOfWeek: 'THURSDAY',
     value: 5
   },
   {
-    label: 'Thứ 6',
+    label: 'FRIDAY',
     dayOfWeek: 'FRIDAY',
     value: 6
   },
   {
-    label: 'Thứ 7',
+    label: 'SATURDAY',
     dayOfWeek: 'SATURDAY',
     value: 7
   },
   {
-    label: 'CN',
+    label: 'SUNDAY',
     dayOfWeek: 'SUNDAY',
     value: 8
   }
@@ -105,8 +105,8 @@ const defaultValues = {
 const format_form = [
   {
     name: 'nameCalendar',
-    label: 'Tên lịch',
-    placeholder: 'Tên lịch',
+    label: 'Schedule Name',
+    placeholder: 'Schedule Name',
     type: 'TextField',
     data: [],
     require: true,
@@ -122,24 +122,24 @@ const format_form = [
   },
   {
     name: 'doorInName',
-    label: 'Cửa vào',
-    placeholder: 'Cửa vào',
+    label: 'Door In',
+    placeholder: 'Door In',
     type: 'AutocompleteDoorIn',
     require: true,
     width: 6
   },
   {
     name: 'doorOutName',
-    label: 'Cửa ra',
-    placeholder: 'Cửa ra',
+    label: 'Door Out',
+    placeholder: 'Door Out',
     type: 'AutocompleteDoorOut',
     require: true,
     width: 6
   },
   {
     name: 'startDate',
-    label: 'Ngày bắt đầu',
-    placeholder: 'Ngày bắt đầu',
+    label: 'Start Date',
+    placeholder: 'Start Date',
     type: 'startDate',
     data: [],
     require: false,
@@ -147,8 +147,8 @@ const format_form = [
   },
   {
     name: 'endDate',
-    label: 'Ngày Kết thúc',
-    placeholder: 'Ngày kết thúc',
+    label: 'End Date',
+    placeholder: 'End Date',
     type: 'endDate',
     data: [],
     require: false,
@@ -269,101 +269,37 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
     }
   }
 
-  const ViewContent = () => {
-    const transformCalendarDays = calendarDays => {
-      console.log('calendarDays', calendarDays)
-
-      return calendarDays.map(day => {
-        const { dayOfWeek, timePeriods } = day
-        const value = dataDailyDefault.find(item => item.dayOfWeek === dayOfWeek)?.value || 1
-
-        let label
-        if (value === 1) {
-          label = 'CN'
-        } else if (value >= 2 && value <= 7) {
-          label = `Thứ ${value}`
-        } else {
-          label = 'CN'
-        }
-
-        return {
-          label,
-          dayOfWeek,
-          value,
-          timePeriods
-        }
-      })
-    }
-
-    useEffect(() => {
-      if (detail && detail.calendarDays) {
-        const transformedData = transformCalendarDays(detail.calendarDays)
-        setDataDailyState(transformedData)
-        setDataDaily(transformedData)
-      }
-    }, [detail])
-
-    return (
-      <div>
-        <div
-          style={{
-            color: '#333',
-            margin: '20px 0 20px 0'
-          }}
-        >
-          <span>Bảng cấu hình thời gian</span>
-        </div>
-
-        <div
-          style={{
-            width: '100%'
-          }}
-        >
-          <div
-            style={{
-              marginLeft: 50,
-              width: 'calc(100% - 150px)',
-              position: 'relative',
-              color: 'rgba(0, 0, 0, 0.6)',
-              fontSize: 14,
-              display: 'flex'
-            }}
-          >
-            {['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'].map((time, index) => (
-              <div
-                key={index.toString()}
-                style={{
-                  width: `${100 / 6}%`,
-                  textAlign: 'center',
-                  padding: '8px 0'
-                }}
-              >
-                {time}
-              </div>
-            ))}
-            <div
-              style={{
-                position: 'absolute',
-                right: -70,
-                textAlign: 'center',
-                padding: '8px 0'
-              }}
-            >
-              24:00
-            </div>
-          </div>
-
-          <Daily
-            callbackOfDaily={v => {
-              setDataDaily(v)
-              setDataDailyState(v)
-            }}
-            dataDailyProps={dataDailyState}
-          />
-        </div>
-      </div>
-    )
+  const dayMapping = {
+    1: 'SUNDAY',
+    2: 'MONDAY',
+    3: 'TUESDAY',
+    4: 'WEDNESDAY',
+    5: 'THURSDAY',
+    6: 'FRIDAY',
+    7: 'SATURDAY'
   }
+
+  const transformCalendarDays = calendarDays => {
+    return calendarDays.map(day => {
+      const { dayOfWeek, timePeriods = [] } = day
+      const value = dataDailyDefault.find(item => item.dayOfWeek === dayOfWeek)?.value || 1
+
+      return {
+        label: dayMapping[value] || 'SUNDAY',
+        dayOfWeek,
+        value,
+        timePeriods: timePeriods.length > 0 ? timePeriods : []
+      }
+    })
+  }
+
+  useEffect(() => {
+    if (detail && detail.calendarDays) {
+      const transformedData = transformCalendarDays(detail.calendarDays)
+      setDataDailyState(transformedData)
+      setDataDaily(transformedData)
+    }
+  }, [detail])
 
   const handleSave = async () => {
     try {
@@ -376,7 +312,10 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
         doorOutId: getValues('doorOutId') || '',
         startDate: getValues('startDate') ? format(new Date(getValues('startDate')), 'yyyy-MM-dd') : null,
         endDate: getValues('endDate') ? format(new Date(getValues('endDate')), 'yyyy-MM-dd') : null,
-        calendarDays: dataDaily,
+        calendarDays: dataDaily.map(day => ({
+          dayOfWeek: day.dayOfWeek,
+          timePeriods: Array.isArray(day.timePeriods) ? (day.timePeriods.length > 0 ? day.timePeriods : []) : []
+        })),
         scheduleId: idScheduleId,
         doorAccessId: idDoorAccessId,
         accessGroupId: idAccessGroupId
@@ -390,7 +329,7 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
         config
       )
       setReload()
-      toast.success('Cập nhật thành công')
+      toast.success('Update Successful')
     } catch (error) {
       console.error('Error updating data: ', error)
       toast.error(error.message || 'Có lỗi xảy ra khi cập nhật')
@@ -433,7 +372,7 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
           </CustomCloseButton>
           <Box sx={{ mb: 8, textAlign: 'left' }}>
             <Typography variant='h3' sx={{ mb: 3 }}>
-              Cấu hình lịch
+              Schedule Configuration
             </Typography>
           </Box>
           <form>
@@ -455,7 +394,7 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
                             placeholder={item.placeholder}
                             error={Boolean(errors[item.name])}
                             aria-describedby='validation-basic-last-name'
-                            {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
+                            {...(errors[item.name] && { helperText: 'This field is required' })}
                           />
                         )}
                       />
@@ -480,12 +419,12 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
                               <Autocomplete
                                 fullWidth
                                 id='autocomplete-custom'
-                                label='Công ty'
+                                label='Department'
                                 value={selectedOption}
                                 options={userGroups}
                                 getOptionLabel={option => option.name || ''}
                                 renderInput={params => (
-                                  <CustomTextField {...params} label='Công ty' placeholder='Khác' />
+                                  <CustomTextField {...params} label='Department' placeholder='Department' />
                                 )}
                                 onChange={(event, newValue) => {
                                   onChange(newValue ? newValue.id : null)
@@ -514,11 +453,13 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
                             <Autocomplete
                               fullWidth
                               id='autocomplete-doorInId'
-                              label='Cửa vào'
+                              label='Door In'
                               value={selectedOption}
                               options={filteredDoorList}
                               getOptionLabel={option => option.name || ''}
-                              renderInput={params => <CustomTextField {...params} label='Cửa vào' placeholder='Khác' />}
+                              renderInput={params => (
+                                <CustomTextField {...params} label='Door In' placeholder='Door In' />
+                              )}
                               onChange={(event, newValue) => {
                                 onChange(newValue ? newValue.id : null)
                                 handleDoorInIdChange(newValue ? newValue.id : null) // Save selected doorInId
@@ -547,11 +488,13 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
                             <Autocomplete
                               fullWidth
                               id='autocomplete-doorOutId'
-                              label='Cửa ra'
+                              label='Door Out'
                               value={selectedOption}
                               options={filteredDoorList}
                               getOptionLabel={option => option.name || ''}
-                              renderInput={params => <CustomTextField {...params} label='Cửa ra' placeholder='Khác' />}
+                              renderInput={params => (
+                                <CustomTextField {...params} label='Door Out' placeholder='Door Out' />
+                              )}
                               onChange={(event, newValue) => {
                                 onChange(newValue ? newValue.id : null)
                                 handleDoorOutIdChange(newValue ? newValue.id : null) // Save selected doorOutId
@@ -563,86 +506,85 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
                     </Grid>
                   )
                 }
+              })}
 
-                if (item.type == 'Schedule') {
-                  return (
-                    <Grid item xs={12} key={index}>
-                      <span style={{ color: '#f5963a', fontSize: 20, position: 'relative' }}>
-                        Cấu hình thời gian hoạt động
-                        <span
+              <Grid item xs={12}>
+                <div>
+                  <div
+                    style={{
+                      color: '#333',
+                      margin: '20px 0'
+                    }}
+                  >
+                    <span>Time Settings</span>
+                  </div>
+
+                  <div
+                    style={{
+                      width: '100%'
+                    }}
+                  >
+                    {!loading && (
+                      <div
+                        style={{
+                          marginLeft: 70,
+                          width: 'calc(100% - 150px)',
+                          position: 'relative',
+                          color: 'rgba(0, 0, 0, 0.6)',
+                          fontSize: 14,
+                          display: 'flex'
+                        }}
+                      >
+                        {['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'].map((time, index) => (
+                          <div
+                            key={index.toString()}
+                            style={{
+                              width: `${100 / 6}%`,
+                              textAlign: 'center',
+                              padding: '8px 0'
+                            }}
+                          >
+                            {time}
+                          </div>
+                        ))}
+                        <div
                           style={{
                             position: 'absolute',
-                            left: 0,
-                            bottom: -10,
-                            display: 'inline-block',
-                            content: '',
-                            width: '100%',
-                            height: '5px',
-                            background: '#7ebbfc',
-                            borderRadius: 25
+                            right: -70,
+                            textAlign: 'center',
+                            padding: '8px 0'
                           }}
-                        />
-                      </span>
-                      {ViewContent()}
-                    </Grid>
-                  )
-                }
-                if (item.type === 'startDate') {
-                  return (
-                    <Grid item xs={12} sm={4} key={index}>
+                        >
+                          24:00
+                        </div>
+                      </div>
+                    )}
+
+                    <Box>
                       <Controller
-                        name='startDate'
+                        name='calendarDays'
                         control={control}
-                        rules={{ required: item.require }}
-                        render={({ field: { value, onChange } }) => (
-                          <DatePickerWrapper>
-                            <DatePicker
-                              selected={value ? new Date(value) : null}
-                              onChange={onChange}
-                              customInput={
-                                <CustomTextField
-                                  fullWidth
-                                  label='Ngày bắt đầu'
-                                  error={Boolean(errors.startDate)}
-                                  helperText={errors.startDate ? 'Trường này bắt buộc' : ''}
-                                />
-                              }
+                        render={() => (
+                          console.log(dataDaily, dataDailyState, 'dđ'),
+                          (
+                            <Daily
+                              callbackOfDaily={v => {
+                                setDataDaily(v)
+                                setDataDailyState(v)
+                              }}
+                              dataDailyProps={dataDailyState}
+                              disabled={isCheckboxChecked}
+                              error={Boolean(errors.calendarDays)}
+                              aria-describedby='validation-basic-last-name'
+                              {...(errors.calendarDays && { helperText: 'This field is required' })}
                             />
-                          </DatePickerWrapper>
+                          )
                         )}
                       />
-                    </Grid>
-                  )
-                }
-                if (item.type === 'endDate') {
-                  return (
-                    <Grid item xs={12} sm={4} key={index}>
-                      <Controller
-                        name='endDate'
-                        control={control}
-                        rules={{ required: item.require }}
-                        render={({ field: { value, onChange } }) => (
-                          <DatePickerWrapper>
-                            <DatePicker
-                              selected={value ? new Date(value) : null}
-                              onChange={onChange}
-                              customInput={
-                                <CustomTextField
-                                  fullWidth
-                                  label='Ngày kết thúc'
-                                  error={Boolean(errors.endDate)}
-                                  helperText={errors.endDate ? 'Trường này bắt buộc' : ''}
-                                />
-                              }
-                            />
-                          </DatePickerWrapper>
-                        )}
-                      />
-                    </Grid>
-                  )
-                }
-              })}
-              <Grid item xs={12}></Grid>
+                    </Box>
+                  </div>
+                </div>
+              </Grid>
             </Grid>
           </form>
         </DialogContent>
@@ -654,10 +596,10 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
           }}
         >
           <Button variant='contained' onClick={onClose}>
-            Hủy
+            Cancel
           </Button>
           <Button variant='contained' onClick={handleSave} disabled={loading}>
-            {loading ? 'Đang lưu...' : 'Lưu'}
+            {loading ? 'Saving...' : 'Ok'}
           </Button>
         </DialogActions>
       </Dialog>

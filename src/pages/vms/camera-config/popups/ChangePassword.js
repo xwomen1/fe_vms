@@ -95,18 +95,19 @@ const PassWord = ({ onClose, camera }) => {
     setLoading(true)
     if (password !== confirmPassword) {
       Swal.fire({
-        title: 'Lỗi!',
-        text: 'Mật khẩu và xác nhận mật khẩu không khớp nhau.',
+        title: 'Error!',
+        text: 'Password and confirm password do not match',
         icon: 'error',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
       })
       setLoading(false)
+      onClose()
 
       return
     }
@@ -131,13 +132,13 @@ const PassWord = ({ onClose, camera }) => {
         config
       )
       Swal.fire({
-        title: 'Thành công!',
-        text: 'Dữ liệu đã được cập nhật thành công.',
+        title: 'Success!',
+        text: 'Data has been updated successfully',
         icon: 'success',
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -151,7 +152,7 @@ const PassWord = ({ onClose, camera }) => {
         willOpen: () => {
           const confirmButton = Swal.getConfirmButton()
           if (confirmButton) {
-            confirmButton.style.backgroundColor = '#FF9F43'
+            confirmButton.style.backgroundColor = '#002060'
             confirmButton.style.color = 'white'
           }
         }
@@ -173,7 +174,7 @@ const PassWord = ({ onClose, camera }) => {
       sx={{ '& .MuiDialog-paper': { overflow: 'visible', minHeight: '10vh', position: 'relative' } }} // Reduced minHeight here
     >
       {loading && <CircularProgress className={classes.circularProgress} />}
-      <DialogTitle>Đổi mật khẩu</DialogTitle>
+      <DialogTitle>Change password </DialogTitle>
       <CustomCloseButton onClick={onClose}>
         <Icon icon='tabler:x' fontSize='1.25rem' />
       </CustomCloseButton>
@@ -188,7 +189,7 @@ const PassWord = ({ onClose, camera }) => {
                   shrink: true
                 }}
                 autoComplete='old-password'
-                label='Mật khẩu cũ'
+                label='Old password '
                 type={showPassword ? 'text' : 'password'}
                 onChange={handlePasswordOldChange}
                 fullWidth
@@ -208,7 +209,7 @@ const PassWord = ({ onClose, camera }) => {
                 InputLabelProps={{
                   shrink: true
                 }}
-                label='Mật khẩu mới'
+                label='New password '
                 autoComplete='new-password'
                 type={showPassword ? 'text' : 'password'}
                 onChange={handlePasswordChange}
@@ -226,7 +227,7 @@ const PassWord = ({ onClose, camera }) => {
             </Grid>
             <Grid item xs={12}>
               <CustomTextField
-                label='Xác nhận mật khẩu'
+                label='Confirm password '
                 autoComplete='off'
                 type={showPassword ? 'text' : 'password'}
                 onChange={handleConfirmPasswordChange}
@@ -246,9 +247,9 @@ const PassWord = ({ onClose, camera }) => {
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Đóng</Button>
+        <Button onClick={onClose}>Close</Button>
         <Button onClick={saveChange} variant='contained'>
-          Lưu
+          Save
         </Button>
       </DialogActions>
     </Dialog>

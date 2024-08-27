@@ -42,16 +42,16 @@ const CustomCloseButton = styled(IconButton)(({ theme }) => ({
 const format_form = [
   {
     name: 'type',
-    label: 'Mã Model AI',
-    placeholder: 'Nhập mã model AI',
+    label: 'Model AI Code',
+    placeholder: 'Enter Model AI Code',
     type: 'TextField',
     require: true,
     width: 6
   },
   {
     name: 'modelName',
-    label: 'Tên Model AI',
-    placeholder: 'Nhập tên Model AI',
+    label: 'Model AI Name',
+    placeholder: 'Enter Model AI Name',
     type: 'TextField',
     require: true,
     width: 6
@@ -131,27 +131,27 @@ const AddModelAI = ({ show, onClose, setReload, data, id, typePopup }) => {
       characteristicForm.push(
         {
           name: `characteristics[${i}].characteristicType`,
-          label: 'Mã thông số',
-          placeholder: 'Nhập mã thông số',
+          label: 'Parameter Code',
+          placeholder: 'Enter Parameter Code',
           type: 'TextField',
           require: true,
           width: 4
         },
         {
           name: `characteristics[${i}].characteristicName`,
-          label: 'Tên thông số',
-          placeholder: 'Nhập tên thông số',
+          label: 'Parameter Name',
+          placeholder: 'Enter Parameter Name',
           type: 'TextField',
           require: true,
           width: 4
         },
         {
           name: `characteristics[${i}].characteristicValue`,
-          label: 'Giá trị thông số',
+          label: 'Parameter Value',
           placeholder: '35',
           type: 'TextField',
           require: true,
-          width: 3,
+          width: 4,
           defaultValue: '35'
         }
       )
@@ -165,27 +165,27 @@ const AddModelAI = ({ show, onClose, setReload, data, id, typePopup }) => {
       ...prevForm,
       {
         name: `characteristics[${characteristicsIndex}].characteristicType`,
-        label: 'Mã thông số',
-        placeholder: 'Nhập mã thông số',
+        label: 'Parameter Code',
+        placeholder: 'Enter Parameter Code',
         type: 'TextField',
         require: true,
         width: 4
       },
       {
         name: `characteristics[${characteristicsIndex}].characteristicName`,
-        label: 'Tên thông số',
-        placeholder: 'Nhập tên thông số',
+        label: 'Parameter Name',
+        placeholder: 'Enter Parameter Name',
         type: 'TextField',
         require: true,
         width: 4
       },
       {
         name: `characteristics[${characteristicsIndex}].characteristicValue`,
-        label: 'Giá trị thông số',
+        label: 'Parameter Value',
         placeholder: '35',
         type: 'TextField',
         require: true,
-        width: 3,
+        width: 4,
         defaultValue: '35'
       }
     ])
@@ -236,7 +236,7 @@ const AddModelAI = ({ show, onClose, setReload, data, id, typePopup }) => {
     axios
       .post(`https://sbs.basesystem.one/ivis/vms/api/v0/camera-model-ai`, { ...params }, config)
       .then(() => {
-        toast.success('Thêm mới thành công')
+        toast.success('Add New Successfully')
         setReload()
         onClose()
       })
@@ -263,7 +263,7 @@ const AddModelAI = ({ show, onClose, setReload, data, id, typePopup }) => {
     axios
       .put(`https://sbs.basesystem.one/ivis/vms/api/v0/camera-model-ai/${data.id}`, { ...params }, config)
       .then(() => {
-        toast.success('Dữ liệu thay đổi thành công')
+        toast.success('Data saved successfully')
         setReload()
         onClose()
       })
@@ -326,7 +326,7 @@ const AddModelAI = ({ show, onClose, setReload, data, id, typePopup }) => {
                             placeholder={item.placeholder}
                             error={Boolean(errors[item.name])}
                             aria-describedby='validation-basic-last-name'
-                            {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
+                            {...(errors[item.name] && { helperText: 'This field is required' })}
                           />
                         )}
                       />
@@ -336,11 +336,11 @@ const AddModelAI = ({ show, onClose, setReload, data, id, typePopup }) => {
               })}
               {typePopup !== 'view' && (
                 <Grid item xs={12}>
-                  <Typography sx={{ mb: 3, fontSize: '16px', fontStyle: 'italic', color: '#FF9F43' }}>
-                    Thêm các thông số Model AI
+                  <Typography sx={{ mb: 3, fontSize: '16px', fontStyle: 'italic', color: '#002060' }}>
+                    Add AI Model Parameters
                   </Typography>
                   <Button variant='contained' color='primary' sx={{ margin: '10px' }} onClick={handleAddNewField}>
-                    Thêm
+                    ADD
                   </Button>
                   {/* {form.length > 2 &&
                                         <Button variant='contained' color='error' sx={{ margin: '10px' }} onClick={() => handleRemoveField()} >
@@ -364,11 +364,11 @@ const AddModelAI = ({ show, onClose, setReload, data, id, typePopup }) => {
             color={typePopup === 'view' ? 'primary' : 'secondary'}
             onClick={onClose}
           >
-            {typePopup === 'view' ? 'Đóng' : 'Hủy'}
+            {typePopup === 'view' ? 'Close' : 'Cancel'}
           </Button>
           {typePopup === 'add' && (
             <Button type='submit' variant='contained' onClick={handleSubmit(onSubmit)}>
-              Lưu
+              Save
             </Button>
           )}
         </DialogActions>

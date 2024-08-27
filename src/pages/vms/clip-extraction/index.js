@@ -1,14 +1,14 @@
-import axios from "axios"
+import axios from 'axios'
 import authConfig from 'src/configs/auth'
-import { TabContext, TabPanel, TreeItem, TreeView } from "@mui/lab"
-import { Box, Card, CardContent, CardHeader, Grid, IconButton, Tab, Typography, styled } from "@mui/material"
+import { TabContext, TabPanel, TreeItem, TreeView } from '@mui/lab'
+import { Box, Card, CardContent, CardHeader, Grid, IconButton, Tab, Typography, styled } from '@mui/material'
 import MuiTabList from '@mui/lab/TabList'
-import { useEffect, useState } from "react"
-import LiveView from "./view/liveView"
-import Review from "./view/review"
-import Storage from "./view/storage"
+import { useEffect, useState } from 'react'
+import LiveView from './view/liveView'
+import Review from './view/review'
+import Storage from './view/storage'
 import Icon from 'src/@core/components/icon'
-import CustomTextField from "src/@core/components/mui/text-field"
+import CustomTextField from 'src/@core/components/mui/text-field'
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   borderBottom: '0 !important',
@@ -70,8 +70,9 @@ const StyledTreeItem = props => {
             py: 1,
             display: 'flex',
             alignItems: 'center',
-            '& svg': { mr: 1 },
-          }}>
+            '& svg': { mr: 1 }
+          }}
+        >
           <Icon icon={labelIcon} color={color} />
           <Typography variant='body2' sx={{ flexGrow: 1, fontWeight: 500, textDecoration: textDirection }}>
             {labelText}
@@ -112,13 +113,13 @@ const ClipExtraction = () => {
     bundlePolicy: 'max-bundle',
     iceServers: [
       {
-        urls: 'stun:dev-ivis-camera-api.basesystem.one:3478',
+        urls: 'stun:dev-ivis-camera-api.basesystem.one:3478'
       },
       {
         urls: 'turn:dev-ivis-camera-api.basesystem.one:3478',
         username: 'demo',
-        credential: 'demo',
-      },
+        credential: 'demo'
+      }
     ]
   }
 
@@ -128,18 +129,15 @@ const ClipExtraction = () => {
 
     setWebsocket(ws)
 
-    //create RTCPeerConnection 
+    //create RTCPeerConnection
     const pc = new RTCPeerConnection(configWs)
     setRtcPeerConnection(pc)
 
     //listen for remote tracks and add them to remote stream
 
-    pc.ontrack = (event) => {
+    pc.ontrack = event => {
       const stream = event.streams[0]
-      if (
-        !remoteVideoRef.current?.srcObject ||
-        remoteVideoRef.current?.srcObject.id !== stream.id
-      ) {
+      if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {
         setRemoteStream(stream)
         remoteVideoRef.current.srcObject = stream
       }
@@ -157,13 +155,13 @@ const ClipExtraction = () => {
     }
   }
 
-  const handleMessage = async (event) => {
+  const handleMessage = async event => {
     const message = JSON.parse(event.data)
     const newMessage = JSON.parse(message?.data)
     setEventData(newMessage)
   }
 
-  const handleClose = async (event) => {
+  const handleClose = async event => {
     if (websocket) {
       websocket.close()
     }
@@ -177,11 +175,11 @@ const ClipExtraction = () => {
 
   useEffect(() => {
     if (websocket) {
-      websocket.addEventListener('open', (event) => { })
+      websocket.addEventListener('open', event => { })
 
       websocket.addEventListener('message', handleMessage)
 
-      websocket.addEventListener('error', (error) => {
+      websocket.addEventListener('error', error => {
         console.error('WebSocket error: ', error)
       })
 
@@ -194,12 +192,9 @@ const ClipExtraction = () => {
   }, [keyword])
 
   useEffect(() => {
-
-    const addStatusToCameras = (data) => {
-
+    const addStatusToCameras = data => {
       return data.map(group => {
         if (group?.cameras && group?.cameras.length > 0) {
-
           return {
             ...group,
             cameras: group?.cameras.map(camera => {
@@ -209,26 +204,22 @@ const ClipExtraction = () => {
                 ...camera,
                 status: matchedEvent?.status ? matchedEvent?.status : false
               }
-            }
-            )
+            })
           }
         }
 
-        return group;
+        return group
       })
     }
 
     const data = addStatusToCameras(cameraList)
     setDataList(data)
-  }, [cameraList]);
-
+  }, [cameraList])
 
   useEffect(() => {
-    const addStatus = (data) => {
-
+    const addStatus = data => {
       return data.map(group => {
         if (group?.cameras && group?.cameras.length > 0) {
-
           return {
             ...group,
             cameras: group?.cameras.map(camera => {
@@ -238,22 +229,24 @@ const ClipExtraction = () => {
               return {
                 ...camera,
                 status:
-                  matchedEvent?.status === camera?.status && matchedEvent?.status !== undefined ? camera?.status
-                    : matchedEvent?.status !== camera?.status && matchedEvent?.status !== undefined ? matchedEvent?.status
-                      : matchedEvent?.status !== camera?.status && matchedEvent?.status === undefined ? camera?.status
+                  matchedEvent?.status === camera?.status && matchedEvent?.status !== undefined
+                    ? camera?.status
+                    : matchedEvent?.status !== camera?.status && matchedEvent?.status !== undefined
+                      ? matchedEvent?.status
+                      : matchedEvent?.status !== camera?.status && matchedEvent?.status === undefined
+                        ? camera?.status
                         : false
               }
-            }
-            )
+            })
           }
         }
 
-        return group;
+        return group
       })
     }
     const data = addStatus(dataList)
     setDataList(data)
-  }, [eventsData]);
+  }, [eventsData])
 
   const fetchCameraList = async () => {
     try {
@@ -266,7 +259,6 @@ const ClipExtraction = () => {
       } else {
         setCameraList([])
       }
-
     } catch (error) {
       console.error('Error fetching data: ', error)
     }
@@ -280,18 +272,16 @@ const ClipExtraction = () => {
     setKeyword(e.target.value)
   }
 
-  const handleSetCamera = (camera) => {
+  const handleSetCamera = camera => {
     setCamera({ id: camera.id, name: camera.deviceName, channel: 'Sub' })
     setIdCameraSelected(camera.id)
   }
 
   const renderTree = group => {
-
     return (
       <StyledTreeItem key={group.id} nodeId={group.id} labelText={group.name} labelIcon='tabler:folder'>
         {group.cameras && group.cameras.length > 0
           ? group.cameras.map(camera => {
-
             return (
               <StyledTreeItem
                 key={camera.id}
@@ -315,14 +305,14 @@ const ClipExtraction = () => {
         <TabContext value={value}>
           <Grid item xs={12} sx={{ mb: 5 }}>
             <TabList onChange={handleChange} aria-label='customized tabs example'>
-              <Tab value='1' label='Trích xuất clip' key={1} />
-              <Tab value='2' label='Xem lại' key={2} />
-              <Tab value='3' label='Trực tiếp' key={3} />
+              <Tab value='1' label='Extract clip' key={1} />
+              <Tab value='2' label='Playback' key={2} />
+              <Tab value='3' label='Live' key={3} />
             </TabList>
           </Grid>
           <Grid item xs={12} sm={4} lg={2}>
             <Card>
-              <CardHeader title='Danh sách Camera' />
+              <CardHeader title='Cameras' />
               <CardContent>
                 <CustomTextField
                   value={keyword}
@@ -350,15 +340,17 @@ const ClipExtraction = () => {
                     }
                   }}
                 />
-                <Box sx={{
-                  height: {
-                    xs: '300px',
-                    sm: '300px',
-                    lg: '400px',
-                  },
-                  overflow: 'auto',
-                  marginTop: '10px'
-                }}>
+                <Box
+                  sx={{
+                    height: {
+                      xs: '300px',
+                      sm: '300px',
+                      lg: '400px'
+                    },
+                    overflow: 'auto',
+                    marginTop: '10px'
+                  }}
+                >
                   <TreeView
                     sx={{ minHeight: 240 }}
                     defaultExpanded={['root']}

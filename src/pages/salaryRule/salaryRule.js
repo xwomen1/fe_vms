@@ -197,14 +197,14 @@ const SalaryRulePage = ({ isOpen, onClose, camera }) => {
         othour: othour,
         salary: salary,
         businessDay: businessDay,
-        salaryLevels: rows.map(row => ({
+        salaryLevels: rows?.map(row => ({
           salaryLevel: parseInt(row.salaryLevel),
           coefficient: parseFloat(row.coefficient)
         }))
       }
 
       const response = await axios.put(
-        'https://dev-ivi.basesystem.one/smc/iam/api/v0/salary/regulation/update/c952ce18-867d-47b6-b4b5-9fa96917d8dc',
+        'https://dev-ivi.basesystem.one/smc/iam/api/v0/salary/regulation/update',
         data,
         config
       )
@@ -216,7 +216,7 @@ const SalaryRulePage = ({ isOpen, onClose, camera }) => {
         setLabelColor('red')
       }
       setSalaryRule(data)
-      toast.success(httpMessage)
+      toast.success('Update Successful')
     } catch (error) {
       console.error('Error saving data:', error)
       toast.error(error.message)
@@ -236,17 +236,17 @@ const SalaryRulePage = ({ isOpen, onClose, camera }) => {
     <div component={Paper} style={{ backgroundColor: 'white' }}>
       {' '}
       <DialogTitle>
-        <h2>QUY ĐỊNH VỀ LƯƠNG</h2>
+        <h2>Salary Regulations</h2>
       </DialogTitle>
       <Grid container spacing={2}>
         <div style={{ width: '80%' }}></div>
         {/* {editing ? ( */}
         <>
           <Button variant='contained' onClick={handleCancel} sx={{ marginRight: '10px' }}>
-            Huỷ
+            Cancel
           </Button>
           <Button variant='contained' onClick={handleSaveClick}>
-            Lưu
+            Save
           </Button>
         </>
 
@@ -254,31 +254,31 @@ const SalaryRulePage = ({ isOpen, onClose, camera }) => {
       </Grid>
       <DialogContent>
         <Grid>
-          <h3>LƯƠNG CƠ BẢN</h3>
+          <h3>Base Salary</h3>
           <>
             <Grid container spacing={2}>
               <Grid item xs={5}>
                 {' '}
-                <p style={{ fontSize: 20 }}>Lương cơ bản/ngày</p>
+                <p style={{ fontSize: 20 }}>Base Salary/day</p>
               </Grid>
               <Grid item xs={4} style={{ marginTop: '2%' }}>
                 <CustomTextField value={salary || 0} onChange={e => setSalary(parseInt(e.target.value))} />
               </Grid>
               <Grid item xs={2}>
                 {' '}
-                <p style={{ fontSize: 20 }}> (đồng)</p>
+                <p style={{ fontSize: 20 }}> (vnd)</p>
               </Grid>
             </Grid>
           </>
         </Grid>
         <hr></hr>
         <Grid>
-          <h3> SỐ GIỜ</h3>
+          <h3>Hours</h3>
           <>
             <Grid container spacing={2}>
               <Grid item xs={5}>
                 {' '}
-                <p style={{ fontSize: 20 }}>Số giờ tính công trên 1 ngày:</p>
+                <p style={{ fontSize: 20 }}>Hours of Work per Day:</p>
               </Grid>
               <Grid item xs={4} style={{ marginTop: '2%' }}>
                 <CustomTextField
@@ -288,13 +288,13 @@ const SalaryRulePage = ({ isOpen, onClose, camera }) => {
               </Grid>
               <Grid item xs={2}>
                 {' '}
-                <p style={{ fontSize: 20 }}> (giờ)</p>
+                <p style={{ fontSize: 20 }}> (hours)</p>
               </Grid>
             </Grid>
             <Grid container spacing={2}>
               <Grid item xs={5}>
                 {' '}
-                <p style={{ fontSize: 20 }}> Số ngày tính công trên 1 tháng:</p>
+                <p style={{ fontSize: 20 }}>Hours of Work per Month:</p>
               </Grid>
               <Grid item xs={4} style={{ marginTop: '2%' }}>
                 <CustomTextField
@@ -304,18 +304,18 @@ const SalaryRulePage = ({ isOpen, onClose, camera }) => {
               </Grid>
               <Grid item xs={2}>
                 {' '}
-                <p style={{ fontSize: 20 }}> (ngày)</p>
+                <p style={{ fontSize: 20 }}> (Day)</p>
               </Grid>
             </Grid>
           </>
         </Grid>
         <hr></hr>
         <Grid>
-          <h3> MỨC LƯƠNG OT-CÔNG TÁC</h3>
+          <h3>OT-Work Travel Salary</h3>
           <Grid container spacing={2}>
             <Grid item xs={5}>
               {' '}
-              <p style={{ fontSize: 20 }}> Mức lương OT/giờ: </p>
+              <p style={{ fontSize: 20 }}>OT Rate per Hour: </p>
             </Grid>
             <Grid item xs={4} style={{ marginTop: '2%' }}>
               <CustomTextField value={othour || 0} onChange={e => setOT(parseInt(e.target.value))} />
@@ -328,21 +328,21 @@ const SalaryRulePage = ({ isOpen, onClose, camera }) => {
           <Grid container spacing={2}>
             <Grid item xs={5}>
               {' '}
-              <p style={{ fontSize: 20 }}>Phụ cấp công tác/ngày: </p>
+              <p style={{ fontSize: 20 }}>Work Travel Allowance per Day: </p>
             </Grid>
             <Grid item xs={4} style={{ marginTop: '2%' }}>
               <CustomTextField value={businessDay || 0} onChange={e => setBussiness(parseInt(e.target.value))} />
             </Grid>
             <Grid item xs={2}>
               {' '}
-              <p style={{ fontSize: 20 }}> (đồng)</p>
+              <p style={{ fontSize: 20 }}> (vnd)</p>
             </Grid>
           </Grid>
           <hr></hr>
           <Grid container spacing={2}>
             <Grid item xs={5}>
               {' '}
-              <p style={{ fontSize: 20 }}> Bảo hiểm xã hội: </p>
+              <p style={{ fontSize: 20 }}> Social Insurance: </p>
             </Grid>
             <Grid item xs={4} style={{ marginTop: '2%' }}>
               <CustomTextField value={BHXH || 0} onChange={e => setBhxh(parseInt(e.target.value))} />
@@ -355,7 +355,7 @@ const SalaryRulePage = ({ isOpen, onClose, camera }) => {
           <Grid container spacing={2}>
             <Grid item xs={5}>
               {' '}
-              <p style={{ fontSize: 20 }}> Bảo hiểm y tế: </p>
+              <p style={{ fontSize: 20 }}> Health Insurance: </p>
             </Grid>
             <Grid item xs={4} style={{ marginTop: '2%' }}>
               <CustomTextField value={BHYT || 0} onChange={e => setBhyt(parseInt(e.target.value))} />

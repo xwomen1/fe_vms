@@ -40,8 +40,8 @@ const initValues = {
 const format_form = [
     {
         name: 'imageObject',
-        label: 'Hình ảnh',
-        placeholder: 'Nhập hình ảnh',
+        label: 'Image',
+        placeholder: 'Image',
         type: 'ImageObject',
         data: [],
         require: true,
@@ -49,8 +49,8 @@ const format_form = [
     },
     {
         name: 'description',
-        label: 'Đối tượng',
-        placeholder: 'Nhập tên đối tượng',
+        label: 'Object',
+        placeholder: 'Object',
         type: 'TextField',
         data: [],
         require: true,
@@ -58,8 +58,8 @@ const format_form = [
     },
     {
         name: 'timestamp',
-        label: 'Thời gian',
-        placeholder: 'Nhập thời gian',
+        label: 'Time ',
+        placeholder: 'Time',
         type: 'TextField',
         data: [],
         require: true,
@@ -68,7 +68,7 @@ const format_form = [
     {
         name: 'camName',
         label: 'Camera',
-        placeholder: 'Nhập Camera',
+        placeholder: 'Camera',
         type: 'VAutocomplete',
         data: [],
         require: true,
@@ -76,8 +76,8 @@ const format_form = [
     },
     {
         name: 'location',
-        label: 'Vị trí',
-        placeholder: 'Nhập vị trí',
+        label: 'Location',
+        placeholder: 'Location',
         type: 'VAutocomplete',
         data: [],
         require: true,
@@ -85,8 +85,8 @@ const format_form = [
     },
     {
         name: 'imageResult',
-        label: 'Ảnh toàn cảnh',
-        placeholder: 'Nhập ảnh toán cảnh',
+        label: 'Image Result',
+        placeholder: 'Image Result',
         type: 'ImageResult',
         data: [],
         require: true,
@@ -172,7 +172,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
         setLoading(true)
         axios.put(`https://sbs.basesystem.one/ivis/cmsgo/api/v0/aievents/update/${data.id}`, { ...params }, config)
             .then(() => {
-                toast.success('Thay đổi thành công')
+                toast.success('Updated successfully')
                 setReload()
                 onClose()
             })
@@ -207,7 +207,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
                         </CustomCloseButton>
                         <Box sx={{ mb: 8, textAlign: 'left' }}>
                             <Typography variant='h3' sx={{ mb: 3 }}>
-                                Chi tiết sự kiện
+                                Details
                             </Typography>
                         </Box>
                         <form>
@@ -224,7 +224,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
                                                             rules={{ required: true }}
                                                             render={({ field: { value, onChange } }) => (
                                                                 <Box>
-                                                                    <Typography sx={{ mb: 1 }}>Ảnh đối tượng</Typography>
+                                                                    <Typography sx={{ mb: 1 }}>{item?.label}</Typography>
                                                                     <CustomAvatar
                                                                         src={value}
                                                                         variant='rounded'
@@ -254,7 +254,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
                                                                     placeholder={item.placeholder}
                                                                     error={Boolean(errors[item.name])}
                                                                     aria-describedby='validation-basic-last-name'
-                                                                    {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
+                                                                    {...(errors[item.name] && { helperText: 'This field is required' })}
                                                                 />
                                                             )}
                                                         />
@@ -281,7 +281,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
                                                                         id='validation-basic-select'
                                                                         error={Boolean(errors[item.name])}
                                                                         aria-describedby='validation-basic-select'
-                                                                        {...(errors[item.name] && { helperText: 'Trường này bắt buộc' })}
+                                                                        {...(errors[item.name] && { helperText: 'This field is required' })}
                                                                     >
                                                                         {item.name === 'camName' && cameraList.map((x) => (
                                                                             <MenuItem key={x.id} value={x.name}>
@@ -315,7 +315,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
                                                             rules={{ required: true }}
                                                             render={({ field: { value, onChange } }) => (
                                                                 <Box>
-                                                                    <Typography sx={{ mb: 1 }}>Ảnh toàn cảnh</Typography>
+                                                                    <Typography sx={{ mb: 1 }}>{item.label}</Typography>
                                                                     <CustomAvatar
                                                                         src={value}
                                                                         variant='rounded'
@@ -342,10 +342,10 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
                         }}
                     >
                         <Button variant='tonal' color='secondary' onClick={onClose}>
-                            Hủy
+                            Cancel
                         </Button>
                         <Button variant='contained' onClick={handleSubmit(onSubmit)}>
-                            Sửa
+                            Save
                         </Button>
                     </DialogActions>
                 </Dialog>

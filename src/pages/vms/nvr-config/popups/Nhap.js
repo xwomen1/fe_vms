@@ -1,172 +1,172 @@
-import { useState, useEffect, useCallback } from 'react'
-import Card from '@mui/material/Card'
-import Menu from '@mui/material/Menu'
-import Grid from '@mui/material/Grid'
-import MenuItem from '@mui/material/MenuItem'
-import TreeView from '@mui/lab/TreeView'
-import TreeItem from '@mui/lab/TreeItem'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
-import authConfig from 'src/configs/auth'
-import Table from '@mui/material/Table'
-import Pagination from '@mui/material/Pagination'
+import { useState, useEffect } from 'react'
+import {
+  Grid,
+  IconButton,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody
+} from '@mui/material'
+import { makeStyles } from '@material-ui/core/styles'
 import Icon from 'src/@core/components/icon'
-import { FormControl, IconButton, InputLabel, Select } from '@mui/material'
-import Swal from 'sweetalert2'
-import { fetchData } from 'src/store/apps/user'
 import { useRouter } from 'next/router'
-import axios from 'axios'
-import TableHeader from 'src/views/apps/asset/TableHeader'
-import CustomTextField from 'src/@core/components/mui/text-field'
-import Link from 'next/link'
+import CircularProgress from '@mui/material/CircularProgress'
+import { callApi, putApi } from 'src/@core/utils/requestUltils'
 
-const UserList = ({ apiData }) => {
-  const [value, setValue] = useState('')
+const AddCamera = ({ nvr, onClose }) => {
+  const classes = useStyles()
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
+  const { id } = router.query
+  const [camera, setCamera] = useState([])
+  const [nvrCameraList, setNVRCameraList] = useState([])
+  const [notification, setNotification] = useState({ message: '', type: '' })
 
-  const [addUserOpen, setAddUserOpen] = useState(false)
-  const [assettype, setAssetType] = useState([])
+  useEffect(() => {
+    fetchGroupData();
+  }, [nvr])
 
-  const [total, setTotal] = useState([1])
-  const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(25)
-  const pageSizeOptions = [25, 50, 100]
-  const [anchorEl, setAnchorEl] = useState(null)
-
-  const handlePageChange = newPage => {
-    setPage(newPage)
-  }
-
-  function showAlertConfirm(options, intl) {
-    const defaultProps = {
-      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Xác nhận',
-      imageWidth: 213,
-      showCancelButton: true,
-      showCloseButton: true,
-      showConfirmButton: true,
-      focusCancel: true,
-      reverseButtons: true,
-      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Đồng ý',
-      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Hủy',
-      customClass: {
-        content: 'content-class',
-        confirmButton: 'swal-btn-confirm'
-      },
-      confirmButtonColor: '#FF9F43'
-    }
-
-    return Swal.fire({ ...defaultProps, ...options })
-  }
-
-  const createData = (name, ch1, ch2) => {
-    return { name, ch1, ch2 }
-  }
-
-  const assetTypes = [
-    createData('Frozen Encoding Paramenter	    ', 'Main Stream(Continuous)    ', 'Main Stream(Event)    '),
-    createData(
-      'Stream Type	    ',
-      <FormControl fullWidth>
-        <InputLabel id='time-validity-label'>Video & Audio</InputLabel>
-        <Select labelId='time-validity-label' id='time-validity-select'>
-          <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
-          <MenuItem value='Undefined'>Không xác định</MenuItem>
-        </Select>
-      </FormControl>,
-      <FormControl fullWidth>
-        <InputLabel id='time-validity-label'>Video & Audio</InputLabel>
-        <Select labelId='time-validity-label' id='time-validity-select'>
-          <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
-          <MenuItem value='Undefined'>Không xác định</MenuItem>
-        </Select>
-      </FormControl>
-    ),
-    createData(
-      'Resolution',
-      <FormControl fullWidth>
-        <InputLabel id='time-validity-label'>1920'1090(1080P)</InputLabel>
-        <Select labelId='time-validity-label' id='time-validity-select'>
-          <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
-          <MenuItem value='Undefined'>Không xác định</MenuItem>
-        </Select>
-      </FormControl>,
-      <FormControl fullWidth>
-        <InputLabel id='time-validity-label'>1920'1080(1080P)</InputLabel>
-        <Select labelId='time-validity-label' id='time-validity-select'>
-          <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
-          <MenuItem value='Undefined'>Không xác định</MenuItem>
-        </Select>
-      </FormControl>
-    ),
-    createData(
-      'Bitrate Type',
-      <FormControl fullWidth>
-        <InputLabel id='time-validity-label'>Constant</InputLabel>
-        <Select labelId='time-validity-label' id='time-validity-select'>
-          <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
-          <MenuItem value='Undefined'>Không xác định</MenuItem>
-        </Select>
-      </FormControl>,
-      <FormControl fullWidth>
-        <InputLabel id='time-validity-label'>Constant</InputLabel>
-        <Select labelId='time-validity-label' id='time-validity-select'>
-          <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
-          <MenuItem value='Undefined'>Không xác định</MenuItem>
-        </Select>
-      </FormControl>
-    ),
-    createData(
-      'Max. Bitrate Range Reacommender',
-      <FormControl fullWidth>
-        <InputLabel id='time-validity-label'>3840~6400(kbps)</InputLabel>
-        <Select labelId='time-validity-label' id='time-validity-select'>
-          <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
-          <MenuItem value='Undefined'>Không xác định</MenuItem>
-        </Select>
-      </FormControl>,
-      <FormControl fullWidth>
-        <InputLabel id='time-validity-label'>3840~6400(kbps)</InputLabel>
-        <Select labelId='time-validity-label' id='time-validity-select'>
-          <MenuItem value='Custom'>Tuỳ chỉnh</MenuItem>
-          <MenuItem value='Undefined'>Không xác định</MenuItem>
-        </Select>
-      </FormControl>
-    )
-  ]
-
-  const handleOpenMenu = event => {
-    setAnchorEl(event.currentTarget)
-  }
-
-  const handleCloseMenu = () => {
-    setAnchorEl(null)
-  }
-
-  const handleSelectPageSize = size => {
-    setPageSize(size)
-    setPage(1)
-    handleCloseMenu()
-  }
-
-  const handleFilter = useCallback(val => {
-    setValue(val)
-  }, [])
-
-  console.log(total, 'totalpage')
-
-  return <Grid container spacing={2}></Grid>
-}
-
-export const getStaticProps = async () => {
-  const res = await axios.get('/cards/statistics')
-  const apiData = res.data
-
-  return {
-    props: {
-      apiData
+  const fetchGroupData = async () => {
+    setLoading(true)
+    try {
+      const response = await callApi(
+        `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${nvr}/cameras`
+      )
+      setCamera(response.data)
+    } catch (error) {
+      console.error('Error fetching camera data:', error)
+    } finally {
+      setLoading(false)
     }
   }
+
+  const handleDelete = async id => {
+    setLoading(true)
+    try {
+
+      const nvrResponse = await callApi(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${nvr}`)
+      const nvrCameras = nvrResponse.data.cameras
+
+      const updatedCameras = nvrCameras.filter(camera => camera.id !== id)
+
+      await putApi(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${nvr}`, { cameras: updatedCameras })
+
+      setNotification({ message: 'Deleted successfully', type: 'success' })
+    } catch (error) {
+      setNotification({ message: `An error occurred: ${error.message}`, type: 'error' })
+      console.error('Error deleting camera:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleUpdate = async (id, name) => {
+    setLoading(true)
+    try {
+
+      const params = {
+        cameras: [
+          ...(nvrCameraList && Array.isArray(nvrCameraList) ? nvrCameraList : []),
+          {
+            id: id,
+            name: name
+          }
+        ]
+      }
+      await putApi(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/camera/${nvr}`, params)
+      setNotification({ message: 'Added successfully', type: 'success' })
+    } catch (error) {
+      setNotification({ message: `Device not responding: ${error.message}`, type: 'error' })
+      console.error('Error adding member to group:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className={classes.loadingContainer}>
+      {loading && <CircularProgress className={classes.circularProgress} />}
+      <Grid container spacing={1}>
+        <Grid item xs={12}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ padding: '16px' }}>NO.</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Camera Name</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Device Type</TableCell>
+                <TableCell sx={{ padding: '16px' }}>IP Address</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Mac Address</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Location</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Status</TableCell>
+                <TableCell sx={{ padding: '16px' }}>Active</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {Array.isArray(camera) && camera.length > 0 ? (
+                camera.map((camera, index) => (
+                  <TableRow key={camera.id}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{camera.Name}</TableCell>
+                    <TableCell></TableCell>
+                    <TableCell>{camera.sourceInputPortDescriptor.ipAddress}</TableCell>
+                    <TableCell>{camera.sourceInputPortDescriptor.macAddress}</TableCell>
+                    <TableCell>{camera.location}</TableCell>
+                    <TableCell></TableCell>
+                    <TableCell sx={{ padding: '16px' }}>
+                      <Grid container spacing={2}>
+                        {Array.isArray(nvrCameraList) && nvrCameraList.length > 0 ? (
+                          nvrCameraList.some(nvrCamera => nvrCamera.id === camera.id) ? (
+                            <IconButton disabled={loading} onClick={() => handleDelete(camera.id)}>
+                              <Icon icon='tabler:minus' />
+                            </IconButton>
+                          ) : (
+                            <IconButton disabled={loading} onClick={() => handleUpdate(camera.id, camera.name)}>
+                              <Icon icon='tabler:plus' />
+                            </IconButton>
+                          )
+                        ) : (
+                          <IconButton disabled={loading} onClick={() => handleDelete(camera.id)}>
+                            <Icon icon='tabler:minus' />
+                          </IconButton>
+                        )}
+                      </Grid>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={7} align='center'>
+                    No data
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+          {notification.message && (
+            <div style={{ color: notification.type === 'success' ? '#002060' : 'red', textAlign: 'center' }}>
+              {notification.message}
+            </div>
+          )}
+        </Grid>
+      </Grid>
+    </div>
+  )
 }
 
-export default UserList
+const useStyles = makeStyles(() => ({
+  loadingContainer: {
+    position: 'relative',
+    minHeight: '100px', // Đặt độ cao tùy ý
+    zIndex: 0
+  },
+  circularProgress: {
+    position: 'absolute',
+    top: '40%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    zIndex: 99999 // Đặt z-index cao hơn so với Grid container
+  }
+}))
+
+export default AddCamera

@@ -258,12 +258,12 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
               </IconButton>
             </Box>
             <Typography variant='h3' sx={{ mb: 3 }}>
-              Chi tiết quản lý nhóm quyền truy cập
+              Detail
             </Typography>
             <Grid container spacing={1}>
               <Grid item xs={6}>
                 <CustomTextField
-                  label='Tên'
+                  label='Name'
                   value={accessGroup ? accessGroup.name : ''}
                   onChange={e => handleInputChange('name', e.target.value)}
                   fullWidth
@@ -271,7 +271,7 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
               </Grid>
               <Grid item xs={6}>
                 <CustomTextField
-                  label='Miêu tả'
+                  label='Description'
                   value={accessGroup ? accessGroup.description : ''}
                   onChange={e => handleInputChange('description', e.target.value)}
                   fullWidth
@@ -301,7 +301,7 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
                       <Chip key={option.objectId} label={option.name} {...getTagProps({ index })} />
                     ))
                   }
-                  renderInput={params => <CustomTextField {...params} label='Cấp quyền truy cập cửa' fullWidth />}
+                  renderInput={params => <CustomTextField {...params} label='Door Access' fullWidth />}
                   loading={loading}
                 />
               </Grid>
@@ -328,7 +328,7 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
                       <Chip key={option.objectId} label={option.name} {...getTagProps({ index })} />
                     ))
                   }
-                  renderInput={params => <CustomTextField {...params} label='Nhóm người' fullWidth />}
+                  renderInput={params => <CustomTextField {...params} label='Group Member' fullWidth />}
                   loading={loading}
                 />
               </Grid>
@@ -345,14 +345,14 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
                       handleInputChange('deviceKGroupId', null)
                     }
                   }}
-                  renderInput={params => <CustomTextField {...params} label='Nhóm khách' fullWidth />}
+                  renderInput={params => <CustomTextField {...params} label='Group Guess' fullWidth />}
                   loading={loading}
                 />
               </Grid>
               <Grid item xs={6}>
                 <Autocomplete
                   disabled
-                  renderInput={params => <CustomTextField {...params} label='Danh sách người dùng' fullWidth />}
+                  renderInput={params => <CustomTextField {...params} label='User list' fullWidth />}
                   loading={loading}
                 />
               </Grid>
@@ -366,10 +366,10 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
             }}
           >
             <Button onClick={onClose} variant='contained' color='primary'>
-              Hủy
+              Cancel
             </Button>
             <Button onClick={UpdateAccessGroup} variant='contained' color='primary'>
-              Lưu
+              Save
             </Button>
           </DialogActions>
         </Dialog>
