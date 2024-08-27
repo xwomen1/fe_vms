@@ -22,10 +22,17 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography
+  Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from '@mui/material'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import { format } from 'date-fns'
+import DatePicker from 'react-datepicker'
+import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
+import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 
 const initValueFilter = {
   location: null,
@@ -48,11 +55,29 @@ const EventList = () => {
   const pageSizeOptions = [25, 50, 100]
 
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
+  const [filterPopupOpen, setFilterPopupOpen] = useState(false)
 
-  const formatDateTime = dateTime => {
-    const date = typeof dateTime === 'number' ? new Date(dateTime) : new Date(dateTime)
+  const [filterValues, setFilterValues] = useState({
+    deviceIds: '',
+    hostIds: '',
+    startDate: null,
+    endDate: null
+  })
 
-    return format(date, 'HH:mm:ss dd/MM/yyyy')
+  const handleStartDateChange = date => {
+    setFilterValues(prev => ({ ...prev, startDate: date }))
+  }
+
+  const handleEndDateChange = date => {
+    setFilterValues(prev => ({ ...prev, endDate: date }))
+  }
+
+  const handleOpenFilterPopup = () => {
+    setFilterPopupOpen(true)
+  }
+
+  const handleCloseFilterPopup = () => {
+    setFilterPopupOpen(false)
   }
 
   const formatTime = dateTime => {
@@ -94,9 +119,21 @@ const EventList = () => {
     setPage(1)
     handleCloseMenu()
   }
+
   useEffect(() => {
     fetchDataList()
   }, [page, pageSize])
+  useEffect(() => {
+    if (searchKeyword === '') {
+      fetchDataList()
+    }
+  }, [searchKeyword])
+  function isoToEpoch(isoDateString) {
+    var milliseconds = Date.parse(isoDateString)
+    var epochSeconds = Math.round(milliseconds)
+
+    return epochSeconds
+  }
 
   const fetchDataList = useCallback(async () => {
     setLoading(true)
@@ -108,15 +145,16 @@ const EventList = () => {
         params: {
           keyword: searchKeyword,
           page: page,
-          limit: pageSize
+          limit: pageSize,
+          deviceName: filterValues.deviceName,
+          hostName: filterValues.hostName,
+          startDate: isoToEpoch(filterValues.startDate) || null,
+          endDate: isoToEpoch(filterValues.endDate) || null
         }
       }
 
-      const response = await axios.get(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/event/user/door`,
-        config
-      )
-      setDevices(response.data.data)
+      const response = await axios.get(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/event/search`, config)
+      setDevices(response.data.rows)
       setTotalPage(Math.ceil(response.data.count / pageSize))
     } catch (error) {
       console.error('Error fetching data:', error)
@@ -124,7 +162,7 @@ const EventList = () => {
     } finally {
       setLoading(false)
     }
-  }, [token, page, pageSize, searchKeyword])
+  }, [token, page, pageSize, searchKeyword, filterValues])
 
   const handleSearch = () => {
     setPage(1)
@@ -133,12 +171,13 @@ const EventList = () => {
 
   const columns = [
     { id: 1, flex: 0.25, minWidth: 50, align: 'left', field: 'userName', label: 'Full Name' },
-    { id: 2, flex: 0.15, minWidth: 150, align: 'left', field: 'accessCode', label: 'Employee Code' },
-    { id: 3, flex: 0.15, minWidth: 100, align: 'left', field: 'doorIn', label: 'Door In' },
-    { id: 4, flex: 0.15, minWidth: 100, align: 'left', field: 'doorOut', label: 'Door Out' },
-    { id: 6, flex: 0.25, minWidth: 50, align: 'left', field: 'timeMin', label: 'Time In' },
-    { id: 7, flex: 0.25, minWidth: 50, align: 'left', field: 'timeMax', label: 'Time Out' },
-    { id: 8, flex: 0.25, minWidth: 50, align: 'left', field: 'totalTime', label: 'Total Time' }
+    { id: 2, flex: 0.15, minWidth: 150, align: 'left', field: 'accessCode', label: 'Access Code' },
+    { id: 3, flex: 0.15, minWidth: 100, align: 'left', field: 'deviceDirection', label: 'Event' },
+    { id: 6, flex: 0.25, minWidth: 50, align: 'left', field: 'timeMin', label: 'Time ' },
+
+    { id: 4, flex: 0.15, minWidth: 100, align: 'left', field: 'doorOut', label: 'Door' },
+    { id: 6, flex: 0.25, minWidth: 50, align: 'left', field: 'timeMin', label: 'Device Name' },
+    { id: 7, flex: 0.25, minWidth: 50, align: 'left', field: 'timeMax', label: 'Device Type' }
   ]
 
   return (
@@ -159,6 +198,11 @@ const EventList = () => {
         action={
           <Grid container spacing={2}>
             <Grid item></Grid>
+            <Grid item>
+              <Button variant='contained' onClick={handleOpenFilterPopup}>
+                <Icon fontSize='1.25rem' icon='tabler:filter' />
+              </Button>
+            </Grid>
             <Grid item>
               <CustomTextField
                 placeholder='Enter event'
@@ -215,7 +259,16 @@ const EventList = () => {
                   devices.map((row, index) => (
                     <TableRow hover tabIndex={-1} key={index}>
                       <TableCell>{(page - 1) * pageSize + index + 1}</TableCell>
-                      {columns.map(column => {
+                      <TableCell>{row.fullName}</TableCell>
+                      <TableCell>{row.accessCode}</TableCell>
+                      <TableCell>{row.deviceDirection}</TableCell>
+                      <TableCell>{formatDate(row.dateEvent)}</TableCell>
+
+                      <TableCell>{row.hostName}</TableCell>
+                      <TableCell>{row.deviceName}</TableCell>
+                      <TableCell>{row.deviceGroupName}</TableCell>
+
+                      {/* {columns.map(column => {
                         const value = row[column.field]
 
                         return (
@@ -229,12 +282,12 @@ const EventList = () => {
                               : value}
                           </TableCell>
                         )
-                      })}
+                      })} */}
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={columns.length + 1}>Loading data ...</TableCell>
+                    <TableCell colSpan={columns.length + 1}>Not data available ...</TableCell>
                   </TableRow>
                 )}
               </TableBody>
@@ -266,6 +319,72 @@ const EventList = () => {
           </Grid>
         </Grid>
       </CardActions>
+      <Dialog
+        open={filterPopupOpen}
+        onClose={handleCloseFilterPopup}
+        PaperProps={{
+          style: {
+            overflow: 'visible' // Đảm bảo popup không bị cắt khi hiển thị các thành phần bên trong
+          }
+        }}
+      >
+        <DialogTitle>Filter</DialogTitle>
+        <DialogContent>
+          <DatePickerWrapper>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
+              <div>
+                <DatePicker
+                  selected={filterValues.startDate}
+                  onChange={handleStartDateChange}
+                  dateFormat='dd/MM/yyyy'
+                  customInput={<CustomInput label='Start date' />}
+                  popperProps={{
+                    modifiers: [
+                      {
+                        name: 'preventOverflow',
+                        options: {
+                          boundary: 'viewport' // Đảm bảo rằng DatePicker không bị cắt bởi viewport
+                        }
+                      }
+                    ]
+                  }}
+                />
+              </div>
+              <div>
+                <DatePicker
+                  selected={filterValues.endDate}
+                  onChange={handleEndDateChange}
+                  dateFormat='dd/MM/yyyy'
+                  customInput={<CustomInput label='End date' />}
+                  popperProps={{
+                    modifiers: [
+                      {
+                        name: 'preventOverflow',
+                        options: {
+                          boundary: 'viewport'
+                        }
+                      }
+                    ]
+                  }}
+                />
+              </div>
+            </Box>
+          </DatePickerWrapper>
+          {/* Các phần tử khác */}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseFilterPopup}>Cancel</Button>
+          <Button
+            variant='contained'
+            onClick={() => {
+              handleSearch()
+              handleCloseFilterPopup()
+            }}
+          >
+            Apply
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Card>
   )
 }
