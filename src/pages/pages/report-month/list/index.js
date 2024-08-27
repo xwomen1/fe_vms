@@ -4,6 +4,7 @@ import {
   Card,
   CardContent,
   CardHeader,
+  CircularProgress,
   Grid,
   Paper,
   Table,
@@ -11,7 +12,8 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TableRow
+  TableRow,
+  TextField
 } from '@mui/material'
 import React from 'react'
 import { useEffect, useState } from 'react'
@@ -30,6 +32,7 @@ import TreeView from '@mui/lab/TreeView'
 import { useForm } from 'react-hook-form'
 import useUrlState from '../useUrlState'
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
+import { makeStyles } from '@material-ui/core/styles'
 
 const initValueFilter = {}
 
@@ -42,6 +45,8 @@ function ReportMonth({ history }) {
   const [daysInRange, setDaysInRange] = useState([])
   const [groups, setGroups] = useState([])
   const [selectedGroupId, setSelectedGroupId] = useState('')
+  const classes = useStyles()
+  const [selectedGroup, setSelectedGroup] = useState(null)
 
   const {
     reset,
@@ -105,27 +110,22 @@ function ReportMonth({ history }) {
     const fetchGroupData = async () => {
       try {
         const token = localStorage.getItem(authConfig.storageTokenKeyName)
+        setLoading(true)
 
         const config = {
           headers: { Authorization: `Bearer ${token}` }
         }
         const response = await axios.get('https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups', config)
-        setGroups(addChildrenField(response.data?.rows))
+        setGroups(response.data?.rows || [])
+        setLoading(false)
       } catch (error) {
         console.error('Error fetching data:', error)
+        setLoading(false)
       }
     }
 
     fetchGroupData()
   }, [])
-
-  const addChildrenField = data => {
-    return data?.map(group => {
-      group.children = data.filter(child => child.parentId === group.id)
-
-      return group
-    })
-  }
 
   const calculateDaysInRange = (start, end) => {
     if (start && end && start instanceof Date && end instanceof Date) {
@@ -255,7 +255,9 @@ function ReportMonth({ history }) {
   const minCellWidth = 150
 
   return (
-    <Card>
+    <Card className={classes.loadingContainer}>
+      {loading && <CircularProgress className={classes.circularProgress} />}
+
       <CardHeader
         title={
           <>
@@ -276,16 +278,23 @@ function ReportMonth({ history }) {
         <Grid container spacing={2}>
           <Grid item xs={12} sm={2}>
             <Autocomplete
-              disablePortal
-              id='autocomplete-user-groups'
-              options={groups || []}
-              autoHighlight
-              getOptionLabel={option => option.name} // Hiển thị tên nhóm
-              renderInput={params => <CustomTextField placeholder='Department' {...params} label='Department' />}
-              onChange={(e, value) => {
-                setSelectedGroupId(value ? { id: value.id } : '')
+              options={groups}
+              getOptionLabel={option => option.name}
+              loading={loading}
+              onChange={(event, newValue) => {
+                setSelectedGroupId(newValue)
               }}
-              value={selectedGroupId ? groups.find(g => g.id === selectedGroupId.id) : null}
+              renderInput={params => (
+                <CustomTextField
+                  {...params}
+                  label='Select User Group'
+                  variant='outlined'
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: <>{params.InputProps.endAdornment}</>
+                  }}
+                />
+              )}
             />
           </Grid>
           <Grid item xs={12} sm={1}>
@@ -323,8 +332,7 @@ function ReportMonth({ history }) {
           <Grid item xs={12} sm={1}>
             <Button
               style={{ marginTop: 20, marginLeft: -30 }}
-              variant='outlined'
-              color='secondary'
+              variant='contained'
               startIcon={<Icon icon='tabler:download' />}
               onClick={exportToExcel}
             >
@@ -477,5 +485,20 @@ const fixedColumnStyles = {
   left: 0,
   zIndex: 5
 }
+
+const useStyles = makeStyles(() => ({
+  loadingContainer: {
+    position: 'relative',
+    minHeight: '100px', // Đặt độ cao tùy ý
+    zIndex: 0
+  },
+  circularProgress: {
+    position: 'absolute',
+    top: '40%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    zIndex: 99999 // Đặt z-index cao hơn so với Grid container
+  }
+}))
 
 export default ReportMonth

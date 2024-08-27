@@ -93,6 +93,34 @@ const EventList = () => {
     }
   }, [token, page, pageSize, searchKeyword])
 
+  const fetchDataList1 = useCallback(async () => {
+    console.log('Fetching data with:', { searchKeyword, page, pageSize })
+    setLoading(true)
+    try {
+      const config = {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+
+      const response = await axios.post(
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/event/search/user?&limit=${pageSize}&page=${page}`,
+
+        config
+      )
+      console.log('Response data:', response.data)
+      setDevices(response.data.rows)
+      setTotalPage(Math.ceil(response.data.count / pageSize))
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      toast.error('Error fetching data')
+    } finally {
+      setLoading(false)
+    }
+  }, [token, page, pageSize, searchKeyword])
+  useEffect(() => {
+    if (searchKeyword === '') {
+      fetchDataList1()
+    }
+  }, [searchKeyword])
   useEffect(() => {
     fetchDataList()
   }, [page, pageSize])

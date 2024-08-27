@@ -16,11 +16,11 @@ const navigation = () => {
           icon: 'tabler:calendar-event'
         },
 
-        {
-          title: 'Scheduling',
-          path: '/pages/scheduling',
-          icon: 'tabler:calendar-plus'
-        },
+        // {
+        //   title: 'Scheduling',
+        //   path: '/pages/scheduling',
+        //   icon: 'tabler:calendar-plus'
+        // },
         {
           title: 'Device Management',
           path: '/device-management',
