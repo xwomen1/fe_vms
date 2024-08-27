@@ -272,13 +272,27 @@ const View = ({ show, onClose, id, setReload, filter }) => {
               display: 'flex'
             }}
           >
-            {['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'].map((time, index) => (
+               {['00:00', '04:00', '08:00'].map((time, index) => (
               <div
                 key={index.toString()}
                 style={{
                   width: `${100 / 6}%`,
                   textAlign: 'center',
-                  padding: '8px 0'
+                  padding: '8px 0',
+                  marginLeft: '60px'
+                }}
+              >
+                {time}
+              </div>
+            ))}
+            {['12:00', '16:00', '20:00'].map((time, index) => (
+              <div
+                key={index.toString()}
+                style={{
+                  width: `${100 / 6}%`,
+                  textAlign: 'center',
+                  padding: '8px 0',
+                  marginLeft: '55px'
                 }}
               >
                 {time}
