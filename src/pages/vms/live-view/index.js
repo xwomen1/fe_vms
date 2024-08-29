@@ -48,7 +48,7 @@ const valueFilterInit = {
 }
 
 const Caller = () => {
-  const [sizeScreen, setSizeScreen] = useState('3x3')
+  const [sizeScreen, setSizeScreen] = useState('2x2')
   const [reload, setReload] = useState(0)
   const [numberShow, setNumberShow] = useState(9)
   const [valueFilter, setValueFilter] = useState(valueFilterInit)

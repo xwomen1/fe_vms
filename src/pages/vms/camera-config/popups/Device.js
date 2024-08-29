@@ -31,15 +31,7 @@ import { MapPin } from './MapPin'
 import DDNS from './DDNS'
 
 const CustomMapPin = () => (
-  <svg
-    xmlns='http://www.w3.org/2000/svg'
-    width='40'
-    height='40'
-    viewBox='0 0 24 24'
-    stroke='orange'
-    fill='orange'
-    className='icon icon-tabler icons-tabler-filled icon-tabler-map-pin'
-  >
+  <svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' stroke='#002060' fill='#002060'>
     <path stroke='none' d='M0 0h24v24H0z' fill='none' />
     <path d='M18.364 4.636a9 9 0 0 1 .203 12.519l-.203 .21l-4.243 4.242a3 3 0 0 1 -4.097 .135l-.144 -.135l-4.244 -4.243a9 9 0 0 1 12.728 -12.728zm-6.364 3.364a3 3 0 1 0 0 6a3 3 0 0 0 0 -6z' />
   </svg>
@@ -84,6 +76,13 @@ const Device = ({ onClose, camera }) => {
     latitude: 21.027763,
     zoom: 14
   })
+  useEffect(() => {
+    setViewport(prev => ({
+      ...prev,
+      longitude: parseFloat(lng) || 105.83416,
+      latitude: parseFloat(lat) || 21.027763
+    }))
+  }, [lat, lng])
 
   const fetchNicTypesDevice = async () => {
     try {
@@ -543,13 +542,7 @@ const Device = ({ onClose, camera }) => {
           </Grid>
           <Grid item xs={0.1}></Grid>
           <Grid item xs={3.9}>
-            <CustomTextField
-              label='Username'
-              type='text'
-              value={userName}
-              onChange={handleUserNameChange}
-              fullWidth
-            />
+            <CustomTextField label='Username' type='text' value={userName} onChange={handleUserNameChange} fullWidth />
           </Grid>
           <Grid item xs={0.1}></Grid>
           <Grid item xs={4}>

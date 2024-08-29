@@ -91,7 +91,7 @@ const Caller = () => {
     end_time: time_end
   })
   const datePickerRef = useRef(null)
-  const [sizeScreen, setSizeScreen] = useState('3x2')
+  const [sizeScreen, setSizeScreen] = useState('2x2')
   const [reload, setReload] = useState(0)
   const [numberShow, setNumberShow] = useState(6)
   const [volume, setVolume] = useState(30)
@@ -178,7 +178,8 @@ const Caller = () => {
   function valuetext(value) {
     const timeCurrent = new Date(timeFilter.start_time + value)
 
-    return `${timeCurrent.getFullYear() +
+    return `${
+      timeCurrent.getFullYear() +
       '/' +
       timeDisplay(timeCurrent.getMonth() + 1) +
       '/' +
@@ -189,7 +190,7 @@ const Caller = () => {
       timeDisplay(timeCurrent.getMinutes()) +
       ':' +
       timeDisplay(timeCurrent.getSeconds())
-      }`
+    }`
   }
 
   const handleIconClick = () => {
@@ -381,8 +382,9 @@ const Caller = () => {
                     <Icon icon='tabler:minus' size='1em' color='#FFF' />
                   </IconButton>
                   <Typography style={{ color: '#fff', fontWeight: 'bold' }}>
-                    {`${Math.floor(valueRange / (60 * 60 * 1000))} Hour -  ${(valueRange - 60 * 60 * 1000 * Math.floor(valueRange / (60 * 60 * 1000))) / (60 * 1000)
-                      } Minute `}
+                    {`${Math.floor(valueRange / (60 * 60 * 1000))} Hour -  ${
+                      (valueRange - 60 * 60 * 1000 * Math.floor(valueRange / (60 * 60 * 1000))) / (60 * 1000)
+                    } Minute `}
                   </Typography>
                 </Box>
                 <Box className='w-100'>
