@@ -31,15 +31,7 @@ import { MapPin } from './MapPin'
 import DDNS from './DDNS'
 
 const CustomMapPin = () => (
-  <svg
-    xmlns='http://www.w3.org/2000/svg'
-    width='40'
-    height='40'
-    viewBox='0 0 24 24'
-    stroke='orange'
-    fill='orange'
-    className='icon icon-tabler icons-tabler-filled icon-tabler-map-pin'
-  >
+  <svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' stroke='#002060' fill='#002060'>
     <path stroke='none' d='M0 0h24v24H0z' fill='none' />
     <path d='M18.364 4.636a9 9 0 0 1 .203 12.519l-.203 .21l-4.243 4.242a3 3 0 0 1 -4.097 .135l-.144 -.135l-4.244 -4.243a9 9 0 0 1 12.728 -12.728zm-6.364 3.364a3 3 0 1 0 0 6a3 3 0 0 0 0 -6z' />
   </svg>
@@ -63,6 +55,7 @@ const Device = ({ onClose, camera }) => {
   const [errorNVR, setErrorNVR] = useState(false)
   const [errorProtocol, setErrorProtocol] = useState(false)
   const [errorType, setErrorType] = useState(false)
+  const [suggestions, setSuggestions] = useState([])
 
   const [cameraGroupSelect, setCameraGroupSelect] = useState({
     label: cameras?.type?.name || '',
@@ -78,12 +71,53 @@ const Device = ({ onClose, camera }) => {
   const [ipAddress, setIpAddress] = useState(null)
   const [http, setHttp] = useState(null)
   const [onvif, setOnvif] = useState(null)
+  const [searchValue, setSearchValue] = useState('')
 
   const [viewport, setViewport] = React.useState({
     longitude: 105.83416,
     latitude: 21.027763,
     zoom: 14
   })
+  useEffect(() => {
+    setViewport(prev => ({
+      ...prev,
+      longitude: parseFloat(lng) || 105.83416,
+      latitude: parseFloat(lat) || 21.027763
+    }))
+  }, [lat, lng])
+
+  const handleSearchChange = async (event, newValue) => {
+    setSearchValue(newValue)
+
+    if (newValue) {
+      const response = await axios.get(`https://maps.googleapis.com/maps/api/place/autocomplete/json`, {
+        params: {
+          input: newValue,
+          key: '7c6c73a727524ce04666401cd689e097f88c74cb' // Thay thế bằng API Key của bạn
+        }
+      })
+
+      setSuggestions(response.data.predictions)
+    } else {
+      setSuggestions([])
+    }
+  }
+
+  const handleOptionSelect = async option => {
+    const placeId = option.place_id
+
+    const detailsResponse = await axios.get(`https://maps.googleapis.com/maps/api/place/details/json`, {
+      params: {
+        place_id: placeId,
+        key: 'YOUR_GOOGLE_API_KEY' // Thay thế bằng API Key của bạn
+      }
+    })
+
+    const location = detailsResponse.data.result.geometry.location
+    console.log('Selected Location:', location)
+
+    // Cập nhật lat và lng ở đây nếu cần
+  }
 
   const fetchNicTypesDevice = async () => {
     try {
@@ -543,13 +577,7 @@ const Device = ({ onClose, camera }) => {
           </Grid>
           <Grid item xs={0.1}></Grid>
           <Grid item xs={3.9}>
-            <CustomTextField
-              label='Username'
-              type='text'
-              value={userName}
-              onChange={handleUserNameChange}
-              fullWidth
-            />
+            <CustomTextField label='Username' type='text' value={userName} onChange={handleUserNameChange} fullWidth />
           </Grid>
           <Grid item xs={0.1}></Grid>
           <Grid item xs={4}>
@@ -721,22 +749,32 @@ const Device = ({ onClose, camera }) => {
         </Grid>{' '}
         {viewport && (
           <Grid item xs={12}>
-            <ReactMapGL
-              {...viewport}
-              width='100%'
-              height='30vh'
-              onViewportChange={setViewport}
-              goongApiAccessToken={GOONG_MAP_KEY}
-              onClick={handleMapClick}
-            >
-              {lat && lng && (
-                <Marker latitude={parseFloat(lat)} longitude={parseFloat(lng)} offsetLeft={-20} offsetTop={-20}>
-                  <div>
-                    <CustomMapPin />{' '}
-                  </div>
-                </Marker>
-              )}
-            </ReactMapGL>
+            <div style={{ width: '100%' }}>
+              <Autocomplete
+                value={searchValue}
+                onChange={handleSearchChange}
+                options={suggestions}
+                getOptionLabel={option => option.description}
+                onInputChange={(event, newInputValue) => {
+                  setSearchValue(newInputValue)
+                }}
+                renderInput={params => <CustomTextField {...params} label='Search Location' fullWidth />}
+              />
+              <ReactMapGL
+                {...viewport}
+                width='100%'
+                height='30vh'
+                onViewportChange={setViewport}
+                goongApiAccessToken={GOONG_MAP_KEY}
+                onClick={handleMapClick}
+              >
+                {lat && lng && (
+                  <Marker latitude={lat} longitude={lng} offsetLeft={-20} offsetTop={-20}>
+                    <CustomMapPin />
+                  </Marker>
+                )}
+              </ReactMapGL>
+            </div>
           </Grid>
         )}
       </Grid>

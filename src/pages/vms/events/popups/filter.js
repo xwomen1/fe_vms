@@ -53,8 +53,8 @@ const initValueFilter = {
 
 const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
   const [loading, setLoading] = useState(false)
-  const [startTime, setStartTime] = useState(new Date())
-  const [endTime, setEndTime] = useState(new Date())
+  const [startTime, setStartTime] = useState(null)
+  const [endTime, setEndTime] = useState(null)
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
   const [locations, setLocations] = useState([])
   const [cameras, setCameras] = useState([])
@@ -69,8 +69,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
   const fetchLocations = async () => {
     try {
       const res = await axios.get(
-        `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=7cac40af-6b9e-47e6-9aba-8d458722d5a4
-            `,
+        `  https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=VMS`,
         config
       )
       setLocations(res.data)
@@ -112,8 +111,8 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
 
   const onSubmit = values => {
     var detail = { ...values }
-    detail['startTime'] = startTime.getTime()
-    detail['endTime'] = endTime.getTime()
+    detail['startTime'] = startTime?.getTime() || null
+    detail['endTime'] = endTime?.getTime() || null
     callback(detail)
     onClose()
   }

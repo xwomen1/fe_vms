@@ -177,7 +177,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
         toast.error(error)
       }
     } finally {
-      ; () => {
+      ;() => {
         setLoading(false)
       }
     }
@@ -199,7 +199,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
         toast.error(error)
       }
     } finally {
-      ; () => {
+      ;() => {
         setLoading(false)
       }
     }
@@ -221,7 +221,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
 
     setLoading(true)
     axios
-      .put(`https://sbs.basesystem.one/ivis/cmsgo/api/v0/aievents/update/${data.id}`, { ...params }, config)
+      .put(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/${data.id}`, { ...params }, config)
       .then(() => {
         toast.success('Updated success')
         onClose()

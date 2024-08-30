@@ -301,43 +301,45 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
     }
   }, [detail])
 
-  const handleSave = async () => {
-    try {
-      setLoading(true)
+  const handleSave = handleSubmit(async data => {
+    if (Object.keys(errors).length === 0) {
+      try {
+        setLoading(true)
 
-      const formData = {
-        nameCalendar: getValues('nameCalendar') || '',
-        groupId: getValues('groupId') || '',
-        doorInId: getValues('doorInId') || '',
-        doorOutId: getValues('doorOutId') || '',
-        startDate: getValues('startDate') ? format(new Date(getValues('startDate')), 'yyyy-MM-dd') : null,
-        endDate: getValues('endDate') ? format(new Date(getValues('endDate')), 'yyyy-MM-dd') : null,
-        calendarDays: dataDaily.map(day => ({
-          dayOfWeek: day.dayOfWeek,
-          timePeriods: Array.isArray(day.timePeriods) ? (day.timePeriods.length > 0 ? day.timePeriods : []) : []
-        })),
-        scheduleId: idScheduleId,
-        doorAccessId: idDoorAccessId,
-        accessGroupId: idAccessGroupId
+        const formData = {
+          nameCalendar: getValues('nameCalendar') || '',
+          groupId: getValues('groupId') || '',
+          doorInId: getValues('doorInId') || '',
+          doorOutId: getValues('doorOutId') || '',
+          startDate: getValues('startDate') ? format(new Date(getValues('startDate')), 'yyyy-MM-dd') : null,
+          endDate: getValues('endDate') ? format(new Date(getValues('endDate')), 'yyyy-MM-dd') : null,
+          calendarDays: dataDaily.map(day => ({
+            dayOfWeek: day.dayOfWeek,
+            timePeriods: Array.isArray(day.timePeriods) ? (day.timePeriods.length > 0 ? day.timePeriods : []) : []
+          })),
+          scheduleId: idScheduleId,
+          doorAccessId: idDoorAccessId,
+          accessGroupId: idAccessGroupId
+        }
+        console.log(detail.startDate, 'startDate')
+        console.log(detail.endDate, 'enddate')
+
+        await axios.put(
+          `https://dev-ivi.basesystem.one/smc/access-control/api/v0/calendar/configuration/${id}`,
+          formData,
+          config
+        )
+        setReload()
+        toast.success('Update Successful')
+      } catch (error) {
+        console.error('Error updating data: ', error)
+        toast.error(error.message || 'Có lỗi xảy ra khi cập nhật')
+      } finally {
+        setLoading(false)
+        onClose()
       }
-      console.log(detail.startDate, 'startDate')
-      console.log(detail.endDate, 'enddate')
-
-      await axios.put(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/calendar/configuration/${id}`,
-        formData,
-        config
-      )
-      setReload()
-      toast.success('Update Successful')
-    } catch (error) {
-      console.error('Error updating data: ', error)
-      toast.error(error.message || 'Có lỗi xảy ra khi cập nhật')
-    } finally {
-      setLoading(false)
-      onClose()
     }
-  }
+  })
 
   const handleDoorOutIdChange = newValue => {
     setSelectedDoorOutId(newValue)
@@ -409,28 +411,29 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
                         control={control}
                         rules={{ required: true }}
                         render={({ field: { value, onChange } }) => {
-                          // Convert `value` to the correct option object
                           const selectedOption = userGroups.find(option => option.id === value) || null
-                          console.log('value:', value)
-                          console.log('selectedOption:', selectedOption)
 
                           return (
-                            <>
-                              <Autocomplete
-                                fullWidth
-                                id='autocomplete-custom'
-                                label='Department'
-                                value={selectedOption}
-                                options={userGroups}
-                                getOptionLabel={option => option.name || ''}
-                                renderInput={params => (
-                                  <CustomTextField {...params} label='Department' placeholder='Department' />
-                                )}
-                                onChange={(event, newValue) => {
-                                  onChange(newValue ? newValue.id : null)
-                                }}
-                              />
-                            </>
+                            <Autocomplete
+                              fullWidth
+                              id='autocomplete-custom'
+                              label='Department'
+                              value={selectedOption}
+                              options={userGroups}
+                              getOptionLabel={option => option.name || ''}
+                              renderInput={params => (
+                                <CustomTextField
+                                  {...params}
+                                  label='Department'
+                                  placeholder='Department'
+                                  error={Boolean(errors.groupId)}
+                                  helperText={errors.groupId ? 'This field is required' : ''}
+                                />
+                              )}
+                              onChange={(event, newValue) => {
+                                onChange(newValue ? newValue.id : null)
+                              }}
+                            />
                           )
                         }}
                       />
@@ -458,7 +461,13 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
                               options={filteredDoorList}
                               getOptionLabel={option => option.name || ''}
                               renderInput={params => (
-                                <CustomTextField {...params} label='Door In' placeholder='Door In' />
+                                <CustomTextField
+                                  {...params}
+                                  label='Door In'
+                                  error={Boolean(errors.doorInId)}
+                                  helperText={errors.doorInId ? 'This field is required' : ''}
+                                  placeholder='Door In'
+                                />
                               )}
                               onChange={(event, newValue) => {
                                 onChange(newValue ? newValue.id : null)
@@ -493,7 +502,13 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
                               options={filteredDoorList}
                               getOptionLabel={option => option.name || ''}
                               renderInput={params => (
-                                <CustomTextField {...params} label='Door Out' placeholder='Door Out' />
+                                <CustomTextField
+                                  {...params}
+                                  label='Door Out'
+                                  error={Boolean(errors.doorOutId)}
+                                  helperText={errors.doorOutId ? 'This field is required' : ''}
+                                  placeholder='Door Out'
+                                />
                               )}
                               onChange={(event, newValue) => {
                                 onChange(newValue ? newValue.id : null)
