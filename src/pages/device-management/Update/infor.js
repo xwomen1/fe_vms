@@ -274,6 +274,7 @@ const InforAll = ({ idInfor }) => {
   const handleSelection = async (event, newValue) => {
     if (newValue) {
       const { id, name } = newValue
+      setSelectedRegion(newValue) // Cập nhật giá trị selectedRegion ngay lập tức
 
       try {
         setLoading(true)
@@ -285,72 +286,60 @@ const InforAll = ({ idInfor }) => {
           }
         }
 
-        const data = {
-          description: 'string',
-          name: name,
-          parentId: postParentId
-        }
+        // First, check if the door group already exists
+        const groupSearchResponse = await axios.get(
+          'https://dev-ivi.basesystem.one/smc/access-control/api/v0/door-groups',
+          config
+        )
 
-        let response
-        try {
-          response = await axios.post(
+        const existingGroup = Object.values(groupSearchResponse.data.rows).find(group => group.name === name)
+        let doorGroupId
+
+        if (existingGroup) {
+          doorGroupId = existingGroup.id
+        } else {
+          // If the door group does not exist, create a new one
+          const createGroupResponse = await axios.post(
             'https://dev-ivi.basesystem.one/smc/access-control/api/v0/door-groups',
-            data,
+            {
+              description: 'string',
+              name: name,
+              parentId: postParentId
+            },
             config
           )
 
-          // Use the id from the successful creation
-          const doorGroupId = response.data.id
-
-          const doorData = {
-            description: 'string',
-            doorGroupId: doorGroupId,
-            name: name
-          }
-
-          // Post to create a new door
-          await axios.post('https://dev-ivi.basesystem.one/smc/access-control/api/v0/doors', doorData, config)
-        } catch (createError) {
-          if (createError.response && createError.response.status === 400) {
-            const searchResponse = await axios.get(
-              'https://dev-ivi.basesystem.one/smc/access-control/api/v0/door-groups',
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`
-                }
-              }
-            )
-
-            const existingGroup = Object.values(searchResponse.data.rows).find(group => group.name === name)
-
-            if (existingGroup) {
-              const doorData = {
-                description: 'string',
-                doorGroupId: existingGroup.id,
-                name: name
-              }
-
-              // Post to create a new door
-              await axios.post('https://dev-ivi.basesystem.one/smc/access-control/api/v0/doors', doorData, config)
-            } else {
-              throw new Error('Không tìm thấy door-group phù hợp.')
-            }
-          } else {
-            throw createError
-          }
+          doorGroupId = createGroupResponse.data.id
         }
-      } catch (error) {
-        if (error.response && error.response.status === 400) {
-          const searchResponse = await axios.get('https://dev-ivi.basesystem.one/smc/access-control/api/v0/doors', {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          })
-          const existingDoor = Object.values(searchResponse.data.rows).find(group => group.name === name)
+
+        // Now, check if the door already exists
+        const doorSearchResponse = await axios.get(
+          'https://dev-ivi.basesystem.one/smc/access-control/api/v0/doors',
+          config
+        )
+
+        const existingDoor = Object.values(doorSearchResponse.data.rows).find(door => door.name === name)
+
+        if (existingDoor) {
           setName(existingDoor.name)
           setIdDoor(existingDoor.id)
+        } else {
+          // Create the new door if it does not exist
+          const createDoorResponse = await axios.post(
+            'https://dev-ivi.basesystem.one/smc/access-control/api/v0/doors',
+            {
+              description: 'string',
+              doorGroupId: doorGroupId,
+              name: name
+            },
+            config
+          )
+
+          setName(createDoorResponse.data.name)
+          setIdDoor(createDoorResponse.data.id)
         }
-        console.error('Error posting data:', error)
+      } catch (error) {
+        console.error('Error handling selection:', error)
       } finally {
         setLoading(false)
       }

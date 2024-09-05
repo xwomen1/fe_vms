@@ -5,6 +5,7 @@ import { Box, Button, Card, CardHeader, Grid, Autocomplete, Paper } from '@mui/m
 import Link from 'next/link'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import authConfig from 'src/configs/auth'
+import Swal from 'sweetalert2'
 
 const InforDoor = ({ idInfor }) => {
   const [inforDoor, setInforDoor] = useState({})
@@ -153,11 +154,35 @@ const InforDoor = ({ idInfor }) => {
         config
       )
 
-      toast.success('Cập nhật thành công!')
+      Swal.fire({
+        title: 'Successful!',
+        text: 'Update successfully',
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
       console.log(response.data, 'updateData')
     } catch (error) {
       console.error('Error updating door:', error)
-      toast.error(error.response?.data?.message || error.message)
+      Swal.fire({
+        title: 'Error!',
+        text: error.response?.data?.message || error.message,
+        icon: 'error',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
+
+      // toast.error(error.response?.data?.message || error.message)
     } finally {
       setLoading(false)
     }

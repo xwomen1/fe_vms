@@ -33,6 +33,12 @@ const DoorAccessUpdate = ({ show, onClose, setReload }) => {
   const [loading, setLoading] = useState(false)
   const [doorGroupIds, setDoorGroupIds] = useState([]) // doorGroupIds là mảng chứa các doorGroupId cho từng hàng
 
+  const [errors, setErrors] = useState({
+    name: false,
+    description: false,
+    policies: []
+  })
+
   const fetchAllSchedules = async () => {
     try {
       setLoading(true)
@@ -217,14 +223,30 @@ const DoorAccessUpdate = ({ show, onClose, setReload }) => {
   const handleAddRow = () => {
     setDoorGroupIds(prevDoorGroupIds => [...prevDoorGroupIds, null])
     setDoorOptions(prevDoorOptions => [...prevDoorOptions, []])
+    setErrors(prevErrors => ({
+      ...prevErrors,
+      policies: [...prevErrors.policies, false]
+    }))
   }
 
   const handleDeleteRow = rowIndex => {
     setDoorGroupIds(prevDoorGroupIds => prevDoorGroupIds.filter((_, index) => index !== rowIndex))
     setDoorOptions(prevDoorOptions => prevDoorOptions.filter((_, index) => index !== rowIndex))
+    setErrors(prevErrors => ({
+      ...prevErrors,
+      policies: prevErrors.policies.filter((_, index) => index !== rowIndex)
+    }))
   }
 
   const handleSave = async () => {
+    const newErrors = {
+      name: !door.name,
+      description: !door.description,
+      policies: doorGroupIds.map((doorGroupId, index) => !doorGroupId || !doorOptions[index]?.[0]?.id)
+    }
+
+    setErrors(newErrors)
+
     const payload = {
       description: door.description,
       name: door.name,
@@ -234,6 +256,7 @@ const DoorAccessUpdate = ({ show, onClose, setReload }) => {
         scheduleId: scheduleOptions[index]?.id || ''
       }))
     }
+    if (Object.keys(errors).length === 0) {
 
     try {
       const config = {
@@ -258,6 +281,7 @@ const DoorAccessUpdate = ({ show, onClose, setReload }) => {
       onClose()
     }
   }
+  }
 
   return (
     <Card>
@@ -271,13 +295,21 @@ const DoorAccessUpdate = ({ show, onClose, setReload }) => {
           </Typography>
           <Grid container spacing={2}>
             <Grid item xs={6}>
-              <CustomTextField onChange={e => handleInputChange('name', e.target.value)} label='Name' fullWidth />
+              <CustomTextField
+                onChange={e => handleInputChange('name', e.target.value)}
+                label='Name'
+                error={errors.name}
+                helperText={errors.name && 'Tên không được bỏ trống'}
+                fullWidth
+              />
             </Grid>
             <Grid item xs={6}>
               <CustomTextField
                 label='Detail'
                 onChange={e => handleInputChange('description', e.target.value)}
                 fullWidth
+                error={errors.description}
+                helperText={errors.description && 'Mô tả không được bỏ trống'}
               />
             </Grid>
             <Grid item xs={12}>
@@ -303,21 +335,39 @@ const DoorAccessUpdate = ({ show, onClose, setReload }) => {
                             options={groupOptions}
                             getOptionLabel={option => option.name}
                             onChange={(event, value) => handleGroupChange(event, value, index)}
-                            renderInput={params => <CustomTextField {...params} />}
+                            renderInput={params => (
+                              <CustomTextField
+                                {...params}
+                                error={errors.policies[index]}
+                                helperText={errors.policies[index] && 'Vui lòng chọn nhóm cửa'}
+                              />
+                            )}
                           />
                         </TableCell>
                         <TableCell>
                           <Autocomplete
                             options={doorOptions[index] || []}
                             getOptionLabel={option => option.name}
-                            renderInput={params => <CustomTextField {...params} />}
+                            renderInput={params => (
+                              <CustomTextField
+                                {...params}
+                                error={errors.policies[index]}
+                                helperText={errors.policies[index] && 'Vui lòng chọn cửa'}
+                              />
+                            )}
                           />
                         </TableCell>
                         <TableCell>
                           <Autocomplete
                             options={scheduleOptions}
                             getOptionLabel={option => option.name}
-                            renderInput={params => <CustomTextField {...params} />}
+                            renderInput={params => (
+                              <CustomTextField
+                                {...params}
+                                error={errors.policies[index]}
+                                helperText={errors.policies[index] && 'Vui lòng chọn lịch'}
+                              />
+                            )}
                           />
                         </TableCell>
                         <TableCell align='center'>
