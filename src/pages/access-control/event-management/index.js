@@ -26,13 +26,17 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  Select,
+  FormControl,
+  InputLabel
 } from '@mui/material'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import { format } from 'date-fns'
 import DatePicker from 'react-datepicker'
 import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
+import * as XLSX from 'xlsx'
 
 const initValueFilter = {
   location: null,
@@ -59,10 +63,28 @@ const EventList = () => {
 
   const [filterValues, setFilterValues] = useState({
     deviceIds: '',
-    hostIds: '',
+    groupId: '',
     startDate: null,
     endDate: null
   })
+  const [userGroups, setUserGroups] = useState([]) // Dùng để lưu danh sách user groups
+  const [selectedUserGroup, setSelectedUserGroup] = useState(null) // Dùng để lưu user group được chọn
+  useEffect(() => {
+    const fetchUserGroups = async () => {
+      try {
+        const response = await axios.get('https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        setUserGroups(response.data.rows) // Giả sử API trả về danh sách user groups
+      } catch (error) {
+        console.error('Error fetching user groups:', error)
+      }
+    }
+
+    fetchUserGroups()
+  }, [])
 
   const handleStartDateChange = date => {
     setFilterValues(prev => ({ ...prev, startDate: date }))
@@ -84,6 +106,29 @@ const EventList = () => {
     const date = typeof dateTime === 'number' ? new Date(dateTime) : new Date(dateTime)
 
     return format(date, 'dd/MM/yyyy HH:mm:ss')
+  }
+  console.log(devices, 'device')
+
+  const handleExportExcel = async () => {
+    const devices = await fetchAllData()
+    console.log(devices, 'devoce')
+
+    const formattedData = devices?.map((device, index) => ({
+      No: index + 1,
+      FullName: device.fullName,
+      AccessCode: device.accessCode,
+      Event: device.deviceDirection,
+      Time: formatTime(device.dateEvent),
+      Door: device.hostName,
+      DeviceName: device.deviceName,
+      DeviceType: device.deviceGroupName
+    }))
+
+    const worksheet = XLSX.utils.json_to_sheet(formattedData)
+    const workbook = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Event Data')
+
+    XLSX.writeFile(workbook, 'event_data.xlsx')
   }
 
   const formatDate = dateTime => {
@@ -148,7 +193,8 @@ const EventList = () => {
           deviceName: filterValues.deviceName,
           hostName: filterValues.hostName,
           startDate: isoToEpoch(filterValues.startDate) || null,
-          endDate: isoToEpoch(filterValues.endDate) || null
+          endDate: isoToEpoch(filterValues.endDate) || null,
+          groupId: filterValues.groupId || null // Thêm groupId vào params
         }
       }
 
@@ -177,7 +223,8 @@ const EventList = () => {
           deviceName: filterValues.deviceName,
           hostName: filterValues.hostName,
           startDate: isoToEpoch(filterValues.startDate) || null,
-          endDate: isoToEpoch(filterValues.endDate) || null
+          endDate: isoToEpoch(filterValues.endDate) || null,
+          groupId: filterValues.groupId || null // Thêm groupId vào params
         }
       }
 
@@ -192,9 +239,43 @@ const EventList = () => {
     }
   }, [token, page, pageSize, searchKeyword, filterValues])
 
+  const fetchDevicesByPage = async page => {
+    const response = await axios.get(
+      `https://dev-ivi.basesystem.one/smc/access-control/api/v0/event/search?page=${page}`
+    )
+
+    return response.data
+  }
+
   const handleSearch = () => {
     setPage(1)
     fetchDataList()
+  }
+
+  const fetchAllData = async () => {
+    let allDevices = []
+    let page = 1
+    let totalPages = 1
+
+    try {
+      const initialResponse = await fetchDevicesByPage(page)
+      totalPages = initialResponse.totalPage
+
+      allDevices = initialResponse.rows
+
+      // Lặp qua từng trang và lấy dữ liệu
+      while (page < totalPages) {
+        page += 1
+        const response = await fetchDevicesByPage(page)
+        allDevices = allDevices.concat(response.rows)
+      }
+
+      return allDevices
+    } catch (error) {
+      console.error('Lỗi khi lấy dữ liệu: ', error)
+
+      return []
+    }
   }
 
   const columns = [
@@ -231,6 +312,12 @@ const EventList = () => {
                 <Icon fontSize='1.25rem' icon='tabler:filter' />
               </Button>
             </Grid>
+            <Grid item>
+              <Button variant='contained' onClick={handleExportExcel}>
+                <Icon fontSize='1.25rem' icon='tabler:file-export' />
+              </Button>
+            </Grid>
+
             <Grid item>
               <CustomTextField
                 placeholder='Enter event'
@@ -398,6 +485,23 @@ const EventList = () => {
               </div>
             </Box>
           </DatePickerWrapper>
+          <FormControl fullWidth margin='normal'>
+            <InputLabel>User Group</InputLabel>
+            <Select
+              value={selectedUserGroup || ''}
+              onChange={e => {
+                const selectedGroup = userGroups.find(group => group.id === e.target.value)
+                setSelectedUserGroup(e.target.value) // Lưu id được chọn
+                setFilterValues(prev => ({ ...prev, groupId: selectedGroup.id })) // Truyền id vào filterValues
+              }}
+            >
+              {userGroups.map(group => (
+                <MenuItem key={group.id} value={group.id}>
+                  {group.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
           {/* Các phần tử khác */}
         </DialogContent>
         <DialogActions>

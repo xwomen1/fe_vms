@@ -4,25 +4,10 @@ import React, { useState, useEffect, useMemo, useRef } from 'react'
 import axios from 'axios'
 import authConfig from 'src/configs/auth'
 import CustomTextField from 'src/@core/components/mui/text-field'
-import {
-  Grid,
-  IconButton,
-  Button,
-  FormControlLabel,
-  Checkbox,
-  Switch,
-  TextField,
-  Typography,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem
-} from '@mui/material'
+import { Grid, IconButton, Button, Switch, TextField } from '@mui/material'
 import { CircularProgress } from '@material-ui/core'
 import Icon from 'src/@core/components/icon'
 import Autocomplete from '@mui/material/Autocomplete'
-import Box from '@mui/material/Box'
-import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import TableContainer from '@mui/material/TableContainer'
 import Paper from '@mui/material/Paper'
 import Table from '@mui/material/Table'
@@ -32,70 +17,30 @@ import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import DatePicker from 'react-datepicker'
 import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
-import RolePopup from './popup/AddGroup'
-import PolicyPopup from './popup/AddPolicy'
 import Swal from 'sweetalert2'
-import Tooltip from 'src/@core/theme/overrides/tooltip'
-import useAxios from 'axios-hooks'
 import EditIcon from '@mui/icons-material/Edit'
-import { Popup } from './popup/ImageForm'
 import ImageForm from './popup/ImageForm'
 
 const UserDetails = () => {
   const router = useRouter()
   const { userId } = router.query
   const [openPopup, setOpenPopup] = useState(false)
-  const [openPopupPolicy, setOpenPopupPolicy] = useState(false)
-  const [timeValidity, setTimeValidity] = useState('Custom')
   const [user, setUser] = useState(null)
   const [readOnly, setReadOnly] = useState(true)
-  const [params, setParams] = useState({})
   const [editing, setEditing] = useState(false)
-  const [groupOptions, setGroupOptions] = useState([])
-  const [defaultGroup, setDefaultGroup] = useState(null)
-  const [leaderOfUnit, setLeaderOfUnit] = useState('')
-  const [status, setStatus] = useState('')
   const [status1, setStatus1] = useState('')
-  const [availableAt, setAvailableAt] = useState('')
-  const [expiredAt, setExpiredAt] = useState('')
-  const [note, setNote] = useState('')
-
-  const [timeEndMorning, setTimeEndMorning] = useState('')
-  const [timeStartAfternoon, setTimeStartAfternoon] = useState('')
-  const [timeEndAfternoon, setTimeEndAfternoon] = useState('')
   const [showPlusColumn, setShowPlusColumn] = useState(false)
-
-  const [dateTime, setDateTime] = useState('')
-  const [startDate, setStartDate] = useState(new Date())
-  const [fullNameValue, setFullNameValue] = useState('')
-  const [email, setEmail] = useState('')
-  const [phoneNumber, setPhoneNumber] = useState('')
-  const [identityNumber, setIdentityNumber] = useState('')
   const [userCode, setUserCode] = useState('')
-  const [syncCode, setSyncCode] = useState('')
   const accessCodeUser = useRef('')
   const availableAtUser = useRef(0)
-  const [group, setGroup] = useState(null)
-  const [policies, setPolicies] = useState(null)
-  const [piId, setPiId] = useState(null)
-  const [ava1, setAva1] = useState(null)
   const [face, setFaces] = useState([])
   const [isFaceEnabled, setIsFaceEnabled] = useState(false)
   const [fingerIdentifyUpdatedAt, setFingerIdentifyUpdatedAt] = useState(false)
   const [imageUrl, setImageUrl] = useState(null)
   const [isOpenUpdateImgUser, setIsOpenUpdateImgUser] = useState(false)
-  const originIdentityData = useRef()
-  const [identityData, setIdentityData] = useState(null)
-
   const [rows1, setRows1] = useState([])
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
   const [faceType, setFaceType] = useState(null) // State để Save faceType của Image được chọn
-
-  const config = {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  }
 
   const handleEditImageButtonClick = (faceType, imageUrl) => {
     setFaceType(faceType)
@@ -183,14 +128,6 @@ const UserDetails = () => {
     }
   }
 
-  const convertStringToTimeArray = timeString => {
-    const date = new Date(timeString)
-    const hour = date.getHours()
-    const minute = date.getMinutes()
-
-    return [hour, minute]
-  }
-
   const updateAccessCodeAndAvaibleAtByIdUser = async () => {
     const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -212,6 +149,28 @@ const UserDetails = () => {
       updateAccessCodeAndAvaibleAtByIdUser()
     }
   }, [userId])
+  useEffect(() => {
+    const fetchGroupData = async () => {
+      try {
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+        console.log('token', token)
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+
+        const response = await axios.get(`https://dev-ivi.basesystem.one/smc/iam/api/v0/cards/user-card/${userId}`, config)
+
+        setPolicyOption(response.data.rows)
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+
+    fetchGroupData()
+  }, [])
 
   const fetchUserData = async () => {
     try {
