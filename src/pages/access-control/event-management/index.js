@@ -29,7 +29,8 @@ import {
   DialogActions,
   Select,
   FormControl,
-  InputLabel
+  InputLabel,
+  CircularProgress
 } from '@mui/material'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import { format } from 'date-fns'
@@ -37,16 +38,7 @@ import DatePicker from 'react-datepicker'
 import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import * as XLSX from 'xlsx'
-
-const initValueFilter = {
-  location: null,
-  cameraName: null,
-  startTime: null,
-  endTime: null,
-  keyword: '',
-  limit: 25,
-  page: 1
-}
+import { makeStyles } from '@material-ui/core/styles'
 
 const EventList = () => {
   const [anchorEl, setAnchorEl] = useState(null)
@@ -57,6 +49,7 @@ const EventList = () => {
   const [pageSize, setPageSize] = useState(25)
   const [loading, setLoading] = useState(false)
   const pageSizeOptions = [25, 50, 100]
+  const classes = useStyles()
 
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
   const [filterPopupOpen, setFilterPopupOpen] = useState(false)
@@ -256,6 +249,7 @@ const EventList = () => {
     let allDevices = []
     let page = 1
     let totalPages = 1
+    setLoading(true)
 
     try {
       const initialResponse = await fetchDevicesByPage(page)
@@ -269,10 +263,12 @@ const EventList = () => {
         const response = await fetchDevicesByPage(page)
         allDevices = allDevices.concat(response.rows)
       }
+      setLoading(false)
 
       return allDevices
     } catch (error) {
       console.error('Lỗi khi lấy dữ liệu: ', error)
+      setLoading(false)
 
       return []
     }
@@ -290,7 +286,9 @@ const EventList = () => {
   ]
 
   return (
-    <Card sx={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
+    <Card sx={{ display: 'flex', flexDirection: 'column', height: '90vh' }} className={classes.loadingContainer}>
+      {loading && <CircularProgress className={classes.circularProgress} />}
+
       <CardHeader
         title={
           <>
@@ -313,8 +311,11 @@ const EventList = () => {
               </Button>
             </Grid>
             <Grid item>
-              <Button variant='contained' onClick={handleExportExcel}>
+              <Button variant='contained' onClick={handleExportExcel} disabled={loading}>
                 <Icon fontSize='1.25rem' icon='tabler:file-export' />
+                {loading && <CircularProgress className={classes.circularProgress} />
+                  ? ''
+                  : ''}
               </Button>
             </Grid>
 
@@ -520,5 +521,20 @@ const EventList = () => {
     </Card>
   )
 }
+
+const useStyles = makeStyles(() => ({
+  loadingContainer: {
+    position: 'relative',
+    minHeight: '100px', // Đặt độ cao tùy ý
+    zIndex: 0
+  },
+  circularProgress: {
+    position: 'absolute',
+    top: '40%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    zIndex: 99999 // Đặt z-index cao hơn so với Grid container
+  }
+}))
 
 export default EventList
