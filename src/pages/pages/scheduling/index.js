@@ -10,8 +10,8 @@ import { useState } from 'react'
 import Approval from './approval'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import Icon from 'src/@core/components/icon'
-import Filter from './popups/Filter'
 import Link from 'next/link'
+import Filter from './popups/filter'
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   borderBottom: '0 !important',
@@ -53,7 +53,6 @@ const Caller = () => {
   const [keyword, setKeyword] = useState('')
   const [valueFilter, setValueFilter] = useState(initValueFilter)
   const [isOpenFilter, setIsOpenFilter] = useState(false)
-  const [isOpenAdd, setIsOpenAdd] = useState(false)
 
   const handleChange = (event, newValue) => {
     setValue(newValue)
@@ -96,8 +95,8 @@ const Caller = () => {
             variant='contained'
             size='small'
             component={Link}
-            href={`/pages/scheduling/register`}
-            sx={{ color: 'blue', right: '10px' }}
+            href={`/pages/scheduling/add`}
+            sx={{ right: '10px' }}
           >
             Add
           </Button>
