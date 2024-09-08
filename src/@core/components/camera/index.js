@@ -1,8 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react'
 import _ from 'lodash'
 import Button from '@mui/material/Button'
+import Link from 'next/link'
 import IconButton from '@mui/material/IconButton'
 import Icon from 'src/@core/components/icon'
+import { connect } from 'react-redux'
 import { Box, CircularProgress } from '@mui/material'
 
 const config = {
@@ -21,165 +23,208 @@ const config = {
 
 export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => {
   const [websocket, setWebsocket] = useState(null)
+  const [text, setText] = useState(null)
   const [rtcPeerConnection, setRtcPeerConnection] = useState(null)
   const [remoteStream, setRemoteStream] = useState(null)
   const [loading, setLoading] = useState(false)
   const remoteVideoRef = useRef(null)
-  const [websocketStatus, setWebsocketStatus] = useState(false)
+  const [websocketStatus, setWebsocketStatus] = useState(true)
+  const [rtcPeerStatus, setRtcPeerStatus] = useState(false)
+
+  const [heightDiv, setHeightDiv] = useState(100)
   const [status, setStatus] = useState('')
   const [reload, setReload] = useState(0)
-  const [heightDiv, setHeightDiv] = useState(100)
+  const [videoDimensions, setVideoDimensions] = useState({ width: '100%', height: null })
+  const intervalRef = useRef(null);
 
   useEffect(() => {
-    const calculateHeight = () => {
-      const heightCaculator = Math.floor((window.innerHeight - 90) / sizeScreen.split('x')[1])
+    const heightCaculator = Math.floor((window.innerHeight - 90) / sizeScreen.split('x')[1])
+    setHeightDiv(heightCaculator)
+    window.addEventListener('resize', () => {
       setHeightDiv(heightCaculator)
-    }
-
-    calculateHeight()
-    window.addEventListener('resize', calculateHeight)
-
-    return () => {
-      window.removeEventListener('resize', calculateHeight)
-    }
+    })
   }, [sizeScreen])
 
-  const randomId = length => {
+  function randomId(length) {
     const characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
-    return [...Array(length)].map(() => characters.charAt(Math.floor(Math.random() * characters.length))).join('')
+
+    const pickRandom = () => characters.charAt(Math.floor(Math.random() * characters.length))
+
+    return [...Array(length)].map(pickRandom).join('')
+  }
+  const SOCKET_LIVE_VIEW = process.env.NEXT_PUBLIC_SOCKET_CCTT
+  function delay(milliseconds) {
+    return new Promise(resolve => {
+      setTimeout(resolve, milliseconds)
+    })
   }
 
-  const delay = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds))
-
   const createWsConnection = async () => {
-    console.log('Creating WebSocket and RTCPeerConnection')
+    // console.log('Creating new WebSocket and RTCPeerConnection at:', new Date().toLocaleTimeString())
 
     const pc = new RTCPeerConnection(config)
 
     pc.ontrack = event => {
+      // console.log('RTCPeerConnection track event at:', new Date().toLocaleTimeString())
       setLoading(false)
       const stream = event.streams[0]
       setRemoteStream(stream)
-      if (remoteVideoRef.current) {
-        remoteVideoRef.current.srcObject = stream
-      }
+      remoteVideoRef.current.srcObject = stream
     }
 
-    pc.oniceconnectionstatechange = () => {
-      console.log('ICE connection state:', pc.iceConnectionState)
+    pc.oniceconnectionstatechange = event => {
+      console.log(
+        'RTCPeerConnection ICE connection state change at:',
+        new Date().toLocaleTimeString(),
+        'New state:',
+        pc.iceConnectionState
+      )
     }
 
-    pc.onconnectionstatechange = () => {
-      console.log('Connection state:', pc.connectionState)
+    pc.onconnectionstatechange = event => {
+      console.log(
+        'RTCPeerConnection connection state change at:',
+        new Date().toLocaleTimeString(),
+        'New state:',
+        pc.connectionState
+      )
       setStatus(pc.connectionState)
-      if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
-        setReload(prev => prev + 1)
-      }
     }
 
     setRtcPeerConnection(pc)
 
-    const ws = new WebSocket(`${process.env.NEXT_PUBLIC_SOCKET_CCTT}/ivis/vms/api/v0/ws/signaling/${randomId(10)}`)
+    const ws = new WebSocket(`${SOCKET_LIVE_VIEW}/ivis/vms/api/v0/ws/signaling/${randomId(10)}`)
+
     setWebsocket(ws)
-
-    ws.addEventListener('open', () => {
-      setWebsocketStatus(true)
-      console.log('WebSocket connection established')
-    })
-
-    ws.addEventListener('message', () => {
-      handleMessage
-    })
-
-    ws.addEventListener('close', () => {
-      setWebsocketStatus(false)
-      console.log('WebSocket connection closed')
-    })
-
-    ws.addEventListener('error', error => {
-      console.error('WebSocket error:', error)
-    })
-
     await delay(500)
   }
 
-  useEffect(() => {
-    if (!websocketStatus && rtcPeerConnection) {
-      rtcPeerConnection.close()
-      setRtcPeerConnection(null)
-      setWebsocketStatus(false)
-    }
-    if (!websocket && !rtcPeerConnection) {
-      createWsConnection()
-    }
-  }, [websocketStatus])
+  // useEffect(() => {
+  //   if (!websocketStatus) {
+  //     if (websocket) {
+  //       websocket.close()
+  //       setWebsocket(null)
+  //     }
+  //     if (rtcPeerConnection) {
+  //       rtcPeerConnection.close()
+  //       setRtcPeerConnection(null)
+  //     }
+  //     createWsConnection()
+  //   }
+  // }, [websocketStatus])
 
   useEffect(() => {
-    if (websocket && websocket.readyState === WebSocket.OPEN) {
-      websocket.send(
-        JSON.stringify({
-          id,
+    if (rtcPeerConnection != null && websocketStatus && websocket !== null) {
+      if (websocket.readyState === WebSocket.OPEN) {
+        console.log('Sending message at:', new Date().toLocaleTimeString(), 'Message:', {
+          id: id,
           type: 'request',
-          channel
+          channel: channel
         })
-      )
+        websocket.send(
+          JSON.stringify({
+            id: id,
+            type: 'request',
+            channel: channel
+          })
+        )
+      } else {
+        console.error(
+          'WebSocket is not open. Ready state:',
+          websocket.readyState,
+          'at:',
+          new Date().toLocaleTimeString()
+        )
+      }
     }
-  }, [rtcPeerConnection, websocket])
+  }, [rtcPeerConnection, websocketStatus, websocket])
 
+  useEffect(() => {
+    if (websocket !== null) {
+      setLoading(true)
+      websocket.addEventListener('open', () => {
+        setWebsocketStatus(true)
+        console.log('WebSocket connection established at:', new Date().toLocaleTimeString())
+      })
+      websocket.addEventListener('message', handleMessage)
+      websocket.addEventListener('close', () => {
+        setWebsocketStatus(false)
+        console.log('WebSocket connection closed at:', new Date().toLocaleTimeString())
+      })
+      websocket.addEventListener('error', error => {
+        console.error('WebSocket error at:', new Date().toLocaleTimeString(), error)
+      })
+    }
+    setLoading(false)
+  }, [websocket])
+
+  useEffect(() => {
+    setWebsocketStatus(false)
+  }, [id, channel])
+
+  // send message to WebSocket server
+  const sendMessage = message => {
+    if (websocket && websocket.readyState === WebSocket.OPEN) {
+      websocket.send(JSON.stringify(message))
+    }
+  }
+
+  // handle WebSocket message
   const handleMessage = async event => {
     const message = JSON.parse(event.data)
 
+    // handle message based on its type
     switch (message.type) {
+      // handle offer message
       case 'offer':
-        await rtcPeerConnection.setRemoteDescription(message)
-        const answer = await rtcPeerConnection.createAnswer()
-        await rtcPeerConnection.setLocalDescription(answer)
+        rtcPeerConnection.setRemoteDescription(message).then(async () => {
+          rtcPeerConnection.setLocalDescription(rtcPeerConnection.createAnswer())
 
-        await new Promise(resolve => {
-          if (rtcPeerConnection.iceGatheringState === 'complete') {
-            resolve()
-          } else {
-            rtcPeerConnection.addEventListener('icegatheringstatechange', () => {
-              if (rtcPeerConnection.iceGatheringState === 'complete') {
-                resolve()
-              }
-            })
-          }
+          // Waiting for iceGathering completed
+          await new Promise(resolve => {
+            if (rtcPeerConnection.iceGatheringState === 'complete') {
+              resolve()
+            } else {
+              rtcPeerConnection.addEventListener('icegatheringstatechange', () => {
+                if (rtcPeerConnection.iceGatheringState === 'complete') {
+                  resolve()
+                }
+              })
+            }
+          })
+
+          sendMessage({
+            id: id,
+            type: 'answer',
+            channel: channel,
+            sdp: rtcPeerConnection?.localDescription.sdp
+          })
         })
 
-        websocket.send(
-          JSON.stringify({
-            id,
-            type: 'answer',
-            channel,
-            sdp: rtcPeerConnection.localDescription.sdp
-          })
-        )
         break
       case 'status':
         break
       default:
         break
     }
+    setText(message?.content)
+    setLoading(false)
   }
 
   useEffect(() => {
-    return () => {
-      if (websocket) {
-        websocket.removeEventListener('message', handleMessage)
-        websocket.close()
-        setWebsocket(null)
-      }
-      if (rtcPeerConnection) {
-        rtcPeerConnection.close()
-        setRtcPeerConnection(null)
-      }
-      if (remoteStream) {
-        remoteStream.getTracks().forEach(track => track.stop())
-        setRemoteStream(null)
-      }
+    if (websocket) {
+      websocket.close()
+      setWebsocket(null)
     }
-  }, [websocket, rtcPeerConnection, remoteStream])
+    if (rtcPeerConnection) {
+      rtcPeerConnection.close()
+      setRtcPeerConnection(null)
+    }
+
+    setWebsocketStatus(false)
+    createWsConnection()
+
+  }, [reload, id, channel])
 
   return (
     <div className='portlet portlet-video live' style={{ width: '100%' }}>
@@ -200,6 +245,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
               >
                 {status ? status.toUpperCase() : 'LIVE'}
               </span>
+
               <span className='caption-subject font-dark sbold uppercase'>{name}</span>
             </div>
             <div className='media-top-controls'>
