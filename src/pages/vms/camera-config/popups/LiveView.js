@@ -1,4 +1,6 @@
+import { fa } from "@faker-js/faker"
 import { Box, Button, Card, CircularProgress, Dialog, DialogContent, Fade, IconButton, styled } from "@mui/material"
+import { right } from "@popperjs/core"
 import { forwardRef, useEffect, useRef, useState } from "react"
 import ViewCamera from "src/@core/components/camera"
 import Icon from "src/@core/components/icon"
@@ -38,24 +40,19 @@ const config = {
 
 const LiveView = ({ show, onClose, data }) => {
     const [loading, setLoading] = useState(true)
-
     const remoteVideoRef = useRef(null)
     const [status, setStatus] = useState('')
     const [reload, setReload] = useState(0)
-
     const [websocket, setWebsocket] = useState(null)
     const [text, setText] = useState(null)
     const [rtcPeerConnection, setRtcPeerConnection] = useState(null)
     const [remoteStream, setRemoteStream] = useState(null)
     const [websocketStatus, setWebsocketStatus] = useState(true)
-    const [rtcPeerStatus, setRtcPeerStatus] = useState(false)
-
-    const [heightDiv, setHeightDiv] = useState(100)
     const [closed, setClosed] = useState(false)
-
     const [id, setId] = useState(data.id)
     const [name, setName] = useState(data.name)
     const [channel, setChannel] = useState('Sub')
+    const [isFullScreen, setIsFullScreen] = useState(false)
 
     // useEffect(() => {
     //     const heightCaculator = Math.floor((window.innerHeight - 90) / sizeScreen.split('x')[1])
@@ -270,11 +267,15 @@ const LiveView = ({ show, onClose, data }) => {
         setChannel(channel)
     }
 
+    const toggleFullScreen = () => {
+        setIsFullScreen((prevFullScreen) => !prevFullScreen);
+    };
+
     return (
         <Card>
             <Dialog
                 fullWidth
-                // fullScreen
+                fullScreen={isFullScreen}
                 open={show}
                 maxWidth='lg'
                 scroll='body'
@@ -294,7 +295,7 @@ const LiveView = ({ show, onClose, data }) => {
                         <Icon icon='tabler:x' fontSize='1.25rem' />
                     </CustomCloseButton>
 
-                    <div className='portlet portlet-video live' style={{ width: '100%' }}>
+                    <div className='portlet portlet-video live' style={{ width: '100%', height: 'auto' }}>
                         {loading && (
                             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
                                 <Box sx={{ display: 'flex' }}>
@@ -357,7 +358,19 @@ const LiveView = ({ show, onClose, data }) => {
                                             <Icon icon='tabler:reload' fontSize={30} />
                                         </IconButton>
                                     )}
+                                    <IconButton
+                                        sx={{
+                                            position: 'absolute',
+                                            bottom: 0,
+                                            right: 0,
+                                        }}
+                                        onClick={toggleFullScreen}
+                                    >
+                                        {isFullScreen ? <Icon icon="tabler:arrow-back" style={{ color: 'white' }} />
+                                            : <Icon icon="tabler:border-corners" style={{ color: 'white' }} />}
+                                    </IconButton>
                                 </div>
+
                             </div>
                         )}
                     </div>
@@ -365,92 +378,6 @@ const LiveView = ({ show, onClose, data }) => {
             </Dialog>
         </Card>
     )
-
-    // const [camera, setCamera] = useState({ id: '', name: '', channel: '' })
-    // const [isButton, setIsButton] = useState(false)
-
-    // useEffect(() => {
-    //     setCamera({ id: data.id, name: data.name, channel: 'Sub' })
-    // }, [])
-
-    // const handSetChanel = (id, channel) => {
-    //     setCamera({ id: data.id, name: data.name, channel: channel })
-    // }
-
-    // const handleClosed = (e) => {
-    //     if (e === 'true') {
-    //         setIsButton(true)
-    //     }
-    // }
-
-    // useEffect(() => {
-    //     if (isButton) {
-    //         onClose()
-    //     }
-    // }, [isButton])
-
-    // return (
-    //     <Card>
-    //         <Dialog
-    //             fullWidth
-    //             open={show}
-    //             maxWidth='lg'
-    //             scroll='body'
-    //             TransitionComponent={Transition}
-    //             sx={{ '& .MuiDialog-paper': { overflow: 'visible' } }}
-    //         >
-    //             <DialogContent
-    //                 sx={{
-    //                     pb: theme => `${theme.spacing(8)} !important`,
-    //                     px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
-    //                     pt: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
-    //                 }}
-    //             >
-    //                 <CustomCloseButton onClick={onClose}>
-    //                     <Icon icon='tabler:x' fontSize='1.25rem' />
-    //                 </CustomCloseButton>
-    //                 <Box sx={{ mb: 8, textAlign: 'left' }}>
-    //                     <Typography variant='h3' sx={{ mb: 3 }}>
-    //                         Live
-    //                     </Typography>
-    //                 </Box>
-
-    //                 <Grid container spacing={2}>
-    //                     <ViewCamera
-    //                         name={camera.name}
-    //                         id={camera.id}
-    //                         channel={camera.channel}
-
-    //                         // status={status}
-    //                         sizeScreen={'1x1.3'}
-    //                         handSetChanel={handSetChanel}
-    //                         handleClosed={handleClosed}
-    //                         isButton={true}
-    //                     />
-    //                 </Grid>
-
-    //             </DialogContent>
-    //             {/* <DialogActions
-    //                 sx={{
-    //                     justifyContent: 'right',
-    //                     px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
-    //                     pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
-    //                 }}
-    //             >
-    //                 <Button
-    //                     variant='contained'
-    //                     color='primary'
-    //                     onClick={() => {
-    //                         handleClosed()
-    //                         onClose()
-    //                     }}
-    //                 >
-    //                     Close
-    //                 </Button>
-    //             </DialogActions> */}
-    //         </Dialog>
-    //     </Card>
-    // )
 }
 
 export default LiveView

@@ -34,6 +34,8 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
   const [heightDiv, setHeightDiv] = useState(100)
   const [status, setStatus] = useState('')
   const [reload, setReload] = useState(0)
+  const [videoDimensions, setVideoDimensions] = useState({ width: '100%', height: null })
+  const intervalRef = useRef(null);
 
   useEffect(() => {
     const heightCaculator = Math.floor((window.innerHeight - 90) / sizeScreen.split('x')[1])
@@ -71,21 +73,21 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
     }
 
     pc.oniceconnectionstatechange = event => {
-      console.log(
-        'RTCPeerConnection ICE connection state change at:',
-        new Date().toLocaleTimeString(),
-        'New state:',
-        pc.iceConnectionState
-      )
+      // console.log(
+      //   'RTCPeerConnection ICE connection state change at:',
+      //   new Date().toLocaleTimeString(),
+      //   'New state:',
+      //   pc.iceConnectionState
+      // )
     }
 
     pc.onconnectionstatechange = event => {
-      console.log(
-        'RTCPeerConnection connection state change at:',
-        new Date().toLocaleTimeString(),
-        'New state:',
-        pc.connectionState
-      )
+      // console.log(
+      //   'RTCPeerConnection connection state change at:',
+      //   new Date().toLocaleTimeString(),
+      //   'New state:',
+      //   pc.connectionState
+      // )
       setStatus(pc.connectionState)
     }
 
@@ -97,19 +99,19 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
     await delay(500)
   }
 
-  // useEffect(() => {
-  //   if (!websocketStatus) {
-  //     if (websocket) {
-  //       websocket.close()
-  //       setWebsocket(null)
-  //     }
-  //     if (rtcPeerConnection) {
-  //       rtcPeerConnection.close()
-  //       setRtcPeerConnection(null)
-  //     }
-  //     createWsConnection()
-  //   }
-  // }, [websocketStatus])
+  useEffect(() => {
+    if (!websocketStatus) {
+      if (websocket) {
+        websocket.close()
+        setWebsocket(null)
+      }
+      if (rtcPeerConnection) {
+        rtcPeerConnection.close()
+        setRtcPeerConnection(null)
+      }
+      createWsConnection()
+    }
+  }, [websocketStatus])
 
   useEffect(() => {
     if (rtcPeerConnection != null && websocketStatus && websocket !== null) {
@@ -153,8 +155,11 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
         console.error('WebSocket error at:', new Date().toLocaleTimeString(), error)
       })
     }
-    setLoading(false)
   }, [websocket])
+
+  useEffect(() => {
+    setWebsocketStatus(false)
+  }, [id, channel])
 
   // send message to WebSocket server
   const sendMessage = message => {
@@ -207,22 +212,74 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
 
   useEffect(() => {
     setWebsocketStatus(false)
-  }, [id, channel])
-
-  useEffect(() => {
-    if (websocket) {
-      websocket.close()
-      setWebsocket(null)
-    }
-    if (rtcPeerConnection) {
-      rtcPeerConnection.close()
-      setRtcPeerConnection(null)
-    }
-
-    setWebsocketStatus(false)
     createWsConnection()
 
-  }, [reload, id, channel])
+    return () => {
+      if (websocket) {
+        websocket.close()
+        setWebsocket(null)
+      }
+      if (rtcPeerConnection) {
+        rtcPeerConnection.close()
+        setRtcPeerConnection(null)
+      }
+    }
+  }, [reload])
+
+  // useEffect(() => {
+  //   const checkStatus = () => {
+  //     if (status === 'disconnected' || status === 'failed' || status === '') {
+  //       console.log('Status is', status, 'at:', new Date().toLocaleTimeString());
+
+  //       if (intervalRef.current) {
+  //         clearInterval(intervalRef.current);
+  //       }
+  //       intervalRef.current = setInterval(() => {
+  //         console.log('Recreating WebSocket connection due to status:', status, 'at:', new Date().toLocaleTimeString());
+  //         setRtcPeerConnection(null)
+  //         setWebsocketStatus(false)
+  //         setWebsocket(null)
+  //         createWsConnection();
+  //       }, 5000);
+  //     } else {
+  //       console.log('Status is connected, no need to retry at:', new Date().toLocaleTimeString());
+
+  //       if (intervalRef.current) {
+  //         clearInterval(intervalRef.current);
+  //       }
+  //     }
+  //   };
+
+  //   checkStatus();
+
+  //   return () => {
+  //     if (intervalRef.current) {
+  //       clearInterval(intervalRef.current);
+  //     }
+  //   };
+  // }, [status]);
+
+  useEffect(() => {
+    if (rtcPeerConnection) {
+      rtcPeerConnection.addEventListener('connectionstatechange', () => {
+        // console.log(
+        //   'RTCPeerConnection state change at:',
+        //   new Date().toLocaleTimeString(),
+        //   'New state:',
+        //   rtcPeerConnection.connectionState
+        // )
+        setStatus(rtcPeerConnection.connectionState)
+      })
+      rtcPeerConnection.addEventListener('iceconnectionstatechange', () => {
+        // console.log(
+        //   'RTCPeerConnection ICE state change at:',
+        //   new Date().toLocaleTimeString(),
+        //   'New ICE state:',
+        //   rtcPeerConnection.iceConnectionState
+        // )
+      })
+    }
+  }, [rtcPeerConnection])
 
   return (
     <div className='portlet portlet-video live' style={{ width: '100%' }}>
