@@ -34,8 +34,6 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
   const [heightDiv, setHeightDiv] = useState(100)
   const [status, setStatus] = useState('')
   const [reload, setReload] = useState(0)
-  const [videoDimensions, setVideoDimensions] = useState({ width: '100%', height: null })
-  const intervalRef = useRef(null);
 
   useEffect(() => {
     const heightCaculator = Math.floor((window.innerHeight - 90) / sizeScreen.split('x')[1])
@@ -158,10 +156,6 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
     setLoading(false)
   }, [websocket])
 
-  useEffect(() => {
-    setWebsocketStatus(false)
-  }, [id, channel])
-
   // send message to WebSocket server
   const sendMessage = message => {
     if (websocket && websocket.readyState === WebSocket.OPEN) {
@@ -210,6 +204,10 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
     setText(message?.content)
     setLoading(false)
   }
+
+  useEffect(() => {
+    setWebsocketStatus(false)
+  }, [id, channel])
 
   useEffect(() => {
     if (websocket) {
