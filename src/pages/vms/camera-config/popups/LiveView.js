@@ -175,7 +175,6 @@ const LiveView = ({ show, onClose, data }) => {
                 console.error('WebSocket error at:', new Date().toLocaleTimeString(), error)
             })
         }
-        // setLoading(false)
     }, [websocket])
 
     // send message to WebSocket server
