@@ -53,6 +53,8 @@ const LiveView = ({ show, onClose, data }) => {
     const [name, setName] = useState(data.name)
     const [channel, setChannel] = useState('Sub')
     const [isFullScreen, setIsFullScreen] = useState(false)
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
 
     // useEffect(() => {
     //     const heightCaculator = Math.floor((window.innerHeight - 90) / sizeScreen.split('x')[1])
@@ -271,6 +273,11 @@ const LiveView = ({ show, onClose, data }) => {
         setIsFullScreen((prevFullScreen) => !prevFullScreen);
     };
 
+    useEffect(() => {
+        console.log('Viewport Width:', viewportWidth);
+        console.log('Viewport Height:', viewportHeight);
+    }, [viewportWidth, viewportHeight])
+
     return (
         <Card>
             <Dialog
@@ -280,101 +287,94 @@ const LiveView = ({ show, onClose, data }) => {
                 maxWidth='lg'
                 scroll='body'
                 TransitionComponent={Transition}
+                onClose={() => setClosed(true)}
                 sx={{ '& .MuiDialog-paper': { overflow: 'visible' } }}
             >
-                <DialogContent
-                    sx={{
-                        // pb: theme => `${theme.spacing(8)} !important`,
-                        // px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
-                        // pt: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
-                    }}
+                {/* <CustomCloseButton
+                    onClick={() => setClosed(true)}
                 >
-                    <CustomCloseButton
-                        onClick={() => setClosed(true)}
-                    >
-                        <Icon icon='tabler:x' fontSize='1.25rem' />
-                    </CustomCloseButton>
+                    <Icon icon='tabler:x' fontSize='1.25rem' />
+                </CustomCloseButton> */}
 
-                    <div className='portlet portlet-video live' style={{ width: '100%', height: 'auto' }}>
-                        {loading && (
-                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
-                                <Box sx={{ display: 'flex' }}>
-                                    <CircularProgress />
-                                </Box>
-                            </div>
-                        )}
-                        {!loading && (
-                            <div>
-                                <div className='portlet-title'>
-                                    <div className='caption'>
-                                        <span
-                                            className='label label-sm'
-                                            style={{ backgroundColor: status === 'connected' ? 'green' : 'red', color: 'white' }}
+                <div className='portlet portlet-video live' style={{ width: '100%', height: '100%' }}>
+                    {loading && (
+                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: isFullScreen ? viewportWidth : '100%', height: isFullScreen ? viewportHeight : '100%' }}>
+                            <Box sx={{ display: 'flex' }}>
+                                <CircularProgress />
+                            </Box>
+                        </div>
+                    )}
+                    {!loading && (
+                        <div>
+                            <div className='portlet-title'>
+                                <div className='caption'>
+                                    <span
+                                        className='label label-sm'
+                                        style={{ backgroundColor: status === 'connected' ? 'green' : 'red', color: 'white' }}
+                                    >
+                                        {status ? status.toUpperCase() : 'LIVE'}
+                                    </span>
+
+                                    <span className='caption-subject font-dark sbold uppercase'>{name}</span>
+                                </div>
+                                <div className='media-top-controls'>
+                                    <div className='btn-group'>
+                                        <Button
+                                            className={`sd_btn btn btn-default btn-xs ${channel === 'Sub' ? 'active' : ''}`}
+                                            onClick={() => handSetChanel(id, 'Sub')}
                                         >
-                                            {status ? status.toUpperCase() : 'LIVE'}
-                                        </span>
-
-                                        <span className='caption-subject font-dark sbold uppercase'>{name}</span>
-                                    </div>
-                                    <div className='media-top-controls'>
-                                        <div className='btn-group'>
-                                            <Button
-                                                className={`sd_btn btn btn-default btn-xs ${channel === 'Sub' ? 'active' : ''}`}
-                                                onClick={() => handSetChanel(id, 'Sub')}
-                                            >
-                                                SD
-                                            </Button>
-                                            <Button
-                                                className={`hd_btn btn btn-default btn-xs ${channel === 'Main' ? 'active' : ''}`}
-                                                onClick={() => handSetChanel(id, 'Main')}
-                                            >
-                                                HD
-                                            </Button>
-                                        </div>
+                                            SD
+                                        </Button>
+                                        <Button
+                                            className={`hd_btn btn btn-default btn-xs ${channel === 'Main' ? 'active' : ''}`}
+                                            onClick={() => handSetChanel(id, 'Main')}
+                                        >
+                                            HD
+                                        </Button>
                                     </div>
                                 </div>
-                                <div>
-                                    <video
-                                        style={{
-                                            width: '100%',
-                                            height: '100%',
-                                            objectFit: 'fill'
-                                        }}
-                                        ref={remoteVideoRef}
-                                        playsInline
-                                        autoPlay
-                                    />
-                                    {(status === 'failed' || status === 'disconnected' || status === '') && (
-                                        <IconButton
-                                            sx={{
-                                                left: '50%',
-                                                top: '50%',
-                                                position: 'absolute',
-                                                color: '#efefef',
-                                                transform: 'translateY(-50%)'
-                                            }}
-                                            onClick={() => setReload(reload + 1)}
-                                        >
-                                            <Icon icon='tabler:reload' fontSize={30} />
-                                        </IconButton>
-                                    )}
+                            </div>
+                            <div>
+                                <video
+                                    style={{
+                                        width: isFullScreen ? viewportWidth : '100%',
+                                        height: isFullScreen ? viewportHeight - 26 : '100%',
+                                        objectFit: 'fill',
+                                        paddingBottom: 38
+                                    }}
+                                    ref={remoteVideoRef}
+                                    playsInline
+                                    autoPlay
+                                />
+                                {(status === 'failed' || status === 'disconnected' || status === '') && (
                                     <IconButton
                                         sx={{
+                                            left: '50%',
+                                            top: '50%',
                                             position: 'absolute',
-                                            bottom: 0,
-                                            right: 0,
+                                            color: '#efefef',
+                                            transform: 'translateY(-50%)'
                                         }}
-                                        onClick={toggleFullScreen}
+                                        onClick={() => setReload(reload + 1)}
                                     >
-                                        {isFullScreen ? <Icon icon="tabler:arrow-back" style={{ color: 'white' }} />
-                                            : <Icon icon="tabler:border-corners" style={{ color: 'white' }} />}
+                                        <Icon icon='tabler:reload' fontSize={30} />
                                     </IconButton>
-                                </div>
-
+                                )}
+                                <IconButton
+                                    sx={{
+                                        position: 'absolute',
+                                        bottom: 0,
+                                        right: 0,
+                                    }}
+                                    onClick={toggleFullScreen}
+                                >
+                                    {isFullScreen ? <Icon icon="tabler:minimize" style={{ color: 'white' }} />
+                                        : <Icon icon="tabler:border-corners" style={{ color: 'white' }} />}
+                                </IconButton>
                             </div>
-                        )}
-                    </div>
-                </DialogContent>
+                        </div>
+                    )}
+                </div>
             </Dialog>
         </Card>
     )
