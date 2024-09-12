@@ -272,11 +272,6 @@ const LiveView = ({ show, onClose, data }) => {
         setIsFullScreen((prevFullScreen) => !prevFullScreen);
     };
 
-    useEffect(() => {
-        console.log('Viewport Width:', viewportWidth);
-        console.log('Viewport Height:', viewportHeight);
-    }, [viewportWidth, viewportHeight])
-
     return (
         <Card>
             <Dialog

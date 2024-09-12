@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 
-import { Grid } from '@mui/material'
+import { Box, Grid, IconButton } from '@mui/material'
 
 // import TableStickyHeader from './table'
 import Tab from '@mui/material/Tab'
@@ -12,6 +12,8 @@ import ViewCamera from 'src/@core/components/camera'
 import Settings from 'src/@core/components/camera/settings'
 import { getApi } from 'src/@core/utils/requestUltils'
 import { CAMERA_API } from 'src/@core/components/api-url'
+import FullScreen from './popups/fullScreen'
+import Icon from "src/@core/components/icon"
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   borderBottom: '0 !important',
@@ -57,6 +59,7 @@ const Caller = () => {
   const [cameraList, setCameraList] = useState([])
   const [selectIndex, setSelectIndex] = useState(0)
   const [page, setPage] = useState(1)
+  const [isOpenFullScreen, setIsOpenFullScreen] = useState(false)
 
   const fetchCameraGroup = async () => {
     try {
@@ -95,36 +98,58 @@ const Caller = () => {
     setCameraGroup(newCamera)
   }
 
+  useEffect(() => {
+
+    console.log('cameraList', cameraList);
+
+  }, [cameraList])
+
   return (
-    <DivStyle style={{ backgroundColor: 'black', minHeight: '100vh', color: 'white' }}>
-      <Grid container spacing={0}>
-        {cameraGroup.length > 0 &&
-          cameraGroup.map((camera, index) => (
-            <Grid item xs={Math.floor(12 / sizeScreen.split('x')[0])} key={camera.id + index}>
-              <ViewCamera
-                name={camera?.deviceName}
-                id={camera.id}
-                channel={camera.channel}
-                status={camera.status}
-                sizeScreen={sizeScreen}
-                handSetChanel={handSetChanel}
-              />
-            </Grid>
-          ))}
-      </Grid>
-      <Settings
-        page={page}
-        onSetPage={setPage}
-        selectIndex={selectIndex}
-        onSetSelectIndex={setSelectIndex}
-        cameraList={cameraList}
-        sizeScreen={sizeScreen}
-        setSizeScreen={size => {
-          setSizeScreen(size)
-          setNumberShow(size.split('x')[0] * size.split('x')[1])
-        }}
-      />
-    </DivStyle>
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-3rem', marginBottom: '1rem' }}>
+        <IconButton onClick={() => setIsOpenFullScreen(true)}>
+          <Icon icon="tabler:border-corners" />
+        </IconButton>
+      </div>
+      <DivStyle style={{ backgroundColor: 'black', minHeight: '100vh', color: 'white' }}>
+        <Grid container spacing={0}>
+          {cameraGroup.length > 0 &&
+            cameraGroup.map((camera, index) => (
+              <Grid item xs={Math.floor(12 / sizeScreen.split('x')[0])} key={camera.id + index}>
+                <ViewCamera
+                  name={camera?.deviceName}
+                  id={camera.id}
+                  channel={camera.channel}
+                  status={camera.status}
+                  sizeScreen={sizeScreen}
+                  handSetChanel={handSetChanel}
+                  isFullScreen={isOpenFullScreen}
+                />
+              </Grid>
+            ))}
+        </Grid>
+        <Settings
+          page={page}
+          onSetPage={setPage}
+          selectIndex={selectIndex}
+          onSetSelectIndex={setSelectIndex}
+          cameraList={cameraList}
+          sizeScreen={sizeScreen}
+          setSizeScreen={size => {
+            setSizeScreen(size)
+            setNumberShow(size.split('x')[0] * size.split('x')[1])
+          }}
+        />
+      </DivStyle>
+      {isOpenFullScreen && (
+        <FullScreen
+          show={isOpenFullScreen}
+          data={cameraGroup}
+          cameraList={cameraList}
+          sizeScreen={sizeScreen}
+          onClose={() => setIsOpenFullScreen(false)} />
+      )}
+    </div>
   )
 }
 

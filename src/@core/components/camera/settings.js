@@ -88,7 +88,7 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   }
 }))
 
-const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList, sizeScreen, setSizeScreen }) => {
+const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList, sizeScreen, setSizeScreen, handleSetIsOpenFullScreen }) => {
   // ** State
   const [open, setOpen] = useState(false)
 
@@ -100,6 +100,9 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
   const [pageList, setPageList] = useState([])
   const [page1, setPage1] = useState(1)
   const [selectedButton, setSelectedButton] = useState(0)
+  const [isFullScreen, setIsFullScreen] = useState(false)
+  // const [isOpenFullScreen, setIsOpenFullScreen] = useState(false)
+
 
   useEffect(() => {
     if (cameraList[selectIndex]?.cameras?.length > 0) {
@@ -176,6 +179,10 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
     onSetPage(page)
     setSelectedButton(index)
   }
+
+  const toggleFullScreen = () => {
+    setIsFullScreen((prevFullScreen) => !prevFullScreen);
+  };
 
   return (
     <div className='customizer'>
@@ -340,8 +347,35 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
               </RadioGroup>
             </Box>
           </CustomizerSpacing>
-
           <Divider sx={{ m: '0 !important' }} />
+
+          {/* <CustomizerSpacing className='customizer-body'>
+            <Box sx={{ mb: layout === 'horizontal' && appBar === 'hidden' ? {} : 5 }}>
+              <Typography>FullScreen</Typography>
+              <Box sx={{ padding: 2 }}>
+                {!isFullScreen && (
+                  <Button variant='contained'
+                    endIcon={<Icon icon="tabler:border-corners" style={{ color: 'white' }} />}
+                    onClick={() => {
+                      toggleFullScreen()
+                      handleSetIsOpenFullScreen('true')
+                    }}
+                  >Open Full Screen</Button>
+                )}
+                {isFullScreen && (
+                  <Button variant='contained'
+                    endIcon={<Icon icon="tabler:minimize" style={{ color: 'white' }} />}
+                    onClick={() => {
+                      toggleFullScreen()
+                      handleSetIsOpenFullScreen('false')
+                    }}
+                  >Close full screen</Button>
+                )}
+              </Box>
+            </Box>
+          </CustomizerSpacing>
+
+          <Divider sx={{ m: '0 !important' }} /> */}
         </PerfectScrollbar>
       </Drawer>
     </div>
