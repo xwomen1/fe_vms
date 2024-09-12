@@ -11,7 +11,7 @@ import Approval from './approval'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import Icon from 'src/@core/components/icon'
 import Link from 'next/link'
-import Filter from './popups/filter'
+import Filter from './popups/Filter'
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   borderBottom: '0 !important',
