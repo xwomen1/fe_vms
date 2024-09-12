@@ -1,16 +1,16 @@
-FROM node:lts-alpine3.14 as dependencies
+FROM node:18-alpine3.19 as dependencies
 WORKDIR /access-fe
 COPY package.json ./
 #RUN yarn install --frozen-lockfile
 RUN yarn install 
 
-FROM node:lts-alpine3.14 as builder
+FROM node:18-alpine3.19 as builder
 WORKDIR /access-fe
 COPY . .
 COPY --from=dependencies /access-fe/node_modules ./node_modules
 RUN yarn build
 
-FROM node:lts-alpine3.14 as runner
+FROM node:18-alpine3.19 as runner
 WORKDIR /access-fe
 ENV NODE_ENV production
 # If you are using a custom next.config.js file, uncomment this line.
