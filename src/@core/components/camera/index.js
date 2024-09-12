@@ -60,46 +60,6 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel, isFul
     })
   }
 
-  // const createWsConnection = async () => {
-  //   // console.log('Creating new WebSocket and RTCPeerConnection at:', new Date().toLocaleTimeString())
-
-  //   const pc = new RTCPeerConnection(config)
-
-  //   pc.ontrack = event => {
-  //     // console.log('RTCPeerConnection track event at:', new Date().toLocaleTimeString())
-  //     setLoading(false)
-  //     const stream = event.streams[0]
-  //     setRemoteStream(stream)
-  //     remoteVideoRef.current.srcObject = stream
-  //   }
-
-  //   pc.oniceconnectionstatechange = event => {
-  //     // console.log(
-  //     //   'RTCPeerConnection ICE connection state change at:',
-  //     //   new Date().toLocaleTimeString(),
-  //     //   'New state:',
-  //     //   pc.iceConnectionState
-  //     // )
-  //   }
-
-  //   pc.onconnectionstatechange = event => {
-  //     // console.log(
-  //     //   'RTCPeerConnection connection state change at:',
-  //     //   new Date().toLocaleTimeString(),
-  //     //   'New state:',
-  //     //   pc.connectionState
-  //     // )
-  //     setStatus(pc.connectionState)
-  //   }
-
-  //   setRtcPeerConnection(pc)
-
-  //   const ws = new WebSocket(`${SOCKET_LIVE_VIEW}/ivis/vms/api/v0/ws/signaling/${randomId(10)}`)
-
-  //   setWebsocket(ws)
-  //   await delay(500)
-  // }
-
   const createWsConnection = async () => {
     console.log('Creating new WebSocket and RTCPeerConnection at:', new Date().toLocaleTimeString())
 
@@ -141,19 +101,19 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel, isFul
     setLoading(false)
   }
 
-  useEffect(() => {
-    if (!websocketStatus) {
-      if (websocket) {
-        websocket.close()
-        setWebsocket(null)
-      }
-      if (rtcPeerConnection) {
-        rtcPeerConnection.close()
-        setRtcPeerConnection(null)
-      }
-      createWsConnection()
-    }
-  }, [websocketStatus])
+  // useEffect(() => {
+  //   if (!websocketStatus) {
+  //     if (websocket) {
+  //       websocket.close()
+  //       setWebsocket(null)
+  //     }
+  //     if (rtcPeerConnection) {
+  //       rtcPeerConnection.close()
+  //       setRtcPeerConnection(null)
+  //     }
+  //     createWsConnection()
+  //   }
+  // }, [websocketStatus])
 
   useEffect(() => {
     if (rtcPeerConnection != null && websocketStatus && websocket !== null) {
@@ -253,25 +213,18 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel, isFul
   }
 
   useEffect(() => {
-    console.log('isFullScreen', isFullScreen, new Date().toLocaleTimeString())
-    setCLosed(true)
-  }, [isFullScreen])
-
-  useEffect(() => {
+    if (websocket) {
+      websocket.close()
+      setWebsocket(null)
+    }
+    if (rtcPeerConnection) {
+      rtcPeerConnection.close()
+      setRtcPeerConnection(null)
+    }
     setWebsocketStatus(false)
     createWsConnection()
 
-    return () => {
-      if (websocket) {
-        websocket.close()
-        setWebsocket(null)
-      }
-      if (rtcPeerConnection) {
-        rtcPeerConnection.close()
-        setRtcPeerConnection(null)
-      }
-    }
-  }, [reload])
+  }, [reload, id, channel])
 
   useEffect(() => {
     if (closed === true) {
@@ -288,6 +241,10 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel, isFul
       }
     }
   }, [closed])
+
+  useEffect(() => {
+    setCLosed(true)
+  }, [isFullScreen])
 
   return (
     <div className='portlet portlet-video live' style={{ width: '100%' }}>

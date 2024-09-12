@@ -59,7 +59,7 @@ const FullScreen = ({ show, data, cameraList, sizeScreen, onClose }) => {
                         </Grid>
                     </div>
                     <div style={{ position: 'absolute', bottom: 0, right: 0 }}>
-                        <Button variant="contained" onClick={onClose} >Close</Button>
+                        <Button variant="contained" onClick={onClose} >Exit</Button>
                     </div>
                 </div>
             </Dialog>
