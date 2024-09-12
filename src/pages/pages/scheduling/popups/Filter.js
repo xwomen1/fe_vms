@@ -44,7 +44,7 @@ const CustomCloseButton = styled(IconButton)(({ theme }) => ({
     }
 }))
 
-export const convertDateToString = dateString => {
+const convertDateToString = dateString => {
     const date = new Date(dateString)
     const pad = num => String(num).padStart(2, '0')
     const year = date.getFullYear()
