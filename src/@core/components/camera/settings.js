@@ -259,6 +259,10 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
                         nodeId={index + ''}
                         labelIcon='tabler:folder'
                         disabled={group.cameras?.length == 0}
+                        oClick={() => {
+                          console.log('cameras', group);
+
+                        }}
                       >
                         {group.cameras && group.cameras?.length > 0
                           ? group.cameras.map((camera, idx) => {
@@ -267,7 +271,7 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
 
                             return (
                               <StyledTreeItem
-                                disabled={true}
+                                // disabled={true}
                                 key={camera?.id}
                                 nodeId={camera?.id}
                                 labelText={camera?.deviceName}
