@@ -295,7 +295,10 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
     }
 
     setErrors(newErrors)
-    if (Object.keys(errors).length === 0) {
+
+    const hasErrors =
+      newErrors.name || newErrors.description || newErrors.policies.some(policyError => policyError === true)
+    if (!hasErrors) {
       try {
         setLoading(true)
 

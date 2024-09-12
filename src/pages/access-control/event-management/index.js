@@ -65,12 +65,12 @@ const EventList = () => {
   useEffect(() => {
     const fetchUserGroups = async () => {
       try {
-        const response = await axios.get('https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups', {
+        const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search', {
           headers: {
             Authorization: `Bearer ${token}`
           }
         })
-        setUserGroups(response.data.rows) // Giả sử API trả về danh sách user groups
+        setUserGroups(response.data) // Giả sử API trả về danh sách user groups
       } catch (error) {
         console.error('Error fetching user groups:', error)
       }
@@ -103,25 +103,35 @@ const EventList = () => {
   console.log(devices, 'device')
 
   const handleExportExcel = async () => {
-    const devices = await fetchAllData()
-    console.log(devices, 'devoce')
+    setLoading(true)
+    try {
+      const response = await fetchDataList1()
+      const devices = response.rows || []
 
-    const formattedData = devices?.map((device, index) => ({
-      No: index + 1,
-      FullName: device.fullName,
-      AccessCode: device.accessCode,
-      Event: device.deviceDirection,
-      Time: formatTime(device.dateEvent),
-      Door: device.hostName,
-      DeviceName: device.deviceName,
-      DeviceType: device.deviceGroupName
-    }))
+      console.log('Data to be exported:', devices) // Kiểm tra dữ liệu ở đây
 
-    const worksheet = XLSX.utils.json_to_sheet(formattedData)
-    const workbook = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Event Data')
+      const formattedData = devices.map((device, index) => ({
+        No: index + 1,
+        FullName: device.fullName,
+        AccessCode: device.accessCode,
+        Event: device.deviceDirection,
+        Time: formatTime(device.dateEvent),
+        Door: device.hostName,
+        DeviceName: device.deviceName,
+        DeviceType: device.deviceGroupName
+      }))
 
-    XLSX.writeFile(workbook, 'event_data.xlsx')
+      const worksheet = XLSX.utils.json_to_sheet(formattedData)
+      const workbook = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Event Data')
+
+      XLSX.writeFile(workbook, 'event_data.xlsx')
+    } catch (error) {
+      console.error('Error exporting data:', error)
+      toast.error('Error exporting data')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const formatDate = dateTime => {
@@ -194,6 +204,8 @@ const EventList = () => {
       const response = await axios.get(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/event/search`, config)
       setDevices(response.data.rows)
       setTotalPage(Math.ceil(response.data.count / pageSize))
+
+      return response.data.rows
     } catch (error) {
       console.error('Error fetching data:', error)
       toast.error('Error fetching data')
@@ -252,7 +264,7 @@ const EventList = () => {
     setLoading(true)
 
     try {
-      const initialResponse = await fetchDevicesByPage(page)
+      const initialResponse = await fetchDataList1(page)
       totalPages = initialResponse.totalPage
 
       allDevices = initialResponse.rows
@@ -260,7 +272,7 @@ const EventList = () => {
       // Lặp qua từng trang và lấy dữ liệu
       while (page < totalPages) {
         page += 1
-        const response = await fetchDevicesByPage(page)
+        const response = await fetchDataList1(page)
         allDevices = allDevices.concat(response.rows)
       }
       setLoading(false)
@@ -313,9 +325,7 @@ const EventList = () => {
             <Grid item>
               <Button variant='contained' onClick={handleExportExcel} disabled={loading}>
                 <Icon fontSize='1.25rem' icon='tabler:file-export' />
-                {loading && <CircularProgress className={classes.circularProgress} />
-                  ? ''
-                  : ''}
+                {loading && <CircularProgress className={classes.circularProgress} /> ? '' : ''}
               </Button>
             </Grid>
 
@@ -491,14 +501,14 @@ const EventList = () => {
             <Select
               value={selectedUserGroup || ''}
               onChange={e => {
-                const selectedGroup = userGroups.find(group => group.id === e.target.value)
+                const selectedGroup = userGroups.find(group => group.groupId === e.target.value)
                 setSelectedUserGroup(e.target.value) // Lưu id được chọn
-                setFilterValues(prev => ({ ...prev, groupId: selectedGroup.id })) // Truyền id vào filterValues
+                setFilterValues(prev => ({ ...prev, groupId: selectedGroup.groupId })) // Truyền id vào filterValues
               }}
             >
               {userGroups.map(group => (
-                <MenuItem key={group.id} value={group.id}>
-                  {group.name}
+                <MenuItem key={group.groupId} value={group.groupId}>
+                  {group.groupName}
                 </MenuItem>
               ))}
             </Select>
