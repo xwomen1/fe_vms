@@ -30,7 +30,7 @@ import Icon from 'src/@core/components/icon'
 import { useSettings } from 'src/@core/hooks/useSettings'
 import select from 'src/@core/theme/overrides/select'
 import { shouldForwardProp } from '@mui/system'
-import { Button, Grid } from '@mui/material'
+import { Button, Checkbox, Grid } from '@mui/material'
 
 const Toggler = styled(Box)(({ theme }) => ({
   right: 0,
@@ -88,7 +88,7 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   }
 }))
 
-const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList, sizeScreen, setSizeScreen, handleSetIsOpenFullScreen }) => {
+const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList, sizeScreen, setSizeScreen, setCameraGroup, cameraGroup }) => {
   // ** State
   const [open, setOpen] = useState(false)
 
@@ -100,9 +100,7 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
   const [pageList, setPageList] = useState([])
   const [page1, setPage1] = useState(1)
   const [selectedButton, setSelectedButton] = useState(0)
-  const [isFullScreen, setIsFullScreen] = useState(false)
-  // const [isOpenFullScreen, setIsOpenFullScreen] = useState(false)
-
+  const [camerasSelected, setCamerasSelected] = useState([])
 
   useEffect(() => {
     if (cameraList[selectIndex]?.cameras?.length > 0) {
@@ -130,7 +128,7 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
 
   const StyledTreeItem = props => {
     // ** Props
-    const { labelText, labelIcon, labelInfo, color, ...other } = props
+    const { checked, onChange, labelText, labelIcon, labelInfo, color, ...other } = props
 
     return (
       <StyledTreeItemRoot
@@ -153,7 +151,7 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
   }
 
   const handleNodeToggle = (event, nodeIds) => {
-    onSetSelectIndex(nodeIds[0])
+    // onSetSelectIndex(nodeIds[0])
     setExpanded([nodeIds[0]])
   }
 
@@ -180,9 +178,11 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
     setSelectedButton(index)
   }
 
-  const toggleFullScreen = () => {
-    setIsFullScreen((prevFullScreen) => !prevFullScreen);
-  };
+  useEffect(() => {
+    console.log("camera Group", cameraGroup);
+    console.log('cameraList', cameraList);
+
+  }, [cameraGroup, cameraList])
 
   return (
     <div className='customizer'>
@@ -259,23 +259,19 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
                         nodeId={index + ''}
                         labelIcon='tabler:folder'
                         disabled={group.cameras?.length == 0}
-                        oClick={() => {
-                          console.log('cameras', group);
-
-                        }}
                       >
                         {group.cameras && group.cameras?.length > 0
                           ? group.cameras.map((camera, idx) => {
-                            // const matchedEvent = eventsData.find(event => event.id === camera.id)
-                            // const status = matchedEvent?.status
 
                             return (
                               <StyledTreeItem
+
                                 // disabled={true}
                                 key={camera?.id}
                                 nodeId={camera?.id}
                                 labelText={camera?.deviceName}
                                 labelIcon='tabler:camera'
+                                onClick={() => setCameraGroup(camera)}
                               />
                             )
                           })
@@ -352,34 +348,6 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
             </Box>
           </CustomizerSpacing>
           <Divider sx={{ m: '0 !important' }} />
-
-          {/* <CustomizerSpacing className='customizer-body'>
-            <Box sx={{ mb: layout === 'horizontal' && appBar === 'hidden' ? {} : 5 }}>
-              <Typography>FullScreen</Typography>
-              <Box sx={{ padding: 2 }}>
-                {!isFullScreen && (
-                  <Button variant='contained'
-                    endIcon={<Icon icon="tabler:border-corners" style={{ color: 'white' }} />}
-                    onClick={() => {
-                      toggleFullScreen()
-                      handleSetIsOpenFullScreen('true')
-                    }}
-                  >Open Full Screen</Button>
-                )}
-                {isFullScreen && (
-                  <Button variant='contained'
-                    endIcon={<Icon icon="tabler:minimize" style={{ color: 'white' }} />}
-                    onClick={() => {
-                      toggleFullScreen()
-                      handleSetIsOpenFullScreen('false')
-                    }}
-                  >Close full screen</Button>
-                )}
-              </Box>
-            </Box>
-          </CustomizerSpacing>
-
-          <Divider sx={{ m: '0 !important' }} /> */}
         </PerfectScrollbar>
       </Drawer>
     </div>

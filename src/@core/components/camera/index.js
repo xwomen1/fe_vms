@@ -61,7 +61,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel, isFul
   }
 
   const createWsConnection = async () => {
-    console.log('Creating new WebSocket and RTCPeerConnection at:', new Date().toLocaleTimeString())
+    // console.log('Creating new WebSocket and RTCPeerConnection at:', new Date().toLocaleTimeString())
 
     const pc = new RTCPeerConnection(config)
 
@@ -74,21 +74,21 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel, isFul
     }
 
     pc.oniceconnectionstatechange = event => {
-      console.log(
-        'RTCPeerConnection ICE connection state change at:',
-        new Date().toLocaleTimeString(),
-        'New state:',
-        pc.iceConnectionState
-      )
+      // console.log(
+      //   'RTCPeerConnection ICE connection state change at:',
+      //   new Date().toLocaleTimeString(),
+      //   'New state:',
+      //   pc.iceConnectionState
+      // )
     }
 
     pc.onconnectionstatechange = event => {
-      console.log(
-        'RTCPeerConnection connection state change at:',
-        new Date().toLocaleTimeString(),
-        'New state:',
-        pc.connectionState
-      )
+      // console.log(
+      //   'RTCPeerConnection connection state change at:',
+      //   new Date().toLocaleTimeString(),
+      //   'New state:',
+      //   pc.connectionState
+      // )
       setStatus(pc.connectionState)
     }
 
@@ -118,11 +118,11 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel, isFul
   useEffect(() => {
     if (rtcPeerConnection != null && websocketStatus && websocket !== null) {
       if (websocket.readyState === WebSocket.OPEN) {
-        console.log('Sending message at:', new Date().toLocaleTimeString(), 'Message:', {
-          id: id,
-          type: 'request',
-          channel: channel
-        })
+        // console.log('Sending message at:', new Date().toLocaleTimeString(), 'Message:', {
+        //   id: id,
+        //   type: 'request',
+        //   channel: channel
+        // })
         websocket.send(
           JSON.stringify({
             id: id,
@@ -146,12 +146,12 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel, isFul
       setLoading(true)
       websocket.addEventListener('open', () => {
         setWebsocketStatus(true)
-        console.log('WebSocket connection established at:', new Date().toLocaleTimeString())
+        // console.log('WebSocket connection established at:', new Date().toLocaleTimeString())
       })
       websocket.addEventListener('message', handleMessage)
       websocket.addEventListener('close', () => {
         setWebsocketStatus(false)
-        console.log('WebSocket connection closed at:', new Date().toLocaleTimeString())
+        // console.log('WebSocket connection closed at:', new Date().toLocaleTimeString())
       })
       websocket.addEventListener('error', error => {
         console.error('WebSocket error at:', new Date().toLocaleTimeString(), error)

@@ -55,6 +55,7 @@ const Caller = () => {
   const [numberShow, setNumberShow] = useState(9)
   const [valueFilter, setValueFilter] = useState(valueFilterInit)
   const [cameraGroup, setCameraGroup] = useState([])
+  const [camerasSelected, setCamerasSelected] = useState([])
   const [cameraHiden, setCameraHiden] = useState([])
   const [cameraList, setCameraList] = useState([])
   const [selectIndex, setSelectIndex] = useState(0)
@@ -79,9 +80,13 @@ const Caller = () => {
     }
   }
 
+  // useEffect(() => {
+  //   fetchCameraGroup()
+  // }, [reload, page, selectIndex, sizeScreen])
+
   useEffect(() => {
     fetchCameraGroup()
-  }, [reload, page, selectIndex, sizeScreen])
+  }, [reload, page, sizeScreen])
 
   const handSetChanel = (id, channel) => {
     let newCamera = cameraGroup.map(item => {
@@ -94,15 +99,35 @@ const Caller = () => {
 
       return item
     })
-    console.log('newCamera', newCamera)
     setCameraGroup(newCamera)
   }
 
   useEffect(() => {
+    if (camerasSelected.length > 0) {
+      const listCamera = camerasSelected.map(camera => ({
+        ...camera,
+        channel: 'Sub',
+      }));
 
-    console.log('cameraList', cameraList);
+      setCameraGroup(prevCameras => {
+        const cameraMap = new Map();
 
-  }, [cameraList])
+        prevCameras.forEach(camera => cameraMap.set(camera.id, camera));
+
+        listCamera.forEach(camera => cameraMap.set(camera.id, camera));
+
+        return Array.from(cameraMap.values());
+      });
+    }
+  }, [camerasSelected]);
+
+  useEffect(() => {
+  }, [cameraGroup])
+
+  const handleSetCameraGroup = camera => {
+    setCamerasSelected(prevCameras => [...prevCameras, camera]);
+  };
+
 
   return (
     <div>
@@ -132,13 +157,15 @@ const Caller = () => {
           page={page}
           onSetPage={setPage}
           selectIndex={selectIndex}
-          onSetSelectIndex={setSelectIndex}
+          // onSetSelectIndex={setSelectIndex}
           cameraList={cameraList}
           sizeScreen={sizeScreen}
           setSizeScreen={size => {
             setSizeScreen(size)
             setNumberShow(size.split('x')[0] * size.split('x')[1])
           }}
+          setCameraGroup={handleSetCameraGroup}
+          cameraGroup={cameraGroup}
         />
       </DivStyle>
       {isOpenFullScreen && (
