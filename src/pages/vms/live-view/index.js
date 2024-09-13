@@ -181,6 +181,7 @@ const Caller = () => {
           page={page}
           onSetPage={setPage}
           selectIndex={selectIndex}
+
           // onSetSelectIndex={setSelectIndex}
           cameraList={cameraList}
           sizeScreen={sizeScreen}

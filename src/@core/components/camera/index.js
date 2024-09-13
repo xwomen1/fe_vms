@@ -101,20 +101,6 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel, isFul
     setLoading(false)
   }
 
-  // useEffect(() => {
-  //   if (!websocketStatus) {
-  //     if (websocket) {
-  //       websocket.close()
-  //       setWebsocket(null)
-  //     }
-  //     if (rtcPeerConnection) {
-  //       rtcPeerConnection.close()
-  //       setRtcPeerConnection(null)
-  //     }
-  //     createWsConnection()
-  //   }
-  // }, [websocketStatus])
-
   useEffect(() => {
     if (rtcPeerConnection != null && websocketStatus && websocket !== null) {
       if (websocket.readyState === WebSocket.OPEN) {
@@ -146,11 +132,13 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel, isFul
       setLoading(true)
       websocket.addEventListener('open', () => {
         setWebsocketStatus(true)
+
         // console.log('WebSocket connection established at:', new Date().toLocaleTimeString())
       })
       websocket.addEventListener('message', handleMessage)
       websocket.addEventListener('close', () => {
         setWebsocketStatus(false)
+
         // console.log('WebSocket connection closed at:', new Date().toLocaleTimeString())
       })
       websocket.addEventListener('error', error => {

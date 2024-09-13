@@ -184,6 +184,7 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
       return cameraGroupList.map(group => {
         const updatedCameras = group?.cameras?.map(groupCamera => {
           const isSelected = cameras?.some(camera => camera.id === groupCamera.id);
+
           return {
             ...groupCamera,
             isSelected
