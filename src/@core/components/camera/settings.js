@@ -100,7 +100,7 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
   const [pageList, setPageList] = useState([])
   const [page1, setPage1] = useState(1)
   const [selectedButton, setSelectedButton] = useState(0)
-  const [camerasSelected, setCamerasSelected] = useState([])
+  const [cameraGroupList, setCameraGroupList] = useState([])
 
   useEffect(() => {
     if (cameraList[selectIndex]?.cameras?.length > 0) {
@@ -134,6 +134,7 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
       <StyledTreeItemRoot
         {...other}
         label={
+
           <Box sx={{ py: 1, display: 'flex', alignItems: 'center', '& svg': { mr: 1 } }}>
             <Icon icon={labelIcon} color={color} />
             <Typography variant='body2' sx={{ flexGrow: 1, fontWeight: 500 }}>
@@ -179,9 +180,26 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
   }
 
   useEffect(() => {
-    console.log("camera Group", cameraGroup);
-    console.log('cameraList', cameraList);
+    function compareGroupsWithCameras(cameraGroupList, cameras) {
+      return cameraGroupList.map(group => {
+        const updatedCameras = group?.cameras?.map(groupCamera => {
+          const isSelected = cameras?.some(camera => camera.id === groupCamera.id);
+          return {
+            ...groupCamera,
+            isSelected
+          };
+        });
 
+        return {
+          ...group,
+          cameras: updatedCameras
+        };
+      });
+    }
+
+    const result = compareGroupsWithCameras(cameraList, cameraGroup);
+
+    setCameraGroupList(result)
   }, [cameraGroup, cameraList])
 
   return (
@@ -250,8 +268,8 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
                 defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
                 defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
               >
-                {cameraList.length > 0 &&
-                  cameraList.map((group, index) => {
+                {cameraGroupList.length > 0 &&
+                  cameraGroupList.map((group, index) => {
                     return (
                       <StyledTreeItem
                         key={index}
@@ -266,7 +284,7 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
                             return (
                               <StyledTreeItem
 
-                                // disabled={true}
+                                disabled={camera?.isSelected}
                                 key={camera?.id}
                                 nodeId={camera?.id}
                                 labelText={camera?.deviceName}

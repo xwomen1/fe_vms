@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 
-import { Box, Grid, IconButton } from '@mui/material'
+import { Box, Button, Grid, IconButton } from '@mui/material'
 
 // import TableStickyHeader from './table'
 import Tab from '@mui/material/Tab'
@@ -121,12 +121,16 @@ const Caller = () => {
     }
   }, [camerasSelected]);
 
-  useEffect(() => {
-  }, [cameraGroup])
 
   const handleSetCameraGroup = camera => {
     setCamerasSelected(prevCameras => [...prevCameras, camera]);
   };
+
+  const handleUpdateCameraGroup = index => {
+    const updateCameraGroup = [...cameraGroup]
+    updateCameraGroup.splice(index, 1)
+    setCameraGroup(updateCameraGroup)
+  }
 
 
   return (
@@ -139,19 +143,39 @@ const Caller = () => {
       <DivStyle style={{ backgroundColor: 'black', minHeight: '100vh', color: 'white' }}>
         <Grid container spacing={0}>
           {cameraGroup.length > 0 &&
-            cameraGroup.map((camera, index) => (
-              <Grid item xs={Math.floor(12 / sizeScreen.split('x')[0])} key={camera.id + index}>
-                <ViewCamera
-                  name={camera?.deviceName}
-                  id={camera.id}
-                  channel={camera.channel}
-                  status={camera.status}
-                  sizeScreen={sizeScreen}
-                  handSetChanel={handSetChanel}
-                  isFullScreen={isOpenFullScreen}
-                />
-              </Grid>
-            ))}
+            cameraGroup.map((camera, index) => {
+
+              return (
+                <Grid item xs={Math.floor(12 / sizeScreen.split('x')[0])} key={camera.id + index}
+                  sx={{ position: 'relative', borderWidth: 0.25, borderColor: '#fff', borderStyle: 'solid' }}
+                >
+                  <ViewCamera
+                    name={camera?.deviceName}
+                    id={camera.id}
+                    channel={camera.channel}
+                    status={camera.status}
+                    sizeScreen={sizeScreen}
+                    handSetChanel={handSetChanel}
+                    isFullScreen={isOpenFullScreen}
+                  />
+                  <div>
+                    <IconButton
+                      variant='outlined'
+                      onClick={() => {
+                        handleUpdateCameraGroup(index)
+                      }}
+                      sx={{
+                        position: 'absolute',
+                        bottom: 0,
+                        right: 0
+                      }}
+                    >
+                      <Icon icon="tabler:x" style={{ color: 'white' }} />
+                    </IconButton>
+                  </div>
+                </Grid>
+              )
+            })}
         </Grid>
         <Settings
           page={page}
