@@ -12,7 +12,7 @@ import { mix } from '../lib/mix';
 export class Map extends mix(Base).with(ModesMixin) {
   constructor(container, options) {
     super(options);
-
+    this.isRightClick = false; // Flag to check if it's a right-click action
     this.defaults = Object.assign({}, MAP);
 
     // set defaults
@@ -34,7 +34,8 @@ export class Map extends mix(Base).with(ModesMixin) {
 
     this.canvas = new fabric.Canvas(canvas, {
       preserveObjectStacking: true,
-      renderOnAddRemove: true
+      renderOnAddRemove: true,
+      fireRightClick: true,  // <-- enable firing of right click events
     });
     this.context = this.canvas.getContext('2d');
 
@@ -379,7 +380,11 @@ export class Map extends mix(Base).with(ModesMixin) {
 
   registerListeners() {
     const vm = this;
-
+    // Prevent the default context menu from appearing on right-click
+    this.canvas.on('contextmenu', e => {
+      console.log("Context here")
+      e.e.preventDefault();
+    });
     this.canvas.on('object:scaling', e => {
       if (e.target.class) {
         vm.emit(`${e.target.class}:scaling`, e.target.parent);
@@ -432,7 +437,6 @@ export class Map extends mix(Base).with(ModesMixin) {
       if (e.target.class) {
         vm.emit(`${e.target.class}:moving`, e.target.parent);
         e.target.parent.emit('moving', e.target.parent);
-
         return;
       }
       const group = e.target;
@@ -510,59 +514,98 @@ export class Map extends mix(Base).with(ModesMixin) {
     });
 
     this.canvas.on('mouse:down', e => {
-      vm.dragObject = e.target;
+      if (e.e.button === 2) { // Right mouse button
+        this.isDragging = true;
+        this.isRightClick = true; // Set flag for right-click action
+        this.lastX = e.e.clientX;
+        this.lastY = e.e.clientY;
+        vm.dragObject = e.target
+        e.e.preventDefault(); // Prevent context menu
+
+      } else {
+        vm.dragObject = e.target;
+      }
     });
 
     this.canvas.on('mouse:move', e => {
-      if (this.isMeasureMode()) {
-        this.measurement.onMouseMove(e);
-      }
-      if (vm.dragObject && vm.dragObject.clickable) {
-        if (vm.dragObject === e.target) {
-          vm.dragObject.dragging = true;
-        } else {
-          vm.dragObject.dragging = false;
+      if (this.isDragging) {
+        const dx = e.e.clientX - this.lastX;
+        const dy = e.e.clientY - this.lastY;
+        this.moveMap(dx, dy); // Assuming moveMap is defined to handle movement
+        this.lastX = e.e.clientX;
+        this.lastY = e.e.clientY;
+      } else {
+        if (this.isMeasureMode()) {
+          this.measurement.onMouseMove(e);
         }
-      }
-      this.isRight = false;
-      if ('which' in e.e) {
-        // Gecko (Firefox), WebKit (Safari/Chrome) & Opera
-        this.isRight = e.e.which === 3;
-      } else if ('button' in e.e) {
-        // IE, Opera
-        this.isRight = e.e.button === 2;
+        if (vm.dragObject && vm.dragObject.clickable) {
+          if (vm.dragObject === e.target) {
+            vm.dragObject.dragging = true;
+          } else {
+            vm.dragObject.dragging = false;
+          }
+        }
+        this.isRight = false;
+        if ('which' in e.e) {
+          // Gecko (Firefox), WebKit (Safari/Chrome) & Opera
+          this.isRight = e.e.which === 3;
+          this.isRightClick = true
+        } else if ('button' in e.e) {
+          // IE, Opera
+          this.isRight = e.e.button === 2;
+          this.isRightClick = true
+        }
+
+        vm.emit('mouse:move', e);
       }
 
-      vm.emit('mouse:move', e);
     });
 
     this.canvas.on('mouse:up', e => {
-      if (this.isMeasureMode()) {
-        this.measurement.onClick(e);
-      }
+      e.e.preventDefault(); // Prevent context menu
+      console.log("Event mouse up ", e, this.isRightClick, vm.dragObject)
+      if (e.e.button === 2) { // Right mouse button
+        if (this.isRightClick) {
 
-      this.isRight = false;
-      this.dx = 0;
-      this.dy = 0;
-
-      if (!vm.dragObject || !e.target || !e.target.selectable) {
-        e.target = null;
-        vm.emit('mouse:click', e);
-      }
-      if (vm.dragObject && vm.dragObject.clickable) {
-        if (vm.dragObject !== e.target) return;
-        if (!vm.dragObject.dragging && !vm.modeToggleByKey) {
-          vm.emit(`${vm.dragObject.class}:click`, vm.dragObject.parent);
+          if (vm.dragObject && vm.dragObject.clickable) {
+            if (vm.dragObject !== e.target) return;
+            if (!vm.dragObject.dragging && !vm.modeToggleByKey) {
+              vm.emit(`${vm.dragObject.class}:rightclick`, vm.dragObject.parent);
+            }
+            vm.dragObject.dragging = false;
+          }
+          vm.dragObject = null;
         }
-        vm.dragObject.dragging = false;
+        this.isDragging = false;
+        this.isRightClick = false;
+      } else {
+        if (this.isMeasureMode()) {
+          this.measurement.onClick(e);
+        }
+
+        this.dx = 0;
+        this.dy = 0;
+
+        if (!vm.dragObject || !e.target || !e.target.selectable) {
+          e.target = null;
+          vm.emit('mouse:click', e);
+        }
+        if (vm.dragObject && vm.dragObject.clickable) {
+          if (vm.dragObject !== e.target) return;
+          if (!vm.dragObject.dragging && !vm.modeToggleByKey) {
+            vm.emit(`${vm.dragObject.class}:click`, vm.dragObject.parent);
+          }
+          vm.dragObject.dragging = false;
+        }
+        vm.dragObject = null;
       }
-      vm.dragObject = null;
     });
     if (typeof window !== 'undefined') {
       window.addEventListener('resize', () => {
         vm.onResize();
       });
     }
+
 
     // document.addEventListener('keyup', () => {
     //   if (this.modeToggleByKey && this.isGrabMode()) {
@@ -579,6 +622,21 @@ export class Map extends mix(Base).with(ModesMixin) {
     //     this.modeToggleByKey = true;
     //   }
     // });
+  }
+  moveMap(dx, dy) {
+    // // Calculate new position based on deltas
+    this.center.x -= dx;
+    this.center.y -= dy;
+
+    // Update canvas pan position
+    this.canvas.relativePan({
+      x: dx,
+      y: -dy,
+    });
+
+
+    // Re-render the map
+    this.update();
   }
 
   unregisterListeners() {
