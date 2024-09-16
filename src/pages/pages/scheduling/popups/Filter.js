@@ -169,15 +169,22 @@ const Filter = ({ show, onClose, valueFilter, callback }) => {
         reset
     } = useForm({ defaultValues })
 
+
     useEffect(() => {
         console.log('value filter', valueFilter);
         handleSetValueFilter()
-        reset(valueFilter)
     }, [valueFilter])
+
 
     useEffect(() => {
         fetchSubscribers()
     }, [])
+
+    useEffect(() => {
+        console.log('createdUserIds', createdUserIds);
+        console.log('status', status);
+
+    }, [createdUserIds, status])
 
     const fetchSubscribers = async () => {
         setLoading(true)
@@ -200,24 +207,38 @@ const Filter = ({ show, onClose, valueFilter, callback }) => {
 
     const handleSetValueFilter = () => {
         if (valueFilter !== null) {
-            if (valueFilter !== null) {
-                if (valueFilter?.createdUserIds !== null) {
-                    const str = valueFilter?.createdUserIds
-                    const parsedArr = JSON.parse(str)
-                    setCreatedUserIds(parsedArr)
-                }
-                if (valueFilter?.status) {
-                    const str = valueFilter?.status
-                    const parsedArr = JSON.parse(str)
-                    setStatus(parsedArr)
-                }
-                setRepeatType(valueFilter?.repeatType)
-                setCreatedAt(valueFilter?.createdAt)
-                setAppointmentDate(valueFilter?.startDate)
-                setStartTime(valueFilter?.startTimeInMinute)
-                setEndTime(valueFilter?.endTimeInMinute)
+            if (valueFilter?.createdUserIds !== null) {
+                const str = valueFilter?.createdUserIds
+                const parsedArr = str?.split(',')
+                setCreatedUserIds(parsedArr)
             }
+            if (valueFilter?.status !== null) {
+                const str = valueFilter?.status
+                const parsedArr = str?.split(',')
+                setStatus(parsedArr)
+            }
+            setRepeatType(valueFilter?.repeatType)
+            setCreatedAt(valueFilter?.createdAt)
+            setAppointmentDate(valueFilter?.startDate)
+            setTime(valueFilter?.startTimeInMinute, setStartTime)
+            setTime(valueFilter?.endTimeInMinute, setEndTime)
         }
+    }
+
+    const setTime = (time, setTimeFunc) => {
+        if (time) {
+            const hour = Math.floor(time / 60)
+            const minute = time % 60
+            const date = new Date()
+            date.setHours(hour)
+            date.setMinutes(minute)
+            setTimeFunc(date)
+        }
+    }
+
+    const handleCancel = () => {
+        callback(defaultValues)
+        onClose()
     }
 
     const onSubmit = () => {
@@ -278,9 +299,13 @@ const Filter = ({ show, onClose, valueFilter, callback }) => {
                                                             sx={{ width: 300 }}
                                                             multiple
                                                             options={item.name === 'createdUserIds' ? subscribers : item.data}
-                                                            // value={item.name === 'createdUserIds' ? createdUserIds : ''}
                                                             id='autocomplete-checkboxes'
-                                                            getOptionLabel={option => item.name === 'createdUserIds' ? option.fullName : option.name || ''}
+                                                            getOptionLabel={option => {
+                                                                console.log('option', option);
+
+                                                                item.name === 'createdUserIds' ? option.fullName : option.name || option || ''
+
+                                                            }}
                                                             renderInput={params => <CustomTextField
                                                                 fullWidth
                                                                 {...params}
@@ -333,17 +358,17 @@ const Filter = ({ show, onClose, valueFilter, callback }) => {
                                                     return (
                                                         <CustomAutocomplete
                                                             sx={{ width: 300 }}
-                                                            value={item?.name === 'repeatType' ? repeatType : value}
+                                                            value={repeatType}
                                                             onChange={(event, selectedItem) => {
-                                                                // onChange(selectedItem)
+                                                                onChange(selectedItem)
                                                                 if (item.name === 'repeatType') {
                                                                     setRepeatType(selectedItem?.id)
                                                                 }
                                                             }}
-                                                            // isOptionEqualToValue={(option, value) => option.id === value.id}
+                                                            isOptionEqualToValue={(option, value) => option.id === value.id}
                                                             options={item.data}
                                                             id='autocomplete-custom'
-                                                            getOptionLabel={option => option.name || ''}
+                                                            getOptionLabel={option => option.name || option || ''}
                                                             renderInput={params => <CustomTextField {...params} label={item.label} />}
                                                         />
                                                     )
@@ -462,7 +487,7 @@ const Filter = ({ show, onClose, valueFilter, callback }) => {
 
                     }}
                 >
-                    <Button variant='contained' color='secondary' onClick={onClose}>
+                    <Button variant='contained' color='secondary' onClick={() => handleCancel()}>
                         Cancel
                     </Button>
                     <Button type='submit' variant='contained' onClick={() => onSubmit()}>
