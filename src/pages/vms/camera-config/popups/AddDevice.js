@@ -327,7 +327,10 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
     try {
       setLoading(true)
 
-      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/device', config)
+      const response = await axios.get(
+        'https://sbs.basesystem.one/ivis/vms/api/v0/device/active?status=connected',
+        config
+      )
 
       const boxes = response.data.map(item => ({
         label: item.nameDevice,
@@ -461,6 +464,8 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
   }
 
   const onSubmit = values => {
+    console.log(values)
+
     const detail = {
       name: values?.name,
       username: values?.username,
@@ -469,15 +474,17 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
       httpPort: values?.httpPort,
       onvifPort: values?.onvifPort,
       protocol: values?.protocol?.name,
-      latitude: lat?.toString(),
-      longitude: lng?.toString(),
+      lat: lat?.toString(),
+      long: lng?.toString(),
       isOfflineSetting: isOfflineSetting,
+      location: values?.siteInfo?.name,
       siteInfo: {
         id: values?.siteInfo?.id,
         name: values?.siteInfo?.name
       },
       box: {
-        id: values?.box?.value
+        id: values?.box?.value,
+        name: values?.box?.label
       },
       streams: [...rows]
     }

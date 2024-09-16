@@ -43,6 +43,7 @@ const CustomCloseButton = styled(IconButton)(({ theme }) => ({
 
 const initValueFilter = {
   device_type: null,
+  event_name: null,
   type: null,
   keyword: '',
   limit: 25,
@@ -59,8 +60,14 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
   ]
 
   const statuses = [
-    { id: 1, name: 'active' },
-    { id: 2, name: 'Inactive' }
+    { id: 1, name: 'Active' },
+    { id: 2, name: 'Deactive' }
+  ]
+
+  const eventName = [
+    { id: 1, name: 'Đã kết nối' },
+    { id: 2, name: 'Mất kết nối' },
+    { id: 3, name: 'Đã xóa camera' }
   ]
 
   const {
@@ -70,13 +77,14 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
     reset
   } = useForm({ defaultValues: initValueFilter })
   useEffect(() => {
-    reset(valueFilter) // Cập nhật giá trị mặc định mỗi khi valueFilter thay đổi
+    reset(valueFilter)
   }, [valueFilter, reset])
 
   const onReset = () => {
     const detail = {
       device_type: null,
-      type: null
+      type: null,
+      event_name: null
     }
     callback(detail)
     onClose()
@@ -123,7 +131,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
           </Box>
           <form onSubmit={handleSubmit(onSubmit)}>
             <Grid container spacing={0}>
-              <Grid item xs={12} sx={{ marginLeft: '8%' }} sm={4}>
+              <Grid item xs={12} sm={3.5}>
                 <Controller
                   name='device_type'
                   control={control}
@@ -150,8 +158,8 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                   )}
                 />
               </Grid>
-              <Grid item xs={2}></Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12} sm={0.5}></Grid>
+              <Grid item xs={12} sm={3.5}>
                 <Controller
                   name='type'
                   control={control}
@@ -170,6 +178,34 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                       helperText={errors.type ? 'This field is required' : ''}
                     >
                       {statuses.map(item => (
+                        <MenuItem key={item.id} value={item.name}>
+                          {item.name}
+                        </MenuItem>
+                      ))}
+                    </CustomTextField>
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} sm={0.5}></Grid>
+              <Grid item xs={12} sm={3.5}>
+                <Controller
+                  name='event_name'
+                  control={control}
+                  render={({ field: { value, onChange } }) => (
+                    <CustomTextField
+                      select
+                      fullWidth
+                      label='Event Name'
+                      SelectProps={{
+                        value: value,
+                        onChange: e => onChange(e)
+                      }}
+                      id='validation-basic-select'
+                      error={Boolean(errors.type)}
+                      aria-describedby='validation-basic-select'
+                      helperText={errors.type ? 'This field is required' : ''}
+                    >
+                      {eventName.map(item => (
                         <MenuItem key={item.id} value={item.name}>
                           {item.name}
                         </MenuItem>

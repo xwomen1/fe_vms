@@ -93,6 +93,10 @@ const Add = ({
           ipAddress: camera.url,
           macAddress: camera.macAddress,
           passWord: passWord,
+          type: {
+            id: '',
+            name: camera.type
+          },
           userName: userName,
           httpPort: camera.host,
           box: {
