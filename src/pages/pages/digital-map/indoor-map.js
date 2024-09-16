@@ -131,24 +131,22 @@ const IndoorMap = ({ cameraGroup }) => {
     };
 
     const handleMarkerRemoved = (e) => {
-        // console.log('marker:removed', e);
     };
+
     const handleMarkerRightClick = (e) => {
-        console.log("On right clicked", e)
         setIsOpenViewCamera(true);
     }
 
     const handleMarkerClick = (e) => {
-        console.log("On clicked", e)
+
         // e.e.preventDefault();
         // addRadar(e, 100);
         setMarkerSelected(e);
-        // setIsOpenViewCamera(true);
-
     };
+
     const handleContextMenu = (e) => {
-        console.log("Map handle context")
     }
+
     const handleMarkerMoving = (e) => {
         if (radar.current && e.id === radar.current.id) {
             radar.current.setPosition(e.position);

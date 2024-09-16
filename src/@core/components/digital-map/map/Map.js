@@ -380,6 +380,7 @@ export class Map extends mix(Base).with(ModesMixin) {
 
   registerListeners() {
     const vm = this;
+
     // Prevent the default context menu from appearing on right-click
     this.canvas.on('contextmenu', e => {
       console.log("Context here")
@@ -437,6 +438,7 @@ export class Map extends mix(Base).with(ModesMixin) {
       if (e.target.class) {
         vm.emit(`${e.target.class}:moving`, e.target.parent);
         e.target.parent.emit('moving', e.target.parent);
+
         return;
       }
       const group = e.target;
