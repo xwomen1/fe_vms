@@ -99,6 +99,7 @@ const Caller = () => {
   const [valueFilter, setValueFilter] = useState(valueFilterInit)
 
   const [cameraGroup, setCameraGroup] = useState([])
+  const [camerasSelected, setCamerasSelected] = useState([])
   const [cameraList, setCameraList] = useState([])
   const [selectIndex, setSelectIndex] = useState(0)
   const [page, setPage] = useState(1)
@@ -240,6 +241,36 @@ const Caller = () => {
     return marks
   }
 
+  useEffect(() => {
+    if (camerasSelected.length > 0) {
+      const listCamera = camerasSelected.map(camera => ({
+        ...camera,
+        channel: 'Sub',
+      }));
+
+      setCameraGroup(prevCameras => {
+        const cameraMap = new Map();
+
+        prevCameras.forEach(camera => cameraMap.set(camera.id, camera));
+
+        listCamera.forEach(camera => cameraMap.set(camera.id, camera));
+
+        return Array.from(cameraMap.values());
+      });
+    }
+  }, [camerasSelected]);
+
+
+  const handleSetCameraGroup = camera => {
+    setCamerasSelected(prevCameras => [...prevCameras, camera]);
+  };
+
+  const handleUpdateCameraGroup = index => {
+    const updateCameraGroup = [...cameraGroup]
+    updateCameraGroup.splice(index, 1)
+    setCameraGroup(updateCameraGroup)
+  }
+
   return (
     <DivStyle
       style={{ backgroundColor: 'black', width: '100%', minHeight: '90vh', color: 'white', position: 'relative' }}
@@ -247,7 +278,9 @@ const Caller = () => {
       <Grid container spacing={0}>
         {cameraGroup.length > 0 &&
           cameraGroup.map((camera, index) => (
-            <Grid item xs={Math.floor(12 / sizeScreen.split('x')[0])} key={index}>
+            <Grid item xs={Math.floor(12 / sizeScreen.split('x')[0])} key={index}
+              sx={{ position: 'relative', borderWidth: 0.25, borderColor: '#fff', borderStyle: 'solid' }}
+            >
               <ViewCamera
                 name={camera?.deviceName}
                 id={camera.id}
@@ -265,6 +298,21 @@ const Caller = () => {
                 handSetChanel={handSetChanel}
                 volume={volume}
               />
+              <div>
+                <IconButton
+                  variant='outlined'
+                  onClick={() => {
+                    handleUpdateCameraGroup(index)
+                  }}
+                  sx={{
+                    position: 'absolute',
+                    bottom: 0,
+                    right: 0
+                  }}
+                >
+                  <Icon icon="tabler:x" style={{ color: 'white' }} />
+                </IconButton>
+              </div>
             </Grid>
           ))}
         <div className='video-controls'>
@@ -510,7 +558,8 @@ const Caller = () => {
       <Settings
         page={page}
         onSetPage={setPage}
-        selectIndex={selectIndex}
+
+        // selectIndex={selectIndex}
         onSetSelectIndex={setSelectIndex}
         cameraList={cameraList}
         sizeScreen={sizeScreen}
@@ -518,6 +567,8 @@ const Caller = () => {
           setSizeScreen(size)
           setNumberShow(size.split('x')[0] * size.split('x')[1])
         }}
+        setCameraGroup={handleSetCameraGroup}
+        cameraGroup={cameraGroup}
       />
     </DivStyle>
   )

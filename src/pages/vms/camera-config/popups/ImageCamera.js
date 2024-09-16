@@ -309,7 +309,7 @@ const ImageCamera = ({ cameraId, onClose }) => {
                                 : false
                             }
                             options={item.data}
-                            getOptionLabel={option => option?.name || option}
+                            getOptionLabel={option => option?.name || option || ''}
                             renderInput={(params) => (
                               <CustomTextField
                                 {...params}

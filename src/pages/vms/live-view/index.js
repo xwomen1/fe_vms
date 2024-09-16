@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 
-import { Grid } from '@mui/material'
+import { Box, Button, Grid, IconButton } from '@mui/material'
 
 // import TableStickyHeader from './table'
 import Tab from '@mui/material/Tab'
@@ -12,6 +12,8 @@ import ViewCamera from 'src/@core/components/camera'
 import Settings from 'src/@core/components/camera/settings'
 import { getApi } from 'src/@core/utils/requestUltils'
 import { CAMERA_API } from 'src/@core/components/api-url'
+import FullScreen from './popups/fullScreen'
+import Icon from "src/@core/components/icon"
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   borderBottom: '0 !important',
@@ -53,10 +55,12 @@ const Caller = () => {
   const [numberShow, setNumberShow] = useState(9)
   const [valueFilter, setValueFilter] = useState(valueFilterInit)
   const [cameraGroup, setCameraGroup] = useState([])
+  const [camerasSelected, setCamerasSelected] = useState([])
   const [cameraHiden, setCameraHiden] = useState([])
   const [cameraList, setCameraList] = useState([])
   const [selectIndex, setSelectIndex] = useState(0)
   const [page, setPage] = useState(1)
+  const [isOpenFullScreen, setIsOpenFullScreen] = useState(false)
 
   const fetchCameraGroup = async () => {
     try {
@@ -76,9 +80,13 @@ const Caller = () => {
     }
   }
 
+  // useEffect(() => {
+  //   fetchCameraGroup()
+  // }, [reload, page, selectIndex, sizeScreen])
+
   useEffect(() => {
     fetchCameraGroup()
-  }, [reload, page, selectIndex, sizeScreen])
+  }, [reload, page, sizeScreen])
 
   const handSetChanel = (id, channel) => {
     let newCamera = cameraGroup.map(item => {
@@ -91,40 +99,109 @@ const Caller = () => {
 
       return item
     })
-    console.log('newCamera', newCamera)
     setCameraGroup(newCamera)
   }
 
+  useEffect(() => {
+    if (camerasSelected.length > 0) {
+      const listCamera = camerasSelected.map(camera => ({
+        ...camera,
+        channel: 'Sub',
+      }));
+
+      setCameraGroup(prevCameras => {
+        const cameraMap = new Map();
+
+        prevCameras.forEach(camera => cameraMap.set(camera.id, camera));
+
+        listCamera.forEach(camera => cameraMap.set(camera.id, camera));
+
+        return Array.from(cameraMap.values());
+      });
+    }
+  }, [camerasSelected]);
+
+
+  const handleSetCameraGroup = camera => {
+    setCamerasSelected(prevCameras => [...prevCameras, camera]);
+  };
+
+  const handleUpdateCameraGroup = index => {
+    const updateCameraGroup = [...cameraGroup]
+    updateCameraGroup.splice(index, 1)
+    setCameraGroup(updateCameraGroup)
+  }
+
+
   return (
-    <DivStyle style={{ backgroundColor: 'black', minHeight: '100vh', color: 'white' }}>
-      <Grid container spacing={0}>
-        {cameraGroup.length > 0 &&
-          cameraGroup.map((camera, index) => (
-            <Grid item xs={Math.floor(12 / sizeScreen.split('x')[0])} key={camera.id + index}>
-              <ViewCamera
-                name={camera?.deviceName}
-                id={camera.id}
-                channel={camera.channel}
-                status={camera.status}
-                sizeScreen={sizeScreen}
-                handSetChanel={handSetChanel}
-              />
-            </Grid>
-          ))}
-      </Grid>
-      <Settings
-        page={page}
-        onSetPage={setPage}
-        selectIndex={selectIndex}
-        onSetSelectIndex={setSelectIndex}
-        cameraList={cameraList}
-        sizeScreen={sizeScreen}
-        setSizeScreen={size => {
-          setSizeScreen(size)
-          setNumberShow(size.split('x')[0] * size.split('x')[1])
-        }}
-      />
-    </DivStyle>
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-3rem', marginBottom: '1rem' }}>
+        <IconButton onClick={() => setIsOpenFullScreen(true)}>
+          <Icon icon="tabler:border-corners" />
+        </IconButton>
+      </div>
+      <DivStyle style={{ backgroundColor: 'black', minHeight: '100vh', color: 'white' }}>
+        <Grid container spacing={0}>
+          {cameraGroup.length > 0 &&
+            cameraGroup.map((camera, index) => {
+
+              return (
+                <Grid item xs={Math.floor(12 / sizeScreen.split('x')[0])} key={camera.id + index}
+                  sx={{ position: 'relative', borderWidth: 0.25, borderColor: '#fff', borderStyle: 'solid' }}
+                >
+                  <ViewCamera
+                    name={camera?.deviceName}
+                    id={camera.id}
+                    channel={camera.channel}
+                    status={camera.status}
+                    sizeScreen={sizeScreen}
+                    handSetChanel={handSetChanel}
+                    isFullScreen={isOpenFullScreen}
+                  />
+                  <div>
+                    <IconButton
+                      variant='outlined'
+                      onClick={() => {
+                        handleUpdateCameraGroup(index)
+                      }}
+                      sx={{
+                        position: 'absolute',
+                        bottom: 0,
+                        right: 0
+                      }}
+                    >
+                      <Icon icon="tabler:x" style={{ color: 'white' }} />
+                    </IconButton>
+                  </div>
+                </Grid>
+              )
+            })}
+        </Grid>
+        <Settings
+          page={page}
+          onSetPage={setPage}
+          selectIndex={selectIndex}
+
+          // onSetSelectIndex={setSelectIndex}
+          cameraList={cameraList}
+          sizeScreen={sizeScreen}
+          setSizeScreen={size => {
+            setSizeScreen(size)
+            setNumberShow(size.split('x')[0] * size.split('x')[1])
+          }}
+          setCameraGroup={handleSetCameraGroup}
+          cameraGroup={cameraGroup}
+        />
+      </DivStyle>
+      {isOpenFullScreen && (
+        <FullScreen
+          show={isOpenFullScreen}
+          data={cameraGroup}
+          cameraList={cameraList}
+          sizeScreen={sizeScreen}
+          onClose={() => setIsOpenFullScreen(false)} />
+      )}
+    </div>
   )
 }
 

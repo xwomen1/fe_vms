@@ -21,7 +21,7 @@ const config = {
   ]
 }
 
-export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => {
+export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel, isFullScreen }) => {
   const [websocket, setWebsocket] = useState(null)
   const [text, setText] = useState(null)
   const [rtcPeerConnection, setRtcPeerConnection] = useState(null)
@@ -36,6 +36,7 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
   const [reload, setReload] = useState(0)
   const [videoDimensions, setVideoDimensions] = useState({ width: '100%', height: null })
   const intervalRef = useRef(null);
+  const [closed, setCLosed] = useState(false)
 
   useEffect(() => {
     const heightCaculator = Math.floor((window.innerHeight - 90) / sizeScreen.split('x')[1])
@@ -97,30 +98,17 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
 
     setWebsocket(ws)
     await delay(500)
+    setLoading(false)
   }
-
-  useEffect(() => {
-    if (!websocketStatus) {
-      if (websocket) {
-        websocket.close()
-        setWebsocket(null)
-      }
-      if (rtcPeerConnection) {
-        rtcPeerConnection.close()
-        setRtcPeerConnection(null)
-      }
-      createWsConnection()
-    }
-  }, [websocketStatus])
 
   useEffect(() => {
     if (rtcPeerConnection != null && websocketStatus && websocket !== null) {
       if (websocket.readyState === WebSocket.OPEN) {
-        console.log('Sending message at:', new Date().toLocaleTimeString(), 'Message:', {
-          id: id,
-          type: 'request',
-          channel: channel
-        })
+        // console.log('Sending message at:', new Date().toLocaleTimeString(), 'Message:', {
+        //   id: id,
+        //   type: 'request',
+        //   channel: channel
+        // })
         websocket.send(
           JSON.stringify({
             id: id,
@@ -144,12 +132,14 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
       setLoading(true)
       websocket.addEventListener('open', () => {
         setWebsocketStatus(true)
-        console.log('WebSocket connection established at:', new Date().toLocaleTimeString())
+
+        // console.log('WebSocket connection established at:', new Date().toLocaleTimeString())
       })
       websocket.addEventListener('message', handleMessage)
       websocket.addEventListener('close', () => {
         setWebsocketStatus(false)
-        console.log('WebSocket connection closed at:', new Date().toLocaleTimeString())
+
+        // console.log('WebSocket connection closed at:', new Date().toLocaleTimeString())
       })
       websocket.addEventListener('error', error => {
         console.error('WebSocket error at:', new Date().toLocaleTimeString(), error)
@@ -211,75 +201,38 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel }) => 
   }
 
   useEffect(() => {
-    setRtcPeerConnection(null)
+    if (websocket) {
+      websocket.close()
+      setWebsocket(null)
+    }
+    if (rtcPeerConnection) {
+      rtcPeerConnection.close()
+      setRtcPeerConnection(null)
+    }
     setWebsocketStatus(false)
-    setWebsocket(null)
     createWsConnection()
 
-    return () => {
-      if (websocket) {
-        websocket.close()
-      }
-      if (rtcPeerConnection) {
-        rtcPeerConnection.close()
-      }
-    }
-  }, [reload])
-
-  // useEffect(() => {
-  //   const checkStatus = () => {
-  //     if (status === 'disconnected' || status === 'failed' || status === '') {
-  //       console.log('Status is', status, 'at:', new Date().toLocaleTimeString());
-
-  //       if (intervalRef.current) {
-  //         clearInterval(intervalRef.current);
-  //       }
-  //       intervalRef.current = setInterval(() => {
-  //         console.log('Recreating WebSocket connection due to status:', status, 'at:', new Date().toLocaleTimeString());
-  //         setRtcPeerConnection(null)
-  //         setWebsocketStatus(false)
-  //         setWebsocket(null)
-  //         createWsConnection();
-  //       }, 5000);
-  //     } else {
-  //       console.log('Status is connected, no need to retry at:', new Date().toLocaleTimeString());
-
-  //       if (intervalRef.current) {
-  //         clearInterval(intervalRef.current);
-  //       }
-  //     }
-  //   };
-
-  //   checkStatus();
-
-  //   return () => {
-  //     if (intervalRef.current) {
-  //       clearInterval(intervalRef.current);
-  //     }
-  //   };
-  // }, [status]);
+  }, [reload, id, channel])
 
   useEffect(() => {
-    if (rtcPeerConnection) {
-      rtcPeerConnection.addEventListener('connectionstatechange', () => {
-        // console.log(
-        //   'RTCPeerConnection state change at:',
-        //   new Date().toLocaleTimeString(),
-        //   'New state:',
-        //   rtcPeerConnection.connectionState
-        // )
-        setStatus(rtcPeerConnection.connectionState)
-      })
-      rtcPeerConnection.addEventListener('iceconnectionstatechange', () => {
-        // console.log(
-        //   'RTCPeerConnection ICE state change at:',
-        //   new Date().toLocaleTimeString(),
-        //   'New ICE state:',
-        //   rtcPeerConnection.iceConnectionState
-        // )
-      })
+    if (closed === true) {
+
+      return () => {
+        if (websocket) {
+          websocket.close()
+          setWebsocket(null)
+        }
+        if (rtcPeerConnection) {
+          rtcPeerConnection.close()
+          setRtcPeerConnection(null)
+        }
+      }
     }
-  }, [rtcPeerConnection])
+  }, [closed])
+
+  useEffect(() => {
+    setCLosed(true)
+  }, [isFullScreen])
 
   return (
     <div className='portlet portlet-video live' style={{ width: '100%' }}>

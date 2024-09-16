@@ -337,7 +337,7 @@ const VideoCamera = ({ camera, onClose }) => {
                             : item.name === 'resolution' && streamType === 'sub' ? item?.dataOfSub
                               : item.data
                         }
-                        getOptionLabel={option => option?.name || option}
+                        getOptionLabel={option => option?.name || option || ''}
                         renderInput={(params) => (
                           <CustomTextField
                             {...params}

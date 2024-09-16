@@ -588,7 +588,7 @@ const Device = ({ onClose, camera }) => {
               value={cameraGroupSelect}
               onChange={handleCameraGroupChange}
               options={cameraGroup || []}
-              getOptionLabel={option => option.label}
+              getOptionLabel={option => option.label || ''}
               renderInput={params => (
                 <CustomTextField
                   {...params}
@@ -624,7 +624,7 @@ const Device = ({ onClose, camera }) => {
               value={selectedProtocol}
               onChange={handleProtocolChange}
               options={protocol || []}
-              getOptionLabel={option => option.name}
+              getOptionLabel={option => option.name || ''}
               renderInput={params => (
                 <CustomTextField
                   {...params}
@@ -642,7 +642,7 @@ const Device = ({ onClose, camera }) => {
               value={selectNVR}
               onChange={handleDDNSChange}
               options={nvrs || []}
-              getOptionLabel={option => option.label}
+              getOptionLabel={option => option.label || ''}
               renderInput={params => (
                 <CustomTextField
                   {...params}
@@ -661,7 +661,7 @@ const Device = ({ onClose, camera }) => {
               value={regionsSelect}
               onChange={handleRegionsChange}
               options={regions || []}
-              getOptionLabel={option => option.label}
+              getOptionLabel={option => option.label || ''}
               renderInput={params => <CustomTextField {...params} label='Region' fullWidth />}
               onFocus={handleComboboxFocusRegions}
             />{' '}
@@ -754,7 +754,7 @@ const Device = ({ onClose, camera }) => {
                 value={searchValue}
                 onChange={handleSearchChange}
                 options={suggestions}
-                getOptionLabel={option => option.description}
+                getOptionLabel={option => option.description || ''}
                 onInputChange={(event, newInputValue) => {
                   setSearchValue(newInputValue)
                 }}

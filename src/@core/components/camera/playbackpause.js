@@ -136,56 +136,26 @@ export const ViewCameraPause = ({
     return () => {
       if (websocket) {
         websocket.close()
+        setWebsocket(null)
       }
       if (rtcPeerConnection) {
         rtcPeerConnection.close()
+        setRtcPeerConnection(null)
       }
     }
   }, [id, channel])
 
-  // useEffect(() => {
-  //   const checkStatus = () => {
-  //     if (status === 'disconnected' || status === 'failed' || status === '') {
-  //       console.log('Status is', status, 'at:', new Date().toLocaleTimeString());
-
-  //       if (intervalRef.current) {
-  //         clearInterval(intervalRef.current);
-  //       }
-  //       intervalRef.current = setInterval(() => {
-  //         console.log('Recreating WebSocket connection due to status:', status, 'at:', new Date().toLocaleTimeString());
-  //         setRtcPeerConnection(null)
-  //         setWebsocket(null)
-  //         createWsConnection();
-  //       }, 5000);
-  //     } else {
-  //       console.log('Status is connected, no need to retry at:', new Date().toLocaleTimeString());
-
-  //       if (intervalRef.current) {
-  //         clearInterval(intervalRef.current);
-  //       }
-  //     }
-  //   };
-
-  //   checkStatus();
-
-  //   return () => {
-  //     if (intervalRef.current) {
-  //       clearInterval(intervalRef.current);
-  //     }
-  //   };
-  // }, [status]);
-
   useEffect(() => {
-    setRtcPeerConnection(null)
-    setWebsocket(null)
     createWsConnection()
 
     return () => {
       if (websocket) {
         websocket.close()
+        setWebsocket(null)
       }
       if (rtcPeerConnection) {
         rtcPeerConnection.close()
+        setRtcPeerConnection(null)
       }
     }
   }, [reload])
@@ -266,10 +236,6 @@ export const ViewCameraPause = ({
       })
     }
   }, [websocket])
-
-  useEffect(() => {
-    console.log('heightDiv', heightDiv)
-  }, [heightDiv])
 
   return (
     <div className='portlet portlet-video live' style={{ width: '100%' }}>

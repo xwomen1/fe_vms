@@ -193,6 +193,7 @@ const Add = ({
                         .map((camera, index) => {
                           const foundcamera = selectedIds.find(item => item.macAddress === camera.macAddress)
                           console.log(camera)
+
                           return (
                             <TableRow key={index}>
                               <TableCell sx={{ padding: '16px' }}>{index + 1}</TableCell>

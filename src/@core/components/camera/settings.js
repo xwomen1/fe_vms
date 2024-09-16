@@ -30,7 +30,7 @@ import Icon from 'src/@core/components/icon'
 import { useSettings } from 'src/@core/hooks/useSettings'
 import select from 'src/@core/theme/overrides/select'
 import { shouldForwardProp } from '@mui/system'
-import { Button, Grid } from '@mui/material'
+import { Button, Checkbox, Grid } from '@mui/material'
 
 const Toggler = styled(Box)(({ theme }) => ({
   right: 0,
@@ -88,7 +88,7 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   }
 }))
 
-const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList, sizeScreen, setSizeScreen }) => {
+const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList, sizeScreen, setSizeScreen, setCameraGroup, cameraGroup }) => {
   // ** State
   const [open, setOpen] = useState(false)
 
@@ -100,6 +100,7 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
   const [pageList, setPageList] = useState([])
   const [page1, setPage1] = useState(1)
   const [selectedButton, setSelectedButton] = useState(0)
+  const [cameraGroupList, setCameraGroupList] = useState([])
 
   useEffect(() => {
     if (cameraList[selectIndex]?.cameras?.length > 0) {
@@ -127,12 +128,13 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
 
   const StyledTreeItem = props => {
     // ** Props
-    const { labelText, labelIcon, labelInfo, color, ...other } = props
+    const { checked, onChange, labelText, labelIcon, labelInfo, color, ...other } = props
 
     return (
       <StyledTreeItemRoot
         {...other}
         label={
+
           <Box sx={{ py: 1, display: 'flex', alignItems: 'center', '& svg': { mr: 1 } }}>
             <Icon icon={labelIcon} color={color} />
             <Typography variant='body2' sx={{ flexGrow: 1, fontWeight: 500 }}>
@@ -150,7 +152,7 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
   }
 
   const handleNodeToggle = (event, nodeIds) => {
-    onSetSelectIndex(nodeIds[0])
+    // onSetSelectIndex(nodeIds[0])
     setExpanded([nodeIds[0]])
   }
 
@@ -176,6 +178,30 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
     onSetPage(page)
     setSelectedButton(index)
   }
+
+  useEffect(() => {
+    function compareGroupsWithCameras(cameraGroupList, cameras) {
+      return cameraGroupList.map(group => {
+        const updatedCameras = group?.cameras?.map(groupCamera => {
+          const isSelected = cameras?.some(camera => camera.id === groupCamera.id);
+
+          return {
+            ...groupCamera,
+            isSelected
+          };
+        });
+
+        return {
+          ...group,
+          cameras: updatedCameras
+        };
+      });
+    }
+
+    const result = compareGroupsWithCameras(cameraList, cameraGroup);
+
+    setCameraGroupList(result)
+  }, [cameraGroup, cameraList])
 
   return (
     <div className='customizer'>
@@ -243,8 +269,8 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
                 defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
                 defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
               >
-                {cameraList.length > 0 &&
-                  cameraList.map((group, index) => {
+                {cameraGroupList.length > 0 &&
+                  cameraGroupList.map((group, index) => {
                     return (
                       <StyledTreeItem
                         key={index}
@@ -255,16 +281,16 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
                       >
                         {group.cameras && group.cameras?.length > 0
                           ? group.cameras.map((camera, idx) => {
-                            // const matchedEvent = eventsData.find(event => event.id === camera.id)
-                            // const status = matchedEvent?.status
 
                             return (
                               <StyledTreeItem
-                                disabled={true}
+
+                                disabled={camera?.isSelected}
                                 key={camera?.id}
                                 nodeId={camera?.id}
                                 labelText={camera?.deviceName}
                                 labelIcon='tabler:camera'
+                                onClick={() => setCameraGroup(camera)}
                               />
                             )
                           })
@@ -340,7 +366,6 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
               </RadioGroup>
             </Box>
           </CustomizerSpacing>
-
           <Divider sx={{ m: '0 !important' }} />
         </PerfectScrollbar>
       </Drawer>
