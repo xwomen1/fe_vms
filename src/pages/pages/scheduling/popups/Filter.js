@@ -169,10 +169,11 @@ const Filter = ({ show, onClose, valueFilter, callback }) => {
         reset
     } = useForm({ defaultValues })
 
-
     useEffect(() => {
+        console.log('value filter', valueFilter);
+        handleSetValueFilter()
         reset(valueFilter)
-    }, [valueFilter, reset])
+    }, [valueFilter])
 
     useEffect(() => {
         fetchSubscribers()
@@ -194,6 +195,28 @@ const Filter = ({ show, onClose, valueFilter, callback }) => {
             }
         } finally {
             setLoading(false)
+        }
+    }
+
+    const handleSetValueFilter = () => {
+        if (valueFilter !== null) {
+            if (valueFilter !== null) {
+                if (valueFilter?.createdUserIds !== null) {
+                    const str = valueFilter?.createdUserIds
+                    const parsedArr = JSON.parse(str)
+                    setCreatedUserIds(parsedArr)
+                }
+                if (valueFilter?.status) {
+                    const str = valueFilter?.status
+                    const parsedArr = JSON.parse(str)
+                    setStatus(parsedArr)
+                }
+                setRepeatType(valueFilter?.repeatType)
+                setCreatedAt(valueFilter?.createdAt)
+                setAppointmentDate(valueFilter?.startDate)
+                setStartTime(valueFilter?.startTimeInMinute)
+                setEndTime(valueFilter?.endTimeInMinute)
+            }
         }
     }
 
@@ -248,48 +271,52 @@ const Filter = ({ show, onClose, valueFilter, callback }) => {
                                                 name={item.name}
                                                 control={control}
                                                 rules={{ required: item.require }}
-                                                render={({ field: { value, onChange } }) => (
-                                                    <CustomAutocomplete
-                                                        sx={{ width: 300 }}
-                                                        multiple
-                                                        options={item.name === 'createdUserIds' ? subscribers : item.data}
-                                                        id='autocomplete-checkboxes'
-                                                        getOptionLabel={option => item.name === 'createdUserIds' ? option.fullName : option.name || ''}
-                                                        renderInput={params => <CustomTextField
-                                                            fullWidth
-                                                            {...params}
-                                                            label={item.label}
-                                                            placeholder={item.placeholder}
-                                                        />}
-                                                        onChange={(event, selectedItems) => {
-                                                            const newArr = []
-                                                            for (let i = 0; i < selectedItems.length; i++) {
-                                                                newArr.push(selectedItems[i]?.userId ? selectedItems[i]?.userId : selectedItems[i].id)
-                                                            }
-                                                            if (item.name === 'createdUserIds') {
-                                                                setCreatedUserIds(newArr)
-                                                            }
-                                                            if (item.name === 'status') {
-                                                                setStatus(newArr)
-                                                            }
-                                                        }}
-                                                        renderOption={(props, option, { selected }) => (
-                                                            <li {...props}>
-                                                                <Checkbox checked={selected} sx={{ mr: 2 }} />
-                                                                <ul style={{ listStyleType: 'none' }}>
-                                                                    <li>
-                                                                        {item.name === 'createdUserIds' ? option.fullName : option.name}
-                                                                    </li>
-                                                                    <li>
-                                                                        <Typography variant="caption" >
-                                                                            {item.name === 'createdUserIds' ? option.email : ''}
-                                                                        </Typography>
-                                                                    </li>
-                                                                </ul>
-                                                            </li>
-                                                        )}
-                                                    />
-                                                )}
+                                                render={({ field: { value, onChange } }) => {
+
+                                                    return (
+                                                        <CustomAutocomplete
+                                                            sx={{ width: 300 }}
+                                                            multiple
+                                                            options={item.name === 'createdUserIds' ? subscribers : item.data}
+                                                            // value={item.name === 'createdUserIds' ? createdUserIds : ''}
+                                                            id='autocomplete-checkboxes'
+                                                            getOptionLabel={option => item.name === 'createdUserIds' ? option.fullName : option.name || ''}
+                                                            renderInput={params => <CustomTextField
+                                                                fullWidth
+                                                                {...params}
+                                                                label={item.label}
+                                                                placeholder={item.placeholder}
+                                                            />}
+                                                            onChange={(event, selectedItems) => {
+                                                                const newArr = []
+                                                                for (let i = 0; i < selectedItems.length; i++) {
+                                                                    newArr.push(selectedItems[i]?.userId ? selectedItems[i]?.userId : selectedItems[i].id)
+                                                                }
+                                                                if (item.name === 'createdUserIds') {
+                                                                    setCreatedUserIds(newArr)
+                                                                }
+                                                                if (item.name === 'status') {
+                                                                    setStatus(newArr)
+                                                                }
+                                                            }}
+                                                            renderOption={(props, option, { selected }) => (
+                                                                <li {...props}>
+                                                                    <Checkbox checked={selected} sx={{ mr: 2 }} />
+                                                                    <ul style={{ listStyleType: 'none' }}>
+                                                                        <li>
+                                                                            {item.name === 'createdUserIds' ? option.fullName : option.name}
+                                                                        </li>
+                                                                        <li>
+                                                                            <Typography variant="caption" >
+                                                                                {item.name === 'createdUserIds' ? option.email : ''}
+                                                                            </Typography>
+                                                                        </li>
+                                                                    </ul>
+                                                                </li>
+                                                            )}
+                                                        />
+                                                    )
+                                                }}
                                             />
                                         </Grid>
                                     )
@@ -301,23 +328,26 @@ const Filter = ({ show, onClose, valueFilter, callback }) => {
                                                 name={item.name}
                                                 control={control}
                                                 rules={{ required: item.require }}
-                                                render={({ field: { value, onChange } }) => (
-                                                    <CustomAutocomplete
-                                                        sx={{ width: 300 }}
-                                                        value={value || null}
-                                                        onChange={(event, selectedItem) => {
-                                                            onChange(selectedItem)
-                                                            if (item.name === 'repeatType') {
-                                                                setRepeatType(selectedItem?.id)
-                                                            }
-                                                        }}
-                                                        isOptionEqualToValue={(option, value) => option.id === value.id}
-                                                        options={item.data}
-                                                        id='autocomplete-custom'
-                                                        getOptionLabel={option => option.name || ''}
-                                                        renderInput={params => <CustomTextField {...params} label={item.label} />}
-                                                    />
-                                                )}
+                                                render={({ field: { value, onChange } }) => {
+
+                                                    return (
+                                                        <CustomAutocomplete
+                                                            sx={{ width: 300 }}
+                                                            value={item?.name === 'repeatType' ? repeatType : value}
+                                                            onChange={(event, selectedItem) => {
+                                                                // onChange(selectedItem)
+                                                                if (item.name === 'repeatType') {
+                                                                    setRepeatType(selectedItem?.id)
+                                                                }
+                                                            }}
+                                                            // isOptionEqualToValue={(option, value) => option.id === value.id}
+                                                            options={item.data}
+                                                            id='autocomplete-custom'
+                                                            getOptionLabel={option => option.name || ''}
+                                                            renderInput={params => <CustomTextField {...params} label={item.label} />}
+                                                        />
+                                                    )
+                                                }}
                                             />
                                         </Grid>
                                     )
@@ -329,40 +359,44 @@ const Filter = ({ show, onClose, valueFilter, callback }) => {
                                                 name={item.name}
                                                 control={control}
                                                 rules={{ required: item.require }}
-                                                render={({ field: { value, onChange } }) => (
-                                                    <DatePickerWrapper>
-                                                        <div>
-                                                            <DatePicker
-                                                                selected={
-                                                                    item.name === 'createdAt' ? createdAt :
-                                                                        item.name === 'AppointmentDate' ? appointmentDate : null
-                                                                }
-                                                                id='basic-input'
-                                                                onChange={date => {
-                                                                    if (item.name === 'createdAt') {
-                                                                        setCreatedAt(date)
+                                                render={({ field: { value, onChange } }) => {
+
+                                                    return (
+                                                        <DatePickerWrapper>
+                                                            <div>
+                                                                <DatePicker
+                                                                    selected={
+                                                                        item.name === 'createdAt' ? createdAt :
+                                                                            item.name === 'AppointmentDate' ? appointmentDate : null
                                                                     }
-                                                                    if (item.name === 'AppointmentDate') {
-                                                                        setAppointmentDate(date)
+                                                                    id='basic-input'
+                                                                    dateFormat='dd/MM/yyyy'
+                                                                    onChange={date => {
+                                                                        if (item.name === 'createdAt') {
+                                                                            setCreatedAt(date)
+                                                                        }
+                                                                        if (item.name === 'AppointmentDate') {
+                                                                            setAppointmentDate(date)
+                                                                        }
+                                                                    }}
+                                                                    placeholderText={item.placeholder}
+                                                                    customInput={
+                                                                        <CustomInput
+                                                                            label={item.label}
+                                                                            InputProps={{
+                                                                                endAdornment: (
+                                                                                    <InputAdornment position='end'>
+                                                                                        <Icon icon="tabler:calendar" />
+                                                                                    </InputAdornment>
+                                                                                )
+                                                                            }}
+                                                                        />
                                                                     }
-                                                                }}
-                                                                placeholderText={item.placeholder}
-                                                                customInput={
-                                                                    <CustomInput
-                                                                        label={item.label}
-                                                                        InputProps={{
-                                                                            endAdornment: (
-                                                                                <InputAdornment position='end'>
-                                                                                    <Icon icon="tabler:calendar" />
-                                                                                </InputAdornment>
-                                                                            )
-                                                                        }}
-                                                                    />
-                                                                }
-                                                            />
-                                                        </div>
-                                                    </DatePickerWrapper>
-                                                )}
+                                                                />
+                                                            </div>
+                                                        </DatePickerWrapper>
+                                                    )
+                                                }}
                                             />
                                         </Grid>
                                     )
@@ -374,44 +408,47 @@ const Filter = ({ show, onClose, valueFilter, callback }) => {
                                                 name={item.name}
                                                 control={control}
                                                 rules={{ required: item.require }}
-                                                render={({ field: { value, onChange } }) => (
-                                                    <DatePickerWrapper>
-                                                        <div>
-                                                            <DatePicker
-                                                                showTimeSelect
-                                                                selected={
-                                                                    item.name === 'startTimeInMinute' ? startTime :
-                                                                        item.name === 'endTimeInMinute' ? endTime : null
-                                                                }
-                                                                timeIntervals={30}
-                                                                showTimeSelectOnly
-                                                                dateFormat='h:mm aa'
-                                                                id='time-only-picker'
-                                                                onChange={date => {
-                                                                    if (item.name === 'startTimeInMinute') {
-                                                                        setStartTime(date)
+                                                render={({ field: { value, onChange } }) => {
+
+                                                    return (
+                                                        <DatePickerWrapper>
+                                                            <div>
+                                                                <DatePicker
+                                                                    showTimeSelect
+                                                                    selected={
+                                                                        item.name === 'startTimeInMinute' ? startTime :
+                                                                            item.name === 'endTimeInMinute' ? endTime : null
                                                                     }
-                                                                    if (item.name === 'endTimeInMinute') {
-                                                                        setEndTime(date)
+                                                                    timeIntervals={30}
+                                                                    showTimeSelectOnly
+                                                                    dateFormat='h:mm aa'
+                                                                    id='time-only-picker'
+                                                                    onChange={date => {
+                                                                        if (item.name === 'startTimeInMinute') {
+                                                                            setStartTime(date)
+                                                                        }
+                                                                        if (item.name === 'endTimeInMinute') {
+                                                                            setEndTime(date)
+                                                                        }
+                                                                    }}
+                                                                    placeholderText={item.placeholder}
+                                                                    customInput={
+                                                                        <CustomInput
+                                                                            label={item.label}
+                                                                            InputProps={{
+                                                                                endAdornment: (
+                                                                                    <InputAdornment position='end'>
+                                                                                        <Icon icon="tabler:clock" />
+                                                                                    </InputAdornment>
+                                                                                )
+                                                                            }}
+                                                                        />
                                                                     }
-                                                                }}
-                                                                placeholderText={item.placeholder}
-                                                                customInput={
-                                                                    <CustomInput
-                                                                        label={item.label}
-                                                                        InputProps={{
-                                                                            endAdornment: (
-                                                                                <InputAdornment position='end'>
-                                                                                    <Icon icon="tabler:clock" />
-                                                                                </InputAdornment>
-                                                                            )
-                                                                        }}
-                                                                    />
-                                                                }
-                                                            />
-                                                        </div>
-                                                    </DatePickerWrapper>
-                                                )}
+                                                                />
+                                                            </div>
+                                                        </DatePickerWrapper>
+                                                    )
+                                                }}
                                             />
                                         </Grid>
                                     )

@@ -37,21 +37,21 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
   }
 }))
 
-const initValueFilter = {
-  createdUserIds: null,
-  startDate: null,
-  endDate: null,
-  startTimeInMinute: null,
-  endTimeInMinute: null,
-  statues: null,
-  repeatType: null,
-  createdAt: null
-}
+// const initValueFilter = {
+//   createdUserIds: null,
+//   startDate: null,
+//   endDate: null,
+//   startTimeInMinute: null,
+//   endTimeInMinute: null,
+//   statues: null,
+//   repeatType: null,
+//   createdAt: null
+// }
 
-const Caller = () => {
+const Scheduling = () => {
   const [value, setValue] = useState('1')
   const [keyword, setKeyword] = useState('')
-  const [valueFilter, setValueFilter] = useState(initValueFilter)
+  const [valueFilter, setValueFilter] = useState(null)
   const [isOpenFilter, setIsOpenFilter] = useState(false)
 
   const handleChange = (event, newValue) => {
@@ -63,6 +63,8 @@ const Caller = () => {
       ...valueFilter,
       ...data,
     }
+
+    console.log('after value filter', data);
 
     setValueFilter(newDto)
     setIsOpenFilter(false)
@@ -129,4 +131,4 @@ const Caller = () => {
   )
 }
 
-export default Caller
+export default Scheduling
