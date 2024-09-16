@@ -1,10 +1,9 @@
-import { forwardRef, useEffect, useState } from "react"
-import Icon from 'src/@core/components/icon'
-import { Box, Button, Card, Dialog, DialogActions, DialogContent, Fade, Grid, IconButton, Tab, Typography, styled } from "@mui/material"
-import { TabContext, TabList, TabPanel } from "@mui/lab"
-import CustomTextField from "src/@core/components/mui/text-field"
-import LiveView from "./LiveView"
-import { Controller, useForm } from "react-hook-form"
+import { forwardRef, useEffect, useState } from "react";
+import Icon from 'src/@core/components/icon';
+import { Box, Button, Card, Dialog, DialogActions, DialogContent, Fade, Grid, IconButton, Typography, styled } from "@mui/material";
+import CustomTextField from "src/@core/components/mui/text-field";
+import LiveView from "./LiveView";
+import { Controller, useForm } from "react-hook-form";
 
 const CustomCloseButton = styled(IconButton)(({ theme }) => ({
     top: 0,
@@ -19,17 +18,17 @@ const CustomCloseButton = styled(IconButton)(({ theme }) => ({
     '&:hover': {
         transform: 'translate(7px, -5px)'
     }
-}))
+}));
 
 const Transition = forwardRef(function Transition(props, ref) {
-    return <Fade ref={ref} {...props} />
-})
+    return <Fade ref={ref} {...props} />;
+});
 
 const defaultValues = {
     rotation: '',
     cameraAngle: '',
     range: ''
-}
+};
 
 const format_form = [
     {
@@ -56,12 +55,12 @@ const format_form = [
         require: true,
         width: 12
     },
-]
+];
 
 const CameraView = ({ show, onClose, data, callback }) => {
-    const [loading, setLoading] = useState(false)
-    const [form, setForm] = useState(format_form)
-    const [camera, setCamera] = useState({ id: '', name: '', channel: '' })
+    const [loading, setLoading] = useState(false);
+    const [form, setForm] = useState(format_form);
+    const [camera, setCamera] = useState({ id: '', name: '', channel: '' });
 
     const {
         handleSubmit,
@@ -72,16 +71,20 @@ const CameraView = ({ show, onClose, data, callback }) => {
         formState: { errors }
     } = useForm({
         defaultValues
-    })
+    });
 
     useEffect(() => {
-        setCamera({ id: data?.id, name: data?.text, channel: 'Sub' })
-    }, [data])
+        setCamera({ id: data?.id, name: data?.text, channel: 'Sub' });
+    }, [data]);
+
+    const handleContextMenu = (event) => {
+        event.preventDefault(); // Prevent context menu
+    };
 
     const onSubmit = values => {
-        callback(values)
-        onClose()
-    }
+        callback(values);
+        onClose();
+    };
 
     return (
         <Card>
@@ -91,6 +94,7 @@ const CameraView = ({ show, onClose, data, callback }) => {
                 maxWidth='sm'
                 scroll='body'
                 TransitionComponent={Transition}
+                onContextMenu={handleContextMenu} // Prevent context menu on Dialog
                 sx={{ '& .MuiDialog-paper': { overflow: 'visible' } }}
             >
                 <DialogContent
@@ -136,7 +140,7 @@ const CameraView = ({ show, onClose, data, callback }) => {
                                                     )}
                                                 />
                                             </Grid>
-                                        )
+                                        );
                                     }
                                 })}
                             </Grid>
@@ -156,7 +160,7 @@ const CameraView = ({ show, onClose, data, callback }) => {
                 </DialogActions>
             </Dialog>
         </Card>
-    )
-}
+    );
+};
 
-export default CameraView
+export default CameraView;
