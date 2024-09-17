@@ -171,7 +171,6 @@ const Filter = ({ show, onClose, valueFilter, callback }) => {
 
 
     useEffect(() => {
-        console.log('value filter', valueFilter);
         handleSetValueFilter()
     }, [valueFilter])
 
@@ -179,12 +178,6 @@ const Filter = ({ show, onClose, valueFilter, callback }) => {
     useEffect(() => {
         fetchSubscribers()
     }, [])
-
-    useEffect(() => {
-        console.log('createdUserIds', createdUserIds);
-        console.log('status', status);
-
-    }, [createdUserIds, status])
 
     const fetchSubscribers = async () => {
         setLoading(true)
@@ -289,7 +282,7 @@ const Filter = ({ show, onClose, valueFilter, callback }) => {
                                     // Tạo danh sách các tùy chọn đã chọn bằng cách so sánh các ID trong createdUserIds với subscribers
                                     const selectedOptions = item.name === 'createdUserIds'
                                         ? subscribers.filter(subscriber => createdUserIds.includes(subscriber.userId || subscriber.id))
-                                        : item.data.filter(s => status.includes(s.id))
+                                        : item.data.filter(s => status?.includes(s.id))
 
                                     return (
                                         <Grid item xs={item.width} key={item.name} sx={{ display: 'flex', alignItems: 'center' }}>
@@ -318,7 +311,7 @@ const Filter = ({ show, onClose, valueFilter, callback }) => {
                                                                 setCreatedUserIds(newArr);  // Cập nhật state createdUserIds
                                                             }
                                                             if (item.name === 'status') {
-                                                                setStatus(newArr.length > 0 ? newArr : null);
+                                                                setStatus(newArr.length > 0 ? newArr : []);
                                                             }
                                                         }}
                                                         renderOption={(props, option, { selected }) => (

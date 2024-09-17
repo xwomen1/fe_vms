@@ -37,17 +37,6 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
   }
 }))
 
-// const initValueFilter = {
-//   createdUserIds: null,
-//   startDate: null,
-//   endDate: null,
-//   startTimeInMinute: null,
-//   endTimeInMinute: null,
-//   statues: null,
-//   repeatType: null,
-//   createdAt: null
-// }
-
 const Scheduling = () => {
   const [value, setValue] = useState('1')
   const [keyword, setKeyword] = useState('')
@@ -63,8 +52,6 @@ const Scheduling = () => {
       ...valueFilter,
       ...data,
     }
-
-    console.log('after value filter', data);
 
     setValueFilter(newDto)
     setIsOpenFilter(false)
