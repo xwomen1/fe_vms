@@ -230,7 +230,8 @@ const Filter = ({ show, onClose, valueFilter, callback }) => {
     }
 
     const handleCancel = () => {
-        callback(defaultValues)
+
+        // callback(defaultValues)
         onClose()
     }
 
