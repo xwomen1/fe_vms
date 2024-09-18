@@ -29,7 +29,6 @@ const ViewCameraPause = ({ id, name, channel, sizeScreen, handSetChanel, startTi
   const [closed, setCLosed] = useState(false)
   const [websocketStatus, setWebsocketStatus] = useState(true)
 
-
   useEffect(() => {
     const heightCalculator = Math.floor((window.innerHeight - 192) / sizeScreen.split('x')[1])
     setHeightDiv(heightCalculator)
@@ -95,11 +94,6 @@ const ViewCameraPause = ({ id, name, channel, sizeScreen, handSetChanel, startTi
   useEffect(() => {
     if (rtcPeerConnection != null && websocketStatus && websocket !== null) {
       if (websocket.readyState === WebSocket.OPEN) {
-        console.log('Sending message at:', new Date().toLocaleTimeString(), 'Message:', {
-          id: id,
-          type: 'request',
-          channel: channel
-        })
         websocket.send(
           JSON.stringify({
             id: id,
@@ -185,8 +179,6 @@ const ViewCameraPause = ({ id, name, channel, sizeScreen, handSetChanel, startTi
       })
       websocket.addEventListener('message', handleMessage)
       websocket.addEventListener('close', () => {
-        console.log('id', id, 'channel', channel);
-
         console.log('WebSocket connection closed')
       })
       websocket.addEventListener('error', error => {
@@ -206,16 +198,12 @@ const ViewCameraPause = ({ id, name, channel, sizeScreen, handSetChanel, startTi
       setRtcPeerConnection(null)
     }
     createWsConnection()
-    console.log('closed 1')
-
-  }, [reload, id, channel])
+  }, [reload, id, channel, startTime, endTime])
 
   useEffect(() => {
     if (closed === true) {
 
       return () => {
-        console.log('closed 2');
-
         if (websocket) {
           websocket.close()
           setWebsocket(null)
@@ -233,26 +221,53 @@ const ViewCameraPause = ({ id, name, channel, sizeScreen, handSetChanel, startTi
     setCLosed(true)
   }, [isFullScreen])
 
-  // // handle on change play, volume, startTime, endTime
-  // const handlePlayPause = () => {
-  //   if (remoteVideoRef.current) {
-  //     if (play) {
-  //       remoteVideoRef.current.play().catch(error => console.error('Error playing video:', error))
-  //     } else {
-  //       remoteVideoRef.current.pause()
+  // handle on change play, volume, startTime, endTime
+  const handlePlayPause = () => {
+    if (remoteVideoRef.current) {
+      if (play) {
+        const playPromise = remoteVideoRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(error => {
+            console.error('Lỗi khi phát video:', error);
+          });
+        }
+      } else {
+        remoteVideoRef.current.pause();
+      }
+    }
+  };
+
+  const handleSeekToTime = time => {
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.currentTime = time; // Tua tới thời gian đã nhập
+      // onChangeCurrentTime(time);
+    }
+  };
+
+  // // Hàm ghi log thời gian hiện tại
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     if (remoteVideoRef.current) {
+  //       console.log("Current Time:", new Date(remoteVideoRef.current.currentTime));
   //     }
-  //   }
-  // }
+  //   }, 1000); // Ghi log mỗi giây
+
+  //   return () => clearInterval(interval); // Dọn dẹp khi component unmount
+  // }, []);
+
+  useEffect(() => {
+    handlePlayPause(play)
+  }, [play])
 
   // useEffect(() => {
-  //   handlePlayPause(play)
-  // }, [play])
+  //   handleSeekToTime(startTime)
+  // }, [startTime])
 
-  // useEffect(() => {
-  //   if (remoteVideoRef.current) {
-  //     remoteVideoRef.current.volume = volume / 100
-  //   }
-  // }, [volume])
+  useEffect(() => {
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.volume = volume / 100
+    }
+  }, [volume])
 
   return (
     <div className='portlet portlet-video live' style={{ width: '100%' }}>

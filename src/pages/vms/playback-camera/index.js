@@ -137,7 +137,7 @@ const Caller = () => {
 
   useEffect(() => {
     fetchCameraGroup()
-  }, [reload, page])
+  }, [page])
 
   const onClickPlay = v => {
     // if (v) {
@@ -156,7 +156,7 @@ const Caller = () => {
   const handleSeekChange = (event, newValue) => {
     setCurrentTime(0)
     setTimePlay(timeFilter.start_time + newValue)
-    setCameraGroup([])
+    // setCameraGroup([])
     // setReload(reload + 1)
   }
 
@@ -270,7 +270,6 @@ const Caller = () => {
 
   const handleUpdateCameraGroup = index => {
     const updateCameraGroup = [...cameraGroup]
-    setCameraGroup([])
     updateCameraGroup.splice(index, 1)
     console.log("updateCameraGroup", updateCameraGroup);
     setCameraGroup(updateCameraGroup)
@@ -557,8 +556,7 @@ const Caller = () => {
                           })
                           setCurrentTime(0)
                           setTimePlay(new Date(date).getTime() - valueRange)
-                          setCameraGroup([])
-                          // setReload(reload + 1)
+                          setReload(reload + 1)
                         }}
                         popperPlacement='bottom-start'
                         customInput={
