@@ -68,6 +68,7 @@ const Add = ({
   }, [popupMessage, isError])
 
   const handleCreateCammera = async camera => {
+    console.log(camera)
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
       setLoading(true)
@@ -91,6 +92,10 @@ const Add = ({
           macAddress: camera.macAddress,
           passWord: passWord,
           userName: userName,
+          type: {
+            id: '',
+            name: camera.type
+          },
           httpPort: camera.host
         },
         config
@@ -187,6 +192,7 @@ const Add = ({
                         .filter(camera => camera.type !== 'NVR')
                         .map((camera, index) => {
                           const foundcamera = selectedIds.find(item => item.macAddress === camera.macAddress)
+                          console.log(camera)
 
                           return (
                             <TableRow key={index}>
@@ -218,7 +224,12 @@ const Add = ({
                                     <Icon icon='tabler:minus' />
                                   </IconButton>
                                 ) : (
-                                  <IconButton onClick={() => handleCreateCammera(camera)}>
+                                  <IconButton
+                                    onClick={() => {
+                                      handleCreateCammera(camera)
+                                      console.log(camera)
+                                    }}
+                                  >
                                     <Icon icon='tabler:plus' />
                                   </IconButton>
                                 )}

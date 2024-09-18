@@ -769,7 +769,7 @@ const Device = ({ onClose, camera }) => {
                 onClick={handleMapClick}
               >
                 {lat && lng && (
-                  <Marker latitude={lat} longitude={lng} offsetLeft={-20} offsetTop={-20}>
+                  <Marker latitude={parseFloat(lat)} longitude={parseFloat(lng)} offsetLeft={-20} offsetTop={-20}>
                     <CustomMapPin />
                   </Marker>
                 )}
