@@ -171,8 +171,9 @@ const Filter = ({ show, onClose, valueFilter, callback }) => {
 
 
     useEffect(() => {
-        reset(valueFilter)
-    }, [valueFilter, reset])
+        handleSetValueFilter()
+    }, [valueFilter])
+
 
     useEffect(() => {
         fetchSubscribers()
@@ -195,6 +196,43 @@ const Filter = ({ show, onClose, valueFilter, callback }) => {
         } finally {
             setLoading(false)
         }
+    }
+
+    const handleSetValueFilter = () => {
+        if (valueFilter !== null) {
+            if (valueFilter?.createdUserIds !== null) {
+                const str = valueFilter?.createdUserIds
+                const parsedArr = str?.split(',')
+                setCreatedUserIds(parsedArr)
+            }
+            if (valueFilter?.status !== null) {
+                const str = valueFilter?.status
+                const parsedArr = str?.split(',')
+                setStatus(parsedArr)
+            }
+            setRepeatType(valueFilter?.repeatType)
+            setCreatedAt(valueFilter?.createdAt)
+            setAppointmentDate(valueFilter?.startDate)
+            setTime(valueFilter?.startTimeInMinute, setStartTime)
+            setTime(valueFilter?.endTimeInMinute, setEndTime)
+        }
+    }
+
+    const setTime = (time, setTimeFunc) => {
+        if (time) {
+            const hour = Math.floor(time / 60)
+            const minute = time % 60
+            const date = new Date()
+            date.setHours(hour)
+            date.setMinutes(minute)
+            setTimeFunc(date)
+        }
+    }
+
+    const handleCancel = () => {
+
+        // callback(defaultValues)
+        onClose()
     }
 
     const onSubmit = () => {
@@ -242,6 +280,11 @@ const Filter = ({ show, onClose, valueFilter, callback }) => {
                         <Grid container spacing={2}>
                             {form.map((item, index) => {
                                 if (item.type === 'MultiAutocomplete') {
+                                    // Tạo danh sách các tùy chọn đã chọn bằng cách so sánh các ID trong createdUserIds với subscribers
+                                    const selectedOptions = item.name === 'createdUserIds'
+                                        ? subscribers.filter(subscriber => createdUserIds.includes(subscriber.userId || subscriber.id))
+                                        : item.data.filter(s => status?.includes(s.id))
+
                                     return (
                                         <Grid item xs={item.width} key={item.name} sx={{ display: 'flex', alignItems: 'center' }}>
                                             <Controller
@@ -253,6 +296,7 @@ const Filter = ({ show, onClose, valueFilter, callback }) => {
                                                         sx={{ width: 300 }}
                                                         multiple
                                                         options={item.name === 'createdUserIds' ? subscribers : item.data}
+                                                        value={selectedOptions}  // Hiển thị các tùy chọn đã chọn
                                                         id='autocomplete-checkboxes'
                                                         getOptionLabel={option => item.name === 'createdUserIds' ? option.fullName : option.name || ''}
                                                         renderInput={params => <CustomTextField
@@ -262,26 +306,24 @@ const Filter = ({ show, onClose, valueFilter, callback }) => {
                                                             placeholder={item.placeholder}
                                                         />}
                                                         onChange={(event, selectedItems) => {
-                                                            const newArr = []
-                                                            for (let i = 0; i < selectedItems.length; i++) {
-                                                                newArr.push(selectedItems[i]?.userId ? selectedItems[i]?.userId : selectedItems[i].id)
-                                                            }
+                                                            // Lấy các ID đã chọn từ selectedItems
+                                                            const newArr = selectedItems.map(item => item.userId || item.id);
                                                             if (item.name === 'createdUserIds') {
-                                                                setCreatedUserIds(newArr)
+                                                                setCreatedUserIds(newArr);  // Cập nhật state createdUserIds
                                                             }
                                                             if (item.name === 'status') {
-                                                                setStatus(newArr)
+                                                                setStatus(newArr.length > 0 ? newArr : []);
                                                             }
                                                         }}
                                                         renderOption={(props, option, { selected }) => (
-                                                            <li {...props}>
+                                                            <li {...props} key={option?.id}>
                                                                 <Checkbox checked={selected} sx={{ mr: 2 }} />
                                                                 <ul style={{ listStyleType: 'none' }}>
                                                                     <li>
                                                                         {item.name === 'createdUserIds' ? option.fullName : option.name}
                                                                     </li>
                                                                     <li>
-                                                                        <Typography variant="caption" >
+                                                                        <Typography variant="caption">
                                                                             {item.name === 'createdUserIds' ? option.email : ''}
                                                                         </Typography>
                                                                     </li>
@@ -294,6 +336,7 @@ const Filter = ({ show, onClose, valueFilter, callback }) => {
                                         </Grid>
                                     )
                                 }
+
                                 if (item.type === 'Autocomplete') {
                                     return (
                                         <Grid item xs={item.width} key={item.name} sx={{ display: 'flex', alignItems: 'center' }}>
@@ -304,7 +347,7 @@ const Filter = ({ show, onClose, valueFilter, callback }) => {
                                                 render={({ field: { value, onChange } }) => (
                                                     <CustomAutocomplete
                                                         sx={{ width: 300 }}
-                                                        value={value || null}
+                                                        value={repeatType}
                                                         onChange={(event, selectedItem) => {
                                                             onChange(selectedItem)
                                                             if (item.name === 'repeatType') {
@@ -314,7 +357,7 @@ const Filter = ({ show, onClose, valueFilter, callback }) => {
                                                         isOptionEqualToValue={(option, value) => option.id === value.id}
                                                         options={item.data}
                                                         id='autocomplete-custom'
-                                                        getOptionLabel={option => option.name || ''}
+                                                        getOptionLabel={option => option.name || option || ''}
                                                         renderInput={params => <CustomTextField {...params} label={item.label} />}
                                                     />
                                                 )}
@@ -338,6 +381,7 @@ const Filter = ({ show, onClose, valueFilter, callback }) => {
                                                                         item.name === 'AppointmentDate' ? appointmentDate : null
                                                                 }
                                                                 id='basic-input'
+                                                                dateFormat='dd/MM/yyyy'
                                                                 onChange={date => {
                                                                     if (item.name === 'createdAt') {
                                                                         setCreatedAt(date)
@@ -425,7 +469,7 @@ const Filter = ({ show, onClose, valueFilter, callback }) => {
 
                     }}
                 >
-                    <Button variant='contained' color='secondary' onClick={onClose}>
+                    <Button variant='contained' color='secondary' onClick={() => handleCancel()}>
                         Cancel
                     </Button>
                     <Button type='submit' variant='contained' onClick={() => onSubmit()}>

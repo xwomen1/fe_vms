@@ -453,7 +453,7 @@ const Add = ({ apiData }) => {
       ) {
         setPopupMessage('Device not responding')
       } else {
-        setPopupMessage(`${error.response.data.message}`)
+        setPopupMessage(`${error.message}`)
       }
 
       setIsError(true) // Đánh dấu là lỗi
@@ -763,7 +763,7 @@ const Add = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                      // loading={loading}
+                        // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.1}></Grid>
@@ -849,7 +849,7 @@ const Add = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                      // loading={loading}
+                        // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.4}></Grid>
@@ -967,7 +967,7 @@ const Add = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                      // loading={loading}
+                        // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.1}></Grid>
