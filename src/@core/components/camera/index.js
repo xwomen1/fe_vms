@@ -207,8 +207,6 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel, isFul
       rtcPeerConnection.close()
       setRtcPeerConnection(null)
     }
-    console.log('closed 1')
-
     setWebsocketStatus(false)
     createWsConnection()
   }, [reload, id, channel])
@@ -216,8 +214,6 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel, isFul
   useEffect(() => {
     if (closed === true) {
       return () => {
-        console.log('closed 2');
-
         if (websocket) {
           websocket.close()
           setWebsocket(null)

@@ -99,6 +99,8 @@ const Caller = () => {
   const [valueFilter, setValueFilter] = useState(valueFilterInit)
 
   const [cameraGroup, setCameraGroup] = useState([])
+  const [cameraDisplays, setCameraDisplays] = useState([])
+
   const [camerasSelected, setCamerasSelected] = useState([])
   const [cameraList, setCameraList] = useState([])
   const [selectIndex, setSelectIndex] = useState(0)
@@ -111,6 +113,7 @@ const Caller = () => {
   const [speed, setSpeed] = useState(1)
   const debouncedSearch = useDebounce(valueRange, 700)
   const [isOpenFullScreen, setIsOpenFullScreen] = useState(false)
+  const [pageSetting, setPageSetting] = useState(0)
 
   const fetchCameraGroup = async () => {
     try {
@@ -124,16 +127,12 @@ const Caller = () => {
           listCamera.push({ ...camera, channel: 'Sub' })
         })
       }
-      // console.log(listCamera)
       setCameraGroup(listCamera)
     } catch (error) {
       console.error('Error fetching data: ', error)
     }
   }
 
-  // useEffect(() => {
-  //   fetchCameraGroup()
-  // }, [reload, page, selectIndex, sizeScreen])
 
   useEffect(() => {
     fetchCameraGroup()
@@ -156,8 +155,6 @@ const Caller = () => {
   const handleSeekChange = (event, newValue) => {
     setCurrentTime(0)
     setTimePlay(timeFilter.start_time + newValue)
-    // setCameraGroup([])
-    // setReload(reload + 1)
   }
 
 
@@ -271,31 +268,31 @@ const Caller = () => {
   const handleUpdateCameraGroup = index => {
     const updateCameraGroup = [...cameraGroup]
     updateCameraGroup.splice(index, 1)
-    console.log("updateCameraGroup", updateCameraGroup);
     setCameraGroup(updateCameraGroup)
   }
 
-  // useEffect(() => {
-  //   console.log('start Time', new Date(timeFilter.start_time));
-  //   console.log('end Time', new Date(timeFilter.end_time));
-  // }, [timeFilter])
-
-  // useEffect(() => {
-  //   console.log('timePlay', new Date(timePlay));
-  // }, [timePlay])
-
   useEffect(() => {
-    console.log('cameraGroup', cameraGroup);
+    const totalCameras = cameraGroup.length;
+    const startIndex = (pageSetting - 1) * numberShow;
+    const endIndex = Math.min(startIndex + numberShow, totalCameras);
 
-  }, [cameraGroup])
+    if (startIndex < 0) {
+      setCameraDisplays([])
+
+      return
+    }
+
+    const cameras = cameraGroup.slice(startIndex, endIndex);
+    setCameraDisplays(cameras);
+  }, [pageSetting, cameraGroup, sizeScreen]);
 
   return (
     <DivStyle
       style={{ backgroundColor: 'black', width: '100%', minHeight: '90vh', color: 'white', position: 'relative' }}
     >
       <Grid container spacing={0} sx={{ paddingBottom: '100px' }}>
-        {cameraGroup.length > 0 &&
-          cameraGroup.map((camera, index) => {
+        {cameraDisplays.length > 0 &&
+          cameraDisplays.map((camera, index) => {
 
             return (
               <Grid item xs={Math.floor(12 / sizeScreen.split('x')[0])} key={camera?.id + index}
@@ -580,8 +577,9 @@ const Caller = () => {
       </Grid>
       <Settings
         page={page}
-        onSetPage={setPage}
+        onSetPage={setPageSetting}
         selectIndex={selectIndex}
+
         // onSetSelectIndex={setSelectIndex}
         cameraList={cameraList}
         sizeScreen={sizeScreen}
