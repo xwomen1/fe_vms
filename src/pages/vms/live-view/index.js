@@ -86,7 +86,7 @@ const Caller = () => {
 
   useEffect(() => {
     fetchCameraGroup()
-  }, [reload, page, sizeScreen])
+  }, [reload, page])
 
   const handSetChanel = (id, channel) => {
     let newCamera = cameraGroup.map(item => {
@@ -129,9 +129,15 @@ const Caller = () => {
   const handleUpdateCameraGroup = index => {
     const updateCameraGroup = [...cameraGroup]
     updateCameraGroup.splice(index, 1)
+    console.log("updateCameraGroup", updateCameraGroup);
+
     setCameraGroup(updateCameraGroup)
   }
 
+  useEffect(() => {
+    console.log('cameraGroup', cameraGroup);
+
+  }, [cameraGroup])
 
   return (
     <div>
@@ -151,9 +157,9 @@ const Caller = () => {
                 >
                   <ViewCamera
                     name={camera?.deviceName}
-                    id={camera.id}
-                    channel={camera.channel}
-                    status={camera.status}
+                    id={camera?.id}
+                    channel={camera?.channel}
+                    status={camera?.status}
                     sizeScreen={sizeScreen}
                     handSetChanel={handSetChanel}
                     isFullScreen={isOpenFullScreen}
