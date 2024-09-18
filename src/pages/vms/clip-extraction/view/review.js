@@ -13,7 +13,7 @@ import { formatTimeShow } from 'src/@core/utils/format'
 import { Card } from "@mui/material"
 import toast from 'react-hot-toast'
 import { postApi } from 'src/@core/utils/requestUltils'
-import PlaybackView from 'src/@core/components/camera/playback'
+import PlaybackView from 'src/@core/components/camera/playbackpause'
 import _ from 'lodash'
 import ViewCamera from 'src/@core/components/camera'
 
@@ -25,6 +25,7 @@ const Review = ({ id, name, channel }) => {
     const [year, setYear] = useState((new Date()).getFullYear())
     const [eventDates, setEventDates] = useState([])
     const [speed, setSpeed] = useState(1)
+    const [isOpenFullScreen, setIsOpenFullScreen] = useState(false)
 
     const time_start = new Date().getTime() - 60 * 60 * 1000
     const time_end = new Date().getTime()
@@ -181,8 +182,8 @@ const Review = ({ id, name, channel }) => {
                                     name={camera.name}
                                     channel={camera.channel}
                                     sizeScreen={'1x1.2'}
-                                    startTime={timePlay || time_start}
-                                    endTime={timeFilter?.end_time || time_end}
+                                    startTime={timePlay}
+                                    endTime={timeFilter?.end_time}
                                     play={play}
                                     duration={duration}
                                     onChangeDuration={setDuration}
@@ -191,6 +192,7 @@ const Review = ({ id, name, channel }) => {
                                     }}
                                     volume={volume}
                                     handSetChanel={handSetChanel}
+                                    isFullScreen={isOpenFullScreen}
                                 />
                             )}
                         </Grid>

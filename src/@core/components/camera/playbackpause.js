@@ -1,12 +1,7 @@
-import React, { useEffect, useState, useRef } from 'react'
-import _ from 'lodash'
-import Button from '@mui/material/Button'
-import Link from 'next/link'
-import IconButton from '@mui/material/IconButton'
+import { Box, Button, CircularProgress, IconButton } from "@mui/material"
+import { useEffect, useRef, useState } from "react"
+import { convertDateToString } from "src/@core/utils/format"
 import Icon from 'src/@core/components/icon'
-import { convertDateToString } from 'src/@core/utils/format'
-import { PlayArrow } from '@material-ui/icons'
-import { Box, CircularProgress } from '@mui/material'
 
 const config = {
   bundlePolicy: 'max-bundle',
@@ -22,37 +17,23 @@ const config = {
   ]
 }
 
-export const ViewCameraPause = ({
-  id,
-  name,
-  channel,
-  sizeScreen,
-  handSetChanel,
-  startTime,
-  endTime,
-  play,
-  onChangeCurrentTime,
-  duration,
-  onChangeDuration,
-  volume
-}) => {
+const ViewCameraPause = ({ id, name, channel, sizeScreen, handSetChanel, startTime, endTime, play, onChangeCurrentTime, duration, onChangeDuration, volume, isFullScreen }) => {
+  const [loading, setLoading] = useState(false)
   const [websocket, setWebsocket] = useState(null)
-  const [text, setText] = useState(null)
   const [rtcPeerConnection, setRtcPeerConnection] = useState(null)
   const [remoteStream, setRemoteStream] = useState(null)
-  const [loading, setLoading] = useState(false)
   const remoteVideoRef = useRef(null)
-  const [heightDiv, setHeightDiv] = useState(100)
   const [status, setStatus] = useState('')
+  const [heightDiv, setHeightDiv] = useState(100)
   const [reload, setReload] = useState(0)
-  const [selectedChannel, setSelectedChannel] = useState('Sub')
-  const intervalRef = useRef(null);
+  const [closed, setCLosed] = useState(false)
+  const [websocketStatus, setWebsocketStatus] = useState(true)
 
   useEffect(() => {
-    const heightCaculator = Math.floor((window.innerHeight - 192) / sizeScreen.split('x')[1])
-    setHeightDiv(heightCaculator)
+    const heightCalculator = Math.floor((window.innerHeight - 192) / sizeScreen.split('x')[1])
+    setHeightDiv(heightCalculator)
     window.addEventListener('resize', () => {
-      setHeightDiv(heightCaculator)
+      setHeightDiv(heightCalculator)
     })
   }, [sizeScreen])
 
@@ -64,41 +45,19 @@ export const ViewCameraPause = ({
     return [...Array(length)].map(pickRandom).join('')
   }
 
-  const handlePlayPause = () => {
-    if (remoteVideoRef.current) {
-      if (play) {
-        remoteVideoRef.current.play().catch(error => console.error('Error playing video:', error))
-      } else {
-        remoteVideoRef.current.pause()
-      }
-    }
+  const SOCKET_PLAYBACK = process.env.NEXT_PUBLIC_SOCKET_CCTT
+
+  function delay(milliseconds) {
+    return new Promise(resolve => {
+      setTimeout(resolve, milliseconds)
+    })
   }
 
-  useEffect(() => {
-    handlePlayPause(play)
-  }, [play])
-
-  useEffect(() => {
-    if (remoteVideoRef.current) {
-      remoteVideoRef.current.volume = volume / 100
-    }
-  }, [volume])
-
-  const SOCKET_LIVE_VIEW = process.env.NEXT_PUBLIC_SOCKET_CCTT
-
-  const createWsConnection = () => {
-    const ws = new WebSocket(`${SOCKET_LIVE_VIEW}/ivis/vms/api/v0/ws/signaling/${randomId(10)}`)
-
-    setWebsocket(ws)
+  const createWsConnection = async () => {
     const pc = new RTCPeerConnection(config)
-    setRtcPeerConnection(pc)
     pc.ontrack = event => {
-      setLoading(false)
       const stream = event.streams[0]
       try {
-        // if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {0
-        // }
-
         setRemoteStream(stream)
         remoteVideoRef.current.srcObject = stream
         remoteVideoRef.current.ontimeupdate = () => {
@@ -106,59 +65,52 @@ export const ViewCameraPause = ({
             onChangeCurrentTime(remoteVideoRef?.current?.currentTime)
           }
         }
-      } catch (err) {
-        console.log(err)
+      } catch (error) {
+        console.log('error', error)
       }
     }
+
+    pc.oniceconnectionstatechange = event => {
+    }
+
+    pc.onconnectionstatechange = event => {
+      setStatus(pc.connectionState)
+    }
+    setRtcPeerConnection(pc)
+
+    const ws = new WebSocket(`${SOCKET_PLAYBACK}/ivis/vms/api/v0/ws/signaling/${randomId(10)}`)
+
+    setWebsocket(ws)
+    await delay(500)
+    setLoading(false)
+
   }
 
   useEffect(() => {
-    if (rtcPeerConnection) {
-      // listen for remote tracks and add them to remote stream
-
-      rtcPeerConnection.addEventListener('connectionstatechange', () => {
-        // console.log('RTCPeerConnection state:', rtcPeerConnection.connectionState)
-        setStatus(rtcPeerConnection.connectionState)
-      })
-    }
-  }, [rtcPeerConnection])
-
-  // useEffect(() => {
-  //   if (websocket) {
-  //     websocket.close()
-  //     createWsConnection()
-  //   }
-  // }, [startTime])
-
-  useEffect(() => {
-    createWsConnection()
-
-    return () => {
-      if (websocket) {
-        websocket.close()
-        setWebsocket(null)
-      }
-      if (rtcPeerConnection) {
-        rtcPeerConnection.close()
-        setRtcPeerConnection(null)
-      }
-    }
+    setWebsocketStatus(false)
   }, [id, channel])
 
-  useEffect(() => {
-    createWsConnection()
 
-    return () => {
-      if (websocket) {
-        websocket.close()
-        setWebsocket(null)
-      }
-      if (rtcPeerConnection) {
-        rtcPeerConnection.close()
-        setRtcPeerConnection(null)
+  useEffect(() => {
+    if (rtcPeerConnection != null && websocketStatus && websocket !== null) {
+      if (websocket.readyState === WebSocket.OPEN) {
+        websocket.send(
+          JSON.stringify({
+            id: id,
+            type: 'request',
+            channel: channel
+          })
+        )
+      } else {
+        console.error(
+          'WebSocket is not open. Ready state:',
+          websocket.readyState,
+          'at:',
+          new Date().toLocaleTimeString()
+        )
       }
     }
-  }, [reload])
+  }, [rtcPeerConnection, websocketStatus, websocket])
 
   // send message to WebSocket server
   const sendMessage = message => {
@@ -205,17 +157,15 @@ export const ViewCameraPause = ({
       default:
         break
     }
-    setText(message?.content)
     setLoading(false)
 
-    // console.log('message', message)
   }
 
-  // set up WebSocket event listeners
   useEffect(() => {
     if (websocket) {
       setLoading(true)
       websocket.addEventListener('open', () => {
+        setWebsocketStatus(true)
         websocket.send(
           JSON.stringify({
             id: id,
@@ -236,6 +186,88 @@ export const ViewCameraPause = ({
       })
     }
   }, [websocket])
+
+  useEffect(() => {
+
+    if (websocket) {
+      websocket.close()
+      setWebsocket(null)
+    }
+    if (rtcPeerConnection) {
+      rtcPeerConnection.close()
+      setRtcPeerConnection(null)
+    }
+    createWsConnection()
+  }, [reload, id, channel, startTime, endTime])
+
+  useEffect(() => {
+    if (closed === true) {
+
+      return () => {
+        if (websocket) {
+          websocket.close()
+          setWebsocket(null)
+        }
+        if (rtcPeerConnection) {
+          rtcPeerConnection.close()
+          setRtcPeerConnection(null)
+        }
+      }
+    }
+
+  }, [closed])
+
+  useEffect(() => {
+    setCLosed(true)
+  }, [isFullScreen])
+
+  // handle on change play, volume, startTime, endTime
+  const handlePlayPause = () => {
+    if (remoteVideoRef.current) {
+      if (play) {
+        const playPromise = remoteVideoRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(error => {
+            console.error('Lỗi khi phát video:', error);
+          });
+        }
+      } else {
+        remoteVideoRef.current.pause();
+      }
+    }
+  };
+
+  const handleSeekToTime = time => {
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.currentTime = time; // Tua tới thời gian đã nhập
+      // onChangeCurrentTime(time);
+    }
+  };
+
+  // // Hàm ghi log thời gian hiện tại
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     if (remoteVideoRef.current) {
+  //       console.log("Current Time:", new Date(remoteVideoRef.current.currentTime));
+  //     }
+  //   }, 1000); // Ghi log mỗi giây
+
+  //   return () => clearInterval(interval); // Dọn dẹp khi component unmount
+  // }, []);
+
+  useEffect(() => {
+    handlePlayPause(play)
+  }, [play])
+
+  // useEffect(() => {
+  //   handleSeekToTime(startTime)
+  // }, [startTime])
+
+  useEffect(() => {
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.volume = volume / 100
+    }
+  }, [volume])
 
   return (
     <div className='portlet portlet-video live' style={{ width: '100%' }}>
@@ -259,42 +291,16 @@ export const ViewCameraPause = ({
               <span className='caption-subject font-dark sbold uppercase'>{name}</span>
             </div>
             <div className='media-top-controls'>
-              <div>
+              <div className='btn-group'>
                 <Button
-                  sx={{
-                    backgroundColor: selectedChannel === 'Sub' ? '#fff' : 'default',
-                    height: '20px',
-                    color: selectedChannel === 'Sub' ? '#FF2C00' : '#ffffff',
-                    '&:hover': {
-                      backgroundColor: '#fff',
-                      color: '#FF2C00'
-                    }
-                  }}
-                  onClick={() => {
-                    handSetChanel(id, 'Sub')
-                    setSelectedChannel('Sub')
-
-                    // createWsConnection()
-                  }}
+                  className={`sd_btn btn btn-default btn-xs ${channel === 'Sub' ? 'active' : ''}`}
+                  onClick={() => handSetChanel(id, 'Sub')}
                 >
                   SD
                 </Button>
                 <Button
-                  sx={{
-                    backgroundColor: selectedChannel === 'Main' ? '#fff' : 'default',
-                    height: '15px',
-                    color: selectedChannel === 'Main' ? '#FF2C00' : '#ffffff',
-                    '&:hover': {
-                      backgroundColor: '#fff',
-                      color: '#FF2C00'
-                    }
-                  }}
-                  onClick={() => {
-                    handSetChanel(id, 'Main')
-                    setSelectedChannel('Main')
-
-                    // createWsConnection()
-                  }}
+                  className={`hd_btn btn btn-default btn-xs ${channel === 'Main' ? 'active' : ''}`}
+                  onClick={() => handSetChanel(id, 'Main')}
                 >
                   HD
                 </Button>
@@ -303,7 +309,7 @@ export const ViewCameraPause = ({
           </div>
           <div>
             <video
-              style={{ width: '100%', height: heightDiv - 26 }}
+              style={{ width: '100%', height: heightDiv - 26, objectFit: 'fill' }}
               ref={remoteVideoRef}
               playsInline
               autoPlay
