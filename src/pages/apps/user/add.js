@@ -425,7 +425,8 @@ const Add = () => {
           userAccount: {
             accStatus: 'ACTIVE',
             username: account,
-            password: password
+            password: password,
+            identityProviderType: 'LOCAL'
           }
         },
         config

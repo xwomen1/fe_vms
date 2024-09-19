@@ -9,6 +9,8 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 import authConfig from 'src/configs/auth'
 import Checkbox from '@mui/material/Checkbox'
 import Update from '../popups/Update'
+import AddNew from '../detail/add'
+
 import {
   Box,
   Button,
@@ -44,6 +46,7 @@ const GroupAccess = () => {
   const [total, setTotal] = useState([1])
   const [page, setPage] = useState(1)
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
+  const [isOpenAdd, setIsOpenAdd] = useState(false)
 
   const handleOpenMenu = event => {
     setAnchorEl(event.currentTarget)
@@ -55,6 +58,10 @@ const GroupAccess = () => {
 
   const handleCloseMenu = () => {
     setAnchorEl(null)
+  }
+
+  const handleClosePopup = () => {
+    setIsOpenAdd(false)
   }
 
   const handleSelectPageSize = size => {
@@ -158,7 +165,12 @@ const GroupAccess = () => {
               </Grid>
               <Grid item>
                 <Box sx={{ textAlign: 'right' }}>
-                  <Button variant='contained' component={Link} href={`/pages/group-access/detail/add`}>
+                  <Button
+                    variant='contained'
+                    onClick={() => {
+                      setIsOpenAdd(true)
+                    }}
+                  >
                     Add
                     <Icon icon='tabler:plus' />
                   </Button>
@@ -226,7 +238,7 @@ const GroupAccess = () => {
               ) : (
                 <TableRow>
                   <TableCell colSpan={8} align='center'>
-                  Data not available
+                    Data not available
                   </TableCell>
                 </TableRow>
               )}
@@ -261,13 +273,9 @@ const GroupAccess = () => {
         </CardActions>
       </Card>
       {isOpenUpdate && (
-        <Update
-          show={isOpenUpdate}
-          onClose={() => setIsOpenUpdate(false)}
-          id={idUpdate}
-          setReload={() => setReload(reload + 1)}
-        />
+        <Update show={isOpenUpdate} onClose={() => setIsOpenUpdate(false)} id={idUpdate} setReload={fetchDataList} />
       )}
+      {isOpenAdd && <AddNew show={isOpenAdd} onClose={handleClosePopup} setReload={fetchDataList} />}
     </>
   )
 }
