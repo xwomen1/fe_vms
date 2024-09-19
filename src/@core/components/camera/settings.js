@@ -102,13 +102,21 @@ const Customizer = ({ page, onSetPage, onSetSelectIndex, selectIndex, cameraList
   const [selectedButton, setSelectedButton] = useState(0)
   const [cameraGroupList, setCameraGroupList] = useState([])
 
+  // useEffect(() => {
+  //   if (cameraList[selectIndex]?.cameras?.length > 0) {
+  //     setTotalPage(
+  //       Math.ceil(cameraList[selectIndex].cameras.length / (sizeScreen.split('x')[0] * sizeScreen.split('x')[1]))
+  //     )
+  //   }
+  // }, [cameraList, sizeScreen])
+
   useEffect(() => {
-    if (cameraList[selectIndex]?.cameras?.length > 0) {
+    if (cameraGroup?.length > 0) {
       setTotalPage(
-        Math.ceil(cameraList[selectIndex].cameras.length / (sizeScreen.split('x')[0] * sizeScreen.split('x')[1]))
+        Math.ceil(cameraGroup.length / (sizeScreen.split('x')[0] * sizeScreen.split('x')[1]))
       )
     }
-  }, [cameraList, sizeScreen])
+  }, [cameraGroup, sizeScreen])
 
   // ** Vars
   const {

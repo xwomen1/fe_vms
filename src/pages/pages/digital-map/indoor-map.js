@@ -42,6 +42,7 @@ const IndoorMap = ({ cameraGroup }) => {
 
             newMap.current.on('marker:removed', handleMarkerRemoved);
             newMap.current.on('marker:click', handleMarkerClick);
+            newMap.current.on('marker:rightclick', handleMarkerRightClick);
             newMap.current.on('marker:moving', handleMarkerMoving);
             newMap.current.on('marker:moved', handleMarkerMoved);
             newMap.current.on('markergroup:moving', handleMarkerGroupMoving);
@@ -52,6 +53,7 @@ const IndoorMap = ({ cameraGroup }) => {
             newMap.current.on('object:scaling', handleObjectScaling);
             newMap.current.on('object:rotate', handleObjectRotate);
             newMap.current.on('mouse:move', handleMouseMove);
+            newMap.current.on('contextmenu', handleContextMenu);
         }
     };
 
@@ -129,14 +131,21 @@ const IndoorMap = ({ cameraGroup }) => {
     };
 
     const handleMarkerRemoved = (e) => {
-        // console.log('marker:removed', e);
     };
 
+    const handleMarkerRightClick = (e) => {
+        setIsOpenViewCamera(true);
+    }
+
     const handleMarkerClick = (e) => {
+
+        // e.e.preventDefault();
         // addRadar(e, 100);
         setMarkerSelected(e);
-        setIsOpenViewCamera(true);
     };
+
+    const handleContextMenu = (e) => {
+    }
 
     const handleMarkerMoving = (e) => {
         if (radar.current && e.id === radar.current.id) {

@@ -32,6 +32,7 @@ const Storage = ({ id, name, channel }) => {
   const [minuteType, setMinuteType] = useState(null)
   const [startTime, setStartTime] = useState(new Date())
   const [endTime, setEndTime] = useState(new Date())
+  const [isOpenFullScreen, setIsOpenFullScreen] = useState(false)
 
   const [startDate, setStartDate] = useState(() => {
     const today = new Date()
@@ -290,6 +291,7 @@ const Storage = ({ id, name, channel }) => {
                     sizeScreen={'1x1.8'}
                     handSetChanel={handSetChanel}
                     volume={volume}
+                    isFullScreen={isOpenFullScreen}
                   />
                 )}
               </Grid>

@@ -56,10 +56,11 @@ const Caller = () => {
   const [valueFilter, setValueFilter] = useState(valueFilterInit)
   const [cameraGroup, setCameraGroup] = useState([])
   const [camerasSelected, setCamerasSelected] = useState([])
-  const [cameraHiden, setCameraHiden] = useState([])
+  const [cameraDisplays, setCameraDisplays] = useState([])
   const [cameraList, setCameraList] = useState([])
   const [selectIndex, setSelectIndex] = useState(0)
   const [page, setPage] = useState(1)
+  const [pageSetting, setPageSetting] = useState(0)
   const [isOpenFullScreen, setIsOpenFullScreen] = useState(false)
 
   const fetchCameraGroup = async () => {
@@ -86,7 +87,7 @@ const Caller = () => {
 
   useEffect(() => {
     fetchCameraGroup()
-  }, [reload, page, sizeScreen])
+  }, [reload])
 
   const handSetChanel = (id, channel) => {
     let newCamera = cameraGroup.map(item => {
@@ -132,6 +133,20 @@ const Caller = () => {
     setCameraGroup(updateCameraGroup)
   }
 
+  useEffect(() => {
+    const totalCameras = cameraGroup.length;
+    const startIndex = (pageSetting - 1) * numberShow;
+    const endIndex = Math.min(startIndex + numberShow, totalCameras);
+
+    if (startIndex < 0) {
+      setCameraDisplays([])
+
+      return
+    }
+
+    const cameras = cameraGroup.slice(startIndex, endIndex);
+    setCameraDisplays(cameras);
+  }, [pageSetting, cameraGroup, sizeScreen]);
 
   return (
     <div>
@@ -142,18 +157,17 @@ const Caller = () => {
       </div>
       <DivStyle style={{ backgroundColor: 'black', minHeight: '100vh', color: 'white' }}>
         <Grid container spacing={0}>
-          {cameraGroup.length > 0 &&
-            cameraGroup.map((camera, index) => {
-
+          {cameraDisplays.length > 0 &&
+            cameraDisplays.map((camera, index) => {
               return (
                 <Grid item xs={Math.floor(12 / sizeScreen.split('x')[0])} key={camera.id + index}
                   sx={{ position: 'relative', borderWidth: 0.25, borderColor: '#fff', borderStyle: 'solid' }}
                 >
                   <ViewCamera
                     name={camera?.deviceName}
-                    id={camera.id}
-                    channel={camera.channel}
-                    status={camera.status}
+                    id={camera?.id}
+                    channel={camera?.channel}
+                    status={camera?.status}
                     sizeScreen={sizeScreen}
                     handSetChanel={handSetChanel}
                     isFullScreen={isOpenFullScreen}
@@ -179,7 +193,7 @@ const Caller = () => {
         </Grid>
         <Settings
           page={page}
-          onSetPage={setPage}
+          onSetPage={setPageSetting}
           selectIndex={selectIndex}
 
           // onSetSelectIndex={setSelectIndex}

@@ -29,13 +29,10 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel, isFul
   const [loading, setLoading] = useState(false)
   const remoteVideoRef = useRef(null)
   const [websocketStatus, setWebsocketStatus] = useState(true)
-  const [rtcPeerStatus, setRtcPeerStatus] = useState(false)
 
   const [heightDiv, setHeightDiv] = useState(100)
   const [status, setStatus] = useState('')
   const [reload, setReload] = useState(0)
-  const [videoDimensions, setVideoDimensions] = useState({ width: '100%', height: null })
-  const intervalRef = useRef(null);
   const [closed, setCLosed] = useState(false)
 
   useEffect(() => {
@@ -205,18 +202,17 @@ export const ViewCamera = ({ id, name, channel, sizeScreen, handSetChanel, isFul
       websocket.close()
       setWebsocket(null)
     }
+
     if (rtcPeerConnection) {
       rtcPeerConnection.close()
       setRtcPeerConnection(null)
     }
     setWebsocketStatus(false)
     createWsConnection()
-
   }, [reload, id, channel])
 
   useEffect(() => {
     if (closed === true) {
-
       return () => {
         if (websocket) {
           websocket.close()
