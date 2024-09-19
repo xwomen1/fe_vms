@@ -262,19 +262,66 @@ const Register = () => {
 
   const onSubmit = async values => {
     if (guests.length <= 0) {
-      toast.error(`Register at least one guest`)
+      Swal.fire({
+        title: 'Error!',
+        text: 'Register at least one guest',
+        icon: 'error',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
     }
 
     if (approvalPersons.length <= 0) {
-      toast.error(`Minimum 1 person approval`)
+      Swal.fire({
+        title: 'Error!',
+        text: 'Minimum 1 person approval',
+        icon: 'error',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
+    }
+    if (vehicles.length <= 0) {
+      Swal.fire({
+        title: 'Error!',
+        text: 'Please add vehicle',
+        icon: 'error',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
     }
 
-    const vehicleErrors = vehicles.some(vehicle => !vehicle.vehicleName || !vehicle.numberPlate)
-    if (vehicleErrors) {
-      toast.error(`Vui lòng điền đầy đủ thông tin cho tất cả các phương tiện`)
+    // const vehicleErrors = vehicles.some(vehicle => !vehicle.vehicleName || !vehicle.numberPlate)
+    // if (vehicleErrors) {
+    //   Swal.fire({
+    //     title: 'Error!',
+    //     text: 'Vui lòng điền đầy đủ thông tin cho tất cả các phương tiện',
+    //     icon: 'error',
+    //     willOpen: () => {
+    //       const confirmButton = Swal.getConfirmButton()
+    //       if (confirmButton) {
+    //         confirmButton.style.backgroundColor = '#002060'
+    //         confirmButton.style.color = 'white'
+    //       }
+    //     }
+    //   })
 
-      return // Dừng lại nếu có lỗi thông tin phương tiện
-    }
+    //   return // Dừng lại nếu có lỗi thông tin phương tiện
+    // }
 
     const check72Hours = await new Promise(resolved => {
       if (repeatType == 'ONCE') {

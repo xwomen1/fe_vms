@@ -453,7 +453,18 @@ const Add = () => {
       router.push(`/apps/user/detail/${response.data.userId}`)
     } catch (error) {
       console.error('Error updating user details:', error)
-      Swal.fire('error!', error?.response?.data?.message, 'error')
+      Swal.fire({
+        title: 'Error!',
+        text: error?.response?.data?.message,
+        icon: 'error',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
     }
   }
 
