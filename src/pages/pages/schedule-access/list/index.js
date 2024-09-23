@@ -108,7 +108,7 @@ const ScheduleAccess = () => {
 
   return (
     <>
-      <Card sx={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
+      <Card sx={{ display: 'flex', flexDirection: 'column', height: '135vh' }}>
         <CardHeader
           title={
             <>
@@ -169,23 +169,23 @@ const ScheduleAccess = () => {
             </Grid>
           }
         />
-        <CardContent sx={{ flex: 1, overflow: 'auto' }}>
+        <CardContent sx={{ flex: 1, overflow: 'auto', minHeight: '115vh' }}>
           <Table>
             <TableHead style={{ background: '#F6F6F7' }}>
               <TableRow>
-                <TableCell sx={{ padding: '16px' }}>No.</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Name</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Description</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Create By</TableCell>
-                <TableCell sx={{ padding: '16px' }}>Action</TableCell>
+                <TableCell sx={{ fontSize: '0.8rem', padding: '6px', textAlign: 'center' }}>No.</TableCell>
+                <TableCell sx={{ fontSize: '0.8rem', padding: '6px', textAlign: 'center' }}>Name</TableCell>
+                <TableCell sx={{ fontSize: '0.8rem', padding: '6px', textAlign: 'center' }}>Description</TableCell>
+                <TableCell sx={{ fontSize: '0.8rem', padding: '6px', textAlign: 'center' }}>Create By</TableCell>
+                <TableCell sx={{ fontSize: '0.8rem', padding: '6px', textAlign: 'center' }}>Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {Array.isArray(dataList) && dataList.length > 0 ? (
                 dataList.map((user, index) => (
                   <TableRow key={user.id}>
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell>
+                    <TableCell sx={{ fontSize: '0.8rem', padding: '6px', textAlign: 'center' }}>{index + 1}</TableCell>
+                    <TableCell sx={{ fontSize: '0.8rem', padding: '6px', textAlign: 'center' }}>
                       <Button
                         onClick={() => {
                           setIdUpdate(user.id)
@@ -197,9 +197,13 @@ const ScheduleAccess = () => {
                         {user.name}
                       </Button>
                     </TableCell>
-                    <TableCell>{user.description}</TableCell>
-                    <TableCell>{user.createdByUser?.fullName}</TableCell>
-                    <TableCell>
+                    <TableCell sx={{ fontSize: '0.8rem', padding: '6px', textAlign: 'center' }}>
+                      {user.description}
+                    </TableCell>
+                    <TableCell sx={{ fontSize: '0.8rem', padding: '6px', textAlign: 'center' }}>
+                      {user.createdByUser?.fullName}
+                    </TableCell>
+                    <TableCell sx={{ fontSize: '0.8rem', padding: '6px', textAlign: 'center' }}>
                       <Box>
                         <Button
                           aria-label='Sửa'
@@ -224,7 +228,7 @@ const ScheduleAccess = () => {
             </TableBody>
           </Table>
         </CardContent>
-        <CardActions sx={{ backgroundColor: 'white', padding: '8px' }}>
+        <CardActions sx={{ backgroundColor: 'white', padding: '8px', borderTop: '1px solid #ddd' }}>
           <Grid container spacing={2} alignItems='center'>
             <Grid item xs={12} sm={6} md={4} sx={{ textAlign: 'right', marginBottom: '8px' }}>
               <IconButton onClick={handleOpenMenu}>

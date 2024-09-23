@@ -48,7 +48,7 @@ const statusAppointment = [
   {
     id: 'OUT_OF_DATE',
     color: 'warning'
-  },
+  }
 ]
 
 const AppointmentList = ({ keyword, valueFilter }) => {
@@ -96,10 +96,7 @@ const AppointmentList = ({ keyword, valueFilter }) => {
         ...valueFilter
       }
 
-      const response = await getApi(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/registrations`,
-        params
-      )
+      const response = await getApi(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/registrations`, params)
       setDataList(response.data?.rows)
       setTotal(Math.ceil(response.data?.count / pageSize)) // Tính tổng số trang dựa trên tổng số mục và kích thước trang
     } catch (error) {
@@ -119,17 +116,24 @@ const AppointmentList = ({ keyword, valueFilter }) => {
     fetchData()
   }, [keyword, page, pageSize, valueFilter])
 
-
   return (
     <>
       {loading === true && (
         <Box
-          sx={{ width: '100%', height: ' 100%', position: 'absolute', zIndex: 10, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+          sx={{
+            width: '100%',
+            height: ' 100%',
+            position: 'absolute',
+            zIndex: 10,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
         >
           <CircularProgress />
         </Box>
       )}
-      <Card sx={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
+      <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         <CardContent sx={{ flex: 1, overflow: 'auto' }}>
           <Table>
             <TableHead style={{ background: '#F6F6F7' }}>
@@ -168,7 +172,8 @@ const AppointmentList = ({ keyword, valueFilter }) => {
                       </TableCell>
                       <TableCell>{Guests.startDate}</TableCell>
                       <TableCell>
-                        {convertMinutesToTime(Guests.startTimeInMinute)} - {convertMinutesToTime(Guests.endTimeInMinute)}
+                        {convertMinutesToTime(Guests.startTimeInMinute)} -{' '}
+                        {convertMinutesToTime(Guests.endTimeInMinute)}
                       </TableCell>
                       <TableCell></TableCell>
                       <TableCell></TableCell>
@@ -180,10 +185,7 @@ const AppointmentList = ({ keyword, valueFilter }) => {
                         <CustomChip label={statusGuests.id} skin='light' color={statusGuests.color} />
                       </TableCell>
                       <TableCell>
-                        <IconButton
-                          component={Link}
-                          href={`/pages/scheduling/detail/${Guests.id}`}
-                        >
+                        <IconButton component={Link} href={`/pages/scheduling/detail/${Guests.id}`}>
                           <Icon icon='tabler:info-circle' />
                         </IconButton>
                       </TableCell>

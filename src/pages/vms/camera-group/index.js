@@ -147,7 +147,7 @@ const CameraGroup = ({ apiData }) => {
         <CardContent>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <TableContainer component={Paper} sx={{ maxHeight: 1000 }}>
+              <TableContainer component={Paper} sx={{ maxHeight: '100%' }}>
                 <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
                   <TableHead>
                     <TableRow>

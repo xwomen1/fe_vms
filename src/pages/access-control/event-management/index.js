@@ -298,7 +298,7 @@ const EventList = () => {
   ]
 
   return (
-    <Card sx={{ display: 'flex', flexDirection: 'column', height: '90vh' }} className={classes.loadingContainer}>
+    <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%' }} className={classes.loadingContainer}>
       {loading && <CircularProgress className={classes.circularProgress} />}
 
       <CardHeader

@@ -112,7 +112,7 @@ const DoorAccess = () => {
 
   return (
     <>
-      <Card sx={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
+      <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         <CardHeader
           title={
             <>

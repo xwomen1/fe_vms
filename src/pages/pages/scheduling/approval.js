@@ -50,9 +50,8 @@ const statusAppointment = [
   {
     id: 'OUT_OF_DATE',
     color: 'warning'
-  },
+  }
 ]
-
 
 const Approval = ({ keyword, valueFilter }) => {
   const [loading, setLoading] = useState(false)
@@ -70,7 +69,6 @@ const Approval = ({ keyword, valueFilter }) => {
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage)
-    fetchDataList(newPage, pageSize)
   }
 
   const handleCloseMenu = () => {
@@ -80,7 +78,6 @@ const Approval = ({ keyword, valueFilter }) => {
   const handleSelectPageSize = size => {
     setPageSize(size)
     setPage(1)
-    fetchDataList(1, size)
     handleCloseMenu()
   }
 
@@ -101,10 +98,7 @@ const Approval = ({ keyword, valueFilter }) => {
         ...valueFilter
       }
 
-      const response = await getApi(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/registrations`,
-        params
-      )
+      const response = await getApi(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/registrations`, params)
       setDataList(response.data?.rows)
       setTotal(Math.ceil(response.data?.count / pageSize)) // Tính tổng số trang dựa trên tổng số mục và kích thước trang
     } catch (error) {
@@ -124,10 +118,9 @@ const Approval = ({ keyword, valueFilter }) => {
     fetchData()
   }, [keyword, page, pageSize, valueFilter])
 
-
   return (
     <>
-      <Card sx={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
+      <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         <CardContent sx={{ flex: 1, overflow: 'auto' }}>
           <Table>
             <TableHead style={{ background: '#F6F6F7' }}>
@@ -161,7 +154,8 @@ const Approval = ({ keyword, valueFilter }) => {
                       </TableCell>
                       <TableCell>{Guests.startDate}</TableCell>
                       <TableCell>
-                        {convertMinutesToTime(Guests.startTimeInMinute)} - {convertMinutesToTime(Guests.endTimeInMinute)}
+                        {convertMinutesToTime(Guests.startTimeInMinute)} -{' '}
+                        {convertMinutesToTime(Guests.endTimeInMinute)}
                       </TableCell>
                       <TableCell></TableCell>
                       <TableCell></TableCell>
@@ -173,10 +167,7 @@ const Approval = ({ keyword, valueFilter }) => {
                         <CustomChip label={statusGuests.id} skin='light' color={statusGuests.color} />
                       </TableCell>
                       <TableCell>
-                        <IconButton
-                          component={Link}
-                          href={`/pages/scheduling/detail/${Guests.id}`}
-                        >
+                        <IconButton component={Link} href={`/pages/scheduling/detail/${Guests.id}`}>
                           <Icon icon='tabler:info-circle' />
                         </IconButton>
                       </TableCell>

@@ -13,7 +13,7 @@ import authConfig from 'src/configs/auth'
 import Table from '@mui/material/Table'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
-import { Autocomplete, Button, CircularProgress, IconButton, Paper, Box } from '@mui/material'
+import { Autocomplete, Button, CircularProgress, IconButton, Paper, Box, TableContainer } from '@mui/material'
 import Swal from 'sweetalert2'
 import { fetchData } from 'src/store/apps/user'
 import { useRouter } from 'next/router'
@@ -664,7 +664,7 @@ const UserList = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                      // loading={loading}
+                        // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.1}></Grid>
@@ -678,7 +678,12 @@ const UserList = ({ apiData }) => {
                     </Grid>
                     <Grid item xs={0.1}></Grid>
                     <Grid item xs={2.4}>
-                      <CustomTextField value={host} onChange={e => setHost(e.target.value)} label='Connection Port' fullWidth />
+                      <CustomTextField
+                        value={host}
+                        onChange={e => setHost(e.target.value)}
+                        label='Connection Port'
+                        fullWidth
+                      />
                     </Grid>
                     <Grid item xs={0.1}></Grid>
                     <Grid item xs={2.4}>
@@ -744,7 +749,7 @@ const UserList = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                      // loading={loading}
+                        // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.4}></Grid>
@@ -856,7 +861,7 @@ const UserList = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                      // loading={loading}
+                        // loading={loading}
                       />{' '}
                     </Grid>
 
@@ -921,7 +926,7 @@ const UserList = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                      // loading={loading}
+                        // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.1}></Grid>
@@ -971,56 +976,58 @@ const UserList = ({ apiData }) => {
                   </>
                 )}
               </Grid>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ padding: '16px' }}>NO.</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Device Name</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Device Type</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>IP Address</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Mac Address</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Location</TableCell>
-                    <TableCell sx={{ padding: '16px' }}>Status</TableCell>
+              <TableContainer component={Paper} sx={{ maxHeight: '100%' }}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ padding: '16px' }}>NO.</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Device Name</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Device Type</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>IP Address</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Mac Address</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Location</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Status</TableCell>
 
-                    <TableCell sx={{ padding: '16px' }}>Active</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {assettype.map((assetType, index) => (
-                    <TableRow key={assetType.id}>
-                      <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.name}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.type.name}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.ipAddress}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.macAddress}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>{assetType.location}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>
-                        {assetType.status?.name ? assetType.status.name : statusText}
-                      </TableCell>
-
-                      <TableCell sx={{ padding: '16px' }}>
-                        <IconButton size='small' onClick={() => handleAddPClick(assetType.id)}>
-                          <Icon icon='tabler:edit' />
-                        </IconButton>
-                        <IconButton
-                          size='small'
-                          onClick={() => {
-                            setIPNVR(assetType.ipAddress)
-                            setNameNvr(assetType.name)
-                            setId(assetType.id)
-                            handleAddConnectCameraClick(assetType.id)
-                          }}
-                        >
-                          <Icon icon='tabler:link' />
-                        </IconButton>
-                        <IconButton onClick={() => handleDelete(assetType.id)}>
-                          <Icon icon='tabler:trash' />
-                        </IconButton>
-                      </TableCell>
+                      <TableCell sx={{ padding: '16px' }}>Active</TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHead>
+                  <TableBody>
+                    {assettype.map((assetType, index) => (
+                      <TableRow key={assetType.id}>
+                        <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{assetType.name}</TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{assetType.type.name}</TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{assetType.ipAddress}</TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{assetType.macAddress}</TableCell>
+                        <TableCell sx={{ padding: '16px' }}>{assetType.location}</TableCell>
+                        <TableCell sx={{ padding: '16px' }}>
+                          {assetType.status?.name ? assetType.status.name : statusText}
+                        </TableCell>
+
+                        <TableCell sx={{ padding: '16px' }}>
+                          <IconButton size='small' onClick={() => handleAddPClick(assetType.id)}>
+                            <Icon icon='tabler:edit' />
+                          </IconButton>
+                          <IconButton
+                            size='small'
+                            onClick={() => {
+                              setIPNVR(assetType.ipAddress)
+                              setNameNvr(assetType.name)
+                              setId(assetType.id)
+                              handleAddConnectCameraClick(assetType.id)
+                            }}
+                          >
+                            <Icon icon='tabler:link' />
+                          </IconButton>
+                          <IconButton onClick={() => handleDelete(assetType.id)}>
+                            <Icon icon='tabler:trash' />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
               <br></br>
               <Grid container spacing={2} style={{ padding: 10 }}>
                 <Grid item xs={3}></Grid>

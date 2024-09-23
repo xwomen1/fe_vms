@@ -14,7 +14,7 @@ import authConfig from 'src/configs/auth'
 import Table from '@mui/material/Table'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
-import { IconButton, Box, Button, CardHeader } from '@mui/material'
+import { IconButton, Box, Button, CardHeader, TableContainer, Paper } from '@mui/material'
 import Swal from 'sweetalert2'
 import { fetchData } from 'src/store/apps/user'
 import { useRouter } from 'next/router'
@@ -458,91 +458,93 @@ const UserList = ({ apiData }) => {
           />
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell align='center'>
-                      <Checkbox
-                        checked={selectedIds.length === assettype.length}
-                        onChange={e => {
-                          if (e.target.checked) {
-                            const allIds = assettype.map(assetType => assetType.id)
-                            setSelectedIds(allIds)
-                          } else {
-                            setSelectedIds([])
-                          }
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell align='center'>NO.</TableCell>
-                    <TableCell align='center'>Device Name</TableCell>
-                    <TableCell align='center'>Device Type</TableCell>
-                    <TableCell align='center'>IP Address</TableCell>
-                    <TableCell align='center'>Mac Address</TableCell>
-                    <TableCell align='center'>Location</TableCell>
-                    <TableCell align='center'>Status</TableCell>
-
-                    <TableCell align='center'>Active</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {assettype.map((assetType, index) => (
-                    <TableRow key={assetType.id}>
+              <TableContainer component={Paper} sx={{ maxHeight: '100%' }}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
                       <TableCell align='center'>
                         <Checkbox
-                          checked={selectedIds.includes(assetType.id)}
-                          onChange={() => handleCheckboxChange(assetType.id)}
+                          checked={selectedIds.length === assettype.length}
+                          onChange={e => {
+                            if (e.target.checked) {
+                              const allIds = assettype.map(assetType => assetType.id)
+                              setSelectedIds(allIds)
+                            } else {
+                              setSelectedIds([])
+                            }
+                          }}
                         />
                       </TableCell>
-                      <TableCell align='center'>{(page - 1) * pageSize + index + 1} </TableCell>
-                      <TableCell align='center'>{assetType.name}</TableCell>
-                      <TableCell align='center'>{assetType.type?.name}</TableCell>
-                      <TableCell align='center'>{assetType.ipAddress}</TableCell>
-                      <TableCell align='center'>{assetType.macAddress}</TableCell>
-                      <TableCell align='center'>{assetType.location}</TableCell>
-                      <TableCell align='center'>
-                        {assetType.status && assetType.status.name ? (
-                          <div>
-                            <CustomChip
-                              rounded
-                              size='small'
-                              skin='light'
-                              sx={{ lineHeight: 1 }}
-                              label={assetType.status.name === 'disconnected' ? 'Lost connection' : 'Connected'}
-                              color={assetType.status.name === 'disconnected' ? 'primary' : 'success'}
-                            />
-                          </div>
-                        ) : (
-                          assetType.status.name
-                        )}
-                      </TableCell>
+                      <TableCell align='center'>NO.</TableCell>
+                      <TableCell align='center'>Device Name</TableCell>
+                      <TableCell align='center'>Device Type</TableCell>
+                      <TableCell align='center'>IP Address</TableCell>
+                      <TableCell align='center'>Mac Address</TableCell>
+                      <TableCell align='center'>Location</TableCell>
+                      <TableCell align='center'>Status</TableCell>
 
-                      <TableCell align='center'>
-                        <IconButton onClick={() => handleReloadClick(assetType.id)}>
-                          <Icon icon='tabler:reload' />
-                        </IconButton>
-                        <IconButton size='small' onClick={() => handleAddPClick(assetType.id)}>
-                          <Icon icon='tabler:edit' />
-                        </IconButton>
-                        <IconButton
-                          size='small'
-                          onClick={() => {
-                            setIPNVR(assetType.ipAddress)
-                            setNameNvr(assetType.name)
-                            setId(assetType.id)
-                            handleAddConnectCameraClick(assetType.id)
-                          }}
-                        >
-                          <Icon icon='tabler:link' />
-                        </IconButton>
-                        <IconButton onClick={() => handleDelete(assetType.id)}>
-                          <Icon icon='tabler:trash' />
-                        </IconButton>
-                      </TableCell>
+                      <TableCell align='center'>Active</TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHead>
+                  <TableBody>
+                    {assettype.map((assetType, index) => (
+                      <TableRow key={assetType.id}>
+                        <TableCell align='center'>
+                          <Checkbox
+                            checked={selectedIds.includes(assetType.id)}
+                            onChange={() => handleCheckboxChange(assetType.id)}
+                          />
+                        </TableCell>
+                        <TableCell align='center'>{(page - 1) * pageSize + index + 1} </TableCell>
+                        <TableCell align='center'>{assetType.name}</TableCell>
+                        <TableCell align='center'>{assetType.type?.name}</TableCell>
+                        <TableCell align='center'>{assetType.ipAddress}</TableCell>
+                        <TableCell align='center'>{assetType.macAddress}</TableCell>
+                        <TableCell align='center'>{assetType.location}</TableCell>
+                        <TableCell align='center'>
+                          {assetType.status && assetType.status.name ? (
+                            <div>
+                              <CustomChip
+                                rounded
+                                size='small'
+                                skin='light'
+                                sx={{ lineHeight: 1 }}
+                                label={assetType.status.name === 'disconnected' ? 'Lost connection' : 'Connected'}
+                                color={assetType.status.name === 'disconnected' ? 'primary' : 'success'}
+                              />
+                            </div>
+                          ) : (
+                            assetType.status.name
+                          )}
+                        </TableCell>
+
+                        <TableCell align='center'>
+                          <IconButton onClick={() => handleReloadClick(assetType.id)}>
+                            <Icon icon='tabler:reload' />
+                          </IconButton>
+                          <IconButton size='small' onClick={() => handleAddPClick(assetType.id)}>
+                            <Icon icon='tabler:edit' />
+                          </IconButton>
+                          <IconButton
+                            size='small'
+                            onClick={() => {
+                              setIPNVR(assetType.ipAddress)
+                              setNameNvr(assetType.name)
+                              setId(assetType.id)
+                              handleAddConnectCameraClick(assetType.id)
+                            }}
+                          >
+                            <Icon icon='tabler:link' />
+                          </IconButton>
+                          <IconButton onClick={() => handleDelete(assetType.id)}>
+                            <Icon icon='tabler:trash' />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
               <br></br>
               <Grid container spacing={2} style={{ padding: 10 }}>
                 <Grid item xs={3}></Grid>
