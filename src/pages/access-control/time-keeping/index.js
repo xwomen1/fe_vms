@@ -137,7 +137,7 @@ const EventList = () => {
   ]
 
   return (
-    <Card sx={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
+    <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <CardHeader
         title={<Button variant='contained'>Time Sheet</Button>}
         titleTypographyProps={{ sx: { mb: [2, 0] } }}

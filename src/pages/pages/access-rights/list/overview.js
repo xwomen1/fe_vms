@@ -310,7 +310,7 @@ const AccessRight = () => {
 
         <CardContent>
           <Grid container spacing={0}>
-            <TableContainer component={Paper} sx={{ maxHeight: 600 }}>
+            <TableContainer component={Paper} sx={{ maxHeight: '100%' }}>
               <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
                 <TableHead>
                   <TableRow>

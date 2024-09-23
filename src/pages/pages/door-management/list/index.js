@@ -601,7 +601,7 @@ const DoorManagement = () => {
             </TreeView>
           </Paper>
         </Grid>
-        <Grid item xs={9.5} style={{ display: 'flex', flexDirection: 'column' }}>
+        <Grid item xs={9.5} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
           <Paper elevation={3} style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
             <TableContainer>
               <Table>

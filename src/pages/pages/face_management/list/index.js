@@ -349,12 +349,12 @@ const FaceManagement = () => {
             loaded
               ? { display: 'none' }
               : {
-                width: '100px',
-                height: '100px',
-                display: 'grid',
-                backgroundColor: '#C4C4C4',
-                placeItems: 'center'
-              }
+                  width: '100px',
+                  height: '100px',
+                  display: 'grid',
+                  backgroundColor: '#C4C4C4',
+                  placeItems: 'center'
+                }
           }
         >
           <CircularProgress size={20} />
@@ -453,81 +453,83 @@ const FaceManagement = () => {
           }}
         />
         <Grid item xs={12}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell align='center'>
-                  <Checkbox onChange={handleSelectAllChange} checked={selectAll} />
-                </TableCell>
-                <TableCell align='center'>NO.</TableCell>
-                <TableCell align='center'>Object Image</TableCell>
-                <TableCell align='center'>Object Name</TableCell>
-                <TableCell align='center'>Last seen</TableCell>
-                <TableCell align='center'>Object Type</TableCell>
-                <TableCell align='center'>Status</TableCell>
-                <TableCell align='center'>Active</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {loading && <CircularProgress style={{ marginLeft: '20%' }} />}
-              {Array.isArray(userData) && userData.length > 0 ? (
-                userData.map(
-                  (user, index) => (
-                    console.log(user.status),
-                    (
-                      <TableRow key={user.id}>
-                        <TableCell align='center'>
-                          <Checkbox
-                            onChange={event => handleCheckboxChange(event, user.id)}
-                            checked={selectedIds.includes(user.id)}
-                          />
-                        </TableCell>
-                        <TableCell align='center'>{index + 1}</TableCell>
-                        <TableCell align='center'>
-                          <Img
-                            src={buildUrlWithToken(
-                              `https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${user.mainImageId}`
-                            )}
-                            style={{ maxWidth: '91px', height: '56px', minWidth: '56px' }}
-                          />
-                        </TableCell>
-                        <TableCell align='center'>{user.name}</TableCell>
-                        <TableCell align='center'>{formatDate(user.lastAppearance)}</TableCell>
-                        <TableCell align='center'>Staff</TableCell>
-                        <TableCell align='center'>
-                          <div>
-                            <CustomChip
-                              rounded
-                              size='small'
-                              skin='light'
-                              sx={{ lineHeight: 1 }}
-                              label={user.status === false ? 'Inactive' : 'Active'}
-                              color={user.status === false ? 'primary' : 'success'}
+          <TableContainer component={Paper} sx={{ maxHeight: '100%' }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell align='center'>
+                    <Checkbox onChange={handleSelectAllChange} checked={selectAll} />
+                  </TableCell>
+                  <TableCell align='center'>NO.</TableCell>
+                  <TableCell align='center'>Object Image</TableCell>
+                  <TableCell align='center'>Object Name</TableCell>
+                  <TableCell align='center'>Last seen</TableCell>
+                  <TableCell align='center'>Object Type</TableCell>
+                  <TableCell align='center'>Status</TableCell>
+                  <TableCell align='center'>Active</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {loading && <CircularProgress style={{ marginLeft: '20%' }} />}
+                {Array.isArray(userData) && userData.length > 0 ? (
+                  userData.map(
+                    (user, index) => (
+                      console.log(user.status),
+                      (
+                        <TableRow key={user.id}>
+                          <TableCell align='center'>
+                            <Checkbox
+                              onChange={event => handleCheckboxChange(event, user.id)}
+                              checked={selectedIds.includes(user.id)}
                             />
-                          </div>
-                        </TableCell>
-                        <TableCell align='center'>
-                          <IconButton component={Link} href={`/pages/face_management/detail/${user.id}`}>
-                            <Icon icon='tabler:info-circle' />
-                          </IconButton>
+                          </TableCell>
+                          <TableCell align='center'>{index + 1}</TableCell>
+                          <TableCell align='center'>
+                            <Img
+                              src={buildUrlWithToken(
+                                `https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${user.mainImageId}`
+                              )}
+                              style={{ maxWidth: '91px', height: '56px', minWidth: '56px' }}
+                            />
+                          </TableCell>
+                          <TableCell align='center'>{user.name}</TableCell>
+                          <TableCell align='center'>{formatDate(user.lastAppearance)}</TableCell>
+                          <TableCell align='center'>Staff</TableCell>
+                          <TableCell align='center'>
+                            <div>
+                              <CustomChip
+                                rounded
+                                size='small'
+                                skin='light'
+                                sx={{ lineHeight: 1 }}
+                                label={user.status === false ? 'Inactive' : 'Active'}
+                                color={user.status === false ? 'primary' : 'success'}
+                              />
+                            </div>
+                          </TableCell>
+                          <TableCell align='center'>
+                            <IconButton component={Link} href={`/pages/face_management/detail/${user.id}`}>
+                              <Icon icon='tabler:info-circle' />
+                            </IconButton>
 
-                          <IconButton onClick={() => handleDelete(user.id)}>
-                            <Icon icon='tabler:trash' />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
+                            <IconButton onClick={() => handleDelete(user.id)}>
+                              <Icon icon='tabler:trash' />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      )
                     )
                   )
-                )
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={7} align='center'>
-                    No data
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={7} align='center'>
+                      No data
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
           <br></br>
           <Grid container spacing={2} style={{ padding: 10 }}>
             <Grid item xs={3}></Grid>
