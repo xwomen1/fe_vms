@@ -87,7 +87,7 @@ const Edit = ({ open, onClose, camera }) => {
       sx={{
         '& .MuiDialog-paper': {
           overflow: 'visible',
-          maxWidth: '1200px', // Custom width
+          maxWidth: '1000px', // Custom width
           width: '100%', // Ensure it takes full width
           padding: '20px' // Additional padding if needed
         }

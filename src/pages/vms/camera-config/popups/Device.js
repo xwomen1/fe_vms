@@ -55,7 +55,6 @@ const Device = ({ onClose, camera }) => {
   const [errorNVR, setErrorNVR] = useState(false)
   const [errorProtocol, setErrorProtocol] = useState(false)
   const [errorType, setErrorType] = useState(false)
-  const [suggestions, setSuggestions] = useState([])
 
   const [cameraGroupSelect, setCameraGroupSelect] = useState({
     label: cameras?.type?.name || '',
@@ -66,12 +65,15 @@ const Device = ({ onClose, camera }) => {
   const [isOfflineSetting, setisOfflineSetting] = useState(false)
   const [lat, setLat] = useState(null)
   const [lng, setLng] = useState(null)
+  const [latitude, setLatitude] = useState(null)
+  const [longitude, setLongitude] = useState(null)
   const [cameraName, setCameraName] = useState(null)
   const [userName, setUserName] = useState(null)
   const [ipAddress, setIpAddress] = useState(null)
   const [http, setHttp] = useState(null)
   const [onvif, setOnvif] = useState(null)
   const [searchValue, setSearchValue] = useState('')
+  const [options, setOptions] = useState([])
 
   const [viewport, setViewport] = React.useState({
     longitude: 105.83416,
@@ -85,39 +87,6 @@ const Device = ({ onClose, camera }) => {
       latitude: parseFloat(lat) || 21.027763
     }))
   }, [lat, lng])
-
-  const handleSearchChange = async (event, newValue) => {
-    setSearchValue(newValue)
-
-    if (newValue) {
-      const response = await axios.get(`https://maps.googleapis.com/maps/api/place/autocomplete/json`, {
-        params: {
-          input: newValue,
-          key: '7c6c73a727524ce04666401cd689e097f88c74cb' // Thay thế bằng API Key của bạn
-        }
-      })
-
-      setSuggestions(response.data.predictions)
-    } else {
-      setSuggestions([])
-    }
-  }
-
-  const handleOptionSelect = async option => {
-    const placeId = option.place_id
-
-    const detailsResponse = await axios.get(`https://maps.googleapis.com/maps/api/place/details/json`, {
-      params: {
-        place_id: placeId,
-        key: 'YOUR_GOOGLE_API_KEY' // Thay thế bằng API Key của bạn
-      }
-    })
-
-    const location = detailsResponse.data.result.geometry.location
-    console.log('Selected Location:', location)
-
-    // Cập nhật lat và lng ở đây nếu cần
-  }
 
   const fetchNicTypesDevice = async () => {
     try {
@@ -438,17 +407,6 @@ const Device = ({ onClose, camera }) => {
   }
   const formatDDNS = ddns => <Checkbox checked={ddns} onChange={handleCheckboxChange} />
 
-  const channelOptions = [
-    { label: 'ONVIF', value: 'ONVIF' },
-    { label: 'IVI', value: 'IVI' },
-    { label: 'HIKVISION', value: 'HIKVISION' },
-    { label: 'DAHUA', label: 'DAHUA' },
-    { label: 'AXIS', value: 'AXIS' },
-    { label: 'BOSCH', value: 'BOSCH' },
-    { label: 'HANWHA', value: 'HANWHA' },
-    { label: 'PANASONIC', value: 'PANASONIC' }
-  ]
-
   const handleDeleteRow = index => {
     const updatedRows = [...rows]
     updatedRows.splice(index, 1)
@@ -559,6 +517,69 @@ const Device = ({ onClose, camera }) => {
     }
     ApiProtocol()
   }, [])
+
+  const handleSearchChange = async (event, newValue) => {
+    setSearchValue(newValue)
+
+    if (newValue.trim() === '') return
+
+    try {
+      const response = await axios.get(
+        `https://rsapi.goong.io/Place/AutoComplete?api_key=R2BrWbt6JsHQSpDm1Y6Dtr53hrg6PQ9rZhTJJKQJ&input=${newValue}`
+      )
+      setOptions(response.data.predictions)
+    } catch (error) {
+      console.error('Lỗi khi tìm kiếm gợi ý:', error)
+    }
+  }
+
+  const handlePlaceSelect = async (event, value) => {
+    if (!value) return
+
+    const placeId = value.place_id
+
+    try {
+      const detailResponse = await axios.get(
+        `https://rsapi.goong.io/Place/Detail?place_id=${placeId}&api_key=R2BrWbt6JsHQSpDm1Y6Dtr53hrg6PQ9rZhTJJKQJ`
+      )
+
+      const placeData = detailResponse.data.result
+
+      const location = placeData.geometry.location
+
+      setLatitude(location.lat)
+      setLongitude(location.lng)
+
+      setViewport(prevViewport => ({
+        ...prevViewport,
+        latitude: location.lat,
+        longitude: location.lng
+      }))
+    } catch (error) {
+      console.error('Lỗi khi lấy chi tiết địa điểm:', error)
+    }
+  }
+
+  useEffect(() => {
+    if (latitude && longitude) {
+      setViewport(prevViewport => ({
+        ...prevViewport,
+        latitude,
+        longitude
+      }))
+    }
+  }, [latitude, longitude])
+
+  const handleReturnToMarker = () => {
+    if (lat && lng) {
+      setViewport(prevViewport => ({
+        ...prevViewport,
+        latitude: parseFloat(lat),
+        longitude: parseFloat(lng),
+        zoom: 14
+      }))
+    }
+  }
 
   return (
     <div style={{ width: '100%' }}>
@@ -688,16 +709,15 @@ const Device = ({ onClose, camera }) => {
         <Grid item xs={12}>
           <Typography variant='h5'>Channel</Typography>
         </Grid>
-        <Grid item xs={11.8} component={Paper}>
+        <Grid item xs={12} component={Paper}>
           <TableContainer>
             <Table>
               <TableHead>
                 <TableRow>
                   <TableCell>Channel Name</TableCell>
                   <TableCell>Proxied</TableCell>
-                  <TableCell align='center'>Channel URL </TableCell>
-                  <TableCell align='center'>StreamType </TableCell>
-
+                  <TableCell align='center'>Channel URL</TableCell>
+                  <TableCell align='center'>StreamType</TableCell>
                   <TableCell align='center'>
                     <IconButton size='small' onClick={handleAddRow}>
                       <Icon icon='tabler:plus' />
@@ -750,16 +770,23 @@ const Device = ({ onClose, camera }) => {
         {viewport && (
           <Grid item xs={12}>
             <div style={{ width: '100%' }}>
-              <Autocomplete
-                value={searchValue}
-                onChange={handleSearchChange}
-                options={suggestions}
-                getOptionLabel={option => option.description || ''}
-                onInputChange={(event, newInputValue) => {
-                  setSearchValue(newInputValue)
-                }}
-                renderInput={params => <CustomTextField {...params} label='Search Location' fullWidth />}
-              />
+              <Grid container spacing={2}>
+                <Grid item xs={11}>
+                  <Autocomplete
+                    options={options}
+                    getOptionLabel={option => option.description}
+                    onInputChange={handleSearchChange}
+                    onChange={handlePlaceSelect}
+                    renderInput={params => <CustomTextField {...params} fullWidth />}
+                  />
+                </Grid>
+                <Grid item xs={1}>
+                  <IconButton onClick={handleReturnToMarker}>
+                    <Icon icon='tabler:current-location' />
+                  </IconButton>
+                </Grid>
+              </Grid>
+
               <ReactMapGL
                 {...viewport}
                 width='100%'
