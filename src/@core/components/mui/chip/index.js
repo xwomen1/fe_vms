@@ -22,8 +22,11 @@ const Chip = props => {
     warning: { ...bgColors.warningLight },
     info: { ...bgColors.infoLight }
   }
+
   const propsToPass = { ...props }
   propsToPass.rounded = undefined
+
+  const colorStyles = skin === 'light' && color && colors[color] ? Object.assign(colors[color], sx) : sx
 
   return (
     <MuiChip
@@ -33,7 +36,7 @@ const Chip = props => {
         'MuiChip-rounded': rounded,
         'MuiChip-light': skin === 'light'
       })}
-      sx={skin === 'light' && color ? Object.assign(colors[color], sx) : sx}
+      sx={colorStyles}
     />
   )
 }

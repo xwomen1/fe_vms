@@ -20,22 +20,28 @@ import {
   Typography,
   Paper
 } from '@mui/material'
+import AddImageGuest from '../popups/addImageGuest'
 import Barcode from 'react-barcode'
+import CustomChip from 'src/@core/components/mui/chip'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import Link from 'next/link'
+import { QRCode } from 'react-qr-code'
 
 const Details = () => {
+  const [reload, setReload] = useState(0)
   const router = useRouter()
   const id = router.query.Details
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(false)
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
+  const [isOpenAddImage, setIsOpenAddImage] = useState(false)
+  const [idImage, setImage] = useState({})
 
   useEffect(() => {
     if (id) {
       fetchDataList()
     }
-  }, [id])
+  }, [id, reload])
 
   const fetchDataList = async () => {
     if (!id) return
@@ -62,6 +68,16 @@ const Details = () => {
   const minutes = data?.waitTimeBeforeCancelInMinute % 60
   const formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
 
+  const statusColorMap = {
+    WAITING: 'default',
+    APPROVED: 'success',
+    COMPLETE: 'success',
+    UNSUCCESSFUL: 'error',
+    CANCELLED: 'warning',
+    REMOVE: 'info'
+  }
+  const chipColor = loading ? 'default' : data ? statusColorMap[data.status] || 'default' : 'default'
+
   return (
     <>
       <div>
@@ -76,19 +92,27 @@ const Details = () => {
               alignItems: ['flex-start', 'center']
             }}
             action={
-              <Grid container spacing={2}>
-                <Grid item xs={4}>
-                  <Box sx={{ float: 'right' }}>
-                    <Button variant='contained' component={Link} href={`/pages/scheduling`}>
+              <Grid container spacing={1}>
+                <Grid item xs={12} sx={{ float: 'left' }}>
+                  <Box>
+                    <Button sx={{ margin: '0 5px' }} variant='contained' component={Link} href={`/pages/scheduling`}>
                       Cancel
                     </Button>
-                  </Box>
-                </Grid>
-                <Grid item xs={8}>
-                  <Box sx={{ float: 'right', marginLeft: '2%' }}>
-                    <Button aria-label='Bộ lọc' variant='contained'>
+                    <Button
+                      component={Link}
+                      href={`/pages/scheduling/register/${data.id}`}
+                      sx={{ margin: '0 5px' }}
+                      aria-label='Bộ lọc'
+                      variant='contained'
+                    >
                       Re register
                     </Button>
+
+                    {data?.status === 'APPROVED' && (
+                      <Button sx={{ margin: '0 5px' }} aria-label='Bộ lọc' variant='contained'>
+                        Unsubscribe
+                      </Button>
+                    )}
                   </Box>
                 </Grid>
               </Grid>
@@ -102,11 +126,23 @@ const Details = () => {
               <p>
                 Last Updated Time : {formattedTime} - {data?.startDate}
               </p>
-              <p>{data?.status}</p>
+              <CustomChip label={data?.status || 'Unknown'} skin='light' color={chipColor} />
             </Grid>
-            <Grid item xs={7}></Grid>
-            <Grid item xs={2}>
-              {data?.code && <Barcode value={data.code} />}
+            <Grid item xs={6}></Grid>
+            <Grid item xs={3} style={{ textAlign: 'center' }}>
+              {data?.code ? (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <QRCode value={data?.code} size={100} fgColor='#000000' />
+                    <div style={{ margin: '0 40px', fontSize: '20px', fontFamily: 'monospace' }}>{data?.code}</div>
+                  </div>
+                  <div style={{ marginRight: '16px', textAlign: 'center' }}>
+                    <Barcode value={data?.code} size={100} lineColor='#000000' />
+                  </div>
+                </div>
+              ) : (
+                <div>loading Code...</div>
+              )}
             </Grid>
           </Grid>
           <Grid
@@ -191,31 +227,59 @@ const Details = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {data.guests?.map((guests, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{index + 1}</TableCell>
-                        <TableCell></TableCell>
-                        <TableCell>{guests.accessCode}</TableCell>
-                        <TableCell>{guests.identityNumber}</TableCell>
-                        <TableCell>{guests.fullName}</TableCell>
-                        <TableCell>{guests.phoneNumber}</TableCell>
-                        <TableCell>{guests.address}</TableCell>
-                        <TableCell>{guests.status}</TableCell>
-                        <TableCell></TableCell>
-                        <TableCell></TableCell>
-                        <TableCell>
-                          <IconButton>
-                            <Icon icon='tabler:polaroid' />
-                          </IconButton>
-                          <IconButton>
-                            <Icon icon='tabler:credit-card' />
-                          </IconButton>
-                          <IconButton>
-                            <Icon icon='tabler:info-circle' />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {data.guests?.map(
+                      (guests, index) => (
+                        console.log(guests.documentFileId, 'log'),
+                        (
+                          <TableRow key={index}>
+                            <TableCell>{index + 1}</TableCell>
+                            <TableCell>
+                              {' '}
+                              {guests.documentFileId && (
+                                <div style={{ width: '100px', height: '100px', overflow: 'hidden' }}>
+                                  {' '}
+                                  <img
+                                    alt='document-file'
+                                    src={`https://dev-ivi.basesystem.one/smc/storage/api/v0/libraries/public/download/${guests.documentFileId}`}
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                  />
+                                </div>
+                              )}
+                            </TableCell>
+                            <TableCell>{guests.accessCode}</TableCell>
+                            <TableCell>{guests.identityNumber}</TableCell>
+                            <TableCell>{guests.fullName}</TableCell>
+                            <TableCell>{guests.phoneNumber}</TableCell>
+                            <TableCell>{guests.address}</TableCell>
+                            <TableCell>{guests.status}</TableCell>
+                            <TableCell></TableCell>
+                            <TableCell></TableCell>
+                            <TableCell>
+                              <IconButton
+                                onClick={() => {
+                                  setIsOpenAddImage(true)
+                                  setImage(guests.guestId)
+                                }}
+                              >
+                                <Icon icon='tabler:polaroid' />
+                              </IconButton>
+                              <IconButton>
+                                <Icon icon='tabler:credit-card' />
+                              </IconButton>
+                              <IconButton
+                                component={Link}
+                                href={`/pages/scheduling/detailGuest/${guests.guestId}`}
+                                sx={{ margin: '0 5px' }}
+                                aria-label='Bộ lọc'
+                                variant='contained'
+                              >
+                                <Icon icon='tabler:info-circle' />
+                              </IconButton>
+                            </TableCell>
+                          </TableRow>
+                        )
+                      )
+                    )}
                   </TableBody>
                 </Table>
               </TableContainer>
@@ -302,6 +366,14 @@ const Details = () => {
           </Grid>
         </Grid>
       </div>
+      {isOpenAddImage && (
+        <AddImageGuest
+          show={isOpenAddImage}
+          onClose={() => setIsOpenAddImage(false)}
+          callback={idImage}
+          setReload={() => setReload(reload + 1)}
+        />
+      )}
     </>
   )
 }
