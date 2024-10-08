@@ -61,6 +61,7 @@ const OrganizationalStructure = () => {
   const handleOpenPopupDetail = id => {
     setOpenPopupId(id)
     setOpenPopupDetail(true)
+    setOperationType('detail')
   }
 
   const handleCloseDetail = () => {
@@ -114,7 +115,6 @@ const OrganizationalStructure = () => {
     setOpenPopupAddChild(true)
     setSelectIds(id)
     setOperationType('addChild')
-    console.log(id, 'nodeid')
   }
 
   const handleClosePPopup = () => {
@@ -122,7 +122,30 @@ const OrganizationalStructure = () => {
     fetchChildrenById()
   }
 
+  const fetchId = async nodeId => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const response = await axios.get(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${nodeId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      setInffo(response.data)
+    } catch (error) {
+      console.error('Error fetching data:', error)
+    }
+  }
+
   const handleSuccess = async () => {
+    if (operationType === 'delete') {
+      setInffo(null)
+    }
+
+    if (operationType === 'detail') {
+      fetchId(openPopupId)
+    }
+    fetchChildDataNote(openPopupId)
     await fetchFilter()
 
     if (selectedNodeId) {
@@ -130,19 +153,15 @@ const OrganizationalStructure = () => {
       const parentId = treeData[nodeId]?.parentId
 
       if (parentId) {
-        console.log(`Fetching parent data for parentId: ${parentId}`)
         await fetchChildData(parentId)
       }
-
-      console.log(`Fetching child data for nodeId: ${nodeId}`)
       await fetchChildData(nodeId)
     }
 
     setOperationType(null)
   }
 
-  const fetchChildData = async parentId => {
-    console.log(`Fetching data for parentId: ${parentId}`)
+  const fetchChildDataNote = async parentId => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -155,7 +174,25 @@ const OrganizationalStructure = () => {
         }
       )
 
-      setChildData(response.data)
+      setChildData(response.data || [])
+    } catch (error) {
+      console.error('Error fetching children:', error)
+    }
+  }
+
+  const fetchChildData = async parentId => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const response = await axios.get(
+        `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
+
       setTreeData(prevTreeData => ({
         ...prevTreeData,
         [parentId]: response.data
@@ -172,9 +209,9 @@ const OrganizationalStructure = () => {
   const handleChangeTab = async id => {
     setSelectedTab(id)
     setInffo(null)
-    setTreeData({})
     setExpandedNodes([])
     await fetchChildData(infra[id]?.id)
+    await fetchChildDataNote(infra[id]?.id)
     setIdGroup(infra[id]?.id)
   }
 
@@ -190,7 +227,7 @@ const OrganizationalStructure = () => {
           }
         }
       )
-      setChildData(response.data)
+      setChildData(response.data || [])
 
       return response.data
     } catch (error) {
@@ -203,6 +240,7 @@ const OrganizationalStructure = () => {
   const handleFetchChildren = async nodeId => {
     const isExpanded = expandedNodes.includes(nodeId)
     const childrenData = await fetchChildrenById(nodeId)
+
     setTreeData(prevTreeData => ({
       ...prevTreeData,
       [nodeId]: childrenData
@@ -214,21 +252,19 @@ const OrganizationalStructure = () => {
       setExpandedNodes([...expandedNodes, nodeId])
       setSelectedNodeId(nodeId)
     }
-
-    setShowPlusIcon(true)
   }
 
-  useEffect(() => {
-    if (infra.length > 0) {
-      infra.forEach(item => {
-        fetchChildData(item.id)
-      })
+  // useEffect(() => {
+  //   if (infra.length > 0) {
+  //     infra.forEach(item => {
+  //       fetchChildData(item.id)
+  //     })
 
-      expandedNodes.forEach(async nodeId => {
-        await fetchChildData(nodeId)
-      })
-    }
-  }, [infra])
+  //     expandedNodes.forEach(async nodeId => {
+  //       await fetchChildData(nodeId)
+  //     })
+  //   }
+  // }, [infra])
 
   const renderTreeItems = nodes => {
     return nodes.map(node => {
@@ -244,6 +280,7 @@ const OrganizationalStructure = () => {
                 size='small'
                 sx={{ textAlign: 'left', justifyContent: 'flex-start', width: '100%' }}
                 onClick={async () => {
+                  await fetchChildDataNote(node.id)
                   await fetchChildData(node.id)
                 }}
               >
@@ -254,7 +291,6 @@ const OrganizationalStructure = () => {
                 size='small'
                 onClick={() => {
                   handleAddPClick(node.id)
-                  console.log(node.id)
                 }}
               >
                 <Icon icon='bi:plus' />
@@ -263,7 +299,6 @@ const OrganizationalStructure = () => {
                 size='small'
                 onClick={() => {
                   handleOpenPopup(node.id)
-                  console.log(node.id)
                 }}
               >
                 <Icon icon='tabler:trash' />
@@ -292,23 +327,6 @@ const OrganizationalStructure = () => {
   const currentTabInfra = infra[selectedTab] || {}
   const rootNodes = treeData[currentTabInfra.id] || []
 
-  const fetchId = async nodeId => {
-    try {
-      const token = localStorage.getItem(authConfig.storageTokenKeyName)
-
-      const response = await axios.get(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${nodeId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      setInffo(response.data)
-    } catch (error) {
-      console.error('Error fetching children:', error)
-
-      return []
-    }
-  }
-
   const getIdFromValue = value => {
     if (!info && !currentTabInfra) return null
     if (info && info.name === value) return info.id
@@ -318,9 +336,10 @@ const OrganizationalStructure = () => {
   }
 
   const handleNodeSelect = (event, nodeId) => {
-    console.log(nodeId)
     fetchId(nodeId)
   }
+
+  console.log(childData, 'childData')
 
   return (
     <>
@@ -399,7 +418,6 @@ const OrganizationalStructure = () => {
                               size='small'
                               onClick={() => {
                                 handleOpenPopup(infraItem.id)
-                                console.log(infraItem.id)
                               }}
                             >
                               <Icon icon='tabler:trash' />
