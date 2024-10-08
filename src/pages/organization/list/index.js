@@ -43,6 +43,7 @@ const OrganizationalStructure = () => {
   const [selectedNodeId, setSelectedNodeId] = useState(null)
   const [operationType, setOperationType] = useState(null)
   const [info, setInffo] = useState([])
+  const [idGroup, setIdGroup] = useState(null)
   useEffect(() => {
     selectedTabRef.current = selectedTab
   }, [selectedTab])
@@ -97,7 +98,12 @@ const OrganizationalStructure = () => {
       setInfra(response.data)
 
       if (response.data.length > 0) {
-        fetchChildData(response.data[selectedTab].id)
+        const parentId = response.data[selectedTab]?.id
+
+        await fetchChildData(parentId)
+        expandedNodes.forEach(async nodeId => {
+          await fetchChildData(nodeId)
+        })
       }
     } catch (error) {
       console.error('Error fetching users:', error)
@@ -118,24 +124,25 @@ const OrganizationalStructure = () => {
 
   const handleSuccess = async () => {
     await fetchFilter()
-    if (operationType === 'delete') {
-      if (selectedTabRef.current > 0) {
-        setSelectedTab(selectedTabRef.current)
-      } else {
-        setSelectedTab(0)
-      }
-    } else if (operationType === 'add') {
-      setSelectedTab(infra.length)
-    } else {
-      setSelectedTab(selectedTabRef.current)
-    }
+
     if (selectedNodeId) {
-      await fetchChildData(selectedNodeId)
+      const nodeId = selectedNodeId
+      const parentId = treeData[nodeId]?.parentId
+
+      if (parentId) {
+        console.log(`Fetching parent data for parentId: ${parentId}`)
+        await fetchChildData(parentId)
+      }
+
+      console.log(`Fetching child data for nodeId: ${nodeId}`)
+      await fetchChildData(nodeId)
     }
+
     setOperationType(null)
   }
 
   const fetchChildData = async parentId => {
+    console.log(`Fetching data for parentId: ${parentId}`)
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -168,6 +175,7 @@ const OrganizationalStructure = () => {
     setTreeData({})
     setExpandedNodes([])
     await fetchChildData(infra[id]?.id)
+    setIdGroup(infra[id]?.id)
   }
 
   const fetchChildrenById = async parentId => {
@@ -194,19 +202,33 @@ const OrganizationalStructure = () => {
 
   const handleFetchChildren = async nodeId => {
     const isExpanded = expandedNodes.includes(nodeId)
+    const childrenData = await fetchChildrenById(nodeId)
+    setTreeData(prevTreeData => ({
+      ...prevTreeData,
+      [nodeId]: childrenData
+    }))
+
     if (isExpanded) {
       setExpandedNodes(expandedNodes.filter(id => id !== nodeId))
     } else {
-      const childrenData = await fetchChildrenById(nodeId)
-      setTreeData(prevTreeData => ({
-        ...prevTreeData,
-        [nodeId]: childrenData
-      }))
       setExpandedNodes([...expandedNodes, nodeId])
       setSelectedNodeId(nodeId)
     }
+
     setShowPlusIcon(true)
   }
+
+  useEffect(() => {
+    if (infra.length > 0) {
+      infra.forEach(item => {
+        fetchChildData(item.id)
+      })
+
+      expandedNodes.forEach(async nodeId => {
+        await fetchChildData(nodeId)
+      })
+    }
+  }, [infra])
 
   const renderTreeItems = nodes => {
     return nodes.map(node => {
@@ -215,12 +237,20 @@ const OrganizationalStructure = () => {
       return (
         <TreeItem
           key={node.id}
-          nodeId={node.id}
+          nodeId={node.id.toString()}
           label={
-            <Box display='flex' alignItems='center' style={{ marginLeft: '5%' }}>
-              <Typography>{node.name}</Typography>
+            <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Button
+                size='small'
+                sx={{ textAlign: 'left', justifyContent: 'flex-start', width: '100%' }}
+                onClick={async () => {
+                  await fetchChildData(node.id)
+                }}
+              >
+                {node.name}
+              </Button>
+
               <IconButton
-                style={{ marginLeft: 'auto' }}
                 size='small'
                 onClick={() => {
                   handleAddPClick(node.id)
@@ -238,22 +268,16 @@ const OrganizationalStructure = () => {
               >
                 <Icon icon='tabler:trash' />
               </IconButton>
-              <IconButton size='small'>
-                <Icon icon='tabler:edit' onClick={() => handleOpenPopupDetail(node.id)} />
+              <IconButton size='small' onClick={() => handleOpenPopupDetail(node.id)}>
+                <Icon icon='tabler:edit' />
               </IconButton>
             </Box>
           }
-          onClick={async () => {
-            // await handleChangeTab(selectedTab) // Thay đổi tab
-            await fetchChildData(node.id) // Fetch lại dữ liệu cho bảng
-            console.log(node.id)
-          }}
-          sx={{ marginLeft: '3%', marginTop: '4%' }}
           icon={
             node.isParent ? (
               <Box display='flex' alignItems='center'>
                 <IconButton style={{ padding: '0px' }} onClick={() => handleFetchChildren(node.id)}>
-                  <Icon icon={expandedNodes.includes(node.id) ? 'bi:chevron-down' : 'tabler:chevron-right'} />
+                  <Icon icon={expandedNodes.includes(node.id) ? 'tabler:chevron-down' : 'tabler:chevron-right'} />
                 </IconButton>
               </Box>
             ) : null
@@ -389,10 +413,13 @@ const OrganizationalStructure = () => {
               </Grid>
               <Grid item xs={2.5} style={{ display: 'flex', flexDirection: 'column' }}>
                 <Paper elevation={3} style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                  <Button onClick={() => handleAddPClick(idGroup)}>
+                    <Icon icon='tabler:plus' />
+                  </Button>
                   <TreeView
                     aria-label='file system navigator'
-                    defaultCollapseIcon={<Icon icon='mdi:folder-open-outline' />}
-                    defaultExpandIcon={<Icon icon='mdi:folder-outline' />}
+                    defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
+                    defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
                     expanded={expandedNodes}
                     sx={{ flexGrow: 1, overflowY: 'auto', height: '100%' }}
                     onNodeSelect={handleNodeSelect}
@@ -417,16 +444,14 @@ const OrganizationalStructure = () => {
                     value={info ? info.code : currentTabInfra.code || ''}
                     fullWidth
                     style={{ marginBottom: '16px' }}
-                    onClick={() => handleOpenPopupDetail(getIdFromValue(info ? info.code : currentTabInfra.code || ''))}
+                    onClick={() => handleOpenPopupDetail(getIdFromValue(info ? info.name : currentTabInfra.name || ''))}
                   />
                   <CustomTextField
                     label='Detail'
                     type='text'
                     value={info ? info.detail : currentTabInfra.detail || ''}
                     fullWidth
-                    onClick={() =>
-                      handleOpenPopupDetail(getIdFromValue(info ? info.detail : currentTabInfra.detail || ''))
-                    }
+                    onClick={() => handleOpenPopupDetail(getIdFromValue(info ? info.name : currentTabInfra.name || ''))}
                   />
                 </Paper>
                 <Paper elevation={3} style={{ padding: '16px', flexGrow: 1 }}>
