@@ -398,6 +398,11 @@ const navigation = () => {
       icon: 'tabler:lock-access',
       children: [
         {
+          path: '/smart-parking/Monitoring/list',
+          title: 'Monitoring',
+          icon: 'tabler:device-computer-camera'
+        },
+        {
           path: '/smart-parking/caller',
           title: 'Subscription',
           icon: 'tabler:phone'

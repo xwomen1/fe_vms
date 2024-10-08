@@ -403,6 +403,11 @@ const navigation = () => {
           icon: 'tabler:phone'
         },
         {
+          path: '/smart-parking/Monitoring/list',
+          title: 'Monitoring',
+          icon: 'tabler:device-computer-camera'
+        },
+        {
           path: '/smart-parking/caller-type',
           title: 'Subscription Type',
           icon: 'tabler:phone'
