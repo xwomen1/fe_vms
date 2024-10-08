@@ -1265,7 +1265,10 @@ const Register = () => {
                   control={control}
                   rules={{ required: true }}
                   render={({ field: { value, onChange } }) => {
-                    const selectedGroup = unitGroup.find(group => group.id === value)
+                    console.log(value, 'selectedGroup,selectedGroup,value')
+                    console.log(unitGroup, 'unitGroup')
+                    const selectedGroup = unitGroup.find(group => group.parentID === value)
+                    console.log(selectedGroup, 'selectedGroup,selectedGroup')
 
                     return (
                       <>
@@ -1278,7 +1281,7 @@ const Register = () => {
                           }}
                           onFocus={fetchUnitGroup}
                           id='autocomplete-controlled'
-                          getOptionLabel={option => option?.name || ''}
+                          getOptionLabel={option => option?.parentName || ''}
                           renderInput={params => (
                             <CustomTextField
                               {...params}

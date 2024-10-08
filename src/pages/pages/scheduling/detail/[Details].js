@@ -21,6 +21,7 @@ import {
   Paper
 } from '@mui/material'
 import AddImageGuest from '../popups/addImageGuest'
+import CardDetai from '../popups/CardDetail'
 import Barcode from 'react-barcode'
 import CustomChip from 'src/@core/components/mui/chip'
 import CustomTextField from 'src/@core/components/mui/text-field'
@@ -36,6 +37,8 @@ const Details = () => {
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
   const [isOpenAddImage, setIsOpenAddImage] = useState(false)
   const [idImage, setImage] = useState({})
+  const [isOpenCard, setIsOpenCard] = useState(false)
+  const [idCard, setCard] = useState({})
 
   useEffect(() => {
     if (id) {
@@ -263,7 +266,12 @@ const Details = () => {
                               >
                                 <Icon icon='tabler:polaroid' />
                               </IconButton>
-                              <IconButton>
+                              <IconButton
+                                onClick={() => {
+                                  setIsOpenCard(true)
+                                  setCard(guests.guestId)
+                                }}
+                              >
                                 <Icon icon='tabler:credit-card' />
                               </IconButton>
                               <IconButton
@@ -371,6 +379,14 @@ const Details = () => {
           show={isOpenAddImage}
           onClose={() => setIsOpenAddImage(false)}
           callback={idImage}
+          setReload={() => setReload(reload + 1)}
+        />
+      )}
+      {isOpenCard && (
+        <CardDetai
+          show={isOpenCard}
+          onClose={() => setIsOpenCard(false)}
+          callback={idCard}
           setReload={() => setReload(reload + 1)}
         />
       )}
