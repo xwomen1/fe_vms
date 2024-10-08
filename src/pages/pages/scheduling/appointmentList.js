@@ -23,31 +23,27 @@ import CustomChip from 'src/@core/components/mui/chip'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
 import { getApi } from 'src/@core/utils/requestUltils'
+import Swal from 'sweetalert2'
+import axios from 'axios'
 
 const statusAppointment = [
   {
-    id: 'WAITING',
-    color: 'primary'
+    id: 'WAITING'
   },
   {
-    id: 'CANCELLED',
-    color: 'Secondary'
+    id: 'CANCELLED'
   },
   {
-    id: 'COMPLETE',
-    color: 'success'
+    id: 'COMPLETE'
   },
   {
-    id: 'APPROVED',
-    color: 'info'
+    id: 'APPROVED'
   },
   {
-    id: 'UNSUCCESSFUL',
-    color: 'error'
+    id: 'UNSUCCESSFUL'
   },
   {
-    id: 'OUT_OF_DATE',
-    color: 'warning'
+    id: 'REMOVE'
   }
 ]
 
@@ -55,11 +51,40 @@ const AppointmentList = ({ keyword, valueFilter }) => {
   const [loading, setLoading] = useState(false)
   const [dataList, setDataList] = useState([])
   const [pageSize, setPageSize] = useState(25)
+  const [reload, setReload] = useState(0)
   const [anchorEl, setAnchorEl] = useState(null)
   const pageSizeOptions = [25, 50, 100]
   const [total, setTotal] = useState(1)
   const [page, setPage] = useState(1)
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+  function showAlertConfirm(options, intl) {
+    const defaultProps = {
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Accept',
+      imageWidth: 213,
+      showCancelButton: true,
+      showCloseButton: true,
+      showConfirmButton: true,
+      focusCancel: true,
+      reverseButtons: true,
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Agree',
+      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Cancel',
+      customClass: {
+        content: 'content-class',
+        confirmButton: 'swal-btn-confirm',
+        cancelButton: 'swal-btn-cancel',
+        actions: 'swal-actions'
+      },
+      didOpen: () => {
+        const confirmButton = Swal.getConfirmButton()
+        if (confirmButton) {
+          confirmButton.style.backgroundColor = '#002060'
+        }
+      }
+    }
+
+    return Swal.fire({ ...defaultProps, ...options })
+  }
 
   const handleOpenMenu = event => {
     setAnchorEl(event.currentTarget)
@@ -86,6 +111,48 @@ const AppointmentList = ({ keyword, valueFilter }) => {
     return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`
   }
 
+  const handleApproveBtnClick = id => {
+    showAlertConfirm({
+      text: 'Are you sure you want to approve this application?'
+    }).then(({ value }) => {
+      if (value) {
+        axios
+          .patch(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/registrations/${id}/approve`)
+          .then(() => {
+            toast.success('Registration approved successfully', {
+              text: 'Approved guest registration request'
+            })
+            setReload(reload + 1)
+          })
+          .catch(error => {
+            toast.error(error?.message)
+          })
+      }
+    })
+  }
+
+  const handleCancelBtnClick = id => {
+    showAlertConfirm({
+      text: 'Are you sure you want to cancel this application?'
+    }).then(({ value }) => {
+      if (value) {
+        axios
+          .patch(
+            `
+          https://dev-ivi.basesystem.one/smc/access-control/api/v0/registrations/${id}/cancel`
+          )
+          .then(() => {
+            toast.success('Unsubscribe successfully', {
+              text: 'Guest registration request has been cancelled'
+            })
+          })
+          .catch(error => {
+            toast.error('There is no authority to approve this application!')
+          })
+      }
+    })
+  }
+
   const fetchData = async () => {
     setLoading(true)
     try {
@@ -98,7 +165,7 @@ const AppointmentList = ({ keyword, valueFilter }) => {
 
       const response = await getApi(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/registrations`, params)
       setDataList(response.data?.rows)
-      setTotal(Math.ceil(response.data?.count / pageSize)) // Tính tổng số trang dựa trên tổng số mục và kích thước trang
+      setTotal(Math.ceil(response.data?.count / pageSize))
     } catch (error) {
       if (error && error?.response?.data) {
         console.error('error', error)
@@ -114,7 +181,7 @@ const AppointmentList = ({ keyword, valueFilter }) => {
 
   useEffect(() => {
     fetchData()
-  }, [keyword, page, pageSize, valueFilter])
+  }, [keyword, page, pageSize, valueFilter, reload])
 
   return (
     <>
@@ -182,12 +249,44 @@ const AppointmentList = ({ keyword, valueFilter }) => {
                       <TableCell>{Guests.approverInfo?.fullName}</TableCell>
                       <TableCell>{Guests.guestInfo?.identityNumber}</TableCell>
                       <TableCell>
-                        <CustomChip label={statusGuests.id} skin='light' color={statusGuests.color} />
+                        <CustomChip
+                          label={statusGuests?.id || 'Unknown'}
+                          skin='light'
+                          color={
+                            statusGuests?.id === 'WAITING'
+                              ? 'default'
+                              : statusGuests?.id === 'APPROVED'
+                              ? 'success'
+                              : statusGuests?.id === 'COMPLETE'
+                              ? 'success'
+                              : statusGuests?.id === 'UNSUCCESSFUL'
+                              ? 'error'
+                              : statusGuests?.id === 'CANCELLED'
+                              ? 'warning'
+                              : statusGuests?.id === 'REMOVE'
+                              ? 'info'
+                              : 'default'
+                          }
+                        />
                       </TableCell>
-                      <TableCell>
-                        <IconButton component={Link} href={`/pages/scheduling/detail/${Guests.id}`}>
-                          <Icon icon='tabler:info-circle' />
-                        </IconButton>
+                      <TableCell sx={{ textAlign: 'center' }}>
+                        {statusGuests?.id === 'WAITING' ? (
+                          <>
+                            <IconButton onClick={() => handleApproveBtnClick(Guests.id)}>
+                              <Icon icon='tabler:check' />
+                            </IconButton>
+                            <IconButton onClick={() => handleCancelBtnClick(Guests.id)}>
+                              <Icon icon='tabler:x' />
+                            </IconButton>{' '}
+                            <IconButton component={Link} href={`/pages/scheduling/detail/${Guests.id}`}>
+                              <Icon icon='tabler:info-circle' />
+                            </IconButton>
+                          </>
+                        ) : (
+                          <IconButton component={Link} href={`/pages/scheduling/detail/${Guests.id}`}>
+                            <Icon icon='tabler:info-circle' />
+                          </IconButton>
+                        )}
                       </TableCell>
                     </TableRow>
                   )

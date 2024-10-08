@@ -17,7 +17,7 @@ const navigation = () => {
         },
 
         {
-          title: 'Scheduling',
+          title: 'Guest Appointment',
           path: '/pages/scheduling',
           icon: 'tabler:calendar-plus'
         },

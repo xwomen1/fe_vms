@@ -44,10 +44,7 @@ const FaceManagement = () => {
   const [loading, setLoading] = useState(false)
   const [listImage, setListImage] = useState([])
   const [isDeleteDisabled, setIsDeleteDisabled] = useState(true)
-  const [dialogOpen, setDialogOpen] = useState(false)
   const [dialogTitle, setDialogTitle] = useState('')
-  const [dialogMessage, setDialogMessage] = useState('')
-  const [isSuccess, setIsSuccess] = useState(false)
   const [anchorEl, setAnchorEl] = useState(null)
   const [pageSize, setPageSize] = useState(25)
   const [total, setTotal] = useState([1])
@@ -88,6 +85,8 @@ const FaceManagement = () => {
   }, [selectedIds])
 
   const handleCheckboxChange = (event, id) => {
+    console.log(id, 'id,id')
+
     const { checked } = event.target
 
     let updatedIds = [...selectedIds]
@@ -107,10 +106,6 @@ const FaceManagement = () => {
 
     setSelectedIds(updatedIds)
     setSelectAll(checked)
-  }
-
-  const handleDialogClose = () => {
-    setDialogOpen(false)
   }
 
   const handlePageChange = newPage => {
@@ -138,24 +133,26 @@ const FaceManagement = () => {
             .delete(urlDelete, config)
             .then(() => {
               setDialogTitle('Deleted Successfully')
-              setIsSuccess(true)
               const updatedData = userData.filter(user => user.id !== idDelete)
               setUserData(updatedData)
             })
             .catch(err => {
               setDialogTitle('Delete failed')
-              setDialogMessage(err.message || 'Delete failed')
-              setIsSuccess(false)
             })
             .finally(() => {
               setLoading(false)
-              setDialogOpen(true)
             })
         })
 
         setSelectedIds([])
       }
     })
+  }
+
+  const formatDate = dateString => {
+    const date = new Date(dateString)
+
+    return format(date, 'hh:mm:ss dd/MM/yyyy')
   }
 
   const exportToExcel = async () => {
@@ -183,12 +180,13 @@ const FaceManagement = () => {
       const data = response.data.map(item => ({
         mainImageId: item.mainImageId,
         name: item.name,
-        time: item.time
+        lastAppearance: formatDate(item.lastAppearance),
+        status: item.status
       }))
 
       const exportData = [
-        ['Image Code', 'Name', 'Last seen'],
-        ...data.map(item => [item.mainImageId, item.name, item.time])
+        ['Image Code', 'Name', 'Last seen', 'Status'],
+        ...data.map(item => [item.mainImageId, item.name, item.lastAppearance, item.status])
       ]
 
       const ws = XLSX.utils.aoa_to_sheet(exportData)
@@ -328,15 +326,6 @@ const FaceManagement = () => {
     })
   }
 
-  const buildUrlWithToken = url => {
-    const token = localStorage.getItem(authConfig.storageTokenKeyName)
-    if (token) {
-      return `${url}?token=${token}`
-    }
-
-    return url
-  }
-
   const Img = React.memo(props => {
     const [loaded, setLoaded] = useState(false)
 
@@ -370,12 +359,6 @@ const FaceManagement = () => {
     )
   })
 
-  const formatDate = dateString => {
-    const date = new Date(dateString)
-
-    return format(date, 'hh:mm:ss dd/MM/yyyy')
-  }
-
   return (
     <>
       <Card>
@@ -389,10 +372,10 @@ const FaceManagement = () => {
                   <Button
                     aria-label='Delete'
                     style={{
-                      background: '#a9a9a9',
                       color: '#ffffff',
                       marginRight: '5px'
                     }}
+                    variant='contained'
                     disabled={isDeleteDisabled}
                     onClick={handleDeleteSelected}
                   >
@@ -401,10 +384,10 @@ const FaceManagement = () => {
                   <Button
                     aria-label='export file'
                     style={{
-                      background: '#a9a9a9',
                       color: '#ffffff',
                       marginRight: '5px'
                     }}
+                    variant='contained'
                     onClick={exportToExcel}
                   >
                     <Icon icon='tabler:file-export' />
@@ -452,6 +435,25 @@ const FaceManagement = () => {
             alignItems: ['flex-start', 'center']
           }}
         />
+        {loading && (
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '100vh',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(255, 255, 255, 0.7)',
+              zIndex: 9999
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        )}
         <Grid item xs={12}>
           <TableContainer component={Paper} sx={{ maxHeight: '100%' }}>
             <Table>
@@ -460,7 +462,7 @@ const FaceManagement = () => {
                   <TableCell align='center'>
                     <Checkbox onChange={handleSelectAllChange} checked={selectAll} />
                   </TableCell>
-                  <TableCell align='center'>NO.</TableCell>
+                  <TableCell align='center'>NOs.</TableCell>
                   <TableCell align='center'>Object Image</TableCell>
                   <TableCell align='center'>Object Name</TableCell>
                   <TableCell align='center'>Last seen</TableCell>
@@ -470,56 +472,45 @@ const FaceManagement = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {loading && <CircularProgress style={{ marginLeft: '20%' }} />}
                 {Array.isArray(userData) && userData.length > 0 ? (
-                  userData.map(
-                    (user, index) => (
-                      console.log(user.status),
-                      (
-                        <TableRow key={user.id}>
-                          <TableCell align='center'>
-                            <Checkbox
-                              onChange={event => handleCheckboxChange(event, user.id)}
-                              checked={selectedIds.includes(user.id)}
-                            />
-                          </TableCell>
-                          <TableCell align='center'>{index + 1}</TableCell>
-                          <TableCell align='center'>
-                            <Img
-                              src={buildUrlWithToken(
-                                `https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${user.mainImageId}`
-                              )}
-                              style={{ maxWidth: '91px', height: '56px', minWidth: '56px' }}
-                            />
-                          </TableCell>
-                          <TableCell align='center'>{user.name}</TableCell>
-                          <TableCell align='center'>{formatDate(user.lastAppearance)}</TableCell>
-                          <TableCell align='center'>Staff</TableCell>
-                          <TableCell align='center'>
-                            <div>
-                              <CustomChip
-                                rounded
-                                size='small'
-                                skin='light'
-                                sx={{ lineHeight: 1 }}
-                                label={user.status === false ? 'Inactive' : 'Active'}
-                                color={user.status === false ? 'primary' : 'success'}
-                              />
-                            </div>
-                          </TableCell>
-                          <TableCell align='center'>
-                            <IconButton component={Link} href={`/pages/face_management/detail/${user.id}`}>
-                              <Icon icon='tabler:info-circle' />
-                            </IconButton>
+                  userData.map((user, index) => (
+                    <TableRow key={user.id}>
+                      <TableCell align='center'>
+                        <Checkbox
+                          onChange={event => handleCheckboxChange(event, user.id)}
+                          checked={selectedIds.includes(user.id)}
+                        />
+                      </TableCell>
+                      <TableCell align='center'>{index + 1}</TableCell>
+                      <TableCell align='center'>
+                        <Img src={user.mainImageUrl} style={{ maxWidth: '91px', height: '56px', minWidth: '56px' }} />
+                      </TableCell>
+                      <TableCell align='center'>{user.name}</TableCell>
+                      <TableCell align='center'>{formatDate(user.lastAppearance)}</TableCell>
+                      <TableCell align='center'>Staff</TableCell>
+                      <TableCell align='center'>
+                        <div>
+                          <CustomChip
+                            rounded
+                            size='small'
+                            skin='light'
+                            sx={{ lineHeight: 1 }}
+                            label={user.status === false ? 'Inactive' : 'Active'}
+                            color={user.status === false ? 'primary' : 'success'}
+                          />
+                        </div>
+                      </TableCell>
+                      <TableCell align='center'>
+                        <IconButton component={Link} href={`/pages/face_management/detail/${user.id}`}>
+                          <Icon icon='tabler:info-circle' />
+                        </IconButton>
 
-                            <IconButton onClick={() => handleDelete(user.id)}>
-                              <Icon icon='tabler:trash' />
-                            </IconButton>
-                          </TableCell>
-                        </TableRow>
-                      )
-                    )
-                  )
+                        <IconButton onClick={() => handleDelete(user.id)}>
+                          <Icon icon='tabler:trash' />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))
                 ) : (
                   <TableRow>
                     <TableCell colSpan={7} align='center'>

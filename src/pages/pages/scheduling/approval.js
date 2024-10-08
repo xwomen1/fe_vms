@@ -28,28 +28,22 @@ import { getApi } from 'src/@core/utils/requestUltils'
 
 const statusAppointment = [
   {
-    id: 'WAITING',
-    color: 'primary'
+    id: 'WAITING'
   },
   {
-    id: 'CANCELLED',
-    color: 'Secondary'
+    id: 'CANCELLED'
   },
   {
-    id: 'COMPLETE',
-    color: 'success'
+    id: 'COMPLETE'
   },
   {
-    id: 'APPROVED',
-    color: 'info'
+    id: 'APPROVED'
   },
   {
-    id: 'UNSUCCESSFUL',
-    color: 'error'
+    id: 'UNSUCCESSFUL'
   },
   {
-    id: 'OUT_OF_DATE',
-    color: 'warning'
+    id: 'OUT_OF_DATE'
   }
 ]
 
@@ -148,7 +142,12 @@ const Approval = ({ keyword, valueFilter }) => {
                     <TableRow key={Guests.id}>
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>
-                        <Button size='small' sx={{ color: 'blue' }}>
+                        <Button
+                          size='small'
+                          component={Link}
+                          href={`/pages/scheduling/detail/${Guests.id}`}
+                          sx={{ color: 'blue', right: '10px' }}
+                        >
                           {Guests.code}
                         </Button>
                       </TableCell>
@@ -164,8 +163,27 @@ const Approval = ({ keyword, valueFilter }) => {
                       <TableCell>{Guests.approverInfo?.fullName}</TableCell>
                       <TableCell>{Guests.guestInfo?.identityNumber}</TableCell>
                       <TableCell>
-                        <CustomChip label={statusGuests.id} skin='light' color={statusGuests.color} />
+                        <CustomChip
+                          label={statusGuests?.id || 'Unknown'}
+                          skin='light'
+                          color={
+                            statusGuests?.id === 'WAITING'
+                              ? 'default'
+                              : statusGuests?.id === 'APPROVED'
+                              ? 'success'
+                              : statusGuests?.id === 'COMPLETE'
+                              ? 'success'
+                              : statusGuests?.id === 'UNSUCCESSFUL'
+                              ? 'error'
+                              : statusGuests?.id === 'CANCELLED'
+                              ? 'warning'
+                              : statusGuests?.id === 'REMOVE'
+                              ? 'info'
+                              : 'default'
+                          }
+                        />
                       </TableCell>
+
                       <TableCell>
                         <IconButton component={Link} href={`/pages/scheduling/detail/${Guests.id}`}>
                           <Icon icon='tabler:info-circle' />

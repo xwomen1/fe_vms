@@ -51,14 +51,8 @@ const AddFaceManagement = () => {
   const [avatarImage, setAvatarImage] = useState(null)
   const [fileAvatarImg, setFileAvatarImg] = useState(null)
   const ALLOWED_FILE_EXTENSIONS = ['.jpg', '.jpeg', '.gif', '.png']
-  const [isDoubleClick, setIsDoubleClick] = useState(false)
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [dialogTitle, setDialogTitle] = useState('')
-  const [dialogMessage, setDialogMessage] = useState('')
   const [status1, setStatus1] = useState(false)
-  const [isSuccess, setIsSuccess] = useState(false)
   const [selectedOption, setSelectedOption] = useState('')
-  const [redirectUrl, setRedirectUrl] = useState('')
   const [errorType, setErrorType] = useState(false)
 
   const handleInputChange = e => {
@@ -66,12 +60,6 @@ const AddFaceManagement = () => {
     setName(value)
     setIsNameEntered(!!value)
   }
-
-  useEffect(() => {
-    if (!showCropper) {
-      setIsDoubleClick(false)
-    }
-  }, [showCropper])
 
   const fileListToBase64 = async fileList => {
     function getBase64(file) {
@@ -204,11 +192,7 @@ const AddFaceManagement = () => {
         }
 
         try {
-          const res = await axios.post(
-            `https://sbs.basesystem.one/ivis/storage/api/v0/libraries/upload/multi`,
-            formData,
-            config
-          )
+          const res = await axios.post(`https://sbs.basesystem.one/ivis/vms/api/v0/images/upload`, formData, config)
           setListFileUpload(files)
 
           const fileIds = res.data.map(x => x.id)
@@ -405,7 +389,12 @@ const AddFaceManagement = () => {
                         >
                           Cancel
                         </Button>
-                        <Button disabled={!isNameEntered} onClick={handleAddBlacklist} variant='contained' color='primary'>
+                        <Button
+                          disabled={!isNameEntered}
+                          onClick={handleAddBlacklist}
+                          variant='contained'
+                          color='primary'
+                        >
                           Save
                         </Button>
                       </Box>

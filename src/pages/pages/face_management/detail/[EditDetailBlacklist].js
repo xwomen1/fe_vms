@@ -33,9 +33,9 @@ const EditFaceManagement = () => {
   const [listFileId, setListFileId] = useState([])
   const [listImage, setListImage] = useState([])
   const listFileUrl = []
+  const [imgs, setImgs] = useState([])
   const [person, setPerson] = useState([])
   const [listFileUpload, setListFileUpload] = useState([])
-  const [fileAvatarImg, setFileAvatarImg] = useState(null)
   const [fileAvatarId, setFileAvatarId] = useState(null)
   const [name, setName] = useState(null)
   const [note, setNote] = useState(null)
@@ -49,28 +49,16 @@ const EditFaceManagement = () => {
   const [img3, setImg3] = useState(null)
   const [img4, setImg4] = useState(null)
   const [title1, setTitle1] = useState('')
-  const [title, setTitle] = useState('')
   const [errorType, setErrorType] = useState(false)
-
-  const buildUrlWithToken = url => {
-    const token = localStorage.getItem(authConfig.storageTokenKeyName)
-    if (token) {
-      return `${url}?token=${token}`
-    }
-
-    return url
-  }
 
   useEffect(() => {
     setListImage([img0, img1, img2, img3, img4])
   }, [])
 
   useEffect(() => {
-    const listImg = listFileId.map(id =>
-      buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${id}`)
-    )
+    const listImg = imgs.map(img => img.urlImage)
     setListImage(listImg)
-  }, [listFileId])
+  }, [imgs])
 
   const handleStatusChange = () => {
     setStatus1(status1 === true ? false : true)
@@ -95,30 +83,18 @@ const EditFaceManagement = () => {
       if (id) {
         const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${id}`, config)
         const imgs = [...response.data.imgs]
-        console.log(response, 'respon')
         setStatus1(response.data.status)
         setFileAvatarId(response.data.mainImageId)
-        setListFileUpload(
-          imgs.map(img =>
-            buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${img.id}`)
-          )
-        )
+        setListFileUpload(response.data.imgs)
         setListFileId(imgs.map(img => img.id))
-        setListImage(
-          imgs.map(img =>
-            buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${img.id}`)
-          )
-        )
-        setAvatarImage(
-          buildUrlWithToken(
-            `https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${response.data.mainImageId}`
-          )
-        )
-        setImg0(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[0]?.id}`))
-        setImg1(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[1]?.id}`))
-        setImg2(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[2]?.id}`))
-        setImg3(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[3]?.id}`))
-        setImg4(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[4]?.id}`))
+        setListImage(imgs.map(img => img.imgs))
+        setAvatarImage(response.data.mainImageUrl)
+        setImgs(response.data.imgs)
+        setImg0(imgs[0]?.urlImage)
+        setImg1(imgs[1]?.urlImage)
+        setImg2(imgs[2]?.urlImage)
+        setImg3(imgs[3]?.urlImage)
+        setImg4(imgs[4]?.urlImage)
         setName(response.data.name)
         setNote(response.data.note)
       }
@@ -153,27 +129,16 @@ const EditFaceManagement = () => {
           setStatus1(response.data.status)
           setTitle1(response.data?.type)
           setFileAvatarId(response.data.mainImageId)
-          setListFileUpload(
-            imgs.map(img =>
-              buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${img.id}`)
-            )
-          )
+          setListFileUpload(imgs.map(img => img.imgs))
           setListFileId(imgs.map(img => img.id))
-          setListImage(
-            imgs.map(img =>
-              buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${img.id}`)
-            )
-          )
-          setAvatarImage(
-            buildUrlWithToken(
-              `https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${response.data.mainImageId}`
-            )
-          )
-          setImg0(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[0]?.id}`))
-          setImg1(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[1]?.id}`))
-          setImg2(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[2]?.id}`))
-          setImg3(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[3]?.id}`))
-          setImg4(buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${imgs[4]?.id}`))
+          setListImage(imgs.map(img => img.imgs))
+          setAvatarImage(response.data.mainImageUrl)
+          setImg0(imgs[0]?.urlImage)
+          setImgs(response.data.imgs)
+          setImg1(imgs[1]?.urlImage)
+          setImg2(imgs[2]?.urlImage)
+          setImg3(imgs[3]?.urlImage)
+          setImg4(imgs[4]?.urlImage)
           setName(response.data.name)
           setNote(response.data.note)
         }
@@ -240,17 +205,6 @@ const EditFaceManagement = () => {
         const allChildData = await fetchAllChildData(parentData.id, 0)
         setPerson(allChildData)
       }
-      if (parentData.id === title1.id) {
-        setTitle(parentData.name)
-        console.log(parentData.name, 'name')
-      } else if (parentData.isParent) {
-        const allChildData = await fetchAllChildData(parentData.id, 0)
-        const matchingChild = allChildData.find(child => child.id === title1.id)
-        if (matchingChild) {
-          setTitle(matchingChild.name)
-          console.log(matchingChild.name, 'name')
-        }
-      }
     } catch (error) {
       console.error('Error fetching initial data:', error)
     }
@@ -262,14 +216,13 @@ const EditFaceManagement = () => {
 
   const renderOption = (props, option) => (
     <li {...props} style={{ paddingLeft: `${option.level * 20}px` }}>
-      {option.name}
+      {option.code}
     </li>
   )
 
   const handleOptionChange = (event, newValue) => {
-    console.log(newValue, 'newvalue')
     setErrorType(!newValue)
-    setTitle(newValue)
+    setTitle1(newValue)
   }
 
   const handleUpdate = async () => {
@@ -300,9 +253,9 @@ const EditFaceManagement = () => {
           urlImage: listFileUrl[id]
         })),
         type: {
-          id: title.id,
-          code: title.code,
-          name: title.name
+          id: title1.id,
+          code: title1.code,
+          name: title1.name
         }
       }
 
@@ -340,6 +293,8 @@ const EditFaceManagement = () => {
     }
   }
 
+  const selectedOption = person.find(option => option.id === title1?.id)
+
   const onDragDropImage = async () => {
     // Open file picker dialog
     const files = await filePickerDialog()
@@ -364,8 +319,9 @@ const EditFaceManagement = () => {
         // Prepare FormData for file upload
         const formData = new FormData()
         files.forEach(file => {
-          formData.append('files', file)
+          formData.append('files[]', file) // Thêm tệp vào FormData với tên trường là 'files[]'
         })
+        console.log(Array.from(formData.entries()), 'FormData entries') // Ghi lại nội dung của FormData
 
         // Display loading indicator
         setShowLoading(true)
@@ -383,25 +339,33 @@ const EditFaceManagement = () => {
 
           // Send POST request to upload files
           const response = await axios.post(
-            `https://sbs.basesystem.one/ivis/storage/api/v0/libraries/upload/multi`,
+            `https://sbs.basesystem.one/ivis/vms/api/v0/images/upload`,
             formData,
             config
           )
 
-          // Update listFileUpload with new file URLs
-          const newFiles = response.data.map(file =>
-            buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${file.id}`)
-          )
-          setListFileUpload([...listFileUpload, ...newFiles])
+          // Kiểm tra phản hồi
+          console.log(response.data, 'response data')
 
-          // Update listFileId with new file IDs
-          const newFileIds = response.data.map(file => file.id)
-          setListFileId([...listFileId, ...newFileIds.slice(0, 5 - listFileId.length)]) // Limit to 5 files
+          if (response.data && Array.isArray(response.data)) {
+            // Update listFileUpload with new file URLs
+            const newFiles = response.data.map(file =>
+              buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${file.id}`)
+            )
+
+            setListFileUpload([...listFileUpload, ...newFiles])
+
+            // Update listFileId with new file IDs
+            const newFileIds = response.data.map(file => file.id)
+            setListFileId([...listFileId, ...newFileIds.slice(0, 5 - listFileId.length)]) // Limit to 5 files
+          } else {
+            console.error('Unexpected response format:', response.data)
+          }
         } catch (error) {
-          console.error('Error occurred during upload:', error)
+          console.error('Error occurred during upload:', error.response || error.message)
 
           Swal.fire({
-            text: 'Upload failed',
+            text: 'Upload failed: ' + (error.response ? error.response.data.message : error.message),
             icon: 'error',
             confirmButtonColor: '#40a574',
             confirmButtonText: 'Close',
@@ -432,8 +396,6 @@ const EditFaceManagement = () => {
       input.click()
     })
   }
-
-  const selectedOption = person.find(option => option.id === title?.id)
 
   return (
     <>
@@ -604,16 +566,16 @@ const EditFaceManagement = () => {
                   >
                     Object Type
                   </p>
-
+                  {console.log(title1)}
                   <Autocomplete
-                    value={title}
+                    value={title1}
                     options={person}
-                    getOptionLabel={option => option.name || title}
+                    getOptionLabel={option => option.code || title1}
                     renderInput={params => (
                       <CustomTextField
                         {...params}
                         fullWidth
-                        placeholder={!title || Object.keys(title).length === 0 ? 'No data' : ''}
+                        placeholder={!title1 || Object.keys(title1).length === 0 ? 'No data' : ''}
                         error={errorType}
                         helperText={errorType ? 'Please select object type' : ''}
                       />
@@ -625,7 +587,7 @@ const EditFaceManagement = () => {
                   />
                 </div>
 
-                {listFileUpload.length === 0 && (
+                {listImage.length === 0 && (
                   <p style={{ margin: '35px 0px 0px 0px', marginTop: '150px', marginLeft: '20px' }}>
                     <div></div>
 
@@ -633,9 +595,9 @@ const EditFaceManagement = () => {
                   </p>
                 )}
 
-                {listFileUpload.length > 0 && (
+                {listImage.length > 0 && (
                   <p style={{ margin: '35px 0px 0px 0px', marginTop: '150px', marginLeft: '10px' }}>
-                    {`Photos of the object: ${listFileUpload.length}/5`}
+                    {`Photos of the object: ${listImage.length}/5`}
                   </p>
                 )}
                 <div
@@ -659,10 +621,10 @@ const EditFaceManagement = () => {
                           height: '100%'
                         }}
                       >
-                        {listFileUpload[index] ? (
+                        {listImage[index] ? (
                           <img
                             alt=''
-                            src={listFileUpload[index]}
+                            src={listImage[index]}
                             style={{
                               objectFit: 'contain',
                               width: '100%',
@@ -675,11 +637,11 @@ const EditFaceManagement = () => {
                         )}
                       </div>
                       <div style={{ display: 'flex', marginTop: '5%', marginLeft: '15%' }}>
-                        {index > 0 && !listFileUpload[index - 1] && !listFileUpload[index] ? (
+                        {index > 0 && !listImage[index - 1] && !listImage[index] ? (
                           <Button variant='contained' style={{ marginLeft: '20%' }} disabled>
                             <Icon icon='tabler:plus' />
                           </Button>
-                        ) : listFileUpload[index] ? (
+                        ) : listImage[index] ? (
                           <Button variant='contained'>
                             <Icon icon='tabler:edit' />
                           </Button>
@@ -692,15 +654,21 @@ const EditFaceManagement = () => {
                             <Icon icon='tabler:plus' />
                           </Button>
                         )}
-                        {listFileUpload[index] ? (
+                        {listImage[index] ? (
                           <Button
                             variant='contained'
                             onClick={() => {
                               const listFileUploadImgId = [...listFileId]
-                              const listFileUploadTmp = [...listFileUpload]
+                              const listFileUploadTmp = [...listImage]
+                              console.log(listFileUploadImgId, 'listFileUploadImgId')
+                              console.log(listFileUploadTmp, 'listFileUploadTmp')
+
                               const indexId = listFileUploadTmp.indexOf(index)
+                              console.log(indexId, 'indexId')
                               listFileUploadImgId.splice(indexId, 1)
                               listFileUploadTmp.splice(indexId, 1)
+                              console.log(listFileUploadImgId, 'listFileUploadImgId')
+                              console.log(listFileUploadTmp, 'listFileUploadTmp')
                               setListFileId(listFileUploadImgId)
                               setListFileUpload(listFileUploadTmp)
                               setListImage(listFileUploadTmp)
