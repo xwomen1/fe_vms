@@ -8,6 +8,7 @@ import { callApi } from "src/@core/utils/requestUltils"
 import CustomTextField from "src/@core/components/mui/text-field"
 import IndoorMap from "./indoor-map"
 import toast from "react-hot-toast"
+import Option from "../popups/option";
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     '&:hover > .MuiTreeItem-content:not(.Mui-selected)': {
@@ -298,34 +299,34 @@ const Map = () => {
         setCameraGroup(list)
     }
 
-    const renderTree = group => {
+    // const renderTree = group => {
 
-        return (
-            <StyledTreeItem key={group.id} nodeId={group.id} labelText={group.name} labelIcon='tabler:folder'>
-                {group.cameras && group.cameras.length > 0
-                    ? group.cameras.map(camera => {
+    //     return (
+    //         <StyledTreeItem key={group.id} nodeId={group.id} labelText={group.name} labelIcon='tabler:folder'>
+    //             {group.cameras && group.cameras.length > 0
+    //                 ? group.cameras.map(camera => {
 
-                        return (
-                            <StyledTreeItem
-                                key={camera.id}
-                                nodeId={camera.id}
-                                color={camera?.status == true ? '#28c76f' : ''}
-                                textDirection={camera.id === idCameraSelected ? 'underline' : ''}
-                                labelText={camera.deviceName}
-                                labelIcon='tabler:camera'
-                                onClick={() => handleSetCamera(camera)}
-                            />
-                        )
-                    })
-                    : null}
-            </StyledTreeItem>
-        )
-    }
+    //                     return (
+    //                         <StyledTreeItem
+    //                             key={camera.id}
+    //                             nodeId={camera.id}
+    //                             color={camera?.status == true ? '#28c76f' : ''}
+    //                             textDirection={camera.id === idCameraSelected ? 'underline' : ''}
+    //                             labelText={camera.deviceName}
+    //                             labelIcon='tabler:camera'
+    //                             onClick={() => handleSetCamera(camera)}
+    //                         />
+    //                     )
+    //                 })
+    //                 : null}
+    //         </StyledTreeItem>
+    //     )
+    // }
 
     return (
         <>
             <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                <div style={{ display: 'inline-block', position: 'absolute', margin: 5, zIndex: 10 }}>
+                {/* <div style={{ display: 'inline-block', position: 'absolute', margin: 5, zIndex: 10 }}>
 
                     {!open1 && (
                         <Button variant='contained' onClick={() => setOpen1(true)}>
@@ -411,7 +412,7 @@ const Map = () => {
                                 }
                             />
                             <CardContent>
-                                {/* <CustomTextField
+                                <CustomTextField
                                     value={keyword}
                                     placeholder='Search…'
                                     InputProps={{
@@ -436,7 +437,7 @@ const Map = () => {
                                             mr: 2
                                         }
                                     }}
-                                /> */}
+                                />
                                 <Box sx={{
                                     height: {
                                         xs: '300px',
@@ -501,11 +502,17 @@ const Map = () => {
                             </CardContent>
                         </Card>
                     )}
-                </div>
+                </div> */}
 
                 <div style={{ position: 'absolute', width: '100%', height: '100%', zIndex: 1 }}>
                     <IndoorMap cameraGroup={cameraGroup} />
                 </div>
+                <Option
+                    setKeyword={setKeyword}
+                    setCamera={handleSetCamera}
+                    cameraGroup={dataList}
+                    areaGroup={areaGroup}
+                />
             </div>
         </>
     )

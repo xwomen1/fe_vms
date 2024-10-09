@@ -6,8 +6,8 @@ import { styled } from '@mui/material/styles'
 import MuiTabList from '@mui/lab/TabList'
 import TabContext from '@mui/lab/TabContext'
 import { useState } from 'react'
-import DigitalMapTable from './table'
-import Map from './map'
+import DigitalMapTable from './view/table'
+import Map from './view/map'
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
     borderBottom: '0 !important',

@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import * as Indoor from 'src/@core/components/digital-map/Indoor';
-import CameraView from './popups/CameraView';
+import CameraView from '../popups/CameraView';
 
 const IndoorMap = ({ cameraGroup }) => {
     const [reload, setReload] = useState(1);

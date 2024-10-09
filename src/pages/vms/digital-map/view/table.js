@@ -2,7 +2,7 @@ import { Box, Button, Card, CardContent, CardHeader, Dialog, DialogActions, Dial
 import { useEffect, useState } from "react"
 import Icon from 'src/@core/components/icon'
 import CustomTextField from "src/@core/components/mui/text-field"
-import AddMap from "./popups/addMap"
+import AddMap from "../popups/addMap"
 
 
 
