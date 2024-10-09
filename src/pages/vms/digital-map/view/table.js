@@ -1,18 +1,22 @@
-import { Box, Button, Card, CardContent, CardHeader, Dialog, DialogActions, DialogContent, Grid, IconButton, Menu, MenuItem, Pagination, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material"
+import { Box, Button, Card, CardContent, CardHeader, CircularProgress, Dialog, DialogActions, DialogContent, Grid, IconButton, Menu, MenuItem, Pagination, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
 import Icon from 'src/@core/components/icon'
 import CustomTextField from "src/@core/components/mui/text-field"
 import AddMap from "../popups/addMap"
+import toast from "react-hot-toast"
+import { delApi, getApi } from "src/@core/utils/requestUltils"
 
 
 
 const DigitalMapTable = () => {
+    const [reload, setReload] = useState(0)
+    const [loading, setLoading] = useState(false)
     const [keyword, setKeyword] = useState('')
     const [page, setPage] = useState(1)
     const [pageSize, setPageSize] = useState(25)
     const pageSizeOptions = [25, 50, 100]
     const [anchorEl, setAnchorEl] = useState(null)
-    const [dataList, setDataList] = useState([])
+    const [data, setData] = useState([])
     const [isOpenAdd, setIsOpenAdd] = useState(false)
     const [isOpenView, setIsOpenView] = useState(false)
     const [isOpenDel, setIsOpenDel] = useState(false)
@@ -54,10 +58,6 @@ const DigitalMapTable = () => {
         { name: "map 04", areaName: "area 04", areaCode: "AREA04" }
     ]
 
-    useEffect(() => {
-        setDataList(dataFake)
-    }, [])
-
     const handleSearch = e => {
         setKeyword(e.target.value)
     }
@@ -80,29 +80,58 @@ const DigitalMapTable = () => {
         handleCloseMenu()
     }
 
+    const fetchData = async () => {
+        setLoading(true)
+        try {
+            const response = await getApi(
+                `https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps?keyword=${keyword}&page=${page}&limit=${pageSize}&sort=-code`
+            )
+
+            const data = response.data
+            if (data?.length > 0) {
+                setData(data)
+            }
+        } catch (error) {
+            if (error && error?.response?.data) {
+                console.error('error', error)
+                toast.error(error?.response?.data?.message)
+            } else {
+                console.error('Error fetching data:', error)
+                toast.error(error)
+            }
+        } finally {
+            setLoading(false)
+        }
+    }
 
     const handleDelete = async () => {
         if (idDelete != null) {
             setLoading(true)
 
-            //   try {
-            //     await axios.delete(`https://sbs.basesystem.one/ivis/vms/api/v0/camera-model-ai/${idDelete}`, config)
-            //     setReload(reload + 1)
-            //     setIdDelete(null)
-            //     toast.success('Deleted Successfully')
-            //   } catch (error) {
-            //     if (error && error?.response?.data) {
-            //       console.error('error', error)
-            //       toast.error(error?.response?.data?.message)
-            //     } else {
-            //       console.error('Error fetching data:', error)
-            //       toast.error(error)
-            //     }
-            //   } finally {
-            //     setLoading(false)
-            //   }
+            try {
+                await delApi(`https://sbs.basesystem.one/ivis/vms/api/v0/camera-model-ai/${idDelete}`)
+                setReload(reload + 1)
+                setIdDelete(null)
+                toast.success('Deleted Successfully')
+            } catch (error) {
+                if (error && error?.response?.data) {
+                    console.error('error', error)
+                    toast.error(error?.response?.data?.message)
+                } else {
+                    console.error('Error fetching data:', error)
+                    toast.error(error)
+                }
+            } finally {
+                setLoading(false)
+            }
         }
     }
+
+
+    useEffect(() => {
+        fetchData()
+    }, [keyword, page, pageSize])
+
 
     const DeleteView = () => (
         <Dialog
@@ -143,7 +172,7 @@ const DigitalMapTable = () => {
                         setIsOpenDel(false)
                     }}
                 >
-                    Ok
+                    Agree
                 </Button>
             </DialogActions>
         </Dialog>
@@ -219,8 +248,23 @@ const DigitalMapTable = () => {
                                         <TableCell align='center'>Actions</TableCell>
                                     </TableRow>
                                 </TableHead>
+                                {loading && (
+                                    <Box
+                                        sx={{
+                                            width: '100%',
+                                            height: ' 100%',
+                                            position: 'absolute',
+                                            zIndex: 10,
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center'
+                                        }}
+                                    >
+                                        <CircularProgress />
+                                    </Box>
+                                )}
                                 <TableBody>
-                                    {dataList.slice(0, pageSize).map((row, index) => (
+                                    {data.slice(0, pageSize).map((row, index) => (
                                         <TableRow hover tabIndex={-1} key={index}>
                                             <TableCell>{index + 1}</TableCell>
                                             {columns.map(column => {
