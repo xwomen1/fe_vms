@@ -152,6 +152,11 @@ const navigation = () => {
           path: '/vms/live-view',
           icon: 'tabler:video'
         },
+        {
+          title: 'Content analysis',
+          path: '/vms/Content-analysis/list',
+          icon: 'tabler:category'
+        },
 
         // {
         //   title: 'Xem trực tiếp 2',
