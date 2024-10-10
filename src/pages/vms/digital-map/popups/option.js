@@ -114,38 +114,18 @@ const Option = ({ keyword, keyword1, setKeyword, setCamera, cameraGroup, areaGro
     const [open, setOpen] = useState(false)
 
     // ** Hook
-    const { settings, saveSettings } = useSettings()
-    const [expanded, setExpanded] = useState(['0'])
+
     const [treeData, setTreeData] = useState([])
-    const [childData, setChildData] = useState([])
     const [expandedNodes, setExpandedNodes] = useState([])
-    const [selectedNodeId, setSelectedNodeId] = useState(null)
     const [data, setData] = useState([])
 
     const handleSearch = e => {
         setKeyword(e)
     }
 
-    const handleNodeSelect = (event, nodeId) => {
-        fetchId(nodeId)
-    }
-
-    const fetchId = async nodeId => {
-        try {
-            const res = await getApi(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${nodeId}`)
-            setData(res.data)
-        } catch (error) {
-            console.error('Error fetching children:', error)
-
-            return []
-        }
-    }
-
-
     const fetchChildrenById = async parentId => {
         try {
             const res = await getApi(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`)
-            setChildData(res.data)
             setTreeData(prevTreeData => ({
                 ...prevTreeData,
                 [parentId]: res.data
@@ -171,7 +151,6 @@ const Option = ({ keyword, keyword1, setKeyword, setCamera, cameraGroup, areaGro
             setExpandedNodes(expandedNodes.filter(id => id !== nodeId))
         } else {
             setExpandedNodes([...expandedNodes, nodeId])
-            setSelectedNodeId(nodeId)
         }
     }
 
@@ -348,9 +327,7 @@ const Option = ({ keyword, keyword1, setKeyword, setCamera, cameraGroup, areaGro
                                     defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
                                     defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
                                     sx={{ flexGrow: 1, overflowY: 'auto', height: '100%' }}
-                                    onNodeSelect={handleNodeSelect}
                                 >
-                                    {/* {areaGroup.map(group => renderTree(group))} */}
                                     {renderTreeItems(areaGroup)}
                                 </TreeView>
                             </Box>

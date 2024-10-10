@@ -93,7 +93,7 @@ const StyledTreeItem = props => {
     )
 }
 
-const AddMap = ({ show, onClose, setReload, data }) => {
+const EditMap = ({ show, onClose, setReload, data, typePopup }) => {
     const [loading, setLoading] = useState(false)
     const [detail, setDetail] = useState(null)
     const [treeData, setTreeData] = useState([])
@@ -112,6 +112,11 @@ const AddMap = ({ show, onClose, setReload, data }) => {
         handleSubmit,
         formState: { errors }
     } = useForm({})
+
+    useEffect(() => {
+        setDetail(data)
+        console.log('data', data)
+    }, [data])
 
     useEffect(() => {
         if (detail) {
@@ -242,7 +247,13 @@ const AddMap = ({ show, onClose, setReload, data }) => {
             areaName: selectedArea?.name,
             img: fileUploadUrl
         }
-        handleAdd(detail)
+
+        if (data) {
+            handleUpdate(detail)
+        } else {
+            handleAdd(detail)
+        }
+
         onClose()
     }
 
@@ -255,6 +266,32 @@ const AddMap = ({ show, onClose, setReload, data }) => {
         postApi(`https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps`, { ...params })
             .then(() => {
                 toast.success('Add Successfully')
+                setReload()
+                onClose()
+            })
+            .catch(error => {
+                if (error && error?.response?.data) {
+                    console.error('error', error)
+                    toast.error(error?.response?.data?.message)
+                } else {
+                    console.error('Error fetching data:', error)
+                    toast.error(error)
+                }
+            })
+            .finally(() => {
+                setLoading(false)
+            })
+    }
+
+    const handleUpdate = values => {
+        const params = {
+            ...values
+        }
+
+        setLoading(true)
+        putApi(`https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps/${data.id}`, { ...params })
+            .then(() => {
+                toast.success('Data saved successfully')
                 setReload()
                 onClose()
             })
@@ -491,4 +528,4 @@ const AddMap = ({ show, onClose, setReload, data }) => {
     )
 }
 
-export default AddMap
+export default EditMap

@@ -130,7 +130,7 @@ const DigitalMapTable = () => {
 
     useEffect(() => {
         fetchData()
-    }, [keyword, page, pageSize])
+    }, [keyword, page, pageSize, reload])
 
 
     const DeleteView = () => (
@@ -332,10 +332,10 @@ const DigitalMapTable = () => {
 
             </Card>
             {isOpenAdd && (
-                <AddMap show={isOpenAdd} onClose={() => setIsOpenAdd(false)} />
+                <AddMap show={isOpenAdd} onClose={() => setIsOpenAdd(false)} setReload={() => setReload(reload + 1)} />
             )}
             {isOpenView && (
-                <AddMap show={isOpenView} onClose={() => setIsOpenView(false)} data={digitalMap} />
+                <EditMap show={isOpenView} onClose={() => setIsOpenView(false)} data={digitalMap} setReload={() => setReload(reload + 1)} />
             )}
             {isOpenDel && DeleteView()}
         </>
