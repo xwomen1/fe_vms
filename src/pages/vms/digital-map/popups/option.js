@@ -132,6 +132,7 @@ const Option = ({ keyword, keyword1, setKeyword, setCamera, cameraGroup, areaGro
             }))
         } catch (error) {
             console.error('Error fetching children:', error)
+
             return []
         }
     }
@@ -166,6 +167,7 @@ const Option = ({ keyword, keyword1, setKeyword, setCamera, cameraGroup, areaGro
                                 key={camera.id}
                                 nodeId={camera.id}
                                 color={camera?.status == true ? '#28c76f' : ''}
+
                                 // textDirection={camera.id === idCameraSelected ? 'underline' : ''}
                                 labelText={camera.deviceName}
                                 labelIcon='tabler:camera'

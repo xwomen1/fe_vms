@@ -180,6 +180,7 @@ const EditMap = ({ show, onClose, setReload, data, typePopup }) => {
             }))
         } catch (error) {
             console.error('Error fetching children:', error)
+
             return []
         }
     }

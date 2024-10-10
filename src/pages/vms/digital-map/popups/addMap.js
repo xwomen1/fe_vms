@@ -175,6 +175,7 @@ const AddMap = ({ show, onClose, setReload, data }) => {
             }))
         } catch (error) {
             console.error('Error fetching children:', error)
+
             return []
         }
     }
