@@ -115,7 +115,7 @@ const EditMap = ({ show, onClose, setReload, data, typePopup }) => {
 
     useEffect(() => {
         setDetail(data)
-        console.log('data', data)
+        setFileUploadUrl(data?.img)
     }, [data])
 
     useEffect(() => {
@@ -209,15 +209,10 @@ const EditMap = ({ show, onClose, setReload, data, typePopup }) => {
         const files = e.value
 
         for (const file of files) {
-            console.log('file', file);
             formData.append('files', file)
         }
-        console.log('formData', formData);
-
         try {
             const res = await postApi(`https://sbs.basesystem.one/ivis/vms/api/v0/images/upload`, formData)
-            console.log('res', res.data.urlImage);
-
             setFileUploadDataName(e.value[0].name)
             setFileUploadDataId(res.data.id)
             setFileUploadUrl(res.data.urlImage)
@@ -362,7 +357,7 @@ const EditMap = ({ show, onClose, setReload, data, typePopup }) => {
                     </CustomCloseButton>
                     <Box sx={{ mb: 8, textAlign: 'left' }}>
                         <Typography variant='h5' sx={{ mb: 3 }}>
-                            Add new Digital Map
+                            Edit Digital Map
                         </Typography>
                     </Box>
                     <form>
@@ -388,52 +383,83 @@ const EditMap = ({ show, onClose, setReload, data, typePopup }) => {
                                     />
                                 </Grid>
                                 <Grid item xs={6} sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <CustomTextField
-                                        fullWidth
-                                        value={selectedArea?.name}
-                                        label={"Area"}
-                                        placeholder={"Chose Area"}
-                                        onClick={handleClick}
-                                        aria-describedby='validation-basic-last-name'
-                                        InputProps={{
-                                            endAdornment: (
-                                                <IconButton>
-                                                    <Icon icon="tabler:chevron-down" />
-                                                </IconButton>
-                                            ),
-                                        }}
-                                    />
-                                    <Popover
-                                        id={id}
-                                        open={open}
-                                        anchorEl={anchorEl}
-                                        onClose={handleClose}
-                                        anchorOrigin={{
-                                            vertical: 'bottom',
-                                            horizontal: 'left',
-                                        }}
-                                        transformOrigin={{
-                                            vertical: 'top',
-                                            horizontal: 'left',
-                                        }}
-                                        PaperProps={{
-                                            sx: {
-                                                maxHeight: 400,
-                                                width: 350, // Đặt width là 100%
-                                            },
-                                        }}
-                                    >
-                                        <TreeView
-                                            aria-label='file system navigator'
-                                            expanded={expandedNodes}
-                                            defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
-                                            defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
-                                            sx={{ flexGrow: 1, overflowY: 'auto', height: '100%' }}
-                                        >
-                                            {renderTreeItems(areaGroup)}
-                                        </TreeView>
-                                    </Popover>
+                                    <Controller
+                                        name={"areaName"}
+                                        control={control}
+                                        rules={{ required: true }}
+                                        render={({ field: { value, onChange } }) => (
+                                            <>
+                                                <CustomTextField
+                                                    fullWidth
+                                                    value={selectedArea?.name || value}
+                                                    label={"Area"}
+                                                    placeholder={"Chose Area"}
+                                                    onClick={handleClick}
+                                                    aria-describedby='validation-basic-last-name'
+                                                    InputProps={{
+                                                        endAdornment: (
+                                                            <IconButton>
+                                                                <Icon icon="tabler:chevron-down" />
+                                                            </IconButton>
+                                                        ),
+                                                    }}
+                                                />
+                                                <Popover
+                                                    id={id}
+                                                    open={open}
+                                                    anchorEl={anchorEl}
+                                                    onClose={handleClose}
+                                                    anchorOrigin={{
+                                                        vertical: 'bottom',
+                                                        horizontal: 'left',
+                                                    }}
+                                                    transformOrigin={{
+                                                        vertical: 'top',
+                                                        horizontal: 'left',
+                                                    }}
+                                                    PaperProps={{
+                                                        sx: {
+                                                            maxHeight: 400,
+                                                            width: 350, // Đặt width là 100%
+                                                        },
+                                                    }}
+                                                >
+                                                    <TreeView
+                                                        aria-label='file system navigator'
+                                                        expanded={expandedNodes}
+                                                        defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
+                                                        defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
+                                                        sx={{ flexGrow: 1, overflowY: 'auto', height: '100%' }}
+                                                    >
+                                                        {renderTreeItems(areaGroup)}
+                                                    </TreeView>
+                                                </Popover>
 
+                                            </>
+                                        )}
+                                    />
+
+                                </Grid>
+                                <Grid item xs={6} sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <Controller
+                                        name={"areaCode"}
+                                        control={control}
+                                        rules={{ required: true }}
+                                        render={({ field: { value, onChange } }) => (
+                                            <CustomTextField
+                                                fullWidth
+                                                disabled
+                                                value={selectedArea?.code || value}
+                                                label={"Area Code"}
+
+                                                // onChange={onChange}
+                                                placeholder={"Area Code"}
+                                                error={Boolean(errors["areaCode"])}
+                                                aria-describedby='validation-basic-last-name'
+                                                {...(errors["areaCode"] && { helperText: 'This field is required' })}
+                                            />
+                                        )}
+                                    />
                                 </Grid>
                             </Grid>
 
@@ -442,44 +468,70 @@ const EditMap = ({ show, onClose, setReload, data, typePopup }) => {
                                     Image Of Digital Map
                                 </Grid>
                                 <Grid item xs={12}>
-                                    {fileUploadDataName && (
-                                        <div>
-                                            <div
-                                                style={{
-                                                    width: '100%',
-                                                    border: '1px solid #ccc',
-                                                    borderRadius: '4px',
-                                                    padding: '10px 5px'
-                                                }}
-                                            >
-                                                <Typography>
-                                                    {' '}
-                                                    {fileUploadDataName}
-                                                    <IconButton
-                                                        style={{ float: 'right' }}
-                                                        size='small'
-                                                        onClick={() => {
-                                                            setFileUploadDataName(null)
-                                                            setFileUploadDataId(null)
+                                    {fileUploadUrl && (
+                                        <>
+                                            <div style={{
+                                                width: "auto",
+                                                height: 450,
+                                                borderStyle: 'solid',
+                                                borderWidth: 2,
+                                                borderRadius: 2,
+                                                borderColor: "#000"
+                                            }}>
+                                                <img
+                                                    alt=''
+                                                    src={fileUploadUrl}
+                                                    style={{
+                                                        objectFit: "cover",
+                                                        maxHeight: 450,
+                                                        maxWidth: '100%',
+                                                        padding: 5
+                                                    }}
+                                                />
+                                            </div>
+                                            {fileUploadDataName && (
+                                                <div>
+                                                    <div
+                                                        style={{
+                                                            width: '100%',
+                                                            border: '1px solid #ccc',
+                                                            borderRadius: '4px',
+                                                            padding: '10px 5px'
                                                         }}
                                                     >
-                                                        <Icon icon='tabler:trash-x-filled' />
-                                                    </IconButton>
-                                                </Typography>
-                                            </div>
-                                            <Button variant='contained' sx={{ float: 'right', marginTop: 2 }}>
-                                                <a
-                                                    href={`https://dev-ivi.basesystem.one/smc/storage/api/v0/libraries/public/download/${fileUploadDataId}`}
-                                                    target='_blank'
-                                                    download
-                                                    style={{ color: 'white', textDecoration: 'none' }}
-                                                >
-                                                    download
-                                                </a>
-                                            </Button>
-                                        </div>
+                                                        <Typography>
+                                                            {' '}
+                                                            {fileUploadDataName}
+                                                            <IconButton
+                                                                style={{ float: 'right' }}
+                                                                size='small'
+                                                                onClick={() => {
+                                                                    setFileUploadDataName(null)
+                                                                    setFileUploadDataId(null)
+
+                                                                    // setFileUploadUrl(null)
+                                                                }}
+                                                            >
+                                                                <Icon icon='tabler:trash-x-filled' />
+                                                            </IconButton>
+                                                        </Typography>
+                                                    </div>
+                                                    <Button variant='contained' sx={{ float: 'right', marginTop: 2 }}>
+                                                        <a
+                                                            href={`https://dev-ivi.basesystem.one/smc/storage/api/v0/libraries/public/download/${fileUploadDataId}`}
+                                                            target='_blank'
+                                                            download
+                                                            style={{ color: 'white', textDecoration: 'none' }}
+                                                        >
+                                                            download
+                                                        </a>
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </>
                                     )}
-                                    {!fileUploadDataName && (
+                                    <br />
+                                    {fileUploadUrl && !fileUploadDataName && (
                                         <div
                                             style={{
                                                 borderStyle: 'dashed',

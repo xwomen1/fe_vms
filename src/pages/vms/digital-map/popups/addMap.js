@@ -204,14 +204,11 @@ const AddMap = ({ show, onClose, setReload, data }) => {
         const files = e.value
 
         for (const file of files) {
-            console.log('file', file);
             formData.append('files', file)
         }
-        console.log('formData', formData);
 
         try {
             const res = await postApi(`https://sbs.basesystem.one/ivis/vms/api/v0/images/upload`, formData)
-            console.log('res', res.data.urlImage);
 
             setFileUploadDataName(e.value[0].name)
             setFileUploadDataId(res.data.id)
