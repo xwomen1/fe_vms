@@ -90,6 +90,7 @@ const StyledTreeItem = props => {
     />
   )
 }
+
 const initValueFilter = {
   keyword: '',
   limit: 25,
@@ -636,9 +637,11 @@ const ContentAnalysis = () => {
         })
     }
   }
+
   const handleSearchClick = () => {
-    if (!startTime || !endTime) {
+    if (!startTimeCamera || !endTimeCamera) {
       toast.error('Vui lòng chọn cả ngày bắt đầu và ngày kết thúc.')
+
       return
     }
     fetchDataList()
