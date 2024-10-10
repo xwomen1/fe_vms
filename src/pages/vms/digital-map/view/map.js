@@ -66,14 +66,11 @@ const StyledTreeItem = props => {
 const Map = () => {
     const [keyword, setKeyword] = useState('')
     const [cameraList, setCameraList] = useState([])
-    const [dataList, setDataList] = useState([])
+    const [cameraGroup, setCameraGroup] = useState([])
     const [idCameraSelected, setIdCameraSelected] = useState(null)
     const [camera, setCamera] = useState({ id: '', name: '', channel: '' })
-    const [cameraGroup, setCameraGroup] = useState([])
+    const [camerasSelected, serCamerasSelected] = useState([])
     const [areaGroup, setAreaGroup] = useState([])
-    const [open1, setOpen1] = useState(false)
-    const [open2, setOpen2] = useState(false)
-    const [open3, setOpen3] = useState(false)
 
     const clientId = 'be571c00-41cf-4878-a1de-b782625da62a'
     const [eventsData, setEventData] = useState([])
@@ -191,7 +188,7 @@ const Map = () => {
         }
 
         const data = addStatusToCameras(cameraList)
-        setDataList(data)
+        setCameraGroup(data)
     }, [cameraList]);
 
     useEffect(() => {
@@ -226,13 +223,13 @@ const Map = () => {
                 return group;
             })
         }
-        const data = addStatus(dataList)
-        setDataList(data)
+        const data = addStatus(cameraGroup)
+        setCameraGroup(data)
     }, [eventsData]);
 
     useEffect(() => {
         if (camera?.id !== '') {
-            handleAddCameraGroup(camera)
+            handleAddCamerasSelected(camera)
         }
     }, [camera])
 
@@ -279,239 +276,51 @@ const Map = () => {
         }
     }
 
-
-    const handleSearch = e => {
-        setKeyword(e.target.value)
-    }
-
     const handleSetCamera = (camera) => {
         setCamera({ id: camera.id, name: camera.deviceName, channel: 'Sub' })
         setIdCameraSelected(camera.id)
     }
 
-    const handleAddCameraGroup = camera => {
-        let list = [...cameraGroup]
+    const handleAddCamerasSelected = camera => {
+        let list = [...camerasSelected]
         const result = list.find(element => element?.id === camera?.id);
+
         if (result === undefined) {
             list.push(camera)
 
         }
-        setCameraGroup(list)
+        serCamerasSelected(list)
     }
 
-    // const renderTree = group => {
+    const handleDelCamerasSelected = camera => {
+        console.log('camera', camera)
+        let list = [...camerasSelected]
+        console.log('list', list);
 
-    //     return (
-    //         <StyledTreeItem key={group.id} nodeId={group.id} labelText={group.name} labelIcon='tabler:folder'>
-    //             {group.cameras && group.cameras.length > 0
-    //                 ? group.cameras.map(camera => {
 
-    //                     return (
-    //                         <StyledTreeItem
-    //                             key={camera.id}
-    //                             nodeId={camera.id}
-    //                             color={camera?.status == true ? '#28c76f' : ''}
-    //                             textDirection={camera.id === idCameraSelected ? 'underline' : ''}
-    //                             labelText={camera.deviceName}
-    //                             labelIcon='tabler:camera'
-    //                             onClick={() => handleSetCamera(camera)}
-    //                         />
-    //                     )
-    //                 })
-    //                 : null}
-    //         </StyledTreeItem>
-    //     )
-    // }
+        let isCameraId = list.includes(camera)
+        console.log('isCameraId', isCameraId)
+
+        if (isCameraId) {
+            const result = list.filter(element => element?.id !== camera?.id);
+
+            serCamerasSelected(result)
+        }
+    }
 
     return (
         <>
             <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                {/* <div style={{ display: 'inline-block', position: 'absolute', margin: 5, zIndex: 10 }}>
-
-                    {!open1 && (
-                        <Button variant='contained' onClick={() => setOpen1(true)}>
-                            Camera List
-                        </Button>
-                    )}
-                    {open1 && (
-                        <Card sx={{ width: '320px' }}>
-                            <CardHeader title='Camera List'
-                                action={
-                                    <Grid container spacing={0}>
-                                        <IconButton onClick={() => setOpen1(false)}>
-                                            <Icon icon="tabler:square-rounded-minus" />
-                                        </IconButton>
-                                    </Grid>
-                                }
-                            />
-                            <CardContent>
-                                <CustomTextField
-                                    value={keyword}
-                                    placeholder='Search…'
-                                    InputProps={{
-                                        startAdornment: (
-                                            <Box sx={{ mr: 2, display: 'flex' }}>
-                                                <Icon fontSize='1.25rem' icon='tabler:search' />
-                                            </Box>
-                                        ),
-                                        endAdornment: (
-                                            <IconButton size='small' title='Clear' aria-label='Clear' onClick={() => setKeyword('')}>
-                                                <Icon fontSize='1.25rem' icon='tabler:x' />
-                                            </IconButton>
-                                        )
-                                    }}
-                                    onChange={handleSearch}
-                                    sx={{
-                                        width: {
-                                            xs: 1,
-                                            sm: 'auto'
-                                        },
-                                        '& .MuiInputBase-root > svg': {
-                                            mr: 2
-                                        }
-                                    }}
-                                />
-                                <Box sx={{
-                                    height: {
-                                        xs: '300px',
-                                        sm: '300px',
-                                        lg: '30vh',
-                                    },
-                                    overflow: 'auto',
-                                    marginTop: '10px'
-                                }}>
-                                    <TreeView
-                                        sx={{ minHeight: 300 }}
-                                        defaultExpanded={['root']}
-                                        defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
-                                        defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
-                                    >
-                                        {dataList.map(group => renderTree(group))}
-                                    </TreeView>
-                                </Box>
-                            </CardContent>
-                        </Card>
-                    )}
-                </div>
-                <div style={{ display: 'inline-block', position: 'absolute', margin: 5, marginLeft: open1 ? '335px' : '185px', zIndex: 10 }}>
-
-                    {!open2 && (
-                        <Button variant='contained' onClick={() => setOpen2(true)}>
-                            Area List
-                        </Button>
-                    )}
-                    {open2 && (
-                        <Card sx={{ width: '320px' }}>
-                            <CardHeader title='Area List'
-                                action={
-                                    <Grid container spacing={0}>
-                                        <IconButton onClick={() => setOpen2(false)}>
-                                            <Icon icon="tabler:square-rounded-minus" />
-                                        </IconButton>
-                                    </Grid>
-                                }
-                            />
-                            <CardContent>
-                                <CustomTextField
-                                    value={keyword}
-                                    placeholder='Search…'
-                                    InputProps={{
-                                        startAdornment: (
-                                            <Box sx={{ mr: 2, display: 'flex' }}>
-                                                <Icon fontSize='1.25rem' icon='tabler:search' />
-                                            </Box>
-                                        ),
-                                        endAdornment: (
-                                            <IconButton size='small' title='Clear' aria-label='Clear' onClick={() => setKeyword('')}>
-                                                <Icon fontSize='1.25rem' icon='tabler:x' />
-                                            </IconButton>
-                                        )
-                                    }}
-                                    onChange={handleSearch}
-                                    sx={{
-                                        width: {
-                                            xs: 1,
-                                            sm: 'auto'
-                                        },
-                                        '& .MuiInputBase-root > svg': {
-                                            mr: 2
-                                        }
-                                    }}
-                                />
-                                <Box sx={{
-                                    height: {
-                                        xs: '300px',
-                                        sm: '300px',
-                                        lg: '30vh',
-                                    },
-                                    overflow: 'auto',
-                                    marginTop: '10px'
-                                }}>
-                                    <TreeView
-                                        sx={{ minHeight: 300 }}
-                                        defaultExpanded={['root']}
-                                        defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
-                                        defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
-                                    >
-                                        {areaGroup.map(group => renderTree(group))}
-                                    </TreeView>
-                                </Box>
-                            </CardContent>
-                        </Card>
-                    )}
-                </div>
-                <div style={{ display: 'inline-block', position: 'absolute', margin: 5, zIndex: 10, marginLeft: (open1 && open2) ? '665px' : (open1 && !open2) ? '520px' : (!open1 && open2) ? '515px' : '370px' }}>
-
-                    {!open3 && (
-                        <Button variant='contained' onClick={() => setOpen3(true)}>
-                            Selected Camera List
-                        </Button>
-                    )}
-                    {open3 && (
-                        <Card sx={{ width: '320px' }}>
-                            <CardHeader title='Selected Camera List'
-                                action={
-                                    <Grid container spacing={0}>
-                                        <IconButton onClick={() => setOpen3(false)}>
-                                            <Icon icon="tabler:square-rounded-minus" />
-                                        </IconButton>
-                                    </Grid>
-                                }
-                            />
-                            <CardContent>
-                                <Box sx={{
-                                    height: {
-                                        xs: '300px',
-                                        sm: '300px',
-                                        lg: '30vh',
-                                    },
-                                    overflow: 'auto',
-                                    marginTop: '10px'
-                                }}>
-                                    <TreeView>
-                                        {cameraGroup.map((cam, index) => (
-                                            <StyledTreeItem
-                                                key={cam.id}
-                                                nodeId={cam.id}
-                                                labelText={cam.name}
-                                                labelIcon='tabler:camera'
-                                            />
-                                        ))}
-                                    </TreeView>
-                                </Box>
-                            </CardContent>
-                        </Card>
-                    )}
-                </div> */}
-
                 <div style={{ position: 'absolute', width: '100%', height: '100%', zIndex: 1 }}>
-                    <IndoorMap cameraGroup={cameraGroup} />
+                    <IndoorMap cameraGroup={camerasSelected} />
                 </div>
                 <Option
                     setKeyword={setKeyword}
                     setCamera={handleSetCamera}
-                    cameraGroup={dataList}
+                    setDelCameraSelected={handleDelCamerasSelected}
+                    cameraGroup={cameraGroup}
                     areaGroup={areaGroup}
+                    camerasSelected={camerasSelected}
                 />
             </div>
         </>

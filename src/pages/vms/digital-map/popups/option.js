@@ -79,37 +79,7 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     }
 }))
 
-const StyledTreeItem = props => {
-    // ** Props
-    const { labelText, labelIcon, labelInfo, color, textDirection, disabled, ...other } = props
-
-    return (
-        <StyledTreeItemRoot
-            {...other}
-            label={
-                <Box
-                    sx={{
-                        py: 1,
-                        display: 'flex',
-                        alignItems: 'center',
-                        '& svg': { mr: 1 },
-                    }}>
-                    <Icon icon={labelIcon} color={color} />
-                    <Typography variant='body2' sx={{ flexGrow: 1, fontWeight: 500, textDecoration: textDirection }}>
-                        {labelText}
-                    </Typography>
-                    {labelInfo ? (
-                        <Typography variant='caption' color='inherit'>
-                            {labelInfo}
-                        </Typography>
-                    ) : null}
-                </Box>
-            }
-        />
-    )
-}
-
-const Option = ({ keyword, keyword1, setKeyword, setCamera, cameraGroup, areaGroup }) => {
+const Option = ({ keyword, keyword1, setKeyword, setCamera, setDelCameraSelected, cameraGroup, areaGroup, camerasSelected }) => {
     // ** State
     const [open, setOpen] = useState(false)
 
@@ -153,6 +123,41 @@ const Option = ({ keyword, keyword1, setKeyword, setCamera, cameraGroup, areaGro
         } else {
             setExpandedNodes([...expandedNodes, nodeId])
         }
+    }
+
+    const StyledTreeItem = props => {
+        // ** Props
+        const { labelText, labelIcon, labelInfo, color, textDirection, disabled, cameraSelected, camera, ...other } = props
+
+        return (
+            <StyledTreeItemRoot
+                {...other}
+                label={
+                    <Box
+                        sx={{
+                            py: 1,
+                            display: 'flex',
+                            alignItems: 'center',
+                            '& svg': { mr: 1 },
+                        }}>
+                        <Icon icon={labelIcon} color={color} />
+                        <Typography variant='body2' sx={{ flexGrow: 1, fontWeight: 500, textDecoration: textDirection }}>
+                            {labelText}
+                        </Typography>
+                        {labelInfo ? (
+                            <Typography variant='caption' color='inherit'>
+                                {labelInfo}
+                            </Typography>
+                        ) : null}
+                        {cameraSelected === true && (
+                            <IconButton aria-label="delete" size="small" onClick={() => setDelCameraSelected(camera)}>
+                                <Icon icon={"tabler:trash"} color={"secondary"} />
+                            </IconButton>
+                        )}
+                    </Box>
+                }
+            />
+        )
     }
 
     const renderTree = group => {
@@ -244,6 +249,7 @@ const Option = ({ keyword, keyword1, setKeyword, setCamera, cameraGroup, areaGro
                     <CustomizerSpacing sx={{ py: 1 }} className='customizer-body'>
                         <Box>
                             <Typography>Camera List</Typography>
+                            <br />
                             <CustomTextField
                                 value={keyword}
                                 placeholder='Search…'
@@ -289,9 +295,39 @@ const Option = ({ keyword, keyword1, setKeyword, setCamera, cameraGroup, areaGro
 
                     <Divider sx={{ m: '0 !important' }} />
 
+                    <CustomizerSpacing sx={{ py: 1 }} className='customizer-body'>
+                        <Box sx={{ position: 'relative' }}>
+                            <Typography>Camera Selected List </Typography>
+                            <Box sx={{
+                                height: 'auto',
+                                overflow: 'auto',
+                                marginTop: '10px'
+                            }}>
+                                <TreeView
+                                    sx={{ minHeight: 300 }}
+                                >
+                                    {camerasSelected.map((cam, index) => (
+                                        <StyledTreeItem
+                                            key={cam.id}
+                                            nodeId={cam.id}
+                                            labelText={cam.name}
+                                            labelIcon='tabler:camera'
+                                            camera={cam}
+                                            cameraSelected={true}
+                                        />
+                                    ))}
+                                </TreeView>
+                            </Box>
+                            <Button variant='contained' sx={{ position: 'absolute', bottom: 0, right: 0 }}>Save Digital Map</Button>
+                        </Box>
+                    </CustomizerSpacing>
+
+                    <Divider sx={{ m: '0 !important' }} />
+
                     <CustomizerSpacing sx={{ py: 1, minHeight: '350px' }} className='customizer-body'>
                         <Box>
                             <Typography>Area List</Typography>
+                            <br />
                             <CustomTextField
                                 value={keyword1}
                                 placeholder='Search…'
@@ -328,7 +364,7 @@ const Option = ({ keyword, keyword1, setKeyword, setCamera, cameraGroup, areaGro
                                     expanded={expandedNodes}
                                     defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
                                     defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
-                                    sx={{ flexGrow: 1, overflowY: 'auto', height: '100%' }}
+                                    sx={{ minHeight: 300, flexGrow: 1, overflowY: 'auto', height: '100%' }}
                                 >
                                     {renderTreeItems(areaGroup)}
                                 </TreeView>
