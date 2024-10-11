@@ -152,6 +152,11 @@ const navigation = () => {
           path: '/vms/live-view',
           icon: 'tabler:video'
         },
+        {
+          title: 'Content analysis',
+          path: '/vms/Content-analysis/list',
+          icon: 'tabler:category'
+        },
 
         // {
         //   title: 'Xem trực tiếp 2',
@@ -404,6 +409,11 @@ const navigation = () => {
       title: 'Smart Parking',
       icon: 'tabler:lock-access',
       children: [
+        {
+          path: '/smart-parking/Monitoring/list',
+          title: 'Monitoring',
+          icon: 'tabler:device-computer-camera'
+        },
         {
           path: '/smart-parking/caller',
           title: 'Subscription',

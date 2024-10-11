@@ -250,22 +250,20 @@ const AppointmentList = ({ keyword, valueFilter }) => {
                       <TableCell>{Guests.guestInfo?.identityNumber}</TableCell>
                       <TableCell>
                         <CustomChip
-                          label={statusGuests?.id || 'Unknown'}
+                          label={
+                            statusGuests?.id === 'WAITING'
+                              ? 'WAITING'
+                              : statusGuests?.id === 'APPROVED' || statusGuests?.id === 'COMPLETE'
+                              ? 'APPROVED'
+                              : 'UNAPPROVED'
+                          }
                           skin='light'
                           color={
                             statusGuests?.id === 'WAITING'
                               ? 'default'
-                              : statusGuests?.id === 'APPROVED'
+                              : statusGuests?.id === 'APPROVED' || statusGuests?.id === 'COMPLETE'
                               ? 'success'
-                              : statusGuests?.id === 'COMPLETE'
-                              ? 'success'
-                              : statusGuests?.id === 'UNSUCCESSFUL'
-                              ? 'error'
-                              : statusGuests?.id === 'CANCELLED'
-                              ? 'warning'
-                              : statusGuests?.id === 'REMOVE'
-                              ? 'info'
-                              : 'default'
+                              : 'error'
                           }
                         />
                       </TableCell>
