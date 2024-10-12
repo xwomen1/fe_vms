@@ -189,7 +189,7 @@ const UserList = ({ apiData }) => {
 
   const fetchRegionName = async regionId => {
     try {
-      const response = await axios.get(`https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions/${regionId}`)
+      const response = await axios.get(`https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/${regionId}`)
 
       return response.data.name
     } catch (error) {
@@ -314,7 +314,9 @@ const UserList = ({ apiData }) => {
       }
       let url
       if (selectedGroups.length > 0) {
-        url = `https://dev-ivi.basesystem.one/smc/iam/api/v0/users/search?groupIds=${selectedGroups.map(g => g.groupId).join(',')}`
+        url = `https://dev-ivi.basesystem.one/smc/iam/api/v0/users/search?groupIds=${selectedGroups
+          .map(g => g.groupId)
+          .join(',')}`
       } else {
         url = 'https://dev-ivi.basesystem.one/smc/iam/api/v0/users/search'
       }
