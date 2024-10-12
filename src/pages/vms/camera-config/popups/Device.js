@@ -460,7 +460,7 @@ const Device = ({ onClose, camera }) => {
       }
 
       const response = await axios.get(
-        'https://sbs.basesystem.one/ivis/infrares/api/v0/regions?limit=25&page=1&parentID=abbe3f3c-963b-4d23-a766-42a8261607c3',
+        'https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions?limit=25&page=1&parentID=abbe3f3c-963b-4d23-a766-42a8261607c3',
         config
       )
 
@@ -771,7 +771,7 @@ const Device = ({ onClose, camera }) => {
           <Grid item xs={12}>
             <div style={{ width: '100%' }}>
               <Grid container spacing={2}>
-                <Grid item xs={11}>
+                <Grid item xs={9.4}>
                   <Autocomplete
                     options={options}
                     getOptionLabel={option => option.description}
@@ -780,10 +780,11 @@ const Device = ({ onClose, camera }) => {
                     renderInput={params => <CustomTextField {...params} fullWidth />}
                   />
                 </Grid>
-                <Grid item xs={1}>
-                  <IconButton onClick={handleReturnToMarker}>
+                <Grid item xs={2.6}>
+                  <Button variant='contained' onClick={handleReturnToMarker}>
                     <Icon icon='tabler:current-location' />
-                  </IconButton>
+                    Reset location
+                  </Button>
                 </Grid>
               </Grid>
 

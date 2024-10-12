@@ -99,7 +99,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
     const [time, setTime] = useState(null)
     const [cameraList, setCameraList] = useState([])
     const [locationList, setLocationList] = useState([])
-    const API_REGIONS = `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/`
+    const API_REGIONS = `https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions/children-lv1/me/`
     const [detail, setDetail] = useState(null)
     const [form, setForm] = useState(format_form);
 
