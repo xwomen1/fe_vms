@@ -69,7 +69,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
   const fetchLocations = async () => {
     try {
       const res = await axios.get(
-        `  https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions/children-lv1/children/code?parentCode=VMS`,
+        `  https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=VMS`,
         config
       )
       setLocations(res.data)

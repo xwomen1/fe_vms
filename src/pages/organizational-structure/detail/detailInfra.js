@@ -23,7 +23,7 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
             Authorization: `Bearer ${token}`
           }
         }
-        const response = await axios.get(`https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions/${id}`, config)
+        const response = await axios.get(`https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/${id}`, config)
         setName(response.data.name || '')
         setType(response.data.type || '')
         setDetail(response.data.detail || '')
@@ -53,7 +53,7 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
         detail: detail
       }
 
-      await axios.put(`https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions/${id}`, payload, config)
+      await axios.put(`https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/${id}`, payload, config)
       Swal.fire('Sửa thành công', '', 'success')
       onSuccess()
       onClose()

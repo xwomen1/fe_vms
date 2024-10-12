@@ -259,7 +259,7 @@ const Device = ({ onClose, nvr }) => {
       }
 
       const response = await axios.get(
-        'https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions?limit=25&page=1&parentID=abbe3f3c-963b-4d23-a766-42a8261607c3',
+        'https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions?limit=25&page=1&parentID=abbe3f3c-963b-4d23-a766-42a8261607c3',
         config
       )
 
@@ -306,13 +306,7 @@ const Device = ({ onClose, nvr }) => {
           </Grid>
           <Grid item xs={0.1}></Grid>
           <Grid item xs={3.9}>
-            <CustomTextField
-              label='Username'
-              type='text'
-              value={userName}
-              onChange={handleUserNameChange}
-              fullWidth
-            />
+            <CustomTextField label='Username' type='text' value={userName} onChange={handleUserNameChange} fullWidth />
           </Grid>
           <Grid item xs={0.1}></Grid>
           <Grid item xs={4}>
@@ -338,13 +332,7 @@ const Device = ({ onClose, nvr }) => {
             <CustomTextField label='Onvif Port ' type='text' value={onvif} onChange={handleOnvifChange} fullWidth />
           </Grid>
           <Grid item xs={3.9}>
-            <CustomTextField
-              label='Version '
-              type='text'
-              value={appVersion}
-              onChange={handleVersionChange}
-              fullWidth
-            />
+            <CustomTextField label='Version ' type='text' value={appVersion} onChange={handleVersionChange} fullWidth />
           </Grid>
           <Grid item xs={0.1}></Grid>
 

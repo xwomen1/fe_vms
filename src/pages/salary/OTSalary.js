@@ -120,7 +120,7 @@ const UserList = ({ apiData }) => {
 
   const fetchRegionName = async regionId => {
     try {
-      const response = await axios.get(`https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions/${regionId}`)
+      const response = await axios.get(`https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/${regionId}`)
 
       return response.data.name
     } catch (error) {

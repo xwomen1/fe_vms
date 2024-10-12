@@ -105,7 +105,7 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
   const handleUnitOpen = async () => {
     try {
       const response = await axios.get(
-        'https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions/children-lv1/children/code?parentCode=dv'
+        'https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=dv'
       )
       setUnits(response.data)
     } catch (error) {

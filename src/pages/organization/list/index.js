@@ -95,7 +95,7 @@ const OrganizationalStructure = () => {
           keyword: ''
         }
       }
-      const response = await axios.get('https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions/adults', config)
+      const response = await axios.get('https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/adults', config)
       setInfra(response.data)
 
       if (response.data.length > 0) {
@@ -126,7 +126,7 @@ const OrganizationalStructure = () => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
-      const response = await axios.get(`https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions/${nodeId}`, {
+      const response = await axios.get(`https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/${nodeId}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -166,7 +166,7 @@ const OrganizationalStructure = () => {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
       const response = await axios.get(
-        `https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`,
+        `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -185,7 +185,7 @@ const OrganizationalStructure = () => {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
       const response = await axios.get(
-        `https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`,
+        `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -220,7 +220,7 @@ const OrganizationalStructure = () => {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
       const response = await axios.get(
-        `https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`,
+        `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`

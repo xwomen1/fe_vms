@@ -28,7 +28,7 @@ const InfraPopupAdd = ({ open, onClose, onSuccess, id }) => {
           page: 1
         }
       }
-      const response = await axios.get('https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions', config)
+      const response = await axios.get('https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions', config)
 
       setAdults(response.data.length > 0 ? response.data[0].id : '')
 
@@ -58,7 +58,7 @@ const InfraPopupAdd = ({ open, onClose, onSuccess, id }) => {
         parentID: id,
         code: type
       }
-      const response = await axios.post('https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions', data, config)
+      const response = await axios.post('https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions', data, config)
       console.log(data)
       Swal.fire({
         title: 'Success!',

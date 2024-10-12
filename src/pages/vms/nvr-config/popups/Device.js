@@ -309,7 +309,7 @@ const Device = ({ onClose, nvr }) => {
       }
 
       const response = await axios.get(
-        'https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions?limit=25&page=1&parentID=abbe3f3c-963b-4d23-a766-42a8261607c3',
+        'https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions?limit=25&page=1&parentID=abbe3f3c-963b-4d23-a766-42a8261607c3',
         config
       )
 

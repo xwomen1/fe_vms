@@ -108,7 +108,7 @@ const UserList = ({ apiData }) => {
 
   const fetchRegionName = async regionId => {
     try {
-      const response = await axios.get(`https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions/${regionId}`)
+      const response = await axios.get(`https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/${regionId}`)
 
       return response.data.name
     } catch (error) {
@@ -442,8 +442,8 @@ const UserList = ({ apiData }) => {
                             user?.carAllowance +
                             user?.phoneAllowance +
                             ((salaries * user?.salaryLevel) / (editedTimeHourDay * editedTimeDayMonth)) *
-                            (OT / 100) *
-                            user?.ot +
+                              (OT / 100) *
+                              user?.ot +
                             user?.goOnBusiness * business || '0'}
                         </TableCell>
                         {/* <TableCell sx={{ padding: '16px' , whiteSpace: 'nowrap' }}>{salaries * user?.salary?.salaryLevel * KPCD || '0'}</TableCell> */}
@@ -459,16 +459,16 @@ const UserList = ({ apiData }) => {
                         <TableCell sx={{ padding: '16px', whiteSpace: 'nowrap' }}>
                           {(user?.totalWorkDay > 0
                             ? (salaries * user?.salaryLevel * user?.totalWorkDay) / editedTimeDayMonth +
-                            user?.brandAllowance +
-                            user?.responsibilityAllowance +
-                            user?.lunchAllowance +
-                            user?.carAllowance +
-                            user?.phoneAllowance +
-                            ((salaries * user?.salaryLevel) / (editedTimeHourDay * editedTimeDayMonth)) *
-                            (OT / 100) *
-                            user?.ot +
-                            user?.goOnBusiness * business -
-                            (salaries * user?.salaryLevel * (BHYT + BHXH)) / 100
+                              user?.brandAllowance +
+                              user?.responsibilityAllowance +
+                              user?.lunchAllowance +
+                              user?.carAllowance +
+                              user?.phoneAllowance +
+                              ((salaries * user?.salaryLevel) / (editedTimeHourDay * editedTimeDayMonth)) *
+                                (OT / 100) *
+                                user?.ot +
+                              user?.goOnBusiness * business -
+                              (salaries * user?.salaryLevel * (BHYT + BHXH)) / 100
                             : 0) || '0'}
                         </TableCell>
                       </TableRow>

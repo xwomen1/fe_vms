@@ -228,7 +228,7 @@ const InforAll = ({ idInfor }) => {
   const fetchRegions = async () => {
     setLoading(true)
     try {
-      const response = await axios.get('https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions', {
+      const response = await axios.get('https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions', {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -240,7 +240,7 @@ const InforAll = ({ idInfor }) => {
       console.log(parentRegion, 'data')
       if (parentRegion) {
         const childResponse = await axios.get(
-          `https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions/children-lv1/me/?parentId=${parentIdToFilter}`,
+          `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentIdToFilter}`,
           {
             headers: {
               Authorization: `Bearer ${token}`
