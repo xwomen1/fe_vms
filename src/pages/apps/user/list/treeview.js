@@ -242,8 +242,7 @@ const GroupSynchronization = ({ apiData }) => {
       }
 
       const response = await axios.get(
-        'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/parentsID?parentID=f963e9d4-3d6b-45df-884d-15f93452f2a2',
-        config
+        'https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions/children-lv1/me/?parentId=f963e9d4-3d6b-45df-884d-15f93452f2a2',         config
       )
       const dataWithChildren = addChildrenFieldIn(response.data)
       const rootGroups = findRootGroupsIn(dataWithChildren)
@@ -268,7 +267,7 @@ const GroupSynchronization = ({ apiData }) => {
         }
 
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/parentsID?parentID=f963e9d4-3d6b-45df-884d-15f93452f2a2',
+          'https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions/parentsID?parentID=f963e9d4-3d6b-45df-884d-15f93452f2a2',
           config
         )
         const dataWithChildren = addChildrenFieldIn(response.data)
@@ -308,7 +307,7 @@ const GroupSynchronization = ({ apiData }) => {
             Authorization: `Bearer ${token}`
           }
         }
-        let urlDelete = `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${id}`
+        let urlDelete = `https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions/${id}`
         axios
           .delete(urlDelete, config)
           .then(() => {

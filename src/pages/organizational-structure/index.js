@@ -92,7 +92,7 @@ const OrganizationalStructure = () => {
           keyword: ''
         }
       }
-      const response = await axios.get('https://sbs.basesystem.one/ivis/infrares/api/v0/regions/adults', config)
+      const response = await axios.get('https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions/adults', config)
       setInfra(response.data)
 
       // Fetch child data for the first tab after infra data is loaded
@@ -142,7 +142,7 @@ const OrganizationalStructure = () => {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
       const response = await axios.get(
-        `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`,
+        `https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -176,7 +176,7 @@ const OrganizationalStructure = () => {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
       const response = await axios.get(
-        `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`,
+        `https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`

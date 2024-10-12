@@ -261,7 +261,7 @@ const DigitalMap = () => {
     const fetchAreaGroup = async () => {
         try {
             const res = await callApi(
-                `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=abbe3f3c-963b-4d23-a766-42a8261607c3`)
+                `https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions/children-lv1/me/?parentId=abbe3f3c-963b-4d23-a766-42a8261607c3`)
             if (Array.isArray(res?.data)) {
                 setAreaGroup(res?.data)
             } else {

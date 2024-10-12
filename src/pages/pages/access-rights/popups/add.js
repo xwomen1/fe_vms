@@ -142,8 +142,8 @@ const Add = ({ show, onClose, setReload }) => {
     }
   }
 
-  const API_REGIONS = `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/`
-  const API_REGIONS_ID = `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/`
+  const API_REGIONS = `https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions/children-lv1/me/`
+  const API_REGIONS_ID = `https://dev-ivi.basesystem.one/smc/infrares/api/v0/regions/`
 
   const fetchDepartment = async () => {
     setLoading(true)
