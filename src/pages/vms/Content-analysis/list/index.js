@@ -562,6 +562,8 @@ const ContentAnalysis = () => {
   }
 
   const handleSetTimeSelected = data => {
+    console.log(data, 'data')
+
     setCurrentTime(0)
     setPlay(!play)
     setStartTime(data?.startTime?.getTime())
@@ -961,7 +963,7 @@ const ContentAnalysis = () => {
                           {loading && <Typography>Loading...</Typography>}
                           {dataListTimeline.length > 0 && (
                             <Timeline
-                              data={dataList}
+                              data={dataListTimeline}
                               minuteType={minuteType}
                               startDate={startDate}
                               endDate={endDate}

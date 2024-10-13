@@ -28,7 +28,7 @@ import PopUpAdd from '../popup/AddChild'
 
 const OrganizationalStructure = () => {
   const [infra, setInfra] = useState([])
-  const [selectedTab, setSelectedTab] = useState(0)
+  const [selectedTab, setSelectedTab] = useState(null)
   const selectedTabRef = useRef(selectedTab)
   const [treeData, setTreeData] = useState({})
   const [expandedNodes, setExpandedNodes] = useState([])
@@ -339,7 +339,7 @@ const OrganizationalStructure = () => {
     fetchId(nodeId)
   }
 
-  console.log(childData, 'childData')
+  console.log(selectedTab, 'selectedTab')
 
   return (
     <>
@@ -431,9 +431,13 @@ const OrganizationalStructure = () => {
               </Grid>
               <Grid item xs={2.5} style={{ display: 'flex', flexDirection: 'column' }}>
                 <Paper elevation={3} style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                  <Button onClick={() => handleAddPClick(idGroup)}>
-                    <Icon icon='tabler:plus' />
-                  </Button>
+                  {/* Hiển thị nút chỉ khi selectedTab khác null */}
+                  {selectedTab !== null && (
+                    <Button onClick={() => handleAddPClick(idGroup)}>
+                      <Icon icon='tabler:plus' />
+                    </Button>
+                  )}
+
                   <TreeView
                     aria-label='file system navigator'
                     defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
@@ -454,6 +458,7 @@ const OrganizationalStructure = () => {
                     value={info ? info.name : currentTabInfra.name || ''}
                     fullWidth
                     style={{ marginBottom: '16px' }}
+                    disabled={selectedTab === null} // Vô hiệu hóa nếu selectedTab là null
                     onClick={() => handleOpenPopupDetail(getIdFromValue(info ? info.name : currentTabInfra.name || ''))}
                   />
                   <CustomTextField
@@ -462,6 +467,7 @@ const OrganizationalStructure = () => {
                     value={info ? info.code : currentTabInfra.code || ''}
                     fullWidth
                     style={{ marginBottom: '16px' }}
+                    disabled={selectedTab === null} // Vô hiệu hóa nếu selectedTab là null
                     onClick={() => handleOpenPopupDetail(getIdFromValue(info ? info.name : currentTabInfra.name || ''))}
                   />
                   <CustomTextField
@@ -469,9 +475,11 @@ const OrganizationalStructure = () => {
                     type='text'
                     value={info ? info.detail : currentTabInfra.detail || ''}
                     fullWidth
+                    disabled={selectedTab === null} // Vô hiệu hóa nếu selectedTab là null
                     onClick={() => handleOpenPopupDetail(getIdFromValue(info ? info.name : currentTabInfra.name || ''))}
                   />
                 </Paper>
+
                 <Paper elevation={3} style={{ padding: '16px', flexGrow: 1 }}>
                   <TableContainer component={Paper}>
                     <Table>
