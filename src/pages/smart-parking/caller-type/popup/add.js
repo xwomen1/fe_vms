@@ -81,7 +81,7 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
         }
 
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=dv',
+          'https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=dv',
           config
         )
 

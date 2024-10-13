@@ -89,7 +89,7 @@ const Add = ({ open, setReload, onClose }) => {
   const fetchChildren = async parentId => {
     try {
       const response = await axios.get(
-        `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`,
+        `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`,
         config
       )
 
@@ -103,7 +103,10 @@ const Add = ({ open, setReload, onClose }) => {
 
   const fetchParentData = async parentId => {
     try {
-      const response = await axios.get(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${parentId}`, config)
+      const response = await axios.get(
+        `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/${parentId}`,
+        config
+      )
 
       return response.data
     } catch (error) {
@@ -129,7 +132,7 @@ const Add = ({ open, setReload, onClose }) => {
   const fetchBrandData = async () => {
     try {
       const response = await axios.get(
-        `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/code?Code=honda&sort=%2Bcreated_at&page=1`,
+        `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/code?Code=honda&sort=%2Bcreated_at&page=1`,
         config
       )
 

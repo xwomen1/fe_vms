@@ -87,7 +87,7 @@ const UserList = ({ apiData }) => {
 
   const fetchRegionName = async regionId => {
     try {
-      const response = await axios.get(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${regionId}`)
+      const response = await axios.get(`https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/${regionId}`)
 
       return response.data.name
     } catch (error) {
@@ -148,7 +148,7 @@ const UserList = ({ apiData }) => {
       }
 
       const response = await axios.get(
-        'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/parentsID?parentID=f963e9d4-3d6b-45df-884d-15f93452f2a2',
+        'https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/parentsID?parentID=f963e9d4-3d6b-45df-884d-15f93452f2a2',
         config
       )
       const dataWithChildren = addChildrenField(response.data)
@@ -175,7 +175,7 @@ const UserList = ({ apiData }) => {
         }
 
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/parentsID?parentID=f963e9d4-3d6b-45df-884d-15f93452f2a2',
+          'https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/parentsID?parentID=f963e9d4-3d6b-45df-884d-15f93452f2a2',
           config
         )
         const dataWithChildren = addChildrenField(response.data)
@@ -215,7 +215,7 @@ const UserList = ({ apiData }) => {
             Authorization: `Bearer ${token}`
           }
         }
-        let urlDelete = `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${id}`
+        let urlDelete = `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/${id}`
         axios
           .delete(urlDelete, config)
           .then(() => {

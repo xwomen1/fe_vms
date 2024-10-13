@@ -179,7 +179,7 @@ const Add = () => {
   // }))
   const fetchRegionName = async regionId => {
     try {
-      const response = await axios.get(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${regionId}`)
+      const response = await axios.get(`https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/${regionId}`)
 
       return response.data.name
     } catch (error) {
@@ -560,7 +560,7 @@ const Add = () => {
     const fetchRegions = async () => {
       try {
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=level'
+          'https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=level'
         )
 
         const regions = response.data.map(region => ({
@@ -582,7 +582,7 @@ const Add = () => {
     const fetchRegions = async () => {
       try {
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=contracttype'
+          'https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=contracttype'
         )
 
         const regions = response.data.map(region => ({
@@ -614,7 +614,7 @@ const Add = () => {
         }
 
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=company',
+          'https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=company',
           config
         )
 

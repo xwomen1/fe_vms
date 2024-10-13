@@ -156,7 +156,7 @@ const EditFaceManagement = () => {
   const fetchChildData = useCallback(async parentId => {
     try {
       const response = await axios.get(
-        `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`
+        `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`
       )
 
       return response.data
@@ -198,7 +198,7 @@ const EditFaceManagement = () => {
   const fetchInitialData = useCallback(async () => {
     try {
       const response = await axios.get(
-        'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/code?code=person_specify&sort=%2Bcreated_at&page=1'
+        'https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/code?code=person_specify&sort=%2Bcreated_at&page=1'
       )
       const parentData = response.data[0]
       if (parentData.isParent) {

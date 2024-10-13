@@ -116,7 +116,7 @@ const InforAll = ({ idInfor }) => {
       }
 
       const parentResponse = await axios.get(
-        'https://dev-ivi.basesystem.one/vf/ac-adapters/v1/device-groups/children-lv1',
+        'https://dev-ivi.basesystem.one/smc/access-control/api/v0/device-access/device/device-groups/children-lv1',
         config
       )
       const parentGroups = parentResponse.data || [] // Ensure it's an array
@@ -124,7 +124,7 @@ const InforAll = ({ idInfor }) => {
       // Fetch child groups for each parent
       const childGroupsPromises = parentGroups.map(async parentGroup => {
         const childResponse = await axios.get(
-          `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/device-groups/children-lv1?parentId=${parentGroup.id}`,
+          `https://dev-ivi.basesystem.one/access-control/api/v0/device-access/device-groups/children-lv1?parentId=${parentGroup.id}`,
           config
         )
 
@@ -228,7 +228,7 @@ const InforAll = ({ idInfor }) => {
   const fetchRegions = async () => {
     setLoading(true)
     try {
-      const response = await axios.get('https://sbs.basesystem.one/ivis/infrares/api/v0/regions', {
+      const response = await axios.get('https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions', {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -240,7 +240,7 @@ const InforAll = ({ idInfor }) => {
       console.log(parentRegion, 'data')
       if (parentRegion) {
         const childResponse = await axios.get(
-          `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentIdToFilter}`,
+          `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentIdToFilter}`,
           {
             headers: {
               Authorization: `Bearer ${token}`

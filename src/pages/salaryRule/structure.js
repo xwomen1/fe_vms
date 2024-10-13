@@ -92,7 +92,7 @@ const UserList = ({ apiData }) => {
 
   const fetchRegionName = async regionId => {
     try {
-      const response = await axios.get(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${regionId}`)
+      const response = await axios.get(`https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/${regionId}`)
 
       return response.data.name
     } catch (error) {
@@ -296,7 +296,7 @@ const UserList = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{'A+B+C+D'}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{user?.salaryBase}</TableCell>
 
-                      <TableCell sx={{ padding: '16px' }}>{ }</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
