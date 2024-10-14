@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import * as Indoor from 'src/@core/components/digital-map/Indoor';
 import CameraView from '../popups/CameraView';
 
-const IndoorMap = ({ cameraGroup }) => {
+const IndoorMap = ({ imgURL, cameraGroup }) => {
     const [reload, setReload] = useState(1);
     const [isOpenViewCamera, setIsOpenViewCamera] = useState(false);
     const [markerSelected, setMarkerSelected] = useState(null);
@@ -14,20 +14,25 @@ const IndoorMap = ({ cameraGroup }) => {
     useEffect(() => {
         if (cameraGroup?.length > 0) {
             setReload(prevReload => prevReload + 1);
+            console.log('cameraGroup', cameraGroup);
+
         }
-    }, [cameraGroup]);
+    }, [cameraGroup])
 
     useEffect(() => {
-        if (cameraGroup.length > 0) {
+        // if (cameraGroup.length > 0) {
+        //     initializeMap();
+        // }
+        if (imgURL !== "" && imgURL !== null) {
             initializeMap();
         }
-    }, [reload]);
+    }, [reload, imgURL]);
 
     const initializeMap = () => {
         if (typeof window !== 'undefined') {
             newMap.current = new Indoor.Map(mapEl.current, {
                 floorplan: new Indoor.Floor({
-                    url: '/images/fp.jpg',
+                    url: imgURL,
                     opacity: 0.7,
                     width: 400,
                     zIndex: 1,

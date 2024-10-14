@@ -85,7 +85,7 @@ const DigitalMapTable = () => {
         setLoading(true)
         try {
             const response = await getApi(
-                `https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps?keyword=${keyword}&page=${page}&limit=${pageSize}&sort=-code`
+                `https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps?keyword=${keyword}&page=${page}&limit=${pageSize}&sort=-created_at`
             )
 
             const data = response.data
@@ -110,7 +110,7 @@ const DigitalMapTable = () => {
             setLoading(true)
 
             try {
-                await delApi(`https://sbs.basesystem.one/ivis/vms/api/v0/camera-model-ai/${idDelete}`)
+                await delApi(`https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps/${idDelete}`)
                 setReload(reload + 1)
                 setIdDelete(null)
                 toast.success('Deleted Successfully')

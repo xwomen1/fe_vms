@@ -2,7 +2,7 @@
 
 import { TreeItem, TreeView } from "@mui/lab"
 import { Box, Button, Card, CardContent, CardHeader, Grid, IconButton, List, styled, Typography } from "@mui/material"
-import { useEffect, useState } from "react"
+import { use, useEffect, useState } from "react"
 import Icon from 'src/@core/components/icon'
 import { callApi } from "src/@core/utils/requestUltils"
 import CustomTextField from "src/@core/components/mui/text-field"
@@ -76,6 +76,7 @@ const Map = () => {
     const [eventsData, setEventData] = useState([])
     const [websocket, setWebsocket] = useState(null)
     const [rtcPeerConnection, setRtcPeerConnection] = useState(null)
+    const [imgMapURL, setImgMapURL] = useState(null)
 
     const configWs = {
         bundlePolicy: 'max-bundle',
@@ -276,6 +277,26 @@ const Map = () => {
         }
     }
 
+    const fetchDigitalMap = async areaCode => {
+        try {
+            const res = await callApi(
+                `https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps/get-by-area-code?areaCode=${areaCode}`)
+            const imgMapURL = res.data?.img
+            if (imgMapURL !== "") {
+                setImgMapURL(imgMapURL)
+            }
+
+        } catch (error) {
+            if (error && error?.response?.data) {
+                console.error('error', error)
+                toast.error(error?.response?.data?.message)
+            } else {
+                console.error('Error fetching data:', error)
+                toast.error(error)
+            }
+        }
+    }
+
     const handleSetCamera = (camera) => {
         setCamera({ id: camera.id, name: camera.deviceName, channel: 'Sub' })
         setIdCameraSelected(camera.id)
@@ -293,13 +314,8 @@ const Map = () => {
     }
 
     const handleDelCamerasSelected = camera => {
-        console.log('camera', camera)
         let list = [...camerasSelected]
-        console.log('list', list);
-
-
         let isCameraId = list.includes(camera)
-        console.log('isCameraId', isCameraId)
 
         if (isCameraId) {
             const result = list.filter(element => element?.id !== camera?.id);
@@ -308,16 +324,21 @@ const Map = () => {
         }
     }
 
+    const handleSetImageMap = map => {
+        fetchDigitalMap(map?.code)
+    }
+
     return (
         <>
             <div style={{ position: 'relative', width: '100%', height: '100%' }}>
                 <div style={{ position: 'absolute', width: '100%', height: '100%', zIndex: 1 }}>
-                    <IndoorMap cameraGroup={camerasSelected} />
+                    <IndoorMap imgURL={imgMapURL} cameraGroup={camerasSelected} />
                 </div>
                 <Option
                     setKeyword={setKeyword}
                     setCamera={handleSetCamera}
                     setDelCameraSelected={handleDelCamerasSelected}
+                    setMap={handleSetImageMap}
                     cameraGroup={cameraGroup}
                     areaGroup={areaGroup}
                     camerasSelected={camerasSelected}

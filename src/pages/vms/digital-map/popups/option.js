@@ -79,7 +79,7 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     }
 }))
 
-const Option = ({ keyword, keyword1, setKeyword, setCamera, setDelCameraSelected, cameraGroup, areaGroup, camerasSelected }) => {
+const Option = ({ keyword, keyword1, setKeyword, setCamera, setDelCameraSelected, setMap, cameraGroup, areaGroup, camerasSelected }) => {
     // ** State
     const [open, setOpen] = useState(false)
 
@@ -205,6 +205,8 @@ const Option = ({ keyword, keyword1, setKeyword, setCamera, setDelCameraSelected
                             </Box>
                         ) : null
                     }
+                    onClick={() => setMap(node)}
+
                 >
                     {hasChildren && renderTreeItems(treeData[node.id])}
                 </StyledTreeItem>
