@@ -95,7 +95,7 @@ const Option = ({ keyword, keyword1, setKeyword, setCamera, setDelCameraSelected
 
     const fetchChildrenById = async parentId => {
         try {
-            const res = await getApi(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`)
+            const res = await getApi(`https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`)
             setTreeData(prevTreeData => ({
                 ...prevTreeData,
                 [parentId]: res.data

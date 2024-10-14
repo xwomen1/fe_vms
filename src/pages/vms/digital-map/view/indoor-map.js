@@ -2,14 +2,15 @@ import React, { useRef, useState, useEffect } from 'react';
 import * as Indoor from 'src/@core/components/digital-map/Indoor';
 import CameraView from '../popups/CameraView';
 
-const IndoorMap = ({ imgURL, cameraGroup }) => {
-    const [reload, setReload] = useState(1);
+const IndoorMap = ({ imgURL, cameraGroup, setCameraGroup }) => {
+    const [reload, setReload] = useState(0);
     const [isOpenViewCamera, setIsOpenViewCamera] = useState(false);
     const [markerSelected, setMarkerSelected] = useState(null);
     const mapEl = useRef(null);
     const markers = useRef([]);
     const radar = useRef(null);
     const newMap = useRef(null);
+    const [camerasSelected, setCamerasSelected] = useState([])
 
     useEffect(() => {
         if (cameraGroup?.length > 0) {
@@ -17,6 +18,7 @@ const IndoorMap = ({ imgURL, cameraGroup }) => {
             console.log('cameraGroup', cameraGroup);
 
         }
+        setCamerasSelected(cameraGroup)
     }, [cameraGroup])
 
     useEffect(() => {
@@ -27,6 +29,10 @@ const IndoorMap = ({ imgURL, cameraGroup }) => {
             initializeMap();
         }
     }, [reload, imgURL]);
+
+    const handleAddPositionCameras = () => {
+
+    }
 
     const initializeMap = () => {
         if (typeof window !== 'undefined') {
@@ -75,33 +81,35 @@ const IndoorMap = ({ imgURL, cameraGroup }) => {
     const addMarkers = () => {
         removeAllMarkers();
 
-        for (let i = 0; i < cameraGroup.length; i += 1) {
-            const x = Math.random() * 400 - 200;
-            const y = Math.random() * 400 - 200;
+        if (cameraGroup?.length > 0) {
+            for (let i = 0; i < cameraGroup.length; i += 1) {
+                const x = Math.random() * 400 - 200;
+                const y = Math.random() * 400 - 200;
 
-            const marker = new Indoor.Marker([x, y], {
-                text: `${cameraGroup[i].name}`,
-                draggable: true,
-                zIndex: 100,
-                id: cameraGroup[i].id,
-            });
+                const marker = new Indoor.Marker([x, y], {
+                    text: `${cameraGroup[i].name}`,
+                    draggable: true,
+                    zIndex: 100,
+                    id: cameraGroup[i].id,
+                });
 
-            marker.on('ready', () => {
-                marker.addTo(newMap.current);
-                markers.current.push(marker);
-                if (typeof window !== 'undefined') {
-                    window.markers = markers.current;
-                }
-            });
+                marker.on('ready', () => {
+                    marker.addTo(newMap.current);
+                    markers.current.push(marker);
+                    if (typeof window !== 'undefined') {
+                        window.markers = markers.current;
+                    }
+                });
+            }
+
+            setTimeout(() => {
+                addLinks();
+                addRadar(markers.current[0], 90);
+            }, 1000);
+            const rect = Indoor.markerGroup([[0, 0], [100, 200]]);
+            rect.on('moving', handleMarkerGroupMoving);
+            rect.addTo(newMap.current);
         }
-
-        setTimeout(() => {
-            addLinks();
-            addRadar(markers.current[0], 90);
-        }, 1000);
-        const rect = Indoor.markerGroup([[0, 0], [100, 200]]);
-        rect.on('moving', handleMarkerGroupMoving);
-        rect.addTo(newMap.current);
     };
 
     const addLinks = () => {

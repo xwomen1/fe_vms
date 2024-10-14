@@ -259,7 +259,7 @@ const Map = () => {
     const fetchAreaGroup = async () => {
         try {
             const res = await callApi(
-                `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=ee7ab701-ca82-4917-96c1-847dfdd20814`)
+                `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=1b038831-3283-40f0-9a4f-7ca2f8d17862`)
             if (Array.isArray(res?.data)) {
                 setAreaGroup(res?.data)
             } else {
@@ -324,6 +324,9 @@ const Map = () => {
         }
     }
 
+    const handleSetPositionCamerasSelected = camera => {
+    }
+
     const handleSetImageMap = map => {
         fetchDigitalMap(map?.code)
     }
@@ -332,7 +335,7 @@ const Map = () => {
         <>
             <div style={{ position: 'relative', width: '100%', height: '100%' }}>
                 <div style={{ position: 'absolute', width: '100%', height: '100%', zIndex: 1 }}>
-                    <IndoorMap imgURL={imgMapURL} cameraGroup={camerasSelected} />
+                    <IndoorMap imgURL={imgMapURL} cameraGroup={camerasSelected} setCamerasSelected={handleSetPositionCamerasSelected} />
                 </div>
                 <Option
                     setKeyword={setKeyword}
