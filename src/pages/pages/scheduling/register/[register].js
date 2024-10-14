@@ -215,7 +215,7 @@ const Register = () => {
 
   const fetchUnitGroup = async () => {
     try {
-      const response = await getApi(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions`)
+      const response = await getApi(`https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions`)
 
       const data = response.data
       setUnitGroup(data)
@@ -234,7 +234,7 @@ const Register = () => {
 
   const fetchAreaGroup = async () => {
     try {
-      const response = await getApi(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/adults`)
+      const response = await getApi(`https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/adults`)
 
       const data = response.data
       if (data?.length > 0) {

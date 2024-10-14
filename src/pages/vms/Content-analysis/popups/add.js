@@ -123,7 +123,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
   const [cameraName, setCameraName] = useState('')
   const [cameraList, setCameraList] = useState([])
   const [locationList, setLocationList] = useState([])
-  const API_REGIONS = `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/`
+  const API_REGIONS = `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/`
   const [detail, setDetail] = useState(null)
   const [form, setForm] = useState(format_form)
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
@@ -186,7 +186,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
   const fetchLocationList = async () => {
     try {
       const res = await axios.get(
-        `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/parentsID?parentID=7cac40af-6b9e-47e6-9aba-8d458722d5a4`,
+        `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/parentsID?parentID=7cac40af-6b9e-47e6-9aba-8d458722d5a4`,
         config
       )
       setLocationList(res.data)

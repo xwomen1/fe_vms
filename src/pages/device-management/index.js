@@ -64,7 +64,7 @@ const AccessControlDevice = () => {
   const fetchChildren = async parentId => {
     try {
       const response = await axios.get(
-        `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/device-groups/children-lv1?parentId=${parentId}`,
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/device-access/device-groups/children-lv1?parentId=${parentId}`,
         config
       )
       const children = response.data
@@ -88,7 +88,7 @@ const AccessControlDevice = () => {
     setLoading(true)
     try {
       const response = await axios.get(
-        'https://dev-ivi.basesystem.one/vf/ac-adapters/v1/device-groups/children-lv1',
+        'https://dev-ivi.basesystem.one/smc/access-control/api/v0/device-access/device/device-groups/children-lv1',
         config
       )
       const parentData = response.data
@@ -124,14 +124,14 @@ const AccessControlDevice = () => {
       }
 
       const response = await axios.get(
-        'https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices/?deviceGroupId=643a2358824177002890430a',
+        'https://dev-ivi.basesystem.one/smc/access-control/api/v0/device-access/devices?deviceGroupId=643a2358824177002890430a',
         {
           ...config,
           params: params
         }
       )
 
-      const devicesWithParentId = response.data.results.map(device => ({
+      const devicesWithParentId = response.data.map(device => ({
         ...device,
         parentId: '643a2358824177002890430a'
       }))
@@ -152,14 +152,14 @@ const AccessControlDevice = () => {
         }
 
         try {
-          const url = `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices/?deviceGroupId=${nodeId}`
+          const url = `https://dev-ivi.basesystem.one/smc/access-control/api/v0/device-access/devices?deviceGroupId=${nodeId}`
 
           const response = await axios.get(url, {
             params: params,
             ...config
           })
 
-          const devicesWithParentId = response.data.results.map(device => ({
+          const devicesWithParentId = response.data.map(device => ({
             ...device,
             parentId: nodeId
           }))
