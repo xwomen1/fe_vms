@@ -307,7 +307,12 @@ const Map = () => {
         const result = list.find(element => element?.id === camera?.id);
 
         if (result === undefined) {
-            list.push(camera)
+            list.push({
+                ...camera,
+                x: null,
+                y: null,
+                type: 'camera'
+            })
 
         }
         serCamerasSelected(list)
@@ -324,7 +329,12 @@ const Map = () => {
         }
     }
 
-    const handleSetPositionCamerasSelected = camera => {
+    const handleSetPositionCamerasSelected = cameras => {
+        console.log('cameras', cameras);
+
+        if (cameras?.length > 0) {
+            serCamerasSelected(cameras)
+        }
     }
 
     const handleSetImageMap = map => {

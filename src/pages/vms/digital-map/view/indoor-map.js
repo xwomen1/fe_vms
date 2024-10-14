@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import * as Indoor from 'src/@core/components/digital-map/Indoor';
 import CameraView from '../popups/CameraView';
 
-const IndoorMap = ({ imgURL, cameraGroup, setCameraGroup }) => {
+const IndoorMap = ({ imgURL, cameraGroup, setCamerasSelected }) => {
     const [reload, setReload] = useState(0);
     const [isOpenViewCamera, setIsOpenViewCamera] = useState(false);
     const [markerSelected, setMarkerSelected] = useState(null);
@@ -10,25 +10,15 @@ const IndoorMap = ({ imgURL, cameraGroup, setCameraGroup }) => {
     const markers = useRef([]);
     const radar = useRef(null);
     const newMap = useRef(null);
-    const [camerasSelected, setCamerasSelected] = useState([])
 
     useEffect(() => {
-        if (cameraGroup?.length > 0) {
-            setReload(prevReload => prevReload + 1);
-            console.log('cameraGroup', cameraGroup);
-
+        if (cameraGroup.length > 0) {
+            initializeMap();
         }
-        setCamerasSelected(cameraGroup)
-    }, [cameraGroup])
-
-    useEffect(() => {
-        // if (cameraGroup.length > 0) {
-        //     initializeMap();
-        // }
         if (imgURL !== "" && imgURL !== null) {
             initializeMap();
         }
-    }, [reload, imgURL]);
+    }, [reload, imgURL, cameraGroup]);
 
     const handleAddPositionCameras = () => {
 
@@ -82,25 +72,61 @@ const IndoorMap = ({ imgURL, cameraGroup, setCameraGroup }) => {
         removeAllMarkers();
 
         if (cameraGroup?.length > 0) {
+            const newArr = []
+
             for (let i = 0; i < cameraGroup.length; i += 1) {
-                const x = Math.random() * 400 - 200;
-                const y = Math.random() * 400 - 200;
+                if (cameraGroup[i].x === null && cameraGroup[i].y === null) {
+                    const x = Math.random() * 400 - 200;
+                    const y = Math.random() * 400 - 200;
 
-                const marker = new Indoor.Marker([x, y], {
-                    text: `${cameraGroup[i].name}`,
-                    draggable: true,
-                    zIndex: 100,
-                    id: cameraGroup[i].id,
-                });
+                    const marker = new Indoor.Marker([x, y], {
+                        text: `${cameraGroup[i].name}`,
+                        draggable: true,
+                        zIndex: 100,
+                        id: cameraGroup[i].id,
+                    });
 
-                marker.on('ready', () => {
-                    marker.addTo(newMap.current);
-                    markers.current.push(marker);
-                    if (typeof window !== 'undefined') {
-                        window.markers = markers.current;
+                    const camera = {
+                        id: `${cameraGroup[i].id}`,
+                        name: `${cameraGroup[i].name}`,
+                        type: 'camera',
+                        x: x,
+                        y: y,
+                        icon: 'camera'
                     }
-                });
+
+                    newArr.push(camera)
+
+                    marker.on('ready', () => {
+                        marker.addTo(newMap.current);
+                        markers.current.push(marker);
+                        if (typeof window !== 'undefined') {
+                            window.markers = markers.current;
+                        }
+                    });
+                }
+                if (cameraGroup[i].x !== null && cameraGroup[i].y !== null) {
+                    const x = cameraGroup[i]?.x
+                    const y = cameraGroup[i]?.y
+
+                    const marker = new Indoor.Marker([x, y], {
+                        text: `${cameraGroup[i].name}`,
+                        draggable: true,
+                        zIndex: 100,
+                        id: cameraGroup[i].id,
+                    });
+
+                    marker.on('ready', () => {
+                        marker.addTo(newMap.current);
+                        markers.current.push(marker);
+                        if (typeof window !== 'undefined') {
+                            window.markers = markers.current;
+                        }
+                    });
+                }
             }
+            setCamerasSelected(newArr)
+
 
             setTimeout(() => {
                 addLinks();

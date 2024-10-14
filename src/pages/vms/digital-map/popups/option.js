@@ -89,6 +89,10 @@ const Option = ({ keyword, keyword1, setKeyword, setCamera, setDelCameraSelected
     const [expandedNodes, setExpandedNodes] = useState([])
     const [data, setData] = useState([])
 
+    useState(() => {
+        console.log('camerasSelected', camerasSelected);
+    }, [camerasSelected])
+
     const handleSearch = e => {
         setKeyword(e)
     }
