@@ -129,7 +129,7 @@ const Monitoring = () => {
             </Button>
             <CameraBox title='Cam toàn cảnh' />
             <CameraBox title='Cam biển số' />
-            <Typography variant='h6'>Các lượt {isEntering ? 'vào' : 'ra'} gần đây</Typography>
+            <Typography variant='h6'>Các lượt {isEntering ? 'ra' : 'vào'} gần đây</Typography>
             <Cameramini />
             <Cameramini />
             <Cameramini />
