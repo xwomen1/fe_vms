@@ -28,13 +28,14 @@ import PopUpAdd from '../popup/AddChild'
 
 const OrganizationalStructure = () => {
   const [infra, setInfra] = useState([])
-  const [selectedTab, setSelectedTab] = useState(0)
+  const [selectedTab, setSelectedTab] = useState(null)
   const selectedTabRef = useRef(selectedTab)
   const [treeData, setTreeData] = useState({})
   const [expandedNodes, setExpandedNodes] = useState([])
   const [childData, setChildData] = useState([])
   const [openPopup, setOpenPopup] = useState(false)
   const [openPopupId, setOpenPopupId] = useState(null)
+  const [openPopupCode, setOpenPopupCode] = useState(null)
   const [openPopupDetail, setOpenPopupDetail] = useState(false)
   const [openPopupAdd, setOpenPopupAdd] = useState(false)
   const [showPlusIcon, setShowPlusIcon] = useState(false)
@@ -42,7 +43,7 @@ const OrganizationalStructure = () => {
   const [selectId, setSelectIds] = useState(null)
   const [selectedNodeId, setSelectedNodeId] = useState(null)
   const [operationType, setOperationType] = useState(null)
-  const [info, setInffo] = useState([])
+  const [info, setInffo] = useState({})
   const [idGroup, setIdGroup] = useState(null)
   useEffect(() => {
     selectedTabRef.current = selectedTab
@@ -54,12 +55,14 @@ const OrganizationalStructure = () => {
 
   const handleOpenPopup = id => {
     setOpenPopupId(id)
+    setOpenPopupCode(id.code)
     setOpenPopup(true)
     setOperationType('delete')
   }
 
   const handleOpenPopupDetail = id => {
-    setOpenPopupId(id)
+    setOpenPopupCode(id.code)
+    setOpenPopupId(id.id)
     setOpenPopupDetail(true)
     setOperationType('detail')
   }
@@ -99,7 +102,7 @@ const OrganizationalStructure = () => {
       setInfra(response.data)
 
       if (response.data.length > 0) {
-        const parentId = response.data[selectedTab]?.id
+        const parentId = response.data[selectedTab]?.code
 
         await fetchChildData(parentId)
         expandedNodes.forEach(async nodeId => {
@@ -126,12 +129,15 @@ const OrganizationalStructure = () => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
-      const response = await axios.get(`https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/${nodeId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
+      const response = await axios.get(
+        `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/code?code=${nodeId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
-      })
-      setInffo(response.data)
+      )
+      setInffo(response.data[0])
     } catch (error) {
       console.error('Error fetching data:', error)
     }
@@ -143,14 +149,16 @@ const OrganizationalStructure = () => {
     }
 
     if (operationType === 'detail') {
-      fetchId(openPopupId)
+      fetchId(openPopupCode)
     }
-    fetchChildDataNote(openPopupId)
+
+    fetchChildDataNote(openPopupCode)
     await fetchFilter()
 
     if (selectedNodeId) {
       const nodeId = selectedNodeId
-      const parentId = treeData[nodeId]?.parentId
+
+      const parentId = treeData[nodeId]?.code
 
       if (parentId) {
         await fetchChildData(parentId)
@@ -166,7 +174,7 @@ const OrganizationalStructure = () => {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
       const response = await axios.get(
-        `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`,
+        `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/codeParent?codeParent=${parentId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -185,7 +193,7 @@ const OrganizationalStructure = () => {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
       const response = await axios.get(
-        `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`,
+        `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/codeParent?codeParent=${parentId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -210,8 +218,8 @@ const OrganizationalStructure = () => {
     setSelectedTab(id)
     setInffo(null)
     setExpandedNodes([])
-    await fetchChildData(infra[id]?.id)
-    await fetchChildDataNote(infra[id]?.id)
+    await fetchChildData(infra[id]?.code)
+    await fetchChildDataNote(infra[id]?.code)
     setIdGroup(infra[id]?.id)
   }
 
@@ -220,7 +228,7 @@ const OrganizationalStructure = () => {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
       const response = await axios.get(
-        `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`,
+        `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/codeParent?codeParent=${parentId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -268,20 +276,20 @@ const OrganizationalStructure = () => {
 
   const renderTreeItems = nodes => {
     return nodes.map(node => {
-      const hasChildren = treeData[node.id] && treeData[node.id].length > 0
+      const hasChildren = treeData[node.code] && treeData[node.code].length > 0
 
       return (
         <TreeItem
           key={node.id}
-          nodeId={node.id.toString()}
+          nodeId={node.code}
           label={
             <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Button
                 size='small'
                 sx={{ textAlign: 'left', justifyContent: 'flex-start', width: '100%' }}
                 onClick={async () => {
-                  await fetchChildDataNote(node.id)
-                  await fetchChildData(node.id)
+                  await fetchChildDataNote(node.code)
+                  await fetchChildData(node.code)
                 }}
               >
                 {node.name}
@@ -303,7 +311,7 @@ const OrganizationalStructure = () => {
               >
                 <Icon icon='tabler:trash' />
               </IconButton>
-              <IconButton size='small' onClick={() => handleOpenPopupDetail(node.id)}>
+              <IconButton size='small' onClick={() => handleOpenPopupDetail(node)}>
                 <Icon icon='tabler:edit' />
               </IconButton>
             </Box>
@@ -311,26 +319,26 @@ const OrganizationalStructure = () => {
           icon={
             node.isParent ? (
               <Box display='flex' alignItems='center'>
-                <IconButton style={{ padding: '0px' }} onClick={() => handleFetchChildren(node.id)}>
-                  <Icon icon={expandedNodes.includes(node.id) ? 'tabler:chevron-down' : 'tabler:chevron-right'} />
+                <IconButton style={{ padding: '0px' }} onClick={() => handleFetchChildren(node.code)}>
+                  <Icon icon={expandedNodes.includes(node.code) ? 'tabler:chevron-down' : 'tabler:chevron-right'} />
                 </IconButton>
               </Box>
             ) : null
           }
         >
-          {hasChildren && renderTreeItems(treeData[node.id])}
+          {hasChildren && renderTreeItems(treeData[node.code])}
         </TreeItem>
       )
     })
   }
 
   const currentTabInfra = infra[selectedTab] || {}
-  const rootNodes = treeData[currentTabInfra.id] || []
+  const rootNodes = treeData[currentTabInfra.code] || []
 
   const getIdFromValue = value => {
     if (!info && !currentTabInfra) return null
-    if (info && info.name === value) return info.id
-    if (currentTabInfra && currentTabInfra.name === value) return currentTabInfra.id
+    if (info && info.name === value) return info
+    if (currentTabInfra && currentTabInfra.name === value) return currentTabInfra
 
     return null
   }
@@ -338,8 +346,6 @@ const OrganizationalStructure = () => {
   const handleNodeSelect = (event, nodeId) => {
     fetchId(nodeId)
   }
-
-  console.log(childData, 'childData')
 
   return (
     <>
@@ -402,7 +408,7 @@ const OrganizationalStructure = () => {
                                 marginRight: '8px',
                                 color: selectedTab === index ? '#fff' : 'inherit'
                               }}
-                              onClick={() => handleOpenPopupDetail(infraItem.id)}
+                              onClick={() => handleOpenPopupDetail(infraItem)}
                             >
                               <Icon icon='tabler:edit' />
                             </IconButton>
@@ -431,9 +437,13 @@ const OrganizationalStructure = () => {
               </Grid>
               <Grid item xs={2.5} style={{ display: 'flex', flexDirection: 'column' }}>
                 <Paper elevation={3} style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                  <Button onClick={() => handleAddPClick(idGroup)}>
-                    <Icon icon='tabler:plus' />
-                  </Button>
+                  {/* Hiển thị nút chỉ khi selectedTab khác null */}
+                  {selectedTab !== null && (
+                    <Button onClick={() => handleAddPClick(idGroup)}>
+                      <Icon icon='tabler:plus' />
+                    </Button>
+                  )}
+
                   <TreeView
                     aria-label='file system navigator'
                     defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
@@ -451,27 +461,37 @@ const OrganizationalStructure = () => {
                   <CustomTextField
                     label='Name'
                     type='text'
-                    value={info ? info.name : currentTabInfra.name || ''}
+                    value={info ? info?.name : currentTabInfra.name || ''}
                     fullWidth
                     style={{ marginBottom: '16px' }}
-                    onClick={() => handleOpenPopupDetail(getIdFromValue(info ? info.name : currentTabInfra.name || ''))}
+                    disabled={selectedTab === null} // Vô hiệu hóa nếu selectedTab là null
+                    onClick={() =>
+                      handleOpenPopupDetail(getIdFromValue(info ? info?.name : currentTabInfra.name || ''))
+                    }
                   />
                   <CustomTextField
                     label='Code'
                     type='text'
-                    value={info ? info.code : currentTabInfra.code || ''}
+                    value={info ? info?.code : currentTabInfra.code || ''}
                     fullWidth
                     style={{ marginBottom: '16px' }}
-                    onClick={() => handleOpenPopupDetail(getIdFromValue(info ? info.name : currentTabInfra.name || ''))}
+                    disabled={selectedTab === null} // Vô hiệu hóa nếu selectedTab là null
+                    onClick={() =>
+                      handleOpenPopupDetail(getIdFromValue(info ? info?.name : currentTabInfra.name || ''))
+                    }
                   />
                   <CustomTextField
                     label='Detail'
                     type='text'
-                    value={info ? info.detail : currentTabInfra.detail || ''}
+                    value={info ? info?.detail : currentTabInfra.detail || ''}
                     fullWidth
-                    onClick={() => handleOpenPopupDetail(getIdFromValue(info ? info.name : currentTabInfra.name || ''))}
+                    disabled={selectedTab === null} // Vô hiệu hóa nếu selectedTab là null
+                    onClick={() =>
+                      handleOpenPopupDetail(getIdFromValue(info ? info?.name : currentTabInfra.name || ''))
+                    }
                   />
                 </Paper>
+
                 <Paper elevation={3} style={{ padding: '16px', flexGrow: 1 }}>
                   <TableContainer component={Paper}>
                     <Table>
@@ -492,7 +512,7 @@ const OrganizationalStructure = () => {
                               <TableCell>{child.code}</TableCell>
                               <TableCell sx={{ padding: '16px' }}>
                                 <IconButton size='small'>
-                                  <Icon icon='tabler:edit' onClick={() => handleOpenPopupDetail(child.id)} />
+                                  <Icon icon='tabler:edit' onClick={() => handleOpenPopupDetail(child)} />
                                 </IconButton>
                                 <IconButton onClick={() => handleOpenPopup(child.id)}>
                                   <Icon icon='tabler:trash' />

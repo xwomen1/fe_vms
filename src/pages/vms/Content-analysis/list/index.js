@@ -304,15 +304,23 @@ const ContentAnalysis = () => {
         endTime: endTimeCamera ? endTimeCamera.getTime() : null
       }
     }
+
     setLoading(true)
+
     try {
       const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/routine`, params)
       setDeviceList(res?.data)
       setCount(res.count)
       setTotalPage(Math.ceil(res.count / pageSize))
     } catch (error) {
+      if (error.response) {
+        toast.error(`Error: ${error.response.data.message || 'An error occurred while fetching data.'}`)
+      } else if (error.request) {
+        toast.error('Error: No response from the server.')
+      } else {
+        toast.error(`Error: ${error.message}`)
+      }
       console.error('Error fetching data:', error)
-      toast.error(error)
     } finally {
       setLoading(false)
     }
@@ -562,6 +570,8 @@ const ContentAnalysis = () => {
   }
 
   const handleSetTimeSelected = data => {
+    console.log(data, 'data')
+
     setCurrentTime(0)
     setPlay(!play)
     setStartTime(data?.startTime?.getTime())
@@ -639,11 +649,6 @@ const ContentAnalysis = () => {
   }
 
   const handleSearchClick = () => {
-    if (!startTimeCamera || !endTimeCamera) {
-      toast.error('Vui lòng chọn cả ngày bắt đầu và ngày kết thúc.')
-
-      return
-    }
     fetchDataList()
   }
 
@@ -961,7 +966,7 @@ const ContentAnalysis = () => {
                           {loading && <Typography>Loading...</Typography>}
                           {dataListTimeline.length > 0 && (
                             <Timeline
-                              data={dataList}
+                              data={dataListTimeline}
                               minuteType={minuteType}
                               startDate={startDate}
                               endDate={endDate}

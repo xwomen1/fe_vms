@@ -116,30 +116,14 @@ const InforAll = ({ idInfor }) => {
       }
 
       const parentResponse = await axios.get(
-        'https://dev-ivi.basesystem.one/smc/access-control/api/v0/device-access/device/device-groups/children-lv1',
+        'https://dev-ivi.basesystem.one/smc/access-control/api/v0/device-access/device-groups',
         config
       )
       const parentGroups = parentResponse.data || [] // Ensure it's an array
 
       // Fetch child groups for each parent
-      const childGroupsPromises = parentGroups.map(async parentGroup => {
-        const childResponse = await axios.get(
-          `https://dev-ivi.basesystem.one/access-control/api/v0/device-access/device-groups/children-lv1?parentId=${parentGroup.id}`,
-          config
-        )
-
-        const childGroups = childResponse.data || [] // Ensure it's an array
-
-        return childGroups.map(child => ({
-          ...child,
-          parentName: parentGroup.name, // Include parent name for better distinction
-          parentId: parentGroup.id // Include parent id for filtering
-        }))
-      })
-
-      const childGroupsArrays = await Promise.all(childGroupsPromises)
-      const allGroups = parentGroups.concat(childGroupsArrays.flat())
-      setDeviceGroups(allGroups)
+      
+      setDeviceGroups(parentGroups)
     } catch (error) {
       console.error('Error fetching device groups:', error)
       toast.error(error.message || 'Error fetching device groups')
