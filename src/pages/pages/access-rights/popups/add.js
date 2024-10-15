@@ -249,6 +249,7 @@ const Add = ({ show, onClose, setReload }) => {
   const getFilteredDoorList = excludeId => {
     return doorList.filter(door => door.id !== excludeId)
   }
+  
   const createNewGroup = async (groupName, groupCode) => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -275,6 +276,7 @@ const Add = ({ show, onClose, setReload }) => {
       throw error
     }
   }
+  
   const handleDepartmentChange = async (selectedValue) => {
     const selectedDepartment = groupName.find(item => item.id === selectedValue);
     
@@ -293,7 +295,8 @@ const Add = ({ show, onClose, setReload }) => {
       }
     }
   };
-  return (
+  
+return (
     <Card>
       <form>
         <Dialog

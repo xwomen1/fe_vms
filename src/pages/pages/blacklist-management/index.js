@@ -216,6 +216,7 @@ const Blacklist = () => {
 
     return Swal.fire({ ...defaultProps, ...options })
   }
+
   const onSubmit = values => {
     var detail = {
       image: base64,
@@ -243,6 +244,7 @@ const Blacklist = () => {
     setPage(1)
     handleCloseMenu()
   }
+
   const handleDeleteMember = idDelete => {
     showAlertConfirm({
       text: 'Are you sure you want to delete?'
@@ -285,6 +287,7 @@ const Blacklist = () => {
       }
     })
   }
+
   const handleDeleteBlacklist = idDelete => {
     showAlertConfirm({
       text: 'Are you sure you want to delete?'

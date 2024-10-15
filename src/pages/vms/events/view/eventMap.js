@@ -354,6 +354,7 @@ const EventMap = () => {
       
       try {
         const response = await axios.get('https://your-api-url-to-fetch-coordinates');
+        
         const newCoordinates = response.data.map(item => ({
           longitude: item.longtitudeOfCam,
           latitude: item.latitudeOfCam,
