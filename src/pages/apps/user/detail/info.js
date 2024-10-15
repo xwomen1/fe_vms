@@ -940,7 +940,6 @@ const UserDetails = () => {
                 <Grid item xs={4}>
                   <TextField label='Name*' value={fullNameValue} onChange={handleFullNameChange} fullWidth />
                 </Grid>
-                {console.log(user.userAccount.accStatus)}
                 <Grid item xs={4}>
                   <TextField label='Email*' value={email} onChange={handleEmailChange} fullWidth />
                 </Grid>
@@ -1299,6 +1298,9 @@ const UserDetails = () => {
                 </Grid>
               </Grid>
               <br></br>
+              { user?.userAccount &&(
+
+
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <Typography variant='h5'>Account Information</Typography>
@@ -1372,7 +1374,7 @@ const UserDetails = () => {
                         <TableRow>
                           <TableCell>Name</TableCell>
                           <TableCell>Code</TableCell>
-                          <TableCell>Description</TableCell>
+                          <TableCell>Details</TableCell>
                           {/* {showPlusColumn && ( */}
                           <TableCell align='center'>
                             <IconButton onClick={handleAddRow1} size='small' sx={{ marginLeft: '10px' }}>
@@ -1422,6 +1424,7 @@ const UserDetails = () => {
                   </TableContainer>
                 </Grid>
               </Grid>
+              )}
             </Grid>
           </Grid>
           <br></br>
