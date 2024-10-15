@@ -37,7 +37,7 @@ const CustomMapPin = () => (
   </svg>
 )
 
-const Device = ({ onClose, camera }) => {
+const Device = ({ onClose, camera, setReload }) => {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [rows, setRows] = useState([])
@@ -364,6 +364,7 @@ const Device = ({ onClose, camera }) => {
 
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${camera}`, data, config)
       setLoading(false)
+      setReload(prev => prev + 1)
       Swal.fire({
         title: 'Success!',
         text: 'Updated successfully',
@@ -381,7 +382,6 @@ const Device = ({ onClose, camera }) => {
     } catch (error) {
       setLoading(false)
       onClose()
-
       Swal.fire({
         title: 'Error!',
         text: error.response?.data?.message,
