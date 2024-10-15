@@ -93,7 +93,7 @@ const StyledTreeItem = props => {
     )
 }
 
-const EditMap = ({ show, onClose, setReload, data, typePopup }) => {
+const EditMap = ({ show, onClose, setReload, id, typePopup }) => {
     const [loading, setLoading] = useState(false)
     const [detail, setDetail] = useState(null)
     const [treeData, setTreeData] = useState([])
@@ -105,6 +105,7 @@ const EditMap = ({ show, onClose, setReload, data, typePopup }) => {
     const [selectedArea, setSelectedArea] = useState(null)
     const [anchorEl, setAnchorEl] = useState(null);
     const [areaGroup, setAreaGroup] = useState([])
+    const [data, setData] = useState(null)
 
     const {
         control,
@@ -117,6 +118,35 @@ const EditMap = ({ show, onClose, setReload, data, typePopup }) => {
         setDetail(data)
         setFileUploadUrl(data?.img)
     }, [data])
+
+    useEffect(() => {
+        fetchDataDigitalMap()
+    }, [])
+
+    useEffect(() => {
+        console.log('fileUploadUrl', fileUploadUrl);
+
+    }, [fileUploadUrl])
+
+    const fetchDataDigitalMap = async () => {
+        if (id) {
+            setLoading(true)
+            try {
+                const res = await getApi(`https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps/${id}`)
+                setData(res.data)
+            } catch (error) {
+                if (error && error?.response?.data) {
+                    console.error('error', error)
+                    toast.error(error?.response?.data?.message)
+                } else {
+                    console.error('Error fetching data:', error)
+                    toast.error(error)
+                }
+            } finally {
+                setLoading(false)
+            }
+        }
+    }
 
     useEffect(() => {
         if (detail) {
@@ -139,7 +169,7 @@ const EditMap = ({ show, onClose, setReload, data, typePopup }) => {
     };
 
     const open = Boolean(anchorEl);
-    const id = open ? 'simple-popover' : undefined;
+    const idPopover = open ? 'simple-popover' : undefined;
 
     const onReset = values => {
         var detail = {}
@@ -244,7 +274,7 @@ const EditMap = ({ show, onClose, setReload, data, typePopup }) => {
             img: fileUploadUrl
         }
 
-        if (data) {
+        if (id) {
             handleUpdate(detail)
         } else {
             handleAdd(detail)
@@ -285,7 +315,7 @@ const EditMap = ({ show, onClose, setReload, data, typePopup }) => {
         }
 
         setLoading(true)
-        putApi(`https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps/${data.id}`, { ...params })
+        putApi(`https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps/${id}`, { ...params })
             .then(() => {
                 toast.success('Data saved successfully')
                 setReload()
@@ -406,7 +436,7 @@ const EditMap = ({ show, onClose, setReload, data, typePopup }) => {
                                                     }}
                                                 />
                                                 <Popover
-                                                    id={id}
+                                                    id={idPopover}
                                                     open={open}
                                                     anchorEl={anchorEl}
                                                     onClose={handleClose}

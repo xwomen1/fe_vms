@@ -20,8 +20,9 @@ import Icon from 'src/@core/components/icon'
 // ** Hook Import
 import { useSettings } from 'src/@core/hooks/useSettings'
 import CustomTextField from 'src/@core/components/mui/text-field'
-import { getApi } from 'src/@core/utils/requestUltils'
+import { getApi, putApi } from 'src/@core/utils/requestUltils'
 import { Button } from '@mui/material'
+import toast from 'react-hot-toast'
 
 const Toggler = styled(Box)(({ theme }) => ({
     right: 0,
@@ -79,7 +80,7 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     }
 }))
 
-const Option = ({ keyword, keyword1, setKeyword, setCamera, setDelCameraSelected, setMap, cameraGroup, areaGroup, camerasSelected }) => {
+const Option = ({ keyword, keyword1, setKeyword, setCamera, setDelCameraSelected, setMap, cameraGroup, areaGroup, camerasSelected, digitalMapId }) => {
     // ** State
     const [open, setOpen] = useState(false)
 
@@ -87,11 +88,8 @@ const Option = ({ keyword, keyword1, setKeyword, setCamera, setDelCameraSelected
 
     const [treeData, setTreeData] = useState([])
     const [expandedNodes, setExpandedNodes] = useState([])
-    const [data, setData] = useState([])
-
-    useState(() => {
-        console.log('camerasSelected', camerasSelected);
-    }, [camerasSelected])
+    const [reload, setReload] = useState(0)
+    const [loading, setLoading] = useState(false)
 
     const handleSearch = e => {
         setKeyword(e)
@@ -129,6 +127,36 @@ const Option = ({ keyword, keyword1, setKeyword, setCamera, setDelCameraSelected
         }
     }
 
+    const handleUpdateDigitalMap = () => {
+        const params = {
+            devices: [...camerasSelected]
+        }
+
+        console.log('params', params);
+        console.log('digitalMapId', digitalMapId);
+
+        // if (digitalMapId) {
+        //     putApi(`https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps/${digitalMapId}`, { ...params })
+        //         .then(() => {
+        //             toast.success('Data saved successfully')
+        //             setReload(reload + 1)
+        //             onClose()
+        //         })
+        //         .catch(error => {
+        //             if (error && error?.response?.data) {
+        //                 console.error('error', error)
+        //                 toast.error(error?.response?.data?.message)
+        //             } else {
+        //                 console.error('Error fetching data:', error)
+        //                 toast.error(error)
+        //             }
+        //         })
+        //         .finally(() => {
+        //             setLoading(false)
+        //         })
+        // }
+    }
+
     const StyledTreeItem = props => {
         // ** Props
         const { labelText, labelIcon, labelInfo, color, textDirection, disabled, cameraSelected, camera, ...other } = props
@@ -154,7 +182,10 @@ const Option = ({ keyword, keyword1, setKeyword, setCamera, setDelCameraSelected
                             </Typography>
                         ) : null}
                         {cameraSelected === true && (
-                            <IconButton aria-label="delete" size="small" onClick={() => setDelCameraSelected(camera)}>
+                            <IconButton aria-label="delete" size="small" onClick={() => {
+                                setDelCameraSelected(camera)
+                                setReload(reload + 1)
+                            }}>
                                 <Icon icon={"tabler:trash"} color={"secondary"} />
                             </IconButton>
                         )}
@@ -176,8 +207,6 @@ const Option = ({ keyword, keyword1, setKeyword, setCamera, setDelCameraSelected
                                 key={camera.id}
                                 nodeId={camera.id}
                                 color={camera?.status == true ? '#28c76f' : ''}
-
-                                // textDirection={camera.id === idCameraSelected ? 'underline' : ''}
                                 labelText={camera.deviceName}
                                 labelIcon='tabler:camera'
                                 onClick={() => setCamera(camera)}
@@ -324,7 +353,7 @@ const Option = ({ keyword, keyword1, setKeyword, setCamera, setDelCameraSelected
                                     ))}
                                 </TreeView>
                             </Box>
-                            <Button variant='contained' sx={{ position: 'absolute', bottom: 0, right: 0 }}>Save Digital Map</Button>
+                            <Button variant='contained' onClick={() => handleUpdateDigitalMap()} sx={{ position: 'absolute', bottom: 0, right: 0 }}>Save Digital Map</Button>
                         </Box>
                     </CustomizerSpacing>
 

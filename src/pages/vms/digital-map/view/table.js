@@ -22,7 +22,7 @@ const DigitalMapTable = () => {
     const [isOpenView, setIsOpenView] = useState(false)
     const [isOpenDel, setIsOpenDel] = useState(false)
     const [idDelete, setIdDelete] = useState(null)
-    const [digitalMap, setDigitalMap] = useState(null)
+    const [digitalMapId, setDigitalMapId] = useState(null)
 
     const columns = [
         {
@@ -283,7 +283,7 @@ const DigitalMapTable = () => {
                                                         size='small'
                                                         sx={{ color: 'text.secondary' }}
                                                         onClick={() => {
-                                                            setDigitalMap(row)
+                                                            setDigitalMapId(row.id)
                                                             setIsOpenView(true)
                                                         }}
                                                     >
@@ -336,7 +336,7 @@ const DigitalMapTable = () => {
                 <AddMap show={isOpenAdd} onClose={() => setIsOpenAdd(false)} setReload={() => setReload(reload + 1)} />
             )}
             {isOpenView && (
-                <EditMap show={isOpenView} onClose={() => setIsOpenView(false)} data={digitalMap} setReload={() => setReload(reload + 1)} />
+                <EditMap show={isOpenView} onClose={() => setIsOpenView(false)} id={digitalMapId} setReload={() => setReload(reload + 1)} />
             )}
             {isOpenDel && DeleteView()}
         </>

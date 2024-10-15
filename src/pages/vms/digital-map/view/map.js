@@ -1,7 +1,7 @@
 "use client";
 
 import { TreeItem, TreeView } from "@mui/lab"
-import { Box, Button, Card, CardContent, CardHeader, Grid, IconButton, List, styled, Typography } from "@mui/material"
+import { Box, Button, Card, CardContent, CardHeader, Divider, Grid, IconButton, List, styled, Typography } from "@mui/material"
 import { use, useEffect, useState } from "react"
 import Icon from 'src/@core/components/icon'
 import { callApi } from "src/@core/utils/requestUltils"
@@ -33,43 +33,14 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     }
 }))
 
-const StyledTreeItem = props => {
-    // ** Props
-    const { labelText, labelIcon, labelInfo, color, textDirection, disabled, ...other } = props
-
-    return (
-        <StyledTreeItemRoot
-            {...other}
-            label={
-                <Box
-                    sx={{
-                        py: 1,
-                        display: 'flex',
-                        alignItems: 'center',
-                        '& svg': { mr: 1 },
-                    }}>
-                    <Icon icon={labelIcon} color={color} />
-                    <Typography variant='body2' sx={{ flexGrow: 1, fontWeight: 500, textDecoration: textDirection }}>
-                        {labelText}
-                    </Typography>
-                    {labelInfo ? (
-                        <Typography variant='caption' color='inherit'>
-                            {labelInfo}
-                        </Typography>
-                    ) : null}
-                </Box>
-            }
-        />
-    )
-}
-
 const Map = () => {
     const [keyword, setKeyword] = useState('')
+    const [keyword1, setKeyword1] = useState('')
     const [cameraList, setCameraList] = useState([])
     const [cameraGroup, setCameraGroup] = useState([])
     const [idCameraSelected, setIdCameraSelected] = useState(null)
     const [camera, setCamera] = useState({ id: '', name: '', channel: '' })
-    const [camerasSelected, serCamerasSelected] = useState([])
+    const [camerasSelected, setCamerasSelected] = useState([])
     const [areaGroup, setAreaGroup] = useState([])
 
     const clientId = 'be571c00-41cf-4878-a1de-b782625da62a'
@@ -77,6 +48,10 @@ const Map = () => {
     const [websocket, setWebsocket] = useState(null)
     const [rtcPeerConnection, setRtcPeerConnection] = useState(null)
     const [imgMapURL, setImgMapURL] = useState(null)
+    const [digitalMapId, setDigitalMap] = useState(null)
+
+    const [treeData, setTreeData] = useState([])
+    const [expandedNodes, setExpandedNodes] = useState([])
 
     const configWs = {
         bundlePolicy: 'max-bundle',
@@ -234,6 +209,10 @@ const Map = () => {
         }
     }, [camera])
 
+    const handleSearch = e => {
+        setKeyword(e)
+    }
+
     const fetchCameraList = async () => {
         try {
             const res = await callApi(
@@ -259,7 +238,7 @@ const Map = () => {
     const fetchAreaGroup = async () => {
         try {
             const res = await callApi(
-                `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=1b038831-3283-40f0-9a4f-7ca2f8d17862`)
+                `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/codeParent?codeParent=digitalmap`)
             if (Array.isArray(res?.data)) {
                 setAreaGroup(res?.data)
             } else {
@@ -282,6 +261,12 @@ const Map = () => {
             const res = await callApi(
                 `https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps/get-by-area-code?areaCode=${areaCode}`)
             const imgMapURL = res.data?.img
+            const devices = res.data?.devices
+
+            setDigitalMap(res.data?.id)
+            if (devices?.length > 0) {
+                setCamerasSelected(devices)
+            }
             if (imgMapURL !== "") {
                 setImgMapURL(imgMapURL)
             }
@@ -295,6 +280,73 @@ const Map = () => {
                 toast.error(error)
             }
         }
+    }
+
+    const fetchChildrenByCode = async parentCode => {
+        try {
+            const res = await getApi(`https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/code?code=${parentCode}`)
+            setTreeData(prevTreeData => ({
+                ...prevTreeData,
+                [parentId]: res.data
+            }))
+        } catch (error) {
+            console.error('Error fetching children:', error)
+
+            return []
+        }
+    }
+
+
+    // const handleNodeSelect = (event, nodeId) => {
+    //     fetchId(nodeId)
+    // }
+
+    const handleFetchChildren = nodeCode => {
+
+        // check nodeId have existed
+        const isExpanded = expandedNodes.includes(nodeCode)
+        const childrenData = fetchChildrenByCode(nodeCode)
+
+        setTreeData(prevTreeData => ({
+            ...prevTreeData,
+            [nodeCode]: childrenData
+        }))
+
+        if (isExpanded) {
+            setExpandedNodes(expandedNodes.filter(code => code !== nodeCode))
+        } else {
+            setExpandedNodes([...expandedNodes, nodeCode])
+        }
+    }
+
+    const handleUpdateDigitalMap = () => {
+        const params = {
+            devices: [...camerasSelected]
+        }
+
+        console.log('params', params);
+        console.log('digitalMapId', digitalMapId);
+
+        // if (digitalMapId) {
+        //     putApi(`https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps/${digitalMapId}`, { ...params })
+        //         .then(() => {
+        //             toast.success('Data saved successfully')
+        //             setReload(reload + 1)
+        //             onClose()
+        //         })
+        //         .catch(error => {
+        //             if (error && error?.response?.data) {
+        //                 console.error('error', error)
+        //                 toast.error(error?.response?.data?.message)
+        //             } else {
+        //                 console.error('Error fetching data:', error)
+        //                 toast.error(error)
+        //             }
+        //         })
+        //         .finally(() => {
+        //             setLoading(false)
+        //         })
+        // }
     }
 
     const handleSetCamera = (camera) => {
@@ -315,7 +367,7 @@ const Map = () => {
             })
 
         }
-        serCamerasSelected(list)
+        setCamerasSelected(list)
     }
 
     const handleDelCamerasSelected = camera => {
@@ -325,27 +377,265 @@ const Map = () => {
         if (isCameraId) {
             const result = list.filter(element => element?.id !== camera?.id);
 
-            serCamerasSelected(result)
+            setCamerasSelected(result)
         }
     }
 
     const handleSetPositionCamerasSelected = cameras => {
         console.log('cameras', cameras);
-
-        if (cameras?.length > 0) {
-            serCamerasSelected(cameras)
-        }
+        setCamerasSelected(cameras)
     }
 
     const handleSetImageMap = map => {
         fetchDigitalMap(map?.code)
     }
 
+    const StyledTreeItem = props => {
+        // ** Props
+        const { labelText, labelIcon, labelInfo, color, textDirection, disabled, cameraSelected, camera, ...other } = props
+
+        return (
+            <StyledTreeItemRoot
+                {...other}
+                label={
+                    <Box
+                        sx={{
+                            py: 1,
+                            display: 'flex',
+                            alignItems: 'center',
+                            '& svg': { mr: 1 },
+                        }}>
+                        <Icon icon={labelIcon} color={color} />
+                        <Typography variant='body2' sx={{ flexGrow: 1, fontWeight: 500, textDecoration: textDirection }}>
+                            {labelText}
+                        </Typography>
+                        {labelInfo ? (
+                            <Typography variant='caption' color='inherit'>
+                                {labelInfo}
+                            </Typography>
+                        ) : null}
+                        {cameraSelected === true && (
+                            <IconButton aria-label="delete" size="small" onClick={() => {
+                                handleDelCamerasSelected(camera)
+                            }}>
+                                <Icon icon={"tabler:trash"} color={"secondary"} />
+                            </IconButton>
+                        )}
+                    </Box>
+                }
+            />
+        )
+    }
+
+    const renderTree = group => {
+
+        return (
+            <StyledTreeItem key={group.id} nodeId={group.id} labelText={group.name} labelIcon='tabler:folder'>
+                {group.cameras && group.cameras.length > 0
+                    ? group.cameras.map(camera => {
+
+                        return (
+                            <StyledTreeItem
+                                key={camera.id}
+                                nodeId={camera.id}
+                                color={camera?.status == true ? '#28c76f' : ''}
+                                labelText={camera.deviceName}
+                                labelIcon='tabler:camera'
+                                onClick={() => handleSetCamera(camera)}
+                            />
+                        )
+                    })
+                    : null}
+            </StyledTreeItem>
+        )
+    }
+
+    const renderTreeItems = nodes => {
+        return nodes.map(node => {
+
+            const hasChildren = treeData[node.id] && treeData[node.id].length > 0
+
+            return (
+                <StyledTreeItem
+                    key={node?.id}
+                    nodeId={node?.id.toString()}
+                    labelText={node.name}
+                    labelIcon='tabler:map'
+                    icon={
+                        node.isParent ? (
+                            <Box display='flex' alignItems='center'>
+                                <IconButton style={{ padding: '0px' }} onClick={() => handleFetchChildren(node.code)}>
+                                    <Icon icon={expandedNodes.includes(node.id) ? 'tabler:chevron-down' : 'tabler:chevron-right'} />
+                                </IconButton>
+                            </Box>
+                        ) : null
+                    }
+                // onClick={() => handleSetImageMap(node)}
+
+                >
+                    {hasChildren && renderTreeItems(treeData[node.id])}
+                </StyledTreeItem>
+            )
+
+        })
+    }
+
     return (
         <>
-            <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+            <Grid container spacing={2}>
+                <Grid item xs={4} container spacing={2}>
+                    <Grid item xs={6}>
+                        <Card>
+                            <CardContent>
+                                <Box>
+                                    <Typography>Camera List</Typography>
+                                    <br />
+                                    <CustomTextField
+                                        value={keyword}
+                                        placeholder='Search…'
+                                        InputProps={{
+                                            startAdornment: (
+                                                <Box sx={{ mr: 2, display: 'flex' }}>
+                                                    <Icon fontSize='1.25rem' icon='tabler:search' />
+                                                </Box>
+                                            ),
+                                            endAdornment: (
+                                                <IconButton size='small' title='Clear' aria-label='Clear' onClick={() => setKeyword('')}>
+                                                    <Icon fontSize='1.25rem' icon='tabler:x' />
+                                                </IconButton>
+                                            )
+                                        }}
+                                        onChange={e => handleSearch(e.target.value)}
+                                        sx={{
+                                            width: {
+                                                xs: 1,
+                                                sm: 'auto'
+                                            },
+                                            '& .MuiInputBase-root > svg': {
+                                                mr: 2
+                                            }
+                                        }}
+                                    />
+                                    <Box sx={{
+                                        height: 'auto',
+                                        overflow: 'auto',
+                                        marginTop: '10px'
+                                    }}>
+                                        <TreeView
+                                            sx={{ minHeight: 300 }}
+                                            defaultExpanded={['root']}
+                                            defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
+                                            defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
+                                        >
+                                            {cameraGroup.map(group => renderTree(group))}
+                                        </TreeView>
+                                    </Box>
+                                </Box>
+
+                                <Divider sx={{ m: '0 !important' }} />
+                                <br />
+                                <Box sx={{ position: 'relative' }}>
+                                    <Typography>Camera Selected List </Typography>
+                                    <Box sx={{
+                                        height: 'auto',
+                                        overflow: 'auto',
+                                        marginTop: '10px'
+                                    }}>
+                                        <TreeView
+                                            sx={{ minHeight: 300 }}
+                                        >
+                                            {camerasSelected.map((cam, index) => (
+                                                <StyledTreeItem
+                                                    key={cam.id}
+                                                    nodeId={cam.id}
+                                                    labelText={cam.name}
+                                                    labelIcon='tabler:camera'
+                                                    camera={cam}
+                                                    cameraSelected={true}
+                                                />
+                                            ))}
+                                        </TreeView>
+                                    </Box>
+                                    <Button variant='contained' onClick={() => handleUpdateDigitalMap()} sx={{ position: 'absolute', bottom: 0, right: 0 }}>Save Digital Map</Button>
+                                </Box>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <Card>
+                            <CardContent>
+                                <Box>
+                                    <Typography>Area List</Typography>
+                                    <br />
+                                    <CustomTextField
+                                        value={keyword1}
+                                        placeholder='Search…'
+                                        InputProps={{
+                                            startAdornment: (
+                                                <Box sx={{ mr: 2, display: 'flex' }}>
+                                                    <Icon fontSize='1.25rem' icon='tabler:search' />
+                                                </Box>
+                                            ),
+                                            endAdornment: (
+                                                <IconButton size='small' title='Clear' aria-label='Clear' onClick={() => setKeyword('')}>
+                                                    <Icon fontSize='1.25rem' icon='tabler:x' />
+                                                </IconButton>
+                                            )
+                                        }}
+                                        onChange={e => handleSearch(e.target.value)}
+                                        sx={{
+                                            width: {
+                                                xs: 1,
+                                                sm: 'auto'
+                                            },
+                                            '& .MuiInputBase-root > svg': {
+                                                mr: 2
+                                            }
+                                        }}
+                                    />
+                                    <Box sx={{
+                                        height: 'auto',
+                                        overflow: 'auto',
+                                        marginTop: '10px'
+                                    }}>
+                                        <TreeView
+                                            aria-label='file system navigator'
+                                            expanded={expandedNodes}
+                                            defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
+                                            defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
+                                            sx={{ minHeight: 300, flexGrow: 1, overflowY: 'auto', height: '100%' }}
+                                        // onNodeSelect={handleNodeSelect}
+                                        >
+                                            {renderTreeItems(areaGroup)}
+                                        </TreeView>
+                                    </Box>
+                                </Box>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                </Grid>
+                <Grid item xs={8}>
+                    <Card>
+                        <CardContent>
+                            <IndoorMap
+                                imgURL={imgMapURL}
+                                cameraGroup={camerasSelected}
+                                setCamerasSelected={handleSetPositionCamerasSelected}
+                                key={imgMapURL}
+                            />
+                        </CardContent>
+                    </Card>
+                </Grid>
+            </Grid>
+
+            {/* <div style={{ position: 'relative', width: '100%', height: '100%' }}>
                 <div style={{ position: 'absolute', width: '100%', height: '100%', zIndex: 1 }}>
-                    <IndoorMap imgURL={imgMapURL} cameraGroup={camerasSelected} setCamerasSelected={handleSetPositionCamerasSelected} />
+                    <IndoorMap
+                        imgURL={imgMapURL}
+                        cameraGroup={camerasSelected}
+                        setCamerasSelected={handleSetPositionCamerasSelected}
+                        key={imgMapURL}
+                    />
                 </div>
                 <Option
                     setKeyword={setKeyword}
@@ -355,10 +645,11 @@ const Map = () => {
                     cameraGroup={cameraGroup}
                     areaGroup={areaGroup}
                     camerasSelected={camerasSelected}
+                    digitalMapId={digitalMapId}
                 />
-            </div>
+            </div> */}
         </>
     )
 }
 
-export default Map
+export default Map 
