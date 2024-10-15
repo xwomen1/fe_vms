@@ -1306,7 +1306,7 @@ const UserDetails = () => {
                 <Grid item xs={4}>
                   <TextField
                     label='Account*'
-                    defaultValue={user?.userAccount.username}
+                    defaultValue={user?.userAccount?.username || ''}
                     onChange={handleUserNameChange}
                     id='form-props-read-only-input'
                     InputProps={{ readOnly: readOnlys }}
@@ -1316,7 +1316,7 @@ const UserDetails = () => {
                 <Grid item xs={4}>
                   <TextField
                     label='Account Type'
-                    defaultValue={user?.userAccount.identityProviderType}
+                    defaultValue={user?.userAccount.identityProviderType || ''}
                     id='form-props-read-only-input'
                     InputProps={{ readOnly: readOnlys }}
                     fullWidth
@@ -1326,7 +1326,7 @@ const UserDetails = () => {
                   <FormControlLabel
                     control={
                       <Switch
-                        checked={status === 'ACTIVE'}
+                        checked={status === 'ACTIVE' || ''}
                         onChange={e => {
                           setStatus(status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE')
                           const newStatus = e.target.checked ? 'true' : 'false'
