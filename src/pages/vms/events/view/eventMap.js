@@ -238,9 +238,7 @@ const EventMap = () => {
   }
 
   const connectPoints = points => {
-    // Kiểm tra xem points có phải là một mảng không
     if (!Array.isArray(points) || points.length < 2) {
-      // Nếu không phải mảng hoặc độ dài của nó không đủ, không thực hiện gì cả
       return
     }
 
@@ -248,7 +246,6 @@ const EventMap = () => {
     const { longitude: lon1, latitude: lat1 } = point1
     const { longitude: lon2, latitude: lat2 } = point2
 
-    // Nếu cả hai điểm đều có tọa độ, thì nối chúng trên Map
     if (lon1 && lat1 && lon2 && lat2) {
       drawLineOnMap(point1, point2)
     }
@@ -256,9 +253,8 @@ const EventMap = () => {
 
   const deletePreviousConnection = () => {
     if (connections.length > 0) {
-      // Xoá điểm được nối từ mảng connections
       const updatedConnections = [...connections]
-      updatedConnections.pop() // Xoá điểm cuối cùng
+      updatedConnections.pop() 
       setConnections(updatedConnections)
     }
   }
@@ -270,7 +266,6 @@ const EventMap = () => {
   }
 
   const drawLineOnMap = (point1, point2) => {
-    // Tạo một đường thẳng trên Map từ point1 đến point2
     const newConnection = {
       type: 'Feature',
       geometry: {
@@ -282,11 +277,9 @@ const EventMap = () => {
       }
     }
 
-    // Thêm đường vừa tạo vào mảng connections
     setConnections(prevConnections => [...prevConnections, newConnection])
   }
 
-  // Chuyển đổi timestamp thành định dạng "dd mm yyyy hh mm ss"
   const convertTimestampToDateTimeString = timestamp => {
     const dateObj = new Date(timestamp)
     const day = ('0' + dateObj.getDate()).slice(-2)
@@ -321,11 +314,10 @@ const EventMap = () => {
       const newSelected = rows.map(n => n.id)
       setSelectedCameraIds(newSelected)
 
-      // Sắp xếp lại các điểm theo thứ tự của chúng trong dữ liệu API
       const sortedRows = rows.sort((a, b) => a.timestamp - b.timestamp)
 
       const newSelectedPoints = sortedRows
-        .filter(row => row.longtitudeOfCam && row.latitudeOfCam) // Lọc ra các điểm có tọa độ
+        .filter(row => row.longtitudeOfCam && row.latitudeOfCam) 
         .map(row => ({
           longitude: row.longtitudeOfCam,
           latitude: row.latitudeOfCam,
@@ -333,7 +325,6 @@ const EventMap = () => {
         }))
       setSelectedPoints(newSelectedPoints)
 
-      // Gọi hàm handleTimeSelect với các điểm mới được Select
     } else {
       setSelectedCameraIds([])
       setSelectedPoints([])
@@ -341,28 +332,41 @@ const EventMap = () => {
     }
   }
 
-  const handleCameraSelect = (event, cameraId, longitudeOfCam, latitudeOfCam, timestamp) => {
+  const handleCameraSelect = async (event, cameraId, longitudeOfCam, latitudeOfCam, timestamp) => {
     if (event.target.checked && longitudeOfCam && latitudeOfCam) {
-      // Kiểm tra xem điểm đã tồn tại chưa trước khi thêm mới
       const pointExists = selectedPoints.some(
         point => point.longitude === longitudeOfCam && point.latitude === latitudeOfCam && point.timestamp === timestamp
-      )
-
+      );
+  
       if (!pointExists) {
-        setSelectedCameraIds(prevIds => [...prevIds, cameraId])
+        setSelectedCameraIds(prevIds => [...prevIds, cameraId]);
         setSelectedPoints(prevPoints => [
           ...prevPoints,
-          { longitude: longitudeOfCam, latitude: latitudeOfCam, timestamp }
-        ])
+          { longitude: longitudeOfCam, latitude: latitudeOfCam, timestamp },
+        ]);
       }
     } else {
-      setSelectedCameraIds(prevIds => prevIds.filter(id => id !== cameraId))
+      // Unchecked, remove point and fetch new coordinates
+      setSelectedCameraIds(prevIds => prevIds.filter(id => id !== cameraId));
       setSelectedPoints(prevPoints =>
         prevPoints.filter(point => point.longitude !== longitudeOfCam || point.latitude !== latitudeOfCam)
-      )
-      setSelectedTimes(prevTimes => prevTimes.filter(time => time.time !== timestamp))
+      );
+      
+      try {
+        const response = await axios.get('https://your-api-url-to-fetch-coordinates');
+        const newCoordinates = response.data.map(item => ({
+          longitude: item.longtitudeOfCam,
+          latitude: item.latitudeOfCam,
+          timestamp: item.timestamp,
+        }));
+  
+        setSelectedPoints(newCoordinates);
+      } catch (error) {
+        console.error("Error fetching new coordinates:", error);
+      }
     }
-  }
+  };
+  
 
   const handleExport = async () => {
     const excelData = rows.reduce((acc, row) => {
@@ -394,7 +398,6 @@ const EventMap = () => {
     return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`
   }
 
-  // Sử dụng hàm epochToDate để chuyển đổi epoch timestamp sang dạng ngày tháng năm và giờ phút giây
   const epochTimestamp = 1621766000000 // Ví dụ với một epoch timestamp cụ thể
   const formattedDate = epochToDate(epochTimestamp)
 
@@ -479,7 +482,6 @@ const EventMap = () => {
 
   const calculateCenter = () => {
     if (selectedPoints.length === 0) {
-      // Trả về giá trị mặc định nếu không có điểm nào được Select
       return {
         latitude: 21.027763,
         longitude: 105.83416,
@@ -487,15 +489,12 @@ const EventMap = () => {
       }
     }
 
-    // Tính tổng tất cả các Location
     const totalLatitude = selectedPoints.reduce((acc, point) => acc + parseFloat(point.latitude), 0)
     const totalLongitude = selectedPoints.reduce((acc, point) => acc + parseFloat(point.longitude), 0)
 
-    // Tính trung bình Location của các điểm được Select
     const averageLatitude = totalLatitude / selectedPoints.length
     const averageLongitude = totalLongitude / selectedPoints.length
 
-    // Tính khoảng cách lớn nhất từ trung tâm đến các điểm
     const maxDistance = selectedPoints.reduce((acc, point) => {
       const distance = Math.sqrt(
         Math.pow(parseFloat(point.latitude) - averageLatitude, 2) +
