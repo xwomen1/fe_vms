@@ -52,13 +52,6 @@ const DigitalMapTable = () => {
 
     ]
 
-    const dataFake = [
-        { name: "map 01", areaName: "area 01", areaCode: "AREA01" },
-        { name: "map 02", areaName: "area 02", areaCode: "AREA02" },
-        { name: "map 03", areaName: "area 03", areaCode: "AREA03" },
-        { name: "map 04", areaName: "area 04", areaCode: "AREA04" }
-    ]
-
     const handleSearch = e => {
         setKeyword(e.target.value)
     }
@@ -127,7 +120,6 @@ const DigitalMapTable = () => {
             }
         }
     }
-
 
     useEffect(() => {
         fetchData()

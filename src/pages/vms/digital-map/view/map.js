@@ -4,7 +4,7 @@ import { TreeItem, TreeView } from "@mui/lab"
 import { Box, Button, Card, CardContent, CardHeader, Divider, Grid, IconButton, List, styled, Typography } from "@mui/material"
 import { use, useEffect, useState } from "react"
 import Icon from 'src/@core/components/icon'
-import { callApi } from "src/@core/utils/requestUltils"
+import { callApi, getApi, putApi } from "src/@core/utils/requestUltils"
 import CustomTextField from "src/@core/components/mui/text-field"
 import IndoorMap from "./indoor-map"
 import toast from "react-hot-toast"
@@ -48,10 +48,13 @@ const Map = () => {
     const [websocket, setWebsocket] = useState(null)
     const [rtcPeerConnection, setRtcPeerConnection] = useState(null)
     const [imgMapURL, setImgMapURL] = useState(null)
-    const [digitalMapId, setDigitalMap] = useState(null)
+    const [digitalMapId, setDigitalMapId] = useState(null)
 
     const [treeData, setTreeData] = useState([])
     const [expandedNodes, setExpandedNodes] = useState([])
+    const [childData, setChildData] = useState([])
+    const [loading, setLoading] = useState(false)
+    const [reload, setReload] = useState(0)
 
     const configWs = {
         bundlePolicy: 'max-bundle',
@@ -139,6 +142,12 @@ const Map = () => {
     }, [keyword])
 
     useEffect(() => {
+        console.log('camerasSelected', camerasSelected);
+        setReload(reload + 1)
+
+    }, [camerasSelected])
+
+    useEffect(() => {
 
         const addStatusToCameras = (data) => {
 
@@ -170,7 +179,6 @@ const Map = () => {
     useEffect(() => {
         fetchAreaGroup()
     }, [])
-
 
     useEffect(() => {
         const addStatus = (data) => {
@@ -234,7 +242,6 @@ const Map = () => {
         }
     }
 
-
     const fetchAreaGroup = async () => {
         try {
             const res = await callApi(
@@ -263,10 +270,13 @@ const Map = () => {
             const imgMapURL = res.data?.img
             const devices = res.data?.devices
 
-            setDigitalMap(res.data?.id)
+            setDigitalMapId(res.data?.id)
             if (devices?.length > 0) {
                 setCamerasSelected(devices)
+            } else {
+                setCamerasSelected([])
             }
+
             if (imgMapURL !== "") {
                 setImgMapURL(imgMapURL)
             }
@@ -282,9 +292,9 @@ const Map = () => {
         }
     }
 
-    const fetchChildrenByCode = async parentCode => {
+    const fetchChildrenById = async parentId => {
         try {
-            const res = await getApi(`https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/code?code=${parentCode}`)
+            const res = await getApi(`https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/codeParent?codeParent=${parentId}`)
             setTreeData(prevTreeData => ({
                 ...prevTreeData,
                 [parentId]: res.data
@@ -296,26 +306,21 @@ const Map = () => {
         }
     }
 
-
-    // const handleNodeSelect = (event, nodeId) => {
-    //     fetchId(nodeId)
-    // }
-
-    const handleFetchChildren = nodeCode => {
+    const handleFetchChildren = nodeId => {
 
         // check nodeId have existed
-        const isExpanded = expandedNodes.includes(nodeCode)
-        const childrenData = fetchChildrenByCode(nodeCode)
+        const isExpanded = expandedNodes.includes(nodeId)
+        const childrenData = fetchChildrenById(nodeId)
 
         setTreeData(prevTreeData => ({
             ...prevTreeData,
-            [nodeCode]: childrenData
+            [nodeId]: childrenData
         }))
 
         if (isExpanded) {
-            setExpandedNodes(expandedNodes.filter(code => code !== nodeCode))
+            setExpandedNodes(expandedNodes.filter(id => id !== nodeId))
         } else {
-            setExpandedNodes([...expandedNodes, nodeCode])
+            setExpandedNodes([...expandedNodes, nodeId])
         }
     }
 
@@ -327,26 +332,24 @@ const Map = () => {
         console.log('params', params);
         console.log('digitalMapId', digitalMapId);
 
-        // if (digitalMapId) {
-        //     putApi(`https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps/${digitalMapId}`, { ...params })
-        //         .then(() => {
-        //             toast.success('Data saved successfully')
-        //             setReload(reload + 1)
-        //             onClose()
-        //         })
-        //         .catch(error => {
-        //             if (error && error?.response?.data) {
-        //                 console.error('error', error)
-        //                 toast.error(error?.response?.data?.message)
-        //             } else {
-        //                 console.error('Error fetching data:', error)
-        //                 toast.error(error)
-        //             }
-        //         })
-        //         .finally(() => {
-        //             setLoading(false)
-        //         })
-        // }
+        if (digitalMapId) {
+            putApi(`https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps/${digitalMapId}`, { ...params })
+                .then(() => {
+                    toast.success('Data saved successfully')
+                })
+                .catch(error => {
+                    if (error && error?.response?.data) {
+                        console.error('error', error)
+                        toast.error(error?.response?.data?.message)
+                    } else {
+                        console.error('Error fetching data:', error)
+                        toast.error(error)
+                    }
+                })
+                .finally(() => {
+                    setLoading(false)
+                })
+        }
     }
 
     const handleSetCamera = (camera) => {
@@ -384,10 +387,6 @@ const Map = () => {
     const handleSetPositionCamerasSelected = cameras => {
         console.log('cameras', cameras);
         setCamerasSelected(cameras)
-    }
-
-    const handleSetImageMap = map => {
-        fetchDigitalMap(map?.code)
     }
 
     const StyledTreeItem = props => {
@@ -450,33 +449,71 @@ const Map = () => {
         )
     }
 
+    const fetchChildDataNote = async parentId => {
+        try {
+            const response = await getApi(
+                `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/codeParent?codeParent=${parentId}`)
+
+            setChildData(response.data || [])
+        } catch (error) {
+            console.error('Error fetching children:', error)
+        }
+    }
+
+    const fetchChildData = async parentId => {
+        try {
+            const response = await getApi(
+                `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/codeParent?codeParent=${parentId}`)
+
+            setTreeData(prevTreeData => ({
+                ...prevTreeData,
+                [parentId]: response.data
+            }))
+        } catch (error) {
+            console.error('Error fetching children:', error)
+        }
+    }
+
     const renderTreeItems = nodes => {
         return nodes.map(node => {
-
-            const hasChildren = treeData[node.id] && treeData[node.id].length > 0
+            const hasChildren = treeData[node.code] && treeData[node.code].length > 0
 
             return (
-                <StyledTreeItem
-                    key={node?.id}
-                    nodeId={node?.id.toString()}
-                    labelText={node.name}
-                    labelIcon='tabler:map'
+                <TreeItem
+                    key={node.id}
+                    nodeId={node.code}
+                    label={
+                        <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Button
+                                size='small'
+                                sx={{ textAlign: 'left', justifyContent: 'flex-start', width: '100%' }}
+                                onClick={async () => {
+                                    await fetchChildDataNote(node.code)
+                                    await fetchChildData(node.code)
+                                }}
+                            >
+                                {node.name}
+                            </Button>
+                        </Box>
+                    }
                     icon={
                         node.isParent ? (
                             <Box display='flex' alignItems='center'>
                                 <IconButton style={{ padding: '0px' }} onClick={() => handleFetchChildren(node.code)}>
-                                    <Icon icon={expandedNodes.includes(node.id) ? 'tabler:chevron-down' : 'tabler:chevron-right'} />
+                                    <Icon icon={expandedNodes.includes(node.code) ? 'tabler:chevron-down' : 'tabler:chevron-right'} />
                                 </IconButton>
                             </Box>
                         ) : null
                     }
-                // onClick={() => handleSetImageMap(node)}
-
+                    onClick={() => {
+                        if (!node.isParent) {
+                            fetchDigitalMap(node.code)
+                        }
+                    }}
                 >
-                    {hasChildren && renderTreeItems(treeData[node.id])}
-                </StyledTreeItem>
+                    {hasChildren && renderTreeItems(treeData[node.code])}
+                </TreeItem>
             )
-
         })
     }
 
@@ -604,7 +641,6 @@ const Map = () => {
                                             defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
                                             defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
                                             sx={{ minHeight: 300, flexGrow: 1, overflowY: 'auto', height: '100%' }}
-                                        // onNodeSelect={handleNodeSelect}
                                         >
                                             {renderTreeItems(areaGroup)}
                                         </TreeView>
@@ -620,34 +656,13 @@ const Map = () => {
                             <IndoorMap
                                 imgURL={imgMapURL}
                                 cameraGroup={camerasSelected}
-                                setCamerasSelected={handleSetPositionCamerasSelected}
-                                key={imgMapURL}
+                                // setCamerasSelected={handleSetPositionCamerasSelected}
+                                key={reload}
                             />
                         </CardContent>
                     </Card>
                 </Grid>
             </Grid>
-
-            {/* <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                <div style={{ position: 'absolute', width: '100%', height: '100%', zIndex: 1 }}>
-                    <IndoorMap
-                        imgURL={imgMapURL}
-                        cameraGroup={camerasSelected}
-                        setCamerasSelected={handleSetPositionCamerasSelected}
-                        key={imgMapURL}
-                    />
-                </div>
-                <Option
-                    setKeyword={setKeyword}
-                    setCamera={handleSetCamera}
-                    setDelCameraSelected={handleDelCamerasSelected}
-                    setMap={handleSetImageMap}
-                    cameraGroup={cameraGroup}
-                    areaGroup={areaGroup}
-                    camerasSelected={camerasSelected}
-                    digitalMapId={digitalMapId}
-                />
-            </div> */}
         </>
     )
 }

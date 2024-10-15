@@ -1,8 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import * as Indoor from 'src/@core/components/digital-map/Indoor';
 import CameraView from '../popups/CameraView';
-import { callApi } from 'src/@core/utils/requestUltils';
-import toast from 'react-hot-toast';
 
 const IndoorMap = ({ imgURL, cameraGroup, setCamerasSelected }) => {
     const [reload, setReload] = useState(0);
@@ -12,18 +10,21 @@ const IndoorMap = ({ imgURL, cameraGroup, setCamerasSelected }) => {
     const markers = useRef([]);
     const radar = useRef(null);
     const newMap = useRef(null);
-
-    // useEffect(() => {
-    //     setReload(reload + 1)
-    //     console.log('cameraGroup', cameraGroup);
-
-    // }, [cameraGroup])
+    const [cameraListSelected, setCameraListSelected] = useState([])
 
     useEffect(() => {
-        if (imgURL !== "" && imgURL !== null) {
+        if (imgURL) {
             initializeMap();
         }
-    }, [reload, imgURL]);
+    }, [imgURL]);
+
+    useEffect(() => {
+        setCameraListSelected(cameraGroup)
+    }, [cameraGroup])
+
+    useEffect(() => {
+        console.log('markers', markers)
+    }, [markers])
 
     const initializeMap = () => {
         if (typeof window !== 'undefined') {
@@ -31,7 +32,7 @@ const IndoorMap = ({ imgURL, cameraGroup, setCamerasSelected }) => {
                 floorplan: new Indoor.Floor({
                     url: imgURL,
                     opacity: 0.7,
-                    width: 400,
+                    width: 300,
                     zIndex: 1,
                 }),
                 minZoom: 0.001,
@@ -69,137 +70,137 @@ const IndoorMap = ({ imgURL, cameraGroup, setCamerasSelected }) => {
         }
     };
 
-    const addMarkers = () => {
-        removeAllMarkers();
-
-        if (cameraGroup?.length > 0) {
-
-            const newArr = []
-
-            for (let i = 0; i < cameraGroup.length; i += 1) {
-                if (cameraGroup[i].x === null && cameraGroup[i].y === null) {
-                    const x = Math.random() * 400 - 200;
-                    const y = Math.random() * 400 - 200;
-
-                    const marker = new Indoor.Marker([x, y], {
-                        text: `${cameraGroup[i].name}`,
-                        draggable: true,
-                        zIndex: 100,
-                        id: cameraGroup[i].id,
-                    });
-
-                    const camera = {
-                        id: `${cameraGroup[i].id}`,
-                        name: `${cameraGroup[i].name}`,
-                        type: 'camera',
-                        x: x,
-                        y: y,
-                        icon: 'camera'
-                    }
-
-                    newArr.push(camera)
-                    marker.on('ready', () => {
-                        marker.addTo(newMap.current);
-                        markers.current.push(marker);
-                        if (typeof window !== 'undefined') {
-                            window.markers = markers.current;
-                        }
-                    });
-                }
-                if (cameraGroup[i].x !== null && cameraGroup[i].y !== null) {
-                    const x = cameraGroup[i]?.x
-                    const y = cameraGroup[i]?.y
-
-                    const marker = new Indoor.Marker([x, y], {
-                        text: `${cameraGroup[i].name}`,
-                        draggable: true,
-                        zIndex: 100,
-                        id: cameraGroup[i].id,
-                    });
-
-                    marker.on('ready', () => {
-                        marker.addTo(newMap.current);
-                        markers.current.push(marker);
-                        if (typeof window !== 'undefined') {
-                            window.markers = markers.current;
-                        }
-                    });
-                }
-            }
-
-            setCamerasSelected(newArr)
-
-            setTimeout(() => {
-                addLinks();
-                addRadar(markers.current[0], 90);
-            }, 1000);
-            const rect = Indoor.markerGroup([[0, 0], [100, 200]]);
-            rect.on('moving', handleMarkerGroupMoving);
-            rect.addTo(newMap.current);
-        }
-    };
-
     // const addMarkers = () => {
-    //     removeAllMarkers();  // Xóa tất cả các marker hiện có
+    //     removeAllMarkers();
 
-    //     if (cameraGroup?.length > 0) {
-    //         const newArr = [];
+    //     if (cameraListSelected?.length > 0) {
 
-    //         // Duyệt qua danh sách camera
-    //         cameraGroup.forEach(cameraData => {
-    //             // Nếu tọa độ x và y là null, tạo tọa độ ngẫu nhiên
-    //             const x = cameraData.x !== null ? cameraData.x : Math.random() * 400 - 200;
-    //             const y = cameraData.y !== null ? cameraData.y : Math.random() * 400 - 200;
+    //         const newArr = []
 
-    //             // Tạo marker mới
-    //             const marker = new Indoor.Marker([x, y], {
-    //                 text: `${cameraData.name}`,  // Hiển thị tên camera
-    //                 draggable: true,  // Cho phép kéo thả marker
-    //                 zIndex: 100,  // Độ ưu tiên hiển thị
-    //                 id: cameraData.id,  // Đặt id cho marker
-    //             });
+    //         for (let i = 0; i < cameraListSelected.length; i += 1) {
+    //             if (cameraListSelected[i].x === null && cameraListSelected[i].y === null) {
+    //                 const x = Math.random() * 400 - 200;
+    //                 const y = Math.random() * 400 - 200;
 
-    //             // Tạo đối tượng camera mới với tọa độ và icon
-    //             const camera = {
-    //                 id: `${cameraData.id}`,
-    //                 name: `${cameraData.name}`,
-    //                 type: 'camera',
-    //                 x: x,
-    //                 y: y,
-    //                 icon: 'camera'
-    //             };
+    //                 const marker = new Indoor.Marker([x, y], {
+    //                     text: `${cameraListSelected[i].name}`,
+    //                     draggable: true,
+    //                     zIndex: 100,
+    //                     id: cameraListSelected[i].id,
+    //                 });
 
-    //             // Thêm camera vào mảng mới
-    //             newArr.push(camera);
-
-    //             // Khi marker đã sẵn sàng, thêm vào bản đồ
-    //             marker.on('ready', () => {
-    //                 marker.addTo(newMap.current);
-    //                 markers.current.push(marker);  // Thêm marker vào danh sách marker hiện tại
-    //                 if (typeof window !== 'undefined') {
-    //                     window.markers = markers.current;  // Lưu danh sách marker vào window (nếu có)
+    //                 const camera = {
+    //                     id: `${cameraListSelected[i].id}`,
+    //                     name: `${cameraListSelected[i].name}`,
+    //                     type: 'camera',
+    //                     x: x,
+    //                     y: y,
+    //                     icon: 'camera'
     //                 }
-    //             });
-    //         });
 
-    //         // Cập nhật danh sách camera đã chọn
-    //         setCamerasSelected(newArr);
+    //                 newArr.push(camera)
+    //                 marker.on('ready', () => {
+    //                     marker.addTo(newMap.current);
+    //                     markers.current.push(marker);
+    //                     if (typeof window !== 'undefined') {
+    //                         window.markers = markers.current;
+    //                     }
+    //                 });
+    //             }
+    //             if (cameraListSelected[i].x !== null && cameraListSelected[i].y !== null) {
+    //                 const x = cameraListSelected[i]?.x
+    //                 const y = cameraListSelected[i]?.y
 
-    //         // Sau khi thêm marker, thêm liên kết giữa các marker và radar
+    //                 const marker = new Indoor.Marker([x, y], {
+    //                     text: `${cameraListSelected[i].name}`,
+    //                     draggable: true,
+    //                     zIndex: 100,
+    //                     id: cameraListSelected[i].id,
+    //                 });
+
+    //                 newArr.push(cameraListSelected[i])
+    //                 marker.on('ready', () => {
+    //                     marker.addTo(newMap.current);
+    //                     markers.current.push(marker);
+    //                     if (typeof window !== 'undefined') {
+    //                         window.markers = markers.current;
+    //                     }
+    //                 });
+    //             }
+    //         }
+
+    //         setCamerasSelected(newArr)
+
     //         setTimeout(() => {
     //             addLinks();
-    //             if (markers.current.length > 0) {
-    //                 addRadar(markers.current[0], 90);  // Thêm radar vào marker đầu tiên
-    //             }
+    //             addRadar(markers.current[0], 90);
     //         }, 1000);
-
-    //         // Tạo nhóm marker (hình chữ nhật) và thêm vào bản đồ
     //         const rect = Indoor.markerGroup([[0, 0], [100, 200]]);
     //         rect.on('moving', handleMarkerGroupMoving);
     //         rect.addTo(newMap.current);
     //     }
     // };
 
+    const addMarkers = () => {
+        removeAllMarkers();  // Xóa tất cả các marker hiện có
+
+        if (cameraGroup?.length > 0) {
+            const newArr = [];
+
+            // Duyệt qua danh sách camera
+            cameraGroup.forEach(cameraData => {
+                // Nếu tọa độ x và y là null, tạo tọa độ ngẫu nhiên
+                const x = cameraData.x !== null ? cameraData.x : Math.random() * 400 - 200;
+                const y = cameraData.y !== null ? cameraData.y : Math.random() * 400 - 200;
+
+                // Tạo marker mới
+                const marker = new Indoor.Marker([x, y], {
+                    text: `${cameraData.name}`,  // Hiển thị tên camera
+                    draggable: true,  // Cho phép kéo thả marker
+                    zIndex: 100,  // Độ ưu tiên hiển thị
+                    id: cameraData.id,  // Đặt id cho marker
+                });
+
+                // Tạo đối tượng camera mới với tọa độ và icon
+                const camera = {
+                    id: `${cameraData.id}`,
+                    name: `${cameraData.name}`,
+                    type: 'camera',
+                    x: x,
+                    y: y,
+                    icon: 'camera'
+                };
+
+                // Thêm camera vào mảng mới
+                newArr.push(camera);
+
+                // Khi marker đã sẵn sàng, thêm vào bản đồ
+                marker.on('ready', () => {
+                    marker.addTo(newMap.current);
+                    markers.current.push(marker);  // Thêm marker vào danh sách marker hiện tại
+                    if (typeof window !== 'undefined') {
+                        window.markers = markers.current;  // Lưu danh sách marker vào window (nếu có)
+                    }
+                });
+            });
+
+            // Cập nhật danh sách camera đã chọn
+            // setCamerasSelected(newArr);
+
+            // Sau khi thêm marker, thêm liên kết giữa các marker và radar
+            setTimeout(() => {
+                addLinks();
+                if (markers.current.length > 0) {
+                    addRadar(markers.current[0], 90);  // Thêm radar vào marker đầu tiên
+                }
+            }, 1000);
+
+            // Tạo nhóm marker (hình chữ nhật) và thêm vào bản đồ
+            const rect = Indoor.markerGroup([[0, 0], [100, 200]]);
+            rect.on('moving', handleMarkerGroupMoving);
+            rect.addTo(newMap.current);
+        }
+    };
 
     const addLinks = () => {
         for (let i = 1; i < markers.current.length; i += 1) {
@@ -250,25 +251,10 @@ const IndoorMap = ({ imgURL, cameraGroup, setCamerasSelected }) => {
     }
 
     const handleMarkerMoving = (e) => {
+
+
         if (radar.current && e.id === radar.current.id) {
             radar.current.setPosition(e.position);
-            console.log('position: ', e.position);
-
-            // Tìm marker đã di chuyển và cập nhật tọa độ trong camerasSelected
-            const updatedCameras = camerasSelected.map(camera => {
-                if (camera.id === e.id) {
-                    // Cập nhật tọa độ x, y mới
-                    return {
-                        ...camera,
-                        x: e.position[0], // lấy giá trị x mới
-                        y: e.position[1]  // lấy giá trị y mới
-                    };
-                }
-                return camera;
-            });
-
-            // Cập nhật lại danh sách camerasSelected với tọa độ mới
-            setCamerasSelected(updatedCameras);
         }
     };
 
