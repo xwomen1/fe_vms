@@ -289,10 +289,22 @@ const Add = ({ apiData }) => {
           keyword: value
         }
       }
+
       const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/cameras', config)
-      setStatus1(response.data.isOfflineSetting)
-      setAssetType(response.data)
-      setTotal(response.data.page)
+
+      if (response && response.data) {
+        if (response.data.isOfflineSetting !== undefined) {
+          setStatus1(response.data.isOfflineSetting)
+        }
+        if (response.data) {
+          setAssetType(response.data)
+        }
+        if (response.data.page !== undefined) {
+          setTotal(response.data.page)
+        }
+      } else {
+        console.error('No data received from API.')
+      }
     } catch (error) {
       console.error('Error fetching users:', error)
     }
@@ -650,6 +662,18 @@ const Add = ({ apiData }) => {
     setSelectedTitle(newValue.name)
   }
 
+  const handleCancel = () => {
+    setStartUrl('')
+    setEndUrl('')
+    setStartHost('')
+    setEndHost('')
+    setUsername('')
+    setPassWord('')
+    setSelectedNVR(null)
+    setUrl('')
+    setHost('')
+  }
+
   return (
     <>
       <Grid container spacing={6.5}>
@@ -728,7 +752,7 @@ const Add = ({ apiData }) => {
                           </Box>
                         ),
                         endAdornment: (
-                          <IconButton size='small' title='Clear' aria-label='Clear'>
+                          <IconButton size='small' title='Clear' aria-label='Clear' onClick={e => setValue('')}>
                             <Icon fontSize='1.25rem' icon='tabler:x' />
                           </IconButton>
                         )
@@ -802,7 +826,7 @@ const Add = ({ apiData }) => {
                     <Grid item xs={0.2}></Grid>
 
                     <Grid item xs={2} style={{ marginTop: '2%' }}>
-                      <Button>Cancel</Button>
+                      <Button onClick={handleCancel}>Cancel</Button>
                       <Button onClick={handleScan} variant='contained'>
                         Scan
                       </Button>
@@ -919,7 +943,7 @@ const Add = ({ apiData }) => {
                     <Grid item xs={0.2}></Grid>
 
                     <Grid item xs={4} style={{ marginTop: '1%' }}>
-                      <Button>Cancel</Button>
+                      <Button onClick={handleCancel}>Cancel</Button>
                       <Button onClick={handleScanDaiIP} variant='contained'>
                         Scan
                       </Button>
@@ -997,7 +1021,7 @@ const Add = ({ apiData }) => {
                     <Grid item xs={0.2}></Grid>
 
                     <Grid item xs={4} style={{ marginTop: '1%' }}>
-                      <Button>Cancel</Button>
+                      <Button onClick={handleCancel}>Cancel</Button>
                       <Button variant='contained' onClick={handleScanLGT}>
                         Scan
                       </Button>
@@ -1137,7 +1161,12 @@ const Add = ({ apiData }) => {
         </Grid>
         {openPopupP && (
           <>
-            <Edit open={openPopupP} onClose={handleClosePPopup} camera={selectedNvrId} />
+            <Edit
+              open={openPopupP}
+              onClose={handleClosePPopup}
+              setReload={() => setReload(reload + 1)}
+              camera={selectedNvrId}
+            />
           </>
         )}
         {isOpenAddDevice && (
