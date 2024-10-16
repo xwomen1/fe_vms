@@ -215,6 +215,7 @@ const Map = () => {
     const handleSearch = e => {
         setKeyword(e)
     }
+
     const showMessageSuccess = () => {
         Swal.fire({
             title: 'Successfully!',
