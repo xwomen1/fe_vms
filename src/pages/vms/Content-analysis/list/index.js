@@ -145,6 +145,7 @@ const ContentAnalysis = () => {
   const [idDelete, setIdDelete] = useState(null)
   const [startTimeCamera, setStartTimeCamera] = useState(null)
   const [endTimeCamera, setEndTimeCamera] = useState(null)
+  const [hasError, setHasError] = useState(false)
 
   const configWs = {
     bundlePolicy: 'max-bundle',
@@ -288,10 +289,6 @@ const ContentAnalysis = () => {
     setDataList(data)
   }, [eventsData])
 
-  useEffect(() => {
-    fetchDataList()
-  }, [camera.name])
-
   const fetchDataList = async () => {
     const params = {
       ...configWs,
@@ -312,7 +309,9 @@ const ContentAnalysis = () => {
       setDeviceList(res?.data)
       setCount(res.count)
       setTotalPage(Math.ceil(res.count / pageSize))
+      setHasError(false)
     } catch (error) {
+      setHasError(true)
       if (error.response) {
         toast.error(`Error: ${error.response.data.message || 'An error occurred while fetching data.'}`)
       } else if (error.request) {
@@ -329,14 +328,13 @@ const ContentAnalysis = () => {
   useEffect(() => {
     fetchDataList()
   }, [])
+  console.log(hasError, 'hasError')
 
   useEffect(() => {
-    fetchDataList()
-  }, [valueFilter, reload, keyword])
-
-  useEffect(() => {
-    fetchDataList()
-  }, [page, pageSize, keyword])
+    if (hasError) {
+      fetchDataList()
+    }
+  }, [valueFilter, reload, keyword, page, pageSize, camera.name])
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage)
@@ -909,6 +907,7 @@ const ContentAnalysis = () => {
                     )}
                   </CardContent>
                 </Card>
+                <Box sx={{ height: '5px', backgroundColor: '#000', marginY: 2 }} />
                 <Card>
                   <Grid container spacing={2}>
                     {' '}

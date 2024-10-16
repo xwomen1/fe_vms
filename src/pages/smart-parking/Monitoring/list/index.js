@@ -1,10 +1,31 @@
 import { useState } from 'react'
 import { Grid, Card, CardContent, Button, Typography, IconButton, Box } from '@mui/material'
 import Icon from 'src/@core/components/icon'
+import ViewCamera from 'src/@core/components/camera/playbackpause'
 
 const Monitoring = () => {
-  // State để theo dõi trạng thái làn xe
-  const [isEntering, setIsEntering] = useState(true) // true nếu làn xe vào, false nếu làn xe ra
+  const [timestamp, setTimestamp] = useState()
+
+  // const time_start = new Date().getTime() - 60 * 60 * 1000
+  // const time_end = new Date().getTime()
+
+  const [dateTime, setDateTime] = useState(new Date())
+
+  const [timeFilter, setTimeFilter] = useState({
+    start_time: timestamp - 5 * 1000,
+    end_time: timestamp + 5 * 1000
+  })
+  const [isEntering, setIsEntering] = useState(true)
+  const [camera, setCamera] = useState({ id: '', name: '', channel: '' })
+  const [play, setPlay] = useState(true)
+  const [duration, setDuration] = useState(0)
+
+  const [timePlay, setTimePlay] = useState(timestamp - 5 * 1000)
+
+  const handSetChanel = (id, channel) => {
+    setCamera({ id: id, name: name, channel: channel })
+  }
+  const [volume, setVolume] = useState(30)
 
   const toggleLane = () => {
     setIsEntering(prev => !prev)
@@ -14,25 +35,65 @@ const Monitoring = () => {
     <Grid container spacing={3} padding={0}>
       {/* Card 1: Làn xe */}
       <Grid item xs={2}>
-        <Card>
-          <CardContent>
+        <Grid container spacing={0}>
+          <Grid item xs={12}>
             <Button variant='contained' color={isEntering ? 'success' : 'error'} fullWidth onClick={toggleLane}>
               {isEntering ? 'Làn xe vào' : 'Làn xe ra'}
             </Button>
-            <CameraBox title='Cam toàn cảnh' />
-            <CameraBox title='Cam biển số' />
-            <Typography variant='h6'>Các lượt {isEntering ? 'vào' : 'ra'} gần đây</Typography>
-            <Cameramini />
-            <Cameramini />
-            <Cameramini />
-            <Button sx={{ marginTop: '10px' }} variant='contained' color='primary' fullWidth>
-              Mở Barrier
-            </Button>
-            <Button variant='contained' color='secondary' fullWidth>
-              Đóng Barrier
-            </Button>
-          </CardContent>
-        </Card>
+          </Grid>
+          <Grid item xs={12} style={{ marginTop: '10px' }}>
+            <p>Camera toàn cảnh</p>
+            <ViewCamera
+              name={camera?.deviceName}
+              id={camera?.id}
+              play={play}
+              onChangeCurrentTime={time => {
+                setCurrentTime(1000 * time)
+              }}
+              duration={duration}
+              onChangeDuration={setDuration}
+              channel={camera?.channel}
+              status={camera?.status}
+              startTime={timePlay}
+              endTime={timeFilter?.end_time}
+              sizeScreen={'1x3'}
+              handSetChanel={handSetChanel}
+              volume={volume}
+            />
+          </Grid>
+
+          <Grid item xs={12} style={{ marginTop: '10px' }}>
+            <p>Camera biển số</p>
+            <ViewCamera
+              name={camera?.deviceName}
+              id={camera?.id}
+              play={play}
+              onChangeCurrentTime={time => {
+                setCurrentTime(1000 * time)
+              }}
+              duration={duration}
+              onChangeDuration={setDuration}
+              channel={camera?.channel}
+              status={camera?.status}
+              startTime={timePlay}
+              endTime={timeFilter?.end_time}
+              sizeScreen={'1x3'}
+              handSetChanel={handSetChanel}
+              volume={volume}
+            />
+          </Grid>
+
+          <Typography variant='h6'>Các lượt {isEntering ? 'vào' : 'ra'} gần đây</Typography>
+          <Cameramini />
+          <Cameramini />
+          <Cameramini />
+          <Button sx={{ marginTop: '10px' }} variant='contained' color='primary' fullWidth>
+            Mở Barrier
+          </Button>
+          <Button variant='contained' color='secondary' fullWidth>
+            Đóng Barrier
+          </Button>
+        </Grid>
       </Grid>
 
       {/* Card 2: Thông tin xe */}
@@ -120,27 +181,66 @@ const Monitoring = () => {
         </Card>
       </Grid>
 
-      {/* Card 3: Làn xe ra */}
       <Grid item xs={2}>
-        <Card>
-          <CardContent>
+        <Grid container spacing={0}>
+          <Grid item xs={12}>
             <Button variant='contained' color={isEntering ? 'error' : 'success'} fullWidth onClick={toggleLane}>
               {isEntering ? 'Làn xe ra' : 'Làn xe vào'}
             </Button>
-            <CameraBox title='Cam toàn cảnh' />
-            <CameraBox title='Cam biển số' />
-            <Typography variant='h6'>Các lượt {isEntering ? 'ra' : 'vào'} gần đây</Typography>
-            <Cameramini />
-            <Cameramini />
-            <Cameramini />
-            <Button variant='contained' sx={{ marginTop: '10px' }} color='primary' fullWidth>
-              Mở Barrier
-            </Button>
-            <Button variant='contained' color='secondary' fullWidth>
-              Đóng Barrier
-            </Button>
-          </CardContent>
-        </Card>
+          </Grid>
+          <Grid item xs={12} style={{ marginTop: '10px' }}>
+            <p>Camera toàn cảnh</p>
+            <ViewCamera
+              name={camera?.deviceName}
+              id={camera?.id}
+              play={play}
+              onChangeCurrentTime={time => {
+                setCurrentTime(1000 * time)
+              }}
+              duration={duration}
+              onChangeDuration={setDuration}
+              channel={camera?.channel}
+              status={camera?.status}
+              startTime={timePlay}
+              endTime={timeFilter?.end_time}
+              sizeScreen={'1x3'}
+              handSetChanel={handSetChanel}
+              volume={volume}
+            />
+          </Grid>
+
+          <Grid item xs={12} style={{ marginTop: '10px' }}>
+            <p>Camera biển số</p>
+            <ViewCamera
+              name={camera?.deviceName}
+              id={camera?.id}
+              play={play}
+              onChangeCurrentTime={time => {
+                setCurrentTime(1000 * time)
+              }}
+              duration={duration}
+              onChangeDuration={setDuration}
+              channel={camera?.channel}
+              status={camera?.status}
+              startTime={timePlay}
+              endTime={timeFilter?.end_time}
+              sizeScreen={'1x3'}
+              handSetChanel={handSetChanel}
+              volume={volume}
+            />
+          </Grid>
+
+          <Typography variant='h6'>Các lượt {isEntering ? 'ra' : 'vào'} gần đây</Typography>
+          <Cameramini />
+          <Cameramini />
+          <Cameramini />
+          <Button sx={{ marginTop: '10px' }} variant='contained' color='primary' fullWidth>
+            Mở Barrier
+          </Button>
+          <Button variant='contained' color='secondary' fullWidth>
+            Đóng Barrier
+          </Button>
+        </Grid>
       </Grid>
     </Grid>
   )

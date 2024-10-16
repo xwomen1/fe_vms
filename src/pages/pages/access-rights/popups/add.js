@@ -142,106 +142,17 @@ const Add = ({ show, onClose, setReload }) => {
     }
   }
 
-  const API_REGIONS = `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/`
-  const API_REGIONS_ID = `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/`
-
   const fetchDepartment = async () => {
     setLoading(true)
     try {
-      const res = await axios.get(`${API_REGIONS}/?parentId=f963e9d4-3d6b-45df-884d-15f93452f2a2`, config)
-      const group = res.data
-
-      groupName.push(...res.data)
-      setGroupName(group)
-      group.map(item => {
-        if (item.isParent == true) {
-          fetchDepartmentChildren(item.id)
-        }
-      })
+      const res = await axios.get(`https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=company`, config)
+      setGroupName(res.data)
+      console.log(res.data, 'data')
     } catch (error) {
       console.error('Error fetching data2: ', error)
     }
   }
 
-  const fetchDepartmentChildren = async idParent => {
-    try {
-      const res = await axios.get(`${API_REGIONS}?parentId=${idParent}`, config)
-      const groupChildren = [...res.data]
-      groupName.push(...groupChildren)
-      setGroupName(prevState => [...prevState, ...groupChildren])
-    } catch (error) {
-      console.error('Error fetching data3: ', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleSelectChange = async selectedValue => {
-    try {
-      const res = await axios.get(`${API_REGIONS_ID}/${selectedValue}`, config)
-      const nameGroup = res?.data
-      handleSelectChangeGroup(nameGroup)
-    } catch (error) {
-      console.error('Error fetching data: ', error)
-    }
-  }
-
-  const handleSelectChangeGroup = async nameGroupUser => {
-    try {
-      let allUserGroups = []
-      let currentPage = 1
-      const limit = 50
-
-      while (true) {
-        const res = await axios.get(
-          `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups/?page=${currentPage}&limit=${limit}`,
-          config
-        )
-        const userGroups = res?.data?.rows
-
-        if (userGroups.length === 0) {
-          break
-        }
-
-        allUserGroups = [...allUserGroups, ...userGroups]
-
-        if (userGroups.length < limit) {
-          break
-        }
-
-        currentPage++
-      }
-
-      const normalizedInputName = nameGroupUser.name.trim().toLowerCase()
-      const matchedGroup = allUserGroups.find(group => group.name.trim().toLowerCase() === normalizedInputName)
-      console.log(matchedGroup, 'matchedGroup')
-
-      if (matchedGroup) {
-        setSelectedGroupId(matchedGroup.id)
-      } else if (matchedGroup === undefined) {
-        const selectedGroup = nameGroupUser.id
-        const selectedGroupName = nameGroupUser.name
-
-        if (!selectedGroup) {
-          return
-        }
-
-        const postData = {
-          id: selectedGroup,
-          name: selectedGroupName,
-          type: 'USER'
-        }
-
-        const response = await axios.post(
-          `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups`,
-          postData
-        )
-        setSelectedGroupId(response?.data?.id)
-      }
-    } catch (error) {
-      console.error('Error handling group change:', error)
-    }
-  }
 
   useEffect(() => {
     fetchDoorList()
@@ -338,8 +249,54 @@ const Add = ({ show, onClose, setReload }) => {
   const getFilteredDoorList = excludeId => {
     return doorList.filter(door => door.id !== excludeId)
   }
+  
+  const createNewGroup = async (groupName, groupCode) => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
-  return (
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.post(
+        'https://dev-ivi.basesystem.one/smc/iam/api/v0/groups',
+        {
+          groupName: groupName,
+          groupCode: groupCode,
+          isPnLVGR: false
+        },
+        config
+      )
+      
+
+      return response.data.groupACId
+    } catch (error) {
+      throw error
+    }
+  }
+  
+  const handleDepartmentChange = async (selectedValue) => {
+    const selectedDepartment = groupName.find(item => item.id === selectedValue);
+    
+    if (selectedDepartment) {
+      console.log('Selected Department:', selectedDepartment.name);
+  
+      // Call createNewGroup function with department name and code
+      try {
+        const groupId = await createNewGroup(selectedDepartment.name, selectedDepartment.code);
+        console.log('New Group ID:', groupId);
+        
+        // Here you can set the state or whatever you want to do with the groupId
+        setSelectedGroupId(groupId);  // assuming you want to store the groupId in state
+      } catch (error) {
+        console.error('Error creating new group:', error);
+      }
+    }
+  };
+  
+return (
     <Card>
       <form>
         <Dialog
@@ -385,34 +342,36 @@ const Add = ({ show, onClose, setReload }) => {
                 />
               </Grid>
               <Grid item xs={4}>
-                <Controller
-                  name='groupId'
-                  control={control}
-                  rules={{ required: true }}
-                  render={({ field: { value, onChange } }) => (
-                    <CustomTextField
-                      select
-                      fullWidth
-                      label='Department'
-                      value={value}
-                      onChange={e => {
-                        const selectedValue = e.target.value
-                        onChange(selectedValue)
-                        handleSelectChange(selectedValue)
-                      }}
-                      id='validation-basic-select'
-                      error={Boolean(errors.groupId)}
-                      aria-describedby='validation-basic-select'
-                      {...(errors.groupId && { helperText: 'This field is required' })}
-                    >
-                      {groupName.map(item => (
-                        <MenuItem key={item.id} value={item.id}>
-                          {item.name}
-                        </MenuItem>
-                      ))}
-                    </CustomTextField>
-                  )}
-                />
+              <Controller
+  name='groupId'
+  control={control}
+  rules={{ required: true }}
+  render={({ field: { value, onChange } }) => (
+    <CustomTextField
+      select
+      fullWidth
+      label='Department'
+      value={value}
+      onChange={e => {
+        const selectedValue = e.target.value;
+        onChange(selectedValue);
+        handleDepartmentChange(selectedValue); // Call the new function here
+      }}
+      id='validation-basic-select'
+      error={Boolean(errors.groupId)}
+      aria-describedby='validation-basic-select'
+      {...(errors.groupId && { helperText: 'This field is required' })}
+    >
+      {groupName.map(item => (
+        <MenuItem key={item.id} value={item.id}>
+          {item.name}
+        </MenuItem>
+      ))}
+    </CustomTextField>
+  )}
+/>
+
+
               </Grid>
               <Grid item xs={4}>
                 <Controller

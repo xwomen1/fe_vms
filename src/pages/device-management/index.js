@@ -479,9 +479,9 @@ const AccessControlDevice = () => {
           <Button onClick={handleCloseDelete} variant='contained'>
             Cancel
           </Button>
-          <Button onClick={handleDeleteOnclick} variant='contained'>
+          {/* <Button onClick={handleDeleteOnclick} variant='contained'>
             Ok
-          </Button>
+          </Button> */} 
         </DialogActions>
       </Dialog>
     </>
