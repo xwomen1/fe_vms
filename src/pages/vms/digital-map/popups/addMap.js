@@ -293,9 +293,6 @@ const AddMap = ({ show, onClose, setReload, data }) => {
             const hasChildren = treeData[node.code] && treeData[node.code].length > 0
             const isExisted = areaListSelected.includes(node.code)
 
-            console.log('isExisted', isExisted);
-
-
             return (
                 <TreeItem
                     key={node.id}
