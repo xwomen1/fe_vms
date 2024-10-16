@@ -142,12 +142,6 @@ const Map = () => {
     }, [keyword])
 
     useEffect(() => {
-        console.log('camerasSelected', camerasSelected);
-        setReload(reload + 1)
-
-    }, [camerasSelected])
-
-    useEffect(() => {
 
         const addStatusToCameras = (data) => {
 
@@ -329,13 +323,11 @@ const Map = () => {
             devices: [...camerasSelected]
         }
 
-        console.log('params', params);
-        console.log('digitalMapId', digitalMapId);
-
         if (digitalMapId) {
             putApi(`https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps/${digitalMapId}`, { ...params })
                 .then(() => {
                     toast.success('Data saved successfully')
+                    setReload(reload + 1)
                 })
                 .catch(error => {
                     if (error && error?.response?.data) {
@@ -370,6 +362,7 @@ const Map = () => {
             })
 
         }
+        setReload(reload + 1)
         setCamerasSelected(list)
     }
 
@@ -381,11 +374,11 @@ const Map = () => {
             const result = list.filter(element => element?.id !== camera?.id);
 
             setCamerasSelected(result)
+            setReload(reload + 1)
         }
     }
 
     const handleSetPositionCamerasSelected = cameras => {
-        console.log('cameras', cameras);
         setCamerasSelected(cameras)
     }
 
@@ -519,7 +512,7 @@ const Map = () => {
 
     return (
         <>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} key={reload}>
                 <Grid item xs={4} container spacing={2}>
                     <Grid item xs={6}>
                         <Card>
@@ -656,8 +649,8 @@ const Map = () => {
                             <IndoorMap
                                 imgURL={imgMapURL}
                                 cameraGroup={camerasSelected}
-                                // setCamerasSelected={handleSetPositionCamerasSelected}
-                                key={reload}
+                                setCamerasSelected={handleSetPositionCamerasSelected}
+                                key={imgMapURL}
                             />
                         </CardContent>
                     </Card>

@@ -18,14 +18,6 @@ const IndoorMap = ({ imgURL, cameraGroup, setCamerasSelected }) => {
         }
     }, [imgURL]);
 
-    useEffect(() => {
-        setCameraListSelected(cameraGroup)
-    }, [cameraGroup])
-
-    useEffect(() => {
-        console.log('markers', markers)
-    }, [markers])
-
     const initializeMap = () => {
         if (typeof window !== 'undefined') {
             newMap.current = new Indoor.Map(mapEl.current, {
@@ -69,77 +61,6 @@ const IndoorMap = ({ imgURL, cameraGroup, setCamerasSelected }) => {
             markers.current = [];
         }
     };
-
-    // const addMarkers = () => {
-    //     removeAllMarkers();
-
-    //     if (cameraListSelected?.length > 0) {
-
-    //         const newArr = []
-
-    //         for (let i = 0; i < cameraListSelected.length; i += 1) {
-    //             if (cameraListSelected[i].x === null && cameraListSelected[i].y === null) {
-    //                 const x = Math.random() * 400 - 200;
-    //                 const y = Math.random() * 400 - 200;
-
-    //                 const marker = new Indoor.Marker([x, y], {
-    //                     text: `${cameraListSelected[i].name}`,
-    //                     draggable: true,
-    //                     zIndex: 100,
-    //                     id: cameraListSelected[i].id,
-    //                 });
-
-    //                 const camera = {
-    //                     id: `${cameraListSelected[i].id}`,
-    //                     name: `${cameraListSelected[i].name}`,
-    //                     type: 'camera',
-    //                     x: x,
-    //                     y: y,
-    //                     icon: 'camera'
-    //                 }
-
-    //                 newArr.push(camera)
-    //                 marker.on('ready', () => {
-    //                     marker.addTo(newMap.current);
-    //                     markers.current.push(marker);
-    //                     if (typeof window !== 'undefined') {
-    //                         window.markers = markers.current;
-    //                     }
-    //                 });
-    //             }
-    //             if (cameraListSelected[i].x !== null && cameraListSelected[i].y !== null) {
-    //                 const x = cameraListSelected[i]?.x
-    //                 const y = cameraListSelected[i]?.y
-
-    //                 const marker = new Indoor.Marker([x, y], {
-    //                     text: `${cameraListSelected[i].name}`,
-    //                     draggable: true,
-    //                     zIndex: 100,
-    //                     id: cameraListSelected[i].id,
-    //                 });
-
-    //                 newArr.push(cameraListSelected[i])
-    //                 marker.on('ready', () => {
-    //                     marker.addTo(newMap.current);
-    //                     markers.current.push(marker);
-    //                     if (typeof window !== 'undefined') {
-    //                         window.markers = markers.current;
-    //                     }
-    //                 });
-    //             }
-    //         }
-
-    //         setCamerasSelected(newArr)
-
-    //         setTimeout(() => {
-    //             addLinks();
-    //             addRadar(markers.current[0], 90);
-    //         }, 1000);
-    //         const rect = Indoor.markerGroup([[0, 0], [100, 200]]);
-    //         rect.on('moving', handleMarkerGroupMoving);
-    //         rect.addTo(newMap.current);
-    //     }
-    // };
 
     const addMarkers = () => {
         removeAllMarkers();  // Xóa tất cả các marker hiện có
@@ -251,7 +172,20 @@ const IndoorMap = ({ imgURL, cameraGroup, setCamerasSelected }) => {
     }
 
     const handleMarkerMoving = (e) => {
+        const position = e.position
 
+        const newCameraGroup = cameraGroup.map((camera) => {
+            if (camera.id === e.id) {
+                return {
+                    ...camera,
+                    x: position.x,
+                    y: position.y,
+                }
+            }
+            return camera
+        })
+
+        setCamerasSelected(newCameraGroup)
 
         if (radar.current && e.id === radar.current.id) {
             radar.current.setPosition(e.position);
