@@ -9,6 +9,7 @@ import CustomTextField from "src/@core/components/mui/text-field"
 import IndoorMap from "./indoor-map"
 import toast from "react-hot-toast"
 import Option from "../popups/option";
+import Swal from "sweetalert2";
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     '&:hover > .MuiTreeItem-content:not(.Mui-selected)': {
@@ -215,6 +216,36 @@ const Map = () => {
         setKeyword(e)
     }
 
+    const showMessageSuccess = () => {
+        Swal.fire({
+            title: 'Successfully!',
+            text: 'Data has been updated successfully.',
+            icon: 'success',
+            willOpen: () => {
+                const confirmButton = Swal.getConfirmButton()
+                if (confirmButton) {
+                    confirmButton.style.backgroundColor = '#002060'
+                    confirmButton.style.color = 'white'
+                }
+            }
+        })
+    }
+
+    const showMessageError = error => {
+        Swal.fire({
+            title: 'Error!',
+            text: error,
+            icon: 'error',
+            willOpen: () => {
+                const confirmButton = Swal.getConfirmButton()
+                if (confirmButton) {
+                    confirmButton.style.backgroundColor = '#002060'
+                    confirmButton.style.color = 'white'
+                }
+            }
+        })
+    }
+
     const fetchCameraList = async () => {
         try {
             const res = await callApi(
@@ -228,10 +259,10 @@ const Map = () => {
         } catch (error) {
             if (error && error?.response?.data) {
                 console.error('error', error)
-                toast.error(error?.response?.data?.message)
+                showMessageError(error?.response?.data?.message)
             } else {
                 console.error('Error fetching data:', error)
-                toast.error(error)
+                showMessageError(error)
             }
         }
     }
@@ -249,10 +280,10 @@ const Map = () => {
         } catch (error) {
             if (error && error?.response?.data) {
                 console.error('error', error)
-                toast.error(error?.response?.data?.message)
+                showMessageError(error?.response?.data?.message)
             } else {
                 console.error('Error fetching data:', error)
-                toast.error(error)
+                showMessageError(error)
             }
         }
     }
@@ -278,10 +309,10 @@ const Map = () => {
         } catch (error) {
             if (error && error?.response?.data) {
                 console.error('error', error)
-                toast.error(error?.response?.data?.message)
+                showMessageError(error?.response?.data?.message)
             } else {
                 console.error('Error fetching data:', error)
-                toast.error(error)
+                showMessageError(error)
             }
         }
     }
@@ -326,16 +357,16 @@ const Map = () => {
         if (digitalMapId) {
             putApi(`https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps/${digitalMapId}`, { ...params })
                 .then(() => {
-                    toast.success('Data saved successfully')
                     setReload(reload + 1)
+                    showMessageSuccess()
                 })
                 .catch(error => {
                     if (error && error?.response?.data) {
                         console.error('error', error)
-                        toast.error(error?.response?.data?.message)
+                        showMessageError(error?.response?.data?.message)
                     } else {
                         console.error('Error fetching data:', error)
-                        toast.error(error)
+                        showMessageError(error)
                     }
                 })
                 .finally(() => {
@@ -382,6 +413,8 @@ const Map = () => {
         setCamerasSelected(cameras)
     }
 
+
+
     const StyledTreeItem = props => {
         // ** Props
         const { labelText, labelIcon, labelInfo, color, textDirection, disabled, cameraSelected, camera, ...other } = props
@@ -389,6 +422,7 @@ const Map = () => {
         return (
             <StyledTreeItemRoot
                 {...other}
+
                 label={
                     <Box
                         sx={{

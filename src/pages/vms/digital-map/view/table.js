@@ -3,9 +3,9 @@ import { useEffect, useState } from "react"
 import Icon from 'src/@core/components/icon'
 import CustomTextField from "src/@core/components/mui/text-field"
 import AddMap from "../popups/addMap"
-import toast from "react-hot-toast"
 import { delApi, getApi } from "src/@core/utils/requestUltils"
 import EditMap from "../popups/editMap"
+import Swal from "sweetalert2"
 
 
 
@@ -88,10 +88,10 @@ const DigitalMapTable = () => {
         } catch (error) {
             if (error && error?.response?.data) {
                 console.error('error', error)
-                toast.error(error?.response?.data?.message)
+                showMessageError(error?.response?.data?.message)
             } else {
                 console.error('Error fetching data:', error)
-                toast.error(error)
+                showMessageError(error)
             }
         } finally {
             setLoading(false)
@@ -106,14 +106,14 @@ const DigitalMapTable = () => {
                 await delApi(`https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps/${idDelete}`)
                 setReload(reload + 1)
                 setIdDelete(null)
-                toast.success('Deleted Successfully')
+                showMessageSuccess()
             } catch (error) {
                 if (error && error?.response?.data) {
                     console.error('error', error)
-                    toast.error(error?.response?.data?.message)
+                    showMessageError(error?.response?.data?.message)
                 } else {
                     console.error('Error fetching data:', error)
-                    toast.error(error)
+                    showMessageError(error)
                 }
             } finally {
                 setLoading(false)
@@ -125,6 +125,35 @@ const DigitalMapTable = () => {
         fetchData()
     }, [keyword, page, pageSize, reload])
 
+    const showMessageSuccess = () => {
+        Swal.fire({
+            title: 'Successfully!',
+            text: 'Data has been updated successfully.',
+            icon: 'success',
+            willOpen: () => {
+                const confirmButton = Swal.getConfirmButton()
+                if (confirmButton) {
+                    confirmButton.style.backgroundColor = '#002060'
+                    confirmButton.style.color = 'white'
+                }
+            }
+        })
+    }
+
+    const showMessageError = error => {
+        Swal.fire({
+            title: 'Error!',
+            text: error,
+            icon: 'error',
+            willOpen: () => {
+                const confirmButton = Swal.getConfirmButton()
+                if (confirmButton) {
+                    confirmButton.style.backgroundColor = '#002060'
+                    confirmButton.style.color = 'white'
+                }
+            }
+        })
+    }
 
     const DeleteView = () => (
         <Dialog

@@ -16,10 +16,10 @@ import {
     styled
 } from '@mui/material'
 import { Controller, useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
 import { FileUploader } from 'devextreme-react'
-import { getApi, postApi, putApi } from 'src/@core/utils/requestUltils'
+import { getApi, postApi } from 'src/@core/utils/requestUltils'
 import { TreeItem, TreeView } from '@mui/lab'
+import Swal from 'sweetalert2'
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Fade ref={ref} {...props} />
@@ -40,59 +40,6 @@ const CustomCloseButton = styled(IconButton)(({ theme }) => ({
     }
 }))
 
-
-const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
-    '&:hover > .MuiTreeItem-content:not(.Mui-selected)': {
-        backgroundColor: theme.palette.action.hover
-    },
-    '& .MuiTreeItem-content': {
-        paddingRight: theme.spacing(3),
-        borderTopRightRadius: theme.spacing(4),
-        borderBottomRightRadius: theme.spacing(4),
-        fontWeight: theme.typography.fontWeightMedium
-    },
-    '& .MuiTreeItem-label': {
-        fontWeight: 'inherit',
-        paddingRight: theme.spacing(3)
-    },
-    '& .MuiTreeItem-group': {
-        marginLeft: 0,
-        '& .MuiTreeItem-content': {
-            paddingLeft: theme.spacing(4),
-            fontWeight: theme.typography.fontWeightRegular
-        }
-    }
-}))
-
-const StyledTreeItem = props => {
-    // ** Props
-    const { labelText, labelIcon, labelInfo, color, textDirection, disabled, ...other } = props
-
-    return (
-        <StyledTreeItemRoot
-            {...other}
-            label={
-                <Box
-                    sx={{
-                        py: 1,
-                        display: 'flex',
-                        alignItems: 'center',
-                        '& svg': { mr: 1 },
-                    }}>
-                    <Typography variant='body2' sx={{ flexGrow: 1, fontWeight: 500, textDecoration: textDirection }}>
-                        {labelText}
-                    </Typography>
-                    {labelInfo ? (
-                        <Typography variant='caption' color='inherit'>
-                            {labelInfo}
-                        </Typography>
-                    ) : null}
-                </Box>
-            }
-        />
-    )
-}
-
 const AddMap = ({ show, onClose, setReload, data }) => {
     const [loading, setLoading] = useState(false)
     const [detail, setDetail] = useState(null)
@@ -105,6 +52,7 @@ const AddMap = ({ show, onClose, setReload, data }) => {
     const [selectedArea, setSelectedArea] = useState(null)
     const [anchorEl, setAnchorEl] = useState(null);
     const [areaGroup, setAreaGroup] = useState([])
+    const [areaListSelected, setAreaListSelected] = useState([])
 
     const {
         control,
@@ -142,10 +90,41 @@ const AddMap = ({ show, onClose, setReload, data }) => {
         onClose()
     }
 
+    useEffect(() => {
+        fetchData()
+    }, [])
+
+    const fetchData = async () => {
+        setLoading(true)
+        try {
+            const response = await getApi(
+                `https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps`
+            )
+
+            const data = response.data
+            if (data?.length > 0) {
+                const arr = data.map((item) => {
+                    return item.areaCode
+                })
+                setAreaListSelected(arr)
+            }
+        } catch (error) {
+            if (error && error?.response?.data) {
+                console.error('error', error)
+                showMessageError(error?.response?.data?.message)
+            } else {
+                console.error('Error fetching data:', error)
+                showMessageError(error)
+            }
+        } finally {
+            setLoading(false)
+        }
+    }
+
     const fetchAreaGroup = async () => {
         try {
             const res = await getApi(
-                `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=1b038831-3283-40f0-9a4f-7ca2f8d17862`)
+                `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/codeParent?codeParent=digitalmap`)
             if (Array.isArray(res?.data)) {
                 setAreaGroup(res?.data)
             } else {
@@ -155,20 +134,17 @@ const AddMap = ({ show, onClose, setReload, data }) => {
         } catch (error) {
             if (error && error?.response?.data) {
                 console.error('error', error)
-                toast.error(error?.response?.data?.message)
             } else {
                 console.error('Error fetching data:', error)
-                toast.error(error)
             }
         } finally {
             setLoading(false)
         }
     }
 
-
     const fetchChildrenById = async parentId => {
         try {
-            const res = await getApi(`https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`)
+            const res = await getApi(`https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/codeParent?codeParent=${parentId}`)
             setTreeData(prevTreeData => ({
                 ...prevTreeData,
                 [parentId]: res.data
@@ -218,16 +194,44 @@ const AddMap = ({ show, onClose, setReload, data }) => {
         } catch (error) {
             if (error && error?.response?.data) {
                 console.error('error', error)
-                toast.error(error?.response?.data?.message)
             } else {
                 console.error('Error fetching data:', error)
-                toast.error(error)
             }
 
             return null
         } finally {
             setLoading(false)
         }
+    }
+
+    const showMessageSuccess = () => {
+        Swal.fire({
+            title: 'Successfully!',
+            text: 'Data has been updated successfully.',
+            icon: 'success',
+            willOpen: () => {
+                const confirmButton = Swal.getConfirmButton()
+                if (confirmButton) {
+                    confirmButton.style.backgroundColor = '#002060'
+                    confirmButton.style.color = 'white'
+                }
+            }
+        })
+    }
+
+    const showMessageError = error => {
+        Swal.fire({
+            title: 'Error!',
+            text: error,
+            icon: 'error',
+            willOpen: () => {
+                const confirmButton = Swal.getConfirmButton()
+                if (confirmButton) {
+                    confirmButton.style.backgroundColor = '#002060'
+                    confirmButton.style.color = 'white'
+                }
+            }
+        })
     }
 
     const onSubmit = values => {
@@ -241,7 +245,6 @@ const AddMap = ({ show, onClose, setReload, data }) => {
             img: fileUploadUrl
         }
         handleAdd(detail)
-        onClose()
     }
 
     const handleAdd = values => {
@@ -251,51 +254,78 @@ const AddMap = ({ show, onClose, setReload, data }) => {
 
         setLoading(true)
         postApi(`https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps`, { ...params })
-            .then(() => {
-                toast.success('Add Successfully')
+            .then((res) => {
+                showMessageSuccess()
                 setReload()
-                onClose()
             })
             .catch(error => {
                 if (error && error?.response?.data) {
                     console.error('error', error)
-                    toast.error(error?.response?.data?.message)
+                    showMessageError(error?.response?.data?.message)
                 } else {
                     console.error('Error fetching data:', error)
-                    toast.error(error)
+                    showMessageError(error)
                 }
             })
             .finally(() => {
                 setLoading(false)
+                onClose()
             })
+    }
+
+    const fetchChildData = async parentId => {
+        try {
+            const response = await getApi(
+                `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/codeParent?codeParent=${parentId}`)
+
+            setTreeData(prevTreeData => ({
+                ...prevTreeData,
+                [parentId]: response.data
+            }))
+        } catch (error) {
+            console.error('Error fetching children:', error)
+        }
     }
 
     const renderTreeItems = nodes => {
         return nodes.map(node => {
 
-            const hasChildren = treeData[node.id] && treeData[node.id].length > 0
+            const hasChildren = treeData[node.code] && treeData[node.code].length > 0
+            const isExisted = areaListSelected.includes(node.code)
 
             return (
-                <StyledTreeItem
-                    key={node?.id}
-                    nodeId={node?.id.toString()}
-                    labelText={node.name}
-                    labelIcon='tabler:map'
+                <TreeItem
+                    key={node.id}
+                    nodeId={node.code}
+                    disabled={isExisted}
+                    label={
+                        <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Button
+                                size='small'
+                                sx={{ textAlign: 'left', justifyContent: 'flex-start', width: '100%' }}
+                                onClick={async () => {
+                                    await fetchChildData(node.code)
+                                }}
+                            >
+                                {node.name}
+                            </Button>
+                        </Box>
+                    }
                     icon={
                         node.isParent ? (
                             <Box display='flex' alignItems='center'>
-                                <IconButton style={{ padding: '0px' }} onClick={() => handleFetchChildren(node.id)}>
-                                    <Icon icon={expandedNodes.includes(node.id) ? 'tabler:chevron-down' : 'tabler:chevron-right'} />
+                                <IconButton style={{ padding: '0px' }} onClick={() => handleFetchChildren(node.code)}>
+                                    <Icon icon={expandedNodes.includes(node.code) ? 'tabler:chevron-down' : 'tabler:chevron-right'} />
                                 </IconButton>
                             </Box>
                         ) : null
                     }
-                    onClick={() =>
+                    onClick={!isExisted ? () => {
                         setSelectedArea(node)
-                    }
+                    } : null}
                 >
-                    {hasChildren && renderTreeItems(treeData[node.id])}
-                </StyledTreeItem>
+                    {hasChildren && renderTreeItems(treeData[node.code])}
+                </TreeItem>
             )
 
         })
@@ -389,7 +419,7 @@ const AddMap = ({ show, onClose, setReload, data }) => {
                                             expanded={expandedNodes}
                                             defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
                                             defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
-                                            sx={{ flexGrow: 1, overflowY: 'auto', height: '100%' }}
+                                            sx={{ minHeight: 300, flexGrow: 1, overflowY: 'auto', height: '100%' }}
                                         >
                                             {renderTreeItems(areaGroup)}
                                         </TreeView>
