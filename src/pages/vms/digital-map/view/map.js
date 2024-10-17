@@ -57,6 +57,9 @@ const Map = () => {
     const [loading, setLoading] = useState(false)
     const [reload, setReload] = useState(0)
 
+    const API_INFRARES = `https://dev-ivi.basesystem.one/ivis/infrares/api/v0`
+
+
     const configWs = {
         bundlePolicy: 'max-bundle',
         iceServers: [
@@ -270,7 +273,7 @@ const Map = () => {
     const fetchAreaGroup = async () => {
         try {
             const res = await callApi(
-                `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/codeParent?codeParent=digitalmap`)
+                `${API_INFRARES}/regions/codeParent?codeParent=digitalmap`)
             if (Array.isArray(res?.data)) {
                 setAreaGroup(res?.data)
             } else {
@@ -291,7 +294,7 @@ const Map = () => {
     const fetchDigitalMap = async areaCode => {
         try {
             const res = await callApi(
-                `https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps/get-by-area-code?areaCode=${areaCode}`)
+                `${API_INFRARES}/digital-maps/get-by-area-code?areaCode=${areaCode}`)
             const imgMapURL = res.data?.img
             const devices = res.data?.devices
 
@@ -319,7 +322,7 @@ const Map = () => {
 
     const fetchChildrenById = async parentId => {
         try {
-            const res = await getApi(`https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/codeParent?codeParent=${parentId}`)
+            const res = await getApi(`${API_INFRARES}/regions/codeParent?codeParent=${parentId}`)
             setTreeData(prevTreeData => ({
                 ...prevTreeData,
                 [parentId]: res.data
@@ -355,7 +358,7 @@ const Map = () => {
         }
 
         if (digitalMapId) {
-            putApi(`https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps/${digitalMapId}`, { ...params })
+            putApi(`${API_INFRARES}/digital-maps/${digitalMapId}`, { ...params })
                 .then(() => {
                     setReload(reload + 1)
                     showMessageSuccess()
@@ -479,7 +482,7 @@ const Map = () => {
     const fetchChildDataNote = async parentId => {
         try {
             const response = await getApi(
-                `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/codeParent?codeParent=${parentId}`)
+                `${API_INFRARES}/regions/codeParent?codeParent=${parentId}`)
 
             setChildData(response.data || [])
         } catch (error) {
@@ -490,7 +493,7 @@ const Map = () => {
     const fetchChildData = async parentId => {
         try {
             const response = await getApi(
-                `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/codeParent?codeParent=${parentId}`)
+                `${API_INFRARES}/regions/codeParent?codeParent=${parentId}`)
 
             setTreeData(prevTreeData => ({
                 ...prevTreeData,

@@ -98,7 +98,7 @@ export class Map extends mix(Base).with(ModesMixin) {
   addLayer(layer) {
     // this.canvas.renderOnAddRemove = false;
     if (!layer.shape) {
-      console.error('shape is undefined');
+      // console.error('shape is undefined');
 
       return;
     }
