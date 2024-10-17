@@ -54,6 +54,8 @@ const AddMap = ({ show, onClose, setReload, data }) => {
     const [areaGroup, setAreaGroup] = useState([])
     const [areaListSelected, setAreaListSelected] = useState([])
 
+    const API_INFRARES = `https://dev-ivi.basesystem.one/ivis/infrares/api/v0`
+
     const {
         control,
         reset,
@@ -98,7 +100,7 @@ const AddMap = ({ show, onClose, setReload, data }) => {
         setLoading(true)
         try {
             const response = await getApi(
-                `https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps`
+                `${API_INFRARES}/digital-maps`
             )
 
             const data = response.data
@@ -124,7 +126,7 @@ const AddMap = ({ show, onClose, setReload, data }) => {
     const fetchAreaGroup = async () => {
         try {
             const res = await getApi(
-                `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/codeParent?codeParent=digitalmap`)
+                `${API_INFRARES}/regions/codeParent?codeParent=digitalmap`)
             if (Array.isArray(res?.data)) {
                 setAreaGroup(res?.data)
             } else {
@@ -144,7 +146,7 @@ const AddMap = ({ show, onClose, setReload, data }) => {
 
     const fetchChildrenById = async parentId => {
         try {
-            const res = await getApi(`https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/codeParent?codeParent=${parentId}`)
+            const res = await getApi(`${API_INFRARES}/regions/codeParent?codeParent=${parentId}`)
             setTreeData(prevTreeData => ({
                 ...prevTreeData,
                 [parentId]: res.data
@@ -253,7 +255,7 @@ const AddMap = ({ show, onClose, setReload, data }) => {
         }
 
         setLoading(true)
-        postApi(`https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps`, { ...params })
+        postApi(`${API_INFRARES}/digital-maps`, { ...params })
             .then((res) => {
                 showMessageSuccess()
                 setReload()
@@ -276,7 +278,7 @@ const AddMap = ({ show, onClose, setReload, data }) => {
     const fetchChildData = async parentId => {
         try {
             const response = await getApi(
-                `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/codeParent?codeParent=${parentId}`)
+                `${API_INFRARES}/regions/codeParent?codeParent=${parentId}`)
 
             setTreeData(prevTreeData => ({
                 ...prevTreeData,
@@ -379,6 +381,25 @@ const AddMap = ({ show, onClose, setReload, data }) => {
                                     />
                                 </Grid>
                                 <Grid item xs={6} sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <Controller
+                                        name={"code"}
+                                        control={control}
+                                        rules={{ required: true }}
+                                        render={({ field: { value, onChange } }) => (
+                                            <CustomTextField
+                                                fullWidth
+                                                value={value}
+                                                label={"Code Digital Map"}
+                                                onChange={onChange}
+                                                placeholder={"Code Digital Map"}
+                                                error={Boolean(errors["code"])}
+                                                aria-describedby='validation-basic-last-code'
+                                                {...(errors["code"] && { helperText: 'This field is required' })}
+                                            />
+                                        )}
+                                    />
+                                </Grid>
+                                <Grid item xs={6} sx={{ display: 'flex', alignItems: 'center' }}>
                                     <CustomTextField
                                         fullWidth
                                         value={selectedArea?.name}
@@ -425,6 +446,27 @@ const AddMap = ({ show, onClose, setReload, data }) => {
                                         </TreeView>
                                     </Popover>
 
+                                </Grid>
+                                <Grid item xs={6} sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <Controller
+                                        name={"areaCode"}
+                                        control={control}
+                                        rules={{ required: false }}
+                                        render={({ field: { value, onChange } }) => (
+                                            <CustomTextField
+                                                fullWidth
+                                                disabled
+                                                value={selectedArea?.code || value}
+                                                label={"Area Code"}
+
+                                                // onChange={onChange}
+                                                placeholder={"Area Code"}
+                                                error={Boolean(errors["areaCode"])}
+                                                aria-describedby='validation-basic-last-name'
+                                                {...(errors["areaCode"] && { helperText: 'This field is required' })}
+                                            />
+                                        )}
+                                    />
                                 </Grid>
                             </Grid>
 

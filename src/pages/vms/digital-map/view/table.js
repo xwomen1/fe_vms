@@ -24,6 +24,8 @@ const DigitalMapTable = () => {
     const [idDelete, setIdDelete] = useState(null)
     const [digitalMapId, setDigitalMapId] = useState(null)
 
+    const API_INFRARES = `https://dev-ivi.basesystem.one/ivis/infrares/api/v0`
+
     const columns = [
         {
             id: 1,
@@ -35,6 +37,14 @@ const DigitalMapTable = () => {
         },
         {
             id: 2,
+            flex: 0.15,
+            minWidth: 50,
+            align: 'center',
+            field: 'code',
+            label: 'Code'
+        },
+        {
+            id: 3,
             flex: 0.25,
             minWidth: 50,
             align: 'center',
@@ -42,7 +52,7 @@ const DigitalMapTable = () => {
             label: 'Area Name'
         },
         {
-            id: 3,
+            id: 4,
             flex: 0.15,
             minWidth: 120,
             align: 'center',
@@ -78,7 +88,7 @@ const DigitalMapTable = () => {
         setLoading(true)
         try {
             const response = await getApi(
-                `https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps?keyword=${keyword}&page=${page}&limit=${pageSize}&sort=-created_at`
+                `${API_INFRARES}/digital-maps?keyword=${keyword}&page=${page}&limit=${pageSize}&sort=-created_at`
             )
 
             const data = response.data
@@ -103,7 +113,7 @@ const DigitalMapTable = () => {
             setLoading(true)
 
             try {
-                await delApi(`https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps/${idDelete}`)
+                await delApi(`${API_INFRARES}/digital-maps/${idDelete}`)
                 setReload(reload + 1)
                 setIdDelete(null)
                 showMessageSuccess()

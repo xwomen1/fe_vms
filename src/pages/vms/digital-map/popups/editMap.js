@@ -40,60 +40,7 @@ const CustomCloseButton = styled(IconButton)(({ theme }) => ({
     }
 }))
 
-
-const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
-    '&:hover > .MuiTreeItem-content:not(.Mui-selected)': {
-        backgroundColor: theme.palette.action.hover
-    },
-    '& .MuiTreeItem-content': {
-        paddingRight: theme.spacing(3),
-        borderTopRightRadius: theme.spacing(4),
-        borderBottomRightRadius: theme.spacing(4),
-        fontWeight: theme.typography.fontWeightMedium
-    },
-    '& .MuiTreeItem-label': {
-        fontWeight: 'inherit',
-        paddingRight: theme.spacing(3)
-    },
-    '& .MuiTreeItem-group': {
-        marginLeft: 0,
-        '& .MuiTreeItem-content': {
-            paddingLeft: theme.spacing(4),
-            fontWeight: theme.typography.fontWeightRegular
-        }
-    }
-}))
-
-const StyledTreeItem = props => {
-    // ** Props
-    const { labelText, labelIcon, labelInfo, color, textDirection, disabled, ...other } = props
-
-    return (
-        <StyledTreeItemRoot
-            {...other}
-            label={
-                <Box
-                    sx={{
-                        py: 1,
-                        display: 'flex',
-                        alignItems: 'center',
-                        '& svg': { mr: 1 },
-                    }}>
-                    <Typography variant='body2' sx={{ flexGrow: 1, fontWeight: 500, textDecoration: textDirection }}>
-                        {labelText}
-                    </Typography>
-                    {labelInfo ? (
-                        <Typography variant='caption' color='inherit'>
-                            {labelInfo}
-                        </Typography>
-                    ) : null}
-                </Box>
-            }
-        />
-    )
-}
-
-const EditMap = ({ show, onClose, setReload, id, typePopup }) => {
+const EditMap = ({ show, onClose, setReload, id }) => {
     const [loading, setLoading] = useState(false)
     const [detail, setDetail] = useState(null)
     const [treeData, setTreeData] = useState([])
@@ -107,6 +54,8 @@ const EditMap = ({ show, onClose, setReload, id, typePopup }) => {
     const [areaGroup, setAreaGroup] = useState([])
     const [data, setData] = useState(null)
     const [areaListSelected, setAreaListSelected] = useState([])
+
+    const API_INFRARES = `https://dev-ivi.basesystem.one/ivis/infrares/api/v0`
 
     const {
         control,
@@ -128,7 +77,7 @@ const EditMap = ({ show, onClose, setReload, id, typePopup }) => {
         if (id) {
             setLoading(true)
             try {
-                const res = await getApi(`https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps/${id}`)
+                const res = await getApi(`${API_INFRARES}/digital-maps/${id}`)
                 setData(res.data)
             } catch (error) {
                 if (error && error?.response?.data) {
@@ -182,7 +131,7 @@ const EditMap = ({ show, onClose, setReload, id, typePopup }) => {
         setLoading(true)
         try {
             const response = await getApi(
-                `https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps`
+                `${API_INFRARES}/digital-maps`
             )
 
             const data = response.data
@@ -209,7 +158,7 @@ const EditMap = ({ show, onClose, setReload, id, typePopup }) => {
     const fetchAreaGroup = async () => {
         try {
             const res = await getApi(
-                `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/codeParent?codeParent=digitalmap`)
+                `${API_INFRARES}/regions/codeParent?codeParent=digitalmap`)
             if (Array.isArray(res?.data)) {
                 setAreaGroup(res?.data)
             } else {
@@ -229,7 +178,7 @@ const EditMap = ({ show, onClose, setReload, id, typePopup }) => {
 
     const fetchChildrenById = async parentId => {
         try {
-            const res = await getApi(`https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/codeParent?codeParent=${parentId}`)
+            const res = await getApi(`${API_INFRARES}/regions/codeParent?codeParent=${parentId}`)
             setTreeData(prevTreeData => ({
                 ...prevTreeData,
                 [parentId]: res.data
@@ -342,7 +291,7 @@ const EditMap = ({ show, onClose, setReload, id, typePopup }) => {
         }
 
         setLoading(true)
-        postApi(`https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps`, { ...params })
+        postApi(`${API_INFRARES}/digital-maps`, { ...params })
             .then(() => {
                 showMessageSuccess()
                 setReload()
@@ -368,7 +317,7 @@ const EditMap = ({ show, onClose, setReload, id, typePopup }) => {
         }
 
         setLoading(true)
-        putApi(`https://sbs.basesystem.one/ivis/infrares/api/v0/digital-maps/${id}`, { ...params })
+        putApi(`${API_INFRARES}/digital-maps/${id}`, { ...params })
             .then(() => {
                 showMessageSuccess()
                 setReload()
@@ -391,7 +340,7 @@ const EditMap = ({ show, onClose, setReload, id, typePopup }) => {
     const fetchChildData = async parentId => {
         try {
             const response = await getApi(
-                `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/codeParent?codeParent=${parentId}`)
+                `${API_INFRARES}/regions/codeParent?codeParent=${parentId}`)
 
             setTreeData(prevTreeData => ({
                 ...prevTreeData,
@@ -407,9 +356,6 @@ const EditMap = ({ show, onClose, setReload, id, typePopup }) => {
 
             const hasChildren = treeData[node.code] && treeData[node.code].length > 0
             const isExisted = areaListSelected.includes(node.code)
-
-            console.log('isExisted', isExisted);
-
 
             return (
                 <TreeItem
@@ -492,6 +438,25 @@ const EditMap = ({ show, onClose, setReload, id, typePopup }) => {
                                                 error={Boolean(errors["name"])}
                                                 aria-describedby='validation-basic-last-name'
                                                 {...(errors["name"] && { helperText: 'This field is required' })}
+                                            />
+                                        )}
+                                    />
+                                </Grid>
+                                <Grid item xs={6} sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <Controller
+                                        name={"code"}
+                                        control={control}
+                                        rules={{ required: true }}
+                                        render={({ field: { value, onChange } }) => (
+                                            <CustomTextField
+                                                fullWidth
+                                                value={value}
+                                                label={"Code Digital Map"}
+                                                onChange={onChange}
+                                                placeholder={"Code Digital Map"}
+                                                error={Boolean(errors["code"])}
+                                                aria-describedby='validation-basic-last-code'
+                                                {...(errors["code"] && { helperText: 'This field is required' })}
                                             />
                                         )}
                                     />
