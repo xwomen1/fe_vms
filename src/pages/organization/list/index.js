@@ -25,12 +25,13 @@ import DeletePopup from '../popup/delete'
 import DetailPopup from '../detail/detailInfra'
 import AddPopup from '../popup/add'
 import PopUpAdd from '../popup/AddChild'
+import { node } from 'stylis'
 
 const OrganizationalStructure = () => {
   const [infra, setInfra] = useState([])
   const [selectedTab, setSelectedTab] = useState(null)
   const selectedTabRef = useRef(selectedTab)
-  const [treeData, setTreeData] = useState({})
+  const [treeData, setTreeData] = useState([])
   const [expandedNodes, setExpandedNodes] = useState([])
   const [childData, setChildData] = useState([])
   const [openPopup, setOpenPopup] = useState(false)
@@ -38,7 +39,7 @@ const OrganizationalStructure = () => {
   const [openPopupCode, setOpenPopupCode] = useState(null)
   const [openPopupDetail, setOpenPopupDetail] = useState(false)
   const [openPopupAdd, setOpenPopupAdd] = useState(false)
-  const [showPlusIcon, setShowPlusIcon] = useState(false)
+  const [selectedGroups, setSelectedGroups] = useState([])
   const [openPopupAddChild, setOpenPopupAddChild] = useState(false)
   const [selectId, setSelectIds] = useState(null)
   const [selectedNodeId, setSelectedNodeId] = useState(null)
@@ -48,10 +49,6 @@ const OrganizationalStructure = () => {
   useEffect(() => {
     selectedTabRef.current = selectedTab
   }, [selectedTab])
-
-  const handleShowItemDetail = item => {
-    setSelectedItemDetail(item)
-  }
 
   const handleOpenPopup = id => {
     setOpenPopupId(id)
@@ -146,10 +143,16 @@ const OrganizationalStructure = () => {
   const handleSuccess = async () => {
     if (operationType === 'delete') {
       setInffo(null)
+      setIdGroup(infra[selectedTab].id || {})
+      fetchChildDataNote(infra[selectedTab].code)
     }
 
     if (operationType === 'detail') {
       fetchId(openPopupCode)
+      fetchChildDataNote(openPopupCode)
+    }
+    if (operationType === 'addChild') {
+      fetchChildDataNote(infra[selectedTab].code)
     }
 
     fetchChildDataNote(openPopupCode)
@@ -174,7 +177,7 @@ const OrganizationalStructure = () => {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
       const response = await axios.get(
-        `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/codeParent?codeParent=${parentId}`,
+        `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=${parentId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -188,12 +191,88 @@ const OrganizationalStructure = () => {
     }
   }
 
+  const addChildrenField = data => {
+    return data.map(group => {
+      const children = data.filter(child => child.parentID === group.id)
+      if (children.length > 0) {
+        group.children = children
+      }
+
+      return group
+    })
+  }
+
+  const findRootGroups = data => {
+    const rootGroups = []
+    data.forEach(group => {
+      if (!data.some(item => item.id === group.parentID)) {
+        rootGroups.push(group)
+      }
+    })
+
+    return rootGroups
+  }
+
+  const handleGroupCheckboxChange = (id, checked) => {
+    if (checked) {
+      setSelectedGroups(prevGroups => [...prevGroups, { id }])
+    } else {
+      setSelectedGroups(prevGroups => prevGroups.filter(g => g.id !== id))
+    }
+  }
+
+  const GroupCheckbox = ({ group, checked, onChange }) => {
+    const handleNameClick = async () => {
+      await fetchId(group.code)
+    }
+
+    return (
+      <Box
+        onClick={handleNameClick}
+        display='flex'
+        alignItems='center'
+        justifyContent='space-between'
+        style={{ width: '100%' }}
+      >
+        <Typography onClick={handleNameClick} style={{ flexGrow: 1, cursor: 'pointer', height: '100%' }}>
+          {group.name}
+        </Typography>
+        <Box display='flex' alignItems='center'>
+          <IconButton
+            size='small'
+            onClick={() => {
+              handleOpenPopupDetail(group)
+            }}
+          >
+            <Icon icon='tabler:edit' />
+          </IconButton>
+          <IconButton
+            onClick={() => {
+              handleOpenPopup(group.id)
+            }}
+            size='small'
+          >
+            <Icon icon='tabler:trash' />
+          </IconButton>
+          <IconButton
+            onClick={() => {
+              handleAddPClick(group.id)
+            }}
+            size='small'
+          >
+            <Icon icon='tabler:plus' />
+          </IconButton>
+        </Box>
+      </Box>
+    )
+  }
+
   const fetchChildData = async parentId => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
       const response = await axios.get(
-        `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/codeParent?codeParent=${parentId}`,
+        `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=${parentId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -201,10 +280,9 @@ const OrganizationalStructure = () => {
         }
       )
 
-      setTreeData(prevTreeData => ({
-        ...prevTreeData,
-        [parentId]: response.data
-      }))
+      const dataWithChildren = addChildrenField(response.data)
+      const rootGroups = findRootGroups(dataWithChildren)
+      setTreeData(rootGroups)
     } catch (error) {
       console.error('Error fetching children:', error)
     }
@@ -228,7 +306,7 @@ const OrganizationalStructure = () => {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
       const response = await axios.get(
-        `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/codeParent?codeParent=${parentId}`,
+        `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=${parentId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -245,95 +323,7 @@ const OrganizationalStructure = () => {
     }
   }
 
-  const handleFetchChildren = async nodeId => {
-    const isExpanded = expandedNodes.includes(nodeId)
-    const childrenData = await fetchChildrenById(nodeId)
-
-    setTreeData(prevTreeData => ({
-      ...prevTreeData,
-      [nodeId]: childrenData
-    }))
-
-    if (isExpanded) {
-      setExpandedNodes(expandedNodes.filter(id => id !== nodeId))
-    } else {
-      setExpandedNodes([...expandedNodes, nodeId])
-      setSelectedNodeId(nodeId)
-    }
-  }
-
-  // useEffect(() => {
-  //   if (infra.length > 0) {
-  //     infra.forEach(item => {
-  //       fetchChildData(item.id)
-  //     })
-
-  //     expandedNodes.forEach(async nodeId => {
-  //       await fetchChildData(nodeId)
-  //     })
-  //   }
-  // }, [infra])
-
-  const renderTreeItems = nodes => {
-    return nodes.map(node => {
-      const hasChildren = treeData[node.code] && treeData[node.code].length > 0
-
-      return (
-        <TreeItem
-          key={node.id}
-          nodeId={node.code}
-          label={
-            <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Button
-                size='small'
-                sx={{ textAlign: 'left', justifyContent: 'flex-start', width: '100%' }}
-                onClick={async () => {
-                  await fetchChildDataNote(node.code)
-                  await fetchChildData(node.code)
-                }}
-              >
-                {node.name}
-              </Button>
-
-              <IconButton
-                size='small'
-                onClick={() => {
-                  handleAddPClick(node.id)
-                }}
-              >
-                <Icon icon='bi:plus' />
-              </IconButton>
-              <IconButton
-                size='small'
-                onClick={() => {
-                  handleOpenPopup(node.id)
-                }}
-              >
-                <Icon icon='tabler:trash' />
-              </IconButton>
-              <IconButton size='small' onClick={() => handleOpenPopupDetail(node)}>
-                <Icon icon='tabler:edit' />
-              </IconButton>
-            </Box>
-          }
-          icon={
-            node.isParent ? (
-              <Box display='flex' alignItems='center'>
-                <IconButton style={{ padding: '0px' }} onClick={() => handleFetchChildren(node.code)}>
-                  <Icon icon={expandedNodes.includes(node.code) ? 'tabler:chevron-down' : 'tabler:chevron-right'} />
-                </IconButton>
-              </Box>
-            ) : null
-          }
-        >
-          {hasChildren && renderTreeItems(treeData[node.code])}
-        </TreeItem>
-      )
-    })
-  }
-
   const currentTabInfra = infra[selectedTab] || {}
-  const rootNodes = treeData[currentTabInfra.code] || []
 
   const getIdFromValue = value => {
     if (!info && !currentTabInfra) return null
@@ -343,9 +333,24 @@ const OrganizationalStructure = () => {
     return null
   }
 
-  const handleNodeSelect = (event, nodeId) => {
-    fetchId(nodeId)
-  }
+  const renderGroup = group => (
+    <TreeItem
+      key={group.id}
+      nodeId={group.id}
+      label={
+        <GroupCheckbox
+          group={group}
+          checked={selectedGroups.some(g => g.id === group.id)}
+          onChange={handleGroupCheckboxChange}
+        />
+      }
+      style={{ marginTop: '5%' }}
+      expandIcon={group.isParent ? <Icon icon='tabler:chevron-right' /> : null}
+      collapseIcon={<Icon icon='tabler:chevron-down' />}
+    >
+      {group.children && group.children.map(childGroup => renderGroup(childGroup))}
+    </TreeItem>
+  )
 
   return (
     <>
@@ -437,7 +442,6 @@ const OrganizationalStructure = () => {
               </Grid>
               <Grid item xs={2.5} style={{ display: 'flex', flexDirection: 'column' }}>
                 <Paper elevation={3} style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                  {/* Hiển thị nút chỉ khi selectedTab khác null */}
                   {selectedTab !== null && (
                     <Button onClick={() => handleAddPClick(idGroup)}>
                       <Icon icon='tabler:plus' />
@@ -445,14 +449,13 @@ const OrganizationalStructure = () => {
                   )}
 
                   <TreeView
-                    aria-label='file system navigator'
-                    defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
+                    sx={{ minHeight: 240 }}
                     defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
-                    expanded={expandedNodes}
-                    sx={{ flexGrow: 1, overflowY: 'auto', height: '100%' }}
-                    onNodeSelect={handleNodeSelect}
+                    defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
                   >
-                    {renderTreeItems(rootNodes)}
+                    {treeData.length > 0 &&
+                      treeData[0].children &&
+                      treeData[0].children.map(childGroup => renderGroup(childGroup))}
                   </TreeView>
                 </Paper>
               </Grid>
