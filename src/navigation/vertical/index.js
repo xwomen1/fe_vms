@@ -263,7 +263,12 @@ const navigation = () => {
           path: '/pages/car_management/list',
           title: 'License Plate Management',
           icon: 'tabler:id-badge-2'
-        }
+        },
+        {
+          title: 'Digital Map',
+          icon: 'tabler:map',
+          path: '/vms/digital-map'
+        },
 
         // {
         //   title: 'Thư viện media',
@@ -385,11 +390,13 @@ const navigation = () => {
           icon: 'tabler:moneybag',
           path: '/salaryRule'
         },
-        {
-          title: 'Digital Map',
-          icon: 'tabler:map',
-          path: '/pages/digital-map'
-        },
+
+        // {
+        //   title: 'Digital Map',
+        //   icon: 'tabler:map',
+        //   path: '/pages/digital-map'
+        // },
+
         {
           title: 'Face List Management',
           icon: 'tabler:user-off',

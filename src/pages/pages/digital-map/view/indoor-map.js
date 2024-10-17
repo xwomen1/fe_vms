@@ -1,35 +1,30 @@
 import React, { useRef, useState, useEffect } from 'react';
 import * as Indoor from 'src/@core/components/digital-map/Indoor';
-import CameraView from './popups/CameraView';
+import CameraView from '../popups/CameraView';
 
-const IndoorMap = ({ cameraGroup }) => {
-    const [reload, setReload] = useState(1);
+const IndoorMap = ({ imgURL, cameraGroup, setCamerasSelected }) => {
+    const [reload, setReload] = useState(0);
     const [isOpenViewCamera, setIsOpenViewCamera] = useState(false);
     const [markerSelected, setMarkerSelected] = useState(null);
     const mapEl = useRef(null);
     const markers = useRef([]);
     const radar = useRef(null);
     const newMap = useRef(null);
+    const [cameraListSelected, setCameraListSelected] = useState([])
 
     useEffect(() => {
-        if (cameraGroup?.length > 0) {
-            setReload(prevReload => prevReload + 1);
-        }
-    }, [cameraGroup]);
-
-    useEffect(() => {
-        if (cameraGroup.length > 0) {
+        if (imgURL) {
             initializeMap();
         }
-    }, [reload]);
+    }, [imgURL]);
 
     const initializeMap = () => {
         if (typeof window !== 'undefined') {
             newMap.current = new Indoor.Map(mapEl.current, {
                 floorplan: new Indoor.Floor({
-                    url: '/images/fp.jpg',
+                    url: imgURL,
                     opacity: 0.7,
-                    width: 400,
+                    width: 300,
                     zIndex: 1,
                 }),
                 minZoom: 0.001,
@@ -68,35 +63,64 @@ const IndoorMap = ({ cameraGroup }) => {
     };
 
     const addMarkers = () => {
-        removeAllMarkers();
+        removeAllMarkers();  // Xóa tất cả các marker hiện có
 
-        for (let i = 0; i < cameraGroup.length; i += 1) {
-            const x = Math.random() * 400 - 200;
-            const y = Math.random() * 400 - 200;
+        if (cameraGroup?.length > 0) {
+            const newArr = [];
 
-            const marker = new Indoor.Marker([x, y], {
-                text: `${cameraGroup[i].name}`,
-                draggable: true,
-                zIndex: 100,
-                id: cameraGroup[i].id,
+            // Duyệt qua danh sách camera
+            cameraGroup.forEach(cameraData => {
+                // Nếu tọa độ x và y là null, tạo tọa độ ngẫu nhiên
+                const x = cameraData.x !== null ? cameraData.x : Math.random() * 400 - 200;
+                const y = cameraData.y !== null ? cameraData.y : Math.random() * 400 - 200;
+
+                // Tạo marker mới
+                const marker = new Indoor.Marker([x, y], {
+                    text: `${cameraData.name}`,  // Hiển thị tên camera
+                    draggable: true,  // Cho phép kéo thả marker
+                    zIndex: 100,  // Độ ưu tiên hiển thị
+                    id: cameraData.id,  // Đặt id cho marker
+                });
+
+                // Tạo đối tượng camera mới với tọa độ và icon
+                const camera = {
+                    id: `${cameraData.id}`,
+                    name: `${cameraData.name}`,
+                    type: 'camera',
+                    x: x,
+                    y: y,
+                    icon: 'camera'
+                };
+
+                // Thêm camera vào mảng mới
+                newArr.push(camera);
+
+                // Khi marker đã sẵn sàng, thêm vào bản đồ
+                marker.on('ready', () => {
+                    marker.addTo(newMap.current);
+                    markers.current.push(marker);  // Thêm marker vào danh sách marker hiện tại
+                    if (typeof window !== 'undefined') {
+                        window.markers = markers.current;  // Lưu danh sách marker vào window (nếu có)
+                    }
+                });
             });
 
-            marker.on('ready', () => {
-                marker.addTo(newMap.current);
-                markers.current.push(marker);
-                if (typeof window !== 'undefined') {
-                    window.markers = markers.current;
+            // Cập nhật danh sách camera đã chọn
+            // setCamerasSelected(newArr);
+
+            // Sau khi thêm marker, thêm liên kết giữa các marker và radar
+            setTimeout(() => {
+                addLinks();
+                if (markers.current.length > 0) {
+                    addRadar(markers.current[0], 90);  // Thêm radar vào marker đầu tiên
                 }
-            });
-        }
+            }, 1000);
 
-        setTimeout(() => {
-            addLinks();
-            addRadar(markers.current[0], 90);
-        }, 1000);
-        const rect = Indoor.markerGroup([[0, 0], [100, 200]]);
-        rect.on('moving', handleMarkerGroupMoving);
-        rect.addTo(newMap.current);
+            // Tạo nhóm marker (hình chữ nhật) và thêm vào bản đồ
+            const rect = Indoor.markerGroup([[0, 0], [100, 200]]);
+            rect.on('moving', handleMarkerGroupMoving);
+            rect.addTo(newMap.current);
+        }
     };
 
     const addLinks = () => {
@@ -148,6 +172,23 @@ const IndoorMap = ({ cameraGroup }) => {
     }
 
     const handleMarkerMoving = (e) => {
+        const position = e.position
+
+        const newCameraGroup = cameraGroup.map((camera) => {
+            if (camera.id === e.id) {
+
+                return {
+                    ...camera,
+                    x: position.x,
+                    y: position.y,
+                }
+            }
+
+            return camera
+        })
+
+        setCamerasSelected(newCameraGroup)
+
         if (radar.current && e.id === radar.current.id) {
             radar.current.setPosition(e.position);
         }
@@ -176,7 +217,7 @@ const IndoorMap = ({ cameraGroup }) => {
     };
 
     const handleObjectDrag = (e) => {
-        // console.log('object:drag', e);
+        console.log('object:drag', e);
     };
 
     const handleObjectScaling = (e) => {
