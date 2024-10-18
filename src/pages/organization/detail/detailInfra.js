@@ -66,7 +66,7 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
           }
         }
       })
-      onSuccess()
+      onSuccess({ name, type, detail })
       onClose()
     } catch (error) {
       console.error('Error updating', error)

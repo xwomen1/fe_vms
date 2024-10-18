@@ -95,6 +95,7 @@ const OrganizationalStructure = () => {
           keyword: ''
         }
       }
+
       const response = await axios.get('https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/adults', config)
       setInfra(response.data)
 
@@ -113,7 +114,8 @@ const OrganizationalStructure = () => {
 
   const handleAddPClick = id => {
     setOpenPopupAddChild(true)
-    setSelectIds(id)
+    setOpenPopupCode(id.code)
+    setSelectIds(id.id)
     setOperationType('addChild')
   }
 
@@ -140,27 +142,27 @@ const OrganizationalStructure = () => {
     }
   }
 
-  const handleSuccess = async () => {
+  const handleSuccess = async code => {
     if (operationType === 'delete') {
       setInffo(null)
-      setIdGroup(infra[selectedTab].id || {})
+      setIdGroup(infra[selectedTab] || {})
       fetchChildDataNote(infra[selectedTab].code)
     }
 
     if (operationType === 'detail') {
+      const effectiveCode = code.type || infra[selectedTab].code
+      fetchId(effectiveCode)
+      fetchChildDataNote(effectiveCode)
+    }
+    if (operationType === 'addChild') {
       fetchId(openPopupCode)
       fetchChildDataNote(openPopupCode)
     }
-    if (operationType === 'addChild') {
-      fetchChildDataNote(infra[selectedTab].code)
-    }
 
-    fetchChildDataNote(openPopupCode)
     await fetchFilter()
 
     if (selectedNodeId) {
       const nodeId = selectedNodeId
-
       const parentId = treeData[nodeId]?.code
 
       if (parentId) {
@@ -169,7 +171,7 @@ const OrganizationalStructure = () => {
       await fetchChildData(nodeId)
     }
 
-    setOperationType(null)
+    setOperationType(null) // Reset operation type
   }
 
   const fetchChildDataNote = async parentId => {
@@ -188,6 +190,8 @@ const OrganizationalStructure = () => {
       setChildData(response.data || [])
     } catch (error) {
       console.error('Error fetching children:', error)
+      setChildData([])
+      setSelectedTab(null)
     }
   }
 
@@ -224,6 +228,7 @@ const OrganizationalStructure = () => {
   const GroupCheckbox = ({ group, checked, onChange }) => {
     const handleNameClick = async () => {
       await fetchId(group.code)
+      await fetchChildDataNote(group.code)
     }
 
     return (
@@ -256,7 +261,7 @@ const OrganizationalStructure = () => {
           </IconButton>
           <IconButton
             onClick={() => {
-              handleAddPClick(group.id)
+              handleAddPClick(group)
             }}
             size='small'
           >
@@ -298,7 +303,7 @@ const OrganizationalStructure = () => {
     setExpandedNodes([])
     await fetchChildData(infra[id]?.code)
     await fetchChildDataNote(infra[id]?.code)
-    setIdGroup(infra[id]?.id)
+    setIdGroup(infra[id])
   }
 
   const fetchChildrenById = async parentId => {
@@ -421,7 +426,7 @@ const OrganizationalStructure = () => {
                               style={{
                                 color: selectedTab === index ? '#fff' : 'inherit'
                               }}
-                              onClick={() => handleAddPClick(infraItem.id)}
+                              onClick={() => handleAddPClick(infraItem)}
                             >
                               <Icon icon='tabler:plus' />
                             </IconButton>
