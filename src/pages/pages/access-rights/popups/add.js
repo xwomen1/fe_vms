@@ -342,34 +342,34 @@ return (
                 />
               </Grid>
               <Grid item xs={4}>
-              <Controller
-  name='groupId'
-  control={control}
-  rules={{ required: true }}
-  render={({ field: { value, onChange } }) => (
-    <CustomTextField
-      select
-      fullWidth
-      label='Department'
-      value={value}
-      onChange={e => {
-        const selectedValue = e.target.value;
-        onChange(selectedValue);
-        handleDepartmentChange(selectedValue); // Call the new function here
-      }}
-      id='validation-basic-select'
-      error={Boolean(errors.groupId)}
-      aria-describedby='validation-basic-select'
-      {...(errors.groupId && { helperText: 'This field is required' })}
-    >
-      {groupName.map(item => (
-        <MenuItem key={item.id} value={item.id}>
-          {item.name}
-        </MenuItem>
-      ))}
-    </CustomTextField>
-  )}
-/>
+               <Controller
+                name='groupId'
+                control={control}
+                rules={{ required: true }}
+                render={({ field: { value, onChange } }) => (
+                  <CustomTextField
+                    select
+                    fullWidth
+                    label='Department'
+                    value={value}
+                    onChange={e => {
+                      const selectedValue = e.target.value;
+                      onChange(selectedValue);
+                      handleDepartmentChange(selectedValue); // Call the new function here
+                    }}
+                    id='validation-basic-select'
+                    error={Boolean(errors.groupId)}
+                    aria-describedby='validation-basic-select'
+                    {...(errors.groupId && { helperText: 'This field is required' })}
+                  >
+                    {groupName.map(item => (
+                      <MenuItem key={item.id} value={item.id}>
+                        {item.name}
+                      </MenuItem>
+                    ))}
+                  </CustomTextField>
+                )}
+              />
 
 
               </Grid>
@@ -412,7 +412,6 @@ return (
                   control={control}
                   rules={{ required: true }}
                   render={({ field: { value, onChange } }) => {
-                    const filteredDoorList = getFilteredDoorList(selectedDoorInId)
 
                     return (
                       <CustomTextField
@@ -429,7 +428,7 @@ return (
                         aria-describedby='validation-basic-select'
                         {...(errors.doorOutId && { helperText: 'This field is required' })}
                       >
-                        {filteredDoorList.map(door => (
+                        {doorList.map(door => (
                           <MenuItem key={door.id} value={door.id}>
                             {door.name}
                           </MenuItem>

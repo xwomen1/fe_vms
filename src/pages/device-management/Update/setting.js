@@ -33,7 +33,7 @@ const Setting = ({ idSetting }) => {
         }
       }
 
-      const response = await axios.get(`https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices/${idSetting}`, config)
+      const response = await axios.get(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/device-access/devices/${idSetting}`, config)
       const deviceData = response.data
       setDevice(deviceData)
     } catch (error) {
@@ -93,7 +93,7 @@ const Setting = ({ idSetting }) => {
       }
 
       const response = await axios.put(
-        `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices/${idSetting}`,
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/device-access/devices/${idSetting}`,
         params,
         config
       )
