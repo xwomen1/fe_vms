@@ -243,22 +243,6 @@ const AccessControlDevice = () => {
     }
   }
 
-  const handleDeleteOnclick = async () => {
-    try {
-      const response = await axios.delete(
-        `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/device-groups/${selectedNode}`,
-        config
-      )
-      toast.success('Deleted successfully')
-      fetchDataList() // Làm mới dữ liệu sau khi xóa
-    } catch (error) {
-      console.error('Error deleting data:', error)
-      toast.error('Có lỗi xảy ra khi xóa.')
-    } finally {
-      handleCloseDelete()
-    }
-  }
-
   const renderTree = nodes => (
     <TreeItem
       key={nodes.id}

@@ -70,7 +70,7 @@ const InforAll = ({ idInfor }) => {
         }
       }
 
-      const response = await axios.get(`https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices/${idInfor}`, config)
+      const response = await axios.get(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/device-access/devices/${idInfor}`, config)
       const deviceData = response.data
       setDevice(deviceData)
       setIdDoor(deviceData.doorId)
@@ -161,7 +161,7 @@ const InforAll = ({ idInfor }) => {
       }
 
       const response = await axios.put(
-        `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices/${idInfor}`,
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/device-access/devices/${idInfor}`,
         params,
         config
       )
@@ -210,6 +210,31 @@ const InforAll = ({ idInfor }) => {
   const parentIdToFilter = 'fa7f0b8b-56a7-44c7-96d6-997e7fc55304'
 
   const fetchRegions = async () => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+      console.log('token', token)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.get(
+        'https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=accesscontrol',
+
+        config
+      )
+
+      
+      setRegions(response.data)
+
+    } catch (error) {
+      console.error('Error fetching data:', error)
+    }
+  }
+
+  const fetchRegions1 = async () => {
     setLoading(true)
     try {
       const response = await axios.get('https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions', {
