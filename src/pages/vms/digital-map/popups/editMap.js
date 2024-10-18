@@ -79,6 +79,8 @@ const EditMap = ({ show, onClose, setReload, id }) => {
             try {
                 const res = await getApi(`${API_INFRARES}/digital-maps/${id}`)
                 setData(res.data)
+                console.log('data', res.data);
+
             } catch (error) {
                 if (error && error?.response?.data) {
                     console.error('error', error)
@@ -351,6 +353,7 @@ const EditMap = ({ show, onClose, setReload, id }) => {
         }
     }
 
+
     const renderTreeItems = nodes => {
         return nodes.map(node => {
 
@@ -384,7 +387,7 @@ const EditMap = ({ show, onClose, setReload, id }) => {
                             </Box>
                         ) : null
                     }
-                    onClick={!isExisted ? () => {
+                    onClick={!isExisted && !node.isParent ? () => {
                         setSelectedArea(node)
                     } : null}
                 >
@@ -610,7 +613,7 @@ const EditMap = ({ show, onClose, setReload, id }) => {
                                         </>
                                     )}
                                     <br />
-                                    {fileUploadUrl && !fileUploadDataName && (
+                                    {!fileUploadDataName && (
                                         <div
                                             style={{
                                                 borderStyle: 'dashed',
