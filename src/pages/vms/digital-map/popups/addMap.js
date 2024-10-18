@@ -244,7 +244,7 @@ const AddMap = ({ show, onClose, setReload, data }) => {
             areaId: selectedArea?.id,
             areaCode: selectedArea?.code,
             areaName: selectedArea?.name,
-            img: fileUploadUrl
+            img: fileUploadUrl ? fileUploadUrl : null
         }
         handleAdd(detail)
     }
@@ -322,7 +322,7 @@ const AddMap = ({ show, onClose, setReload, data }) => {
                             </Box>
                         ) : null
                     }
-                    onClick={!isExisted ? () => {
+                    onClick={!isExisted && !node.isParent ? () => {
                         setSelectedArea(node)
                     } : null}
                 >

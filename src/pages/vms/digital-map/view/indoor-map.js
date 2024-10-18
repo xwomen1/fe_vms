@@ -10,7 +10,6 @@ const IndoorMap = ({ imgURL, cameraGroup, setCamerasSelected }) => {
     const markers = useRef([]);
     const radar = useRef(null);
     const newMap = useRef(null);
-    const [cameraListSelected, setCameraListSelected] = useState([])
 
     useEffect(() => {
         if (imgURL) {
