@@ -277,11 +277,10 @@ const Blacklist = () => {
                 }
               }
             })
-            fetchData()            
+            setReload(reload + 1);    
           })
           .catch(err => {
             Swal.fire('error', err.message, 'error')
-            fetchData()            
 
           })
       }
@@ -320,11 +319,11 @@ const Blacklist = () => {
                 }
               }
             })
-            fetchData()            
+            setReload(reload + 1);
           })
           .catch(err => {
             Swal.fire('error', err.message, 'error')
-            fetchData()            
+            setReload(reload + 1);           
 
           })
       }

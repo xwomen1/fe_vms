@@ -179,6 +179,8 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
   const [selectedDoorOutId, setSelectedDoorOutId] = useState(null)
   const [selectedDoorInId, setSelectedDoorInId] = useState(null)
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
+  const [isAlwaysChecked, setIsAlwaysChecked] = useState(false);
+  const [timeSlotsRendered, setTimeSlotsRendered] = useState(false);
 
   const config = {
     headers: {
@@ -313,7 +315,9 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
           doorOutId: getValues('doorOutId') || '',
           startDate: getValues('startDate') ? format(new Date(getValues('startDate')), 'yyyy-MM-dd') : null,
           endDate: getValues('endDate') ? format(new Date(getValues('endDate')), 'yyyy-MM-dd') : null,
-          calendarDays: dataDaily.map(day => ({
+          calendarDays: dataDaily
+          .filter(day => day.dayOfWeek) // Filter out days without dayOfWeek
+          .map(day => ({
             dayOfWeek: day.dayOfWeek,
             timePeriods: Array.isArray(day.timePeriods) ? (day.timePeriods.length > 0 ? day.timePeriods : []) : []
           })),
@@ -348,6 +352,15 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
   const handleDoorInIdChange = newValue => {
     setSelectedDoorInId(newValue)
   }
+
+  const handleCheckboxChange = (event) => {
+    setIsAlwaysChecked(event.target.checked);
+    if (event.target.checked) {
+      setTimeSlotsRendered(true); // Set to true when checkbox is checked
+    } else {
+      setTimeSlotsRendered(false); // Reset if unchecked
+    }
+  };
 
   const filterDoorList = doorIdToExclude => {
     return doorList.filter(option => option.id !== doorIdToExclude)
@@ -441,7 +454,6 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
                   )
                 }
                 if (item.type === 'AutocompleteDoorIn') {
-                  const filteredDoorList = filterDoorList(selectedDoorOutId)
 
                   return (
                     <Grid item xs={12} sm={4} key={index}>
@@ -450,7 +462,7 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
                         control={control}
                         rules={{ required: true }}
                         render={({ field: { value, onChange } }) => {
-                          const selectedOption = filteredDoorList.find(option => option.id === value) || null
+                          const selectedOption = doorList.find(option => option.id === value) || null
 
                           return (
                             <Autocomplete
@@ -458,7 +470,7 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
                               id='autocomplete-doorInId'
                               label='Door In'
                               value={selectedOption}
-                              options={filteredDoorList}
+                              options={doorList}
                               getOptionLabel={option => option.name || ''}
                               renderInput={params => (
                                 <CustomTextField
@@ -482,7 +494,6 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
                 }
 
                 if (item.type === 'AutocompleteDoorOut') {
-                  const filteredDoorList = filterDoorList(selectedDoorInId)
 
                   return (
                     <Grid item xs={12} sm={4} key={index}>
@@ -499,7 +510,7 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
                               id='autocomplete-doorOutId'
                               label='Door Out'
                               value={selectedOption}
-                              options={filteredDoorList}
+                              options={doorList}
                               getOptionLabel={option => option.name || ''}
                               renderInput={params => (
                                 <CustomTextField
@@ -522,84 +533,57 @@ const View = ({ show, onClose, id, setReload, filter, idAccessGroupId, idDoorAcc
                   )
                 }
               })}
+               <Grid item xs={2}>
+      <FormControlLabel
+        control={<Checkbox checked={isAlwaysChecked} onChange={handleCheckboxChange} />}
+        label='Always'
+        style={{ marginTop: '25px' }}
+      />
+    </Grid>
+   <Grid item xs={12}>
+    <div>
+      <div style={{ color: '#333', margin: '20px 0' }}>
+        <span>Time Settings</span>
+      </div>
 
-              <Grid item xs={12}>
-                <div>
-                  <div
-                    style={{
-                      color: '#333',
-                      margin: '20px 0'
-                    }}
-                  >
-                    <span>Time Settings</span>
-                  </div>
+      <div style={{ width: '100%' }}>
+        {isAlwaysChecked && !timeSlotsRendered && (
+          <div style={{ marginLeft: 70, width: 'calc(100% - 150px)', position: 'relative', color: 'rgba(0, 0, 0, 0.6)', fontSize: 14, display: 'flex' }}>
+            {['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'].map((time, index) => (
+              <div key={index.toString()} style={{ width: `${100 / 6}%`, textAlign: 'center', padding: '8px 0' }}>
+                {time}
+              </div>
+            ))}
+            <div style={{ position: 'absolute', right: -70, textAlign: 'center', padding: '8px 0' }}>
+              24:00
+            </div>
+          </div>
+        )}
 
-                  <div
-                    style={{
-                      width: '100%'
-                    }}
-                  >
-                    {!loading && (
-                      <div
-                        style={{
-                          marginLeft: 70,
-                          width: 'calc(100% - 150px)',
-                          position: 'relative',
-                          color: 'rgba(0, 0, 0, 0.6)',
-                          fontSize: 14,
-                          display: 'flex'
-                        }}
-                      >
-                        {['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'].map((time, index) => (
-                          <div
-                            key={index.toString()}
-                            style={{
-                              width: `${100 / 6}%`,
-                              textAlign: 'center',
-                              padding: '8px 0'
-                            }}
-                          >
-                            {time}
-                          </div>
-                        ))}
-                        <div
-                          style={{
-                            position: 'absolute',
-                            right: -70,
-                            textAlign: 'center',
-                            padding: '8px 0'
-                          }}
-                        >
-                          24:00
-                        </div>
-                      </div>
-                    )}
+        <Box>
+          <Controller
+            name='calendarDays'
+            control={control}
+            render={() => (
+              <Daily
+                callbackOfDaily={(v) => {
+                  setDataDaily(v);
+                  setDataDailyState(v);
+                }}
+                dataDailyProps={dataDailyState}
+                disabled={isAlwaysChecked}        
+                error={Boolean(errors.calendarDays)}
+                aria-describedby='validation-basic-last-name'
+                {...(errors.calendarDays && { helperText: 'This field is required' })}
+              />
+            )}
+          />
+        </Box>
+      </div>
+    </div>
 
-                    <Box>
-                      <Controller
-                        name='calendarDays'
-                        control={control}
-                        render={() => (
-                          console.log(dataDaily, dataDailyState, 'dđ'),
-                          (
-                            <Daily
-                              callbackOfDaily={v => {
-                                setDataDaily(v)
-                                setDataDailyState(v)
-                              }}
-                              dataDailyProps={dataDailyState}
-                              disabled={isCheckboxChecked}
-                              error={Boolean(errors.calendarDays)}
-                              aria-describedby='validation-basic-last-name'
-                              {...(errors.calendarDays && { helperText: 'This field is required' })}
-                            />
-                          )
-                        )}
-                      />
-                    </Box>
-                  </div>
-                </div>
-              </Grid>
+   
+  </Grid>
             </Grid>
           </form>
         </DialogContent>
