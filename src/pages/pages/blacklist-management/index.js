@@ -40,6 +40,7 @@ const buildUrlWithToken = url => {
 
   return url
 }
+
 const columns1 = [
   {
     id: 1,
@@ -87,6 +88,7 @@ const columns1 = [
     label: 'Similarity level'
   }
 ]
+
 const columns = [
   {
     id: 1,
