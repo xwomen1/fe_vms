@@ -215,6 +215,12 @@ const Map = () => {
         }
     }, [camera])
 
+    // useEffect(() => {
+    //     if (!imgMapURL) {
+    //         showMessageError("No digital map image yet")
+    //     }
+    // }, [imgMapURL])
+
     const handleSearch = e => {
         setKeyword(e)
     }
@@ -535,11 +541,9 @@ const Map = () => {
                             </Box>
                         ) : null
                     }
-                    onClick={() => {
-                        if (!node.isParent) {
-                            fetchDigitalMap(node.code)
-                        }
-                    }}
+                    onClick={!node.isParent ? () => {
+                        fetchDigitalMap(node.code)
+                    } : null}
                 >
                     {hasChildren && renderTreeItems(treeData[node.code])}
                 </TreeItem>
