@@ -94,9 +94,13 @@ const DoorManagement = () => {
 
       const treeWithChildren = await Promise.all(
         parentData.map(async parent => {
-          const children = await fetchChildren(parent.id)
+          if (parent.isParent) {
+            const children = await fetchChildren(parent.id)
 
-          return { ...parent, children }
+            return { ...parent, children }
+          } else {
+            return { ...parent, children: [] }
+          }
         })
       )
 
@@ -120,12 +124,17 @@ const DoorManagement = () => {
         `https://dev-ivi.basesystem.one/smc/access-control/api/v0/door-groups/children-lv1?parentId=${parentId}`,
         config
       )
-      const children = response.data // Lấy dữ liệu từ response
+      const children = response.data
 
+      // Chỉ tiếp tục gọi API nếu nút con là parent
       const promises = children.map(async child => {
-        const subChildren = await fetchChildren(child.id)
+        if (child.isParent) {
+          const subChildren = await fetchChildren(child.id)
 
-        return { ...child, children: subChildren }
+          return { ...child, children: subChildren }
+        } else {
+          return { ...child, children: [] }
+        }
       })
 
       return await Promise.all(promises)
@@ -161,8 +170,8 @@ const DoorManagement = () => {
           doorGroupIds: nodeId,
           doorStatuses: valueFilter.doorStatuses,
           keyword: value,
-          limit: valueFilter.limit,
-          page: valueFilter.page
+          limit: pageSize,
+          page: page
         }
 
         const url = `https://dev-ivi.basesystem.one/smc/access-control/api/v0/doors`
@@ -178,6 +187,7 @@ const DoorManagement = () => {
           ...device,
           parentId: nodeId
         }))
+        setTotal(response.data.totalPage)
 
         setDeviceData(devicesWithParentId)
       } catch (error) {
@@ -638,7 +648,7 @@ const DoorManagement = () => {
                           {device.name}
                         </Button>
                       </TableCell>
-                      <TableCell>{device.deviceName}</TableCell>
+                      <TableCell>{device.deviceModel?.name}</TableCell>
                       <TableCell>{device.description}</TableCell>
                       <TableCell>{device.status}</TableCell>
                       <TableCell>{device.lastUpdatedByUser?.fullName}</TableCell>

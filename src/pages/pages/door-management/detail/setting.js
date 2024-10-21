@@ -8,7 +8,7 @@ import authConfig from 'src/configs/auth'
 import Swal from 'sweetalert2'
 
 const InforDoor = ({ idSetting }) => {
-  const [inforDoor, setInforDoor] = useState({})
+  const [inforDevice, setInforDevice] = useState({})
   const [loading, setLoading] = useState(false)
   const [selectedGroup, setSelectedGroup] = useState(null)
   const [deviceGroups, setDeviceGroups] = useState([])
@@ -40,7 +40,7 @@ const InforDoor = ({ idSetting }) => {
         config
       )
       const deviceData = response.data
-      setInforDoor(deviceData)
+      setInforDevice(deviceData.deviceModel?.name)
       setSelectedGroup(deviceData.doorGroup)
       console.log(deviceData, 'deviceData')
     } catch (error) {
@@ -50,6 +50,8 @@ const InforDoor = ({ idSetting }) => {
       setLoading(false)
     }
   }
+
+  console.log(inforDevice, 'infodevice')
 
   useEffect(() => {
     fetchDeviceGroups()
@@ -212,12 +214,7 @@ const InforDoor = ({ idSetting }) => {
               </Grid>
               <Grid item xs={0.1}></Grid>
               <Grid item xs={5.8} style={{ marginTop: 20 }}>
-                <Autocomplete
-                  getOptionLabel={option => option.name}
-                  renderInput={params => <CustomTextField {...params} label='Device' fullWidth />}
-                  disabled
-                  loading={loading}
-                />
+                <CustomTextField label='Device' value={inforDevice || []} disabled fullWidth />
               </Grid>
             </Grid>
           </Grid>

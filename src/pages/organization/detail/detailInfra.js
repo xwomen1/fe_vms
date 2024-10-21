@@ -48,9 +48,9 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
       }
 
       const payload = {
-        name: name,
-        code: type,
-        detail: detail
+        name: name.trimEnd(),
+        code: type.trimEnd(),
+        detail: detail.trimEnd()
       }
 
       await axios.put(`https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/${id}`, payload, config)
