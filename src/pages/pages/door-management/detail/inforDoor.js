@@ -60,26 +60,33 @@ const InforDoor = ({ idInfor }) => {
 
       // Hàm đệ quy để lấy nhóm con và xây dựng cây phân cấp
       const fetchChildGroups = async parentGroup => {
-        const childResponse = await axios.get(
-          `https://dev-ivi.basesystem.one/smc/access-control/api/v0/door-groups/children-lv1?parentId=${parentGroup.id}`,
-          config
-        )
-        const childGroups = childResponse.data || []
+        // Chỉ gọi API nếu parentGroup có con
+        if (parentGroup.isParent) {
+          // Kiểm tra nếu nhóm là parent
+          const childResponse = await axios.get(
+            `https://dev-ivi.basesystem.one/smc/access-control/api/v0/door-groups/children-lv1?parentId=${parentGroup.id}`,
+            config
+          )
+          const childGroups = childResponse.data || []
 
-        const childGroupsWithParentInfo = await Promise.all(
-          childGroups.map(async child => {
-            const subChildGroups = await fetchChildGroups(child)
+          const childGroupsWithParentInfo = await Promise.all(
+            childGroups.map(async child => {
+              const subChildGroups = await fetchChildGroups(child)
 
-            return {
-              ...child,
-              children: subChildGroups,
-              parentName: parentGroup.name,
-              parentId: parentGroup.id
-            }
-          })
-        )
+              return {
+                ...child,
+                children: subChildGroups,
+                parentName: parentGroup.name,
+                parentId: parentGroup.id
+              }
+            })
+          )
 
-        return childGroupsWithParentInfo
+          return childGroupsWithParentInfo
+        } else {
+          // Nếu không phải nhóm cha, trả về mảng rỗng
+          return []
+        }
       }
 
       const parentResponse = await axios.get(
