@@ -42,7 +42,7 @@ const initValueFilter = {
   page: 1
 }
 
-const EventList = ({ }) => {
+const EventList = ({}) => {
   const [keyword, setKeyword] = useState('')
   const [valueFilter, setValueFilter] = useState(initValueFilter)
   const [loading, setLoading] = useState(false)
@@ -153,7 +153,7 @@ const EventList = ({ }) => {
 
   useEffect(() => {
     if (rtcPeerConnection) {
-      rtcPeerConnection.addEventListener('connectionstatechange', () => { })
+      rtcPeerConnection.addEventListener('connectionstatechange', () => {})
     }
   }, [rtcPeerConnection])
 
@@ -553,7 +553,12 @@ const EventList = ({ }) => {
       </Card>
 
       {isOpenFilter && (
-        <Filter show={isOpenFilter} onClose={() => setIsOpenFilter(false)} callback={handleSetValueFilter} />
+        <Filter
+          valueFilter={valueFilter}
+          show={isOpenFilter}
+          onClose={() => setIsOpenFilter(false)}
+          callback={handleSetValueFilter}
+        />
       )}
 
       {isOpenView && (

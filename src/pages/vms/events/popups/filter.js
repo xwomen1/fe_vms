@@ -52,6 +52,8 @@ const initValueFilter = {
 }
 
 const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
+  console.log(direction, 'direction')
+
   const [loading, setLoading] = useState(false)
   const [startTime, setStartTime] = useState(null)
   const [endTime, setEndTime] = useState(null)
@@ -90,13 +92,20 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
   const {
     control,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
+    reset
   } = useForm({ defaultValues: initValueFilter })
 
   useEffect(() => {
     fetchLocations()
     fetchCameras()
   }, [])
+
+  useEffect(() => {
+    reset(valueFilter)
+    setStartTime(valueFilter.startTime ? new Date(valueFilter.startTime) : null)
+    setEndTime(valueFilter.endTime ? new Date(valueFilter.endTime) : null)
+  }, [valueFilter, reset])
 
   const onReset = values => {
     var detail = {
@@ -116,6 +125,8 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
     callback(detail)
     onClose()
   }
+
+  console.log(startTime, 'starttime')
 
   return (
     <Card>
@@ -211,7 +222,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                         timeFormat='HH:mm'
                         selected={startTime}
                         id='date-time-picker'
-                        dateFormat='MM/dd/yyyy h:mm aa'
+                        dateFormat='MM/dd/yyyy'
                         onChange={date => setStartTime(date)}
                         customInput={<CustomInput label='Start date' />}
                       />
@@ -228,7 +239,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                         timeFormat='HH:mm'
                         selected={endTime}
                         id='date-time-picker'
-                        dateFormat='MM/dd/yyyy h:mm aa'
+                        dateFormat='MM/dd/yyyy'
                         onChange={date => setEndTime(date)}
                         customInput={<CustomInput label='End date' />}
                       />

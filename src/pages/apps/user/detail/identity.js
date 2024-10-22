@@ -20,6 +20,7 @@ import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInpu
 import Swal from 'sweetalert2'
 import EditIcon from '@mui/icons-material/Edit'
 import ImageForm from './popup/ImageForm'
+import ImagePopup from './popup/ImagePopup'
 
 const UserDetails = () => {
   const router = useRouter()
@@ -41,6 +42,8 @@ const UserDetails = () => {
   const [rows1, setRows1] = useState([])
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
   const [faceType, setFaceType] = useState(null) // State để Save faceType của Image được chọn
+  const [isPopupOpen, setIsPopupOpen] = useState(false)
+  const [selectedImage, setSelectedImage] = useState(null)
 
   const handleEditImageButtonClick = (faceType, imageUrl) => {
     setFaceType(faceType)
@@ -161,9 +164,12 @@ const UserDetails = () => {
           }
         }
 
-        const response = await axios.get(`https://dev-ivi.basesystem.one/smc/iam/api/v0/cards/user-card/${userId}`, config)
+        const response = await axios.get(
+          `https://dev-ivi.basesystem.one/smc/iam/api/v0/cards/user-card/${userId}`,
+          config
+        )
 
-        setPolicyOption(response.data.rows)
+        // setPolicyOption(response.data.rows)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -238,84 +244,132 @@ const UserDetails = () => {
 
     const imageData = data.length === 0 ? emptyImages : data
 
+    const openImagePopup = imageUrl => {
+      setSelectedImage(imageUrl)
+      setIsPopupOpen(true)
+    }
+
+    const closeImagePopup = () => {
+      setIsPopupOpen(false)
+      setSelectedImage(null)
+    }
+
     return (
-      <div style={{ display: 'flex', gap: '34px' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <Img src={imageData[0].imageFileUrl ? buildUrlWithToken(imageData[0].imageFileUrl) : null} />
-          <p style={{ margin: 0, marginTop: '5px', whiteSpace: 'nowrap' }}>{imgTitle} 1</p>
-          {editing && (
-            <IconButton
-              size='small'
-              onClick={() => {
-                setOpenPopup(true)
-                handleEditImageButtonClick(imageData[0].faceType, imageData[0].imageFileUrl)
-              }}
-            >
-              <EditIcon />
-            </IconButton>
-          )}
+      <>
+        <div style={{ display: 'flex', gap: '34px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Img
+              src={imageData[0].imageFileUrl ? buildUrlWithToken(imageData[0].imageFileUrl) : null}
+              onClick={() =>
+                openImagePopup(
+                  imageData[0].imageFileUrl ? buildUrlWithToken(imageData[0].imageFileUrl) : '/images/user.jpg'
+                )
+              }
+            />
+            <p style={{ margin: 0, marginTop: '5px', whiteSpace: 'nowrap' }}>{imgTitle} 1</p>
+            {editing && (
+              <IconButton
+                size='small'
+                onClick={() => {
+                  setOpenPopup(true)
+                  handleEditImageButtonClick(imageData[0].faceType, imageData[0].imageFileUrl)
+                }}
+              >
+                <EditIcon />
+              </IconButton>
+            )}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Img
+              src={imageData[1].imageFileUrl ? buildUrlWithToken(imageData[1].imageFileUrl) : null}
+              onClick={() =>
+                openImagePopup(
+                  imageData[1].imageFileUrl ? buildUrlWithToken(imageData[1].imageFileUrl) : '/images/user.jpg'
+                )
+              }
+            />
+            <p style={{ margin: 0, marginTop: '5px', whiteSpace: 'nowrap' }}>{imgTitle} 2</p>
+            {editing && (
+              <IconButton
+                size='small'
+                onClick={() => {
+                  setOpenPopup(true)
+                  handleEditImageButtonClick(imageData[1].faceType, imageData[1].imageFileUrl)
+                }}
+              >
+                <EditIcon />
+              </IconButton>
+            )}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Img
+              src={imageData[2].imageFileUrl ? buildUrlWithToken(imageData[2].imageFileUrl) : null}
+              onClick={() =>
+                openImagePopup(
+                  imageData[2].imageFileUrl ? buildUrlWithToken(imageData[2].imageFileUrl) : '/images/user.jpg'
+                )
+              }
+            />
+            <p style={{ margin: 0, marginTop: '5px', whiteSpace: 'nowrap' }}>{imgTitle} 3</p>
+            {editing && (
+              <IconButton
+                size='small'
+                onClick={() => {
+                  setOpenPopup(true)
+                  handleEditImageButtonClick(imageData[2].faceType, imageData[2].imageFileUrl)
+                }}
+              >
+                <EditIcon />
+              </IconButton>
+            )}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Img
+              src={imageData[3].imageFileUrl ? buildUrlWithToken(imageData[3].imageFileUrl) : null}
+              onClick={() =>
+                openImagePopup(
+                  imageData[3].imageFileUrl ? buildUrlWithToken(imageData[3].imageFileUrl) : '/images/user.jpg'
+                )
+              }
+            />
+            <p style={{ margin: 0, marginTop: '5px', whiteSpace: 'nowrap' }}>{imgTitle} 4</p>
+            {editing && (
+              <IconButton
+                size='small'
+                onClick={() => {
+                  setOpenPopup(true)
+                  handleEditImageButtonClick(imageData[3].faceType, imageData[3].imageFileUrl)
+                }}
+              >
+                <EditIcon />
+              </IconButton>
+            )}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Img
+              src={imageData[4].imageFileUrl ? buildUrlWithToken(imageData[4].imageFileUrl) : null}
+              onClick={() =>
+                openImagePopup(
+                  imageData[4].imageFileUrl ? buildUrlWithToken(imageData[4].imageFileUrl) : '/images/user.jpg'
+                )
+              }
+            />
+            <p style={{ margin: 0, marginTop: '5px', whiteSpace: 'nowrap' }}>{imgTitle} 5</p>
+            {editing && (
+              <IconButton
+                size='small'
+                onClick={() => {
+                  setOpenPopup(true)
+                  handleEditImageButtonClick(imageData[4].faceType, imageData[4].imageFileUrl)
+                }}
+              >
+                <EditIcon />
+              </IconButton>
+            )}
+          </div>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <Img src={imageData[1].imageFileUrl ? buildUrlWithToken(imageData[1].imageFileUrl) : null} />
-          <p style={{ margin: 0, marginTop: '5px', whiteSpace: 'nowrap' }}>{imgTitle} 2</p>
-          {editing && (
-            <IconButton
-              size='small'
-              onClick={() => {
-                setOpenPopup(true)
-                handleEditImageButtonClick(imageData[1].faceType, imageData[1].imageFileUrl)
-              }}
-            >
-              <EditIcon />
-            </IconButton>
-          )}
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <Img src={imageData[2].imageFileUrl ? buildUrlWithToken(imageData[2].imageFileUrl) : null} />
-          <p style={{ margin: 0, marginTop: '5px', whiteSpace: 'nowrap' }}>{imgTitle} 3</p>
-          {editing && (
-            <IconButton
-              size='small'
-              onClick={() => {
-                setOpenPopup(true)
-                handleEditImageButtonClick(imageData[2].faceType, imageData[2].imageFileUrl)
-              }}
-            >
-              <EditIcon />
-            </IconButton>
-          )}
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <Img src={imageData[3].imageFileUrl ? buildUrlWithToken(imageData[3].imageFileUrl) : null} />
-          <p style={{ margin: 0, marginTop: '5px', whiteSpace: 'nowrap' }}>{imgTitle} 4</p>
-          {editing && (
-            <IconButton
-              size='small'
-              onClick={() => {
-                setOpenPopup(true)
-                handleEditImageButtonClick(imageData[3].faceType, imageData[3].imageFileUrl)
-              }}
-            >
-              <EditIcon />
-            </IconButton>
-          )}
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <Img src={imageData[4].imageFileUrl ? buildUrlWithToken(imageData[4].imageFileUrl) : null} />
-          <p style={{ margin: 0, marginTop: '5px', whiteSpace: 'nowrap' }}>{imgTitle} 5</p>
-          {editing && (
-            <IconButton
-              size='small'
-              onClick={() => {
-                setOpenPopup(true)
-                handleEditImageButtonClick(imageData[4].faceType, imageData[4].imageFileUrl)
-              }}
-            >
-              <EditIcon />
-            </IconButton>
-          )}
-        </div>
-      </div>
+        <ImagePopup isOpen={isPopupOpen} imageSrc={selectedImage} onClose={closeImagePopup} />
+      </>
     )
   }
 

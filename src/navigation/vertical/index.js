@@ -178,6 +178,11 @@ const navigation = () => {
           icon: 'tabler:timeline-event-exclamation'
         },
         {
+          title: 'Human Event',
+          path: '/vms/events/view/eventHuman',
+          icon: 'tabler:timeline-event-exclamation'
+        },
+        {
           title: 'Face',
           path: '/vms/events/view/eventFace',
           icon: 'tabler:timeline-event-exclamation'
@@ -268,7 +273,7 @@ const navigation = () => {
           title: 'Digital Map',
           icon: 'tabler:map',
           path: '/vms/digital-map'
-        },
+        }
 
         // {
         //   title: 'Thư viện media',
