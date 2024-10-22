@@ -46,12 +46,22 @@ const initValueFilter = {
   cameraName: null,
   startTime: null,
   endTime: null,
+  eventType: null,
   keyword: '',
   limit: 25,
   page: 1
 }
 
+const typeEvent = [
+  { id: 1, name: 'AI_EVENT_PERSON_RECOGNITION' },
+  { id: 2, name: 'LICENSE_PLATE_RECOGNITION' },
+  { id: 3, name: 'AI_EVENT_BLACKLIST_FACE_RECOGNITION' },
+  { id: 4, name: 'AI_EVENT_UNKNOWN_FACE_RECOGNITION' }
+]
+
 const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
+  console.log(valueFilter, 'valueFilter')
+
   const [loading, setLoading] = useState(false)
   const [startTime, setStartTime] = useState(null)
   const [endTime, setEndTime] = useState(null)
@@ -90,7 +100,8 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
   const {
     control,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
+    reset
   } = useForm({ defaultValues: initValueFilter })
 
   useEffect(() => {
@@ -98,12 +109,19 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
     fetchCameras()
   }, [])
 
+  useEffect(() => {
+    reset(valueFilter)
+    setStartTime(valueFilter.startTime ? new Date(valueFilter.startTime) : null)
+    setEndTime(valueFilter.endTime ? new Date(valueFilter.endTime) : null)
+  }, [valueFilter, reset])
+
   const onReset = values => {
     var detail = {
       location: '',
       cameraName: '',
       startTime: null,
-      endTime: null
+      endTime: null,
+      eventType: null
     }
     callback(detail)
     onClose()
@@ -116,6 +134,8 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
     callback(detail)
     onClose()
   }
+
+  console.log(startTime, 'starttime')
 
   return (
     <Card>
@@ -144,7 +164,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
           </Box>
           <form>
             <Grid container spacing={4}>
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12} sm={6}>
                 <Controller
                   name='location'
                   control={control}
@@ -172,8 +192,8 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                   )}
                 />
               </Grid>
-              <Grid item xs={2}></Grid>
-              <Grid item xs={12} sm={4}>
+
+              <Grid item xs={12} sm={6}>
                 <Controller
                   name='cameraName'
                   control={control}
@@ -201,41 +221,72 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                   )}
                 />
               </Grid>
-              <Grid item xs={2}></Grid>
+
               <Grid item xs={12} sm={6}>
-                <DatePickerWrapper>
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
-                    <div>
+                <DatePickerWrapper style={{ width: '100%' }}>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', width: '100%' }} className='demo-space-x'>
+                    <div style={{ width: '100%' }}>
                       <DatePicker
                         showTimeSelect
                         timeFormat='HH:mm'
                         selected={startTime}
                         id='date-time-picker'
-                        dateFormat='MM/dd/yyyy h:mm aa'
+                        dateFormat='MM/dd/yyyy'
                         onChange={date => setStartTime(date)}
-                        customInput={<CustomInput label='Start date' />}
+                        customInput={<CustomTextField fullWidth label='Start date' />}
                       />
                     </div>
                   </Box>
                 </DatePickerWrapper>
               </Grid>
+
               <Grid item xs={12} sm={6}>
-                <DatePickerWrapper>
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap' }} className='demo-space-x'>
-                    <div>
+                <DatePickerWrapper style={{ width: '100%' }}>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', width: '100%' }} className='demo-space-x'>
+                    <div style={{ width: '100%' }}>
                       <DatePicker
                         showTimeSelect
                         timeFormat='HH:mm'
                         selected={endTime}
                         id='date-time-picker'
-                        dateFormat='MM/dd/yyyy h:mm aa'
+                        dateFormat='MM/dd/yyyy'
                         onChange={date => setEndTime(date)}
-                        customInput={<CustomInput label='End date' />}
+                        customInput={<CustomTextField fullWidth label='End date' />}
                       />
                     </div>
                   </Box>
                 </DatePickerWrapper>
               </Grid>
+              {direction === 'ALL_EVENT' && (
+                <Grid item xs={12} sm={5.8}>
+                  <Controller
+                    name='eventType'
+                    control={control}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        select
+                        fullWidth
+                        defaultValue=''
+                        label='Type Event'
+                        SelectProps={{
+                          value: value,
+                          onChange: e => onChange(e.target.value)
+                        }}
+                        id='validation-basic-select'
+                        error={Boolean(errors.type)}
+                        aria-describedby='validation-basic-select'
+                        {...(errors.type && { helperText: 'This field is required' })}
+                      >
+                        {typeEvent.map(item => (
+                          <MenuItem key={item.id} value={item.name}>
+                            {item.name}
+                          </MenuItem>
+                        ))}
+                      </CustomTextField>
+                    )}
+                  />
+                </Grid>
+              )}
               <Grid item xs={12}>
                 <DialogActions
                   sx={{

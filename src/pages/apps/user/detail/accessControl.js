@@ -39,6 +39,7 @@ const AccessRight = () => {
   const [reload, setReload] = useState(0)
   const router = useRouter()
   const { userId } = router.query
+  console.log(userId, 'userId')
 
   const [loading, setLoading] = useState(false)
   const [keyword, setKeyword] = useState('')
@@ -57,6 +58,7 @@ const AccessRight = () => {
   const pageSizeOptions = [25, 50, 100]
   const [anchorEl, setAnchorEl] = useState(null)
   const [totalPage, setTotalPage] = useState(0)
+  const [userData, setUserData] = useState([])
   const [rows, setRows] = useState([])
 
   const tabList = [
@@ -83,6 +85,17 @@ const AccessRight = () => {
     groupId: null
   }
   const [valueFilter, setValueFilter] = useState(initValueFilter)
+
+  const formatDate = timestamp => {
+    const date = new Date(timestamp) // Chuyển đổi timestamp thành đối tượng Date
+
+    // Lấy các thành phần ngày, tháng, năm
+    const day = String(date.getDate()).padStart(2, '0') // Đảm bảo ngày có 2 chữ số
+    const month = String(date.getMonth() + 1).padStart(2, '0') // Tháng bắt đầu từ 0
+    const year = date.getFullYear() // Lấy năm
+
+    return `${day}/${month}/${year}` // Trả về định dạng ngày/tháng/năm
+  }
 
   const columns = [
     {
@@ -128,28 +141,27 @@ const AccessRight = () => {
     {
       id: 6,
       flex: 0.15,
-      type: 'date',
       minWidth: 130,
       align: 'left',
-      label: 'Start date',
-      field: 'startDate',
-      valueGetter: params => new Date(params.value)
+      field: 'availableAt',
+      label: 'Available At',
+      valueGetter: params => params.value
     },
     {
       id: 7,
       flex: 0.15,
-      type: 'date',
       minWidth: 130,
       align: 'left',
-      label: 'End date',
-      field: 'endDate',
-      valueGetter: params => new Date(params.value)
+      field: 'expiredAt',
+      label: 'Expired At',
+      valueGetter: params => params.value
     }
   ]
 
   const fetchDataList = async () => {
     setLoading(true)
     setErrorMessage('')
+
     try {
       const config = {
         headers: {
@@ -162,16 +174,40 @@ const AccessRight = () => {
         }
       }
 
-      const response = await axios.get(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/calendar/configuration/?userId=${userId}`,
-        config
-      )
+      let dataConfig = []
+      let dataUser = {}
+      try {
+        const responseConfig = await axios.get(
+          `https://dev-ivi.basesystem.one/smc/access-control/api/v0/calendar/configuration/?userId=${userId}`,
+          config
+        )
+        dataConfig = responseConfig.data.rows
+      } catch (error) {
+        const errorMessage = error.response ? error.response.data.message : error.message
+        console.error('Error fetching configuration data:', errorMessage)
+        toast.error(`Error fetching configuration data: ${errorMessage}`)
+      }
 
-      setDataList(response.data.rows)
+      try {
+        const responseUser = await axios.get(`https://dev-ivi.basesystem.one/smc/iam/api/v0/users/${userId}`, config)
+        dataUser = responseUser.data
+      } catch (error) {
+        const errorMessage = error.response ? error.response.data.message : error.message
+        console.error('Error fetching user data:', errorMessage)
+        toast.error(`Error fetching user data: ${errorMessage}`)
+      }
+
+      const combinedData = dataConfig.map(item => ({
+        ...item,
+        availableAt: dataUser.availableAt ? formatDate(dataUser.availableAt) : 'none',
+        expiredAt: dataUser.expiredAt ? formatDate(dataUser.expiredAt) : 'none'
+      }))
+
+      setDataList(combinedData)
     } catch (error) {
-      console.error('Error fetching data3:', error.message)
-      setErrorMessage(`Không có dữ liệu ... (${error.message})`)
-      toast.error(error.message)
+      console.error('Unexpected error:', error.message)
+      setErrorMessage(`Unexpected error: ${error.message}`)
+      toast.error(`Unexpected error: ${error.message}`)
     } finally {
       setLoading(false)
     }

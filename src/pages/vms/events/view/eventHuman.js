@@ -17,10 +17,17 @@ import {
   Grid,
   IconButton,
   Menu,
+  Paper,
   MenuItem,
   Pagination,
   Switch,
-  Typography
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow
 } from '@mui/material'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import Filter from '../popups/filter'
@@ -32,7 +39,6 @@ const initValueFilter = {
   location: null,
   cameraName: null,
   startTime: null,
-  eventType: null,
   endTime: null,
   keyword: '',
   limit: 25,
@@ -62,6 +68,8 @@ const EventList = ({}) => {
   const defaultCameraID = '0eb23593-a9b1-4278-9fb1-4d18f30ed6ff'
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
   const [isRealtime, setIsRealtime] = useState(false)
+  const [isRealtimeTable, setIsRealtimeTable] = useState(false)
+  const [isTableView, setIsTableView] = useState(false)
 
   const config = {
     bundlePolicy: 'max-bundle',
@@ -76,6 +84,79 @@ const EventList = ({}) => {
       }
     ]
   }
+
+  const eventTypeColors = {
+    'Phát hiện Event AI': 'success',
+    'Phát hiện Object nguy hiểm': 'error',
+    'Phát hiện hành vi bất thường': 'warning',
+    'Phát hiện Object danh sách đen': 'secondary'
+  }
+
+  const columns = [
+    {
+      id: 1,
+      flex: 0.25,
+      maxWidth: 70,
+      align: 'center',
+      field: 'imageObject',
+      label: 'Image',
+      renderCell: value => (
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          <img src={value} alt='' style={{ maxWidth: '40%', height: 'auto', objectFit: 'contain' }} />
+        </Box>
+      )
+    },
+    {
+      id: 2,
+      flex: 0.15,
+      maxWidth: 180,
+      align: 'center',
+      label: 'Event',
+      field: 'eventTypeString',
+      renderCell: value => <Chip label={value} color={eventTypeColors[value]} />
+    },
+    {
+      id: 7,
+      flex: 0.15,
+      maxWidth: 150,
+      align: 'center',
+      label: 'Result',
+      field: 'result'
+    },
+    {
+      id: 3,
+      flex: 0.15,
+      maxWidth: 70,
+      align: 'center',
+      field: 'description',
+      label: 'Object Name'
+    },
+    {
+      id: 4,
+      flex: 0.15,
+      maxWidth: 50,
+      align: 'center',
+      field: 'timestamp',
+      label: 'Date',
+      renderCell: value => new Date(value).toLocaleString()
+    },
+    {
+      id: 5,
+      flex: 0.25,
+      maxWidth: 50,
+      align: 'center',
+      field: 'camName',
+      label: 'Camera'
+    },
+    {
+      id: 6,
+      flex: 0.25,
+      maxWidth: 50,
+      align: 'center',
+      field: 'location',
+      label: 'Location'
+    }
+  ]
 
   useEffect(() => {
     if (isRealtime) {
@@ -176,7 +257,7 @@ const EventList = ({}) => {
       cameraName: valueFilter?.cameraName || '',
       startTime: valueFilter?.startTime || '',
       endTime: valueFilter?.endTime || '',
-      eventType: valueFilter?.eventType || ''
+      eventType: 'AI_EVENT_UNKNOWN_FACE_RECOGNITION'
     }
     setLoading(true)
     try {
@@ -310,11 +391,16 @@ const EventList = ({}) => {
     }
   }
 
+  const handleSwitchTableChange = event => {
+    setIsRealtimeTable(event.target.checked)
+    setIsTableView(event.target.checked)
+  }
+
   return (
     <>
       <Card>
         <CardHeader
-          title='Event list'
+          title='Event Human'
           titleTypographyProps={{ sx: { mb: [2, 0] } }}
           sx={{
             py: 4,
@@ -324,6 +410,19 @@ const EventList = ({}) => {
           }}
           action={
             <Grid container spacing={2}>
+              <Grid item>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={isRealtimeTable}
+                      onChange={handleSwitchTableChange}
+                      name='realtimeEvents'
+                      color='primary'
+                    />
+                  }
+                  label='Event Human Table'
+                />
+              </Grid>
               <Grid item>
                 <FormControlLabel
                   control={
@@ -381,128 +480,187 @@ const EventList = ({}) => {
             <Typography variant='h6' align='center'>
               No data available
             </Typography>
-          ) : (
-            <Grid container rowSpacing={3} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-              {deviceList?.map((item, index) => {
-                return (
-                  <Grid item xs={12} sm={6} lg={2.4} key={index}>
-                    <Card
-                      sx={{
-                        width: '100%',
-                        height: '300px',
-                        borderWidth: 1,
-                        borderRadius: '10px',
-                        borderStyle: 'solid',
-                        borderColor: '#ccc'
-                      }}
-                    >
-                      <CardContent>
-                        <Box
-                          sx={{
-                            height: '100%',
-                            minHeight: 140,
-                            display: 'flex',
-                            alignItems: 'flex-end',
-                            justifyContent: 'center'
-                          }}
-                        >
-                          <img
-                            width={'100%'}
-                            height={150}
-                            alt='add-role'
-                            src={item?.imageObject}
-                            style={{
-                              objectFit: 'contain',
-                              cursor: 'pointer'
-                            }}
+          ) : isTableView ? (
+            <TableContainer component={Paper} sx={{ maxHeight: 1000 }}>
+              <Table stickyHeader aria-label='sticky table'>
+                <TableHead>
+                  <TableRow>
+                    <TableCell style={{ width: '20px' }}>NO.</TableCell>
+                    {columns.map(({ id, label, align, maxWidth }) => (
+                      <TableCell key={id} align={align} sx={{ maxWidth }}>
+                        {label}
+                      </TableCell>
+                    ))}
+                    <TableCell style={{ width: '30px' }}>Action</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {deviceList.slice(0, pageSize).map((row, index) => (
+                    <TableRow hover tabIndex={-1} key={index}>
+                      <TableCell>{index + 1}</TableCell>
+                      {columns.map(({ field, renderCell, align, maxWidth }) => {
+                        const value = row[field] || ''
+
+                        return (
+                          <TableCell
+                            key={field}
+                            align={align}
+                            sx={{ maxWidth, wordBreak: 'break-word', flexWrap: 'wrap' }}
+                          >
+                            {renderCell ? renderCell(value) : value}
+                          </TableCell>
+                        )
+                      })}
+                      <TableCell>
+                        <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center' }}>
+                          <IconButton
+                            size='small'
+                            sx={{ color: 'text.secondary' }}
                             onClick={() => {
                               setIsOpenView(true)
-                              setEventDetail(item)
+                              setEventDetail(row)
                             }}
-                          />
-                        </Box>
-                        <Typography sx={{ marginTop: '10px' }}>
-                          {item?.timestamp ? new Date(item?.timestamp).toLocaleString() : 'Date'}
-                        </Typography>
-                        <Typography
-                          sx={{
-                            marginTop: '10px',
-                            fontWeight: 600,
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis'
-                          }}
-                        >
-                          {item?.result}
-                        </Typography>
-                        <Typography sx={{ marginTop: '10px' }}>
-                          {item?.location ? item?.location : 'Location'}
-                        </Typography>
-
-                        <IconButton
-                          size='small'
-                          sx={{ color: 'text.secondary' }}
+                          >
+                            <Icon icon='tabler:info-circle' />
+                          </IconButton>
+                          <IconButton
+                            size='small'
+                            sx={{ color: 'text.secondary' }}
+                            onClick={() => {
+                              setIsOpenEdit(true)
+                              setEventDetail(row)
+                            }}
+                          >
+                            <Icon icon='tabler:edit' />
+                          </IconButton>
+                          <IconButton
+                            onClick={() => {
+                              setIdDelete(row.id)
+                              setIsOpenDel(true)
+                            }}
+                          >
+                            <Icon icon='tabler:trash' />
+                          </IconButton>
+                        </Grid>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          ) : (
+            <Grid container rowSpacing={3} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+              {deviceList.map((item, index) => (
+                <Grid item xs={12} sm={6} lg={2.4} key={index}>
+                  <Card
+                    sx={{
+                      width: '100%',
+                      height: '300px',
+                      borderWidth: 1,
+                      borderRadius: '10px',
+                      borderStyle: 'solid',
+                      borderColor: '#ccc'
+                    }}
+                  >
+                    <CardContent>
+                      <Box
+                        sx={{
+                          height: '100%',
+                          minHeight: 140,
+                          display: 'flex',
+                          alignItems: 'flex-end',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <img
+                          width={'100%'}
+                          height={150}
+                          alt='add-role'
+                          src={item?.imageObject}
+                          style={{ objectFit: 'contain', cursor: 'pointer' }}
                           onClick={() => {
                             setIsOpenView(true)
                             setEventDetail(item)
                           }}
-                        >
-                          <Icon icon='tabler:info-circle' />
-                        </IconButton>
-                        <IconButton
-                          size='small'
-                          sx={{ color: 'text.secondary' }}
-                          onClick={() => {
-                            setIsOpenEdit(true)
-                            setEventDetail(item)
-                          }}
-                        >
-                          <Icon icon='tabler:edit' />
-                        </IconButton>
-                        <IconButton
-                          onClick={() => {
-                            setIdDelete(item.id)
-                            setIsOpenDel(true)
-                          }}
-                        >
-                          <Icon icon='tabler:trash' />
-                        </IconButton>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                )
-              })}
-              <Grid container spacing={2} style={{ padding: 10 }}>
-                <Grid item xs={3}></Grid>
-
-                <Grid item xs={1} style={{ padding: 0 }}>
-                  <Box>
-                    <IconButton onClick={handleOpenMenu}>
-                      <Icon icon='tabler:selector' />
-                      <p style={{ fontSize: 15 }}>{pageSize} line/page</p>
-                    </IconButton>
-                    <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
-                      {pageSizeOptions.map(size => (
-                        <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
-                          {size}
-                        </MenuItem>
-                      ))}
-                    </Menu>
-                  </Box>
+                        />
+                      </Box>
+                      <Typography sx={{ marginTop: '10px' }}>
+                        {item?.timestamp ? new Date(item?.timestamp).toLocaleString() : 'Date'}
+                      </Typography>
+                      <Typography
+                        sx={{
+                          marginTop: '10px',
+                          fontWeight: 600,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}
+                      >
+                        {item?.result}
+                      </Typography>
+                      <Typography sx={{ marginTop: '10px' }}>{item?.location ? item?.location : 'Location'}</Typography>
+                      <IconButton
+                        size='small'
+                        sx={{ color: 'text.secondary' }}
+                        onClick={() => {
+                          setIsOpenView(true)
+                          setEventDetail(item)
+                        }}
+                      >
+                        <Icon icon='tabler:info-circle' />
+                      </IconButton>
+                      <IconButton
+                        size='small'
+                        sx={{ color: 'text.secondary' }}
+                        onClick={() => {
+                          setIsOpenEdit(true)
+                          setEventDetail(item)
+                        }}
+                      >
+                        <Icon icon='tabler:edit' />
+                      </IconButton>
+                      <IconButton
+                        onClick={() => {
+                          setIdDelete(item.id)
+                          setIsOpenDel(true)
+                        }}
+                      >
+                        <Icon icon='tabler:trash' />
+                      </IconButton>
+                    </CardContent>
+                  </Card>
                 </Grid>
-                <Grid item xs={6}>
-                  <Pagination count={total} page={page} color='primary' onChange={handlePageChange} />
-                </Grid>
-              </Grid>
+              ))}
             </Grid>
           )}
+          <Grid container spacing={2} style={{ padding: 10 }}>
+            <Grid item xs={3}></Grid>
+
+            <Grid item xs={1} style={{ padding: 0 }}>
+              <Box>
+                <IconButton onClick={handleOpenMenu}>
+                  <Icon icon='tabler:selector' />
+                  <p style={{ fontSize: 15 }}>{pageSize} line/page</p>
+                </IconButton>
+                <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+                  {pageSizeOptions.map(size => (
+                    <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
+                      {size}
+                    </MenuItem>
+                  ))}
+                </Menu>
+              </Box>
+            </Grid>
+            <Grid item xs={6}>
+              <Pagination count={total} page={page} color='primary' onChange={handlePageChange} />
+            </Grid>
+          </Grid>
         </CardContent>
       </Card>
 
       {isOpenFilter && (
         <Filter
           valueFilter={valueFilter}
-          direction='ALL_EVENT'
           show={isOpenFilter}
           onClose={() => setIsOpenFilter(false)}
           callback={handleSetValueFilter}

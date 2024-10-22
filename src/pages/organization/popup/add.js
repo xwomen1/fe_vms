@@ -54,7 +54,6 @@ const InfraPopupAdd = ({ open, onClose, onSuccess }) => {
         detail: note.trimEnd(),
         isParent: true,
         name: name.trimEnd(),
-        parentID: id,
         code: type.trimEnd()
       }
       const response = await axios.post('https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions', data, config)
