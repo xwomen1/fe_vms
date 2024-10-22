@@ -500,6 +500,7 @@ const EventList = ({}) => {
                       <TableCell>{index + 1}</TableCell>
                       {columns.map(({ field, renderCell, align, maxWidth }) => {
                         const value = row[field] || ''
+
                         return (
                           <TableCell
                             key={field}

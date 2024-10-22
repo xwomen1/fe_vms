@@ -32,6 +32,7 @@ const initValueFilter = {
   location: null,
   cameraName: null,
   startTime: null,
+  eventType: null,
   endTime: null,
   keyword: '',
   limit: 25,
@@ -174,7 +175,8 @@ const EventList = ({}) => {
       location: valueFilter?.location || '',
       cameraName: valueFilter?.cameraName || '',
       startTime: valueFilter?.startTime || '',
-      endTime: valueFilter?.endTime || ''
+      endTime: valueFilter?.endTime || '',
+      eventType: valueFilter?.eventType || ''
     }
     setLoading(true)
     try {
@@ -500,7 +502,7 @@ const EventList = ({}) => {
       {isOpenFilter && (
         <Filter
           valueFilter={valueFilter}
-          direction='ALL_EVEN'
+          direction='ALL_EVENT'
           show={isOpenFilter}
           onClose={() => setIsOpenFilter(false)}
           callback={handleSetValueFilter}

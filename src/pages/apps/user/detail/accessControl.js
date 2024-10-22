@@ -196,6 +196,7 @@ const AccessRight = () => {
         console.error('Error fetching user data:', errorMessage)
         toast.error(`Error fetching user data: ${errorMessage}`)
       }
+
       const combinedData = dataConfig.map(item => ({
         ...item,
         availableAt: dataUser.availableAt ? formatDate(dataUser.availableAt) : 'none',
