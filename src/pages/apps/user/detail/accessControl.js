@@ -197,6 +197,8 @@ const AccessRight = () => {
         toast.error(`Error fetching user data: ${errorMessage}`)
       }
 
+      //gộp thêm dữ liệu availableAt,expiredAt vào respon lịch để hiển thị ra table
+      
       const combinedData = dataConfig.map(item => ({
         ...item,
         availableAt: dataUser.availableAt ? formatDate(dataUser.availableAt) : 'none',

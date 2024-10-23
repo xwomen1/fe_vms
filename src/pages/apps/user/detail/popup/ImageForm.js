@@ -8,6 +8,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import { color } from '@mui/system'
 import { Dialog } from '@mui/material'
 import { Input } from '@mui/icons-material'
+import { CircularProgress } from '@material-ui/core'
 import Swal from 'sweetalert2'
 import { useRouter } from 'next/router'
 
@@ -16,6 +17,9 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode, fetchUserD
   const [imageNew, setImageDataNew] = useState(null)
   const [imageId, setImageId] = useState(null)
 
+  //error nhận lỗi từ api về lỗi
+
+  const [errorMessage, setErrorMessage] = useState(null)
   const [showPopup, setShowPopup] = useState(true)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
@@ -53,9 +57,10 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode, fetchUserD
       const base64Image = Buffer.from(downloadResponse.data, 'binary').toString('base64')
       const imageDataUrl = `data:${downloadResponse.headers['content-type'].toLowerCase()};base64,${base64Image}`
       setImageDataNew(imageDataUrl)
+      setErrorMessage(null)
     } catch (error) {
       console.error('Error uploading image:', error)
-      Swal.fire('Error', error?.response?.data?.message, 'error')
+      setErrorMessage(error.response?.data?.message || 'Error saving data')
     }
   }
 
@@ -77,7 +82,9 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode, fetchUserD
 
         setImageData(imageDataUrl)
         setShowPopup(true)
+        setErrorMessage(null)
       } catch (error) {
+        setErrorMessage(error.response?.data?.message || 'Error saving data')
         console.error('Error fetching image:', error)
         setShowPopup(false)
         setLoading(false)
@@ -146,7 +153,7 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode, fetchUserD
 
           Swal.fire('Successfully', '', 'success')
         } catch (error) {
-          Swal.fire('Error', error.response.data.message, 'error')
+          setErrorMessage(error.response?.data?.message || 'Error saving data')
 
           console.error('Error saving data:', error)
         } finally {
@@ -171,6 +178,7 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode, fetchUserD
 
           onClose()
         } catch (error) {
+          setErrorMessage(error.response?.data?.message || 'Error saving data')
           Swal.fire('Error', error.response.data.message, 'error')
           onClose()
 
@@ -183,7 +191,7 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode, fetchUserD
       // Đóng dialog sau khi Save thành công
       onClose()
     } catch (error) {
-      Swal.fire('Error', error.response.data.message, 'error')
+      setErrorMessage(error.response?.data?.message || 'Error saving data')
       onClose()
 
       console.error('Error saving data:', error)
@@ -191,11 +199,10 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode, fetchUserD
       setLoading(false) // Dừng loading sau khi hoàn thành request
     }
   }
+
   useEffect(() => {
     fetchUserData()
   }, [])
-
-
 
   return (
     <Dialog open={true} onClose={onClose}>
@@ -248,6 +255,8 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode, fetchUserD
               </div>
             )}
           </div>
+          {/* Hiển thị lỗi khi api upload ảnh lỗi*/}
+          {errorMessage && <div style={{ color: 'red', marginTop: '10px', textAlign: 'center' }}>{errorMessage}</div>}
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '60px' }}>
             <Button variant='contained' color='secondary' onClick={onClose}>
               Close

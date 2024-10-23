@@ -260,6 +260,8 @@ const UserDetails = () => {
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Img
               src={imageData[0].imageFileUrl ? buildUrlWithToken(imageData[0].imageFileUrl) : null}
+
+              /* Thêm sự kiện bấm vào ảnh mở popup fullscreen imageData[0] */
               onClick={() =>
                 openImagePopup(
                   imageData[0].imageFileUrl ? buildUrlWithToken(imageData[0].imageFileUrl) : '/images/user.jpg'
@@ -282,6 +284,8 @@ const UserDetails = () => {
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Img
               src={imageData[1].imageFileUrl ? buildUrlWithToken(imageData[1].imageFileUrl) : null}
+
+              /* Thêm sự kiện bấm vào ảnh mở popup fullscreen imageData[1] */
               onClick={() =>
                 openImagePopup(
                   imageData[1].imageFileUrl ? buildUrlWithToken(imageData[1].imageFileUrl) : '/images/user.jpg'
@@ -289,7 +293,7 @@ const UserDetails = () => {
               }
             />
             <p style={{ margin: 0, marginTop: '5px', whiteSpace: 'nowrap' }}>{imgTitle} 2</p>
-            {editing && (
+           {editing && (
               <IconButton
                 size='small'
                 onClick={() => {
@@ -304,6 +308,8 @@ const UserDetails = () => {
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Img
               src={imageData[2].imageFileUrl ? buildUrlWithToken(imageData[2].imageFileUrl) : null}
+
+              /* Thêm sự kiện bấm vào ảnh mở popup fullscreen imageData[2] */
               onClick={() =>
                 openImagePopup(
                   imageData[2].imageFileUrl ? buildUrlWithToken(imageData[2].imageFileUrl) : '/images/user.jpg'
@@ -326,6 +332,8 @@ const UserDetails = () => {
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Img
               src={imageData[3].imageFileUrl ? buildUrlWithToken(imageData[3].imageFileUrl) : null}
+
+              /* Thêm sự kiện bấm vào ảnh mở popup fullscreen imageData[3] */
               onClick={() =>
                 openImagePopup(
                   imageData[3].imageFileUrl ? buildUrlWithToken(imageData[3].imageFileUrl) : '/images/user.jpg'
@@ -348,6 +356,8 @@ const UserDetails = () => {
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Img
               src={imageData[4].imageFileUrl ? buildUrlWithToken(imageData[4].imageFileUrl) : null}
+
+              /* Thêm sự kiện bấm vào ảnh mở popup fullscreen imageData[4] */
               onClick={() =>
                 openImagePopup(
                   imageData[4].imageFileUrl ? buildUrlWithToken(imageData[4].imageFileUrl) : '/images/user.jpg'
@@ -374,60 +384,69 @@ const UserDetails = () => {
   }
 
   const processImageData = data => {
-    // Nếu data trống hoặc không tồn tại, trả về mảng rỗng
+
+    // Nếu data trống hoặc không tồn tại, trả về mảng chứa các giá trị faceType mặc định
+    const defaultImage = {
+      imageFileUrl: '/images/user.jpg', // Đường dẫn Image mặc định
+      imageBase64: null
+    }
+
     if (!data || data.length === 0) {
       return Array.from({ length: 5 }, (_, index) => ({
-        imageFileUrl: '/images/user.jpg', // Đường dẫn Image mặc định
-        imageBase64: null,
+        ...defaultImage,
         faceType: getFaceTypeFromIndex(index)
       }))
     }
 
+    // Tạo một bản sao của data để tránh thay đổi trực tiếp
+    const clonedData = [...data]
+
     // Nếu data có ít hơn 5 Image, thêm các ô Image trống vào để đạt được 5 Image
-    while (data.length < 5) {
-      data.push({
-        imageFileUrl: '/images/user.jpg', // Đường dẫn Image mặc định
-        imageBase64: null,
+    while (clonedData.length < 5) {
+      clonedData.push({
+        ...defaultImage,
         faceType: null
       })
     }
 
-    // Lấy giá trị faceType từ Image đầu tiên của API
-    const firstImageFaceType = data[0].faceType
-
-    // Tạo một mảng chứa các giá trị faceType có thể được sử dụng cho các Image còn lại
-    const availableFaceTypes = ['LEFT', 'RIGHT', 'CENTER', 'ABOVE', 'BOTTOM'].filter(
-      type => type !== firstImageFaceType
-    )
-
-    // Lặp qua mảng data và điền các giá trị faceType
-    const processedData = data.map((item, index) => ({
-      ...item,
-      faceType: index === 0 ? firstImageFaceType : availableFaceTypes[index - 1]
+    // Tạo mảng kết quả cho 5 ô hình ảnh
+    const result = Array.from({ length: 5 }, (_, index) => ({
+      ...defaultImage,
+      faceType: getFaceTypeFromIndex(index)
     }))
 
-    return processedData
+    // Gán faceType cho từng ảnh dựa trên giá trị faceType của item
+    clonedData.forEach(item => {
+      const index = getFaceIndex(item.faceType) // Lấy index dựa trên faceType
+      if (index !== -1) {
+        result[index] = {
+          ...item,
+          faceType: item.faceType // Giữ nguyên faceType từ item
+        }
+      }
+    })
+
+    return result
   }
 
+  // Helper function to get face type based on index
   const getFaceTypeFromIndex = index => {
-    // Xác định faceType dựa trên index của Image
-    switch (index) {
-      case 0:
-        return 'LEFT'
-      case 1:
-        return 'RIGHT'
-      case 2:
-        return 'CENTER'
-      case 3:
-        return 'ABOVE'
-      default:
-        return 'BOTTOM'
-    }
+    const faceTypes = ['LEFT', 'RIGHT', 'CENTER', 'ABOVE', 'BOTTOM']
+    
+    return faceTypes[index] || 'BOTTOM'
+  }
+
+  // Helper function to get the index based on faceType
+  const getFaceIndex = faceType => {
+    const faceTypes = ['LEFT', 'RIGHT', 'CENTER', 'ABOVE', 'BOTTOM']
+
+    return faceTypes.indexOf(faceType)
   }
 
   // Sử dụng useMemo để gọi hàm processImageData mỗi khi user thay đổi
 
   const processedImages = processImageData(face)
+  console.log(processedImages, 'processedImages')
 
   const Img = React.memo(props => {
     const [loaded, setLoaded] = useState(false)
@@ -512,8 +531,6 @@ const UserDetails = () => {
         setStatus1(response.data.isEnableFace)
         setFingerIdentifyUpdatedAt(response.data.fingerIdentifyUpdatedAt)
         setUser(response.data)
-        console.log(response.data, 'face')
-        console.log(response.data.faces, 'face')
         const faces = response.data.faces
 
         const order = ['LEFT', 'RIGHT', 'CENTER', 'ABOVE', 'BOTTOM']

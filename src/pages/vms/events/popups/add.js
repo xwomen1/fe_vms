@@ -224,6 +224,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
       .put(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/${data.id}`, { ...params }, config)
       .then(() => {
         toast.success('Updated success')
+        setReload()
         onClose()
       })
       .catch(err => {
@@ -338,19 +339,22 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
                               control={control}
                               rules={{ required: true }}
                               render={({ field: { value, onChange } }) => {
+                                //nhận id camera từ value find trong danh sách cam id nào trùng thì lấy thông tin camera đó
+                                const camera = cameraList.find(cam => cam.id === value)
+                                console.log(camera?.name, 'camera.name')
+
                                 return (
                                   <CustomTextField
                                     select
                                     fullWidth
                                     label={item.label}
                                     SelectProps={{
-                                      value: value,
+                                      value: camera ? camera.name : '', // Nhận giá trị của tên camera nếu có
                                       onChange: e => {
-                                        onChange(e)
-                                        if (item.name === 'camName') {
-                                          const cam = cameraList.find(cam => cam.name === e.target.value)
-                                          setCameraId(cam.id)
-                                        }
+                                        const cam = cameraList.find(cam => cam.name === e.target.value) // Tìm camera theo tên
+                                        console.log(cam, 'cam')
+                                        onChange(cam ? cam.id : '') // Lưu ID của camera
+                                        setCameraId(cam?.id) // Cập nhật ID camera nếu tên khớp
                                       }
                                     }}
                                     id='validation-basic-select'

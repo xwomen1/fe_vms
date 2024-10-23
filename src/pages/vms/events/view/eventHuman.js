@@ -222,7 +222,8 @@ const EventList = ({}) => {
     }
   }
   useEffect(() => {
-    if (isRealtime && eventData) {
+    //khi eventype ===  AI_EVENT_UNKNOWN_FACE_RECOGNITION thì mới truyền vào danh sách
+    if (isRealtime && eventData && eventData.eventType === 'AI_EVENT_UNKNOWN_FACE_RECOGNITION') {
       const newList = []
 
       deviceList?.map((item, index) => {
