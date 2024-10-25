@@ -27,6 +27,7 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode, fetchUserD
   const handleFileChange = async event => {
     const file = event.target.files[0]
     try {
+      setLoading(true)
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
       const formData = new FormData()
       formData.append('file', file)
@@ -58,7 +59,9 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode, fetchUserD
       const imageDataUrl = `data:${downloadResponse.headers['content-type'].toLowerCase()};base64,${base64Image}`
       setImageDataNew(imageDataUrl)
       setErrorMessage(null)
+      setLoading(false)
     } catch (error) {
+      setLoading(false)
       console.error('Error uploading image:', error)
       setErrorMessage(error.response?.data?.message || 'Error saving data')
     }
@@ -78,16 +81,15 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode, fetchUserD
 
         const base64Image = Buffer.from(response.data, 'binary').toString('base64')
         const imageDataUrl = `data:${response.headers['content-type'].toLowerCase()};base64,${base64Image}`
-        setLoading(true)
 
         setImageData(imageDataUrl)
         setShowPopup(true)
         setErrorMessage(null)
       } catch (error) {
+        setLoading(false)
         setErrorMessage(error.response?.data?.message || 'Error saving data')
         console.error('Error fetching image:', error)
         setShowPopup(false)
-        setLoading(false)
       }
     }
 
@@ -211,48 +213,54 @@ const ImageForm = ({ faceType, imageUrl, onClose, userId, accessCode, fetchUserD
           <IconButton onClick={onClose}>{/* <CloseIcon /> */}</IconButton>
           <div>faceType: {faceType}</div>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'white' }}>
-            {imageData && imageNew == null && imageUrl != '/images/user.jpg' && (
-              <div>
-                <img src={imageData} alt='Image' style={{ height: '50%', width: '50%' }} />
-              </div>
-            )}
-            {imageData && imageNew !== null && !loading && (
-              <div style={{ marginRight: 50 }}>
-                <img src={imageData} alt='Image' style={{ height: '200px', width: '200px' }} />
-              </div>
-            )}
-            {imageNew && (
-              <div>
-                <img src={imageNew} alt='Image' style={{ height: '200px', width: '200px' }} />
-                <Button component='label'>
-                  Change Image
-                  <input type='file' onChange={handleFileChange} style={{ display: 'none' }} />
-                </Button>
-              </div>
-            )}
-            {imageNew == null && (
-              <div
-                style={{
-                  margin: 'auto',
-                  width: '300px',
-                  height: '300px',
-                  border: '1px dashed rgb(0, 0, 0)',
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'center'
-                }}
-              >
-                <input
-                  accept='image/jpeg,image/png'
-                  type='file'
-                  onChange={handleFileChange} // Kết nối với hàm xử lý
-                  style={{ display: 'none' }}
-                />
-                <Button component='label'>
-                  Select Image
-                  <input type='file' onChange={handleFileChange} style={{ display: 'none' }} />
-                </Button>
-              </div>
+            {loading ? ( // Hiển thị loading khi đang tải ảnh
+              <CircularProgress />
+            ) : (
+              <>
+                {imageData && imageNew == null && imageUrl != '/images/user.jpg' && (
+                  <div>
+                    <img src={imageData} alt='Image' style={{ height: '50%', width: '50%' }} />
+                  </div>
+                )}
+                {imageData && imageNew !== null && !loading && (
+                  <div style={{ marginRight: 50 }}>
+                    <img src={imageData} alt='Image' style={{ height: '200px', width: '200px' }} />
+                  </div>
+                )}
+                {imageNew && (
+                  <div>
+                    <img src={imageNew} alt='Image' style={{ height: '200px', width: '200px' }} />
+                    <Button component='label'>
+                      Change Image
+                      <input type='file' onChange={handleFileChange} style={{ display: 'none' }} />
+                    </Button>
+                  </div>
+                )}
+                {imageNew == null && (
+                  <div
+                    style={{
+                      margin: 'auto',
+                      width: '300px',
+                      height: '300px',
+                      border: '1px dashed rgb(0, 0, 0)',
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <input
+                      accept='image/jpeg,image/png'
+                      type='file'
+                      onChange={handleFileChange} // Kết nối với hàm xử lý
+                      style={{ display: 'none' }}
+                    />
+                    <Button component='label'>
+                      Select Image
+                      <input type='file' onChange={handleFileChange} style={{ display: 'none' }} />
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
           </div>
           {/* Hiển thị lỗi khi api upload ảnh lỗi*/}

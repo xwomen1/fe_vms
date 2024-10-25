@@ -30,7 +30,8 @@ import {
   Select,
   FormControl,
   InputLabel,
-  CircularProgress
+  CircularProgress,
+  Badge
 } from '@mui/material'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import { format } from 'date-fns'
@@ -50,6 +51,8 @@ const EventList = () => {
   const [loading, setLoading] = useState(false)
   const pageSizeOptions = [25, 50, 100]
   const classes = useStyles()
+  const [devicesGroup, setDevicesGroup] = useState([])
+  const [isReset, setIsReset] = useState(false)
 
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
   const [filterPopupOpen, setFilterPopupOpen] = useState(false)
@@ -62,6 +65,7 @@ const EventList = () => {
   })
   const [userGroups, setUserGroups] = useState([]) // Dùng để lưu danh sách user groups
   const [selectedUserGroup, setSelectedUserGroup] = useState(null) // Dùng để lưu user group được chọn
+  const [selectedDeviceGroup, setSelectedDeviceGroup] = useState(null) // Dùng để lưu device group được chọn
   useEffect(() => {
     const fetchUserGroups = async () => {
       try {
@@ -79,6 +83,32 @@ const EventList = () => {
     fetchUserGroups()
   }, [])
 
+  useEffect(() => {
+    const fetchDeviceGroupsAndDevices = async () => {
+      try {
+        // Gọi API đầu tiên để lấy device groups
+        const response = await axios.get(
+          'https://dev-ivi.basesystem.one/smc/access-control/api/v0/device-access/device/device-groups/children-lv1'
+        )
+
+        if (response.data && response.data.length > 0) {
+          const firstGroupId = response.data[0]?.id // Lấy id của device group đầu tiên
+
+          // Gọi API thứ hai để lấy danh sách devices với id của group đầu tiên
+          const devicesResponse = await axios.get(
+            `https://dev-ivi.basesystem.one/smc/access-control/api/v0/device-access/devices?deviceGroupId=${firstGroupId}&keyword=`
+          )
+          setDevicesGroup(devicesResponse.data) // Cập nhật danh sách devices
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+    fetchDeviceGroupsAndDevices()
+  }, [])
+
+  console.log(devicesGroup, 'devicesGroup')
+
   const handleStartDateChange = date => {
     setFilterValues(prev => ({ ...prev, startDate: date }))
   }
@@ -94,6 +124,39 @@ const EventList = () => {
   const handleCloseFilterPopup = () => {
     setFilterPopupOpen(false)
   }
+
+  const resetEvent = () => {
+    setSelectedUserGroup([])
+    setSelectedDeviceGroup([])
+    setFilterValues({
+      deviceIds: '',
+      groupId: '',
+      startDate: null,
+      endDate: null
+    })
+
+    setIsReset(true) // Đặt cờ reset để biết rằng cần chạy lại fetchDataList sau khi reset
+    handleSearch() // Nếu bạn cần thêm xử lý tìm kiếm khác
+  }
+
+  useEffect(() => {
+    if (isReset) {
+      fetchDataList() // Gọi fetchDataList khi reset
+      setIsReset(false) // Đặt lại cờ sau khi dữ liệu đã được tải lại
+    }
+  }, [filterValues, isReset])
+
+  const countActiveFilters = () => {
+    let count = 0
+    if (filterValues.deviceIds) count++
+    if (filterValues.groupId) count++
+    if (filterValues.startDate) count++
+    if (filterValues.endDate) count++
+
+    return count
+  }
+
+  const hasFilterValues = Object.values(filterValues).some(value => value !== '' && value !== null)
 
   const formatTime = dateTime => {
     const date = typeof dateTime === 'number' ? new Date(dateTime) : new Date(dateTime)
@@ -195,6 +258,7 @@ const EventList = () => {
           limit: pageSize,
           deviceName: filterValues.deviceName,
           hostName: filterValues.hostName,
+          deviceIds: filterValues.deviceIds,
           startDate: isoToEpoch(filterValues.startDate) || null,
           endDate: isoToEpoch(filterValues.endDate) || null,
           groupId: filterValues.groupId || null // Thêm groupId vào params
@@ -226,6 +290,7 @@ const EventList = () => {
           page: page,
           limit: pageSize,
           deviceName: filterValues.deviceName,
+          deviceIds: filterValues.deviceIds,
           hostName: filterValues.hostName,
           startDate: isoToEpoch(filterValues.startDate) || null,
           endDate: isoToEpoch(filterValues.endDate) || null,
@@ -243,6 +308,8 @@ const EventList = () => {
       setLoading(false)
     }
   }, [token, page, pageSize, searchKeyword, filterValues])
+
+  console.log(filterValues, 'filterValues')
 
   const fetchDevicesByPage = async page => {
     const response = await axios.get(
@@ -318,9 +385,21 @@ const EventList = () => {
           <Grid container spacing={2}>
             <Grid item></Grid>
             <Grid item>
-              <Button variant='contained' onClick={handleOpenFilterPopup}>
-                <Icon fontSize='1.25rem' icon='tabler:filter' />
+              <Button
+                variant='contained'
+                onClick={() => resetEvent()}
+                disabled={!hasFilterValues} // Nút bị disable nếu không có filterValues
+              >
+                <Icon icon='tabler:x' />
+                Reset filter
               </Button>
+            </Grid>
+            <Grid item>
+              <Badge badgeContent={countActiveFilters()} color='primary'>
+                <Button variant='contained' onClick={handleOpenFilterPopup}>
+                  <Icon fontSize='1.25rem' icon='tabler:filter' />
+                </Button>
+              </Badge>
             </Grid>
             <Grid item>
               <Button variant='contained' onClick={handleExportExcel} disabled={loading}>
@@ -349,6 +428,7 @@ const EventList = () => {
                     </IconButton>
                   )
                 }}
+                autoComplete='off'
                 sx={{
                   width: {
                     xs: 1,
@@ -474,6 +554,7 @@ const EventList = () => {
                       }
                     ]
                   }}
+                  autoComplete='off'
                 />
               </div>
               <div>
@@ -492,6 +573,7 @@ const EventList = () => {
                       }
                     ]
                   }}
+                  autoComplete='off'
                 />
               </div>
             </Box>
@@ -513,10 +595,37 @@ const EventList = () => {
               ))}
             </Select>
           </FormControl>
+          <FormControl fullWidth margin='normal'>
+            <InputLabel>Device</InputLabel>
+            <Select
+              value={selectedDeviceGroup || ''}
+              onChange={e => {
+                const selectedGroups = devicesGroup.find(group => group.id === e.target.value)
+                setSelectedDeviceGroup(e.target.value) // Lưu id được chọn
+                setFilterValues(prev => ({ ...prev, deviceIds: selectedGroups.id })) // Truyền id vào filterValues
+              }}
+            >
+              {devicesGroup.map(group => (
+                <MenuItem key={group.id} value={group.id}>
+                  {group.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
           {/* Các phần tử khác */}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseFilterPopup}>Cancel</Button>
+          <Button variant='contained' onClick={handleCloseFilterPopup}>
+            Cancel
+          </Button>
+          <Button
+            variant='contained'
+            onClick={() => {
+              resetEvent()
+            }}
+          >
+            RESET
+          </Button>
           <Button
             variant='contained'
             onClick={() => {

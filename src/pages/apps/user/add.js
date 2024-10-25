@@ -779,10 +779,12 @@ const Add = () => {
                       selected={dateTime}
                       timeIntervals={15}
                       showTimeSelectOnly
-                      dateFormat='h:mm '
+                      dateFormat='HH:mm' // Hiển thị theo định dạng 24 giờ
+                      timeFormat='HH:mm' // Định dạng giờ 24 giờ
                       id='time-only-picker'
                       onChange={date => handleTimeChange(date)}
                       customInput={<CustomInput />}
+                      timeCaption='Time' // Chú thích giờ
                     />
                   </div>
                 </Box>
@@ -797,7 +799,9 @@ const Add = () => {
                       selected={timeEndMorning}
                       timeIntervals={15}
                       showTimeSelectOnly
-                      dateFormat='h:mm '
+                      dateFormat='HH:mm' // Hiển thị theo định dạng 24 giờ
+                      timeFormat='HH:mm' // Định dạng giờ 24 giờ
+                      timeCaption='Time' // Chú thích giờ
                       id='time-only-picker'
                       onChange={date => handleTimeEndMorningChange(date)}
                       customInput={<CustomInput />}
@@ -818,7 +822,9 @@ const Add = () => {
                       selected={timeStartAfternoon}
                       timeIntervals={15}
                       showTimeSelectOnly
-                      dateFormat='h:mm '
+                      dateFormat='HH:mm' // Hiển thị theo định dạng 24 giờ
+                      timeFormat='HH:mm' // Định dạng giờ 24 giờ
+                      timeCaption='Time' // Chú thích giờ
                       id='time-only-picker'
                       onChange={date => handleTimeStartAfetrnoonChange(date)}
                       customInput={<CustomInput />}
@@ -836,7 +842,9 @@ const Add = () => {
                       selected={timeEndAfternoon}
                       timeIntervals={15}
                       showTimeSelectOnly
-                      dateFormat='h:mm '
+                      dateFormat='HH:mm' // Hiển thị theo định dạng 24 giờ
+                      timeFormat='HH:mm' // Định dạng giờ 24 giờ
+                      timeCaption='Time' // Chú thích giờ
                       id='time-only-picker'
                       onChange={date => handleTimeEndAfternoonChange(date)}
                       customInput={<CustomInput />}
