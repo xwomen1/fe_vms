@@ -222,8 +222,13 @@ const EventList = ({}) => {
     }
   }
   useEffect(() => {
-    //khi eventype ===  AI_EVENT_UNKNOWN_FACE_RECOGNITION thì mới truyền vào danh sách
-    if (isRealtime && eventData && eventData.eventType === 'AI_EVENT_UNKNOWN_FACE_RECOGNITION') {
+    // khi eventType === 'AI_EVENT_UNKNOWN_FACE_RECOGNITION' hoặc 'AI_EVENT_PERSON_RECOGNITION' thì mới truyền vào danh sách
+    if (
+      isRealtime &&
+      eventData &&
+      (eventData.eventType === 'AI_EVENT_UNKNOWN_FACE_RECOGNITION' ||
+        eventData.eventType === 'AI_EVENT_PERSON_RECOGNITION')
+    ) {
       const newList = []
 
       deviceList?.map((item, index) => {
@@ -258,21 +263,22 @@ const EventList = ({}) => {
       cameraName: valueFilter?.cameraName || '',
       startTime: valueFilter?.startTime || '',
       endTime: valueFilter?.endTime || '',
-      eventType: 'AI_EVENT_UNKNOWN_FACE_RECOGNITION'
+      eventType1: 'AI_EVENT_UNKNOWN_FACE_RECOGNITION',
+      eventType2: 'AI_EVENT_PERSON_RECOGNITION'
     }
     setLoading(true)
     try {
-      const res = await getApi(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/routine`, params)
+      const res = await getApi('https://sbs.basesystem.one/ivis/vms/api/v0/aievents/routine', params)
       setDeviceList(res?.data)
       setCount(res.count)
       setTotalPage(Math.ceil(res.count / pageSize))
     } catch (error) {
-      if (error && error?.response?.data) {
-        console.error('error', error)
-        toast.error(error?.response?.data?.message)
+      if (error && error.response) {
+        console.error('API Error:', error.response)
+        toast.error(error.response?.statusText || 'Internal Server Error')
       } else {
-        console.error('Error fetching data:', error)
-        toast.error(error)
+        console.error('Unknown Error:', error)
+        toast.error('Internal Server Error')
       }
     } finally {
       setLoading(false)
@@ -496,7 +502,7 @@ const EventList = ({}) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {deviceList.slice(0, pageSize).map((row, index) => (
+                  {deviceList?.slice(0, pageSize).map((row, index) => (
                     <TableRow hover tabIndex={-1} key={index}>
                       <TableCell>{index + 1}</TableCell>
                       {columns.map(({ field, renderCell, align, maxWidth }) => {
@@ -551,7 +557,7 @@ const EventList = ({}) => {
             </TableContainer>
           ) : (
             <Grid container rowSpacing={3} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-              {deviceList.map((item, index) => (
+              {deviceList?.map((item, index) => (
                 <Grid item xs={12} sm={6} lg={2.4} key={index}>
                   <Card
                     sx={{

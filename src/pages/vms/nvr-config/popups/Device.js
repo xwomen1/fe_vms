@@ -47,10 +47,7 @@ const Device = ({ onClose, nvr }) => {
 
   const [protocol, setProtocol] = useState()
 
-  const [regionsSelect, setRegionsSelect] = useState({
-    label: cameras?.regions?.name || '',
-    value: cameras?.regions?.name || ''
-  })
+  const [regionsSelect, setRegionsSelect] = useState([])
   const [selectNVR, setSelectedNVR] = useState('')
   const [nvrs, setNVR] = useState([])
   const [isOfflineSetting, setisOfflineSetting] = useState(false)
@@ -147,10 +144,10 @@ const Device = ({ onClose, nvr }) => {
       }))
       setNVR(nicTypes)
 
-      // Set selectedNicType here based on your business logic
-      if (nicTypes.length > 0) {
-        setSelectedNVR(nicTypes[0].id) // Set it to the first value in the array, or adjust as needed
-      }
+      // // Set selectedNicType here based on your business logic
+      // if (nicTypes.length > 0) {
+      //   setSelectedNVR(nicTypes[0].id) // Set it to the first value in the array, or adjust as needed
+      // }
     } catch (error) {
       console.error('Error fetching NIC types:', error)
     } finally {
@@ -161,6 +158,8 @@ const Device = ({ onClose, nvr }) => {
   const handleComboboxFocusDevice = () => {
     fetchNicTypesDevice()
   }
+
+  console.log(regionsSelect, 'regionsSelect')
 
   useEffect(() => {
     const fetchGroupData = async () => {
@@ -187,14 +186,18 @@ const Device = ({ onClose, nvr }) => {
             label: response.data.box?.name || ''
           })
           setSelectedProtocol({
-            name: response.data.protocol || ''
+            name: response.data.Protocol || ''
           })
           setIdBox({
             value: response.data.box?.id || '',
             label: response.data.box?.name || ''
           })
+          setRegionsSelect({
+            id: response.data.siteInfo?.id || '',
+            name: response.data.siteInfo?.name || ''
+          })
           setHttp(response.data.httpPort)
-          setOnvif(response.data.onvif)
+          setOnvif(response.data.onvifPort)
           console.log(nvr)
           setLat(response.data.lat)
           setLng(response.data.long)
@@ -245,6 +248,10 @@ const Device = ({ onClose, nvr }) => {
         box: {
           id: idBox.value,
           name: idBox.label
+        },
+        siteInfo: {
+          id: regionsSelect.id,
+          name: regionsSelect.name
         },
         protocol: selectedProtocol.name || '',
         isOfflineSetting: isOfflineSetting
@@ -315,15 +322,9 @@ const Device = ({ onClose, nvr }) => {
 
       const nicTypes = response.data.map(item => ({
         id: item.id,
-        name: item.name,
-        label: item.name,
-        value: item.value
+        name: item.name
       }))
       setRegions(nicTypes)
-      console.log(nicTypes)
-      if (nicTypes.length > 0) {
-        setRegionsSelect(nicTypes[0].value)
-      }
     } catch (error) {
       console.error('Error fetching NIC types:', error)
     } finally {
@@ -438,8 +439,8 @@ const Device = ({ onClose, nvr }) => {
             <Autocomplete
               value={regionsSelect || ''}
               onChange={handleRegionsChange}
-              options={regions}
-              getOptionLabel={option => option.label}
+              options={regions || ''}
+              getOptionLabel={option => option.name}
               renderInput={params => <CustomTextField {...params} label='Region' fullWidth />}
               onFocus={handleComboboxFocusRegions}
             />{' '}
