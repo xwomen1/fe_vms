@@ -29,7 +29,7 @@ import Swal from 'sweetalert2'
 import ReactMapGL, { Marker, Popup } from '@goongmaps/goong-map-react'
 import { MapPin } from 'tabler-icons-react'
 
-const Device = ({ onClose, nvr }) => {
+const Device = ({ onClose, nvr, setReload }) => {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -271,7 +271,7 @@ const Device = ({ onClose, nvr }) => {
           }
         }
       })
-
+      setReload()
       onClose()
     } catch (error) {
       console.error(error)

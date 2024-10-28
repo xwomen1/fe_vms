@@ -437,7 +437,7 @@ const UserList = ({ apiData }) => {
                         </Box>
                       ),
                       endAdornment: (
-                        <IconButton size='small' title='Clear' aria-label='Clear'>
+                        <IconButton size='small' title='Clear' aria-label='Clear' onClick={() => setValue('')}>
                           <Icon fontSize='1.25rem' icon='tabler:x' />
                         </IconButton>
                       )

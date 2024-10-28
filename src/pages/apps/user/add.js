@@ -987,13 +987,25 @@ const Add = () => {
                 <Typography variant='h5'>Create Login Account</Typography>
               </Grid>
               <Grid item xs={4}>
-                <TextField label='Account*' onChange={handleAccountChange} fullWidth />
+                <TextField autoComplete='new-password' label='Account*' onChange={handleAccountChange} fullWidth />
               </Grid>
               <Grid item xs={4}>
-                <TextField label='Password*' type='password' onChange={handlePasswordChange} fullWidth />
+                <TextField
+                  autoComplete='new-password'
+                  label='Password*'
+                  type='password'
+                  onChange={handlePasswordChange}
+                  fullWidth
+                />
               </Grid>
               <Grid item xs={3.8}>
-                <TextField label='Confirm password*' type='password' onChange={handleConfirmPasswordChange} fullWidth />
+                <TextField
+                  autoComplete='new-password'
+                  label='Confirm password*'
+                  type='password'
+                  onChange={handleConfirmPasswordChange}
+                  fullWidth
+                />
               </Grid>
               <Grid item xs={2} style={{ marginTop: '1.1%' }}>
                 <FormControlLabel

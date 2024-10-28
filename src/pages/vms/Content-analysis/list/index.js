@@ -36,21 +36,22 @@ import ViewCameraPause from 'src/@core/components/camera/playbackpause'
 import Timeline from '../mocdata/timeline'
 import EventDetails from '../popups/eventDetails'
 import Add from '../popups/add'
+import Checkbox from '@mui/material/Checkbox'
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
-  '&:hover > .MuiTreeItem-content:not(.Mui-selected)': {
-    backgroundColor: theme.palette.action.hover
-  },
-  '& .MuiTreeItem-content': {
-    paddingRight: theme.spacing(3),
-    borderTopRightRadius: theme.spacing(4),
-    borderBottomRightRadius: theme.spacing(4),
-    fontWeight: theme.typography.fontWeightMedium
-  },
-  '& .MuiTreeItem-label': {
-    fontWeight: 'inherit',
-    paddingRight: theme.spacing(3)
-  },
+  // '&:hover > .MuiTreeItem-content:not(.Mui-selected)': {
+  //   backgroundColor: theme.palette.action.hover
+  // },
+  // '& .MuiTreeItem-content': {
+  //   paddingRight: theme.spacing(3),
+  //   borderTopRightRadius: theme.spacing(4),
+  //   borderBottomRightRadius: theme.spacing(4),
+  //   fontWeight: theme.typography.fontWeightMedium
+  // },
+  // '& .MuiTreeItem-label': {
+  //   fontWeight: 'inherit',
+  //   paddingRight: theme.spacing(3)
+  // },
   '& .MuiTreeItem-group': {
     marginLeft: 0,
     '& .MuiTreeItem-content': {
@@ -145,6 +146,7 @@ const ContentAnalysis = () => {
   const [idDelete, setIdDelete] = useState(null)
   const [startTimeCamera, setStartTimeCamera] = useState(null)
   const [endTimeCamera, setEndTimeCamera] = useState(null)
+  const [selectedCameras, setSelectedCameras] = useState([])
 
   const configWs = {
     bundlePolicy: 'max-bundle',
@@ -289,13 +291,14 @@ const ContentAnalysis = () => {
   }, [eventsData])
 
   const fetchDataList = async () => {
+    const deviceName = selectedCameras?.map(camera => camera.deviceName).join(',')
     const params = {
       ...configWs,
       params: {
         keyword: keyword || '',
         limit: pageSize,
         page: parseInt(page),
-        cameraName: camera.name,
+        cameraName: deviceName,
         startTime: startTimeCamera ? startTimeCamera.getTime() : null,
         endTime: endTimeCamera ? endTimeCamera.getTime() : null
       }
@@ -328,7 +331,7 @@ const ContentAnalysis = () => {
 
   useEffect(() => {
     fetchDataList()
-  }, [valueFilter, reload, keyword, page, pageSize, camera.name])
+  }, [valueFilter, reload, keyword, page, pageSize, camera.name, selectedCameras])
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage)
@@ -381,20 +384,45 @@ const ContentAnalysis = () => {
     setIdCameraSelected(camera.id)
   }
 
+  const handleCheckboxChange = (camera, checked) => {
+    setSelectedCameras(prevSelected => {
+      if (checked) {
+        // Thêm camera vào danh sách nếu được chọn
+        return [...prevSelected, camera]
+      } else {
+        // Xóa camera khỏi danh sách nếu bỏ chọn
+        return prevSelected.filter(item => item.id !== camera.id)
+      }
+    })
+  }
+
   const renderTree = group => {
     return (
       <StyledTreeItem key={group.id} nodeId={group.id} labelText={group.name} labelIcon='tabler:folder'>
         {group.cameras && group.cameras.length > 0
           ? group.cameras.map(camera => {
+              const isChecked = selectedCameras.some(item => item.id === camera.id)
+
               return (
                 <StyledTreeItem
                   key={camera.id}
                   nodeId={camera.id}
-                  color={camera?.status == true ? '#28c76f' : ''}
+                  color={camera.status ? '#28c76f' : ''}
                   textDirection={camera.id === idCameraSelected ? 'underline' : ''}
-                  labelText={camera.deviceName}
+                  labelText={
+                    <>
+                      <Checkbox
+                        checked={isChecked}
+                        onChange={e => handleCheckboxChange(camera, e.target.checked)}
+                        onClick={e => e.stopPropagation()}
+                      />
+                      <span onClick={() => handleCheckboxChange(camera, !isChecked)} style={{ cursor: 'pointer' }}>
+                        {camera.deviceName}
+                      </span>
+                    </>
+                  }
                   labelIcon='tabler:camera'
-                  onClick={() => handleSetCamera(camera)}
+                  onClick={() => handleCheckboxChange(camera, !isChecked)}
                 />
               )
             })
