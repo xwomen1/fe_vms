@@ -67,6 +67,8 @@ const Device = ({ onClose, nvr, setReload }) => {
     zoom: 14
   })
 
+  console.log(setReload, 'setReload')
+
   const handleLatitudeChange = event => {
     setLat(event.target.value)
   }

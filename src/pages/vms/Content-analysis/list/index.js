@@ -710,6 +710,7 @@ const ContentAnalysis = () => {
                     )
                   }}
                   onChange={e => handleSearch(e)}
+                  autoComplete='off'
                   sx={{
                     width: {
                       xs: 1,
@@ -729,8 +730,13 @@ const ContentAnalysis = () => {
                 <DatePicker
                   selected={startTimeCamera}
                   onChange={date => setStartTimeCamera(date)}
-                  placeholderText='Click to select a date'
-                  customInput={<CustomInput />}
+                  placeholderText='Click to select a date and time'
+                  customInput={<CustomTextField />}
+                  autoComplete='off'
+                  showTimeSelect
+                  timeFormat='HH:mm'
+                  timeIntervals={15}
+                  dateFormat='MMMM d, yyyy h:mm aa'
                 />
               </Grid>
 
@@ -742,8 +748,14 @@ const ContentAnalysis = () => {
                 <DatePicker
                   selected={endTimeCamera}
                   onChange={date => setEndTimeCamera(date)}
-                  placeholderText='Click to select a date'
-                  customInput={<CustomInput />}
+                  placeholderText='Click to select a date and time'
+                  customInput={<CustomTextField />}
+                  autoComplete='off'
+                  showTimeSelect
+                  timeFormat='HH:mm'
+                  timeIntervals={15}
+                  dateFormat='MMMM d, yyyy h:mm aa'
+                  minDate={startTimeCamera}
                 />
               </Grid>
               <Grid item>
@@ -780,6 +792,7 @@ const ContentAnalysis = () => {
                           </IconButton>
                         )
                       }}
+                      autoComplete='off'
                       onChange={e => handleSearchCamera(e)}
                       sx={{
                         width: {

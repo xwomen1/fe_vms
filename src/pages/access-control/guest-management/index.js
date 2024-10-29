@@ -546,14 +546,17 @@ const EventList = () => {
                 <DatePicker
                   selected={filterValues.startDate}
                   onChange={handleStartDateChange}
-                  dateFormat='dd/MM/yyyy'
+                  dateFormat='dd/MM/yyyy h:mm'
+                  showTimeSelect
+                  timeFormat='HH:mm'
+                  timeIntervals={15}
                   customInput={<CustomInput label='Start date' />}
                   popperProps={{
                     modifiers: [
                       {
                         name: 'preventOverflow',
                         options: {
-                          boundary: 'viewport' // Đảm bảo rằng DatePicker không bị cắt bởi viewport
+                          boundary: 'viewport'
                         }
                       }
                     ]
@@ -565,8 +568,12 @@ const EventList = () => {
                 <DatePicker
                   selected={filterValues.endDate}
                   onChange={handleEndDateChange}
-                  dateFormat='dd/MM/yyyy'
+                  dateFormat='dd/MM/yyyy h:mm'
+                  showTimeSelect
+                  timeFormat='HH:mm'
+                  timeIntervals={15}
                   customInput={<CustomInput label='End date' />}
+                  minDate={filterValues.startDate}
                   popperProps={{
                     modifiers: [
                       {

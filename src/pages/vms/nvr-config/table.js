@@ -50,7 +50,7 @@ const UserList = ({ apiData }) => {
   const [openPopupCloud, setOpenPopupCloud] = useState(false)
   const [openPopupConnectCamera, setOpenPopupConnectCamera] = useState(false)
   const [openPopupVideoConnectCamera, setOpenPopupVideoConnectCamera] = useState(false)
-
+  const [reload, setReload] = useState(0)
   const [selectedNvrId, setSelectedNvrId] = useState(null)
   const [addUserOpen, setAddUserOpen] = useState(false)
   const [assettype, setAssetType] = useState([])
@@ -152,7 +152,7 @@ const UserList = ({ apiData }) => {
       }
     }
     fetchFilteredOrAllUsers()
-  }, [page, pageSize, total, value])
+  }, [page, pageSize, total, value, reload])
 
   const handlePageChange = newPage => {
     setPage(newPage)
@@ -610,7 +610,12 @@ const UserList = ({ apiData }) => {
         )}
         {openPopupP && (
           <>
-            <Edit open={openPopupP} onClose={handleClosePPopup} nvr={selectedNvrId} />
+            <Edit
+              setReload={() => setReload(reload + 1)}
+              open={openPopupP}
+              onClose={handleClosePPopup}
+              nvr={selectedNvrId}
+            />
           </>
         )}
         {/* <Passwords open={openPopupP} onClose={handleClosePPopup} nvr={selectedIds} /> */}
