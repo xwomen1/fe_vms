@@ -41,6 +41,54 @@ const buildUrlWithToken = url => {
   return url
 }
 
+const columns1 = [
+  {
+    id: 1,
+    flex: 0.25,
+    maxWidth: 150,
+    align: 'center',
+    field: 'data',
+    label: 'Image',
+    renderCell: data => {
+      const value = data?.find(item => item.faceType === 'CENTER')
+
+      return (
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          <img
+            src={(value?.imageFileUrl)}
+            alt=''
+            style={{ width: 100, height: 100, objectFit: 'contain' }}
+          />
+        </Box>
+      )
+    }
+  },
+  {
+    id: 2,
+    flex: 0.15,
+    maxWidth: 150,
+    align: 'center',
+    field: 'member_id',
+    label: 'ID'
+  },
+  {
+    id: 3,
+    flex: 0.15,
+    maxWidth: 150,
+    align: 'center',
+    field: 'quality',
+    label: 'Quality'
+  },
+  {
+    id: 4,
+    flex: 0.15,
+    maxWidth: 150,
+    align: 'center',
+    field: 'distance',
+    label: 'Similarity level'
+  }
+]
+
 const columns = [
   {
     id: 1,
@@ -514,7 +562,7 @@ const Blacklist = () => {
                   <TableHead>
                     <TableRow>
                       <TableCell style={{ width: '20px' }}>NO.</TableCell>
-                      {columns.map(column => (
+                      {columns1.map(column => (
                         <TableCell key={column.id} align={column.align} sx={{ maxWidth: column.maxWidth }}>
                           {column.label}
                         </TableCell>
@@ -527,7 +575,7 @@ const Blacklist = () => {
                       return (
                         <TableRow hover tabIndex={-1} key={index}>
                           <TableCell>{index + 1}</TableCell>
-                          {columns.map(({ field, renderCell, align, maxWidth }) => {
+                          {columns1.map(({ field, renderCell, align, maxWidth }) => {
                             const value = row[field]
 
                             return (

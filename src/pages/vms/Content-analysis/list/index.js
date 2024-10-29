@@ -42,6 +42,7 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   '&:hover > .MuiTreeItem-content:not(.Mui-selected)': {
     backgroundColor: theme.palette.action.hover
   }
+
   // '& .MuiTreeItem-content': {
   //   paddingRight: theme.spacing(3),
   //   borderTopRightRadius: theme.spacing(4),
@@ -292,6 +293,7 @@ const ContentAnalysis = () => {
 
   const fetchDataList = async () => {
     const deviceName = selectedCameras?.map(camera => camera.deviceName).join(',')
+
     const params = {
       ...configWs,
       params: {
@@ -390,6 +392,7 @@ const ContentAnalysis = () => {
         // Thêm camera vào danh sách nếu được chọn
         setIdCameraSelected(camera.id)
         setCamera({ id: camera.id, name: camera.deviceName, channel: 'Sub' })
+
         return [...prevSelected, camera]
       } else {
         // Xóa camera khỏi danh sách nếu bỏ chọn
