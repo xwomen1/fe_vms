@@ -490,12 +490,14 @@ const UserList = ({ apiData }) => {
                     <TableCell sx={{ padding: '16px' }}>Phone Number </TableCell>
                     <TableCell sx={{ padding: '16px' }}>Department</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Contract Type</TableCell>
-
+                    <TableCell sx={{ padding: '16px' }}>Face Enable</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Card Enable</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Finger Enable</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Action</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {userData.map((user, index) => (
+                  {userData?.map((user, index) => (
                     <TableRow key={user.userId}>
                       <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
                       <TableCell sx={{ padding: '16px' }}>{user.accessCode}</TableCell>
@@ -503,10 +505,10 @@ const UserList = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{user.email}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{user.phoneNumber}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{user.userGroup[0]?.groupName}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>
-                        {contractTypes[user.contractType] || 'Không thời hạn'}
-                      </TableCell>
-
+                      <TableCell sx={{ padding: '16px' }}>{contractTypes[user.contractType] || 'Indefinite'}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{user?.faceEnable}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{user?.cardEnable}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{user?.fingerEnable}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>
                         <Grid container spacing={2}>
                           <IconButton

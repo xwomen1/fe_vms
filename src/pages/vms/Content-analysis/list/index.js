@@ -469,8 +469,10 @@ const ContentAnalysis = () => {
   }, [startDate, endDate])
 
   const fetchDateListTimeLine = async () => {
-    if (camera.id !== '') {
+    if (selectedCameras.length > 0) {
       setLoading(true)
+
+      const cameraIds = selectedCameras.map(camera => camera.id).join(',')
 
       const params = {
         startTime: convertDateToString1(startDate),
@@ -479,7 +481,7 @@ const ContentAnalysis = () => {
 
       try {
         const res = await getApi(
-          `https://sbs.basesystem.one/ivis/vms/api/v0/playback/camera/${camera.id}?startTime=${params.startTime}&endTime=${params.endTime}`
+          `https://sbs.basesystem.one/ivis/vms/api/v0/playback/camera/${cameraIds}?startTime=${params.startTime}&endTime=${params.endTime}`
         )
 
         const data = res.data.MatchList.map((item, index) => {
@@ -506,6 +508,8 @@ const ContentAnalysis = () => {
 
     const timeDistance = endTime - startTime
 
+    const cameraIds = selectedCameras.map(camera => camera.id).join(',')
+
     if (timeDistance <= 30 * 60 * 1000) {
       const params = []
       let length = 0
@@ -527,12 +531,12 @@ const ContentAnalysis = () => {
         })
       }
 
-      if (camera.id !== '') {
+      if (selectedCameras.length > 0) {
         try {
           const requests = params.map(async time => {
             try {
               const res = await axios.get(
-                `https://sbs.basesystem.one/ivis/vms/api/v0/video/download?idCamera=${camera.id}&startTime=${time.start}&endTime=${time.end}`
+                `https://sbs.basesystem.one/ivis/vms/api/v0/video/download?idCamera=${cameraIds}&startTime=${time.start}&endTime=${time.end}`
               )
               if (
                 res.data &&
