@@ -39,9 +39,9 @@ import Add from '../popups/add'
 import Checkbox from '@mui/material/Checkbox'
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
-  // '&:hover > .MuiTreeItem-content:not(.Mui-selected)': {
-  //   backgroundColor: theme.palette.action.hover
-  // },
+  '&:hover > .MuiTreeItem-content:not(.Mui-selected)': {
+    backgroundColor: theme.palette.action.hover
+  }
   // '& .MuiTreeItem-content': {
   //   paddingRight: theme.spacing(3),
   //   borderTopRightRadius: theme.spacing(4),
@@ -52,13 +52,13 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   //   fontWeight: 'inherit',
   //   paddingRight: theme.spacing(3)
   // },
-  '& .MuiTreeItem-group': {
-    marginLeft: 0,
-    '& .MuiTreeItem-content': {
-      paddingLeft: theme.spacing(4),
-      fontWeight: theme.typography.fontWeightRegular
-    }
-  }
+  // '& .MuiTreeItem-group': {
+  //   marginLeft: 0,
+  //   '& .MuiTreeItem-content': {
+  //     paddingLeft: theme.spacing(4),
+  //     fontWeight: theme.typography.fontWeightRegular
+  //   }
+  // }
 }))
 
 const StyledTreeItem = props => {
@@ -379,15 +379,17 @@ const ContentAnalysis = () => {
   }
   console.log(camera.id, camera.name, camera.channel, 'camera')
 
-  const handleSetCamera = camera => {
-    setCamera({ id: camera.id, name: camera.deviceName, channel: 'Sub' })
-    setIdCameraSelected(camera.id)
-  }
+  // const handleSetCamera = camera => {
+  //   setCamera({ id: camera.id, name: camera.deviceName, channel: 'Sub' })
+  //   setIdCameraSelected(camera.id)
+  // }
 
   const handleCheckboxChange = (camera, checked) => {
     setSelectedCameras(prevSelected => {
       if (checked) {
         // Thêm camera vào danh sách nếu được chọn
+        setIdCameraSelected(camera.id)
+        setCamera({ id: camera.id, name: camera.deviceName, channel: 'Sub' })
         return [...prevSelected, camera]
       } else {
         // Xóa camera khỏi danh sách nếu bỏ chọn
@@ -739,7 +741,7 @@ const ContentAnalysis = () => {
               </Grid>
               <Grid item>
                 <Button variant='contained' onClick={handleSearchClick}>
-                  Tìm kiếm
+                  Search
                 </Button>
               </Grid>
             </Grid>
