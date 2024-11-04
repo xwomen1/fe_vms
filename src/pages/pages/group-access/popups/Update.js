@@ -64,26 +64,52 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
 
   useEffect(() => {
     fetchAllData()
-    fetchGroupMembersData()
-    fetchDeviceGroups1()
   }, [])
 
-  const fetchDeviceGroups1 = async () => {
+  const fetchDeviceGroups = async () => {
     setLoading(true)
     try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+      const fetchChildGroups = async parentGroup => {
+        const childResponse = await axios.get(
+          `https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups/children-lv1?parentId=${parentGroup.id}`,
+          config
+        )
+        const childGroups = childResponse.data || []
+
+        const childGroupsWithParentInfo = await Promise.all(
+          childGroups.map(async child => {
+            const subChildGroups = await fetchChildGroups(child)
+
+            return {
+              ...child,
+              children: subChildGroups,
+              parentName: parentGroup.name,
+              parentId: parentGroup.id
+            }
+          })
+        )
+
+        return childGroupsWithParentInfo
       }
 
       const parentResponse = await axios.get(
-        'https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups/children-lv1?type=GUEST',
+        'https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups/children-lv1',
         config
       )
       const parentGroups = parentResponse.data || []
 
-      setDeviceGroups2(parentGroups)
+      const allGroups = await Promise.all(
+        parentGroups.map(async parentGroup => {
+          const childGroups = await fetchChildGroups(parentGroup)
+
+          return {
+            ...parentGroup,
+            children: childGroups
+          }
+        })
+      )
+
+      setDeviceGroups1(allGroups)
     } catch (error) {
       console.error('Error fetching device groups:', error)
       toast.error(error.message || 'Error fetching device groups')
@@ -92,52 +118,27 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
     }
   }
 
-  const fetchGroupMembersData = async () => {
-    try {
-      const response = await axios.get(
-        'https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups/children-lv1?parentId=59ad2698-329d-46d6-8bf5-2f11fb2dd974',
-        config
-      )
-
-      // Lưu dữ liệu vào state
-      setDeviceGroups1(response.data || [])
-    } catch (error) {
-      console.error('Error fetching group members data:', error)
-      toast.error(error.message)
-    }
-  }
-
   const fetchAllData = async () => {
     try {
-      // Gọi nhiều API cùng lúc
-      const [doorAccessResponse, userGroupsResponse, accessGroupResponse, guestGroupsResponse] = await Promise.all([
+      const [doorAccessResponse, accessGroupResponse] = await Promise.all([
         axios.get(
           'https://dev-ivi.basesystem.one/smc/access-control/api/v0/door-accesses?keyword=&limit=50&page=1',
           config
         ),
-        axios.get('https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups/children-lv1', config),
-        axios.get(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/access-groups/${id}`, config),
-        axios.get(
-          'https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups/children-lv1?type=GUEST',
-          config
-        ) // Thêm API nhóm khách
+        axios.get(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/access-groups/${id}`, config)
       ])
 
-      // Lưu dữ liệu vào state
       setData({
         doorAccesses: doorAccessResponse.data.rows || [],
-        userGroups: userGroupsResponse.data || [],
-        accessGroup: accessGroupResponse.data || {},
-        guestGroups: guestGroupsResponse.data[0] || [] // Lưu dữ liệu nhóm khách
+        accessGroup: accessGroupResponse.data || {}
       })
-      console.log(guestGroupsResponse.data[0], 'gúet')
 
-      const transformedDoorAccesses = accessGroupResponse.data.doorAccesses.map(item => ({
+      const transformedDoorAccesses = (accessGroupResponse.data.doorAccesses || []).map(item => ({
         objectId: item.objectId,
         name: item.objectName
       }))
 
-      const transformedUserGroups = accessGroupResponse.data.userGroups.map(item => ({
+      const transformedUserGroups = (accessGroupResponse.data.userGroups || []).map(item => ({
         objectId: item.objectId,
         name: item.objectName
       }))
@@ -148,27 +149,10 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
         userGroups: transformedUserGroups
       })
 
-      // Lấy danh sách userGroups.pathOfTrees (mảng các id)
-      const pathOfTrees = accessGroupResponse.data.userGroups.map(group => group.pathOfTrees).flat()
-
       // Gọi API cho từng parentId lấy từ pathOfTrees
     } catch (error) {
       console.error('Error fetching data:', error)
       toast.error(error.message)
-    }
-  }
-
-  const handleVautoClick = () => {
-    if (data) {
-      const doorAccessData = data.doorAccesses.filter(item => item.name.includes('Vauto'))
-      setFilteredDoorAccesses(doorAccessData)
-    }
-  }
-
-  const handleGroupMemberClick = () => {
-    if (data) {
-      const userGroupData = data.userGroups.filter(group => group.name.includes('Member'))
-      setFilteredUserGroups(userGroupData)
     }
   }
 
@@ -209,7 +193,12 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
   const flattenGroups = groups => {
     let flattened = []
     groups.forEach(group => {
-      flattened.push(group)
+      // Tạo bản sao của group và đổi id thành objectId
+      const groupWithObjectId = { ...group, objectId: group.id }
+      delete groupWithObjectId.id
+
+      flattened.push(groupWithObjectId)
+
       if (group.children && group.children.length > 0) {
         flattened = flattened.concat(flattenGroups(group.children))
       }
@@ -278,7 +267,7 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
                 multiple
                 options={data ? data.doorAccesses.map(item => ({ objectId: item.id, name: item.name })) : []}
                 value={accessGroup ? accessGroup.doorAccesses : []}
-                getOptionLabel={option => option.name}
+                getOptionLabel={option => option.name || 'No Name'}
                 isOptionEqualToValue={(option, value) => option.objectId === value.objectId}
                 onChange={(event, newValue) => {
                   setAccessGroup(prevDevice => ({
@@ -310,9 +299,9 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
             <Grid item xs={12}>
               <Autocomplete
                 multiple
-                options={deviceGroups1.map(item => ({ objectId: item.id, name: item.name }))}
+                options={flattenedDeviceGroups}
+                getOptionLabel={option => option.name || 'No Name'}
                 value={accessGroup ? accessGroup.userGroups : []}
-                getOptionLabel={option => option.name}
                 isOptionEqualToValue={(option, value) => option.objectId === value.objectId}
                 onChange={(event, newValue) => {
                   setAccessGroup(prevDevice => ({
@@ -323,6 +312,9 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
                     'userGroupIds',
                     newValue.map(item => item.objectId)
                   )
+                }}
+                onOpen={async () => {
+                  await fetchDeviceGroups()
                 }}
                 renderTags={(value, getTagProps) =>
                   value.map((option, index) => (
@@ -341,11 +333,12 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
                 loading={loading}
               />
             </Grid>
+
             <Grid item xs={6}>
               <Autocomplete
                 options={deviceGroups2}
                 value={accessGroup ? accessGroup.deviceKGroupId : []}
-                getOptionLabel={option => option.name}
+                getOptionLabel={option => option.name || 'No Name'}
                 onChange={(event, newValue) => {
                   if (newValue) {
                     handleInputChange('deviceKGroupId', newValue.id)

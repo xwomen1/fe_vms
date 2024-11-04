@@ -87,7 +87,6 @@ const AddGroupAccess = ({ show, onClose, setReload }) => {
 
   useEffect(() => {
     fetchDevice()
-    fetchDeviceGroups()
     fetchDeviceGroups1()
   }, [])
 
@@ -196,7 +195,7 @@ const AddGroupAccess = ({ show, onClose, setReload }) => {
       }
 
       const parentResponse = await axios.get(
-        'https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups/children-lv1?type=GUEST',
+        'https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups/children-lv1',
         config
       )
       const parentGroups = parentResponse.data || []
@@ -327,6 +326,9 @@ const AddGroupAccess = ({ show, onClose, setReload }) => {
                         <Chip key={option.id} label={option.name} {...getTagProps({ index })} />
                       ))
                     }
+                    onOpen={async () => {
+                      await fetchDeviceGroups()
+                    }}
                     renderInput={params => (
                       <CustomTextField
                         {...params}

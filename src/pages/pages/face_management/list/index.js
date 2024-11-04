@@ -392,7 +392,7 @@ const FaceManagement = () => {
                   >
                     <Icon icon='tabler:file-export' />
                   </Button>
-                  <Button variant='contained' style={{}} component={Link} href={`/pages/face_management/detail/add`}>
+                  <Button variant='contained' component={Link} href={`/pages/face_management/detail/add`}>
                     <Icon icon='tabler:plus' />
                     Add new
                   </Button>
@@ -410,7 +410,7 @@ const FaceManagement = () => {
                       </Box>
                     ),
                     endAdornment: (
-                      <IconButton size='small' title='Clear' aria-label='Clear'>
+                      <IconButton size='small' title='Clear' aria-label='Clear' onClick={() => setValue('')}>
                         <Icon fontSize='1.25rem' icon='tabler:x' />
                       </IconButton>
                     )
