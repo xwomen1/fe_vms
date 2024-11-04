@@ -473,7 +473,8 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
         name: values?.siteInfo?.name
       },
       box: {
-        id: values?.box?.value
+        id: values?.box?.value,
+        name: values?.box?.label
       },
       streams: [...rows]
     }

@@ -34,6 +34,7 @@ import toast from 'react-hot-toast'
 import * as XLSX from 'xlsx'
 import Checkbox from '@mui/material/Checkbox'
 import Link from 'next/link'
+import { format } from 'date-fns'
 
 const Car_management = () => {
   const [keyword, setKeyword] = useState('')
@@ -48,9 +49,6 @@ const Car_management = () => {
   const [pageSize, setPageSize] = useState(25)
   const [total, setTotal] = useState([1])
   const [page, setPage] = useState(1)
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [dialogTitle, setDialogTitle] = useState('')
-  const [dialogMessage, setDialogMessage] = useState('')
   const [isSuccess, setIsSuccess] = useState(false)
   const pageSizeOptions = [25, 50, 100]
 
@@ -108,10 +106,6 @@ const Car_management = () => {
     setSelectAll(checked)
   }
 
-  const handleDialogClose = () => {
-    setDialogOpen(false)
-  }
-
   const handleDeleteSelected = () => {
     showAlertConfirm({
       text: 'Do you want to delete it?'
@@ -132,19 +126,16 @@ const Car_management = () => {
           axios
             .delete(urlDelete, config)
             .then(() => {
-              setDialogTitle('Deleted successfully')
               setIsSuccess(true)
               const updatedData = userData.filter(user => user.id !== idDelete)
               setUserData(updatedData)
             })
             .catch(err => {
-              setDialogTitle('Delete failed')
-              setDialogMessage(err.message || 'Delete failed')
+              toast.error(err.message)
               setIsSuccess(false)
             })
             .finally(() => {
               setLoading(false)
-              setDialogOpen(true)
             })
         })
 
@@ -175,12 +166,12 @@ const Car_management = () => {
       const data = response.data.map(item => ({
         mainImageId: item.mainImageId,
         name: item.name,
-        time: item.time
+        lastAppearance: formatDate(item.lastAppearance)
       }))
 
       const exportData = [
         ['Image code', 'License plate', 'Last seen'],
-        ...data.map(item => [item.mainImageId, item.name, item.time])
+        ...data.map(item => [item.mainImageId, item.name, item.lastAppearance])
       ]
 
       const ws = XLSX.utils.aoa_to_sheet(exportData)
@@ -321,13 +312,10 @@ const Car_management = () => {
     })
   }
 
-  const buildUrlWithToken = url => {
-    const token = localStorage.getItem(authConfig.storageTokenKeyName)
-    if (token) {
-      return `${url}?token=${token}`
-    }
+  const formatDate = dateString => {
+    const date = new Date(dateString)
 
-    return url
+    return format(date, 'hh:mm:ss ')
   }
 
   const handlePageChange = newPage => {
@@ -346,12 +334,12 @@ const Car_management = () => {
             loaded
               ? { display: 'none' }
               : {
-                width: '100px',
-                height: '100px',
-                display: 'grid',
-                backgroundColor: '#C4C4C4',
-                placeItems: 'center'
-              }
+                  width: '100px',
+                  height: '100px',
+                  display: 'grid',
+                  backgroundColor: '#C4C4C4',
+                  placeItems: 'center'
+                }
           }
         >
           <CircularProgress size={20} />
@@ -383,10 +371,9 @@ const Car_management = () => {
                     <Button
                       aria-label='Delete'
                       style={{
-                        background: '#a9a9a9',
-                        color: '#ffffff',
                         marginRight: '5px'
                       }}
+                      variant='contained'
                       disabled={isDeleteDisabled}
                       onClick={handleDeleteSelected}
                     >
@@ -395,10 +382,9 @@ const Car_management = () => {
                     <Button
                       aria-label='export file'
                       style={{
-                        background: '#a9a9a9',
-                        color: '#ffffff',
                         marginRight: '5px'
                       }}
+                      variant='contained'
                       onClick={exportToExcel}
                     >
                       <Icon icon='tabler:file-export' />
@@ -421,7 +407,7 @@ const Car_management = () => {
                         </Box>
                       ),
                       endAdornment: (
-                        <IconButton size='small' title='Clear' aria-label='Clear'>
+                        <IconButton size='small' title='Clear' aria-label='Clear' onClick={() => setValue('')}>
                           <Icon fontSize='1.25rem' icon='tabler:x' />
                         </IconButton>
                       )
@@ -477,9 +463,7 @@ const Car_management = () => {
                         <TableCell align='center'>
                           {user && user.mainImageId.length > 0 ? (
                             <Img
-                              src={buildUrlWithToken(
-                                `https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${user.mainImageId}`
-                              )}
+                              src={user.mainImageUrl}
                               style={{ maxWidth: '91px', height: '56px', minWidth: '56px' }}
                             />
                           ) : (
@@ -492,7 +476,7 @@ const Car_management = () => {
                         <TableCell align='center'>{user.name}</TableCell>
                         <TableCell align='center'>{user.vehicleType}</TableCell>
 
-                        <TableCell align='center'>{user.lastAppearance}</TableCell>
+                        <TableCell align='center'>{formatDate(user.lastAppearance)}</TableCell>
                         <TableCell align='center'>
                           <div>
                             <CustomChip

@@ -17,6 +17,12 @@ const navigation = () => {
         },
 
         {
+          title: 'History Guest',
+          path: '/access-control/guest-management',
+          icon: 'tabler:align-box-bottom-left'
+        },
+
+        {
           title: 'Guest Appointment',
           path: '/pages/scheduling',
           icon: 'tabler:calendar-plus'

@@ -56,7 +56,12 @@ const EditFaceManagement = () => {
   }, [])
 
   useEffect(() => {
-    const listImg = imgs.map(img => img.urlImage)
+    const listImg = imgs.map(img => ({
+      id: img.id,
+      urlImage: img.urlImage,
+      name: img.name
+    }))
+
     setListImage(listImg)
   }, [imgs])
 
@@ -86,7 +91,13 @@ const EditFaceManagement = () => {
         setStatus1(response.data.status)
         setFileAvatarId(response.data.mainImageId)
         setListFileUpload(response.data.imgs)
-        setListFileId(imgs.map(img => img.id))
+        setListFileId(
+          imgs.map(img => ({
+            id: img.id,
+            urlImage: img.urlImage,
+            name: img.name
+          }))
+        )
         setListImage(imgs.map(img => img.imgs))
         setAvatarImage(response.data.mainImageUrl)
         setImgs(response.data.imgs)
@@ -128,9 +139,18 @@ const EditFaceManagement = () => {
           const imgs = [...response.data.imgs]
           setStatus1(response.data.status)
           setTitle1(response.data?.type)
-          setFileAvatarId(response.data.mainImageId)
-          setListFileUpload(imgs.map(img => img.imgs))
-          setListFileId(imgs.map(img => img.id))
+          setFileAvatarId({
+            mainImageId: response.data.mainImageId,
+            mainImageUrl: response.data.mainImageUrl
+          })
+          setListFileUpload(response.data?.imgs)
+          setListFileId(
+            imgs.map(img => ({
+              id: img.id,
+              urlImage: img.urlImage,
+              name: img.name
+            }))
+          )
           setListImage(imgs.map(img => img.imgs))
           setAvatarImage(response.data.mainImageUrl)
           setImg0(imgs[0]?.urlImage)
@@ -153,47 +173,20 @@ const EditFaceManagement = () => {
     fetchFilteredOrAllUsers()
   }, [id])
 
-  const fetchChildData = useCallback(async parentId => {
+  const fetchChildData = useCallback(async parentCode => {
     try {
       const response = await axios.get(
-        `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`
+        `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=${parentCode}`
       )
 
       return response.data
     } catch (error) {
       console.error('Error fetching child data:', error)
+      toast.error(error)
 
       return []
     }
   }, [])
-
-  const fetchAllChildData = useCallback(
-    async (parentId, level = 0) => {
-      let result = []
-      setLoading(true)
-
-      const recurseFetch = async (parentId, level) => {
-        const childData = await fetchChildData(parentId)
-        for (const child of childData) {
-          result.push({ code: child.code, name: child.name, id: child.id, level })
-          if (child.isParent) {
-            await recurseFetch(child.id, level + 1)
-          }
-        }
-      }
-
-      try {
-        await recurseFetch(parentId, level)
-      } catch (error) {
-        console.error('Error fetching all child data:', error)
-      } finally {
-        setLoading(false)
-      }
-
-      return result
-    },
-    [fetchChildData]
-  )
 
   const fetchInitialData = useCallback(async () => {
     try {
@@ -201,14 +194,17 @@ const EditFaceManagement = () => {
         'https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/code?code=person_specify&sort=%2Bcreated_at&page=1'
       )
       const parentData = response.data[0]
-      if (parentData.isParent) {
-        const allChildData = await fetchAllChildData(parentData.id, 0)
-        setPerson(allChildData)
-      }
+
+      const allChildData = await fetchChildData(parentData.code)
+
+      const childDataOnly = allChildData.filter(child => child.code !== parentData.code)
+
+      setPerson(childDataOnly)
     } catch (error) {
       console.error('Error fetching initial data:', error)
+      toast.error(error)
     }
-  }, [fetchAllChildData, title1])
+  }, [fetchChildData])
 
   useEffect(() => {
     fetchInitialData()
@@ -227,6 +223,7 @@ const EditFaceManagement = () => {
 
   const handleUpdate = async () => {
     setLoading(true)
+
     if (!selectedOption) {
       setErrorType(true)
       setLoading(false)
@@ -247,10 +244,12 @@ const EditFaceManagement = () => {
         name: name,
         note: note,
         status: status1,
-        mainImageId: fileAvatarId,
-        imgs: listFileId.map(id => ({
-          id: id,
-          urlImage: listFileUrl[id]
+        mainImageId: fileAvatarId.mainImageId || fileAvatarId.id,
+        mainImageUrl: fileAvatarId.mainImageUrl || fileAvatarId.urlImage,
+        imgs: listFileId.map((id, index) => ({
+          id: id.id,
+          name: id.name,
+          urlImage: id.urlImage
         })),
         type: {
           id: title1.id,
@@ -293,90 +292,57 @@ const EditFaceManagement = () => {
     }
   }
 
-  const selectedOption = person.find(option => option.id === title1?.id)
+  const selectedOption = person.find(option => option.code === title1?.code)
 
   const onDragDropImage = async () => {
-    // Open file picker dialog
     const files = await filePickerDialog()
 
     if (files.length > 0) {
-      if (files.length + listFileUpload.length > 5) {
-        // Handle maximum file limit exceeded
+      if (files.length + listImage.length > 5) {
         Swal.fire({
           text: 'Up to 5 images',
           icon: 'error',
-          showCancelButton: false,
-          showCloseButton: false,
-          showConfirmButton: true,
-          focusConfirm: true,
           confirmButtonColor: '#40a574',
           confirmButtonText: 'Close',
-          customClass: {
-            content: 'content-class'
-          }
+          customClass: { content: 'content-class' }
         })
       } else {
-        // Prepare FormData for file upload
-        const formData = new FormData()
-        files.forEach(file => {
-          formData.append('files[]', file) // Thêm tệp vào FormData với tên trường là 'files[]'
-        })
-        console.log(Array.from(formData.entries()), 'FormData entries') // Ghi lại nội dung của FormData
-
-        // Display loading indicator
         setShowLoading(true)
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+        const config = { headers: { Authorization: `Bearer ${token}` } }
 
-        try {
-          // Fetch token from local storage
-          const token = localStorage.getItem(authConfig.storageTokenKeyName)
+        const newImageUrls = [...listImage] // Bắt đầu với các URL hiện có
 
-          // Prepare headers for API request
-          const config = {
-            headers: {
-              Authorization: `Bearer ${token}`
+        for (const file of files) {
+          const formData = new FormData()
+          formData.append('files', file)
+
+          try {
+            const res = await axios.post('https://sbs.basesystem.one/ivis/vms/api/v0/images/upload', formData, config)
+            if (res.data) {
+              newImageUrls.push({
+                id: res.data.id,
+                name: res.data.name,
+                urlImage: res.data.urlImage
+              })
             }
+          } catch (error) {
+            console.error('Error occurred during upload:', error.response || error.message)
+            Swal.fire({
+              text: 'Upload failed: ' + (error.response ? error.response.data.message : error.message),
+              icon: 'error',
+              confirmButtonColor: '#40a574',
+              confirmButtonText: 'Close',
+              customClass: { content: 'content-class' }
+            })
           }
-
-          // Send POST request to upload files
-          const response = await axios.post(
-            `https://sbs.basesystem.one/ivis/vms/api/v0/images/upload`,
-            formData,
-            config
-          )
-
-          // Kiểm tra phản hồi
-          console.log(response.data, 'response data')
-
-          if (response.data && Array.isArray(response.data)) {
-            // Update listFileUpload with new file URLs
-            const newFiles = response.data.map(file =>
-              buildUrlWithToken(`https://sbs.basesystem.one/ivis/storage/api/v0/libraries/download/${file.id}`)
-            )
-
-            setListFileUpload([...listFileUpload, ...newFiles])
-
-            // Update listFileId with new file IDs
-            const newFileIds = response.data.map(file => file.id)
-            setListFileId([...listFileId, ...newFileIds.slice(0, 5 - listFileId.length)]) // Limit to 5 files
-          } else {
-            console.error('Unexpected response format:', response.data)
-          }
-        } catch (error) {
-          console.error('Error occurred during upload:', error.response || error.message)
-
-          Swal.fire({
-            text: 'Upload failed: ' + (error.response ? error.response.data.message : error.message),
-            icon: 'error',
-            confirmButtonColor: '#40a574',
-            confirmButtonText: 'Close',
-            customClass: {
-              content: 'content-class'
-            }
-          })
-        } finally {
-          // Hide loading indicator
-          setShowLoading(false)
         }
+
+        // Cập nhật listImage với tối đa 5 URL
+        setListImage(newImageUrls.slice(0, 5))
+        setListFileUpload(newImageUrls.slice(0, 5))
+        setListFileId(newImageUrls.slice(0, 5))
+        setShowLoading(false)
       }
     }
   }
@@ -480,12 +446,12 @@ const EditFaceManagement = () => {
                     >
                       <img
                         alt=''
-                        src={avatarImage}
+                        src={avatarImage || fileAvatarId?.urlImage}
                         style={{
-                          marginBottom: `${avatarImage ? '' : '-10%'}`,
+                          marginBottom: `${avatarImage || fileAvatarId?.urlImage ? '' : '-10%'}`,
                           objectFit: 'contain',
-                          width: `${avatarImage ? '100%' : ''}`,
-                          height: `${avatarImage ? '100%' : ''}`
+                          width: `${avatarImage || fileAvatarId?.urlImage ? '100%' : ''}`,
+                          height: `${avatarImage || fileAvatarId?.urlImage ? '100%' : ''}`
                         }}
                       />
                     </div>
@@ -566,7 +532,6 @@ const EditFaceManagement = () => {
                   >
                     Object Type
                   </p>
-                  {console.log(title1)}
                   <Autocomplete
                     value={title1}
                     options={person}
@@ -624,18 +589,20 @@ const EditFaceManagement = () => {
                         {listImage[index] ? (
                           <img
                             alt=''
-                            src={listImage[index]}
+                            src={listImage[index].urlImage}
                             style={{
                               objectFit: 'contain',
                               width: '100%',
                               borderRadius: '8px',
                               height: '100%'
                             }}
+                            onDoubleClick={() => setFileAvatarId(listImage[index])}
                           />
                         ) : (
                           MaskGroup
                         )}
                       </div>
+
                       <div style={{ display: 'flex', marginTop: '5%', marginLeft: '15%' }}>
                         {index > 0 && !listImage[index - 1] && !listImage[index] ? (
                           <Button variant='contained' style={{ marginLeft: '20%' }} disabled>
@@ -654,24 +621,24 @@ const EditFaceManagement = () => {
                             <Icon icon='tabler:plus' />
                           </Button>
                         )}
+
                         {listImage[index] ? (
                           <Button
                             variant='contained'
                             onClick={() => {
                               const listFileUploadImgId = [...listFileId]
                               const listFileUploadTmp = [...listImage]
-                              console.log(listFileUploadImgId, 'listFileUploadImgId')
-                              console.log(listFileUploadTmp, 'listFileUploadTmp')
 
-                              const indexId = listFileUploadTmp.indexOf(index)
-                              console.log(indexId, 'indexId')
-                              listFileUploadImgId.splice(indexId, 1)
-                              listFileUploadTmp.splice(indexId, 1)
-                              console.log(listFileUploadImgId, 'listFileUploadImgId')
-                              console.log(listFileUploadTmp, 'listFileUploadTmp')
-                              setListFileId(listFileUploadImgId)
-                              setListFileUpload(listFileUploadTmp)
-                              setListImage(listFileUploadTmp)
+                              // Tìm index của ảnh cần xóa
+                              const indexId = listFileUploadTmp.findIndex(img => img.id === listImage[index].id)
+
+                              if (indexId !== -1) {
+                                listFileUploadImgId.splice(indexId, 1)
+                                listFileUploadTmp.splice(indexId, 1)
+                                setListFileId(listFileUploadImgId)
+                                setListFileUpload(listFileUploadTmp)
+                                setListImage(listFileUploadTmp)
+                              }
                             }}
                             style={{ marginLeft: '5%' }}
                           >

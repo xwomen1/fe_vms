@@ -779,10 +779,12 @@ const Add = () => {
                       selected={dateTime}
                       timeIntervals={15}
                       showTimeSelectOnly
-                      dateFormat='h:mm '
+                      dateFormat='HH:mm' // Hiển thị theo định dạng 24 giờ
+                      timeFormat='HH:mm' // Định dạng giờ 24 giờ
                       id='time-only-picker'
                       onChange={date => handleTimeChange(date)}
                       customInput={<CustomInput />}
+                      timeCaption='Time' // Chú thích giờ
                     />
                   </div>
                 </Box>
@@ -797,7 +799,9 @@ const Add = () => {
                       selected={timeEndMorning}
                       timeIntervals={15}
                       showTimeSelectOnly
-                      dateFormat='h:mm '
+                      dateFormat='HH:mm' // Hiển thị theo định dạng 24 giờ
+                      timeFormat='HH:mm' // Định dạng giờ 24 giờ
+                      timeCaption='Time' // Chú thích giờ
                       id='time-only-picker'
                       onChange={date => handleTimeEndMorningChange(date)}
                       customInput={<CustomInput />}
@@ -818,7 +822,9 @@ const Add = () => {
                       selected={timeStartAfternoon}
                       timeIntervals={15}
                       showTimeSelectOnly
-                      dateFormat='h:mm '
+                      dateFormat='HH:mm' // Hiển thị theo định dạng 24 giờ
+                      timeFormat='HH:mm' // Định dạng giờ 24 giờ
+                      timeCaption='Time' // Chú thích giờ
                       id='time-only-picker'
                       onChange={date => handleTimeStartAfetrnoonChange(date)}
                       customInput={<CustomInput />}
@@ -836,7 +842,9 @@ const Add = () => {
                       selected={timeEndAfternoon}
                       timeIntervals={15}
                       showTimeSelectOnly
-                      dateFormat='h:mm '
+                      dateFormat='HH:mm' // Hiển thị theo định dạng 24 giờ
+                      timeFormat='HH:mm' // Định dạng giờ 24 giờ
+                      timeCaption='Time' // Chú thích giờ
                       id='time-only-picker'
                       onChange={date => handleTimeEndAfternoonChange(date)}
                       customInput={<CustomInput />}
@@ -979,13 +987,25 @@ const Add = () => {
                 <Typography variant='h5'>Create Login Account</Typography>
               </Grid>
               <Grid item xs={4}>
-                <TextField label='Account*' onChange={handleAccountChange} fullWidth />
+                <TextField autoComplete='new-password' label='Account*' onChange={handleAccountChange} fullWidth />
               </Grid>
               <Grid item xs={4}>
-                <TextField label='Password*' type='password' onChange={handlePasswordChange} fullWidth />
+                <TextField
+                  autoComplete='new-password'
+                  label='Password*'
+                  type='password'
+                  onChange={handlePasswordChange}
+                  fullWidth
+                />
               </Grid>
               <Grid item xs={3.8}>
-                <TextField label='Confirm password*' type='password' onChange={handleConfirmPasswordChange} fullWidth />
+                <TextField
+                  autoComplete='new-password'
+                  label='Confirm password*'
+                  type='password'
+                  onChange={handleConfirmPasswordChange}
+                  fullWidth
+                />
               </Grid>
               <Grid item xs={2} style={{ marginTop: '1.1%' }}>
                 <FormControlLabel

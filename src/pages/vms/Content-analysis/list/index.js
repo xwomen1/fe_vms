@@ -36,28 +36,30 @@ import ViewCameraPause from 'src/@core/components/camera/playbackpause'
 import Timeline from '../mocdata/timeline'
 import EventDetails from '../popups/eventDetails'
 import Add from '../popups/add'
+import Checkbox from '@mui/material/Checkbox'
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   '&:hover > .MuiTreeItem-content:not(.Mui-selected)': {
     backgroundColor: theme.palette.action.hover
-  },
-  '& .MuiTreeItem-content': {
-    paddingRight: theme.spacing(3),
-    borderTopRightRadius: theme.spacing(4),
-    borderBottomRightRadius: theme.spacing(4),
-    fontWeight: theme.typography.fontWeightMedium
-  },
-  '& .MuiTreeItem-label': {
-    fontWeight: 'inherit',
-    paddingRight: theme.spacing(3)
-  },
-  '& .MuiTreeItem-group': {
-    marginLeft: 0,
-    '& .MuiTreeItem-content': {
-      paddingLeft: theme.spacing(4),
-      fontWeight: theme.typography.fontWeightRegular
-    }
   }
+
+  // '& .MuiTreeItem-content': {
+  //   paddingRight: theme.spacing(3),
+  //   borderTopRightRadius: theme.spacing(4),
+  //   borderBottomRightRadius: theme.spacing(4),
+  //   fontWeight: theme.typography.fontWeightMedium
+  // },
+  // '& .MuiTreeItem-label': {
+  //   fontWeight: 'inherit',
+  //   paddingRight: theme.spacing(3)
+  // },
+  // '& .MuiTreeItem-group': {
+  //   marginLeft: 0,
+  //   '& .MuiTreeItem-content': {
+  //     paddingLeft: theme.spacing(4),
+  //     fontWeight: theme.typography.fontWeightRegular
+  //   }
+  // }
 }))
 
 const StyledTreeItem = props => {
@@ -145,6 +147,7 @@ const ContentAnalysis = () => {
   const [idDelete, setIdDelete] = useState(null)
   const [startTimeCamera, setStartTimeCamera] = useState(null)
   const [endTimeCamera, setEndTimeCamera] = useState(null)
+  const [selectedCameras, setSelectedCameras] = useState([])
 
   const configWs = {
     bundlePolicy: 'max-bundle',
@@ -289,13 +292,15 @@ const ContentAnalysis = () => {
   }, [eventsData])
 
   const fetchDataList = async () => {
+    const deviceName = selectedCameras?.map(camera => camera.deviceName).join(',')
+
     const params = {
       ...configWs,
       params: {
         keyword: keyword || '',
         limit: pageSize,
         page: parseInt(page),
-        cameraName: camera.name,
+        cameraName: deviceName,
         startTime: startTimeCamera ? startTimeCamera.getTime() : null,
         endTime: endTimeCamera ? endTimeCamera.getTime() : null
       }
@@ -328,7 +333,7 @@ const ContentAnalysis = () => {
 
   useEffect(() => {
     fetchDataList()
-  }, [valueFilter, reload, keyword, page, pageSize, camera.name])
+  }, [valueFilter, reload, keyword, page, pageSize, camera.name, selectedCameras])
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage)
@@ -376,9 +381,24 @@ const ContentAnalysis = () => {
   }
   console.log(camera.id, camera.name, camera.channel, 'camera')
 
-  const handleSetCamera = camera => {
-    setCamera({ id: camera.id, name: camera.deviceName, channel: 'Sub' })
-    setIdCameraSelected(camera.id)
+  // const handleSetCamera = camera => {
+  //   setCamera({ id: camera.id, name: camera.deviceName, channel: 'Sub' })
+  //   setIdCameraSelected(camera.id)
+  // }
+
+  const handleCheckboxChange = (camera, checked) => {
+    setSelectedCameras(prevSelected => {
+      if (checked) {
+        // Thêm camera vào danh sách nếu được chọn
+        setIdCameraSelected(camera.id)
+        setCamera({ id: camera.id, name: camera.deviceName, channel: 'Sub' })
+
+        return [...prevSelected, camera]
+      } else {
+        // Xóa camera khỏi danh sách nếu bỏ chọn
+        return prevSelected.filter(item => item.id !== camera.id)
+      }
+    })
   }
 
   const renderTree = group => {
@@ -386,15 +406,28 @@ const ContentAnalysis = () => {
       <StyledTreeItem key={group.id} nodeId={group.id} labelText={group.name} labelIcon='tabler:folder'>
         {group.cameras && group.cameras.length > 0
           ? group.cameras.map(camera => {
+              const isChecked = selectedCameras.some(item => item.id === camera.id)
+
               return (
                 <StyledTreeItem
                   key={camera.id}
                   nodeId={camera.id}
-                  color={camera?.status == true ? '#28c76f' : ''}
+                  color={camera.status ? '#28c76f' : ''}
                   textDirection={camera.id === idCameraSelected ? 'underline' : ''}
-                  labelText={camera.deviceName}
+                  labelText={
+                    <>
+                      <Checkbox
+                        checked={isChecked}
+                        onChange={e => handleCheckboxChange(camera, e.target.checked)}
+                        onClick={e => e.stopPropagation()}
+                      />
+                      <span onClick={() => handleCheckboxChange(camera, !isChecked)} style={{ cursor: 'pointer' }}>
+                        {camera.deviceName}
+                      </span>
+                    </>
+                  }
                   labelIcon='tabler:camera'
-                  onClick={() => handleSetCamera(camera)}
+                  onClick={() => handleCheckboxChange(camera, !isChecked)}
                 />
               )
             })
@@ -436,8 +469,10 @@ const ContentAnalysis = () => {
   }, [startDate, endDate])
 
   const fetchDateListTimeLine = async () => {
-    if (camera.id !== '') {
+    if (selectedCameras.length > 0) {
       setLoading(true)
+
+      const cameraIds = selectedCameras.map(camera => camera.id).join(',')
 
       const params = {
         startTime: convertDateToString1(startDate),
@@ -446,7 +481,7 @@ const ContentAnalysis = () => {
 
       try {
         const res = await getApi(
-          `https://sbs.basesystem.one/ivis/vms/api/v0/playback/camera/${camera.id}?startTime=${params.startTime}&endTime=${params.endTime}`
+          `https://sbs.basesystem.one/ivis/vms/api/v0/playback/camera/${cameraIds}?startTime=${params.startTime}&endTime=${params.endTime}`
         )
 
         const data = res.data.MatchList.map((item, index) => {
@@ -473,6 +508,8 @@ const ContentAnalysis = () => {
 
     const timeDistance = endTime - startTime
 
+    const cameraIds = selectedCameras.map(camera => camera.id).join(',')
+
     if (timeDistance <= 30 * 60 * 1000) {
       const params = []
       let length = 0
@@ -494,12 +531,12 @@ const ContentAnalysis = () => {
         })
       }
 
-      if (camera.id !== '') {
+      if (selectedCameras.length > 0) {
         try {
           const requests = params.map(async time => {
             try {
               const res = await axios.get(
-                `https://sbs.basesystem.one/ivis/vms/api/v0/video/download?idCamera=${camera.id}&startTime=${time.start}&endTime=${time.end}`
+                `https://sbs.basesystem.one/ivis/vms/api/v0/video/download?idCamera=${cameraIds}&startTime=${time.start}&endTime=${time.end}`
               )
               if (
                 res.data &&
@@ -673,6 +710,7 @@ const ContentAnalysis = () => {
                     )
                   }}
                   onChange={e => handleSearch(e)}
+                  autoComplete='off'
                   sx={{
                     width: {
                       xs: 1,
@@ -692,8 +730,13 @@ const ContentAnalysis = () => {
                 <DatePicker
                   selected={startTimeCamera}
                   onChange={date => setStartTimeCamera(date)}
-                  placeholderText='Click to select a date'
-                  customInput={<CustomInput />}
+                  placeholderText='Click to select a date and time'
+                  customInput={<CustomTextField />}
+                  autoComplete='off'
+                  showTimeSelect
+                  timeFormat='HH:mm'
+                  timeIntervals={15}
+                  dateFormat='MMMM d, yyyy h:mm aa'
                 />
               </Grid>
 
@@ -705,13 +748,19 @@ const ContentAnalysis = () => {
                 <DatePicker
                   selected={endTimeCamera}
                   onChange={date => setEndTimeCamera(date)}
-                  placeholderText='Click to select a date'
-                  customInput={<CustomInput />}
+                  placeholderText='Click to select a date and time'
+                  customInput={<CustomTextField />}
+                  autoComplete='off'
+                  showTimeSelect
+                  timeFormat='HH:mm'
+                  timeIntervals={15}
+                  dateFormat='MMMM d, yyyy h:mm aa'
+                  minDate={startTimeCamera}
                 />
               </Grid>
               <Grid item>
                 <Button variant='contained' onClick={handleSearchClick}>
-                  Tìm kiếm
+                  Search
                 </Button>
               </Grid>
             </Grid>
@@ -743,6 +792,7 @@ const ContentAnalysis = () => {
                           </IconButton>
                         )
                       }}
+                      autoComplete='off'
                       onChange={e => handleSearchCamera(e)}
                       sx={{
                         width: {

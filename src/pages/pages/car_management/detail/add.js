@@ -50,8 +50,8 @@ const AddFaceManagement = () => {
   const [listImage, setListImage] = useState([])
   const [fileAvatarId, setFileAvatarId] = useState(null)
   const [listFileUpload, setListFileUpload] = useState([])
-  const [name, setName] = useState(null)
-  const [note, setNote] = useState(null)
+  const [name, setName] = useState('')
+  const [note, setNote] = useState('')
   const [type, setType] = useState('')
   const [showCropper, setShowCopper] = useState(false)
   const [isNameEntered, setIsNameEntered] = useState(false)
@@ -61,12 +61,7 @@ const AddFaceManagement = () => {
   const [fileAvatarImg, setFileAvatarImg] = useState(null)
   const ALLOWED_FILE_EXTENSIONS = ['.jpg', '.jpeg', '.gif', '.png']
   const [isDoubleClick, setIsDoubleClick] = useState(false)
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [dialogTitle, setDialogTitle] = useState('')
-  const [dialogMessage, setDialogMessage] = useState('')
-  const [isSuccess, setIsSuccess] = useState(false)
-  const [redirectUrl, setRedirectUrl] = useState('')
-  const [status1, setStatus1] = useState('')
+  const [status1, setStatus1] = useState(false)
 
   const handleInputChange = e => {
     const value = e.target.value
@@ -178,63 +173,65 @@ const AddFaceManagement = () => {
 
   const onDragDropImage = async e => {
     if (e.value.length > 0) {
-      if (e.value.length + listFileUpload.length > 5) {
-        Swal.fire({
-          text: 'Up to 5 images',
-          icon: 'error',
-          showCancelButton: false,
-          showCloseButton: false,
-          showConfirmButton: true,
-          focusConfirm: true,
-          confirmButtonColor: '#40a574',
-          confirmButtonText: 'Close',
-          customClass: {
-            content: 'content-class'
-          }
-        })
-      } else {
-        const files = listFileUpload.concat(e.value)
+      setShowLoading(true)
+      setLoading(true)
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
-        const formData = new FormData()
+      const config = {
+        headers: { Authorization: `Bearer ${token}` }
+      }
 
-        for (const file of files) {
+      const newFileData = []
+      const newListFileUpload = [...listFileUpload]
+
+      try {
+        for (const file of e.value) {
+          const formData = new FormData()
           formData.append('files', file)
-        }
-        setShowLoading(true)
 
-        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+          const res = await axios.post('https://sbs.basesystem.one/ivis/vms/api/v0/images/upload', formData, config)
+          console.log(res, 'res')
 
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
+          if (res.data) {
+            newFileData.push({
+              id: res.data.id,
+              name: res.data.name,
+              urlImage: res.data.urlImage
+            })
+            newListFileUpload.push(file)
+            console.log(newListFileUpload, 'newListFileUpload')
           }
         }
 
-        try {
-          const res = await axios.post(
-            `https://sbs.basesystem.one/ivis/storage/api/v0/libraries/upload/multi`,
-            formData,
-            config
-          )
-          setListFileUpload(files)
-
-          const fileIds = res.data.map(x => x.id)
-
-          const arr = [...listFileId, ...fileIds]
-
-          setListFileId([...arr].slice(0, 5))
-        } catch (error) {
-          console.error('Error occurred during upload:', error)
-        } finally {
-          setShowLoading(false)
+        // Kiểm tra số lượng hình ảnh sau khi thêm mới
+        if (newListFileUpload.length > 5) {
+          await Swal.fire({
+            text: 'Up to 5 images',
+            icon: 'error',
+            showCancelButton: false,
+            showCloseButton: false,
+            showConfirmButton: true,
+            focusConfirm: true,
+            confirmButtonColor: '#40a574',
+            confirmButtonText: 'Close',
+            customClass: { content: 'content-class' }
+          })
+        } else {
+          const updatedFileData = [...listFileId, ...newFileData].slice(0, 5)
+          setListFileId(updatedFileData)
+          setListFileUpload(newListFileUpload.slice(0, 5))
         }
+      } catch (error) {
+        console.error('Error occurred during upload:', error)
+        toast.error(error)
+      } finally {
+        setLoading(false)
+        setShowLoading(false)
       }
-      if (fileUploader2?.current?.instance) {
-        fileUploader2.current.instance.reset()
-      }
-      if (fileUploader1?.current?.instance) {
-        fileUploader1.current.instance.reset()
-      }
+
+      // Reset file uploader sau khi tải lên
+      fileUploader2?.current?.instance?.reset()
+      fileUploader1?.current?.instance?.reset()
     }
   }
 
@@ -254,10 +251,12 @@ const AddFaceManagement = () => {
         name: name,
         vehicleType: type,
         status: status1,
-        mainImageId: fileAvatarId,
+        mainImageId: fileAvatarId.id,
+        mainImageUrl: fileAvatarId.urlImage,
         imgs: listFileId.map((id, index) => ({
-          id: id,
-          urlImage: listFileUrl[id]
+          id: id.id,
+          urlImage: id.urlImage,
+          name: id.name
         })),
         note: note
       }
@@ -325,7 +324,12 @@ const AddFaceManagement = () => {
                         >
                           Cancel
                         </Button>
-                        <Button disabled={!isNameEntered} onClick={handleAddBlacklist} variant='contained' color='primary'>
+                        <Button
+                          disabled={!isNameEntered}
+                          onClick={handleAddBlacklist}
+                          variant='contained'
+                          color='primary'
+                        >
                           Save
                         </Button>
                       </Box>

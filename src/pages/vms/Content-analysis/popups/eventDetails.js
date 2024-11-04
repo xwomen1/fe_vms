@@ -181,11 +181,11 @@ const EventDetails = ({ show, onClose, data, setReload }) => {
             pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
           }}
         >
-          {value === '1' && (
+          {/* {value === '1' && (
             <Button type='submit' variant='contained' onClick={() => handleDownloadFile()}>
               Export
             </Button>
-          )}
+          )} */}
           <Button variant='contained' onClick={onClose}>
             Close
           </Button>

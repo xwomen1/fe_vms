@@ -29,6 +29,7 @@ import Swal from 'sweetalert2'
 import ReactMapGL, { Marker, Popup } from '@goongmaps/goong-map-react'
 import { MapPin } from './MapPin'
 import DDNS from './DDNS'
+import toast from 'react-hot-toast'
 
 const CustomMapPin = () => (
   <svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' stroke='#002060' fill='#002060'>
@@ -277,13 +278,14 @@ const Device = ({ onClose, camera, setReload }) => {
           }
 
           const response = await axios.get(
-            `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/{idCamera}?idCamera=${camera}`,
+            `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/${camera}`,
             config
           )
 
           setDns(response.data.ddns)
         }
       } catch (error) {
+        toast.error(error?.response?.data?.message)
         console.error('Error fetching data:', error)
       }
     }

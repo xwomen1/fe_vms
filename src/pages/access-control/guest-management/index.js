@@ -43,7 +43,7 @@ import { makeStyles } from '@material-ui/core/styles'
 
 const EventList = () => {
   const [anchorEl, setAnchorEl] = useState(null)
-  const [totalPage, setTotalPage] = useState(0)
+  const [totalPage, setTotalPage] = useState([1])
   const [searchKeyword, setSearchKeyword] = useState('')
   const [page, setPage] = useState(1)
   const [devices, setDevices] = useState([])
@@ -261,7 +261,8 @@ const EventList = () => {
           deviceIds: filterValues.deviceIds,
           startDate: isoToEpoch(filterValues.startDate) || null,
           endDate: isoToEpoch(filterValues.endDate) || null,
-          groupId: filterValues.groupId || null // Thêm groupId vào params
+          groupId: filterValues.groupId || null, // Thêm groupId vào params,
+          listUserType: 'GUEST'
         }
       }
 
@@ -294,7 +295,8 @@ const EventList = () => {
           hostName: filterValues.hostName,
           startDate: isoToEpoch(filterValues.startDate) || null,
           endDate: isoToEpoch(filterValues.endDate) || null,
-          groupId: filterValues.groupId || null // Thêm groupId vào params
+          groupId: filterValues.groupId || null, // Thêm groupId vào params
+          listUserType: 'GUEST'
         }
       }
 
@@ -357,11 +359,12 @@ const EventList = () => {
     { id: 1, flex: 0.25, minWidth: 50, align: 'left', field: 'userName', label: 'Full Name' },
     { id: 2, flex: 0.15, minWidth: 150, align: 'left', field: 'accessCode', label: 'Access Code' },
     { id: 3, flex: 0.15, minWidth: 100, align: 'left', field: 'deviceDirection', label: 'Event' },
-    { id: 6, flex: 0.25, minWidth: 50, align: 'left', field: 'timeMin', label: 'Time ' },
+    { id: 4, flex: 0.25, minWidth: 50, align: 'left', field: 'timeMin', label: 'Time ' },
 
-    { id: 4, flex: 0.15, minWidth: 100, align: 'left', field: 'doorOut', label: 'Door' },
+    { id: 5, flex: 0.15, minWidth: 100, align: 'left', field: 'doorOut', label: 'Door' },
     { id: 6, flex: 0.25, minWidth: 50, align: 'left', field: 'timeMin', label: 'Device Name' },
-    { id: 7, flex: 0.25, minWidth: 50, align: 'left', field: 'timeMax', label: 'Device Type' }
+    { id: 7, flex: 0.25, minWidth: 50, align: 'left', field: 'timeMax', label: 'Device Type' },
+    { id: 8, flex: 0.25, minWidth: 50, align: 'left', field: 'userType', label: 'Type' }
   ]
 
   return (
@@ -371,7 +374,7 @@ const EventList = () => {
       <CardHeader
         title={
           <>
-            <Button variant='contained'>Event List</Button>
+            <Button variant='contained'>History Guest</Button>
           </>
         }
         titleTypographyProps={{ sx: { mb: [2, 0] } }}
@@ -410,7 +413,7 @@ const EventList = () => {
 
             <Grid item>
               <CustomTextField
-                placeholder='Enter event'
+                placeholder='History Guest'
                 value={searchKeyword}
                 onChange={e => setSearchKeyword(e.target.value)}
                 InputProps={{
@@ -473,6 +476,7 @@ const EventList = () => {
                       <TableCell>{row.hostName}</TableCell>
                       <TableCell>{row.deviceName}</TableCell>
                       <TableCell>{row.deviceGroupName}</TableCell>
+                      <TableCell>{row.userType}</TableCell>
 
                       {/* {columns.map(column => {
                         const value = row[column.field]

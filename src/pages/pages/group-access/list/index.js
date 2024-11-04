@@ -142,7 +142,6 @@ const GroupAccess = () => {
                         aria-label='Clear'
                         onClick={() => {
                           setSearchKeyword('')
-                          fetchDataList()
                         }}
                       >
                         <Icon fontSize='1.25rem' icon='tabler:x' />
