@@ -164,10 +164,7 @@ const navigation = () => {
           icon: 'tabler:category'
         },
 
-        // {
-        //   title: 'Xem trực tiếp 2',
-        //   path: '/vms/live-view-p2p-private'
-        // },
+       
         {
           title: 'Playback',
           path: '/vms/playback-camera',
@@ -182,6 +179,11 @@ const navigation = () => {
           title: 'AI Event',
           path: '/vms/events/view/eventList',
           icon: 'tabler:timeline-event-exclamation'
+        },
+        {
+          title: 'Face Searching',
+          path: '/vms/face-searching',
+          icon: 'tabler:eye-search'
         },
         {
           title: 'Human Event',
@@ -199,11 +201,7 @@ const navigation = () => {
           icon: 'tabler:timeline-event-exclamation'
         },
 
-        // {
-        //   title: 'Phát hiện đám đông',
-        //   path: '/vms/events',
-        //   icon: 'tabler:timeline-event-exclamation'
-        // },
+      
 
         {
           title: 'AI Map',

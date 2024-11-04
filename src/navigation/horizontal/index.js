@@ -184,6 +184,11 @@ const navigation = () => {
           icon: 'tabler:timeline-event-exclamation'
         },
         {
+          title: 'Face Searching',
+          path: '/vms/face-searching',
+          icon: 'tabler:eye-search'
+        },
+        {
           title: 'Human Event',
           path: '/vms/events/view/eventHuman',
           icon: 'tabler:timeline-event-exclamation'
