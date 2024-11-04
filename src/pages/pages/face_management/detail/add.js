@@ -170,6 +170,7 @@ const AddFaceManagement = () => {
       setShowLoading(true)
       setLoading(true)
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
       const config = {
         headers: { Authorization: `Bearer ${token}` }
       }
@@ -316,6 +317,7 @@ const AddFaceManagement = () => {
     } catch (error) {
       console.error('Error fetching child data:', error)
       toast.error(error)
+
       return []
     }
   }, [])

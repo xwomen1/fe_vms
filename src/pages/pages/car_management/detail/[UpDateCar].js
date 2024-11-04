@@ -167,6 +167,7 @@ const UpDateCar = () => {
       }
     }
   }
+
   const handleStatusChange = () => {
     setStatus1(status1 === true ? false : true)
   }

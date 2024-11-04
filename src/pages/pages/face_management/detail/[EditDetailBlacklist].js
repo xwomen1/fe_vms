@@ -183,6 +183,7 @@ const EditFaceManagement = () => {
     } catch (error) {
       console.error('Error fetching child data:', error)
       toast.error(error)
+
       return []
     }
   }, [])
