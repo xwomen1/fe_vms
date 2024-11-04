@@ -12,6 +12,7 @@ const CustomAutocomplete = forwardRef((props, ref) => {
     <Autocomplete
       {...props}
       ref={ref}
+      autoComplete='off'
       PaperComponent={props => <Paper {...props} className='custom-autocomplete-paper' />}
     />
   )

@@ -133,35 +133,54 @@ const AccessRight = () => {
   const fetchDataList = async () => {
     setLoading(true)
     setErrorMessage('')
+    let allData = []
+    let currentPage = 1
+    const limit = valueFilter.limit || 25
+
     try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        params: {
-          nameCalendar: value,
-          page: valueFilter.page,
-          limit: valueFilter.limit,
-          doorInId: valueFilter.doorInId || '',
-          doorOutId: valueFilter.doorOutId || '',
-          groupId: valueFilter.groupId || ''
+      while (true) {
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          params: {
+            nameCalendar: value,
+            page: currentPage,
+            limit: limit,
+            doorInId: valueFilter.doorInId || '',
+            doorOutId: valueFilter.doorOutId || '',
+            groupId: valueFilter.groupId || ''
+          }
+        }
+
+        const response = await axios.get(
+          `https://dev-ivi.basesystem.one/smc/access-control/api/v0/calendar/configuration/`,
+          config
+        )
+
+        const fetchedData = response.data.rows
+        if (fetchedData.length === 0) {
+          break
+        }
+        allData = [...allData, ...fetchedData]
+        currentPage++
+        if (fetchedData.length < limit) {
+          break
         }
       }
 
-      const response = await axios.get(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/calendar/configuration/`,
-        config
-      )
-
-      setDataList(response.data.rows)
+      setDataList(allData)
     } catch (error) {
-      console.error('Error fetching data3:', error.message)
+      console.error('Error fetching data:', error.message)
       setErrorMessage(`Không có dữ liệu ... (${error.message})`)
       toast.error(error.message)
     } finally {
       setLoading(false)
     }
   }
+
+  console.log(dataList, 'dataList')
+  console.log(rows, 'rows')
 
   const handleFilter = useCallback(val => {
     setValue(val)
@@ -173,6 +192,8 @@ const AccessRight = () => {
     let totalPages = 0
 
     totalRecords = dataList.reduce((acc, curr) => acc + curr.users.length, 0)
+    console.log(totalRecords, 'totalRecords')
+
     totalPages = Math.ceil(totalRecords / pageSize)
 
     const startIndex = (page - 1) * pageSize
@@ -310,7 +331,7 @@ const AccessRight = () => {
 
         <CardContent>
           <Grid container spacing={0}>
-            <TableContainer component={Paper} sx={{ maxHeight: 600 }}>
+            <TableContainer component={Paper} sx={{ maxHeight: '100%' }}>
               <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
                 <TableHead>
                   <TableRow>

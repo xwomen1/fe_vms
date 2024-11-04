@@ -63,7 +63,7 @@ const Network = ({ open, onClose, onSelect, camera }) => {
           }
 
           const response = await axios.get(
-            `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/{idCamera}?idCamera=${camera}`,
+            `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/${camera}`,
             config
           )
 

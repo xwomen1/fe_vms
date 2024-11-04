@@ -26,6 +26,10 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
   const [deviceGroups2, setDeviceGroups2] = useState([])
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
   const [accessGroup, setAccessGroup] = useState(null)
+  const [data, setData] = useState(null)
+  const [filteredDoorAccesses, setFilteredDoorAccesses] = useState([])
+  const [filteredUserGroups, setFilteredUserGroups] = useState([])
+  const [errors, setErrors] = useState({})
 
   const config = {
     headers: {
@@ -33,75 +37,34 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
     }
   }
 
+  const validateFields = () => {
+    const newErrors = {}
+
+    if (!accessGroup.name) {
+      newErrors.name = 'Group Name is required'
+    }
+
+    if (accessGroup.doorAccessIds?.length === 0) {
+      newErrors.doorAccessIds = 'Please select at least one Door Access'
+    }
+
+    if (accessGroup.userGroupIds?.length === 0) {
+      newErrors.userGroupIds = 'Please select at least one Member Group'
+    }
+
+    if (!accessGroup.description) {
+      newErrors.description = 'Description is required'
+    }
+
+    setErrors(newErrors)
+
+    // Return true if no errors
+    return Object.keys(newErrors).length === 0
+  }
+
   useEffect(() => {
-    if (show) {
-      fetchDataList1()
-      fetchDevice()
-      fetchDeviceGroups()
-      fetchDeviceGroups1()
-    }
-  }, [show])
-
-  const fetchDataList1 = async () => {
-    setLoading(true)
-    try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-
-      const response = await axios.get(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/access-groups/${id}`,
-        config
-      )
-
-      // Chuyển đổi dữ liệu từ objectName sang đối tượng có objectId và name
-      const transformedDoorAccesses = response.data.doorAccesses.map(item => ({
-        objectId: item.objectId,
-        name: item.objectName
-      }))
-
-      const transformedUserGroups = response.data.userGroups.map(item => ({
-        objectId: item.objectId,
-        name: item.objectName
-      }))
-
-      // Cập nhật state với dữ liệu đã chuyển đổi
-      setAccessGroup({
-        ...response.data,
-        doorAccesses: transformedDoorAccesses,
-        userGroups: transformedUserGroups
-      })
-    } catch (error) {
-      console.error('Error fetching data:', error)
-      toast.error(error.message)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const fetchDevice = async () => {
-    setLoading(true)
-    try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-
-      const parentResponse = await axios.get(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/door-accesses?keyword=&limit=50&page=1`,
-        config
-      )
-      setDeviceGroups(parentResponse.data?.rows)
-    } catch (error) {
-      console.error('Error fetching device groups:', error)
-      toast.error(error.message || 'Error fetching device groups')
-    } finally {
-      setLoading(false)
-    }
-  }
+    fetchAllData()
+  }, [])
 
   const fetchDeviceGroups = async () => {
     setLoading(true)
@@ -155,46 +118,46 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
     }
   }
 
-  const flattenGroups = groups => {
-    let flattened = []
-    groups.forEach(group => {
-      flattened.push(group)
-      if (group.children && group.children.length > 0) {
-        flattened = flattened.concat(flattenGroups(group.children))
-      }
-    })
-
-    return flattened
-  }
-
-  const flattenedDeviceGroups = flattenGroups(deviceGroups1)
-
-  const fetchDeviceGroups1 = async () => {
-    setLoading(true)
+  const fetchAllData = async () => {
     try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
+      const [doorAccessResponse, accessGroupResponse] = await Promise.all([
+        axios.get(
+          'https://dev-ivi.basesystem.one/smc/access-control/api/v0/door-accesses?keyword=&limit=50&page=1',
+          config
+        ),
+        axios.get(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/access-groups/${id}`, config)
+      ])
 
-      const parentResponse = await axios.get(
-        'https://dev-ivi.basesystem.one/smc/access-control/api/v0/user-groups/children-lv1?type=GUEST',
-        config
-      )
-      const parentGroups = parentResponse.data || []
+      setData({
+        doorAccesses: doorAccessResponse.data.rows || [],
+        accessGroup: accessGroupResponse.data || {}
+      })
 
-      setDeviceGroups2(parentGroups)
+      const transformedDoorAccesses = (accessGroupResponse.data.doorAccesses || []).map(item => ({
+        objectId: item.objectId,
+        name: item.objectName
+      }))
+
+      const transformedUserGroups = (accessGroupResponse.data.userGroups || []).map(item => ({
+        objectId: item.objectId,
+        name: item.objectName
+      }))
+
+      setAccessGroup({
+        ...accessGroupResponse.data,
+        doorAccesses: transformedDoorAccesses,
+        userGroups: transformedUserGroups
+      })
+
+      // Gọi API cho từng parentId lấy từ pathOfTrees
     } catch (error) {
-      console.error('Error fetching device groups:', error)
-      toast.error(error.message || 'Error fetching device groups')
-    } finally {
-      setLoading(false)
+      console.error('Error fetching data:', error)
+      toast.error(error.message)
     }
   }
-  console.log()
 
   const UpdateAccessGroup = async () => {
+    if (!validateFields()) return
     setLoading(true)
     try {
       const updateData = {
@@ -202,7 +165,7 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
         doorAccessIds: accessGroup.doorAccesses.map(item => item.objectId),
         name: accessGroup.name,
         userGroupIds: accessGroup.userGroups.map(item => item.objectId),
-        userIds: [] // Nếu bạn có dữ liệu userIds, bạn có thể thay đổi chỗ này
+        userIds: []
       }
 
       const response = await axios.put(
@@ -227,154 +190,191 @@ const DoorAccessUpdate = ({ show, onClose, id, setReload }) => {
     }))
   }
 
+  const flattenGroups = groups => {
+    let flattened = []
+    groups.forEach(group => {
+      // Tạo bản sao của group và đổi id thành objectId
+      const groupWithObjectId = { ...group, objectId: group.id }
+      delete groupWithObjectId.id
+
+      flattened.push(groupWithObjectId)
+
+      if (group.children && group.children.length > 0) {
+        flattened = flattened.concat(flattenGroups(group.children))
+      }
+    })
+
+    return flattened
+  }
+
+  const flattenedDeviceGroups = flattenGroups(deviceGroups1)
+
   return (
-    <>
-      <Card>
-        <Dialog
-          open={show}
-          maxWidth='md'
-          scroll='body'
-          TransitionComponent={Slide}
-          onClose={onClose}
-          sx={{ '& .MuiDialog-paper': { overflow: 'visible' } }}
+    <Card>
+      <Dialog
+        open={show}
+        maxWidth='md'
+        scroll='body'
+        TransitionComponent={Slide}
+        onClose={onClose}
+        sx={{ '& .MuiDialog-paper': { overflow: 'visible' } }}
+      >
+        <DialogContent
+          sx={{
+            pb: theme => `${theme.spacing(12)} !important`,
+            px: theme => [`${theme.spacing(20)} !important`, `${theme.spacing(12)} !important`],
+            pt: theme => [`${theme.spacing(20)} !important`, `${theme.spacing(12.5)} !important`]
+          }}
         >
-          <DialogContent
+          <Box
             sx={{
-              pb: theme => `${theme.spacing(12)} !important`,
-              px: theme => [`${theme.spacing(20)} !important`, `${theme.spacing(12)} !important`],
-              pt: theme => [`${theme.spacing(20)} !important`, `${theme.spacing(12.5)} !important`]
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              color: 'grey.500'
             }}
           >
-            <Box
-              sx={{
-                position: 'absolute',
-                top: 0,
-                right: 0,
-                color: 'grey.500'
-              }}
-            >
-              <IconButton onClick={onClose}>
-                <Icon icon='tabler:x' fontSize='1.25rem' />
-              </IconButton>
-            </Box>
-            <Typography variant='h3' sx={{ mb: 3 }}>
-              Detail
-            </Typography>
-            <Grid container spacing={1}>
-              <Grid item xs={6}>
-                <CustomTextField
-                  label='Name'
-                  value={accessGroup ? accessGroup.name : ''}
-                  onChange={e => handleInputChange('name', e.target.value)}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <CustomTextField
-                  label='Description'
-                  value={accessGroup ? accessGroup.description : ''}
-                  onChange={e => handleInputChange('description', e.target.value)}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Autocomplete
-                  multiple
-                  options={deviceGroups.map(item => ({ objectId: item.id, name: item.name }))}
-                  value={accessGroup ? accessGroup.doorAccesses : []}
-                  getOptionLabel={option => option.name}
-                  isOptionEqualToValue={(option, value) => option.objectId === value.objectId}
-                  onChange={(event, newValue) => {
-                    console.log(newValue.map(item => item.objectId))
-                    console.log(newValue, 'value')
-                    setAccessGroup(prevDevice => ({
-                      ...prevDevice,
-                      doorAccesses: newValue
-                    }))
-                    handleInputChange(
-                      'doorAccessIds',
-                      newValue.map(item => item.objectId)
-                    )
-                  }}
-                  renderTags={(value, getTagProps) =>
-                    value.map((option, index) => (
-                      <Chip key={option.objectId} label={option.name} {...getTagProps({ index })} />
-                    ))
-                  }
-                  renderInput={params => <CustomTextField {...params} label='Door Access' fullWidth />}
-                  loading={loading}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Autocomplete
-                  multiple
-                  options={flattenedDeviceGroups.map(item => ({ objectId: item.id, name: item.name }))}
-                  value={accessGroup ? accessGroup.userGroups : []}
-                  getOptionLabel={option => option.name}
-                  isOptionEqualToValue={(option, value) => option.objectId === value.objectId}
-                  onChange={(event, newValue) => {
-                    console.log(newValue.map(item => item.objectId))
-                    setAccessGroup(prevDevice => ({
-                      ...prevDevice,
-                      userGroups: newValue
-                    }))
-                    handleInputChange(
-                      'userGroupIds',
-                      newValue.map(item => item.objectId)
-                    )
-                  }}
-                  renderTags={(value, getTagProps) =>
-                    value.map((option, index) => (
-                      <Chip key={option.objectId} label={option.name} {...getTagProps({ index })} />
-                    ))
-                  }
-                  renderInput={params => <CustomTextField {...params} label='Group Member' fullWidth />}
-                  loading={loading}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <Autocomplete
-                  options={deviceGroups2}
-                  value={accessGroup ? accessGroup.deviceKGroupId : []}
-                  getOptionLabel={option => option.name}
-                  onChange={(event, newValue) => {
-                    console.log(newValue.id)
-                    if (newValue) {
-                      handleInputChange('deviceKGroupId', newValue.id)
-                    } else {
-                      handleInputChange('deviceKGroupId', null)
-                    }
-                  }}
-                  renderInput={params => <CustomTextField {...params} label='Group Guess' fullWidth />}
-                  loading={loading}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <Autocomplete
-                  disabled
-                  renderInput={params => <CustomTextField {...params} label='User list' fullWidth />}
-                  loading={loading}
-                />
-              </Grid>
+            <IconButton onClick={onClose}>
+              <Icon icon='tabler:x' fontSize='1.25rem' />
+            </IconButton>
+          </Box>
+          <Typography variant='h3' sx={{ mb: 3 }}>
+            Detail
+          </Typography>
+          <Grid container spacing={1}>
+            <Grid item xs={6}>
+              <CustomTextField
+                label='Name'
+                value={accessGroup ? accessGroup.name : ''}
+                onChange={e => handleInputChange('name', e.target.value)}
+                fullWidth
+                error={!!errors.name}
+                helperText={errors.name}
+              />
             </Grid>
-          </DialogContent>
-          <DialogActions
-            sx={{
-              justifyContent: 'flex-end',
-              px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
-              pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
-            }}
-          >
-            <Button onClick={onClose} variant='contained' color='primary'>
-              Cancel
-            </Button>
-            <Button onClick={UpdateAccessGroup} variant='contained' color='primary'>
-              Save
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Card>
-    </>
+            <Grid item xs={6}>
+              <CustomTextField
+                label='Description'
+                value={accessGroup ? accessGroup.description : ''}
+                onChange={e => handleInputChange('description', e.target.value)}
+                error={!!errors.description}
+                helperText={errors.description}
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Autocomplete
+                multiple
+                options={data ? data.doorAccesses.map(item => ({ objectId: item.id, name: item.name })) : []}
+                value={accessGroup ? accessGroup.doorAccesses : []}
+                getOptionLabel={option => option.name || 'No Name'}
+                isOptionEqualToValue={(option, value) => option.objectId === value.objectId}
+                onChange={(event, newValue) => {
+                  setAccessGroup(prevDevice => ({
+                    ...prevDevice,
+                    doorAccesses: newValue
+                  }))
+                  handleInputChange(
+                    'doorAccessIds',
+                    newValue.map(item => item.objectId)
+                  )
+                }}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => (
+                    <Chip key={option.objectId} label={option.name} {...getTagProps({ index })} />
+                  ))
+                }
+                renderInput={params => (
+                  <CustomTextField
+                    {...params}
+                    label='Door Access'
+                    error={!!errors.doorAccessIds}
+                    helperText={errors.doorAccessIds}
+                    fullWidth
+                  />
+                )}
+                loading={loading}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Autocomplete
+                multiple
+                options={flattenedDeviceGroups}
+                getOptionLabel={option => option.name || 'No Name'}
+                value={accessGroup ? accessGroup.userGroups : []}
+                isOptionEqualToValue={(option, value) => option.objectId === value.objectId}
+                onChange={(event, newValue) => {
+                  setAccessGroup(prevDevice => ({
+                    ...prevDevice,
+                    userGroups: newValue
+                  }))
+                  handleInputChange(
+                    'userGroupIds',
+                    newValue.map(item => item.objectId)
+                  )
+                }}
+                onOpen={async () => {
+                  await fetchDeviceGroups()
+                }}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => (
+                    <Chip key={option.objectId} label={option.name} {...getTagProps({ index })} />
+                  ))
+                }
+                renderInput={params => (
+                  <CustomTextField
+                    {...params}
+                    label='Group Member'
+                    error={!!errors.userGroupIds}
+                    helperText={errors.userGroupIds}
+                    fullWidth
+                  />
+                )}
+                loading={loading}
+              />
+            </Grid>
+
+            <Grid item xs={6}>
+              <Autocomplete
+                options={deviceGroups2}
+                value={accessGroup ? accessGroup.deviceKGroupId : []}
+                getOptionLabel={option => option.name || 'No Name'}
+                onChange={(event, newValue) => {
+                  if (newValue) {
+                    handleInputChange('deviceKGroupId', newValue.id)
+                  } else {
+                    handleInputChange('deviceKGroupId', null)
+                  }
+                }}
+                renderInput={params => <CustomTextField {...params} label='Group Guest' fullWidth />}
+                loading={loading}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <Autocomplete
+                disabled
+                renderInput={params => <CustomTextField {...params} label='User list' fullWidth />}
+                loading={loading}
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions
+          sx={{
+            justifyContent: 'flex-end',
+            px: theme => [`${theme.spacing(6)} !important`, `${theme.spacing(12)} !important`],
+            pb: theme => `${theme.spacing(12)} !important`
+          }}
+        >
+          <Button variant='contained' onClick={UpdateAccessGroup}>
+            Save
+          </Button>
+          <Button variant='outlined' onClick={onClose}>
+            Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Card>
   )
 }
 

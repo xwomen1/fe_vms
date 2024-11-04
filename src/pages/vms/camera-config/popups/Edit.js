@@ -64,13 +64,14 @@ const StyledTabPanel = styled(TabPanel)(({ theme }) => ({
   overflow: 'auto' // Enable scrolling if content exceeds the height
 }))
 
-const Edit = ({ open, onClose, camera }) => {
+const Edit = ({ open, onClose, camera, setReload }) => {
   const [cameras, setCamera] = useState([])
   const [value, setValue] = useState('0')
 
   const handleChange = (event, newValue) => {
     setValue(newValue)
   }
+  console.log(setReload, 'setreload')
 
   const handleCancel = () => {
     onClose()
@@ -87,7 +88,7 @@ const Edit = ({ open, onClose, camera }) => {
       sx={{
         '& .MuiDialog-paper': {
           overflow: 'visible',
-          maxWidth: '1200px', // Custom width
+          maxWidth: '1000px', // Custom width
           width: '100%', // Ensure it takes full width
           padding: '20px' // Additional padding if needed
         }
@@ -110,7 +111,7 @@ const Edit = ({ open, onClose, camera }) => {
             </TabList>
           </Grid>
           <StyledTabPanel value='0'>
-            <Device onClose={handleCancel} camera={camera} />
+            <Device onClose={handleCancel} camera={camera} setReload={setReload} />
           </StyledTabPanel>
           <StyledTabPanel value='1'>
             <Passwords onClose={handleCancel} camera={camera} />

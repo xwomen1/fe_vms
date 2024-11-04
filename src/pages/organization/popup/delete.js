@@ -21,7 +21,7 @@ const InfraPopup = ({ open, id, onClose, onSuccess }) => {
       }
     }
 
-    const urlDelete = `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${id}`
+    const urlDelete = `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/${id}`
 
     axios
       .delete(urlDelete, config)

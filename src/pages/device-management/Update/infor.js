@@ -70,7 +70,7 @@ const InforAll = ({ idInfor }) => {
         }
       }
 
-      const response = await axios.get(`https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices/${idInfor}`, config)
+      const response = await axios.get(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/device-access/devices/${idInfor}`, config)
       const deviceData = response.data
       setDevice(deviceData)
       setIdDoor(deviceData.doorId)
@@ -79,17 +79,19 @@ const InforAll = ({ idInfor }) => {
 
       // Fetch regions and set Autocomplete value if doorName matches any region name
       await fetchRegions() // Ensure fetchRegions updates regions before proceeding
-      setRegions(currentRegions => {
-        const matchingRegion = currentRegions.find(region => region.name.trim() === deviceData.doorName.trim())
+      if (deviceData.doorName !== null) {
+        setRegions(currentRegions => {
+          const matchingRegion = currentRegions.find(region => region.name.trim() === deviceData.doorName.trim())
 
-        console.log(matchingRegion, 'match')
+          console.log(matchingRegion, 'match')
 
-        if (matchingRegion) {
-          setSelectedRegion(matchingRegion)
-        }
+          if (matchingRegion) {
+            setSelectedRegion(matchingRegion)
+          }
 
-        return currentRegions
-      })
+          return currentRegions
+        })
+      }
     } catch (error) {
       console.error('Error fetching data:', error)
       toast.error(error.message)
@@ -114,30 +116,14 @@ const InforAll = ({ idInfor }) => {
       }
 
       const parentResponse = await axios.get(
-        'https://dev-ivi.basesystem.one/vf/ac-adapters/v1/device-groups/children-lv1',
+        'https://dev-ivi.basesystem.one/smc/access-control/api/v0/device-access/device-groups',
         config
       )
       const parentGroups = parentResponse.data || [] // Ensure it's an array
 
       // Fetch child groups for each parent
-      const childGroupsPromises = parentGroups.map(async parentGroup => {
-        const childResponse = await axios.get(
-          `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/device-groups/children-lv1?parentId=${parentGroup.id}`,
-          config
-        )
-
-        const childGroups = childResponse.data || [] // Ensure it's an array
-
-        return childGroups.map(child => ({
-          ...child,
-          parentName: parentGroup.name, // Include parent name for better distinction
-          parentId: parentGroup.id // Include parent id for filtering
-        }))
-      })
-
-      const childGroupsArrays = await Promise.all(childGroupsPromises)
-      const allGroups = parentGroups.concat(childGroupsArrays.flat())
-      setDeviceGroups(allGroups)
+      
+      setDeviceGroups(parentGroups)
     } catch (error) {
       console.error('Error fetching device groups:', error)
       toast.error(error.message || 'Error fetching device groups')
@@ -175,7 +161,7 @@ const InforAll = ({ idInfor }) => {
       }
 
       const response = await axios.put(
-        `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices/${idInfor}`,
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/device-access/devices/${idInfor}`,
         params,
         config
       )
@@ -224,9 +210,34 @@ const InforAll = ({ idInfor }) => {
   const parentIdToFilter = 'fa7f0b8b-56a7-44c7-96d6-997e7fc55304'
 
   const fetchRegions = async () => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+      console.log('token', token)
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+
+      const response = await axios.get(
+        'https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=accesscontrol',
+
+        config
+      )
+
+      
+      setRegions(response.data)
+
+    } catch (error) {
+      console.error('Error fetching data:', error)
+    }
+  }
+
+  const fetchRegions1 = async () => {
     setLoading(true)
     try {
-      const response = await axios.get('https://sbs.basesystem.one/ivis/infrares/api/v0/regions', {
+      const response = await axios.get('https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions', {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -238,7 +249,7 @@ const InforAll = ({ idInfor }) => {
       console.log(parentRegion, 'data')
       if (parentRegion) {
         const childResponse = await axios.get(
-          `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentIdToFilter}`,
+          `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentIdToFilter}`,
           {
             headers: {
               Authorization: `Bearer ${token}`
@@ -272,6 +283,7 @@ const InforAll = ({ idInfor }) => {
   const handleSelection = async (event, newValue) => {
     if (newValue) {
       const { id, name } = newValue
+      setSelectedRegion(newValue) // Cập nhật giá trị selectedRegion ngay lập tức
 
       try {
         setLoading(true)
@@ -283,72 +295,60 @@ const InforAll = ({ idInfor }) => {
           }
         }
 
-        const data = {
-          description: 'string',
-          name: name,
-          parentId: postParentId
-        }
+        // First, check if the door group already exists
+        const groupSearchResponse = await axios.get(
+          'https://dev-ivi.basesystem.one/smc/access-control/api/v0/door-groups',
+          config
+        )
 
-        let response
-        try {
-          response = await axios.post(
+        const existingGroup = Object.values(groupSearchResponse.data.rows).find(group => group.name === name)
+        let doorGroupId
+
+        if (existingGroup) {
+          doorGroupId = existingGroup.id
+        } else {
+          // If the door group does not exist, create a new one
+          const createGroupResponse = await axios.post(
             'https://dev-ivi.basesystem.one/smc/access-control/api/v0/door-groups',
-            data,
+            {
+              description: 'string',
+              name: name,
+              parentId: postParentId
+            },
             config
           )
 
-          // Use the id from the successful creation
-          const doorGroupId = response.data.id
-
-          const doorData = {
-            description: 'string',
-            doorGroupId: doorGroupId,
-            name: name
-          }
-
-          // Post to create a new door
-          await axios.post('https://dev-ivi.basesystem.one/smc/access-control/api/v0/doors', doorData, config)
-        } catch (createError) {
-          if (createError.response && createError.response.status === 400) {
-            const searchResponse = await axios.get(
-              'https://dev-ivi.basesystem.one/smc/access-control/api/v0/door-groups',
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`
-                }
-              }
-            )
-
-            const existingGroup = Object.values(searchResponse.data.rows).find(group => group.name === name)
-
-            if (existingGroup) {
-              const doorData = {
-                description: 'string',
-                doorGroupId: existingGroup.id,
-                name: name
-              }
-
-              // Post to create a new door
-              await axios.post('https://dev-ivi.basesystem.one/smc/access-control/api/v0/doors', doorData, config)
-            } else {
-              throw new Error('Không tìm thấy door-group phù hợp.')
-            }
-          } else {
-            throw createError
-          }
+          doorGroupId = createGroupResponse.data.id
         }
-      } catch (error) {
-        if (error.response && error.response.status === 400) {
-          const searchResponse = await axios.get('https://dev-ivi.basesystem.one/smc/access-control/api/v0/doors', {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          })
-          const existingDoor = Object.values(searchResponse.data.rows).find(group => group.name === name)
+
+        // Now, check if the door already exists
+        const doorSearchResponse = await axios.get(
+          'https://dev-ivi.basesystem.one/smc/access-control/api/v0/doors',
+          config
+        )
+
+        const existingDoor = Object.values(doorSearchResponse.data.rows).find(door => door.name === name)
+
+        if (existingDoor) {
           setName(existingDoor.name)
           setIdDoor(existingDoor.id)
+        } else {
+          // Create the new door if it does not exist
+          const createDoorResponse = await axios.post(
+            'https://dev-ivi.basesystem.one/smc/access-control/api/v0/doors',
+            {
+              description: 'string',
+              doorGroupId: doorGroupId,
+              name: name
+            },
+            config
+          )
+
+          setName(createDoorResponse.data.name)
+          setIdDoor(createDoorResponse.data.id)
         }
-        console.error('Error posting data:', error)
+      } catch (error) {
+        console.error('Error handling selection:', error)
       } finally {
         setLoading(false)
       }

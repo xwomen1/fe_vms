@@ -5,6 +5,7 @@ import { Box, Button, Card, CardHeader, Grid, Autocomplete, Paper } from '@mui/m
 import Link from 'next/link'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import authConfig from 'src/configs/auth'
+import Swal from 'sweetalert2'
 
 const InforDoor = ({ idInfor }) => {
   const [inforDoor, setInforDoor] = useState({})
@@ -59,26 +60,33 @@ const InforDoor = ({ idInfor }) => {
 
       // Hàm đệ quy để lấy nhóm con và xây dựng cây phân cấp
       const fetchChildGroups = async parentGroup => {
-        const childResponse = await axios.get(
-          `https://dev-ivi.basesystem.one/smc/access-control/api/v0/door-groups/children-lv1?parentId=${parentGroup.id}`,
-          config
-        )
-        const childGroups = childResponse.data || []
+        // Chỉ gọi API nếu parentGroup có con
+        if (parentGroup.isParent) {
+          // Kiểm tra nếu nhóm là parent
+          const childResponse = await axios.get(
+            `https://dev-ivi.basesystem.one/smc/access-control/api/v0/door-groups/children-lv1?parentId=${parentGroup.id}`,
+            config
+          )
+          const childGroups = childResponse.data || []
 
-        const childGroupsWithParentInfo = await Promise.all(
-          childGroups.map(async child => {
-            const subChildGroups = await fetchChildGroups(child)
+          const childGroupsWithParentInfo = await Promise.all(
+            childGroups.map(async child => {
+              const subChildGroups = await fetchChildGroups(child)
 
-            return {
-              ...child,
-              children: subChildGroups,
-              parentName: parentGroup.name,
-              parentId: parentGroup.id
-            }
-          })
-        )
+              return {
+                ...child,
+                children: subChildGroups,
+                parentName: parentGroup.name,
+                parentId: parentGroup.id
+              }
+            })
+          )
 
-        return childGroupsWithParentInfo
+          return childGroupsWithParentInfo
+        } else {
+          // Nếu không phải nhóm cha, trả về mảng rỗng
+          return []
+        }
       }
 
       const parentResponse = await axios.get(
@@ -153,11 +161,35 @@ const InforDoor = ({ idInfor }) => {
         config
       )
 
-      toast.success('Cập nhật thành công!')
+      Swal.fire({
+        title: 'Successful!',
+        text: 'Update successfully',
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
       console.log(response.data, 'updateData')
     } catch (error) {
       console.error('Error updating door:', error)
-      toast.error(error.response?.data?.message || error.message)
+      Swal.fire({
+        title: 'Error!',
+        text: error.response?.data?.message || error.message,
+        icon: 'error',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
+
+      // toast.error(error.response?.data?.message || error.message)
     } finally {
       setLoading(false)
     }

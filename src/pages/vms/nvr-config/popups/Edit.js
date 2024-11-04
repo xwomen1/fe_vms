@@ -65,7 +65,7 @@ const StyledTabPanel = styled(TabPanel)(({ theme }) => ({
   overflow: 'auto' // Enable scrolling if content exceeds the height
 }))
 
-const Edit = ({ open, onClose, nvr }) => {
+const Edit = ({ open, onClose, nvr, setReload }) => {
   const [cameras, setCamera] = useState([])
   const [value, setValue] = useState('0')
 
@@ -104,7 +104,7 @@ const Edit = ({ open, onClose, nvr }) => {
             </TabList>
           </Grid>
           <StyledTabPanel value='0'>
-            <Device onClose={handleCancel} nvr={nvr} />
+            <Device onClose={handleCancel} nvr={nvr} setReload={setReload} />
           </StyledTabPanel>
           <StyledTabPanel value='1'>
             <Passwords onClose={handleCancel} nvr={nvr} />

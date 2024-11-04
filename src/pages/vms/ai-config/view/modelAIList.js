@@ -163,7 +163,7 @@ const ModelAIList = () => {
       >
         <Box sx={{ mb: 4, textAlign: 'center' }}>
           <Typography variant='h3' sx={{ mb: 3 }}>
-          Confirm
+            Confirm
           </Typography>
           <Typography sx={{ color: 'text.secondary' }}>Are you sure you want to delete?</Typography>
         </Box>
@@ -274,7 +274,7 @@ const ModelAIList = () => {
         <CardContent>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <TableContainer component={Paper} sx={{ maxHeight: 600 }}>
+              <TableContainer component={Paper} sx={{ maxHeight: '100%' }}>
                 <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
                   <TableHead>
                     <TableRow>

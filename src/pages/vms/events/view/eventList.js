@@ -13,29 +13,33 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  FormControlLabel,
   Grid,
   IconButton,
   Menu,
   MenuItem,
   Pagination,
+  Switch,
   Typography
 } from '@mui/material'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import Filter from '../popups/filter'
 import Add from '../popups/add'
 import EventDetails from '../popups/eventDetails'
+import { delApi, getApi } from 'src/@core/utils/requestUltils'
 
 const initValueFilter = {
   location: null,
   cameraName: null,
   startTime: null,
+  eventType: null,
   endTime: null,
   keyword: '',
   limit: 25,
   page: 1
 }
 
-const EventList = ({ }) => {
+const EventList = ({}) => {
   const [keyword, setKeyword] = useState('')
   const [valueFilter, setValueFilter] = useState(initValueFilter)
   const [loading, setLoading] = useState(false)
@@ -53,11 +57,11 @@ const EventList = ({ }) => {
   const [pageSize, setPageSize] = useState(25)
   const pageSizeOptions = [25, 50, 100]
   const [anchorEl, setAnchorEl] = useState(null)
-  const [rtcPeerConnection, setRtcPeerConnection] = useState(null)
   const [websocket, setWebsocket] = useState(null)
   const [eventData, setEventData] = useState(null)
   const defaultCameraID = '0eb23593-a9b1-4278-9fb1-4d18f30ed6ff'
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
+  const [isRealtime, setIsRealtime] = useState(false)
 
   const config = {
     bundlePolicy: 'max-bundle',
@@ -74,40 +78,35 @@ const EventList = ({ }) => {
   }
 
   useEffect(() => {
-    // create WebSocket connection
+    if (isRealtime) {
+      const ws = new WebSocket(
+        `wss://sbs.basesystem.one/ivis/vms/api/v0/websocket/topic/list_ai_event/be571c00-41cf-4878-a1de-b782625da62a`
+      )
+      setWebsocket(ws)
 
-    const ws = new WebSocket(
-      `wss://sbs.basesystem.one/ivis/vms/api/v0/websocket/topic/list_ai_event/be571c00-41cf-4878-a1de-b782625da62a`
-    )
+      ws.addEventListener('open', () => {
+        ws.send(
+          JSON.stringify({
+            id: defaultCameraID,
+            type: 'request'
+          })
+        )
+      })
 
-    setWebsocket(ws)
+      ws.addEventListener('message', handleMessage)
+      ws.addEventListener('error', error => {
+        console.error('WebSocket error:', error)
+      })
+      ws.addEventListener('close', handleClose)
 
-    // create RTCPeerConnection
-
-    const pc = new RTCPeerConnection(config)
-    setRtcPeerConnection(pc)
-
-    // listen for remote tracks and add them to remote stream
-
-    pc.ontrack = event => {
-      const stream = event.streams[0]
-      if (!remoteVideoRef.current?.srcObject || remoteVideoRef.current?.srcObject.id !== stream.id) {
-        setRemoteStream(stream)
-        remoteVideoRef.current.srcObject = stream
+      return () => {
+        if (ws) {
+          ws.close()
+          setWebsocket(null)
+        }
       }
     }
-
-    // close WebSocket and RTCPeerConnection on component unmount
-
-    return () => {
-      if (websocket) {
-        websocket.close()
-      }
-      if (rtcPeerConnection) {
-        rtcPeerConnection.close()
-      }
-    }
-  }, [])
+  }, [isRealtime])
 
   const handleMessage = async event => {
     const message = JSON.parse(event.data)
@@ -138,48 +137,27 @@ const EventList = ({ }) => {
   const handleClose = async event => {
     if (websocket) {
       websocket.close()
+      setWebsocket(null)
     }
   }
-
   useEffect(() => {
-    if (rtcPeerConnection) {
-      rtcPeerConnection.addEventListener('connectionstatechange', () => { })
+    if (isRealtime && eventData) {
+      const newList = []
+
+      deviceList?.map((item, index) => {
+        if (index === 0) {
+          newList.push(eventData)
+          newList.push(item)
+          setCount(count + 1)
+          deviceList?.pop()
+        } else {
+          newList.push(item)
+        }
+      })
+
+      setDeviceList([...newList])
     }
-  }, [rtcPeerConnection])
-
-  const config1 = {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  }
-
-  const eventTypeColors = {
-    'Phát hiện Event AI': 'success',
-    'Phát hiện Object nguy hiểm': 'error',
-    'Phát hiện hành vi bất thường': 'warning',
-    'Phát hiện Object danh sách đen': 'secondary'
-  }
-
-  useEffect(() => {
-    const newList = []
-
-    deviceList?.map((item, index) => {
-      if (index === 0) {
-        newList.push(eventData)
-        newList.push(item)
-        setCount(count + 1)
-        deviceList?.pop()
-      } else {
-        newList.push(item)
-      }
-    })
-
-    setDeviceList([...newList])
-  }, [eventData])
-
-  useEffect(() => {
-    fetchDataList()
-  }, [])
+  }, [isRealtime, eventData])
 
   useEffect(() => {
     fetchDataList()
@@ -191,26 +169,29 @@ const EventList = ({ }) => {
 
   const fetchDataList = async () => {
     const params = {
-      ...config1,
-      params: {
-        keyword: keyword || '',
-        limit: pageSize,
-        page: parseInt(page),
-        location: valueFilter?.location || '',
-        cameraName: valueFilter?.cameraName || '',
-        startTime: valueFilter?.startTime || '',
-        endTime: valueFilter?.endTime || ''
-      }
+      keyword: keyword || '',
+      limit: pageSize,
+      page: parseInt(page),
+      location: valueFilter?.location || '',
+      cameraName: valueFilter?.cameraName || '',
+      startTime: valueFilter?.startTime || '',
+      endTime: valueFilter?.endTime || '',
+      eventType: valueFilter?.eventType || ''
     }
     setLoading(true)
     try {
-      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/routine`, params)
+      const res = await getApi(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/routine`, params)
       setDeviceList(res?.data)
       setCount(res.count)
       setTotalPage(Math.ceil(res.count / pageSize))
     } catch (error) {
-      console.error('Error fetching data:', error)
-      toast.error(error)
+      if (error && error?.response?.data) {
+        console.error('error', error)
+        toast.error(error?.response?.data?.message)
+      } else {
+        console.error('Error fetching data:', error)
+        toast.error(error)
+      }
     } finally {
       setLoading(false)
     }
@@ -247,6 +228,16 @@ const EventList = ({ }) => {
 
     setValueFilter(newDto)
     setIsOpenFilter(false)
+  }
+
+  const handleSwitchChange = event => {
+    const isChecked = event.target.checked
+    setIsRealtime(isChecked)
+
+    if (!isChecked && websocket) {
+      websocket.close()
+      setWebsocket(null)
+    }
   }
 
   const DeleteView = () => (
@@ -298,22 +289,20 @@ const EventList = ({ }) => {
     if (idDelete != null) {
       setLoading(true)
 
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-
-      axios
-        .delete(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/${idDelete}`, config)
+      delApi(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/${idDelete}`)
         .then(() => {
           toast.success('Deleted successfully')
           setIdDelete(null)
           setReload(reload + 1)
         })
         .catch(error => {
-          console.error('Error fetching data:', error)
-          toast.error(error?.response?.data || '')
+          if (error && error?.response?.data) {
+            console.error('error', error)
+            toast.error(error?.response?.data?.message)
+          } else {
+            console.error('Error fetching data:', error)
+            toast.error(error)
+          }
         })
         .finally(() => {
           setLoading(false)
@@ -335,6 +324,14 @@ const EventList = ({ }) => {
           }}
           action={
             <Grid container spacing={2}>
+              <Grid item>
+                <FormControlLabel
+                  control={
+                    <Switch checked={isRealtime} onChange={handleSwitchChange} name='realtimeEvents' color='primary' />
+                  }
+                  label='Real time event.'
+                />
+              </Grid>
               <Grid item>
                 <Box sx={{ float: 'right' }}>
                   <IconButton
@@ -380,122 +377,136 @@ const EventList = ({ }) => {
           }
         />
         <CardContent>
-          <Grid container rowSpacing={3} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-            {deviceList?.map((item, index) => {
-              return (
-                <Grid item xs={12} sm={6} lg={2.4} key={index}>
-                  <Card
-                    sx={{
-                      width: '100%',
-                      height: '300px',
-                      borderWidth: 1,
-                      borderRadius: '10px',
-                      borderStyle: 'solid',
-                      borderColor: '#ccc'
-                    }}
-                  >
-                    <CardContent>
-                      <Box
-                        sx={{
-                          height: '100%',
-                          minHeight: 140,
-                          display: 'flex',
-                          alignItems: 'flex-end',
-                          justifyContent: 'center'
-                        }}
-                      >
-                        <img
-                          width={'100%'}
-                          height={150}
-                          alt='add-role'
-                          src={item?.imageObject}
-                          style={{
-                            objectFit: 'contain',
-                            cursor: 'pointer'
+          {deviceList?.length === 0 ? (
+            <Typography variant='h6' align='center'>
+              No data available
+            </Typography>
+          ) : (
+            <Grid container rowSpacing={3} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+              {deviceList?.map((item, index) => {
+                return (
+                  <Grid item xs={12} sm={6} lg={2.4} key={index}>
+                    <Card
+                      sx={{
+                        width: '100%',
+                        height: '300px',
+                        borderWidth: 1,
+                        borderRadius: '10px',
+                        borderStyle: 'solid',
+                        borderColor: '#ccc'
+                      }}
+                    >
+                      <CardContent>
+                        <Box
+                          sx={{
+                            height: '100%',
+                            minHeight: 140,
+                            display: 'flex',
+                            alignItems: 'flex-end',
+                            justifyContent: 'center'
                           }}
+                        >
+                          <img
+                            width={'100%'}
+                            height={150}
+                            alt='add-role'
+                            src={item?.imageObject}
+                            style={{
+                              objectFit: 'contain',
+                              cursor: 'pointer'
+                            }}
+                            onClick={() => {
+                              setIsOpenView(true)
+                              setEventDetail(item)
+                            }}
+                          />
+                        </Box>
+                        <Typography sx={{ marginTop: '10px' }}>
+                          {item?.timestamp ? new Date(item?.timestamp).toLocaleString() : 'Date'}
+                        </Typography>
+                        <Typography
+                          sx={{
+                            marginTop: '10px',
+                            fontWeight: 600,
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis'
+                          }}
+                        >
+                          {item?.result}
+                        </Typography>
+                        <Typography sx={{ marginTop: '10px' }}>
+                          {item?.location ? item?.location : 'Location'}
+                        </Typography>
+
+                        <IconButton
+                          size='small'
+                          sx={{ color: 'text.secondary' }}
                           onClick={() => {
                             setIsOpenView(true)
                             setEventDetail(item)
                           }}
-                        />
-                      </Box>
-                      <Typography sx={{ marginTop: '10px' }}>
-                        {item?.timestamp ? new Date(item?.timestamp).toLocaleString() : 'Date'}
-                      </Typography>
-                      <Typography
-                        sx={{
-                          marginTop: '10px',
-                          fontWeight: 600,
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis'
-                        }}
-                      >
-                        {item?.result}
-                      </Typography>
-                      <Typography sx={{ marginTop: '10px' }}>{item?.location ? item?.location : 'Location'}</Typography>
+                        >
+                          <Icon icon='tabler:info-circle' />
+                        </IconButton>
+                        <IconButton
+                          size='small'
+                          sx={{ color: 'text.secondary' }}
+                          onClick={() => {
+                            setIsOpenEdit(true)
+                            setEventDetail(item)
+                          }}
+                        >
+                          <Icon icon='tabler:edit' />
+                        </IconButton>
+                        <IconButton
+                          onClick={() => {
+                            setIdDelete(item.id)
+                            setIsOpenDel(true)
+                          }}
+                        >
+                          <Icon icon='tabler:trash' />
+                        </IconButton>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                )
+              })}
+              <Grid container spacing={2} style={{ padding: 10 }}>
+                <Grid item xs={3}></Grid>
 
-                      <IconButton
-                        size='small'
-                        sx={{ color: 'text.secondary' }}
-                        onClick={() => {
-                          setIsOpenView(true)
-                          setEventDetail(item)
-                        }}
-                      >
-                        <Icon icon='tabler:info-circle' />
-                      </IconButton>
-                      <IconButton
-                        size='small'
-                        sx={{ color: 'text.secondary' }}
-                        onClick={() => {
-                          setIsOpenEdit(true)
-                          setEventDetail(item)
-                        }}
-                      >
-                        <Icon icon='tabler:edit' />
-                      </IconButton>
-                      <IconButton
-                        onClick={() => {
-                          setIdDelete(item.id)
-                          setIsOpenDel(true)
-                        }}
-                      >
-                        <Icon icon='tabler:trash' />
-                      </IconButton>
-                    </CardContent>
-                  </Card>
+                <Grid item xs={1} style={{ padding: 0 }}>
+                  <Box>
+                    <IconButton onClick={handleOpenMenu}>
+                      <Icon icon='tabler:selector' />
+                      <p style={{ fontSize: 15 }}>{pageSize} line/page</p>
+                    </IconButton>
+                    <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+                      {pageSizeOptions.map(size => (
+                        <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
+                          {size}
+                        </MenuItem>
+                      ))}
+                    </Menu>
+                  </Box>
                 </Grid>
-              )
-            })}
-          </Grid>
+                <Grid item xs={6}>
+                  <Pagination count={total} page={page} color='primary' onChange={handlePageChange} />
+                </Grid>
+              </Grid>
+            </Grid>
+          )}
         </CardContent>
-        <Grid container spacing={2} style={{ padding: 10 }}>
-          <Grid item xs={3}></Grid>
-
-          <Grid item xs={1} style={{ padding: 0 }}>
-            <Box>
-              <IconButton onClick={handleOpenMenu}>
-                <Icon icon='tabler:selector' />
-                <p style={{ fontSize: 15 }}>{pageSize} line/page</p>
-              </IconButton>
-              <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
-                {pageSizeOptions.map(size => (
-                  <MenuItem key={size} onClick={() => handleSelectPageSize(size)}>
-                    {size}
-                  </MenuItem>
-                ))}
-              </Menu>
-            </Box>
-          </Grid>
-          <Grid item xs={6}>
-            <Pagination count={total} page={page} color='primary' onChange={handlePageChange} />
-          </Grid>
-        </Grid>
       </Card>
 
       {isOpenFilter && (
-        <Filter show={isOpenFilter} onClose={() => setIsOpenFilter(false)} callback={handleSetValueFilter} />
+        <Filter
+          valueFilter={valueFilter}
+          direction='ALL_EVENT'
+          show={isOpenFilter}
+          onClose={() => setIsOpenFilter(false)}
+          callback={handleSetValueFilter}
+        />
       )}
 
       {isOpenView && (

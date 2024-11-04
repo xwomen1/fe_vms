@@ -46,7 +46,7 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
 
   const fetchGroups = () => {
     axios
-      .get('https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=phankhu')
+      .get('https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=phankhu')
       .then(response => {
         setGroups(response.data)
       })
@@ -57,7 +57,7 @@ const Edit = ({ open, onClose, fetchGroupData, assetId }) => {
 
   const fetchUnit = () => {
     axios
-      .get('https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=dv')
+      .get('https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=dv')
       .then(response => {
         setDonVi(response.data)
       })

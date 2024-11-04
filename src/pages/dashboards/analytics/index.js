@@ -269,9 +269,9 @@ const EventList = () => {
     } catch (error) {
       console.error('Error fetching data:', error)
       if (error.response && error.response.status === 404) {
-        setError('Không tìm thấy trong hệ thống')
+        console.error('Không tìm thấy trong hệ thống')
       } else {
-        setError(error.response?.data?.message || 'Đang gặp sự cố')
+        console.error(error.response?.data?.message || 'Đang gặp sự cố')
       }
       setDeviceList([])
       toast.error('Đang gặp sự cố')
@@ -363,12 +363,12 @@ const EventList = () => {
                   {deviceList?.slice(0, pageSize).map((row, index) => {
                     return (
                       <TableRow hover tabIndex={-1} key={index}>
-                        <TableCell>{index + 1}</TableCell>
+                        <TableCell sx={{ padding: '4px', height: '35px' }}>{index + 1}</TableCell>
                         {columns.map(column => {
                           const value = row[column.field]
 
                           return (
-                            <TableCell key={column.id} align={column.align}>
+                            <TableCell sx={{ padding: '4px', height: '35px' }} key={column.id} align={column.align}>
                               {column.renderCell ? column.renderCell(value) : value}
                             </TableCell>
                           )

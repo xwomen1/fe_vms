@@ -5,9 +5,10 @@ import { Box, Button, Card, CardHeader, Grid, Autocomplete, Paper } from '@mui/m
 import Link from 'next/link'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import authConfig from 'src/configs/auth'
+import Swal from 'sweetalert2'
 
 const InforDoor = ({ idSetting }) => {
-  const [inforDoor, setInforDoor] = useState({})
+  const [inforDevice, setInforDevice] = useState({})
   const [loading, setLoading] = useState(false)
   const [selectedGroup, setSelectedGroup] = useState(null)
   const [deviceGroups, setDeviceGroups] = useState([])
@@ -39,7 +40,7 @@ const InforDoor = ({ idSetting }) => {
         config
       )
       const deviceData = response.data
-      setInforDoor(deviceData)
+      setInforDevice(deviceData.deviceModel?.name)
       setSelectedGroup(deviceData.doorGroup)
       console.log(deviceData, 'deviceData')
     } catch (error) {
@@ -49,6 +50,8 @@ const InforDoor = ({ idSetting }) => {
       setLoading(false)
     }
   }
+
+  console.log(inforDevice, 'infodevice')
 
   useEffect(() => {
     fetchDeviceGroups()
@@ -111,11 +114,33 @@ const InforDoor = ({ idSetting }) => {
         config
       )
 
-      toast.success('Cập nhật thành công!')
+      Swal.fire({
+        title: 'Successful!',
+        text: 'Update successfully',
+        icon: 'success',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
       console.log(response.data, 'updateData')
     } catch (error) {
       console.error('Error updating door:', error)
-      toast.error(error.response?.data?.message || error.message)
+      Swal.fire({
+        title: 'Error!',
+        text: error.response?.data?.message || error.message,
+        icon: 'error',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
     } finally {
       setLoading(false)
     }
@@ -189,12 +214,7 @@ const InforDoor = ({ idSetting }) => {
               </Grid>
               <Grid item xs={0.1}></Grid>
               <Grid item xs={5.8} style={{ marginTop: 20 }}>
-                <Autocomplete
-                  getOptionLabel={option => option.name}
-                  renderInput={params => <CustomTextField {...params} label='Device' fullWidth />}
-                  disabled
-                  loading={loading}
-                />
+                <CustomTextField label='Device' value={inforDevice || []} disabled fullWidth />
               </Grid>
             </Grid>
           </Grid>

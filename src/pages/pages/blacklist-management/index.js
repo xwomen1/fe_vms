@@ -21,6 +21,7 @@ import {
   TableRow,
   Typography
 } from '@mui/material'
+import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
@@ -28,6 +29,7 @@ import Icon from 'src/@core/components/icon'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import { delApi, postApi } from 'src/@core/utils/requestUltils'
 import authConfig from 'src/configs/auth'
+import Swal from 'sweetalert2'
 
 const buildUrlWithToken = url => {
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
@@ -38,6 +40,54 @@ const buildUrlWithToken = url => {
 
   return url
 }
+
+const columns1 = [
+  {
+    id: 1,
+    flex: 0.25,
+    maxWidth: 150,
+    align: 'center',
+    field: 'data',
+    label: 'Image',
+    renderCell: data => {
+      const value = data?.find(item => item.faceType === 'CENTER')
+
+      return (
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          <img
+            src={(value?.imageFileUrl)}
+            alt=''
+            style={{ width: 100, height: 100, objectFit: 'contain' }}
+          />
+        </Box>
+      )
+    }
+  },
+  {
+    id: 2,
+    flex: 0.15,
+    maxWidth: 150,
+    align: 'center',
+    field: 'member_id',
+    label: 'ID'
+  },
+  {
+    id: 3,
+    flex: 0.15,
+    maxWidth: 150,
+    align: 'center',
+    field: 'quality',
+    label: 'Quality'
+  },
+  {
+    id: 4,
+    flex: 0.15,
+    maxWidth: 150,
+    align: 'center',
+    field: 'distance',
+    label: 'Similarity level'
+  }
+]
 
 const columns = [
   {
@@ -194,6 +244,26 @@ const Blacklist = () => {
   const handleSearch = e => {
     setKeyword(e.target.value)
   }
+  function showAlertConfirm(options, intl) {
+    const defaultProps = {
+      title: intl ? intl.formatMessage({ id: 'app.title.confirm' }) : 'Confirm',
+      imageWidth: 213,
+      showCancelButton: true,
+      showCloseButton: true,
+      showConfirmButton: true,
+      focusCancel: true,
+      reverseButtons: true,
+      confirmButtonText: intl ? intl.formatMessage({ id: 'app.button.OK' }) : 'Ok',
+      cancelButtonText: intl ? intl.formatMessage({ id: 'app.button.cancel' }) : 'Cancel',
+      customClass: {
+        content: 'content-class',
+        confirmButton: 'swal-btn-confirm'
+      },
+      confirmButtonColor: '#002060'
+    }
+
+    return Swal.fire({ ...defaultProps, ...options })
+  }
 
   const onSubmit = values => {
     var detail = {
@@ -223,6 +293,91 @@ const Blacklist = () => {
     handleCloseMenu()
   }
 
+  const handleDeleteMember = idDelete => {
+    showAlertConfirm({
+      text: 'Are you sure you want to delete?'
+    }).then(({ value }) => {
+      if (value) {
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+        if (!token) {
+          return
+        }
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          
+        }
+        let urlDelete = `https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${idDelete}?type=member`
+        axios
+          .delete(urlDelete, config)
+          .then(() => {
+            Swal.fire({
+              title: 'Successful!',
+              text: 'Delete Successful',
+              icon: 'success',
+              willOpen: () => {
+                const confirmButton = Swal.getConfirmButton()
+                if (confirmButton) {
+                  confirmButton.style.backgroundColor = '#002060'
+                  confirmButton.style.color = 'white'
+                }
+              }
+            })
+            setReload(reload + 1);    
+          })
+          .catch(err => {
+            Swal.fire('error', err.message, 'error')
+
+          })
+      }
+    })
+  }
+
+  const handleDeleteBlacklist = idDelete => {
+    showAlertConfirm({
+      text: 'Are you sure you want to delete?'
+    }).then(({ value }) => {
+      if (value) {
+        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+        if (!token) {
+          return
+        }
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          
+        }
+        let urlDelete = `https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${idDelete}?type=blacklist`
+        axios
+          .delete(urlDelete, config)
+          .then(() => {
+            Swal.fire({
+              title: 'Successful!',
+              text: 'Delete Successful',
+              icon: 'success',
+              willOpen: () => {
+                const confirmButton = Swal.getConfirmButton()
+                if (confirmButton) {
+                  confirmButton.style.backgroundColor = '#002060'
+                  confirmButton.style.color = 'white'
+                }
+              }
+            })
+            setReload(reload + 1);
+          })
+          .catch(err => {
+            Swal.fire('error', err.message, 'error')
+            setReload(reload + 1);           
+
+          })
+      }
+    })
+  }
+  
   const handleDelete = async () => {
     if (deleteId !== null && typeDel !== null) {
       setLoading(true)
@@ -407,7 +562,7 @@ const Blacklist = () => {
                   <TableHead>
                     <TableRow>
                       <TableCell style={{ width: '20px' }}>NO.</TableCell>
-                      {columns.map(column => (
+                      {columns1.map(column => (
                         <TableCell key={column.id} align={column.align} sx={{ maxWidth: column.maxWidth }}>
                           {column.label}
                         </TableCell>
@@ -420,7 +575,7 @@ const Blacklist = () => {
                       return (
                         <TableRow hover tabIndex={-1} key={index}>
                           <TableCell>{index + 1}</TableCell>
-                          {columns.map(({ field, renderCell, align, maxWidth }) => {
+                          {columns1.map(({ field, renderCell, align, maxWidth }) => {
                             const value = row[field]
 
                             return (
@@ -436,11 +591,8 @@ const Blacklist = () => {
                           <TableCell>
                             <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center' }}>
                               <IconButton
-                                onClick={() => {
-                                  setDeleteId(row?.member_id)
-                                  setIsOpenDel(true)
-                                  setTypeDel('blacklist')
-                                }}
+                              onClick={() => handleDeleteBlacklist(row?.member_id)}
+
                               >
                                 <Icon icon='tabler:trash' />
                               </IconButton>
@@ -494,10 +646,7 @@ const Blacklist = () => {
                           <TableCell>
                             <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center' }}>
                               <IconButton
-                                onClick={() => {
-                                  setDeleteId(row?.member_id)
-                                  setIsOpenDel(true)
-                                }}
+                               onClick={() => handleDeleteMember(row?.member_id)}
                               >
                                 <Icon icon='tabler:trash' />
                               </IconButton>

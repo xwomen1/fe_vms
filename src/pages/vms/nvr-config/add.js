@@ -769,7 +769,7 @@ const UserList = ({ apiData }) => {
                           </Box>
                         ),
                         endAdornment: (
-                          <IconButton size='small' title='Clear' aria-label='Clear'>
+                          <IconButton size='small' title='Clear' aria-label='Clear' onClick={() => setValue('')}>
                             <Icon fontSize='1.25rem' icon='tabler:x' />
                           </IconButton>
                         )
@@ -805,7 +805,7 @@ const UserList = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                      // loading={loading}
+                        // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.1}></Grid>
@@ -819,7 +819,12 @@ const UserList = ({ apiData }) => {
                     </Grid>
                     <Grid item xs={0.1}></Grid>
                     <Grid item xs={2.4}>
-                      <CustomTextField value={host} onChange={e => setHost(e.target.value)} label='Connection Port' fullWidth />
+                      <CustomTextField
+                        value={host}
+                        onChange={e => setHost(e.target.value)}
+                        label='Connection Port'
+                        fullWidth
+                      />
                     </Grid>
                     <Grid item xs={0.1}></Grid>
                     <Grid item xs={2.4}>
@@ -888,7 +893,7 @@ const UserList = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                      // loading={loading}
+                        // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.4}></Grid>
@@ -1003,7 +1008,7 @@ const UserList = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                      // loading={loading}
+                        // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.1}></Grid>
@@ -1187,7 +1192,12 @@ const UserList = ({ apiData }) => {
         )}
         {openPopupP && (
           <>
-            <Edit open={openPopupP} onClose={handleClosePPopup} nvr={selectedNvrId} />
+            <Edit
+              setReload={() => setReload(reload + 1)}
+              open={openPopupP}
+              onClose={handleClosePPopup}
+              nvr={selectedNvrId}
+            />
           </>
         )}
         {isOpenAddDevice && (

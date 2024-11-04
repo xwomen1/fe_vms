@@ -6,6 +6,149 @@ const navigation = () => {
       path: '/dashboards/analytics'
     },
     {
+      path: '/',
+      title: 'Access Control',
+      icon: 'tabler:lock-access',
+      children: [
+        {
+          title: 'Event',
+          path: '/access-control/event-management',
+          icon: 'tabler:calendar-event'
+        },
+
+        {
+          title: 'History Guest',
+          path: '/access-control/guest-management',
+          icon: 'tabler:align-box-bottom-left'
+        },
+
+        {
+          title: 'Guest Appointment',
+          path: '/pages/scheduling',
+          icon: 'tabler:calendar-plus'
+        },
+        {
+          title: 'Device Management',
+          path: '/device-management',
+          icon: 'tabler:accessible'
+        },
+        {
+          path: '/pages/access-rights/list',
+          title: 'Access Permissions',
+          icon: 'tabler:calendar-month'
+        },
+
+        {
+          title: 'Time Tracking Management',
+          path: '/access-control/time-keeping',
+          icon: 'tabler:lock-access'
+        },
+        {
+          path: '/pages/report-month/list',
+          title: 'Monthly Report',
+          icon: 'tabler:id'
+        },
+        {
+          path: '/',
+          title: 'Advanced Settings',
+          icon: 'tabler:lock-access',
+          children: [
+            {
+              path: '/pages/door-access/list',
+              title: 'Door Access Permissions',
+              icon: 'tabler:door-enter'
+            },
+            {
+              path: '/pages/schedule-access/list',
+              title: 'Calendar Management',
+              icon: 'tabler:calendar-due'
+            },
+
+            {
+              path: '/pages/door-management/list',
+              title: 'Door Management',
+              icon: 'tabler:door'
+            },
+            {
+              path: '/pages/group-access/list',
+              title: 'Access Group',
+              icon: 'tabler:mood-check'
+            }
+
+            // {
+            //   path: '/pages/access-rights/list',
+            //   title: 'Quyền truy cập',
+            //   icon: 'tabler:shield'
+            // },
+            // {
+            //   path: '/pages/access-rights/list',
+            //   title: 'Thống kê',
+            //   icon: 'tabler:statistics/time?tab=%2Fstatistics%2Ftime'
+            // },
+            // {
+            //   path: '/pages/access-rights/list',
+            //   title: 'Hẹn lịch',
+            //   icon: 'tabler:guest-registrations'
+            // }
+          ]
+        }
+
+        // {
+        //   path: '/pages/access-rights/list',
+        //   title: 'Quyền truy cập',
+        //   icon: 'tabler:shield'
+        // },
+        // {
+        //   path: '/pages/access-rights/list',
+        //   title: 'Thống kê',
+        //   icon: 'tabler:statistics/time?tab=%2Fstatistics%2Ftime'
+        // },
+        // {
+        //   path: '/pages/access-rights/list',
+        //   title: 'Hẹn lịch',
+        //   icon: 'tabler:guest-registrations'
+        // }
+      ]
+    },
+    {
+      path: '/',
+      title: 'Performance Management',
+      icon: 'tabler:lock-access',
+      children: [
+        {
+          title: 'Set Up KPI Metrics',
+          path: '/kpi',
+          icon: 'tabler:calendar-event'
+        },
+        {
+          title: 'Assign KPI',
+          path: '/kpi/assign-kpi',
+          icon: 'tabler:calendar-event'
+        },
+        {
+          title: 'Assess KPI',
+          path: '/kpi/assess-kpi',
+          icon: 'tabler:calendar-event'
+        },
+        {
+          path: '/mappingACToInf',
+          title: 'Advanced Settings',
+          icon: 'tabler:shield'
+        }
+
+        // {
+        //   path: '/pages/access-rights/list',
+        //   title: 'Thống kê',
+        //   icon: 'tabler:statistics/time?tab=%2Fstatistics%2Ftime'
+        // },
+        // {
+        //   path: '/pages/access-rights/list',
+        //   title: 'Hẹn lịch',
+        //   icon: 'tabler:guest-registrations'
+        // }
+      ]
+    },
+    {
       path: '/asset',
       title: 'Hệ thống VMS',
       icon: 'tabler:camera',
@@ -14,6 +157,11 @@ const navigation = () => {
           title: 'Xem trực tiếp',
           path: '/vms/live-view',
           icon: 'tabler:video'
+        },
+        {
+          title: 'Content analysis',
+          path: '/vms/Content-analysis/list',
+          icon: 'tabler:category'
         },
 
         // {
@@ -36,7 +184,17 @@ const navigation = () => {
           icon: 'tabler:timeline-event-exclamation'
         },
         {
-          title: 'Danh sách khuôn mặt',
+          title: 'Face Searching',
+          path: '/vms/face-searching',
+          icon: 'tabler:eye-search'
+        },
+        {
+          title: 'Human Event',
+          path: '/vms/events/view/eventHuman',
+          icon: 'tabler:timeline-event-exclamation'
+        },
+        {
+          title: 'Face',
           path: '/vms/events/view/eventFace',
           icon: 'tabler:timeline-event-exclamation'
         },
@@ -121,6 +279,11 @@ const navigation = () => {
           path: '/pages/car_management/list',
           title: 'Quản lý Biển số',
           icon: 'tabler:id-badge-2'
+        },
+        {
+          title: 'Digital Map',
+          icon: 'tabler:map',
+          path: '/vms/digital-map'
         }
 
         // {
@@ -225,7 +388,108 @@ const navigation = () => {
           title: 'Vai trò',
           icon: 'tabler:users',
           path: '/apps/roles'
+        },
+        {
+          title: 'Salary',
+          icon: 'tabler:coin-pound',
+          path: '/salary'
+        },
+        {
+          title: 'Salary Regulations',
+          icon: 'tabler:moneybag',
+          path: '/salaryRule'
+        },
+
+        // {
+        //   title: 'Digital Map',
+        //   icon: 'tabler:map',
+        //   path: '/pages/digital-map'
+        // },
+
+        {
+          title: 'Face List Management',
+          icon: 'tabler:user-off',
+          path: '/pages/blacklist-management'
         }
+      ]
+    },
+    {
+      path: '/',
+      title: 'Smart Parking',
+      icon: 'tabler:lock-access',
+      children: [
+        {
+          path: '/smart-parking/caller',
+          title: 'Subscription',
+          icon: 'tabler:phone'
+        },
+        {
+          path: '/smart-parking/Monitoring/list',
+          title: 'Monitoring',
+          icon: 'tabler:device-computer-camera'
+        },
+        {
+          path: '/smart-parking/caller-type',
+          title: 'Subscription Type',
+          icon: 'tabler:phone'
+        },
+        {
+          path: '/smart-parking/cards',
+          title: 'Card',
+          icon: 'tabler:cards'
+        },
+        {
+          path: '/smart-parking/vehicle',
+          title: 'Vehicle',
+          icon: 'tabler:car'
+        },
+        {
+          path: '/smart-parking/vehicle-type',
+          title: 'Vehicle Type',
+          icon: 'tabler:parking'
+        },
+        {
+          path: '/smart-parking/service',
+          title: 'Service',
+          icon: 'tabler:zoom-money'
+        },
+        {
+          path: '/smart-parking/parking',
+          title: 'Parking Lot',
+          icon: 'tabler:parking'
+        },
+
+        {
+          path: '/smart-parking/asset',
+          title: 'Asset Management',
+          icon: 'tabler:moneybag',
+          children: [
+            {
+              title: 'Asset Type',
+              path: '/smart-parking/assetType'
+            },
+            {
+              title: 'Asset',
+              path: '/smart-parking/asset'
+            }
+          ]
+        }
+
+        // {
+        //   path: '/pages/access-rights/list',
+        //   title: 'Quyền truy cập',
+        //   icon: 'tabler:shield'
+        // },
+        // {
+        //   path: '/pages/access-rights/list',
+        //   title: 'Thống kê',
+        //   icon: 'tabler:statistics/time?tab=%2Fstatistics%2Ftime'
+        // },
+        // {
+        //   path: '/pages/access-rights/list',
+        //   title: 'Hẹn lịch',
+        //   icon: 'tabler:guest-registrations'
+        // }
       ]
     }
 

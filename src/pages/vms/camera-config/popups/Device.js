@@ -29,6 +29,7 @@ import Swal from 'sweetalert2'
 import ReactMapGL, { Marker, Popup } from '@goongmaps/goong-map-react'
 import { MapPin } from './MapPin'
 import DDNS from './DDNS'
+import toast from 'react-hot-toast'
 
 const CustomMapPin = () => (
   <svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' stroke='#002060' fill='#002060'>
@@ -37,7 +38,7 @@ const CustomMapPin = () => (
   </svg>
 )
 
-const Device = ({ onClose, camera }) => {
+const Device = ({ onClose, camera, setReload }) => {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [rows, setRows] = useState([])
@@ -65,11 +66,15 @@ const Device = ({ onClose, camera }) => {
   const [isOfflineSetting, setisOfflineSetting] = useState(false)
   const [lat, setLat] = useState(null)
   const [lng, setLng] = useState(null)
+  const [latitude, setLatitude] = useState(null)
+  const [longitude, setLongitude] = useState(null)
   const [cameraName, setCameraName] = useState(null)
   const [userName, setUserName] = useState(null)
   const [ipAddress, setIpAddress] = useState(null)
   const [http, setHttp] = useState(null)
   const [onvif, setOnvif] = useState(null)
+  const [searchValue, setSearchValue] = useState('')
+  const [options, setOptions] = useState([])
 
   const [viewport, setViewport] = React.useState({
     longitude: 105.83416,
@@ -273,13 +278,14 @@ const Device = ({ onClose, camera }) => {
           }
 
           const response = await axios.get(
-            `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/{idCamera}?idCamera=${camera}`,
+            `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/${camera}`,
             config
           )
 
           setDns(response.data.ddns)
         }
       } catch (error) {
+        toast.error(error?.response?.data?.message)
         console.error('Error fetching data:', error)
       }
     }
@@ -360,6 +366,7 @@ const Device = ({ onClose, camera }) => {
 
       await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${camera}`, data, config)
       setLoading(false)
+      setReload(prev => prev + 1)
       Swal.fire({
         title: 'Success!',
         text: 'Updated successfully',
@@ -377,7 +384,6 @@ const Device = ({ onClose, camera }) => {
     } catch (error) {
       setLoading(false)
       onClose()
-
       Swal.fire({
         title: 'Error!',
         text: error.response?.data?.message,
@@ -402,17 +408,6 @@ const Device = ({ onClose, camera }) => {
     }
   }
   const formatDDNS = ddns => <Checkbox checked={ddns} onChange={handleCheckboxChange} />
-
-  const channelOptions = [
-    { label: 'ONVIF', value: 'ONVIF' },
-    { label: 'IVI', value: 'IVI' },
-    { label: 'HIKVISION', value: 'HIKVISION' },
-    { label: 'DAHUA', label: 'DAHUA' },
-    { label: 'AXIS', value: 'AXIS' },
-    { label: 'BOSCH', value: 'BOSCH' },
-    { label: 'HANWHA', value: 'HANWHA' },
-    { label: 'PANASONIC', value: 'PANASONIC' }
-  ]
 
   const handleDeleteRow = index => {
     const updatedRows = [...rows]
@@ -467,7 +462,7 @@ const Device = ({ onClose, camera }) => {
       }
 
       const response = await axios.get(
-        'https://sbs.basesystem.one/ivis/infrares/api/v0/regions?limit=25&page=1&parentID=abbe3f3c-963b-4d23-a766-42a8261607c3',
+        'https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions?limit=25&page=1&parentID=abbe3f3c-963b-4d23-a766-42a8261607c3',
         config
       )
 
@@ -525,6 +520,69 @@ const Device = ({ onClose, camera }) => {
     ApiProtocol()
   }, [])
 
+  const handleSearchChange = async (event, newValue) => {
+    setSearchValue(newValue)
+
+    if (newValue.trim() === '') return
+
+    try {
+      const response = await axios.get(
+        `https://rsapi.goong.io/Place/AutoComplete?api_key=R2BrWbt6JsHQSpDm1Y6Dtr53hrg6PQ9rZhTJJKQJ&input=${newValue}`
+      )
+      setOptions(response.data.predictions)
+    } catch (error) {
+      console.error('Lỗi khi tìm kiếm gợi ý:', error)
+    }
+  }
+
+  const handlePlaceSelect = async (event, value) => {
+    if (!value) return
+
+    const placeId = value.place_id
+
+    try {
+      const detailResponse = await axios.get(
+        `https://rsapi.goong.io/Place/Detail?place_id=${placeId}&api_key=R2BrWbt6JsHQSpDm1Y6Dtr53hrg6PQ9rZhTJJKQJ`
+      )
+
+      const placeData = detailResponse.data.result
+
+      const location = placeData.geometry.location
+
+      setLatitude(location.lat)
+      setLongitude(location.lng)
+
+      setViewport(prevViewport => ({
+        ...prevViewport,
+        latitude: location.lat,
+        longitude: location.lng
+      }))
+    } catch (error) {
+      console.error('Lỗi khi lấy chi tiết địa điểm:', error)
+    }
+  }
+
+  useEffect(() => {
+    if (latitude && longitude) {
+      setViewport(prevViewport => ({
+        ...prevViewport,
+        latitude,
+        longitude
+      }))
+    }
+  }, [latitude, longitude])
+
+  const handleReturnToMarker = () => {
+    if (lat && lng) {
+      setViewport(prevViewport => ({
+        ...prevViewport,
+        latitude: parseFloat(lat),
+        longitude: parseFloat(lng),
+        zoom: 14
+      }))
+    }
+  }
+
   return (
     <div style={{ width: '100%' }}>
       {loading && <CircularProgress />}
@@ -553,7 +611,7 @@ const Device = ({ onClose, camera }) => {
               value={cameraGroupSelect}
               onChange={handleCameraGroupChange}
               options={cameraGroup || []}
-              getOptionLabel={option => option.label}
+              getOptionLabel={option => option.label || ''}
               renderInput={params => (
                 <CustomTextField
                   {...params}
@@ -589,7 +647,7 @@ const Device = ({ onClose, camera }) => {
               value={selectedProtocol}
               onChange={handleProtocolChange}
               options={protocol || []}
-              getOptionLabel={option => option.name}
+              getOptionLabel={option => option.name || ''}
               renderInput={params => (
                 <CustomTextField
                   {...params}
@@ -607,7 +665,7 @@ const Device = ({ onClose, camera }) => {
               value={selectNVR}
               onChange={handleDDNSChange}
               options={nvrs || []}
-              getOptionLabel={option => option.label}
+              getOptionLabel={option => option.label || ''}
               renderInput={params => (
                 <CustomTextField
                   {...params}
@@ -626,7 +684,7 @@ const Device = ({ onClose, camera }) => {
               value={regionsSelect}
               onChange={handleRegionsChange}
               options={regions || []}
-              getOptionLabel={option => option.label}
+              getOptionLabel={option => option.label || ''}
               renderInput={params => <CustomTextField {...params} label='Region' fullWidth />}
               onFocus={handleComboboxFocusRegions}
             />{' '}
@@ -653,16 +711,15 @@ const Device = ({ onClose, camera }) => {
         <Grid item xs={12}>
           <Typography variant='h5'>Channel</Typography>
         </Grid>
-        <Grid item xs={11.8} component={Paper}>
+        <Grid item xs={12} component={Paper}>
           <TableContainer>
             <Table>
               <TableHead>
                 <TableRow>
                   <TableCell>Channel Name</TableCell>
                   <TableCell>Proxied</TableCell>
-                  <TableCell align='center'>Channel URL </TableCell>
-                  <TableCell align='center'>StreamType </TableCell>
-
+                  <TableCell align='center'>Channel URL</TableCell>
+                  <TableCell align='center'>StreamType</TableCell>
                   <TableCell align='center'>
                     <IconButton size='small' onClick={handleAddRow}>
                       <Icon icon='tabler:plus' />
@@ -714,22 +771,40 @@ const Device = ({ onClose, camera }) => {
         </Grid>{' '}
         {viewport && (
           <Grid item xs={12}>
-            <ReactMapGL
-              {...viewport}
-              width='100%'
-              height='30vh'
-              onViewportChange={setViewport}
-              goongApiAccessToken={GOONG_MAP_KEY}
-              onClick={handleMapClick}
-            >
-              {lat && lng && (
-                <Marker latitude={parseFloat(lat)} longitude={parseFloat(lng)} offsetLeft={-20} offsetTop={-20}>
-                  <div>
-                    <CustomMapPin />{' '}
-                  </div>
-                </Marker>
-              )}
-            </ReactMapGL>
+            <div style={{ width: '100%' }}>
+              <Grid container spacing={2}>
+                <Grid item xs={9.4}>
+                  <Autocomplete
+                    options={options}
+                    getOptionLabel={option => option.description}
+                    onInputChange={handleSearchChange}
+                    onChange={handlePlaceSelect}
+                    renderInput={params => <CustomTextField {...params} fullWidth />}
+                  />
+                </Grid>
+                <Grid item xs={2.6}>
+                  <Button variant='contained' onClick={handleReturnToMarker}>
+                    <Icon icon='tabler:current-location' />
+                    Reset location
+                  </Button>
+                </Grid>
+              </Grid>
+
+              <ReactMapGL
+                {...viewport}
+                width='100%'
+                height='30vh'
+                onViewportChange={setViewport}
+                goongApiAccessToken={GOONG_MAP_KEY}
+                onClick={handleMapClick}
+              >
+                {lat && lng && (
+                  <Marker latitude={parseFloat(lat)} longitude={parseFloat(lng)} offsetLeft={-20} offsetTop={-20}>
+                    <CustomMapPin />
+                  </Marker>
+                )}
+              </ReactMapGL>
+            </div>
           </Grid>
         )}
       </Grid>

@@ -28,31 +28,24 @@ import { getApi } from 'src/@core/utils/requestUltils'
 
 const statusAppointment = [
   {
-    id: 'WAITING',
-    color: 'primary'
+    id: 'WAITING'
   },
   {
-    id: 'CANCELLED',
-    color: 'Secondary'
+    id: 'CANCELLED'
   },
   {
-    id: 'COMPLETE',
-    color: 'success'
+    id: 'COMPLETE'
   },
   {
-    id: 'APPROVED',
-    color: 'info'
+    id: 'APPROVED'
   },
   {
-    id: 'UNSUCCESSFUL',
-    color: 'error'
+    id: 'UNSUCCESSFUL'
   },
   {
-    id: 'OUT_OF_DATE',
-    color: 'warning'
-  },
+    id: 'OUT_OF_DATE'
+  }
 ]
-
 
 const Approval = ({ keyword, valueFilter }) => {
   const [loading, setLoading] = useState(false)
@@ -70,7 +63,6 @@ const Approval = ({ keyword, valueFilter }) => {
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage)
-    fetchDataList(newPage, pageSize)
   }
 
   const handleCloseMenu = () => {
@@ -80,7 +72,6 @@ const Approval = ({ keyword, valueFilter }) => {
   const handleSelectPageSize = size => {
     setPageSize(size)
     setPage(1)
-    fetchDataList(1, size)
     handleCloseMenu()
   }
 
@@ -101,10 +92,7 @@ const Approval = ({ keyword, valueFilter }) => {
         ...valueFilter
       }
 
-      const response = await getApi(
-        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/registrations`,
-        params
-      )
+      const response = await getApi(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/registrations`, params)
       setDataList(response.data?.rows)
       setTotal(Math.ceil(response.data?.count / pageSize)) // Tính tổng số trang dựa trên tổng số mục và kích thước trang
     } catch (error) {
@@ -124,10 +112,9 @@ const Approval = ({ keyword, valueFilter }) => {
     fetchData()
   }, [keyword, page, pageSize, valueFilter])
 
-
   return (
     <>
-      <Card sx={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
+      <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         <CardContent sx={{ flex: 1, overflow: 'auto' }}>
           <Table>
             <TableHead style={{ background: '#F6F6F7' }}>
@@ -155,13 +142,19 @@ const Approval = ({ keyword, valueFilter }) => {
                     <TableRow key={Guests.id}>
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>
-                        <Button size='small' sx={{ color: 'blue' }}>
+                        <Button
+                          size='small'
+                          component={Link}
+                          href={`/pages/scheduling/detail/${Guests.id}`}
+                          sx={{ color: 'blue', right: '10px' }}
+                        >
                           {Guests.code}
                         </Button>
                       </TableCell>
                       <TableCell>{Guests.startDate}</TableCell>
                       <TableCell>
-                        {convertMinutesToTime(Guests.startTimeInMinute)} - {convertMinutesToTime(Guests.endTimeInMinute)}
+                        {convertMinutesToTime(Guests.startTimeInMinute)} -{' '}
+                        {convertMinutesToTime(Guests.endTimeInMinute)}
                       </TableCell>
                       <TableCell></TableCell>
                       <TableCell></TableCell>
@@ -170,13 +163,27 @@ const Approval = ({ keyword, valueFilter }) => {
                       <TableCell>{Guests.approverInfo?.fullName}</TableCell>
                       <TableCell>{Guests.guestInfo?.identityNumber}</TableCell>
                       <TableCell>
-                        <CustomChip label={statusGuests.id} skin='light' color={statusGuests.color} />
+                        <CustomChip
+                          label={
+                            statusGuests?.id === 'WAITING'
+                              ? 'WAITING'
+                              : statusGuests?.id === 'APPROVED' || statusGuests?.id === 'COMPLETE'
+                              ? 'APPROVED'
+                              : 'UNAPPROVED'
+                          }
+                          skin='light'
+                          color={
+                            statusGuests?.id === 'WAITING'
+                              ? 'default'
+                              : statusGuests?.id === 'APPROVED' || statusGuests?.id === 'COMPLETE'
+                              ? 'success'
+                              : 'error' // Những trạng thái khác sẽ có màu 'error'
+                          }
+                        />
                       </TableCell>
+
                       <TableCell>
-                        <IconButton
-                          component={Link}
-                          href={`/pages/scheduling/detail/${Guests.id}`}
-                        >
+                        <IconButton component={Link} href={`/pages/scheduling/detail/${Guests.id}`}>
                           <Icon icon='tabler:info-circle' />
                         </IconButton>
                       </TableCell>

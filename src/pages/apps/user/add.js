@@ -179,7 +179,7 @@ const Add = () => {
   // }))
   const fetchRegionName = async regionId => {
     try {
-      const response = await axios.get(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${regionId}`)
+      const response = await axios.get(`https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/${regionId}`)
 
       return response.data.name
     } catch (error) {
@@ -425,7 +425,8 @@ const Add = () => {
           userAccount: {
             accStatus: 'ACTIVE',
             username: account,
-            password: password
+            password: password,
+            identityProviderType: 'LOCAL'
           }
         },
         config
@@ -452,7 +453,18 @@ const Add = () => {
       router.push(`/apps/user/detail/${response.data.userId}`)
     } catch (error) {
       console.error('Error updating user details:', error)
-      Swal.fire('error!', error?.response?.data?.message, 'error')
+      Swal.fire({
+        title: 'Error!',
+        text: error?.response?.data?.message,
+        icon: 'error',
+        willOpen: () => {
+          const confirmButton = Swal.getConfirmButton()
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = '#002060'
+            confirmButton.style.color = 'white'
+          }
+        }
+      })
     }
   }
 
@@ -548,7 +560,7 @@ const Add = () => {
     const fetchRegions = async () => {
       try {
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=level'
+          'https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=level'
         )
 
         const regions = response.data.map(region => ({
@@ -570,7 +582,7 @@ const Add = () => {
     const fetchRegions = async () => {
       try {
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=contracttype'
+          'https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=contracttype'
         )
 
         const regions = response.data.map(region => ({
@@ -602,7 +614,7 @@ const Add = () => {
         }
 
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=company',
+          'https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=company',
           config
         )
 
@@ -767,10 +779,12 @@ const Add = () => {
                       selected={dateTime}
                       timeIntervals={15}
                       showTimeSelectOnly
-                      dateFormat='h:mm '
+                      dateFormat='HH:mm' // Hiển thị theo định dạng 24 giờ
+                      timeFormat='HH:mm' // Định dạng giờ 24 giờ
                       id='time-only-picker'
                       onChange={date => handleTimeChange(date)}
                       customInput={<CustomInput />}
+                      timeCaption='Time' // Chú thích giờ
                     />
                   </div>
                 </Box>
@@ -785,7 +799,9 @@ const Add = () => {
                       selected={timeEndMorning}
                       timeIntervals={15}
                       showTimeSelectOnly
-                      dateFormat='h:mm '
+                      dateFormat='HH:mm' // Hiển thị theo định dạng 24 giờ
+                      timeFormat='HH:mm' // Định dạng giờ 24 giờ
+                      timeCaption='Time' // Chú thích giờ
                       id='time-only-picker'
                       onChange={date => handleTimeEndMorningChange(date)}
                       customInput={<CustomInput />}
@@ -806,7 +822,9 @@ const Add = () => {
                       selected={timeStartAfternoon}
                       timeIntervals={15}
                       showTimeSelectOnly
-                      dateFormat='h:mm '
+                      dateFormat='HH:mm' // Hiển thị theo định dạng 24 giờ
+                      timeFormat='HH:mm' // Định dạng giờ 24 giờ
+                      timeCaption='Time' // Chú thích giờ
                       id='time-only-picker'
                       onChange={date => handleTimeStartAfetrnoonChange(date)}
                       customInput={<CustomInput />}
@@ -824,7 +842,9 @@ const Add = () => {
                       selected={timeEndAfternoon}
                       timeIntervals={15}
                       showTimeSelectOnly
-                      dateFormat='h:mm '
+                      dateFormat='HH:mm' // Hiển thị theo định dạng 24 giờ
+                      timeFormat='HH:mm' // Định dạng giờ 24 giờ
+                      timeCaption='Time' // Chú thích giờ
                       id='time-only-picker'
                       onChange={date => handleTimeEndAfternoonChange(date)}
                       customInput={<CustomInput />}
@@ -967,13 +987,25 @@ const Add = () => {
                 <Typography variant='h5'>Create Login Account</Typography>
               </Grid>
               <Grid item xs={4}>
-                <TextField label='Account*' onChange={handleAccountChange} fullWidth />
+                <TextField autoComplete='new-password' label='Account*' onChange={handleAccountChange} fullWidth />
               </Grid>
               <Grid item xs={4}>
-                <TextField label='Password*' type='password' onChange={handlePasswordChange} fullWidth />
+                <TextField
+                  autoComplete='new-password'
+                  label='Password*'
+                  type='password'
+                  onChange={handlePasswordChange}
+                  fullWidth
+                />
               </Grid>
               <Grid item xs={3.8}>
-                <TextField label='Confirm password*' type='password' onChange={handleConfirmPasswordChange} fullWidth />
+                <TextField
+                  autoComplete='new-password'
+                  label='Confirm password*'
+                  type='password'
+                  onChange={handleConfirmPasswordChange}
+                  fullWidth
+                />
               </Grid>
               <Grid item xs={2} style={{ marginTop: '1.1%' }}>
                 <FormControlLabel

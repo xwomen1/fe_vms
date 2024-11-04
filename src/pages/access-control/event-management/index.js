@@ -26,23 +26,20 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  Select,
+  FormControl,
+  InputLabel,
+  CircularProgress,
+  Badge
 } from '@mui/material'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import { format } from 'date-fns'
 import DatePicker from 'react-datepicker'
 import CustomInput from 'src/views/forms/form-elements/pickers/PickersCustomInput'
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
-
-const initValueFilter = {
-  location: null,
-  cameraName: null,
-  startTime: null,
-  endTime: null,
-  keyword: '',
-  limit: 25,
-  page: 1
-}
+import * as XLSX from 'xlsx'
+import { makeStyles } from '@material-ui/core/styles'
 
 const EventList = () => {
   const [anchorEl, setAnchorEl] = useState(null)
@@ -53,16 +50,64 @@ const EventList = () => {
   const [pageSize, setPageSize] = useState(25)
   const [loading, setLoading] = useState(false)
   const pageSizeOptions = [25, 50, 100]
+  const classes = useStyles()
+  const [devicesGroup, setDevicesGroup] = useState([])
+  const [isReset, setIsReset] = useState(false)
 
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
   const [filterPopupOpen, setFilterPopupOpen] = useState(false)
 
   const [filterValues, setFilterValues] = useState({
     deviceIds: '',
-    hostIds: '',
+    groupId: '',
     startDate: null,
     endDate: null
   })
+  const [userGroups, setUserGroups] = useState([]) // Dùng để lưu danh sách user groups
+  const [selectedUserGroup, setSelectedUserGroup] = useState(null) // Dùng để lưu user group được chọn
+  const [selectedDeviceGroup, setSelectedDeviceGroup] = useState(null) // Dùng để lưu device group được chọn
+  useEffect(() => {
+    const fetchUserGroups = async () => {
+      try {
+        const response = await axios.get('https://dev-ivi.basesystem.one/smc/iam/api/v0/groups/search', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        setUserGroups(response.data) // Giả sử API trả về danh sách user groups
+      } catch (error) {
+        console.error('Error fetching user groups:', error)
+      }
+    }
+
+    fetchUserGroups()
+  }, [])
+
+  useEffect(() => {
+    const fetchDeviceGroupsAndDevices = async () => {
+      try {
+        // Gọi API đầu tiên để lấy device groups
+        const response = await axios.get(
+          'https://dev-ivi.basesystem.one/smc/access-control/api/v0/device-access/device/device-groups/children-lv1'
+        )
+
+        if (response.data && response.data.length > 0) {
+          const firstGroupId = response.data[0]?.id // Lấy id của device group đầu tiên
+
+          // Gọi API thứ hai để lấy danh sách devices với id của group đầu tiên
+          const devicesResponse = await axios.get(
+            `https://dev-ivi.basesystem.one/smc/access-control/api/v0/device-access/devices?deviceGroupId=${firstGroupId}&keyword=`
+          )
+          setDevicesGroup(devicesResponse.data) // Cập nhật danh sách devices
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+    fetchDeviceGroupsAndDevices()
+  }, [])
+
+  console.log(devicesGroup, 'devicesGroup')
 
   const handleStartDateChange = date => {
     setFilterValues(prev => ({ ...prev, startDate: date }))
@@ -80,10 +125,76 @@ const EventList = () => {
     setFilterPopupOpen(false)
   }
 
+  const resetEvent = () => {
+    setSelectedUserGroup([])
+    setSelectedDeviceGroup([])
+    setFilterValues({
+      deviceIds: '',
+      groupId: '',
+      startDate: null,
+      endDate: null
+    })
+
+    setIsReset(true) // Đặt cờ reset để biết rằng cần chạy lại fetchDataList sau khi reset
+    handleSearch() // Nếu bạn cần thêm xử lý tìm kiếm khác
+  }
+
+  useEffect(() => {
+    if (isReset) {
+      fetchDataList() // Gọi fetchDataList khi reset
+      setIsReset(false) // Đặt lại cờ sau khi dữ liệu đã được tải lại
+    }
+  }, [filterValues, isReset])
+
+  const countActiveFilters = () => {
+    let count = 0
+    if (filterValues.deviceIds) count++
+    if (filterValues.groupId) count++
+    if (filterValues.startDate) count++
+    if (filterValues.endDate) count++
+
+    return count
+  }
+
+  const hasFilterValues = Object.values(filterValues).some(value => value !== '' && value !== null)
+
   const formatTime = dateTime => {
     const date = typeof dateTime === 'number' ? new Date(dateTime) : new Date(dateTime)
 
     return format(date, 'dd/MM/yyyy HH:mm:ss')
+  }
+  console.log(devices, 'device')
+
+  const handleExportExcel = async () => {
+    setLoading(true)
+    try {
+      const response = await fetchDataList1()
+      const devices = response.rows || []
+
+      console.log('Data to be exported:', devices) // Kiểm tra dữ liệu ở đây
+
+      const formattedData = devices.map((device, index) => ({
+        No: index + 1,
+        FullName: device.fullName,
+        AccessCode: device.accessCode,
+        Event: device.deviceDirection,
+        Time: formatTime(device.dateEvent),
+        Door: device.hostName,
+        DeviceName: device.deviceName,
+        DeviceType: device.deviceGroupName
+      }))
+
+      const worksheet = XLSX.utils.json_to_sheet(formattedData)
+      const workbook = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Event Data')
+
+      XLSX.writeFile(workbook, 'event_data.xlsx')
+    } catch (error) {
+      console.error('Error exporting data:', error)
+      toast.error('Error exporting data')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const formatDate = dateTime => {
@@ -147,14 +258,18 @@ const EventList = () => {
           limit: pageSize,
           deviceName: filterValues.deviceName,
           hostName: filterValues.hostName,
+          deviceIds: filterValues.deviceIds,
           startDate: isoToEpoch(filterValues.startDate) || null,
-          endDate: isoToEpoch(filterValues.endDate) || null
+          endDate: isoToEpoch(filterValues.endDate) || null,
+          groupId: filterValues.groupId || null // Thêm groupId vào params
         }
       }
 
       const response = await axios.get(`https://dev-ivi.basesystem.one/smc/access-control/api/v0/event/search`, config)
       setDevices(response.data.rows)
       setTotalPage(Math.ceil(response.data.count / pageSize))
+
+      return response.data.rows
     } catch (error) {
       console.error('Error fetching data:', error)
       toast.error('Error fetching data')
@@ -175,9 +290,11 @@ const EventList = () => {
           page: page,
           limit: pageSize,
           deviceName: filterValues.deviceName,
+          deviceIds: filterValues.deviceIds,
           hostName: filterValues.hostName,
           startDate: isoToEpoch(filterValues.startDate) || null,
-          endDate: isoToEpoch(filterValues.endDate) || null
+          endDate: isoToEpoch(filterValues.endDate) || null,
+          groupId: filterValues.groupId || null // Thêm groupId vào params
         }
       }
 
@@ -192,9 +309,48 @@ const EventList = () => {
     }
   }, [token, page, pageSize, searchKeyword, filterValues])
 
+  console.log(filterValues, 'filterValues')
+
+  const fetchDevicesByPage = async page => {
+    const response = await axios.get(
+      `https://dev-ivi.basesystem.one/smc/access-control/api/v0/event/search?page=${page}`
+    )
+
+    return response.data
+  }
+
   const handleSearch = () => {
     setPage(1)
     fetchDataList()
+  }
+
+  const fetchAllData = async () => {
+    let allDevices = []
+    let page = 1
+    let totalPages = 1
+    setLoading(true)
+
+    try {
+      const initialResponse = await fetchDataList1(page)
+      totalPages = initialResponse.totalPage
+
+      allDevices = initialResponse.rows
+
+      // Lặp qua từng trang và lấy dữ liệu
+      while (page < totalPages) {
+        page += 1
+        const response = await fetchDataList1(page)
+        allDevices = allDevices.concat(response.rows)
+      }
+      setLoading(false)
+
+      return allDevices
+    } catch (error) {
+      console.error('Lỗi khi lấy dữ liệu: ', error)
+      setLoading(false)
+
+      return []
+    }
   }
 
   const columns = [
@@ -209,7 +365,9 @@ const EventList = () => {
   ]
 
   return (
-    <Card sx={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
+    <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%' }} className={classes.loadingContainer}>
+      {loading && <CircularProgress className={classes.circularProgress} />}
+
       <CardHeader
         title={
           <>
@@ -227,10 +385,29 @@ const EventList = () => {
           <Grid container spacing={2}>
             <Grid item></Grid>
             <Grid item>
-              <Button variant='contained' onClick={handleOpenFilterPopup}>
-                <Icon fontSize='1.25rem' icon='tabler:filter' />
+              <Button
+                variant='contained'
+                onClick={() => resetEvent()}
+                disabled={!hasFilterValues} // Nút bị disable nếu không có filterValues
+              >
+                <Icon icon='tabler:x' />
+                Reset filter
               </Button>
             </Grid>
+            <Grid item>
+              <Badge badgeContent={countActiveFilters()} color='primary'>
+                <Button variant='contained' onClick={handleOpenFilterPopup}>
+                  <Icon fontSize='1.25rem' icon='tabler:filter' />
+                </Button>
+              </Badge>
+            </Grid>
+            <Grid item>
+              <Button variant='contained' onClick={handleExportExcel} disabled={loading}>
+                <Icon fontSize='1.25rem' icon='tabler:file-export' />
+                {loading && <CircularProgress className={classes.circularProgress} /> ? '' : ''}
+              </Button>
+            </Grid>
+
             <Grid item>
               <CustomTextField
                 placeholder='Enter event'
@@ -251,6 +428,7 @@ const EventList = () => {
                     </IconButton>
                   )
                 }}
+                autoComplete='off'
                 sx={{
                   width: {
                     xs: 1,
@@ -364,26 +542,11 @@ const EventList = () => {
                 <DatePicker
                   selected={filterValues.startDate}
                   onChange={handleStartDateChange}
-                  dateFormat='dd/MM/yyyy'
+                  dateFormat='dd/MM/yyyy h:mm'
+                  showTimeSelect
+                  timeFormat='HH:mm'
+                  timeIntervals={15}
                   customInput={<CustomInput label='Start date' />}
-                  popperProps={{
-                    modifiers: [
-                      {
-                        name: 'preventOverflow',
-                        options: {
-                          boundary: 'viewport' // Đảm bảo rằng DatePicker không bị cắt bởi viewport
-                        }
-                      }
-                    ]
-                  }}
-                />
-              </div>
-              <div>
-                <DatePicker
-                  selected={filterValues.endDate}
-                  onChange={handleEndDateChange}
-                  dateFormat='dd/MM/yyyy'
-                  customInput={<CustomInput label='End date' />}
                   popperProps={{
                     modifiers: [
                       {
@@ -394,14 +557,82 @@ const EventList = () => {
                       }
                     ]
                   }}
+                  autoComplete='off'
+                />
+              </div>
+              <div>
+                <DatePicker
+                  selected={filterValues.endDate}
+                  onChange={handleEndDateChange}
+                  dateFormat='dd/MM/yyyy h:mm'
+                  showTimeSelect
+                  timeFormat='HH:mm'
+                  timeIntervals={15}
+                  customInput={<CustomInput label='End date' />}
+                  minDate={filterValues.startDate}
+                  popperProps={{
+                    modifiers: [
+                      {
+                        name: 'preventOverflow',
+                        options: {
+                          boundary: 'viewport'
+                        }
+                      }
+                    ]
+                  }}
+                  autoComplete='off'
                 />
               </div>
             </Box>
           </DatePickerWrapper>
+          <FormControl fullWidth margin='normal'>
+            <InputLabel>User Group</InputLabel>
+            <Select
+              value={selectedUserGroup || ''}
+              onChange={e => {
+                const selectedGroup = userGroups.find(group => group.groupId === e.target.value)
+                setSelectedUserGroup(e.target.value) // Lưu id được chọn
+                setFilterValues(prev => ({ ...prev, groupId: selectedGroup.groupId })) // Truyền id vào filterValues
+              }}
+            >
+              {userGroups.map(group => (
+                <MenuItem key={group.groupId} value={group.groupId}>
+                  {group.groupName}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl fullWidth margin='normal'>
+            <InputLabel>Device</InputLabel>
+            <Select
+              value={selectedDeviceGroup || ''}
+              onChange={e => {
+                const selectedGroups = devicesGroup.find(group => group.id === e.target.value)
+                setSelectedDeviceGroup(e.target.value) // Lưu id được chọn
+                setFilterValues(prev => ({ ...prev, deviceIds: selectedGroups.id })) // Truyền id vào filterValues
+              }}
+            >
+              {devicesGroup.map(group => (
+                <MenuItem key={group.id} value={group.id}>
+                  {group.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
           {/* Các phần tử khác */}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseFilterPopup}>Cancel</Button>
+          <Button variant='contained' onClick={handleCloseFilterPopup}>
+            Cancel
+          </Button>
+          <Button
+            variant='contained'
+            onClick={() => {
+              resetEvent()
+            }}
+          >
+            RESET
+          </Button>
           <Button
             variant='contained'
             onClick={() => {
@@ -416,5 +647,20 @@ const EventList = () => {
     </Card>
   )
 }
+
+const useStyles = makeStyles(() => ({
+  loadingContainer: {
+    position: 'relative',
+    minHeight: '100px', // Đặt độ cao tùy ý
+    zIndex: 0
+  },
+  circularProgress: {
+    position: 'absolute',
+    top: '40%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    zIndex: 99999 // Đặt z-index cao hơn so với Grid container
+  }
+}))
 
 export default EventList

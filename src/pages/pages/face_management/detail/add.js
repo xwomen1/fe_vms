@@ -17,6 +17,7 @@ import {
   TextField,
   Switch
 } from '@mui/material'
+import toast from 'react-hot-toast'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import { Fragment, useState, useEffect, useRef, useCallback } from 'react'
 import axios from 'axios'
@@ -51,14 +52,8 @@ const AddFaceManagement = () => {
   const [avatarImage, setAvatarImage] = useState(null)
   const [fileAvatarImg, setFileAvatarImg] = useState(null)
   const ALLOWED_FILE_EXTENSIONS = ['.jpg', '.jpeg', '.gif', '.png']
-  const [isDoubleClick, setIsDoubleClick] = useState(false)
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [dialogTitle, setDialogTitle] = useState('')
-  const [dialogMessage, setDialogMessage] = useState('')
   const [status1, setStatus1] = useState(false)
-  const [isSuccess, setIsSuccess] = useState(false)
   const [selectedOption, setSelectedOption] = useState('')
-  const [redirectUrl, setRedirectUrl] = useState('')
   const [errorType, setErrorType] = useState(false)
 
   const handleInputChange = e => {
@@ -66,12 +61,7 @@ const AddFaceManagement = () => {
     setName(value)
     setIsNameEntered(!!value)
   }
-
-  useEffect(() => {
-    if (!showCropper) {
-      setIsDoubleClick(false)
-    }
-  }, [showCropper])
+  console.log(fileAvatarId, 'fileAvatarId')
 
   const fileListToBase64 = async fileList => {
     function getBase64(file) {
@@ -99,7 +89,6 @@ const AddFaceManagement = () => {
   useEffect(() => {
     async function fetchData() {
       const arrayOfBase64 = await fileListToBase64(listFileUpload)
-
       setListImage(arrayOfBase64)
     }
     if (listFileUpload.length > 0) {
@@ -146,10 +135,17 @@ const AddFaceManagement = () => {
           <IconButton
             className='close'
             onClick={() => {
+              // Tạo bản sao tạm thời của listFileUpload và listFileId
               const listFileUploadTmp = [...listFileUpload]
+              const listFileIdTmp = [...listFileId]
 
-              listFileUploadTmp.splice(listImage.indexOf(image), 1)
+              // Xóa phần tử tại vị trí của ảnh hiện tại
+              listFileUploadTmp.splice(index, 1)
+              listFileIdTmp.splice(index, 1)
+
+              // Cập nhật lại trạng thái
               setListFileUpload(listFileUploadTmp)
+              setListFileId(listFileIdTmp)
             }}
             color='primary'
           >
@@ -171,63 +167,65 @@ const AddFaceManagement = () => {
 
   const onDragDropImage = async e => {
     if (e.value.length > 0) {
-      if (e.value.length + listFileUpload.length > 5) {
-        Swal.fire({
-          text: 'Up to 5 images',
-          icon: 'error',
-          showCancelButton: false,
-          showCloseButton: false,
-          showConfirmButton: true,
-          focusConfirm: true,
-          confirmButtonColor: '#40a574',
-          confirmButtonText: 'Close',
-          customClass: {
-            content: 'content-class'
-          }
-        })
-      } else {
-        const files = listFileUpload.concat(e.value)
+      setShowLoading(true)
+      setLoading(true)
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
-        const formData = new FormData()
+      const config = {
+        headers: { Authorization: `Bearer ${token}` }
+      }
 
-        for (const file of files) {
+      const newFileData = []
+      const newListFileUpload = [...listFileUpload]
+
+      try {
+        for (const file of e.value) {
+          const formData = new FormData()
           formData.append('files', file)
-        }
-        setShowLoading(true)
 
-        const token = localStorage.getItem(authConfig.storageTokenKeyName)
+          const res = await axios.post('https://sbs.basesystem.one/ivis/vms/api/v0/images/upload', formData, config)
+          console.log(res, 'res')
 
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
+          if (res.data) {
+            newFileData.push({
+              id: res.data.id,
+              name: res.data.name,
+              urlImage: res.data.urlImage
+            })
+            newListFileUpload.push(file)
+            console.log(newListFileUpload, 'newListFileUpload')
           }
         }
 
-        try {
-          const res = await axios.post(
-            `https://sbs.basesystem.one/ivis/storage/api/v0/libraries/upload/multi`,
-            formData,
-            config
-          )
-          setListFileUpload(files)
-
-          const fileIds = res.data.map(x => x.id)
-
-          const arr = [...listFileId, ...fileIds]
-
-          setListFileId([...arr].slice(0, 5))
-        } catch (error) {
-          console.error('Error occurred during upload:', error)
-        } finally {
-          setShowLoading(false)
+        // Kiểm tra số lượng hình ảnh sau khi thêm mới
+        if (newListFileUpload.length > 5) {
+          await Swal.fire({
+            text: 'Up to 5 images',
+            icon: 'error',
+            showCancelButton: false,
+            showCloseButton: false,
+            showConfirmButton: true,
+            focusConfirm: true,
+            confirmButtonColor: '#40a574',
+            confirmButtonText: 'Close',
+            customClass: { content: 'content-class' }
+          })
+        } else {
+          const updatedFileData = [...listFileId, ...newFileData].slice(0, 5)
+          setListFileId(updatedFileData)
+          setListFileUpload(newListFileUpload.slice(0, 5))
         }
+      } catch (error) {
+        console.error('Error occurred during upload:', error)
+        toast.error(error)
+      } finally {
+        setLoading(false)
+        setShowLoading(false)
       }
-      if (fileUploader2?.current?.instance) {
-        fileUploader2.current.instance.reset()
-      }
-      if (fileUploader1?.current?.instance) {
-        fileUploader1.current.instance.reset()
-      }
+
+      // Reset file uploader sau khi tải lên
+      fileUploader2?.current?.instance?.reset()
+      fileUploader1?.current?.instance?.reset()
     }
   }
 
@@ -255,14 +253,17 @@ const AddFaceManagement = () => {
       const params = {
         name: name,
         status: status1,
-        mainImageId: fileAvatarId,
+        mainImageId: fileAvatarId.id,
+        mainImageUrl: fileAvatarId.urlImage,
         imgs: listFileId.map((id, index) => ({
-          id: id,
-          urlImage: listFileUrl[id]
+          id: id.id,
+          urlImage: id.urlImage,
+          name: id.name
         })),
         note: note,
         type: {
           id: selectedOption.id,
+          name: selectedOption.name,
           code: selectedOption.code
         }
       }
@@ -306,70 +307,46 @@ const AddFaceManagement = () => {
     }
   }
 
-  const fetchChildData = useCallback(async parentId => {
+  const fetchChildData = useCallback(async parentCode => {
     try {
       const response = await axios.get(
-        `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`
+        `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=${parentCode}`
       )
 
       return response.data
     } catch (error) {
       console.error('Error fetching child data:', error)
+      toast.error(error)
 
       return []
     }
   }, [])
 
-  const fetchAllChildData = useCallback(
-    async (parentId, level = 0) => {
-      let result = []
-      setLoading(true)
-
-      const recurseFetch = async (parentId, level) => {
-        const childData = await fetchChildData(parentId)
-        for (const child of childData) {
-          result.push({ code: child.code, name: child.name, id: child.id, level })
-          if (child.isParent) {
-            await recurseFetch(child.id, level + 1)
-          }
-        }
-      }
-
-      try {
-        await recurseFetch(parentId, level)
-      } catch (error) {
-        console.error('Error fetching all child data:', error)
-      } finally {
-        setLoading(false)
-      }
-
-      return result
-    },
-    [fetchChildData]
-  )
-
   const fetchInitialData = useCallback(async () => {
     try {
       const response = await axios.get(
-        'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/code?code=person_specify&sort=%2Bcreated_at&page=1'
+        'https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/code?code=person_specify&sort=%2Bcreated_at&page=1'
       )
       const parentData = response.data[0]
-      if (parentData.isParent) {
-        const allChildData = await fetchAllChildData(parentData.id, 0)
-        setPerson(allChildData)
-      }
+
+      const allChildData = await fetchChildData(parentData.code)
+
+      const childDataOnly = allChildData.filter(child => child.code !== parentData.code)
+
+      setPerson(childDataOnly)
     } catch (error) {
       console.error('Error fetching initial data:', error)
+      toast.error(error)
     }
-  }, [fetchAllChildData])
+  }, [fetchChildData])
 
   useEffect(() => {
     fetchInitialData()
   }, [fetchInitialData])
 
   const renderOption = (props, option) => (
-    <li {...props} style={{ paddingLeft: `${option.level * 20}px` }}>
-      {option.name}
+    <li {...props} style={{ paddingLeft: `${option.level * 10}px` }}>
+      {option.code}
     </li>
   )
 
@@ -405,7 +382,12 @@ const AddFaceManagement = () => {
                         >
                           Cancel
                         </Button>
-                        <Button disabled={!isNameEntered} onClick={handleAddBlacklist} variant='contained' color='primary'>
+                        <Button
+                          disabled={!isNameEntered}
+                          onClick={handleAddBlacklist}
+                          variant='contained'
+                          color='primary'
+                        >
                           Save
                         </Button>
                       </Box>
@@ -549,10 +531,9 @@ const AddFaceManagement = () => {
                       >
                         Object Type
                       </p>
-                      {console.log(person)}
                       <Autocomplete
                         options={person}
-                        getOptionLabel={option => option.name}
+                        getOptionLabel={option => option.code}
                         renderInput={params => (
                           <CustomTextField
                             {...params}

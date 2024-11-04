@@ -44,7 +44,8 @@ export class MarkerGroup extends Layer {
       this.shape.set(this.coords);
     } else {
       Object.assign(this.style, this.coords);
-      this.shape = new Rect(this.style);
+
+      // this.shape = new Rect(this.style);
     }
   }
 }

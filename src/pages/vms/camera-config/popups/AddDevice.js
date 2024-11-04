@@ -113,7 +113,7 @@ const format_form = [
     placeholder: 'IP Address',
     type: 'TextField',
     data: [],
-    require: false,
+    require: true,
     width: 4
   },
   {
@@ -122,7 +122,7 @@ const format_form = [
     placeholder: 'Http Port',
     type: 'TextField',
     data: [],
-    require: false,
+    require: true,
     width: 2
   },
   {
@@ -131,7 +131,7 @@ const format_form = [
     placeholder: 'Onvif Port',
     type: 'TextField',
     data: [],
-    require: false,
+    require: true,
     width: 2
   },
 
@@ -184,7 +184,7 @@ const format_form = [
       key: 'id',
       value: 'name'
     },
-    require: false,
+    require: true,
     width: 4
   },
   {
@@ -327,7 +327,10 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
     try {
       setLoading(true)
 
-      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/device', config)
+      const response = await axios.get(
+        'https://sbs.basesystem.one/ivis/vms/api/v0/device/active?status=connected',
+        config
+      )
 
       const boxes = response.data.map(item => ({
         label: item.nameDevice,
@@ -352,7 +355,7 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
       setLoading(true)
 
       const response = await axios.get(
-        'https://sbs.basesystem.one/ivis/infrares/api/v0/regions?limit=25&page=1&parentID=abbe3f3c-963b-4d23-a766-42a8261607c3',
+        'https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions?limit=25&page=1&parentID=abbe3f3c-963b-4d23-a766-42a8261607c3',
         config
       )
 
@@ -461,6 +464,8 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
   }
 
   const onSubmit = values => {
+    console.log(values)
+
     const detail = {
       name: values?.name,
       username: values?.username,
@@ -469,15 +474,17 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
       httpPort: values?.httpPort,
       onvifPort: values?.onvifPort,
       protocol: values?.protocol?.name,
-      latitude: lat?.toString(),
-      longitude: lng?.toString(),
+      lat: lat?.toString(),
+      long: lng?.toString(),
       isOfflineSetting: isOfflineSetting,
+      location: values?.siteInfo?.name,
       siteInfo: {
         id: values?.siteInfo?.id,
         name: values?.siteInfo?.name
       },
       box: {
-        id: values?.box?.value
+        id: values?.box?.value,
+        name: values?.box?.label
       },
       streams: [...rows]
     }
@@ -547,14 +554,28 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
                       if (item?.name === 'latitude') {
                         return (
                           <Grid item xs={item.width} key={index}>
-                            <CustomTextField label='Latitude' type='text' disabled value={lat || ''} fullWidth />
+                            <CustomTextField
+                              label='Latitude'
+                              type='text'
+                              aria-describedby='validation-basic-last-name'
+                              disabled
+                              value={lat || ''}
+                              fullWidth
+                            />
                           </Grid>
                         )
                       }
                       if (item?.name === 'longitude') {
                         return (
                           <Grid item xs={item.width} key={index}>
-                            <CustomTextField label='Longitude' type='text' disabled value={lng || ''} fullWidth />
+                            <CustomTextField
+                              label='Longitude'
+                              type='text'
+                              aria-describedby='validation-basic-last-name'
+                              disabled
+                              value={lng || ''}
+                              fullWidth
+                            />
                           </Grid>
                         )
                       }
@@ -564,19 +585,23 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
                           <Controller
                             name={item.name}
                             control={control}
-                            rules={{ required: true }}
-                            render={({ field: { value, onChange } }) => (
-                              <CustomTextField
-                                fullWidth
-                                value={value}
-                                label={item.label}
-                                onChange={e => onChange(e.target.value)}
-                                type={item?.name === 'password' ? 'password' : ''}
-                                placeholder={item.placeholder}
-                                error={Boolean(errors[item.name])}
-                                aria-describedby='validation-basic-last-name'
-                                {...(errors[item.name] && { helperText: 'This field is required' })}
-                              />
+                            rules={{
+                              required: item.require ? `${item.label} is required` : false
+                            }}
+                            render={({ field: { value, onChange }, fieldState: { error } }) => (
+                              <>
+                                <CustomTextField
+                                  fullWidth
+                                  value={value}
+                                  label={item.label}
+                                  onChange={e => onChange(e.target.value)}
+                                  type={item?.name === 'password' ? 'password' : ''}
+                                  placeholder={item.placeholder}
+                                  error={Boolean(errors[item.name])}
+                                  aria-describedby='validation-basic-last-name'
+                                  {...(errors[item.name] && { helperText: 'This field is required' })}
+                                />
+                              </>
                             )}
                           />
                         </Grid>
@@ -588,8 +613,10 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
                           <Controller
                             name={item.name}
                             control={control}
-                            rules={{ required: true }}
-                            render={({ field: { value, onChange } }) => {
+                            rules={{
+                              required: item.require ? `${item.label} is required` : false
+                            }}
+                            render={({ field: { value, onChange }, fieldState: { error } }) => {
                               switch (item.name) {
                                 case 'cameraGroup':
                                   return (
@@ -599,7 +626,14 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
                                       options={cameraGroup}
                                       getOptionLabel={option => option.label}
                                       renderInput={params => (
-                                        <CustomTextField {...params} label={item?.label} fullWidth />
+                                        <CustomTextField
+                                          {...params}
+                                          aria-describedby='validation-basic-select'
+                                          label={item?.label}
+                                          error={!!error}
+                                          helperText={error ? error.message : ''}
+                                          fullWidth
+                                        />
                                       )}
                                       onFocus={handleComboBoxFocus}
                                     />
@@ -612,7 +646,14 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
                                       options={protocols}
                                       getOptionLabel={option => option.label || ''}
                                       renderInput={params => (
-                                        <CustomTextField {...params} label={item?.label} fullWidth />
+                                        <CustomTextField
+                                          {...params}
+                                          aria-describedby='validation-basic-select'
+                                          label={item?.label}
+                                          error={!!error}
+                                          helperText={error ? error.message : ''}
+                                          fullWidth
+                                        />
                                       )}
                                       onFocus={handleComboBoxFocusProtocol}
                                     />
@@ -625,7 +666,14 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
                                       options={regions}
                                       getOptionLabel={option => option.label || ''}
                                       renderInput={params => (
-                                        <CustomTextField {...params} label={item?.label} fullWidth />
+                                        <CustomTextField
+                                          {...params}
+                                          aria-describedby='validation-basic-select'
+                                          label={item?.label}
+                                          fullWidth
+                                          error={!!error}
+                                          helperText={error ? error.message : ''}
+                                        />
                                       )}
                                       onFocus={handleComboBoxFocusRegions}
                                     />
@@ -638,7 +686,14 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
                                       options={box}
                                       getOptionLabel={option => option.label || ''}
                                       renderInput={params => (
-                                        <CustomTextField {...params} label={item?.label} fullWidth />
+                                        <CustomTextField
+                                          {...params}
+                                          aria-describedby='validation-basic-select'
+                                          label={item?.label}
+                                          error={!!error}
+                                          helperText={error ? error.message : ''}
+                                          fullWidth
+                                        />
                                       )}
                                       onFocus={handleComboBoxFocusBox}
                                     />

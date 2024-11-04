@@ -54,7 +54,7 @@ const Filter = ({ open, onClose, fetchGroupData }) => {
 
   const fetchGroups = () => {
     axios
-      .get('https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=dv')
+      .get('https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=dv')
       .then(response => {
         setGroups(response.data)
       })
@@ -65,7 +65,7 @@ const Filter = ({ open, onClose, fetchGroupData }) => {
 
   const fetchServices = () => {
     axios
-      .get('https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=dichvu')
+      .get('https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=dichvu')
       .then(response => {
         setServices(response.data)
       })

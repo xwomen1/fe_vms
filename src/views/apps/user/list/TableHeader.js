@@ -21,7 +21,6 @@ const TableHeader = ({ handleFilter, exportValue, importValue, toggle, value, on
       })
       .catch(err => {
         console.error('Error downloading the file', err)
-        showError(err)
       })
   }
 

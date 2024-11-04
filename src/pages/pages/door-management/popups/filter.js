@@ -45,11 +45,11 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
   const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
   const doorStatuses = [
-    { name: 'Hoạt động', id: 'ACTIVE' },
-    { name: 'Đang xả', id: 'FREE' },
-    { name: 'Mất kết nối', id: 'DISCONNECTED' },
-    { name: 'Chưa gắn thiết bị', id: 'UNASSIGN' },
-    { name: 'Đang khóa', id: 'LOCKED' }
+    { name: 'ACTIVE', id: 'ACTIVE' },
+    { name: 'FREE', id: 'FREE' },
+    { name: 'DISCONNECTED', id: 'DISCONNECTED' },
+    { name: 'UNASSIGN', id: 'UNASSIGN' },
+    { name: 'LOCKED', id: 'LOCKED' }
   ]
 
   const config = {
@@ -111,12 +111,12 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
           </CustomCloseButton>
           <Box sx={{ mb: 8, textAlign: 'center' }}>
             <Typography variant='h3' sx={{ mb: 3 }}>
-              Bộ lọc
+              Filter
             </Typography>
           </Box>
           <form>
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={4}>
+            <Grid container>
+              <Grid item xs={12}>
                 <Controller
                   name='doorStatuses'
                   control={control}
@@ -126,7 +126,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                         select
                         fullWidth
                         defaultValue=''
-                        label='Trạng thái'
+                        label='Status'
                         SelectProps={{
                           value: value,
                           onChange: e => onChange(e)
@@ -164,13 +164,13 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
                   }}
                 >
                   <Button type='submit' variant='contained' onClick={handleSubmit(onSubmit)}>
-                    Lọc
+                    Filter
                   </Button>
                   <Button variant='tonal' onClick={handleSubmit(onReset)}>
-                    Mặc định
+                    Reset
                   </Button>
                   <Button variant='tonal' color='secondary' onClick={onClose}>
-                    Hủy
+                    Cancel
                   </Button>
                 </DialogActions>
               </Grid>

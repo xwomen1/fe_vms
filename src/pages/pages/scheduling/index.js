@@ -10,8 +10,8 @@ import { useState } from 'react'
 import Approval from './approval'
 import CustomTextField from 'src/@core/components/mui/text-field'
 import Icon from 'src/@core/components/icon'
-import Filter from './popups/Filter'
 import Link from 'next/link'
+import Filter from './popups/Filter'
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   borderBottom: '0 !important',
@@ -37,23 +37,11 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
   }
 }))
 
-const initValueFilter = {
-  createdUserIds: null,
-  startDate: null,
-  endDate: null,
-  startTimeInMinute: null,
-  endTimeInMinute: null,
-  statues: null,
-  repeatType: null,
-  createdAt: null
-}
-
-const Caller = () => {
+const Scheduling = () => {
   const [value, setValue] = useState('1')
   const [keyword, setKeyword] = useState('')
-  const [valueFilter, setValueFilter] = useState(initValueFilter)
+  const [valueFilter, setValueFilter] = useState(null)
   const [isOpenFilter, setIsOpenFilter] = useState(false)
-  const [isOpenAdd, setIsOpenAdd] = useState(false)
 
   const handleChange = (event, newValue) => {
     setValue(newValue)
@@ -96,8 +84,8 @@ const Caller = () => {
             variant='contained'
             size='small'
             component={Link}
-            href={`/pages/scheduling/register`}
-            sx={{ color: 'blue', right: '10px' }}
+            href={`/pages/scheduling/add`}
+            sx={{ right: '10px' }}
           >
             Add
           </Button>
@@ -130,4 +118,4 @@ const Caller = () => {
   )
 }
 
-export default Caller
+export default Scheduling

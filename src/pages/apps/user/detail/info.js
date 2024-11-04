@@ -127,7 +127,7 @@ const UserDetails = () => {
     const fetchRegions = async () => {
       try {
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=level'
+          'https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=level'
         )
 
         const regions = response.data.map(region => ({
@@ -149,7 +149,7 @@ const UserDetails = () => {
     const fetchRegions = async () => {
       try {
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=contracttype'
+          'https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=contracttype'
         )
 
         const regions = response.data.map(region => ({
@@ -170,7 +170,7 @@ const UserDetails = () => {
 
   const fetchRegionName = async regionId => {
     try {
-      const response = await axios.get(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${regionId}`)
+      const response = await axios.get(`https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/${regionId}`)
 
       return response.data.name
     } catch (error) {
@@ -695,7 +695,7 @@ const UserDetails = () => {
         }
 
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=company',
+          'https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=company',
 
           config
         )
@@ -940,7 +940,6 @@ const UserDetails = () => {
                 <Grid item xs={4}>
                   <TextField label='Name*' value={fullNameValue} onChange={handleFullNameChange} fullWidth />
                 </Grid>
-                {console.log(user.userAccount.accStatus)}
                 <Grid item xs={4}>
                   <TextField label='Email*' value={email} onChange={handleEmailChange} fullWidth />
                 </Grid>
@@ -1043,11 +1042,12 @@ const UserDetails = () => {
                           selected={dateTime}
                           timeIntervals={15}
                           showTimeSelectOnly
-                          dateFormat='h:mm a' // Thay đổi định dạng giờ
+                          dateFormat='HH:mm' // Hiển thị theo định dạng 24 giờ
+                          timeFormat='HH:mm' // Định dạng giờ 24 giờ
                           id='time-only-picker'
                           onChange={date => handleTimeChange(date)}
                           customInput={<CustomInput />}
-                          filterTime={time => time.getHours() < 12} // Chỉ cho phép giờ AM
+                          timeCaption='Time' // Chú thích giờ
                         />
                       </div>
                     </Box>
@@ -1062,10 +1062,12 @@ const UserDetails = () => {
                           selected={timeEndMorning}
                           timeIntervals={15}
                           showTimeSelectOnly
-                          dateFormat='h:mm '
+                          dateFormat='HH:mm' // Hiển thị theo định dạng 24 giờ
+                          timeFormat='HH:mm' // Định dạng giờ 24 giờ
                           id='time-only-picker'
                           onChange={date => handleTimeEndMorningChange(date)}
                           customInput={<CustomInput />}
+                          timeCaption='Time' // Chú thích giờ
                         />
                       </div>
                     </Box>
@@ -1083,10 +1085,12 @@ const UserDetails = () => {
                           selected={timeStartAfternoon}
                           timeIntervals={15}
                           showTimeSelectOnly
-                          dateFormat='h:mm '
+                          dateFormat='HH:mm' // Hiển thị theo định dạng 24 giờ
+                          timeFormat='HH:mm' // Định dạng giờ 24 giờ
                           id='time-only-picker'
                           onChange={date => handleTimeStartAfetrnoonChange(date)}
                           customInput={<CustomInput />}
+                          timeCaption='Time' // Chú thích giờ
                         />
                       </div>
                     </Box>
@@ -1101,10 +1105,12 @@ const UserDetails = () => {
                           selected={timeEndAfternoon}
                           timeIntervals={15}
                           showTimeSelectOnly
-                          dateFormat='h:mm '
+                          dateFormat='HH:mm' // Hiển thị theo định dạng 24 giờ
+                          timeFormat='HH:mm' // Định dạng giờ 24 giờ
                           id='time-only-picker'
                           onChange={date => handleTimeEndAfternoonChange(date)}
                           customInput={<CustomInput />}
+                          timeCaption='Time' // Chú thích giờ
                         />
                       </div>
                     </Box>
@@ -1299,129 +1305,131 @@ const UserDetails = () => {
                 </Grid>
               </Grid>
               <br></br>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <Typography variant='h5'>Account Information</Typography>
-                </Grid>
-                <Grid item xs={4}>
-                  <TextField
-                    label='Account*'
-                    defaultValue={user?.userAccount.username}
-                    onChange={handleUserNameChange}
-                    id='form-props-read-only-input'
-                    InputProps={{ readOnly: readOnlys }}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={4}>
-                  <TextField
-                    label='Account Type'
-                    defaultValue={user?.userAccount.identityProviderType}
-                    id='form-props-read-only-input'
-                    InputProps={{ readOnly: readOnlys }}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={2} style={{ marginTop: '1.1%' }}>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={status === 'ACTIVE'}
-                        onChange={e => {
-                          setStatus(status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE')
-                          const newStatus = e.target.checked ? 'true' : 'false'
-                          const token = localStorage.getItem(authConfig.storageTokenKeyName)
-                          fetch(
-                            `https://dev-ivi.basesystem.one/smc/iam/api/v0/users/${userId}/enable-account?enabled=${newStatus}`,
-                            {
-                              method: 'PUT',
-                              headers: {
-                                'Content-Type': 'application/json',
-                                Authorization: `Bearer ${token}` // Passing the token as a bearer token
+              {user?.userAccount && (
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <Typography variant='h5'>Account Information</Typography>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <TextField
+                      label='Account*'
+                      defaultValue={user?.userAccount?.username || ''}
+                      onChange={handleUserNameChange}
+                      id='form-props-read-only-input'
+                      InputProps={{ readOnly: readOnlys }}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <TextField
+                      label='Account Type'
+                      defaultValue={user?.userAccount.identityProviderType || ''}
+                      id='form-props-read-only-input'
+                      InputProps={{ readOnly: readOnlys }}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={2} style={{ marginTop: '1.1%' }}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={status === 'ACTIVE' || ''}
+                          onChange={e => {
+                            setStatus(status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE')
+                            const newStatus = e.target.checked ? 'true' : 'false'
+                            const token = localStorage.getItem(authConfig.storageTokenKeyName)
+                            fetch(
+                              `https://dev-ivi.basesystem.one/smc/iam/api/v0/users/${userId}/enable-account?enabled=${newStatus}`,
+                              {
+                                method: 'PUT',
+                                headers: {
+                                  'Content-Type': 'application/json',
+                                  Authorization: `Bearer ${token}` // Passing the token as a bearer token
+                                }
                               }
-                            }
-                          )
-                            .then(response => {
-                              if (!response.ok) {
-                                throw new Error('Failed to update account status')
-                              }
+                            )
+                              .then(response => {
+                                if (!response.ok) {
+                                  throw new Error('Failed to update account status')
+                                }
 
-                              return response.json()
-                            })
-                            .then(data => {
-                              console.log('Account status updated:', data)
-                            })
-                            .catch(error => {
-                              console.error('Error updating account status:', error)
-                            })
-                        }}
-                        color='primary'
-                      />
-                    }
-                    label='Status'
-                    labelPlacement='start'
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <Typography variant='h5'>Role</Typography>
-                </Grid>
-                <Grid item xs={11.8}>
-                  <TableContainer>
-                    <Table>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Name</TableCell>
-                          <TableCell>Code</TableCell>
-                          <TableCell>Description</TableCell>
-                          {/* {showPlusColumn && ( */}
-                          <TableCell align='center'>
-                            <IconButton onClick={handleAddRow1} size='small' sx={{ marginLeft: '10px' }}>
-                              <Icon icon='bi:plus' />
-                            </IconButton>
-                          </TableCell>
-                          {/* )} */}
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {policies.map((policy, index) => (
-                          <TableRow key={index}>
-                            <TableCell>
-                              {' '}
-                              <Autocomplete
-                                options={filteredPolicyOptions}
-                                getOptionLabel={option => option.policyName}
-                                value={policyOption.find(option => option.policyName === policy.policyName) || null}
-                                onChange={(event, newValue) => {
-                                  const updatedRows = [...policies]
-                                  updatedRows[index].policyName = newValue.policyName
-                                  updatedRows[index].policyCode = newValue.policyCode
-                                  updatedRows[index].description = newValue.description
-                                  updatedRows[index].policyId = newValue.policyId
-
-                                  // updatedRows[index].id = newValue.id
-                                  setPolicies(updatedRows)
-                                }}
-                                renderInput={params => <TextField {...params} label='Role' />}
-                              />
+                                return response.json()
+                              })
+                              .then(data => {
+                                console.log('Account status updated:', data)
+                              })
+                              .catch(error => {
+                                console.error('Error updating account status:', error)
+                              })
+                          }}
+                          color='primary'
+                        />
+                      }
+                      label='Status'
+                      labelPlacement='start'
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Typography variant='h5'>Role</Typography>
+                  </Grid>
+                  <Grid item xs={11.8}>
+                    <TableContainer>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Name</TableCell>
+                            <TableCell>Code</TableCell>
+                            <TableCell>Details</TableCell>
+                            {/* {showPlusColumn && ( */}
+                            <TableCell align='center'>
+                              <IconButton onClick={handleAddRow1} size='small' sx={{ marginLeft: '10px' }}>
+                                <Icon icon='bi:plus' />
+                              </IconButton>
                             </TableCell>
-                            <TableCell>{policy.policyCode}</TableCell>
-
-                            <TableCell>{policy.description}</TableCell>
-
-                            {showPlusColumn && (
-                              <TableCell align='center'>
-                                <IconButton onClick={() => handleDeleteRow1(index)}>
-                                  <Icon icon='bi:trash' />
-                                </IconButton>
-                              </TableCell>
-                            )}
+                            {/* )} */}
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
+                        </TableHead>
+                        <TableBody>
+                          {policies.map((policy, index) => (
+                            <TableRow key={index}>
+                              <TableCell>
+                                {' '}
+                                <Autocomplete
+                                  options={filteredPolicyOptions}
+                                  getOptionLabel={option => option.policyName}
+                                  value={policyOption.find(option => option.policyName === policy.policyName) || null}
+                                  onChange={(event, newValue) => {
+                                    const updatedRows = [...policies]
+                                    updatedRows[index].policyName = newValue.policyName
+                                    updatedRows[index].policyCode = newValue.policyCode
+                                    updatedRows[index].description = newValue.description
+                                    updatedRows[index].policyId = newValue.policyId
+
+                                    // updatedRows[index].id = newValue.id
+                                    setPolicies(updatedRows)
+                                  }}
+                                  renderInput={params => <TextField {...params} label='Role' />}
+                                />
+                              </TableCell>
+                              <TableCell>{policy.policyCode}</TableCell>
+
+                              <TableCell>{policy.description}</TableCell>
+
+                              {showPlusColumn && (
+                                <TableCell align='center'>
+                                  <IconButton onClick={() => handleDeleteRow1(index)}>
+                                    <Icon icon='bi:trash' />
+                                  </IconButton>
+                                </TableCell>
+                              )}
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </Grid>
                 </Grid>
-              </Grid>
+              )}
             </Grid>
           </Grid>
           <br></br>

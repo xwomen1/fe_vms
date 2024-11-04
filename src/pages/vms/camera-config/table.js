@@ -421,7 +421,7 @@ const Camera = ({ apiData }) => {
           />
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <TableContainer component={Paper} sx={{ maxHeight: 1000 }}>
+              <TableContainer component={Paper} sx={{ maxHeight: '100%' }}>
                 <Table>
                   <TableHead>
                     <TableRow>

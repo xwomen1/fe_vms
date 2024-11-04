@@ -11,7 +11,7 @@ import authConfig from 'src/configs/auth'
 import Table from '@mui/material/Table'
 import Pagination from '@mui/material/Pagination'
 import Icon from 'src/@core/components/icon'
-import { Box, Autocomplete, Button, IconButton, Paper, CardHeader } from '@mui/material'
+import { Box, Autocomplete, Button, IconButton, Paper, CardHeader, TableContainer } from '@mui/material'
 import Swal from 'sweetalert2'
 import axios from 'axios'
 import CustomTextField from 'src/@core/components/mui/text-field'
@@ -289,10 +289,22 @@ const Add = ({ apiData }) => {
           keyword: value
         }
       }
+
       const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/cameras', config)
-      setStatus1(response.data.isOfflineSetting)
-      setAssetType(response.data)
-      setTotal(response.data.page)
+
+      if (response && response.data) {
+        if (response.data.isOfflineSetting !== undefined) {
+          setStatus1(response.data.isOfflineSetting)
+        }
+        if (response.data) {
+          setAssetType(response.data)
+        }
+        if (response.data.page !== undefined) {
+          setTotal(response.data.page)
+        }
+      } else {
+        console.error('No data received from API.')
+      }
     } catch (error) {
       console.error('Error fetching users:', error)
     }
@@ -453,7 +465,7 @@ const Add = ({ apiData }) => {
       ) {
         setPopupMessage('Device not responding')
       } else {
-        setPopupMessage(`${error.response.data.message}`)
+        setPopupMessage(`${error.message}`)
       }
 
       setIsError(true) // Đánh dấu là lỗi
@@ -650,6 +662,18 @@ const Add = ({ apiData }) => {
     setSelectedTitle(newValue.name)
   }
 
+  const handleCancel = () => {
+    setStartUrl('')
+    setEndUrl('')
+    setStartHost('')
+    setEndHost('')
+    setUsername('')
+    setPassWord('')
+    setSelectedNVR(null)
+    setUrl('')
+    setHost('')
+  }
+
   return (
     <>
       <Grid container spacing={6.5}>
@@ -728,7 +752,7 @@ const Add = ({ apiData }) => {
                           </Box>
                         ),
                         endAdornment: (
-                          <IconButton size='small' title='Clear' aria-label='Clear'>
+                          <IconButton size='small' title='Clear' aria-label='Clear' onClick={e => setValue('')}>
                             <Icon fontSize='1.25rem' icon='tabler:x' />
                           </IconButton>
                         )
@@ -763,7 +787,7 @@ const Add = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                      // loading={loading}
+                        // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.1}></Grid>
@@ -802,7 +826,7 @@ const Add = ({ apiData }) => {
                     <Grid item xs={0.2}></Grid>
 
                     <Grid item xs={2} style={{ marginTop: '2%' }}>
-                      <Button>Cancel</Button>
+                      <Button onClick={handleCancel}>Cancel</Button>
                       <Button onClick={handleScan} variant='contained'>
                         Scan
                       </Button>
@@ -849,7 +873,7 @@ const Add = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR/AI BOX' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                      // loading={loading}
+                        // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.4}></Grid>
@@ -919,7 +943,7 @@ const Add = ({ apiData }) => {
                     <Grid item xs={0.2}></Grid>
 
                     <Grid item xs={4} style={{ marginTop: '1%' }}>
-                      <Button>Cancel</Button>
+                      <Button onClick={handleCancel}>Cancel</Button>
                       <Button onClick={handleScanDaiIP} variant='contained'>
                         Scan
                       </Button>
@@ -967,7 +991,7 @@ const Add = ({ apiData }) => {
                         renderInput={params => <CustomTextField {...params} label='NVR' fullWidth />}
                         onFocus={handleComboboxFocus}
 
-                      // loading={loading}
+                        // loading={loading}
                       />{' '}
                     </Grid>
                     <Grid item xs={0.1}></Grid>
@@ -997,7 +1021,7 @@ const Add = ({ apiData }) => {
                     <Grid item xs={0.2}></Grid>
 
                     <Grid item xs={4} style={{ marginTop: '1%' }}>
-                      <Button>Cancel</Button>
+                      <Button onClick={handleCancel}>Cancel</Button>
                       <Button variant='contained' onClick={handleScanLGT}>
                         Scan
                       </Button>
@@ -1029,84 +1053,85 @@ const Add = ({ apiData }) => {
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <div></div>
-
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell align='center'>
-                        <Checkbox
-                          checked={selectedIds.length === assettype.length}
-                          onChange={e => {
-                            if (e.target.checked) {
-                              const allIds = assettype.map(assetType => assetType.id)
-                              setSelectedIds(allIds)
-                            } else {
-                              setSelectedIds([])
-                            }
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell align='center'>NO.</TableCell>
-                      <TableCell align='center'>Device Name</TableCell>
-                      <TableCell align='center'>Device Type</TableCell>
-                      <TableCell align='center'>IP Address</TableCell>
-                      <TableCell align='center'>Mac Address</TableCell>
-                      <TableCell align='center'>Location</TableCell>
-                      <TableCell align='center'>Status</TableCell>
-
-                      <TableCell align='center'>Active</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {assettype.map((assetType, index) => (
-                      <TableRow key={assetType.id}>
+                <TableContainer component={Paper} sx={{ maxHeight: '100%' }}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
                         <TableCell align='center'>
                           <Checkbox
-                            checked={selectedIds.includes(assetType.id)}
-                            onChange={() => handleCheckboxChange(assetType.id)}
+                            checked={selectedIds.length === assettype.length}
+                            onChange={e => {
+                              if (e.target.checked) {
+                                const allIds = assettype.map(assetType => assetType.id)
+                                setSelectedIds(allIds)
+                              } else {
+                                setSelectedIds([])
+                              }
+                            }}
                           />
                         </TableCell>
-                        <TableCell align='center'>{(page - 1) * pageSize + index + 1} </TableCell>
-                        <TableCell align='center'>{assetType.name}</TableCell>
-                        <TableCell align='center'>{assetType.type.name}</TableCell>
-                        <TableCell align='center'>{assetType.ipAddress}</TableCell>
-                        <TableCell align='center'>{assetType.macAddress}</TableCell>
-                        <TableCell align='center'>{assetType.location}</TableCell>
-                        <TableCell align='center'>
-                          {assetType.status && assetType.status.name ? (
-                            <div>
-                              <CustomChip
-                                rounded
-                                size='small'
-                                skin='light'
-                                sx={{ lineHeight: 1 }}
-                                label={assetType.status.name === 'disconnected' ? 'Lost connection' : 'Connected'}
-                                color={assetType.status.name === 'disconnected' ? 'primary' : 'success'}
-                              />
-                            </div>
-                          ) : (
-                            assetType.status.name
-                          )}
-                        </TableCell>
+                        <TableCell align='center'>NO.</TableCell>
+                        <TableCell align='center'>Device Name</TableCell>
+                        <TableCell align='center'>Device Type</TableCell>
+                        <TableCell align='center'>IP Address</TableCell>
+                        <TableCell align='center'>Mac Address</TableCell>
+                        <TableCell align='center'>Location</TableCell>
+                        <TableCell align='center'>Status</TableCell>
 
-                        <TableCell align='center'>
-                          <IconButton onClick={() => handleReloadClick(assetType.id)}>
-                            <Icon icon='tabler:reload' />
-                          </IconButton>
-                          <IconButton onClick={() => handleOpenLiveView(assetType)}>
-                            <Icon icon='tabler:video' />
-                          </IconButton>
-                          <IconButton size='small' onClick={() => handleAddPClick(assetType.id)}>
-                            <Icon icon='tabler:edit' />
-                          </IconButton>
-                          <IconButton onClick={() => handleDelete(assetType.id)}>
-                            <Icon icon='tabler:trash' />
-                          </IconButton>
-                        </TableCell>
+                        <TableCell align='center'>Active</TableCell>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHead>
+                    <TableBody>
+                      {assettype.map((assetType, index) => (
+                        <TableRow key={assetType.id}>
+                          <TableCell align='center'>
+                            <Checkbox
+                              checked={selectedIds.includes(assetType.id)}
+                              onChange={() => handleCheckboxChange(assetType.id)}
+                            />
+                          </TableCell>
+                          <TableCell align='center'>{(page - 1) * pageSize + index + 1} </TableCell>
+                          <TableCell align='center'>{assetType.name}</TableCell>
+                          <TableCell align='center'>{assetType.type.name}</TableCell>
+                          <TableCell align='center'>{assetType.ipAddress}</TableCell>
+                          <TableCell align='center'>{assetType.macAddress}</TableCell>
+                          <TableCell align='center'>{assetType.location}</TableCell>
+                          <TableCell align='center'>
+                            {assetType.status && assetType.status.name ? (
+                              <div>
+                                <CustomChip
+                                  rounded
+                                  size='small'
+                                  skin='light'
+                                  sx={{ lineHeight: 1 }}
+                                  label={assetType.status.name === 'disconnected' ? 'Lost connection' : 'Connected'}
+                                  color={assetType.status.name === 'disconnected' ? 'primary' : 'success'}
+                                />
+                              </div>
+                            ) : (
+                              assetType.status.name
+                            )}
+                          </TableCell>
+
+                          <TableCell align='center'>
+                            <IconButton onClick={() => handleReloadClick(assetType.id)}>
+                              <Icon icon='tabler:reload' />
+                            </IconButton>
+                            <IconButton onClick={() => handleOpenLiveView(assetType)}>
+                              <Icon icon='tabler:video' />
+                            </IconButton>
+                            <IconButton size='small' onClick={() => handleAddPClick(assetType.id)}>
+                              <Icon icon='tabler:edit' />
+                            </IconButton>
+                            <IconButton onClick={() => handleDelete(assetType.id)}>
+                              <Icon icon='tabler:trash' />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
                 <br></br>
                 <Grid container spacing={2} style={{ padding: 10 }}>
                   <Grid item xs={3}></Grid>
@@ -1136,7 +1161,12 @@ const Add = ({ apiData }) => {
         </Grid>
         {openPopupP && (
           <>
-            <Edit open={openPopupP} onClose={handleClosePPopup} camera={selectedNvrId} />
+            <Edit
+              open={openPopupP}
+              onClose={handleClosePPopup}
+              setReload={() => setReload(reload + 1)}
+              camera={selectedNvrId}
+            />
           </>
         )}
         {isOpenAddDevice && (

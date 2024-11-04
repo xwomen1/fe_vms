@@ -64,7 +64,7 @@ const AccessControlDevice = () => {
   const fetchChildren = async parentId => {
     try {
       const response = await axios.get(
-        `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/device-groups/children-lv1?parentId=${parentId}`,
+        `https://dev-ivi.basesystem.one/smc/access-control/api/v0/device-access/device-groups/children-lv1?parentId=${parentId}`,
         config
       )
       const children = response.data
@@ -88,7 +88,7 @@ const AccessControlDevice = () => {
     setLoading(true)
     try {
       const response = await axios.get(
-        'https://dev-ivi.basesystem.one/vf/ac-adapters/v1/device-groups/children-lv1',
+        'https://dev-ivi.basesystem.one/smc/access-control/api/v0/device-access/device/device-groups/children-lv1',
         config
       )
       const parentData = response.data
@@ -124,14 +124,14 @@ const AccessControlDevice = () => {
       }
 
       const response = await axios.get(
-        'https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices/?deviceGroupId=643a2358824177002890430a',
+        'https://dev-ivi.basesystem.one/smc/access-control/api/v0/device-access/devices?deviceGroupId=643a2358824177002890430a',
         {
           ...config,
           params: params
         }
       )
 
-      const devicesWithParentId = response.data.results.map(device => ({
+      const devicesWithParentId = response.data.map(device => ({
         ...device,
         parentId: '643a2358824177002890430a'
       }))
@@ -152,14 +152,14 @@ const AccessControlDevice = () => {
         }
 
         try {
-          const url = `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/devices/?deviceGroupId=${nodeId}`
+          const url = `https://dev-ivi.basesystem.one/smc/access-control/api/v0/device-access/devices?deviceGroupId=${nodeId}`
 
           const response = await axios.get(url, {
             params: params,
             ...config
           })
 
-          const devicesWithParentId = response.data.results.map(device => ({
+          const devicesWithParentId = response.data.map(device => ({
             ...device,
             parentId: nodeId
           }))
@@ -240,22 +240,6 @@ const AccessControlDevice = () => {
       toast.error('Có lỗi xảy ra khi thêm mới.')
     } finally {
       handleClose()
-    }
-  }
-
-  const handleDeleteOnclick = async () => {
-    try {
-      const response = await axios.delete(
-        `https://dev-ivi.basesystem.one/vf/ac-adapters/v1/device-groups/${selectedNode}`,
-        config
-      )
-      toast.success('Deleted successfully')
-      fetchDataList() // Làm mới dữ liệu sau khi xóa
-    } catch (error) {
-      console.error('Error deleting data:', error)
-      toast.error('Có lỗi xảy ra khi xóa.')
-    } finally {
-      handleCloseDelete()
     }
   }
 
@@ -391,8 +375,8 @@ const AccessControlDevice = () => {
             </TreeView>
           </Paper>
         </Grid>
-        <Grid item xs={9.5} style={{ display: 'flex', flexDirection: 'column' }}>
-          <Paper elevation={3} style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        <Grid item xs={9.5} style={{ display: 'flex', flexDirection: 'column', maxHeight: '100%' }}>
+          <Paper elevation={3} style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', maxHeight: '100%' }}>
             <TableContainer>
               <Table>
                 <TableHead style={{ background: '#F6F6F7' }}>
@@ -479,9 +463,9 @@ const AccessControlDevice = () => {
           <Button onClick={handleCloseDelete} variant='contained'>
             Cancel
           </Button>
-          <Button onClick={handleDeleteOnclick} variant='contained'>
+          {/* <Button onClick={handleDeleteOnclick} variant='contained'>
             Ok
-          </Button>
+          </Button> */} 
         </DialogActions>
       </Dialog>
     </>

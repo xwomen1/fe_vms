@@ -163,6 +163,7 @@ const CustomTextField = forwardRef((props, ref) => {
     <TextFieldStyled
       size={size}
       inputRef={ref}
+      autoComplete='new-password'
       {...rest}
       variant='filled'
       InputLabelProps={{ ...InputLabelProps, shrink: true }}

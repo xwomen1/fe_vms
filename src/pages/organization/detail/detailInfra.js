@@ -23,7 +23,7 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
             Authorization: `Bearer ${token}`
           }
         }
-        const response = await axios.get(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${id}`, config)
+        const response = await axios.get(`https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/${id}`, config)
         setName(response.data.name || '')
         setType(response.data.code || '')
         setDetail(response.data.detail || '')
@@ -48,12 +48,12 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
       }
 
       const payload = {
-        name: name,
-        code: type,
-        detail: detail
+        name: name.trimEnd(),
+        code: type.trimEnd(),
+        detail: detail.trimEnd()
       }
 
-      await axios.put(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${id}`, payload, config)
+      await axios.put(`https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/${id}`, payload, config)
       Swal.fire({
         title: 'Success!',
         text: 'The data has been updated successfully.',
@@ -66,7 +66,7 @@ const InfraPopupDetail = ({ open, id, onClose, onSuccess }) => {
           }
         }
       })
-      onSuccess()
+      onSuccess({ name, type, detail })
       onClose()
     } catch (error) {
       console.error('Error updating', error)

@@ -96,7 +96,8 @@ const EventList = () => {
           limit: pageSize,
           type: valueFilter.type,
           device_type: valueFilter.device_type,
-          sort: '+status'
+          device_name: value || '',
+          sort: '+status,-created_at'
         }
       }
 
@@ -270,7 +271,7 @@ const EventList = () => {
                       </Box>
                     ),
                     endAdornment: (
-                      <IconButton size='small' title='Clear' aria-label='Clear' onClick={() => setKeyword('')}>
+                      <IconButton size='small' title='Clear' aria-label='Clear' onClick={() => setValue('')}>
                         <Icon fontSize='1.25rem' icon='tabler:x' />
                       </IconButton>
                     )
@@ -290,7 +291,7 @@ const EventList = () => {
           }
         />
         <Grid container spacing={0}>
-          <TableContainer component={Paper} sx={{ maxHeight: 600 }}>
+          <TableContainer component={Paper} sx={{ maxHeight: '100%' }}>
             <Table stickyHeader aria-label='sticky table' sx={{ overflow: 'auto' }}>
               <TableHead>
                 <TableRow>
@@ -336,15 +337,7 @@ const EventList = () => {
                       })}
                       <TableCell align='center'>
                         <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center' }}>
-                          {row.eventName === 'Đã kết nối' ? (
-                            <IconButton
-                              onClick={() => handleAsNvr(row.id)}
-                              size='small'
-                              sx={{ color: 'text.secondary', visibility: 'hidden' }}
-                            >
-                              <Icon icon='tabler:check' />
-                            </IconButton>
-                          ) : (
+                          {row.type === 'Deactive' && (
                             <IconButton
                               onClick={() => handleAsNvr(row.id)}
                               size='small'

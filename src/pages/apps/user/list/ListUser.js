@@ -189,7 +189,7 @@ const UserList = ({ apiData }) => {
 
   const fetchRegionName = async regionId => {
     try {
-      const response = await axios.get(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${regionId}`)
+      const response = await axios.get(`https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/${regionId}`)
 
       return response.data.name
     } catch (error) {
@@ -314,7 +314,9 @@ const UserList = ({ apiData }) => {
       }
       let url
       if (selectedGroups.length > 0) {
-        url = `https://dev-ivi.basesystem.one/smc/iam/api/v0/users/search?groupIds=${selectedGroups.map(g => g.groupId).join(',')}`
+        url = `https://dev-ivi.basesystem.one/smc/iam/api/v0/users/search?groupIds=${selectedGroups
+          .map(g => g.groupId)
+          .join(',')}`
       } else {
         url = 'https://dev-ivi.basesystem.one/smc/iam/api/v0/users/search'
       }
@@ -488,12 +490,14 @@ const UserList = ({ apiData }) => {
                     <TableCell sx={{ padding: '16px' }}>Phone Number </TableCell>
                     <TableCell sx={{ padding: '16px' }}>Department</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Contract Type</TableCell>
-
+                    <TableCell sx={{ padding: '16px' }}>Face Enable</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Card Enable</TableCell>
+                    <TableCell sx={{ padding: '16px' }}>Finger Enable</TableCell>
                     <TableCell sx={{ padding: '16px' }}>Action</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {userData.map((user, index) => (
+                  {userData?.map((user, index) => (
                     <TableRow key={user.userId}>
                       <TableCell sx={{ padding: '16px' }}>{(page - 1) * pageSize + index + 1} </TableCell>
                       <TableCell sx={{ padding: '16px' }}>{user.accessCode}</TableCell>
@@ -501,10 +505,10 @@ const UserList = ({ apiData }) => {
                       <TableCell sx={{ padding: '16px' }}>{user.email}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{user.phoneNumber}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>{user.userGroup[0]?.groupName}</TableCell>
-                      <TableCell sx={{ padding: '16px' }}>
-                        {contractTypes[user.contractType] || 'Không thời hạn'}
-                      </TableCell>
-
+                      <TableCell sx={{ padding: '16px' }}>{contractTypes[user.contractType] || 'Indefinite'}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{user?.faceEnable}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{user?.cardEnable}</TableCell>
+                      <TableCell sx={{ padding: '16px' }}>{user?.fingerEnable}</TableCell>
                       <TableCell sx={{ padding: '16px' }}>
                         <Grid container spacing={2}>
                           <IconButton

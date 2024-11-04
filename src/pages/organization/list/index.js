@@ -25,41 +25,43 @@ import DeletePopup from '../popup/delete'
 import DetailPopup from '../detail/detailInfra'
 import AddPopup from '../popup/add'
 import PopUpAdd from '../popup/AddChild'
+import { node } from 'stylis'
 
 const OrganizationalStructure = () => {
   const [infra, setInfra] = useState([])
-  const [selectedTab, setSelectedTab] = useState(0)
+  const [selectedTab, setSelectedTab] = useState(null)
   const selectedTabRef = useRef(selectedTab)
-  const [treeData, setTreeData] = useState({})
+  const [treeData, setTreeData] = useState([])
   const [expandedNodes, setExpandedNodes] = useState([])
   const [childData, setChildData] = useState([])
   const [openPopup, setOpenPopup] = useState(false)
   const [openPopupId, setOpenPopupId] = useState(null)
+  const [openPopupCode, setOpenPopupCode] = useState(null)
   const [openPopupDetail, setOpenPopupDetail] = useState(false)
   const [openPopupAdd, setOpenPopupAdd] = useState(false)
-  const [showPlusIcon, setShowPlusIcon] = useState(false)
+  const [selectedGroups, setSelectedGroups] = useState([])
   const [openPopupAddChild, setOpenPopupAddChild] = useState(false)
   const [selectId, setSelectIds] = useState(null)
   const [selectedNodeId, setSelectedNodeId] = useState(null)
   const [operationType, setOperationType] = useState(null)
-  const [info, setInffo] = useState([])
+  const [info, setInffo] = useState({})
+  const [idGroup, setIdGroup] = useState(null)
   useEffect(() => {
     selectedTabRef.current = selectedTab
   }, [selectedTab])
 
-  const handleShowItemDetail = item => {
-    setSelectedItemDetail(item)
-  }
-
   const handleOpenPopup = id => {
     setOpenPopupId(id)
+    setOpenPopupCode(id.code)
     setOpenPopup(true)
     setOperationType('delete')
   }
 
   const handleOpenPopupDetail = id => {
-    setOpenPopupId(id)
+    setOpenPopupCode(id.code)
+    setOpenPopupId(id.id)
     setOpenPopupDetail(true)
+    setOperationType('detail')
   }
 
   const handleCloseDetail = () => {
@@ -93,11 +95,17 @@ const OrganizationalStructure = () => {
           keyword: ''
         }
       }
-      const response = await axios.get('https://sbs.basesystem.one/ivis/infrares/api/v0/regions/adults', config)
+
+      const response = await axios.get('https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/adults', config)
       setInfra(response.data)
 
       if (response.data.length > 0) {
-        fetchChildData(response.data[selectedTab].id)
+        const parentId = response.data[selectedTab]?.code
+
+        await fetchChildData(parentId)
+        expandedNodes.forEach(async nodeId => {
+          await fetchChildData(nodeId)
+        })
       }
     } catch (error) {
       console.error('Error fetching users:', error)
@@ -106,9 +114,9 @@ const OrganizationalStructure = () => {
 
   const handleAddPClick = id => {
     setOpenPopupAddChild(true)
-    setSelectIds(id)
+    setOpenPopupCode(id.code)
+    setSelectIds(id.id)
     setOperationType('addChild')
-    console.log(id, 'nodeid')
   }
 
   const handleClosePPopup = () => {
@@ -116,31 +124,62 @@ const OrganizationalStructure = () => {
     fetchChildrenById()
   }
 
-  const handleSuccess = async () => {
-    await fetchFilter()
-    if (operationType === 'delete') {
-      if (selectedTabRef.current > 0) {
-        setSelectedTab(selectedTabRef.current)
-      } else {
-        setSelectedTab(0)
-      }
-    } else if (operationType === 'add') {
-      setSelectedTab(infra.length)
-    } else {
-      setSelectedTab(selectedTabRef.current)
-    }
-    if (selectedNodeId) {
-      await fetchChildData(selectedNodeId)
-    }
-    setOperationType(null)
-  }
-
-  const fetchChildData = async parentId => {
+  const fetchId = async nodeId => {
     try {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
       const response = await axios.get(
-        `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`,
+        `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/code?code=${nodeId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
+      setInffo(response.data[0])
+    } catch (error) {
+      console.error('Error fetching data:', error)
+    }
+  }
+
+  const handleSuccess = async code => {
+    if (operationType === 'delete') {
+      setInffo(null)
+      setIdGroup(infra[selectedTab] || {})
+      fetchChildDataNote(infra[selectedTab].code)
+    }
+
+    if (operationType === 'detail') {
+      const effectiveCode = code.type || infra[selectedTab].code
+      fetchId(effectiveCode)
+      fetchChildDataNote(effectiveCode)
+    }
+    if (operationType === 'addChild') {
+      fetchId(openPopupCode)
+      fetchChildDataNote(openPopupCode)
+    }
+
+    await fetchFilter()
+
+    if (selectedNodeId) {
+      const nodeId = selectedNodeId
+      const parentId = treeData[nodeId]?.code
+
+      if (parentId) {
+        await fetchChildData(parentId)
+      }
+      await fetchChildData(nodeId)
+    }
+
+    setOperationType(null) // Reset operation type
+  }
+
+  const fetchChildDataNote = async parentId => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const response = await axios.get(
+        `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=${parentId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -148,11 +187,107 @@ const OrganizationalStructure = () => {
         }
       )
 
-      setChildData(response.data)
-      setTreeData(prevTreeData => ({
-        ...prevTreeData,
-        [parentId]: response.data
-      }))
+      setChildData(response.data || [])
+    } catch (error) {
+      console.error('Error fetching children:', error)
+      setChildData([])
+      setSelectedTab(null)
+    }
+  }
+
+  const addChildrenField = data => {
+    return data.map(group => {
+      const children = data.filter(child => child.parentID === group.id)
+      if (children.length > 0) {
+        group.children = children
+      }
+
+      return group
+    })
+  }
+
+  const findRootGroups = data => {
+    const rootGroups = []
+    data.forEach(group => {
+      if (!data.some(item => item.id === group.parentID)) {
+        rootGroups.push(group)
+      }
+    })
+
+    return rootGroups
+  }
+
+  const handleGroupCheckboxChange = (id, checked) => {
+    if (checked) {
+      setSelectedGroups(prevGroups => [...prevGroups, { id }])
+    } else {
+      setSelectedGroups(prevGroups => prevGroups.filter(g => g.id !== id))
+    }
+  }
+
+  const GroupCheckbox = ({ group, checked, onChange }) => {
+    const handleNameClick = async () => {
+      await fetchId(group.code)
+      await fetchChildDataNote(group.code)
+    }
+
+    return (
+      <Box
+        onClick={handleNameClick}
+        display='flex'
+        alignItems='center'
+        justifyContent='space-between'
+        style={{ width: '100%' }}
+      >
+        <Typography onClick={handleNameClick} style={{ flexGrow: 1, cursor: 'pointer', height: '100%' }}>
+          {group.name}
+        </Typography>
+        <Box display='flex' alignItems='center'>
+          <IconButton
+            size='small'
+            onClick={() => {
+              handleOpenPopupDetail(group)
+            }}
+          >
+            <Icon icon='tabler:edit' />
+          </IconButton>
+          <IconButton
+            onClick={() => {
+              handleOpenPopup(group.id)
+            }}
+            size='small'
+          >
+            <Icon icon='tabler:trash' />
+          </IconButton>
+          <IconButton
+            onClick={() => {
+              handleAddPClick(group)
+            }}
+            size='small'
+          >
+            <Icon icon='tabler:plus' />
+          </IconButton>
+        </Box>
+      </Box>
+    )
+  }
+
+  const fetchChildData = async parentId => {
+    try {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      const response = await axios.get(
+        `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=${parentId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
+
+      const dataWithChildren = addChildrenField(response.data)
+      const rootGroups = findRootGroups(dataWithChildren)
+      setTreeData(rootGroups)
     } catch (error) {
       console.error('Error fetching children:', error)
     }
@@ -165,9 +300,10 @@ const OrganizationalStructure = () => {
   const handleChangeTab = async id => {
     setSelectedTab(id)
     setInffo(null)
-    setTreeData({})
     setExpandedNodes([])
-    await fetchChildData(infra[id]?.id)
+    await fetchChildData(infra[id]?.code)
+    await fetchChildDataNote(infra[id]?.code)
+    setIdGroup(infra[id])
   }
 
   const fetchChildrenById = async parentId => {
@@ -175,14 +311,14 @@ const OrganizationalStructure = () => {
       const token = localStorage.getItem(authConfig.storageTokenKeyName)
 
       const response = await axios.get(
-        `https://sbs.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/me/?parentId=${parentId}`,
+        `https://dev-ivi.basesystem.one/ivis/infrares/api/v0/regions/children-lv1/children/code?parentCode=${parentId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`
           }
         }
       )
-      setChildData(response.data)
+      setChildData(response.data || [])
 
       return response.data
     } catch (error) {
@@ -192,111 +328,34 @@ const OrganizationalStructure = () => {
     }
   }
 
-  const handleFetchChildren = async nodeId => {
-    const isExpanded = expandedNodes.includes(nodeId)
-    if (isExpanded) {
-      setExpandedNodes(expandedNodes.filter(id => id !== nodeId))
-    } else {
-      const childrenData = await fetchChildrenById(nodeId)
-      setTreeData(prevTreeData => ({
-        ...prevTreeData,
-        [nodeId]: childrenData
-      }))
-      setExpandedNodes([...expandedNodes, nodeId])
-      setSelectedNodeId(nodeId)
-    }
-    setShowPlusIcon(true)
-  }
-
-  const renderTreeItems = nodes => {
-    return nodes.map(node => {
-      const hasChildren = treeData[node.id] && treeData[node.id].length > 0
-
-      return (
-        <TreeItem
-          key={node.id}
-          nodeId={node.id}
-          label={
-            <Box display='flex' alignItems='center' style={{ marginLeft: '5%' }}>
-              <Typography>{node.name}</Typography>
-              <IconButton
-                style={{ marginLeft: 'auto' }}
-                size='small'
-                onClick={() => {
-                  handleAddPClick(node.id)
-                  console.log(node.id)
-                }}
-              >
-                <Icon icon='bi:plus' />
-              </IconButton>
-              <IconButton
-                size='small'
-                onClick={() => {
-                  handleOpenPopup(node.id)
-                  console.log(node.id)
-                }}
-              >
-                <Icon icon='tabler:trash' />
-              </IconButton>
-              <IconButton size='small'>
-                <Icon icon='tabler:edit' onClick={() => handleOpenPopupDetail(node.id)} />
-              </IconButton>
-            </Box>
-          }
-          onClick={async () => {
-            // await handleChangeTab(selectedTab) // Thay đổi tab
-            await fetchChildData(node.id) // Fetch lại dữ liệu cho bảng
-            console.log(node.id)
-          }}
-          sx={{ marginLeft: '3%', marginTop: '4%' }}
-          icon={
-            node.isParent ? (
-              <Box display='flex' alignItems='center'>
-                <IconButton style={{ padding: '0px' }} onClick={() => handleFetchChildren(node.id)}>
-                  <Icon icon={expandedNodes.includes(node.id) ? 'bi:chevron-down' : 'tabler:chevron-right'} />
-                </IconButton>
-              </Box>
-            ) : null
-          }
-        >
-          {hasChildren && renderTreeItems(treeData[node.id])}
-        </TreeItem>
-      )
-    })
-  }
-
   const currentTabInfra = infra[selectedTab] || {}
-  const rootNodes = treeData[currentTabInfra.id] || []
-
-  const fetchId = async nodeId => {
-    try {
-      const token = localStorage.getItem(authConfig.storageTokenKeyName)
-
-      const response = await axios.get(`https://sbs.basesystem.one/ivis/infrares/api/v0/regions/${nodeId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      setInffo(response.data)
-    } catch (error) {
-      console.error('Error fetching children:', error)
-
-      return []
-    }
-  }
 
   const getIdFromValue = value => {
     if (!info && !currentTabInfra) return null
-    if (info && info.name === value) return info.id
-    if (currentTabInfra && currentTabInfra.name === value) return currentTabInfra.id
+    if (info && info.name === value) return info
+    if (currentTabInfra && currentTabInfra.name === value) return currentTabInfra
 
     return null
   }
 
-  const handleNodeSelect = (event, nodeId) => {
-    console.log(nodeId)
-    fetchId(nodeId)
-  }
+  const renderGroup = group => (
+    <TreeItem
+      key={group.id}
+      nodeId={group.id}
+      label={
+        <GroupCheckbox
+          group={group}
+          checked={selectedGroups.some(g => g.id === group.id)}
+          onChange={handleGroupCheckboxChange}
+        />
+      }
+      style={{ marginTop: '5%' }}
+      expandIcon={group.isParent ? <Icon icon='tabler:chevron-right' /> : null}
+      collapseIcon={<Icon icon='tabler:chevron-down' />}
+    >
+      {group.children && group.children.map(childGroup => renderGroup(childGroup))}
+    </TreeItem>
+  )
 
   return (
     <>
@@ -359,7 +418,7 @@ const OrganizationalStructure = () => {
                                 marginRight: '8px',
                                 color: selectedTab === index ? '#fff' : 'inherit'
                               }}
-                              onClick={() => handleOpenPopupDetail(infraItem.id)}
+                              onClick={() => handleOpenPopupDetail(infraItem)}
                             >
                               <Icon icon='tabler:edit' />
                             </IconButton>
@@ -367,7 +426,7 @@ const OrganizationalStructure = () => {
                               style={{
                                 color: selectedTab === index ? '#fff' : 'inherit'
                               }}
-                              onClick={() => handleAddPClick(infraItem.id)}
+                              onClick={() => handleAddPClick(infraItem)}
                             >
                               <Icon icon='tabler:plus' />
                             </IconButton>
@@ -375,7 +434,6 @@ const OrganizationalStructure = () => {
                               size='small'
                               onClick={() => {
                                 handleOpenPopup(infraItem.id)
-                                console.log(infraItem.id)
                               }}
                             >
                               <Icon icon='tabler:trash' />
@@ -389,15 +447,20 @@ const OrganizationalStructure = () => {
               </Grid>
               <Grid item xs={2.5} style={{ display: 'flex', flexDirection: 'column' }}>
                 <Paper elevation={3} style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                  {selectedTab !== null && (
+                    <Button onClick={() => handleAddPClick(idGroup)}>
+                      <Icon icon='tabler:plus' />
+                    </Button>
+                  )}
+
                   <TreeView
-                    aria-label='file system navigator'
-                    defaultCollapseIcon={<Icon icon='mdi:folder-open-outline' />}
-                    defaultExpandIcon={<Icon icon='mdi:folder-outline' />}
-                    expanded={expandedNodes}
-                    sx={{ flexGrow: 1, overflowY: 'auto', height: '100%' }}
-                    onNodeSelect={handleNodeSelect}
+                    sx={{ minHeight: 240 }}
+                    defaultExpandIcon={<Icon icon='tabler:chevron-right' />}
+                    defaultCollapseIcon={<Icon icon='tabler:chevron-down' />}
                   >
-                    {renderTreeItems(rootNodes)}
+                    {treeData.length > 0 &&
+                      treeData[0].children &&
+                      treeData[0].children.map(childGroup => renderGroup(childGroup))}
                   </TreeView>
                 </Paper>
               </Grid>
@@ -406,29 +469,37 @@ const OrganizationalStructure = () => {
                   <CustomTextField
                     label='Name'
                     type='text'
-                    value={info ? info.name : currentTabInfra.name || ''}
+                    value={info ? info?.name : currentTabInfra.name || ''}
                     fullWidth
                     style={{ marginBottom: '16px' }}
-                    onClick={() => handleOpenPopupDetail(getIdFromValue(info ? info.name : currentTabInfra.name || ''))}
+                    disabled={selectedTab === null} // Vô hiệu hóa nếu selectedTab là null
+                    onClick={() =>
+                      handleOpenPopupDetail(getIdFromValue(info ? info?.name : currentTabInfra.name || ''))
+                    }
                   />
                   <CustomTextField
                     label='Code'
                     type='text'
-                    value={info ? info.code : currentTabInfra.code || ''}
+                    value={info ? info?.code : currentTabInfra.code || ''}
                     fullWidth
                     style={{ marginBottom: '16px' }}
-                    onClick={() => handleOpenPopupDetail(getIdFromValue(info ? info.code : currentTabInfra.code || ''))}
+                    disabled={selectedTab === null} // Vô hiệu hóa nếu selectedTab là null
+                    onClick={() =>
+                      handleOpenPopupDetail(getIdFromValue(info ? info?.name : currentTabInfra.name || ''))
+                    }
                   />
                   <CustomTextField
                     label='Detail'
                     type='text'
-                    value={info ? info.detail : currentTabInfra.detail || ''}
+                    value={info ? info?.detail : currentTabInfra.detail || ''}
                     fullWidth
+                    disabled={selectedTab === null} // Vô hiệu hóa nếu selectedTab là null
                     onClick={() =>
-                      handleOpenPopupDetail(getIdFromValue(info ? info.detail : currentTabInfra.detail || ''))
+                      handleOpenPopupDetail(getIdFromValue(info ? info?.name : currentTabInfra.name || ''))
                     }
                   />
                 </Paper>
+
                 <Paper elevation={3} style={{ padding: '16px', flexGrow: 1 }}>
                   <TableContainer component={Paper}>
                     <Table>
@@ -449,7 +520,7 @@ const OrganizationalStructure = () => {
                               <TableCell>{child.code}</TableCell>
                               <TableCell sx={{ padding: '16px' }}>
                                 <IconButton size='small'>
-                                  <Icon icon='tabler:edit' onClick={() => handleOpenPopupDetail(child.id)} />
+                                  <Icon icon='tabler:edit' onClick={() => handleOpenPopupDetail(child)} />
                                 </IconButton>
                                 <IconButton onClick={() => handleOpenPopup(child.id)}>
                                   <Icon icon='tabler:trash' />

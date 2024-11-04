@@ -91,7 +91,7 @@ const Caller = () => {
     end_time: time_end
   })
   const datePickerRef = useRef(null)
-  const [sizeScreen, setSizeScreen] = useState('2x2')
+  const [sizeScreen, setSizeScreen] = useState('3x3')
   const [reload, setReload] = useState(0)
   const [numberShow, setNumberShow] = useState(6)
   const [volume, setVolume] = useState(30)
@@ -99,6 +99,9 @@ const Caller = () => {
   const [valueFilter, setValueFilter] = useState(valueFilterInit)
 
   const [cameraGroup, setCameraGroup] = useState([])
+  const [cameraDisplays, setCameraDisplays] = useState([])
+
+  const [camerasSelected, setCamerasSelected] = useState([])
   const [cameraList, setCameraList] = useState([])
   const [selectIndex, setSelectIndex] = useState(0)
   const [page, setPage] = useState(1)
@@ -109,25 +112,8 @@ const Caller = () => {
   const [duration, setDuration] = useState(0)
   const [speed, setSpeed] = useState(1)
   const debouncedSearch = useDebounce(valueRange, 700)
-
-  const onClickPlay = v => {
-    if (v) {
-      setPlay(v)
-      setTimePlay(timePlay + currentTime)
-      setCurrentTime(0)
-      setCameraGroup([])
-      setReload(reload + 1)
-    } else {
-      setPlay(v)
-    }
-  }
-
-  const handleSeekChange = (event, newValue) => {
-    setCurrentTime(0)
-    setTimePlay(timeFilter.start_time + newValue)
-    setCameraGroup([])
-    setReload(reload + 1)
-  }
+  const [isOpenFullScreen, setIsOpenFullScreen] = useState(false)
+  const [pageSetting, setPageSetting] = useState(0)
 
   const fetchCameraGroup = async () => {
     try {
@@ -136,26 +122,41 @@ const Caller = () => {
       )
       let listCamera = []
       setCameraList(res?.data)
-      if (res.data.length > 0) {
-        res.data[selectIndex]?.cameras.map((camera, index) => {
-          if (index < page * numberShow && index >= (page - 1) * numberShow) {
-            listCamera.push({
-              ...camera,
-              channel: 'Sub'
-            })
-          }
+      if (res.data.length > 0 && res.data[selectIndex]?.cameras) {
+        res.data[selectIndex].cameras.slice((page - 1) * numberShow, page * numberShow).forEach(camera => {
+          listCamera.push({ ...camera, channel: 'Sub' })
         })
       }
-      console.log(listCamera)
       setCameraGroup(listCamera)
     } catch (error) {
       console.error('Error fetching data: ', error)
     }
   }
 
+
   useEffect(() => {
     fetchCameraGroup()
-  }, [reload, page, selectIndex, sizeScreen])
+  }, [page])
+
+  const onClickPlay = v => {
+    // if (v) {
+    //   setPlay(v)
+    //   setTimePlay(timePlay + currentTime)
+    //   setCurrentTime(0)
+    //   setCameraGroup([])
+    //   setReload(reload + 1)
+    // } else {
+    //   setPlay(v)
+    // }
+    setPlay(v)
+
+  }
+
+  const handleSeekChange = (event, newValue) => {
+    setCurrentTime(0)
+    setTimePlay(timeFilter.start_time + newValue)
+  }
+
 
   const handSetChanel = (id, channel) => {
     let newCamera = cameraGroup.map(item => {
@@ -241,42 +242,109 @@ const Caller = () => {
     return marks
   }
 
+  useEffect(() => {
+    if (camerasSelected.length > 0) {
+      const listCamera = camerasSelected.map(camera => ({
+        ...camera,
+        channel: 'Sub',
+      }));
+
+      setCameraGroup(prevCameras => {
+        const cameraMap = new Map();
+
+        prevCameras.forEach(camera => cameraMap.set(camera.id, camera));
+
+        listCamera.forEach(camera => cameraMap.set(camera.id, camera));
+
+        return Array.from(cameraMap.values());
+      });
+    }
+  }, [camerasSelected]);
+
+
+  const handleSetCameraGroup = camera => {
+    setCamerasSelected(prevCameras => [...prevCameras, camera]);
+  };
+
+  const handleUpdateCameraGroup = index => {
+    const updateCameraGroup = [...cameraGroup]
+    updateCameraGroup.splice(index, 1)
+    setCameraGroup(updateCameraGroup)
+  }
+
+  useEffect(() => {
+    const totalCameras = cameraGroup.length;
+    const startIndex = (pageSetting - 1) * numberShow;
+    const endIndex = Math.min(startIndex + numberShow, totalCameras);
+
+    if (startIndex < 0) {
+      setCameraDisplays([])
+
+      return
+    }
+
+    const cameras = cameraGroup.slice(startIndex, endIndex);
+    setCameraDisplays(cameras);
+  }, [pageSetting, cameraGroup, sizeScreen]);
+
   return (
     <DivStyle
       style={{ backgroundColor: 'black', width: '100%', minHeight: '90vh', color: 'white', position: 'relative' }}
     >
-      <Grid container spacing={0}>
-        {cameraGroup.length > 0 &&
-          cameraGroup.map((camera, index) => (
-            <Grid item xs={Math.floor(12 / sizeScreen.split('x')[0])} key={index}>
-              <ViewCamera
-                name={camera?.deviceName}
-                id={camera.id}
-                play={play}
-                onChangeCurrentTime={time => {
-                  setCurrentTime(1000 * time)
-                }}
-                duration={duration}
-                onChangeDuration={setDuration}
-                channel={camera.channel}
-                status={camera.status}
-                startTime={timePlay || time_start}
-                endTime={timeFilter?.endTime || time_end}
-                sizeScreen={sizeScreen}
-                handSetChanel={handSetChanel}
-                volume={volume}
-              />
-            </Grid>
-          ))}
-        <div className='video-controls'>
-          <div
-            style={{
-              width: '100%'
-            }}
-          >
-            <div className='bottom-controls'>
-              <div className='left-controls'>
-                {/* <Box className='w-100' sx={{ px: 2 }}>
+      <Grid container spacing={0} sx={{ paddingBottom: '100px' }}>
+        {cameraDisplays.length > 0 &&
+          cameraDisplays.map((camera, index) => {
+
+            return (
+              <Grid item xs={Math.floor(12 / sizeScreen.split('x')[0])} key={camera?.id + index}
+                sx={{ position: 'relative', borderWidth: 0.25, borderColor: '#fff', borderStyle: 'solid' }}
+              >
+                <ViewCamera
+                  name={camera?.deviceName}
+                  id={camera?.id}
+                  play={play}
+                  onChangeCurrentTime={time => {
+                    setCurrentTime(1000 * time)
+                  }}
+                  duration={duration}
+                  onChangeDuration={setDuration}
+                  channel={camera?.channel}
+                  status={camera?.status}
+                  startTime={timePlay}
+                  endTime={timeFilter?.end_time}
+                  sizeScreen={sizeScreen}
+                  handSetChanel={handSetChanel}
+                  volume={volume}
+                  isFullScreen={isOpenFullScreen}
+                />
+                <div>
+                  <IconButton
+                    variant='outlined'
+                    onClick={() => {
+                      handleUpdateCameraGroup(index)
+                    }}
+                    sx={{
+                      position: 'absolute',
+                      bottom: 0,
+                      right: 0
+                    }}
+                  >
+                    <Icon icon="tabler:x" style={{ color: 'white' }} />
+                  </IconButton>
+                </div>
+              </Grid>
+            )
+          })}
+        <Grid>
+          <div className='video-controls'>
+            <div
+              style={{
+                width: '100%'
+              }}
+            >
+              <div className='bottom-controls'>
+                <div className='left-controls'>
+                  {/* <Box className='w-100' sx={{ px: 2 }}>
                   <Slider
                     defaultValue={1}
                     min={0.5}
@@ -319,207 +387,209 @@ const Caller = () => {
                     }}
                   />
                 </Box> */}
-                <div className='w-100' style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  {timeFilter && (
-                    <IconButton
-                      style={{ padding: 5, margin: '0 8px 0 8px' }}
-                      onClick={() => {
-                        // onChangeRange(1);
-                      }}
-                    >
-                      <Icon icon='mage:previous' size='1.2em' color='#FFF' />
+                  <div className='w-100' style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    {timeFilter && (
+                      <IconButton
+                        style={{ padding: 5, margin: '0 8px 0 8px' }}
+                        onClick={() => {
+                          // onChangeRange(1);
+                        }}
+                      >
+                        <Icon icon='mage:previous' size='1.2em' color='#FFF' />
+                      </IconButton>
+                    )}
+
+                    {timeFilter && (
+                      <IconButton
+                        onClick={() => {
+                          onClickPlay(!play)
+                        }}
+                        style={{ padding: 5, margin: '0 8px 0 8px' }}
+                      >
+                        {!play ? (
+                          <Icon icon='ph:play-light' size='1.2em' color='#FFF' />
+                        ) : (
+                          <Icon icon='ic:twotone-pause' size='1.2em' color='#FFF' />
+                        )}
+                      </IconButton>
+                    )}
+                    <IconButton style={{ padding: 5, margin: '0 8px 0 8px' }}>
+                      <Icon icon='mage:next' size='1em' color='#FFF' />
                     </IconButton>
-                  )}
+                  </div>
 
-                  {timeFilter && (
+                  <div style={{ marginTop: 8 }} className='time'>
+                    <time id='time-elapsed'>{`${formatTimeShow(timeFilter.start_time)}`}</time>
+                    <span>{`/${formatTimeShow(timeFilter.end_time)}`}</span>
+                  </div>
+                </div>
+                <div className='slidecontainer-2'>
+                  <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'end' }}>
                     <IconButton
+                      style={{ padding: 5 }}
                       onClick={() => {
-                        onClickPlay(!play)
-                      }}
-                      style={{ padding: 5, margin: '0 8px 0 8px' }}
-                    >
-                      {!play ? (
-                        <Icon icon='ph:play-light' size='1.2em' color='#FFF' />
-                      ) : (
-                        <Icon icon='ic:twotone-pause' size='1.2em' color='#FFF' />
-                      )}
-                    </IconButton>
-                  )}
-                  <IconButton style={{ padding: 5, margin: '0 8px 0 8px' }}>
-                    <Icon icon='mage:next' size='1em' color='#FFF' />
-                  </IconButton>
-                </div>
-
-                <div style={{ marginTop: 8 }} className='time'>
-                  <time id='time-elapsed'>{`${formatTimeShow(timeFilter.start_time)}`}</time>
-                  <span>{`/${formatTimeShow(timeFilter.end_time)}`}</span>
-                </div>
-              </div>
-              <div className='slidecontainer-2'>
-                <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'end' }}>
-                  <IconButton
-                    style={{ padding: 5 }}
-                    onClick={() => {
-                      setValueRange(valueRange * 2)
-                      setTimeFilter({
-                        ...timeFilter,
-                        end_time: timeFilter.end_time + valueRange
-                      })
-                    }}
-                  >
-                    <Icon icon='tabler:plus' size='1em' color='#FFF' />
-                  </IconButton>
-                  <IconButton
-                    onClick={() => {
-                      setValueRange(valueRange / 2)
-                      setTimeFilter({
-                        ...timeFilter,
-                        end_time: timeFilter.end_time - valueRange
-                      })
-                    }}
-                    style={{ padding: 5 }}
-                  >
-                    <Icon icon='tabler:minus' size='1em' color='#FFF' />
-                  </IconButton>
-                  <Typography style={{ color: '#fff', fontWeight: 'bold' }}>
-                    {`${Math.floor(valueRange / (60 * 60 * 1000))} Hour -  ${
-                      (valueRange - 60 * 60 * 1000 * Math.floor(valueRange / (60 * 60 * 1000))) / (60 * 1000)
-                    } Minute `}
-                  </Typography>
-                </Box>
-                <Box className='w-100'>
-                  <Slider
-                    defaultValue={0}
-                    color='secondary'
-                    step={2000}
-                    min={0}
-                    max={valueRange}
-                    valueLabelDisplay='on'
-                    onChange={handleSeekChange}
-                    value={timePlay - timeFilter?.start_time + currentTime}
-                    getAriaValueText={valuetext}
-                    valueLabelFormat={valuetext}
-                    marks={renderMarks()}
-                    aria-labelledby='custom-marks-slider'
-                    sx={{
-                      '& .MuiSlider-thumb': {
-                        width: 20,
-                        height: 20,
-                        transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
-                        '&::before': {
-                          boxShadow: '0 2px 12px 0 rgba(0,0,0,0.4)'
-                        },
-                        '&:hover, &.Mui-focusVisible': {
-                          boxShadow: `0px 0px 0px 8px ${'rgb(0 0 0 / 16%)'}`
-                        },
-                        '&.Mui-active': {
-                          width: 20,
-                          height: 20
-                        }
-                      },
-                      '& .MuiSlider-track': {
-                        opacity: 0,
-                        backgroundColor: '#fff'
-                      },
-                      '& .MuiSlider-rail': {
-                        opacity: 0.28,
-                        backgroundColor: '#fff'
-                      },
-                      '& .MuiSlider-markLabel': {
-                        color: '#fff'
-                      }
-                    }}
-                  />
-                </Box>
-              </div>
-              <div className='right-controls'>
-                <Stack spacing={4} direction='row' sx={{ mb: 1, px: 1 }} alignItems='center'>
-                  <Icon icon='formkit:volumedown' size='1rem' color='#fff' />
-
-                  <Slider
-                    aria-label='Volume'
-                    defaultValue={30}
-                    min={0}
-                    max={100}
-                    value={volume}
-                    onChange={(event, vol) => {
-                      setVolume(vol)
-                    }}
-                    color='secondary'
-                    sx={{
-                      '& .MuiSlider-track': {
-                        border: 'none'
-                      },
-                      '& .MuiSlider-thumb': {
-                        width: 10,
-                        height: 10,
-                        backgroundColor: '#fff',
-                        '&::before': {
-                          boxShadow: '0 4px 8px rgba(0,0,0,0.4)'
-                        },
-                        '&:hover, &.Mui-focusVisible, &.Mui-active': {
-                          boxShadow: 'none'
-                        }
-                      }
-                    }}
-                  />
-                  <Icon icon='formkit:volumeup' size='1rem' color='#fff' />
-                </Stack>
-                <Box sx={{ mt: 1, ml: 4, display: 'flex', alignItems: 'center' }}>
-                  <IconButton size='small' title='date' onClick={handleIconClick}>
-                    <Icon color='#fff' fontSize='1.5rem' icon='fluent-mdl2:date-time-12' />
-                  </IconButton>
-                  <DatePickerWrapper sx={{ '& .react-datepicker-wrapper': { width: 'auto' } }}>
-                    <DatePicker
-                      ref={datePickerRef}
-                      showTimeSelect
-                      timeFormat='HH:mm'
-                      timeIntervals={15}
-                      selected={dateTime}
-                      id='date-time-picker'
-                      dateFormat='MM/dd/yyyy h:mm aa'
-                      onChange={date => {
-                        setDateTime(date)
+                        setValueRange(valueRange * 2)
                         setTimeFilter({
                           ...timeFilter,
-                          start_time: new Date(date).getTime() - valueRange,
-                          end_time: new Date(date).getTime()
+                          end_time: timeFilter.end_time + valueRange
                         })
-                        setCurrentTime(0)
-                        setTimePlay(new Date(date).getTime() - valueRange)
-                        setCameraGroup([])
-                        setReload(reload + 1)
                       }}
-                      popperPlacement='bottom-start'
-                      customInput={
-                        <CustomInput
-                          sx={{
-                            '& .MuiInputBase-input': {
-                              color: '#fff',
-                              fontWeight: 'bold'
-                            }
-                          }}
-                        />
-                      }
+                    >
+                      <Icon icon='tabler:plus' size='1em' color='#FFF' />
+                    </IconButton>
+                    <IconButton
+                      onClick={() => {
+                        setValueRange(valueRange / 2)
+                        setTimeFilter({
+                          ...timeFilter,
+                          end_time: timeFilter.end_time - valueRange
+                        })
+                      }}
+                      style={{ padding: 5 }}
+                    >
+                      <Icon icon='tabler:minus' size='1em' color='#FFF' />
+                    </IconButton>
+                    <Typography style={{ color: '#fff', fontWeight: 'bold' }}>
+                      {`${Math.floor(valueRange / (60 * 60 * 1000))} Hour -  ${(valueRange - 60 * 60 * 1000 * Math.floor(valueRange / (60 * 60 * 1000))) / (60 * 1000)
+                        } Minute `}
+                    </Typography>
+                  </Box>
+                  <Box className='w-100'>
+                    <Slider
+                      defaultValue={0}
+                      color='secondary'
+                      step={2000}
+                      min={0}
+                      max={valueRange}
+                      valueLabelDisplay='on'
+                      onChange={handleSeekChange}
+                      value={timePlay - timeFilter?.start_time + currentTime}
+                      getAriaValueText={valuetext}
+                      valueLabelFormat={valuetext}
+                      marks={renderMarks()}
+                      aria-labelledby='custom-marks-slider'
+                      sx={{
+                        '& .MuiSlider-thumb': {
+                          width: 20,
+                          height: 20,
+                          transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
+                          '&::before': {
+                            boxShadow: '0 2px 12px 0 rgba(0,0,0,0.4)'
+                          },
+                          '&:hover, &.Mui-focusVisible': {
+                            boxShadow: `0px 0px 0px 8px ${'rgb(0 0 0 / 16%)'}`
+                          },
+                          '&.Mui-active': {
+                            width: 20,
+                            height: 20
+                          }
+                        },
+                        '& .MuiSlider-track': {
+                          opacity: 0,
+                          backgroundColor: '#fff'
+                        },
+                        '& .MuiSlider-rail': {
+                          opacity: 0.28,
+                          backgroundColor: '#fff'
+                        },
+                        '& .MuiSlider-markLabel': {
+                          color: '#fff'
+                        }
+                      }}
                     />
-                  </DatePickerWrapper>
-                </Box>
+                  </Box>
+                </div>
+                <div className='right-controls'>
+                  <Stack spacing={4} direction='row' sx={{ mb: 1, px: 1 }} alignItems='center'>
+                    <Icon icon='formkit:volumedown' size='1rem' color='#fff' />
+
+                    <Slider
+                      aria-label='Volume'
+                      defaultValue={30}
+                      min={0}
+                      max={100}
+                      value={volume}
+                      onChange={(event, vol) => {
+                        setVolume(vol)
+                      }}
+                      color='secondary'
+                      sx={{
+                        '& .MuiSlider-track': {
+                          border: 'none'
+                        },
+                        '& .MuiSlider-thumb': {
+                          width: 10,
+                          height: 10,
+                          backgroundColor: '#fff',
+                          '&::before': {
+                            boxShadow: '0 4px 8px rgba(0,0,0,0.4)'
+                          },
+                          '&:hover, &.Mui-focusVisible, &.Mui-active': {
+                            boxShadow: 'none'
+                          }
+                        }
+                      }}
+                    />
+                    <Icon icon='formkit:volumeup' size='1rem' color='#fff' />
+                  </Stack>
+                  <Box sx={{ mt: 1, ml: 4, display: 'flex', alignItems: 'center' }}>
+                    <IconButton size='small' title='date' onClick={handleIconClick}>
+                      <Icon color='#fff' fontSize='1.5rem' icon='fluent-mdl2:date-time-12' />
+                    </IconButton>
+                    <DatePickerWrapper sx={{ '& .react-datepicker-wrapper': { width: 'auto' } }}>
+                      <DatePicker
+                        ref={datePickerRef}
+                        showTimeSelect
+                        timeFormat='HH:mm'
+                        timeIntervals={15}
+                        selected={dateTime}
+                        id='date-time-picker'
+                        dateFormat='MM/dd/yyyy h:mm aa'
+                        onChange={date => {
+                          setDateTime(date)
+                          setTimeFilter({
+                            ...timeFilter,
+                            start_time: new Date(date).getTime() - valueRange,
+                            end_time: new Date(date).getTime()
+                          })
+                          setCurrentTime(0)
+                          setTimePlay(new Date(date).getTime() - valueRange)
+                          setReload(reload + 1)
+                        }}
+                        popperPlacement='bottom-start'
+                        customInput={
+                          <CustomInput
+                            sx={{
+                              '& .MuiInputBase-input': {
+                                color: '#fff',
+                                fontWeight: 'bold'
+                              }
+                            }}
+                          />
+                        }
+                      />
+                    </DatePickerWrapper>
+                  </Box>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </Grid>
       </Grid>
       <Settings
         page={page}
-        onSetPage={setPage}
+        onSetPage={setPageSetting}
         selectIndex={selectIndex}
-        onSetSelectIndex={setSelectIndex}
+
+        // onSetSelectIndex={setSelectIndex}
         cameraList={cameraList}
         sizeScreen={sizeScreen}
         setSizeScreen={size => {
           setSizeScreen(size)
           setNumberShow(size.split('x')[0] * size.split('x')[1])
         }}
+        setCameraGroup={handleSetCameraGroup}
+        cameraGroup={cameraGroup}
       />
     </DivStyle>
   )
