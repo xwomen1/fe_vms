@@ -100,15 +100,18 @@ const App = props => {
   return (
     <Provider store={store}>
       <CacheProvider value={emotionCache}>
-        <Head>
-          <title>{`VOTV AI VMS`}</title>
-          <meta
-            name='description'
-            content={`${themeConfig.templateName} – Material Design React Admin Dashboard Template – is the most developer friendly & highly customizable Admin Dashboard Template based on MUI v5.`}
-          />
-          <meta name='keywords' content='Material Design, MUI, Admin Template, React Admin Template' />
-          <meta name='viewport' content='initial-scale=1, width=device-width' />
-        </Head>
+      <Head>
+  <link rel='icon' type='image/png' sizes='512x512' href='/images/file2.png' />
+  <title>{`AI Vms`}</title>
+  <meta
+    name='description'
+    content={`${themeConfig.templateName} A Smart Security System's Video Management Software`}
+  />
+  <meta name='keywords' content='' />
+  <meta name='viewport' content='initial-scale=1, width=device-width' />
+</Head>
+
+
 
         <AuthProvider>
           <SettingsProvider {...(setConfig ? { pageSettings: setConfig() } : {})}>

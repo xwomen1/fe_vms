@@ -97,7 +97,7 @@ const EventList = () => {
           type: valueFilter.type,
           device_type: valueFilter.device_type,
           device_name: value || '',
-          sort: '+status,-created_at'
+          sort: '-created_at'
         }
       }
 

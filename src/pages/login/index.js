@@ -166,7 +166,7 @@ const LoginPage = () => {
         >
           <Box sx={{ width: '100%', maxWidth: 400 }}>
             <Box sx={{ my: 6 }}>
-              <img height='100' alt='error-illustration' src='/images/favicon.png' />
+              <img height='50' alt='error-illustration' src='/images/favicon.png' />
 
               <Typography variant='h3' sx={{ mb: 1.5 }}>
                 {`Hệ thống an ninh thông minh! `}
