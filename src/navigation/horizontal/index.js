@@ -112,7 +112,7 @@ const navigation = () => {
     },
     {
       path: '/',
-      title: 'Performance Management',
+      title: 'Performance',
       icon: 'tabler:lock-access',
       children: [
         {

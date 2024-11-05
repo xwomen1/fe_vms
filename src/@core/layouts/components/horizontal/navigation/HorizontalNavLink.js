@@ -126,10 +126,10 @@ const HorizontalNavLink = props => {
                 ...(menuTextTruncate && { overflow: 'hidden' })
               }}
             >
-              <ListItemIcon sx={{ mr: 2, color: 'text.secondary' }}>
+              <ListItemIcon sx={{ mr: 1, minWidth: 'auto', color: 'text.secondary' }}>
                 <UserIcon icon={icon} fontSize={icon === navSubItemIcon ? '0.625rem' : '1.375rem'} />
-              </ListItemIcon>
-              <Typography {...(menuTextTruncate && { noWrap: true })} sx={{ color: 'text.secondary' }}>
+                </ListItemIcon>
+              <Typography {...(menuTextTruncate && { noWrap: true })} sx={{ color: 'text.secondary', fontSize:'15px' }}>
                 <Translations text={item.title} />
               </Typography>
             </Box>

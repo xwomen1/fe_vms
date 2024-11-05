@@ -5,6 +5,22 @@
   import { Timeline, TimelineItem, TimelineSeparator, TimelineDot, TimelineConnector, TimelineContent, TimelineOppositeContent } from '@mui/lab';
   import authConfig from 'src/configs/auth'
 import axios from 'axios';
+import { makeStyles } from '@material-ui/core/styles'
+
+const useStyles = makeStyles(() => ({
+  loadingContainer: {
+    position: 'relative',
+    minHeight: '100px',
+    zIndex: 0,
+  },
+  circularProgress: {
+    position: 'absolute',
+    top: '40%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    zIndex: 99999,
+  },
+}));
 
 
   const EventList = () => {
@@ -15,6 +31,8 @@ import axios from 'axios';
     const [results, setResults] = useState([]); // State for search results
     const [cameras, setCameras] = useState([]); // State for search results
     const [fakeData, setfakeData] = useState([]); // State for search results
+    const [loading, setLoading] = useState(false); // Loading state
+    const classes = useStyles()
 
     const handleSearchClick1 = () => {
       setOpenPopup(true);
@@ -67,7 +85,8 @@ import axios from 'axios';
       const cameraID = selectedCamera?.id || null; // Assuming selectedCamera has an id property
       const endtime = Date.now(); // Set your end time
       const starttime = endtime - 60 * 60 * 1000; // Example: 1 hour before end time
-  
+      setLoading(true);
+
       const images = savedImage.map(image => ({
         base64: image.base64 || null, // Ensure you have base64 data in savedImage
         id: image.id,
@@ -85,8 +104,12 @@ import axios from 'axios';
         const response = await axios.post('https://votv.ivms.vn/votv/vms/api/v0/ai-events/search-face', requestData);
         setResults(response.data); // Assuming you want to store results in state
         console.log('Search results:', response.data);
+        setLoading(false); 
+
         setfakeData(response.data)
       } catch (error) {
+        setLoading(false); 
+
         console.error('Error calling API:', error);
       }
     };
@@ -197,6 +220,8 @@ return (
 
               </Grid>
               <Grid item xs={8}>
+              <div className={classes.loadingContainer}>
+              {loading && <CircularProgress className={classes.circularProgress} />}
                 <Grid item xs={12}>
                   <Typography variant="h5">Timeline </Typography>
                   <Timeline
@@ -237,12 +262,15 @@ return (
                     ))}
                   </Timeline>
                 </Grid>
+                </div>
               </Grid>
             </Grid>
           </Paper>
         </Grid>
 
         <Grid item xs={6} style={{ display: 'flex', flexDirection: 'column' }}>
+          <div className={classes.loadingContainer}>
+          {loading && <CircularProgress className={classes.circularProgress} />}
           <Paper elevation={3} style={{ padding: '16px', flex: 1 }}>
             <h2>Image</h2>
             <CardContent>
@@ -310,6 +338,7 @@ return (
               )}
             </CardContent>
           </Paper>
+          </div>
         </Grid>
       </Grid>
       </>

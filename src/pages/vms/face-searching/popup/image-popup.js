@@ -6,10 +6,29 @@ import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import CloseIcon from '@mui/icons-material/Close';
 import Swal from 'sweetalert2';
+import CircularProgress from '@mui/material/CircularProgress';
+import { makeStyles } from '@material-ui/core/styles'
+
+const useStyles = makeStyles(() => ({
+  loadingContainer: {
+    position: 'relative',
+    minHeight: '100px',
+    zIndex: 0,
+  },
+  circularProgress: {
+    position: 'absolute',
+    top: '40%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    zIndex: 99999,
+  },
+}));
 
 const ImageForm = ({ onClose, onSave }) => {
   const [images, setImages] = useState([]);
   const [imagesSelect, setImagesSelect] = useState([]);
+  const [loading, setLoading] = useState(false); // Loading state
+  const classes = useStyles()
 
   const handleFileChange = async (event) => {
     let files = Array.from(event.target.files);
@@ -23,7 +42,7 @@ return;
 
     const newImages = [];
     const newImagesSelect = [];
-
+    setLoading(true);
     for (const file of files) {
       try {
         const token = localStorage.getItem(authConfig.storageTokenKeyName);
@@ -65,6 +84,7 @@ return;
 
     setImages(newImages);
     setImagesSelect(newImagesSelect);
+    setLoading(false); 
   };
 
   const handleSave = () => {
@@ -84,7 +104,7 @@ return;
   };
 
   return (
-    <Dialog open={true} onClose={onClose}>
+    <Dialog open={true} onClose={onClose} disableBackdropClick={loading}>
       <IconButton
           onClick={onClose}
           style={{ position: 'absolute', top: '8px', right: '8px' }}
@@ -92,9 +112,12 @@ return;
           <CloseIcon />
         </IconButton>
       <div style={{ backgroundColor: 'white', margin: 80, position: 'relative', padding: '16px' }}>
-        
+      <div className={classes.loadingContainer}>
+
+      {loading && <CircularProgress className={classes.circularProgress} />}
 
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: 'white' }}>
+          
           {images.length > 0 ? (
             <>
               {/* Hiển thị 3 ảnh đầu tiên trên một dòng */}
@@ -149,7 +172,7 @@ return;
             </div>
           )}
         </div>
-
+</div>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '16px' }}>
           <Button style={{marginRight: 10}} onClick={handleSave} variant="contained" color="primary">
             Save Images
