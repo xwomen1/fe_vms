@@ -66,7 +66,7 @@ const Review = ({ id, name, channel }) => {
         }
 
         try {
-            const res = await postApi(`https://sbs.basesystem.one/ivis/vms/api/v0/playback/camera/${camera.id}`, params)
+            const res = await postApi(`https://votv.ivms.vn/votv/vms/api/v0/playback/camera/${camera.id}`, params)
             console.log('res', res.data);
 
             const dataList = [...res.data.DayList?.Days]

@@ -88,7 +88,7 @@ const Network = ({ open, onClose, onSelect, nvr }) => {
         }
 
         const response = await axios.get(
-          `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/config/networkconfig/{idNVR}?idNVR=${nvr}`,
+          `https://votv.ivms.vn/votv/vms/api/v0/nvrs/config/networkconfig/{idNVR}?idNVR=${nvr}`,
           config
         )
 

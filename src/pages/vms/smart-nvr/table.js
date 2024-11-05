@@ -209,7 +209,7 @@ const UserList = ({ apiData }) => {
             Authorization: `Bearer ${token}`
           }
         }
-        let urlDelete = `https://sbs.basesystem.one/ivis/vms/api/v0/device/${idDelete}`
+        let urlDelete = `https://votv.ivms.vn/votv/vms/api/v0/device/${idDelete}`
         axios
           .delete(urlDelete, config)
           .then(() => {
@@ -263,7 +263,7 @@ const UserList = ({ apiData }) => {
             keyword: value
           }
         }
-        const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/device', config)
+        const response = await axios.get('https://votv.ivms.vn/votv/vms/api/v0/device', config)
         if (response.data && Array.isArray(response.data) && response.data.length > 0) {
           setStatus1(response.data.isOfflineSetting || false)
           setNvr(response.data[0].id)

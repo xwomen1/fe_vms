@@ -110,44 +110,45 @@ const navigation = () => {
         // }
       ]
     },
-    {
-      path: '/',
-      title: 'Performance Management',
-      icon: 'tabler:lock-access',
-      children: [
-        {
-          title: 'Set Up KPI Metrics',
-          path: '/kpi',
-          icon: 'tabler:calendar-event'
-        },
-        {
-          title: 'Assign KPI',
-          path: '/kpi/assign-kpi',
-          icon: 'tabler:calendar-event'
-        },
-        {
-          title: 'Assess KPI',
-          path: '/kpi/assess-kpi',
-          icon: 'tabler:calendar-event'
-        },
-        {
-          path: '/mappingACToInf',
-          title: 'Advanced Settings',
-          icon: 'tabler:shield'
-        }
 
-        // {
-        //   path: '/pages/access-rights/list',
-        //   title: 'Thống kê',
-        //   icon: 'tabler:statistics/time?tab=%2Fstatistics%2Ftime'
-        // },
-        // {
-        //   path: '/pages/access-rights/list',
-        //   title: 'Hẹn lịch',
-        //   icon: 'tabler:guest-registrations'
-        // }
-      ]
-    },
+    // {
+    //   path: '/',
+    //   title: 'Performance',
+    //   icon: 'tabler:lock-access',
+    //   children: [
+    //     {
+    //       title: 'Set Up KPI Metrics',
+    //       path: '/kpi',
+    //       icon: 'tabler:calendar-event'
+    //     },
+    //     {
+    //       title: 'Assign KPI',
+    //       path: '/kpi/assign-kpi',
+    //       icon: 'tabler:calendar-event'
+    //     },
+    //     {
+    //       title: 'Assess KPI',
+    //       path: '/kpi/assess-kpi',
+    //       icon: 'tabler:calendar-event'
+    //     },
+    //     {
+    //       path: '/mappingACToInf',
+    //       title: 'Advanced Settings',
+    //       icon: 'tabler:shield'
+    //     }
+
+    //     // {
+    //     //   path: '/pages/access-rights/list',
+    //     //   title: 'Thống kê',
+    //     //   icon: 'tabler:statistics/time?tab=%2Fstatistics%2Ftime'
+    //     // },
+    //     // {
+    //     //   path: '/pages/access-rights/list',
+    //     //   title: 'Hẹn lịch',
+    //     //   icon: 'tabler:guest-registrations'
+    //     // }
+    //   ]
+    // },
     {
       path: '/asset',
       title: 'VMS System',

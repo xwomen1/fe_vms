@@ -75,7 +75,7 @@ const PassWord = ({ onClose, nvr }) => {
         }
       }
       await axios.put(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/config/changepassword?idNVR=${nvr}`,
+        `https://votv.ivms.vn/votv/vms/api/v0/nvrs/config/changepassword?idNVR=${nvr}`,
         {
           passwordNew: password,
           username: username,
@@ -128,7 +128,7 @@ const PassWord = ({ onClose, nvr }) => {
               Authorization: `Bearer ${token}`
             }
           }
-          const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${nvr}`, config)
+          const response = await axios.get(`https://votv.ivms.vn/votv/vms/api/v0/nvrs/${nvr}`, config)
           setIpAddress(response.data.ipAddress)
           setHttpPort(response.data.httpPort)
           setUserName(response.data.username)

@@ -309,7 +309,7 @@ const EventConfig = () => {
   const fetchCameraGroup = async () => {
     try {
       const res = await axios.get(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/camera-groups?deviceTypes=NVR&keyword=${keyword}&limit=25&page=1`,
+        `https://votv.ivms.vn/votv/vms/api/v0/camera-groups?deviceTypes=NVR&keyword=${keyword}&limit=25&page=1`,
         config
       )
       setCameraGroup(res.data)
@@ -335,7 +335,7 @@ const EventConfig = () => {
   const fetchModelAICamera = async () => {
     try {
       const res = await axios.get(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties/camera/${idCameraSelect}`,
+        `https://votv.ivms.vn/votv/vms/api/v0/cameras/user/ai-properties/camera/${idCameraSelect}`,
         config
       )
       setAlertAIList(res.data)
@@ -587,7 +587,7 @@ const EventConfig = () => {
 
     try {
       await axios.put(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties/${cameraAIPropertyId}`,
+        `https://votv.ivms.vn/votv/vms/api/v0/cameras/user/ai-properties/${cameraAIPropertyId}`,
         { ...params },
         config
       )

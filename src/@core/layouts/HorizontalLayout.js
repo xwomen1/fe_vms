@@ -126,23 +126,7 @@ const HorizontalLayout = props => {
               ...(navHidden ? {} : { borderBottom: theme => `1px solid ${theme.palette.divider}` })
             }}
           >
-            {/* <Toolbar
-              className='navbar-content-container'
-              sx={{
-                mx: 'auto',
-                ...(contentWidth === 'boxed' && { '@media (min-width:1440px)': { maxWidth: 1440 } }),
-                minHeight: theme => `${theme.mixins.toolbar.minHeight - 2}px !important`
-              }}
-            >
-              <AppBarContent
-                {...props}
-                hidden={hidden}
-                settings={settings}
-                saveSettings={saveSettings}
-                appBarContent={horizontalLayoutProps?.appBar?.content}
-                appBarBranding={horizontalLayoutProps?.appBar?.branding}
-              />
-            </Toolbar> */}
+           
             <Box
               className='layout-horizontal-nav'
               sx={{

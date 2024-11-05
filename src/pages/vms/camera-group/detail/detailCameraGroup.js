@@ -49,7 +49,7 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
             Authorization: `Bearer ${token}`
           }
         }
-        const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/camera-groups/${id}`, config)
+        const response = await axios.get(`https://votv.ivms.vn/votv/vms/api/v0/camera-groups/${id}`, config)
         setCameraGroup(response.data)
         setGroupName(response.data.name)
         setDescription(response.data.description)
@@ -76,7 +76,7 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
 
           const cameraPromises = cameraIds.map(async cameraId => {
             try {
-              const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${cameraId}`, config)
+              const response = await axios.get(`https://votv.ivms.vn/votv/vms/api/v0/cameras/${cameraId}`, config)
 
               return response.data
             } catch (error) {
@@ -119,7 +119,7 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
       }
 
       const response = await axios.put(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/camera-groups/${id}`,
+        `https://votv.ivms.vn/votv/vms/api/v0/camera-groups/${id}`,
         payload,
         config
       )
@@ -198,7 +198,7 @@ const CameraPopupDetail = ({ open, id, onClose, onSuccess }) => {
             Authorization: `Bearer ${token}`
           }
         }
-        const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/cameras', config)
+        const response = await axios.get('https://votv.ivms.vn/votv/vms/api/v0/cameras', config)
 
         setGroupOptions(response.data)
       } catch (error) {

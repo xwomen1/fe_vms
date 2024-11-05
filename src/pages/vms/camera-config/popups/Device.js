@@ -101,7 +101,7 @@ const Device = ({ onClose, camera, setReload }) => {
       }
 
       const response = await axios.get(
-        'https://sbs.basesystem.one/ivis/vms/api/v0/device/active?status=connected',
+        'https://votv.ivms.vn/votv/vms/api/v0/device/active?status=connected',
         config
       )
 
@@ -224,7 +224,7 @@ const Device = ({ onClose, camera, setReload }) => {
             }
           }
 
-          const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${camera}`, config)
+          const response = await axios.get(`https://votv.ivms.vn/votv/vms/api/v0/cameras/${camera}`, config)
           console.log(response.data.box, 'r')
           setCamera(response.data)
           setCameraName(response.data.name)
@@ -278,7 +278,7 @@ const Device = ({ onClose, camera, setReload }) => {
           }
 
           const response = await axios.get(
-            `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/${camera}`,
+            `https://votv.ivms.vn/votv/vms/api/v0/cameras/config/networkconfig/${camera}`,
             config
           )
 
@@ -364,7 +364,7 @@ const Device = ({ onClose, camera, setReload }) => {
         location: regionsSelect.name
       }
 
-      await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${camera}`, data, config)
+      await axios.put(`https://votv.ivms.vn/votv/vms/api/v0/cameras/${camera}`, data, config)
       setLoading(false)
       setReload(prev => prev + 1)
       Swal.fire({
@@ -426,7 +426,7 @@ const Device = ({ onClose, camera, setReload }) => {
         }
       }
 
-      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/camera-groups', config)
+      const response = await axios.get('https://votv.ivms.vn/votv/vms/api/v0/camera-groups', config)
 
       const cameraGroup = response.data.map(item => ({
         id: item.id,
@@ -509,7 +509,7 @@ const Device = ({ onClose, camera, setReload }) => {
         }
 
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/vms/api/v0/cameras/options/protocol-types',
+          'https://votv.ivms.vn/votv/vms/api/v0/cameras/options/protocol-types',
           config
         )
         setProtocol(response.data)

@@ -136,7 +136,7 @@ const Device = ({ onClose, nvr, setReload }) => {
       }
 
       const response = await axios.get(
-        'https://sbs.basesystem.one/ivis/vms/api/v0/device/active?status=connected',
+        'https://votv.ivms.vn/votv/vms/api/v0/device/active?status=connected',
         config
       )
 
@@ -177,7 +177,7 @@ const Device = ({ onClose, nvr, setReload }) => {
             }
           }
 
-          const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${nvr}`, config)
+          const response = await axios.get(`https://votv.ivms.vn/votv/vms/api/v0/nvrs/${nvr}`, config)
           setCamera(response.data)
           setCameraName(response.data.name)
           setUserName(response.data.username)
@@ -259,7 +259,7 @@ const Device = ({ onClose, nvr, setReload }) => {
         isOfflineSetting: isOfflineSetting
       }
 
-      await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${nvr}`, data, config)
+      await axios.put(`https://votv.ivms.vn/votv/vms/api/v0/nvrs/${nvr}`, data, config)
       setLoading(false)
       Swal.fire({
         title: 'Successfully!',
@@ -359,7 +359,7 @@ const Device = ({ onClose, nvr, setReload }) => {
         }
 
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/vms/api/v0/cameras/options/protocol-types',
+          'https://votv.ivms.vn/votv/vms/api/v0/cameras/options/protocol-types',
           config
         )
         setProtocol(response.data)

@@ -84,7 +84,7 @@ const Filter = ({ show, onClose, valueFilter, callback, direction }) => {
 
   const fetchCameras = async () => {
     try {
-      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras`, config)
+      const res = await axios.get(`https://votv.ivms.vn/votv/vms/api/v0/cameras`, config)
       setCameras(res.data)
     } catch (error) {
       console.error('Error fetching cameras: ', error)

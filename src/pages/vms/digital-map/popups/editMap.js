@@ -221,7 +221,7 @@ const EditMap = ({ show, onClose, setReload, id }) => {
             formData.append('files', file)
         }
         try {
-            const res = await postApi(`https://sbs.basesystem.one/ivis/vms/api/v0/images/upload`, formData)
+            const res = await postApi(`https://votv.ivms.vn/votv/vms/api/v0/images/upload`, formData)
             setFileUploadDataName(e.value[0].name)
             setFileUploadDataId(res.data.id)
             setFileUploadUrl(res.data.urlImage)

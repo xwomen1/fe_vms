@@ -154,7 +154,7 @@ const Camera = ({ apiData }) => {
           keyword: value
         }
       }
-      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/cameras', config)
+      const response = await axios.get('https://votv.ivms.vn/votv/vms/api/v0/cameras', config)
       setStatus1(response.data.isOfflineSetting)
       setAssetType(response.data)
       setTotal(response.data.page)
@@ -258,7 +258,7 @@ const Camera = ({ apiData }) => {
             Authorization: `Bearer ${token}`
           }
         }
-        let urlDelete = `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${idDelete}`
+        let urlDelete = `https://votv.ivms.vn/votv/vms/api/v0/cameras/${idDelete}`
         axios
           .delete(urlDelete, config)
           .then(() => {
@@ -313,7 +313,7 @@ const Camera = ({ apiData }) => {
       }
 
       const response = await axios.get(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/device/camera/synchronize?camera_id=${id}`,
+        `https://votv.ivms.vn/votv/vms/api/v0/device/camera/synchronize?camera_id=${id}`,
         config
       )
       Swal.fire({

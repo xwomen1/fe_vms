@@ -281,7 +281,7 @@ const EventList = ({}) => {
     }
     setLoading(true)
     try {
-      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/routine`, params)
+      const res = await axios.get(`https://votv.ivms.vn/votv/vms/api/v0/aievents/routine`, params)
       setDeviceList(res.data)
       setCount(res.count)
       setTotalPage(Math.ceil(res.count / pageSize))
@@ -382,7 +382,7 @@ const EventList = ({}) => {
       }
 
       axios
-        .delete(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/${idDelete}`, config)
+        .delete(`https://votv.ivms.vn/votv/vms/api/v0/aievents/${idDelete}`, config)
         .then(() => {
           toast.success('Deleted successfully')
           setIdDelete(null)

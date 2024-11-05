@@ -40,7 +40,7 @@ const ImportPopup = ({ open, handleClose }) => {
         }
       }
 
-      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/device', config)
+      const response = await axios.get('https://votv.ivms.vn/votv/vms/api/v0/device', config)
 
       const nicTypes = response.data.map(item => ({
         label: item.nameDevice,
@@ -91,7 +91,7 @@ const ImportPopup = ({ open, handleClose }) => {
         }
       }
 
-      const response = await axios.post('https://sbs.basesystem.one/ivis/vms/api/v0/cameras/import', formData, config)
+      const response = await axios.post('https://votv.ivms.vn/votv/vms/api/v0/cameras/import', formData, config)
 
       console.log('Import successful')
       if (response.data && response.data.length > 0) {
@@ -140,7 +140,7 @@ const ImportPopup = ({ open, handleClose }) => {
         responseType: 'blob' // Ensure the response is in blob format
       }
 
-      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/cameras/sample-data', config)
+      const response = await axios.get('https://votv.ivms.vn/votv/vms/api/v0/cameras/sample-data', config)
 
       const blob = new Blob([response.data], { type: 'text/csv' })
 
@@ -172,7 +172,7 @@ const ImportPopup = ({ open, handleClose }) => {
         responseType: 'blob' // Ensure the response is in blob format
       }
 
-      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/cameras/imported/download', config)
+      const response = await axios.get('https://votv.ivms.vn/votv/vms/api/v0/cameras/imported/download', config)
 
       const blob = new Blob([response.data], { type: 'application/octet-stream' })
 

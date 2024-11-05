@@ -49,7 +49,7 @@ const AddCamera = ({ nvr, onClose }) => {
         }
 
         const response = await axios.get(
-          `https://sbs.basesystem.one/ivis/vms/api/v0/device/${nvr}/cameras?sort=-created_at`,
+          `https://votv.ivms.vn/votv/vms/api/v0/device/${nvr}/cameras?sort=-created_at`,
           config
         )
         setCamera(response.data)
@@ -69,7 +69,7 @@ const AddCamera = ({ nvr, onClose }) => {
           }
         }
 
-        const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/device/hik?idNVR=${nvr}`, config)
+        const response = await axios.get(`https://votv.ivms.vn/votv/vms/api/v0/device/hik?idNVR=${nvr}`, config)
         setNVRCameraList(response.data.cameras)
       } catch (error) {
         console.error('Error fetching NVR data:', error)
@@ -92,7 +92,7 @@ const AddCamera = ({ nvr, onClose }) => {
         Authorization: `Bearer ${token}`
       }
     }
-    let urlDelete = `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${idDelete}`
+    let urlDelete = `https://votv.ivms.vn/votv/vms/api/v0/cameras/${idDelete}`
     axios
       .delete(urlDelete, config)
       .then(() => {
@@ -131,7 +131,7 @@ const AddCamera = ({ nvr, onClose }) => {
           id: nvr
         }
       }
-      await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/camera/${nvr}`, params, config)
+      await axios.put(`https://votv.ivms.vn/votv/vms/api/v0/nvrs/camera/${nvr}`, params, config)
       setNotification({ message: 'Data has been updated successfully', type: 'success' })
     } catch (error) {
       setNotification({ message: `Device not responding: ${error.message}`, type: 'error' })

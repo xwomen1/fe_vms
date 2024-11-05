@@ -55,7 +55,7 @@ const UserDetails = ({ cameras, onClose }) => {
       }
 
       await axios.put(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/{idNetWorkConfig}?idNetWorkConfig=${cameras.id}&NetWorkConfigType=port`,
+        `https://votv.ivms.vn/votv/vms/api/v0/cameras/config/networkconfig/{idNetWorkConfig}?idNetWorkConfig=${cameras.id}&NetWorkConfigType=port`,
         data,
         config
       )

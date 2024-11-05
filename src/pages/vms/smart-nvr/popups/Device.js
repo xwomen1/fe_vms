@@ -138,7 +138,7 @@ const Device = ({ onClose, nvr }) => {
             }
           }
 
-          const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/device/search/${nvr}`, config)
+          const response = await axios.get(`https://votv.ivms.vn/votv/vms/api/v0/device/search/${nvr}`, config)
           setCamera(response.data)
           setCameraName(response.data.nameDevice)
           setUserName(response.data.mqttAccount.username)
@@ -189,7 +189,7 @@ const Device = ({ onClose, nvr }) => {
         isOfflineSetting: isOfflineSetting
       }
 
-      await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/device/${nvr}`, data, config)
+      await axios.put(`https://votv.ivms.vn/votv/vms/api/v0/device/${nvr}`, data, config)
       setLoading(false)
       Swal.fire({
         title: 'Successfully!',

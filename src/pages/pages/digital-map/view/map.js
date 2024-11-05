@@ -218,7 +218,7 @@ const Map = () => {
     const fetchCameraList = async () => {
         try {
             const res = await callApi(
-                `https://sbs.basesystem.one/ivis/vms/api/v0/camera-groups?deviceTypes=NVR&keyword=${keyword}&limit=25&page=1`)
+                `https://votv.ivms.vn/votv/vms/api/v0/camera-groups?deviceTypes=NVR&keyword=${keyword}&limit=25&page=1`)
             if (Array.isArray(res?.data)) {
                 setCameraList(res?.data)
             } else {

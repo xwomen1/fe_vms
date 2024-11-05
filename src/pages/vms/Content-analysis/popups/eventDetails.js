@@ -83,7 +83,7 @@ const EventDetails = ({ show, onClose, data, setReload }) => {
 
       try {
         const res = await axios.get(
-          `https://sbs.basesystem.one/ivis/vms/api/v0/video/downloadchoice?idCamera=${camera}&startTime=${params.startTime}&endTime=${params.endTime}`
+          `https://votv.ivms.vn/votv/vms/api/v0/video/downloadchoice?idCamera=${camera}&startTime=${params.startTime}&endTime=${params.endTime}`
         )
         const videoDownloadUrl = res.data[0].videoDownLoad[0].video
 

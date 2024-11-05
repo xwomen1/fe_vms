@@ -31,7 +31,7 @@ const AddCamera = ({ nvr, onClose }) => {
     setLoading(true)
     try {
       const response = await callApi(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${nvr}/cameras`
+        `https://votv.ivms.vn/votv/vms/api/v0/nvrs/${nvr}/cameras`
       )
       setCamera(response.data)
     } catch (error) {
@@ -45,12 +45,12 @@ const AddCamera = ({ nvr, onClose }) => {
     setLoading(true)
     try {
 
-      const nvrResponse = await callApi(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${nvr}`)
+      const nvrResponse = await callApi(`https://votv.ivms.vn/votv/vms/api/v0/nvrs/${nvr}`)
       const nvrCameras = nvrResponse.data.cameras
 
       const updatedCameras = nvrCameras.filter(camera => camera.id !== id)
 
-      await putApi(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${nvr}`, { cameras: updatedCameras })
+      await putApi(`https://votv.ivms.vn/votv/vms/api/v0/nvrs/${nvr}`, { cameras: updatedCameras })
 
       setNotification({ message: 'Deleted successfully', type: 'success' })
     } catch (error) {
@@ -74,7 +74,7 @@ const AddCamera = ({ nvr, onClose }) => {
           }
         ]
       }
-      await putApi(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/camera/${nvr}`, params)
+      await putApi(`https://votv.ivms.vn/votv/vms/api/v0/nvrs/camera/${nvr}`, params)
       setNotification({ message: 'Added successfully', type: 'success' })
     } catch (error) {
       setNotification({ message: `Device not responding: ${error.message}`, type: 'error' })

@@ -179,7 +179,7 @@ const Add = ({ apiData }) => {
       }
 
       const response = await axios.get(
-        'https://sbs.basesystem.one/ivis/vms/api/v0/device/active?status=connected',
+        'https://votv.ivms.vn/votv/vms/api/v0/device/active?status=connected',
         config
       )
 
@@ -227,7 +227,7 @@ const Add = ({ apiData }) => {
       }
 
       const response = await axios.post(
-        'https://sbs.basesystem.one/ivis/vms/api/v0/device/onvif/scandevicestaticip',
+        'https://votv.ivms.vn/votv/vms/api/v0/device/onvif/scandevicestaticip',
         payload,
         config
       )
@@ -290,7 +290,7 @@ const Add = ({ apiData }) => {
         }
       }
 
-      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/cameras', config)
+      const response = await axios.get('https://votv.ivms.vn/votv/vms/api/v0/cameras', config)
 
       if (response && response.data) {
         if (response.data.isOfflineSetting !== undefined) {
@@ -329,7 +329,7 @@ const Add = ({ apiData }) => {
             Authorization: `Bearer ${token}`
           }
         }
-        let urlDelete = `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${idDelete}`
+        let urlDelete = `https://votv.ivms.vn/votv/vms/api/v0/cameras/${idDelete}`
         axios
           .delete(urlDelete, config)
           .then(() => {
@@ -445,7 +445,7 @@ const Add = ({ apiData }) => {
       }
 
       const response = await axios.post(
-        'https://sbs.basesystem.one/ivis/vms/api/v0/device/onvif/devicescanhikivision',
+        'https://votv.ivms.vn/votv/vms/api/v0/device/onvif/devicescanhikivision',
         payload,
         config
       )
@@ -498,7 +498,7 @@ const Add = ({ apiData }) => {
       }
 
       const response = await axios.post(
-        'https://sbs.basesystem.one/ivis/vms/api/v0/device/onvif/devicescanlistip',
+        'https://votv.ivms.vn/votv/vms/api/v0/device/onvif/devicescanlistip',
         payload,
         config
       )
@@ -545,7 +545,7 @@ const Add = ({ apiData }) => {
             keyword: value
           }
         }
-        const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/cameras', config)
+        const response = await axios.get('https://votv.ivms.vn/votv/vms/api/v0/cameras', config)
         setStatus1(response.data.isOfflineSetting)
         setAssetType(response.data)
         setTotal(response.data.page)
@@ -572,7 +572,7 @@ const Add = ({ apiData }) => {
         }
 
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/vms/api/v0/cameras/options/protocol-types',
+          'https://votv.ivms.vn/votv/vms/api/v0/cameras/options/protocol-types',
           config
         )
         setProtocol(response.data)
@@ -612,7 +612,7 @@ const Add = ({ apiData }) => {
       }
 
       const response = await axios.get(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/device/camera/synchronize?camera_id=${id}`,
+        `https://votv.ivms.vn/votv/vms/api/v0/device/camera/synchronize?camera_id=${id}`,
         config
       )
       Swal.fire({

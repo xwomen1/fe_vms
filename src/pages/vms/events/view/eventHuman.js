@@ -268,7 +268,7 @@ const EventList = ({}) => {
     }
     setLoading(true)
     try {
-      const res = await getApi('https://sbs.basesystem.one/ivis/vms/api/v0/aievents/routine', params)
+      const res = await getApi('https://votv.ivms.vn/votv/vms/api/v0/aievents/routine', params)
       setDeviceList(res?.data)
       setCount(res.count)
       setTotalPage(Math.ceil(res.count / pageSize))
@@ -377,7 +377,7 @@ const EventList = ({}) => {
     if (idDelete != null) {
       setLoading(true)
 
-      delApi(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/${idDelete}`)
+      delApi(`https://votv.ivms.vn/votv/vms/api/v0/aievents/${idDelete}`)
         .then(() => {
           toast.success('Deleted successfully')
           setIdDelete(null)

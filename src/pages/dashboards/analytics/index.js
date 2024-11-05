@@ -87,7 +87,7 @@ const EventList = () => {
             Authorization: `Bearer ${token}`
           }
         }
-        const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras?limit=25&page=1`, config)
+        const response = await axios.get(`https://votv.ivms.vn/votv/vms/api/v0/cameras?limit=25&page=1`, config)
         const cameras = response.data
 
         // Đếm số lượng kết nối và không kết nối
@@ -262,7 +262,7 @@ const EventList = () => {
       }
     }
     try {
-      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/routine`, params)
+      const res = await axios.get(`https://votv.ivms.vn/votv/vms/api/v0/aievents/routine`, params)
       setDeviceList(res.data)
       setCount(res.count)
       setTotalPage(Math.ceil(res.count / 5))
@@ -292,7 +292,7 @@ const EventList = () => {
         }
       }
 
-      const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/incidents/logs`, config)
+      const response = await axios.get(`https://votv.ivms.vn/votv/vms/api/v0/incidents/logs`, config)
       setDevices(response.data)
       setTotalPage1(Math.ceil(response.count / 5))
     } catch (error) {

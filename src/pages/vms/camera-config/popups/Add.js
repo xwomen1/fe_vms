@@ -53,7 +53,7 @@ const Add = ({
       }
 
       const responsecamera = await axios.get(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras?sort=%2Bcreated_at&page=1`,
+        `https://votv.ivms.vn/votv/vms/api/v0/cameras?sort=%2Bcreated_at&page=1`,
         config
       )
       setSelectedIds(responsecamera.data)
@@ -83,7 +83,7 @@ const Add = ({
       }
 
       const response = await axios.post(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras`,
+        `https://votv.ivms.vn/votv/vms/api/v0/cameras`,
         {
           box: {
             id: idBoxDaiIP
@@ -136,7 +136,7 @@ const Add = ({
         }
       }
 
-      await axios.delete(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/${id}`, config)
+      await axios.delete(`https://votv.ivms.vn/votv/vms/api/v0/cameras/${id}`, config)
 
       setMessage({ text: 'Deleted successfully', type: 'delete', error: false })
       setReload()

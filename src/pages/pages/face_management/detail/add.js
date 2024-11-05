@@ -183,7 +183,7 @@ const AddFaceManagement = () => {
           const formData = new FormData()
           formData.append('files', file)
 
-          const res = await axios.post('https://sbs.basesystem.one/ivis/vms/api/v0/images/upload', formData, config)
+          const res = await axios.post('https://votv.ivms.vn/votv/vms/api/v0/images/upload', formData, config)
           console.log(res, 'res')
 
           if (res.data) {
@@ -268,7 +268,7 @@ const AddFaceManagement = () => {
         }
       }
 
-      const response = await axios.post(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist`, params, config)
+      const response = await axios.post(`https://votv.ivms.vn/votv/vms/api/v0/blacklist`, params, config)
       const newId = response.data.id
 
       Swal.fire({

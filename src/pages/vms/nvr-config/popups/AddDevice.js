@@ -294,7 +294,7 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
     try {
       setLoading(true)
 
-      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/camera-groups', config)
+      const response = await axios.get('https://votv.ivms.vn/votv/vms/api/v0/camera-groups', config)
 
       const cameraGroup = response.data.map(item => ({
         id: item.id,
@@ -323,7 +323,7 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
     try {
       setLoading(true)
 
-      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/device', config)
+      const response = await axios.get('https://votv.ivms.vn/votv/vms/api/v0/device', config)
 
       const boxes = response.data.map(item => ({
         label: item.nameDevice,
@@ -380,7 +380,7 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
       setLoading(true)
 
       const response = await axios.get(
-        'https://sbs.basesystem.one/ivis/vms/api/v0/cameras/options/protocol-types',
+        'https://votv.ivms.vn/votv/vms/api/v0/cameras/options/protocol-types',
         config
       )
 
@@ -490,7 +490,7 @@ const AddDevice = ({ show, setReload, onClose, camera }) => {
     }
 
     axios
-      .post(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs`, params, config)
+      .post(`https://votv.ivms.vn/votv/vms/api/v0/nvrs`, params, config)
       .then(res => {
         toast.success(res.message)
       })

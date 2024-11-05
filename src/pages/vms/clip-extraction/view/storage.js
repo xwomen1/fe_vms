@@ -75,7 +75,7 @@ const Storage = ({ id, name, channel }) => {
 
       try {
         const res = await getApi(
-          `https://sbs.basesystem.one/ivis/vms/api/v0/playback/camera/${camera.id}?startTime=${params.startTime}&endTime=${params.endTime}`
+          `https://votv.ivms.vn/votv/vms/api/v0/playback/camera/${camera.id}?startTime=${params.startTime}&endTime=${params.endTime}`
         )
 
         const data = res.data.MatchList.map((item, index) => {
@@ -128,7 +128,7 @@ const Storage = ({ id, name, channel }) => {
           const requests = params.map(async time => {
             try {
               const res = await axios.get(
-                `https://sbs.basesystem.one/ivis/vms/api/v0/video/download?idCamera=${camera.id}&startTime=${time.start}&endTime=${time.end}`
+                `https://votv.ivms.vn/votv/vms/api/v0/video/download?idCamera=${camera.id}&startTime=${time.start}&endTime=${time.end}`
               )
               if (
                 res.data &&

@@ -45,7 +45,7 @@ const AddCamera = ({ nvr, onClose }) => {
         }
 
         const response = await axios.get(
-          'https://sbs.basesystem.one/ivis/vms/api/v0/cameras?sort=%2Bcreated_at&page=1',
+          'https://votv.ivms.vn/votv/vms/api/v0/cameras?sort=%2Bcreated_at&page=1',
           config
         )
         setCamera(response.data)
@@ -64,7 +64,7 @@ const AddCamera = ({ nvr, onClose }) => {
           }
         }
 
-        const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${nvr}`, config)
+        const response = await axios.get(`https://votv.ivms.vn/votv/vms/api/v0/nvrs/${nvr}`, config)
         setNVRCameraList(response.data.cameras)
       } catch (error) {
         console.error('Error fetching NVR data:', error)
@@ -86,12 +86,12 @@ const AddCamera = ({ nvr, onClose }) => {
         }
       }
 
-      const nvrResponse = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${nvr}`, config)
+      const nvrResponse = await axios.get(`https://votv.ivms.vn/votv/vms/api/v0/nvrs/${nvr}`, config)
       const nvrCameras = nvrResponse.data.cameras
 
       const updatedCameras = nvrCameras.filter(camera => camera.id !== id)
 
-      await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${nvr}`, { cameras: updatedCameras }, config)
+      await axios.put(`https://votv.ivms.vn/votv/vms/api/v0/nvrs/${nvr}`, { cameras: updatedCameras }, config)
 
       setNotification({ message: 'Deleted successfully', type: 'success' })
     } catch (error) {
@@ -122,7 +122,7 @@ const AddCamera = ({ nvr, onClose }) => {
           }
         ]
       }
-      await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/camera/${nvr}`, params, config)
+      await axios.put(`https://votv.ivms.vn/votv/vms/api/v0/nvrs/camera/${nvr}`, params, config)
       setNotification({ message: 'Added successfully', type: 'success' })
     } catch (error) {
       setNotification({ message: `Device not responding: ${error.message}`, type: 'error' })

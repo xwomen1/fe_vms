@@ -139,7 +139,7 @@ const UpDateCar = () => {
           formData.append('files', file)
 
           try {
-            const res = await axios.post('https://sbs.basesystem.one/ivis/vms/api/v0/images/upload', formData, config)
+            const res = await axios.post('https://votv.ivms.vn/votv/vms/api/v0/images/upload', formData, config)
             if (res.data) {
               newImageUrls.push({
                 id: res.data.id,
@@ -189,7 +189,7 @@ const UpDateCar = () => {
       }
 
       if (id) {
-        const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates/${id}`, config)
+        const response = await axios.get(`https://votv.ivms.vn/votv/vms/api/v0/licenseplates/${id}`, config)
         const imgs = [...response.data?.imgs]
         setFileAvatarId({
           mainImageId: response.data?.mainImageId,
@@ -243,7 +243,7 @@ const UpDateCar = () => {
         }
 
         if (id) {
-          const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates/${id}`, config)
+          const response = await axios.get(`https://votv.ivms.vn/votv/vms/api/v0/licenseplates/${id}`, config)
           const imgs = [...response.data?.imgs]
           setFileAvatarId({
             mainImageId: response.data?.mainImageId,
@@ -307,7 +307,7 @@ const UpDateCar = () => {
         }))
       }
 
-      await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates/${id}`, params, config)
+      await axios.put(`https://votv.ivms.vn/votv/vms/api/v0/licenseplates/${id}`, params, config)
       Swal.fire({
         title: 'Successfully!',
         text: 'Data has been updated successfully.',

@@ -50,7 +50,7 @@ const RolePopup = ({ open, onClose, onSelect, nvr }) => {
       }
 
       const response = await axios.put(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/config/changepassword?idCamera=${nvr}`,
+        `https://votv.ivms.vn/votv/vms/api/v0/nvrs/config/changepassword?idCamera=${nvr}`,
         {
           password: password
         },

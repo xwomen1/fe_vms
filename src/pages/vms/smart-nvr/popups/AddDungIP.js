@@ -49,7 +49,7 @@ const Add = ({
       }
 
       const responsenvr = await axios.get(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs?sort=%2Bcreated_at&page=1`,
+        `https://votv.ivms.vn/votv/vms/api/v0/nvrs?sort=%2Bcreated_at&page=1`,
         config
       )
       setSelectedIds(responsenvr.data)
@@ -79,7 +79,7 @@ const Add = ({
       }
 
       await axios.post(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs`,
+        `https://votv.ivms.vn/votv/vms/api/v0/nvrs`,
         {
           box: {
             id: idBox
@@ -118,7 +118,7 @@ const Add = ({
         }
       }
 
-      await axios.delete(`https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${id}`, config)
+      await axios.delete(`https://votv.ivms.vn/votv/vms/api/v0/nvrs/${id}`, config)
 
       setMessage({ text: 'Deleted successfully', type: 'delete', error: false })
       setReload()

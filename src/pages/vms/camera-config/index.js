@@ -57,7 +57,7 @@ const Caller = () => {
           page: 1
         }
       }
-      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/cameras', config)
+      const response = await axios.get('https://votv.ivms.vn/votv/vms/api/v0/cameras', config)
       setAssetTypeStatus(response.data)
     } catch (error) {
       console.error('Error fetching users:', error)

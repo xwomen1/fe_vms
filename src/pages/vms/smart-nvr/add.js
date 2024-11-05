@@ -122,7 +122,7 @@ const UserList = ({ apiData }) => {
       }
 
       const response = await axios.post(
-        'https://sbs.basesystem.one/ivis/vms/api/v0/device/onvif/scandevicestaticip',
+        'https://votv.ivms.vn/votv/vms/api/v0/device/onvif/scandevicestaticip',
         payload,
         config
       )
@@ -169,7 +169,7 @@ const UserList = ({ apiData }) => {
       }
 
       const response = await axios.post(
-        'https://sbs.basesystem.one/ivis/vms/api/v0/device/onvif/devicescanhikivision',
+        'https://votv.ivms.vn/votv/vms/api/v0/device/onvif/devicescanhikivision',
         payload,
         config
       )
@@ -225,7 +225,7 @@ const UserList = ({ apiData }) => {
       }
 
       const response = await axios.post(
-        'https://sbs.basesystem.one/ivis/vms/api/v0/device/onvif/devicescanlistip',
+        'https://votv.ivms.vn/votv/vms/api/v0/device/onvif/devicescanlistip',
         payload,
         config
       )
@@ -274,7 +274,7 @@ const UserList = ({ apiData }) => {
       }
 
       const response = await axios.post(
-        'https://sbs.basesystem.one/ivis/vms/api/v0/device/onvif/scandevice',
+        'https://votv.ivms.vn/votv/vms/api/v0/device/onvif/scandevice',
         payload,
         config
       )
@@ -444,7 +444,7 @@ const UserList = ({ apiData }) => {
             Authorization: `Bearer ${token}`
           }
         }
-        let urlDelete = `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/${idDelete}`
+        let urlDelete = `https://votv.ivms.vn/votv/vms/api/v0/nvrs/${idDelete}`
         axios
           .delete(urlDelete, config)
           .then(() => {
@@ -504,7 +504,7 @@ const UserList = ({ apiData }) => {
             keyword: value
           }
         }
-        const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/nvrs', config)
+        const response = await axios.get('https://votv.ivms.vn/votv/vms/api/v0/nvrs', config)
 
         if (response.data && Array.isArray(response.data) && response.data.length > 0) {
           setStatus1(response.data.isOfflineSetting || false)
@@ -537,7 +537,7 @@ const UserList = ({ apiData }) => {
         }
       }
 
-      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/device', config)
+      const response = await axios.get('https://votv.ivms.vn/votv/vms/api/v0/device', config)
 
       const nicTypes = response.data.map(item => ({
         label: item.nameDevice,

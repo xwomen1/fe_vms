@@ -138,7 +138,7 @@ const Add = ({ show, onClose, id, data, setReload, filter }) => {
 
   const fetchCameraList = async () => {
     try {
-      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras?sort=%2Bcreated_at`, config)
+      const res = await axios.get(`https://votv.ivms.vn/votv/vms/api/v0/cameras?sort=%2Bcreated_at`, config)
       setCameraList(res.data)
     } catch (error) {
       console.error('Error fetching data: ', error)

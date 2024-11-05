@@ -76,7 +76,7 @@ const TCP = ({ cameras, onClose, mtu }) => {
       }
 
       const response = await axios.get(
-        'https://sbs.basesystem.one/ivis/vms/api/v0/cameras/options/combox?cameraType=network_nic_type',
+        'https://votv.ivms.vn/votv/vms/api/v0/cameras/options/combox?cameraType=network_nic_type',
         config
       )
       setNic(response.data)
@@ -145,7 +145,7 @@ const TCP = ({ cameras, onClose, mtu }) => {
       }
 
       await axios.put(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/networkconfig/{idNetWorkConfig}?idNetWorkConfig=${cameras.id}&NetWorkConfigType=tcpip`,
+        `https://votv.ivms.vn/votv/vms/api/v0/cameras/config/networkconfig/{idNetWorkConfig}?idNetWorkConfig=${cameras.id}&NetWorkConfigType=tcpip`,
         data,
         config
       )

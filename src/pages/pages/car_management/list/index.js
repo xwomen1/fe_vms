@@ -122,7 +122,7 @@ const Car_management = () => {
           }
         }
         selectedIds.forEach(idDelete => {
-          let urlDelete = `https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates/${idDelete}`
+          let urlDelete = `https://votv.ivms.vn/votv/vms/api/v0/licenseplates/${idDelete}`
           axios
             .delete(urlDelete, config)
             .then(() => {
@@ -161,7 +161,7 @@ const Car_management = () => {
         }
       }
 
-      const response = await axios.get('https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates', config)
+      const response = await axios.get('https://votv.ivms.vn/votv/vms/api/v0/licenseplates', config)
 
       const data = response.data.map(item => ({
         mainImageId: item.mainImageId,
@@ -232,7 +232,7 @@ const Car_management = () => {
       }
 
       const response = await axios.get(
-        'https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates?sort=%2Bcreated_at&page=1',
+        'https://votv.ivms.vn/votv/vms/api/v0/licenseplates?sort=%2Bcreated_at&page=1',
         config
       )
       if (response.data && response.data.length > 0) {
@@ -272,7 +272,7 @@ const Car_management = () => {
             Authorization: `Bearer ${token}`
           }
         }
-        let urlDelete = `https://sbs.basesystem.one/ivis/vms/api/v0/licenseplates/${idDelete}`
+        let urlDelete = `https://votv.ivms.vn/votv/vms/api/v0/licenseplates/${idDelete}`
         axios
           .delete(urlDelete, config)
           .then(() => {

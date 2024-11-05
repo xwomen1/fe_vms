@@ -128,7 +128,7 @@ const FaceManagement = () => {
           }
         }
         selectedIds.forEach(idDelete => {
-          let urlDelete = `https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${idDelete}`
+          let urlDelete = `https://votv.ivms.vn/votv/vms/api/v0/blacklist/${idDelete}`
           axios
             .delete(urlDelete, config)
             .then(() => {
@@ -173,7 +173,7 @@ const FaceManagement = () => {
       }
 
       const response = await axios.get(
-        'https://sbs.basesystem.one/ivis/vms/api/v0/blacklist?sort=%2Bcreated_at&page=1',
+        'https://votv.ivms.vn/votv/vms/api/v0/blacklist?sort=%2Bcreated_at&page=1',
         config
       )
 
@@ -248,7 +248,7 @@ const FaceManagement = () => {
       }
 
       const response = await axios.get(
-        'https://sbs.basesystem.one/ivis/vms/api/v0/blacklist?sort=%2Bcreated_at&page=1',
+        'https://votv.ivms.vn/votv/vms/api/v0/blacklist?sort=%2Bcreated_at&page=1',
         config
       )
       if (response?.data && response?.data.length > 0) {
@@ -286,7 +286,7 @@ const FaceManagement = () => {
             Authorization: `Bearer ${token}`
           }
         }
-        let urlDelete = `https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${idDelete}`
+        let urlDelete = `https://votv.ivms.vn/votv/vms/api/v0/blacklist/${idDelete}`
         axios
           .delete(urlDelete, config)
           .then(() => {

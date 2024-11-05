@@ -223,7 +223,7 @@ const Blacklist = () => {
     }
 
     try {
-      const res = await postApi(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/search`, params)
+      const res = await postApi(`https://votv.ivms.vn/votv/vms/api/v0/blacklist/search`, params)
       const topBlacklist = res.data?.topk_blacklists
       const topMember = res.data?.topk_members
       setBlacklist(topBlacklist)
@@ -309,7 +309,7 @@ const Blacklist = () => {
           },
           
         }
-        let urlDelete = `https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${idDelete}?type=member`
+        let urlDelete = `https://votv.ivms.vn/votv/vms/api/v0/blacklist/${idDelete}?type=member`
         axios
           .delete(urlDelete, config)
           .then(() => {
@@ -351,7 +351,7 @@ const Blacklist = () => {
           },
           
         }
-        let urlDelete = `https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${idDelete}?type=blacklist`
+        let urlDelete = `https://votv.ivms.vn/votv/vms/api/v0/blacklist/${idDelete}?type=blacklist`
         axios
           .delete(urlDelete, config)
           .then(() => {
@@ -385,7 +385,7 @@ const Blacklist = () => {
       const id = deleteId
 
       try {
-        await delApi(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${id}?type=${typeDel}`)
+        await delApi(`https://votv.ivms.vn/votv/vms/api/v0/blacklist/${id}?type=${typeDel}`)
         toast.success('Delete Successful')
       } catch (error) {
         if (error && error?.response?.data) {

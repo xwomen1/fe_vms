@@ -55,7 +55,7 @@ const Port = ({ nvr, onClose }) => {
       }
 
       await axios.put(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/config/networkconfig/{idNetWorkConfig}?idNetWorkConfig=${nvr.id}&NetWorkConfigType=port`,
+        `https://votv.ivms.vn/votv/vms/api/v0/nvrs/config/networkconfig/{idNetWorkConfig}?idNetWorkConfig=${nvr.id}&NetWorkConfigType=port`,
         data,
         config
       )

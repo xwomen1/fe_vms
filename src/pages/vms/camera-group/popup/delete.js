@@ -20,7 +20,7 @@ const CameraPopup = ({ open, id, onClose, onSuccess }) => {
         Authorization: `Bearer ${token}`
       }
     }
-    const urlDelete = `https://sbs.basesystem.one/ivis/vms/api/v0/camera-groups/${id}`
+    const urlDelete = `https://votv.ivms.vn/votv/vms/api/v0/camera-groups/${id}`
 
     axios
       .delete(urlDelete, config)

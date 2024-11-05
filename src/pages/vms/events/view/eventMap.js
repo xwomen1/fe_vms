@@ -213,7 +213,7 @@ const EventMap = () => {
       const startEpoch = startTime ? Math.floor(startTime.getTime()) : ''
       const endEpoch = endTime ? Math.floor(endTime.getTime()) : ''
 
-      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/routine?sort=-created_at`, {
+      const res = await axios.get(`https://votv.ivms.vn/votv/vms/api/v0/aievents/routine?sort=-created_at`, {
         params: {
           keyword,
           startTime: startEpoch,

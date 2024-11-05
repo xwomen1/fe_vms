@@ -101,7 +101,7 @@ const EventList = () => {
         }
       }
 
-      const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/incidents/logs`, config)
+      const response = await axios.get(`https://votv.ivms.vn/votv/vms/api/v0/incidents/logs`, config)
       setDevices(response.data)
       setTotalPage(Math.ceil(response.count / pageSize))
     } catch (error) {
@@ -148,7 +148,7 @@ const EventList = () => {
             Authorization: `Bearer ${token}`
           }
         }
-        let urlDelete = `https://sbs.basesystem.one/ivis/vms/api/v0/incidents/${id}`
+        let urlDelete = `https://votv.ivms.vn/votv/vms/api/v0/incidents/${id}`
         axios
           .delete(urlDelete, config)
           .then(() => {
@@ -198,7 +198,7 @@ const EventList = () => {
         }
       }
 
-      await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/incidents/logs/status/${id}`, config)
+      await axios.put(`https://votv.ivms.vn/votv/vms/api/v0/incidents/logs/status/${id}`, config)
       setLoading()
       fetchDataList()
     } catch (error) {

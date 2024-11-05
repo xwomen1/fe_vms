@@ -111,7 +111,7 @@ const ImageCamera = ({ cameraId, onClose }) => {
     setLoading(true)
     try {
       const response = await getApi(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/imageconfig/${cameraId}?channel=1&protocolType=HIKVISION`
+        `https://votv.ivms.vn/votv/vms/api/v0/cameras/config/imageconfig/${cameraId}?channel=1&protocolType=HIKVISION`
       )
 
       const data = response.data
@@ -136,7 +136,7 @@ const ImageCamera = ({ cameraId, onClose }) => {
     setLoading(true)
     try {
       const response = await getApi(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/snapshot/${cameraId}?channel=1`
+        `https://votv.ivms.vn/votv/vms/api/v0/cameras/snapshot/${cameraId}?channel=1`
       )
 
       const data = response.data
@@ -196,7 +196,7 @@ const ImageCamera = ({ cameraId, onClose }) => {
       ...values
     }
 
-    putApi(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/imageconfig/${cameraId}?channel=1&protocolType=HIKVISION`, { ...params })
+    putApi(`https://votv.ivms.vn/votv/vms/api/v0/cameras/config/imageconfig/${cameraId}?channel=1&protocolType=HIKVISION`, { ...params })
       .then(() => {
         toast.success('Data has been updated successfully ')
       })

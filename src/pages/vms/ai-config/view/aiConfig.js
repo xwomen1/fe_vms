@@ -120,7 +120,7 @@ const AIConfig = () => {
 
   const fetchCameraGroup = async () => {
     try {
-      const res = await getApi(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras?sort=%2Bcreated_at&page=1`)
+      const res = await getApi(`https://votv.ivms.vn/votv/vms/api/v0/cameras?sort=%2Bcreated_at&page=1`)
       setCameraGroup(res.data)
     } catch (error) {
       console.error('Error fetching data: ', error)
@@ -135,7 +135,7 @@ const AIConfig = () => {
     }
 
     try {
-      const res = await getApi(`https://sbs.basesystem.one/ivis/vms/api/v0/camera-model-ai`, { params })
+      const res = await getApi(`https://votv.ivms.vn/votv/vms/api/v0/camera-model-ai`, { params })
       const list = []
       const face = res.data?.find(item => item.type === 'face_recognition')
       const licensePlate = res.data?.find(item => item.type === 'license_plate_recognition')
@@ -161,7 +161,7 @@ const AIConfig = () => {
     try {
       const promises = cameraGroup.map(async camera => {
         const res = await getApi(
-          `https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties/camera/${camera.id}`
+          `https://votv.ivms.vn/votv/vms/api/v0/cameras/user/ai-properties/camera/${camera.id}`
         )
 
         return res?.data[0]
@@ -270,7 +270,7 @@ const AIConfig = () => {
     const params = Object.values(values)
 
     try {
-      await putApi(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties/cameras`, params)
+      await putApi(`https://votv.ivms.vn/votv/vms/api/v0/cameras/user/ai-properties/cameras`, params)
       setReload(reload + 1)
       toast.success('Updated successfully')
     } catch (error) {

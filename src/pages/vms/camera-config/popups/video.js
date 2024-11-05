@@ -237,7 +237,7 @@ const VideoConfig = ({ open, onClose, camera }) => {
       ...values
     }
 
-    // putApi(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/config/videoconfig/${camera}`, { ...params })
+    // putApi(`https://votv.ivms.vn/votv/vms/api/v0/cameras/config/videoconfig/${camera}`, { ...params })
     //   .then(() => {
     //     toast.success('Data has been updated successfully ')
     //   })

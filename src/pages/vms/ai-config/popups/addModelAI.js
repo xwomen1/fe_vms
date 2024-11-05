@@ -234,7 +234,7 @@ const AddModelAI = ({ show, onClose, setReload, data, id, typePopup }) => {
 
     setLoading(true)
     axios
-      .post(`https://sbs.basesystem.one/ivis/vms/api/v0/camera-model-ai`, { ...params }, config)
+      .post(`https://votv.ivms.vn/votv/vms/api/v0/camera-model-ai`, { ...params }, config)
       .then(() => {
         toast.success('Add New Successfully')
         setReload()
@@ -261,7 +261,7 @@ const AddModelAI = ({ show, onClose, setReload, data, id, typePopup }) => {
 
     setLoading(true)
     axios
-      .put(`https://sbs.basesystem.one/ivis/vms/api/v0/camera-model-ai/${data.id}`, { ...params }, config)
+      .put(`https://votv.ivms.vn/votv/vms/api/v0/camera-model-ai/${data.id}`, { ...params }, config)
       .then(() => {
         toast.success('Data saved successfully')
         setReload()

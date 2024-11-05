@@ -86,7 +86,7 @@ const EditFaceManagement = () => {
       }
 
       if (id) {
-        const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${id}`, config)
+        const response = await axios.get(`https://votv.ivms.vn/votv/vms/api/v0/blacklist/${id}`, config)
         const imgs = [...response.data.imgs]
         setStatus1(response.data.status)
         setFileAvatarId(response.data.mainImageId)
@@ -135,7 +135,7 @@ const EditFaceManagement = () => {
         }
 
         if (id) {
-          const response = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${id}`, config)
+          const response = await axios.get(`https://votv.ivms.vn/votv/vms/api/v0/blacklist/${id}`, config)
           const imgs = [...response.data.imgs]
           setStatus1(response.data.status)
           setTitle1(response.data?.type)
@@ -258,7 +258,7 @@ const EditFaceManagement = () => {
         }
       }
 
-      await axios.put(`https://sbs.basesystem.one/ivis/vms/api/v0/blacklist/${id}`, params, config)
+      await axios.put(`https://votv.ivms.vn/votv/vms/api/v0/blacklist/${id}`, params, config)
       Swal.fire({
         title: 'Successfully!',
         text: 'Data has been updated successfully.',
@@ -318,7 +318,7 @@ const EditFaceManagement = () => {
           formData.append('files', file)
 
           try {
-            const res = await axios.post('https://sbs.basesystem.one/ivis/vms/api/v0/images/upload', formData, config)
+            const res = await axios.post('https://votv.ivms.vn/votv/vms/api/v0/images/upload', formData, config)
             if (res.data) {
               newImageUrls.push({
                 id: res.data.id,

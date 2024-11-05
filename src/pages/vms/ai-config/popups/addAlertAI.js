@@ -104,7 +104,7 @@ const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => 
     }
 
     try {
-      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/camera-model-ai`, params)
+      const res = await axios.get(`https://votv.ivms.vn/votv/vms/api/v0/camera-model-ai`, params)
       setDataList(res.data)
       setTotal(res.data.size)
     } catch (error) {
@@ -168,7 +168,7 @@ const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => 
     }
 
     axios
-      .post(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties`, params, config)
+      .post(`https://votv.ivms.vn/votv/vms/api/v0/cameras/user/ai-properties`, params, config)
       .then(res => {
         setReload()
         onClose()
@@ -205,7 +205,7 @@ const AddAlertAI = ({ show, onClose, setReload, data, cameraId, typePopup }) => 
     }
 
     axios
-      .put(`https://sbs.basesystem.one/ivis/vms/api/v0/cameras/user/ai-properties/${cameraId}`, params, config)
+      .put(`https://votv.ivms.vn/votv/vms/api/v0/cameras/user/ai-properties/${cameraId}`, params, config)
       .then(res => {
         setReload()
         onClose()

@@ -1,962 +1,41 @@
-  import React, { useState } from 'react';
-  import { Grid, Paper, IconButton, TextField, Autocomplete, Button, Typography, CardContent, Card, Box } from '@mui/material';
+  import React, { useEffect, useState } from 'react';
+  import { Grid, Paper, IconButton, TextField, Autocomplete, Button, Typography, CardContent, Card, Box, CircularProgress } from '@mui/material';
   import ImageForm from './popup/image-popup'; // Import ImageForm
   import Icon from 'src/@core/components/icon';
   import { Timeline, TimelineItem, TimelineSeparator, TimelineDot, TimelineConnector, TimelineContent, TimelineOppositeContent } from '@mui/lab';
+  import authConfig from 'src/configs/auth'
+import axios from 'axios';
+import { makeStyles } from '@material-ui/core/styles'
+import EventDetails from '../../vms/events/popups/eventDetails'
 
-  const cameras = [
-    { title: 'Camera 1' },
-    { title: 'Camera 2' },
-    { title: 'Camera 3' },
+const useStyles = makeStyles(() => ({
+  loadingContainer: {
+    position: 'relative',
+    minHeight: '100px',
+    zIndex: 0,
+  },
+  circularProgress: {
+    position: 'absolute',
+    top: '40%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    zIndex: 99999,
+  },
+}));
 
-    // Thêm các camera khác tại đây
-  ];
 
-  const fakeData = [
-    {
-      "id": "cb029640-1e8b-4009-9def-62093be66e6d",
-      "description": "Phát hiện người đi qua",
-      "timestamp": 1730111251603,
-      "timeStart": 1730111258579,
-      "image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg%22\u0026X-Amz-Signature=92c7347b708270040673fde0873ece496ef25cfff1dd8fec3cca1a48ef4aa3ce",
-      "imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg%22\u0026X-Amz-Signature=92c7347b708270040673fde0873ece496ef25cfff1dd8fec3cca1a48ef4aa3ce",
-      "imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_person_25557.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_person_25557.jpg%22\u0026X-Amz-Signature=2d9ae7b728e432bdb7155d149d3d4aaac5dbcd8c5839c6e5c2caf6ea9257a127",
-      "storageBucket": "traffic-ai-engine",
-      "eventType": "AI_EVENT_PERSON_RECOGNITION",
-      "camName": "MCL12D_AF_C3",
-      "cameraId": "43fd8c86-f3a4-44da-a48c-f483f118deee",
-      "memberID": "PID 25557 | 5438807",
-      "createdAt": "2024-10-28T10:27:39.716697Z",
-      "updatedAt": "2024-10-28T10:27:39.716697Z",
-      "deletedMark": false,
-      "deletedAt": "0001-01-01T00:00:00Z",
-      "longtitudeOfCam": 105.9101839240255,
-      "latitudeOfCam": 21.047448929910566,
-      "eventTypeString": "Sự kiện AI chưa phân loại",
-      "location": "NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3",
-      "status": "NEW",
-      "converTimestamp": "2024-10-28T10:27:31.603Z",
-      "cabinID": "00000000-0000-0000-0000-000000000000",
-      "result": "PID 25557 | 5438807"
-  },
-  {
-      "id": "9f36f490-f21b-4a9d-a407-d955a8503a88",
-      "description": "Phát hiện người đi qua",
-      "timestamp": 1730111250834,
-      "timeStart": 1730111259580,
-      "image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg%22\u0026X-Amz-Signature=44478995fb84cb81edda6e5f1efca9c99494fe22d5ba4471c5f6f4e11ce1e394",
-      "imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg%22\u0026X-Amz-Signature=44478995fb84cb81edda6e5f1efca9c99494fe22d5ba4471c5f6f4e11ce1e394",
-      "imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_person_25560.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_person_25560.jpg%22\u0026X-Amz-Signature=ff09b32256a81cc05e443d6780ff32e70c89ec0aab49f3c5e652e85250273308",
-      "storageBucket": "traffic-ai-engine",
-      "eventType": "AI_EVENT_PERSON_RECOGNITION",
-      "camName": "MCL12D_AF_C3",
-      "cameraId": "43fd8c86-f3a4-44da-a48c-f483f118deee",
-      "memberID": "PID 25560 | 5438807",
-      "createdAt": "2024-10-28T10:27:40.617222Z",
-      "updatedAt": "2024-10-28T10:27:40.617222Z",
-      "deletedMark": false,
-      "deletedAt": "0001-01-01T00:00:00Z",
-      "longtitudeOfCam": 105.9101839240255,
-      "latitudeOfCam": 21.047448929910566,
-      "eventTypeString": "Sự kiện AI chưa phân loại",
-      "location": "NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3",
-      "status": "NEW",
-      "converTimestamp": "2024-10-28T10:27:30.834Z",
-      "cabinID": "00000000-0000-0000-0000-000000000000",
-      "result": "PID 25560 | 5438807"
-  },
-  {
-      "id": "cf0cc9d4-4b9c-41e1-bbd4-19cc864162cf",
-      "description": "Phát hiện người đi qua",
-      "timestamp": 1730111247422,
-      "timeStart": 1730111260581,
-      "image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg%22\u0026X-Amz-Signature=56fb7a077c03cb99da7d3d8e2f8cf463a8b048e446c8057844517c2fda24e5b9",
-      "imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg%22\u0026X-Amz-Signature=56fb7a077c03cb99da7d3d8e2f8cf463a8b048e446c8057844517c2fda24e5b9",
-      "imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_person_25556.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_person_25556.jpg%22\u0026X-Amz-Signature=88f89e7cba7d3b284bcc8edd8e3df3381127719c1e32fc029e349fdc9d779871",
-      "storageBucket": "traffic-ai-engine",
-      "eventType": "AI_EVENT_PERSON_RECOGNITION",
-      "camName": "MCL12D_AF_C1",
-      "cameraId": "91b02ecc-f2cc-4f95-ab2f-7a7e9998c1ff",
-      "memberID": "PID 25556 | 5427219",
-      "createdAt": "2024-10-28T10:27:41.516926Z",
-      "updatedAt": "2024-10-28T10:27:41.516926Z",
-      "deletedMark": false,
-      "deletedAt": "0001-01-01T00:00:00Z",
-      "longtitudeOfCam": 105.9101839240255,
-      "latitudeOfCam": 21.047448929910566,
-      "eventTypeString": "Sự kiện AI chưa phân loại",
-      "location": "NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3",
-      "status": "NEW",
-      "converTimestamp": "2024-10-28T10:27:27.422Z",
-      "cabinID": "00000000-0000-0000-0000-000000000000",
-      "result": "PID 25556 | 5427219"
-  },
-  {
-    "id": "cb029640-1e8b-4009-9def-62093be66e6d",
-    "description": "Phát hiện người đi qua",
-    "timestamp": 1730111251603,
-    "timeStart": 1730111258579,
-    "image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg%22\u0026X-Amz-Signature=92c7347b708270040673fde0873ece496ef25cfff1dd8fec3cca1a48ef4aa3ce",
-    "imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg%22\u0026X-Amz-Signature=92c7347b708270040673fde0873ece496ef25cfff1dd8fec3cca1a48ef4aa3ce",
-    "imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_person_25557.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_person_25557.jpg%22\u0026X-Amz-Signature=2d9ae7b728e432bdb7155d149d3d4aaac5dbcd8c5839c6e5c2caf6ea9257a127",
-    "storageBucket": "traffic-ai-engine",
-    "eventType": "AI_EVENT_PERSON_RECOGNITION",
-    "camName": "MCL12D_AF_C3",
-    "cameraId": "43fd8c86-f3a4-44da-a48c-f483f118deee",
-    "memberID": "PID 25557 | 5438807",
-    "createdAt": "2024-10-28T10:27:39.716697Z",
-    "updatedAt": "2024-10-28T10:27:39.716697Z",
-    "deletedMark": false,
-    "deletedAt": "0001-01-01T00:00:00Z",
-    "longtitudeOfCam": 105.9101839240255,
-    "latitudeOfCam": 21.047448929910566,
-    "eventTypeString": "Sự kiện AI chưa phân loại",
-    "location": "NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3",
-    "status": "NEW",
-    "converTimestamp": "2024-10-28T10:27:31.603Z",
-    "cabinID": "00000000-0000-0000-0000-000000000000",
-    "result": "PID 25557 | 5438807"
-},
-{
-    "id": "9f36f490-f21b-4a9d-a407-d955a8503a88",
-    "description": "Phát hiện người đi qua",
-    "timestamp": 1730111250834,
-    "timeStart": 1730111259580,
-    "image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg%22\u0026X-Amz-Signature=44478995fb84cb81edda6e5f1efca9c99494fe22d5ba4471c5f6f4e11ce1e394",
-    "imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg%22\u0026X-Amz-Signature=44478995fb84cb81edda6e5f1efca9c99494fe22d5ba4471c5f6f4e11ce1e394",
-    "imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_person_25560.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_person_25560.jpg%22\u0026X-Amz-Signature=ff09b32256a81cc05e443d6780ff32e70c89ec0aab49f3c5e652e85250273308",
-    "storageBucket": "traffic-ai-engine",
-    "eventType": "AI_EVENT_PERSON_RECOGNITION",
-    "camName": "MCL12D_AF_C3",
-    "cameraId": "43fd8c86-f3a4-44da-a48c-f483f118deee",
-    "memberID": "PID 25560 | 5438807",
-    "createdAt": "2024-10-28T10:27:40.617222Z",
-    "updatedAt": "2024-10-28T10:27:40.617222Z",
-    "deletedMark": false,
-    "deletedAt": "0001-01-01T00:00:00Z",
-    "longtitudeOfCam": 105.9101839240255,
-    "latitudeOfCam": 21.047448929910566,
-    "eventTypeString": "Sự kiện AI chưa phân loại",
-    "location": "NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3",
-    "status": "NEW",
-    "converTimestamp": "2024-10-28T10:27:30.834Z",
-    "cabinID": "00000000-0000-0000-0000-000000000000",
-    "result": "PID 25560 | 5438807"
-},
-{
-    "id": "cf0cc9d4-4b9c-41e1-bbd4-19cc864162cf",
-    "description": "Phát hiện người đi qua",
-    "timestamp": 1730111247422,
-    "timeStart": 1730111260581,
-    "image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg%22\u0026X-Amz-Signature=56fb7a077c03cb99da7d3d8e2f8cf463a8b048e446c8057844517c2fda24e5b9",
-    "imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg%22\u0026X-Amz-Signature=56fb7a077c03cb99da7d3d8e2f8cf463a8b048e446c8057844517c2fda24e5b9",
-    "imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_person_25556.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_person_25556.jpg%22\u0026X-Amz-Signature=88f89e7cba7d3b284bcc8edd8e3df3381127719c1e32fc029e349fdc9d779871",
-    "storageBucket": "traffic-ai-engine",
-    "eventType": "AI_EVENT_PERSON_RECOGNITION",
-    "camName": "MCL12D_AF_C1",
-    "cameraId": "91b02ecc-f2cc-4f95-ab2f-7a7e9998c1ff",
-    "memberID": "PID 25556 | 5427219",
-    "createdAt": "2024-10-28T10:27:41.516926Z",
-    "updatedAt": "2024-10-28T10:27:41.516926Z",
-    "deletedMark": false,
-    "deletedAt": "0001-01-01T00:00:00Z",
-    "longtitudeOfCam": 105.9101839240255,
-    "latitudeOfCam": 21.047448929910566,
-    "eventTypeString": "Sự kiện AI chưa phân loại",
-    "location": "NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3",
-    "status": "NEW",
-    "converTimestamp": "2024-10-28T10:27:27.422Z",
-    "cabinID": "00000000-0000-0000-0000-000000000000",
-    "result": "PID 25556 | 5427219"
-},
-{
-  "id": "cb029640-1e8b-4009-9def-62093be66e6d",
-  "description": "Phát hiện người đi qua",
-  "timestamp": 1730111251603,
-  "timeStart": 1730111258579,
-  "image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg%22\u0026X-Amz-Signature=92c7347b708270040673fde0873ece496ef25cfff1dd8fec3cca1a48ef4aa3ce",
-  "imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg%22\u0026X-Amz-Signature=92c7347b708270040673fde0873ece496ef25cfff1dd8fec3cca1a48ef4aa3ce",
-  "imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_person_25557.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_person_25557.jpg%22\u0026X-Amz-Signature=2d9ae7b728e432bdb7155d149d3d4aaac5dbcd8c5839c6e5c2caf6ea9257a127",
-  "storageBucket": "traffic-ai-engine",
-  "eventType": "AI_EVENT_PERSON_RECOGNITION",
-  "camName": "MCL12D_AF_C3",
-  "cameraId": "43fd8c86-f3a4-44da-a48c-f483f118deee",
-  "memberID": "PID 25557 | 5438807",
-  "createdAt": "2024-10-28T10:27:39.716697Z",
-  "updatedAt": "2024-10-28T10:27:39.716697Z",
-  "deletedMark": false,
-  "deletedAt": "0001-01-01T00:00:00Z",
-  "longtitudeOfCam": 105.9101839240255,
-  "latitudeOfCam": 21.047448929910566,
-  "eventTypeString": "Sự kiện AI chưa phân loại",
-  "location": "NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3",
-  "status": "NEW",
-  "converTimestamp": "2024-10-28T10:27:31.603Z",
-  "cabinID": "00000000-0000-0000-0000-000000000000",
-  "result": "PID 25557 | 5438807"
-},
-{
-  "id": "9f36f490-f21b-4a9d-a407-d955a8503a88",
-  "description": "Phát hiện người đi qua",
-  "timestamp": 1730111250834,
-  "timeStart": 1730111259580,
-  "image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg%22\u0026X-Amz-Signature=44478995fb84cb81edda6e5f1efca9c99494fe22d5ba4471c5f6f4e11ce1e394",
-  "imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg%22\u0026X-Amz-Signature=44478995fb84cb81edda6e5f1efca9c99494fe22d5ba4471c5f6f4e11ce1e394",
-  "imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_person_25560.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_person_25560.jpg%22\u0026X-Amz-Signature=ff09b32256a81cc05e443d6780ff32e70c89ec0aab49f3c5e652e85250273308",
-  "storageBucket": "traffic-ai-engine",
-  "eventType": "AI_EVENT_PERSON_RECOGNITION",
-  "camName": "MCL12D_AF_C3",
-  "cameraId": "43fd8c86-f3a4-44da-a48c-f483f118deee",
-  "memberID": "PID 25560 | 5438807",
-  "createdAt": "2024-10-28T10:27:40.617222Z",
-  "updatedAt": "2024-10-28T10:27:40.617222Z",
-  "deletedMark": false,
-  "deletedAt": "0001-01-01T00:00:00Z",
-  "longtitudeOfCam": 105.9101839240255,
-  "latitudeOfCam": 21.047448929910566,
-  "eventTypeString": "Sự kiện AI chưa phân loại",
-  "location": "NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3",
-  "status": "NEW",
-  "converTimestamp": "2024-10-28T10:27:30.834Z",
-  "cabinID": "00000000-0000-0000-0000-000000000000",
-  "result": "PID 25560 | 5438807"
-},
-{
-  "id": "cf0cc9d4-4b9c-41e1-bbd4-19cc864162cf",
-  "description": "Phát hiện người đi qua",
-  "timestamp": 1730111247422,
-  "timeStart": 1730111260581,
-  "image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg%22\u0026X-Amz-Signature=56fb7a077c03cb99da7d3d8e2f8cf463a8b048e446c8057844517c2fda24e5b9",
-  "imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg%22\u0026X-Amz-Signature=56fb7a077c03cb99da7d3d8e2f8cf463a8b048e446c8057844517c2fda24e5b9",
-  "imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_person_25556.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_person_25556.jpg%22\u0026X-Amz-Signature=88f89e7cba7d3b284bcc8edd8e3df3381127719c1e32fc029e349fdc9d779871",
-  "storageBucket": "traffic-ai-engine",
-  "eventType": "AI_EVENT_PERSON_RECOGNITION",
-  "camName": "MCL12D_AF_C1",
-  "cameraId": "91b02ecc-f2cc-4f95-ab2f-7a7e9998c1ff",
-  "memberID": "PID 25556 | 5427219",
-  "createdAt": "2024-10-28T10:27:41.516926Z",
-  "updatedAt": "2024-10-28T10:27:41.516926Z",
-  "deletedMark": false,
-  "deletedAt": "0001-01-01T00:00:00Z",
-  "longtitudeOfCam": 105.9101839240255,
-  "latitudeOfCam": 21.047448929910566,
-  "eventTypeString": "Sự kiện AI chưa phân loại",
-  "location": "NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3",
-  "status": "NEW",
-  "converTimestamp": "2024-10-28T10:27:27.422Z",
-  "cabinID": "00000000-0000-0000-0000-000000000000",
-  "result": "PID 25556 | 5427219"
-},
-{
-  "id": "cb029640-1e8b-4009-9def-62093be66e6d",
-  "description": "Phát hiện người đi qua",
-  "timestamp": 1730111251603,
-  "timeStart": 1730111258579,
-  "image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg%22\u0026X-Amz-Signature=92c7347b708270040673fde0873ece496ef25cfff1dd8fec3cca1a48ef4aa3ce",
-  "imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg%22\u0026X-Amz-Signature=92c7347b708270040673fde0873ece496ef25cfff1dd8fec3cca1a48ef4aa3ce",
-  "imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_person_25557.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_person_25557.jpg%22\u0026X-Amz-Signature=2d9ae7b728e432bdb7155d149d3d4aaac5dbcd8c5839c6e5c2caf6ea9257a127",
-  "storageBucket": "traffic-ai-engine",
-  "eventType": "AI_EVENT_PERSON_RECOGNITION",
-  "camName": "MCL12D_AF_C3",
-  "cameraId": "43fd8c86-f3a4-44da-a48c-f483f118deee",
-  "memberID": "PID 25557 | 5438807",
-  "createdAt": "2024-10-28T10:27:39.716697Z",
-  "updatedAt": "2024-10-28T10:27:39.716697Z",
-  "deletedMark": false,
-  "deletedAt": "0001-01-01T00:00:00Z",
-  "longtitudeOfCam": 105.9101839240255,
-  "latitudeOfCam": 21.047448929910566,
-  "eventTypeString": "Sự kiện AI chưa phân loại",
-  "location": "NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3",
-  "status": "NEW",
-  "converTimestamp": "2024-10-28T10:27:31.603Z",
-  "cabinID": "00000000-0000-0000-0000-000000000000",
-  "result": "PID 25557 | 5438807"
-},
-{
-  "id": "9f36f490-f21b-4a9d-a407-d955a8503a88",
-  "description": "Phát hiện người đi qua",
-  "timestamp": 1730111250834,
-  "timeStart": 1730111259580,
-  "image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg%22\u0026X-Amz-Signature=44478995fb84cb81edda6e5f1efca9c99494fe22d5ba4471c5f6f4e11ce1e394",
-  "imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg%22\u0026X-Amz-Signature=44478995fb84cb81edda6e5f1efca9c99494fe22d5ba4471c5f6f4e11ce1e394",
-  "imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_person_25560.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_person_25560.jpg%22\u0026X-Amz-Signature=ff09b32256a81cc05e443d6780ff32e70c89ec0aab49f3c5e652e85250273308",
-  "storageBucket": "traffic-ai-engine",
-  "eventType": "AI_EVENT_PERSON_RECOGNITION",
-  "camName": "MCL12D_AF_C3",
-  "cameraId": "43fd8c86-f3a4-44da-a48c-f483f118deee",
-  "memberID": "PID 25560 | 5438807",
-  "createdAt": "2024-10-28T10:27:40.617222Z",
-  "updatedAt": "2024-10-28T10:27:40.617222Z",
-  "deletedMark": false,
-  "deletedAt": "0001-01-01T00:00:00Z",
-  "longtitudeOfCam": 105.9101839240255,
-  "latitudeOfCam": 21.047448929910566,
-  "eventTypeString": "Sự kiện AI chưa phân loại",
-  "location": "NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3",
-  "status": "NEW",
-  "converTimestamp": "2024-10-28T10:27:30.834Z",
-  "cabinID": "00000000-0000-0000-0000-000000000000",
-  "result": "PID 25560 | 5438807"
-},
-{
-  "id": "cf0cc9d4-4b9c-41e1-bbd4-19cc864162cf",
-  "description": "Phát hiện người đi qua",
-  "timestamp": 1730111247422,
-  "timeStart": 1730111260581,
-  "image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg%22\u0026X-Amz-Signature=56fb7a077c03cb99da7d3d8e2f8cf463a8b048e446c8057844517c2fda24e5b9",
-  "imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg%22\u0026X-Amz-Signature=56fb7a077c03cb99da7d3d8e2f8cf463a8b048e446c8057844517c2fda24e5b9",
-  "imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_person_25556.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_person_25556.jpg%22\u0026X-Amz-Signature=88f89e7cba7d3b284bcc8edd8e3df3381127719c1e32fc029e349fdc9d779871",
-  "storageBucket": "traffic-ai-engine",
-  "eventType": "AI_EVENT_PERSON_RECOGNITION",
-  "camName": "MCL12D_AF_C1",
-  "cameraId": "91b02ecc-f2cc-4f95-ab2f-7a7e9998c1ff",
-  "memberID": "PID 25556 | 5427219",
-  "createdAt": "2024-10-28T10:27:41.516926Z",
-  "updatedAt": "2024-10-28T10:27:41.516926Z",
-  "deletedMark": false,
-  "deletedAt": "0001-01-01T00:00:00Z",
-  "longtitudeOfCam": 105.9101839240255,
-  "latitudeOfCam": 21.047448929910566,
-  "eventTypeString": "Sự kiện AI chưa phân loại",
-  "location": "NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3",
-  "status": "NEW",
-  "converTimestamp": "2024-10-28T10:27:27.422Z",
-  "cabinID": "00000000-0000-0000-0000-000000000000",
-  "result": "PID 25556 | 5427219"
-},
-{
-"id": "cb029640-1e8b-4009-9def-62093be66e6d",
-"description": "Phát hiện người đi qua",
-"timestamp": 1730111251603,
-"timeStart": 1730111258579,
-"image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg%22\u0026X-Amz-Signature=92c7347b708270040673fde0873ece496ef25cfff1dd8fec3cca1a48ef4aa3ce",
-"imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg%22\u0026X-Amz-Signature=92c7347b708270040673fde0873ece496ef25cfff1dd8fec3cca1a48ef4aa3ce",
-"imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_person_25557.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_person_25557.jpg%22\u0026X-Amz-Signature=2d9ae7b728e432bdb7155d149d3d4aaac5dbcd8c5839c6e5c2caf6ea9257a127",
-"storageBucket": "traffic-ai-engine",
-"eventType": "AI_EVENT_PERSON_RECOGNITION",
-"camName": "MCL12D_AF_C3",
-"cameraId": "43fd8c86-f3a4-44da-a48c-f483f118deee",
-"memberID": "PID 25557 | 5438807",
-"createdAt": "2024-10-28T10:27:39.716697Z",
-"updatedAt": "2024-10-28T10:27:39.716697Z",
-"deletedMark": false,
-"deletedAt": "0001-01-01T00:00:00Z",
-"longtitudeOfCam": 105.9101839240255,
-"latitudeOfCam": 21.047448929910566,
-"eventTypeString": "Sự kiện AI chưa phân loại",
-"location": "NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3",
-"status": "NEW",
-"converTimestamp": "2024-10-28T10:27:31.603Z",
-"cabinID": "00000000-0000-0000-0000-000000000000",
-"result": "PID 25557 | 5438807"
-},
-{
-"id": "9f36f490-f21b-4a9d-a407-d955a8503a88",
-"description": "Phát hiện người đi qua",
-"timestamp": 1730111250834,
-"timeStart": 1730111259580,
-"image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg%22\u0026X-Amz-Signature=44478995fb84cb81edda6e5f1efca9c99494fe22d5ba4471c5f6f4e11ce1e394",
-"imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg%22\u0026X-Amz-Signature=44478995fb84cb81edda6e5f1efca9c99494fe22d5ba4471c5f6f4e11ce1e394",
-"imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_person_25560.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_person_25560.jpg%22\u0026X-Amz-Signature=ff09b32256a81cc05e443d6780ff32e70c89ec0aab49f3c5e652e85250273308",
-"storageBucket": "traffic-ai-engine",
-"eventType": "AI_EVENT_PERSON_RECOGNITION",
-"camName": "MCL12D_AF_C3",
-"cameraId": "43fd8c86-f3a4-44da-a48c-f483f118deee",
-"memberID": "PID 25560 | 5438807",
-"createdAt": "2024-10-28T10:27:40.617222Z",
-"updatedAt": "2024-10-28T10:27:40.617222Z",
-"deletedMark": false,
-"deletedAt": "0001-01-01T00:00:00Z",
-"longtitudeOfCam": 105.9101839240255,
-"latitudeOfCam": 21.047448929910566,
-"eventTypeString": "Sự kiện AI chưa phân loại",
-"location": "NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3",
-"status": "NEW",
-"converTimestamp": "2024-10-28T10:27:30.834Z",
-"cabinID": "00000000-0000-0000-0000-000000000000",
-"result": "PID 25560 | 5438807"
-},
-{
-"id": "cf0cc9d4-4b9c-41e1-bbd4-19cc864162cf",
-"description": "Phát hiện người đi qua",
-"timestamp": 1730111247422,
-"timeStart": 1730111260581,
-"image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg%22\u0026X-Amz-Signature=56fb7a077c03cb99da7d3d8e2f8cf463a8b048e446c8057844517c2fda24e5b9",
-"imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg%22\u0026X-Amz-Signature=56fb7a077c03cb99da7d3d8e2f8cf463a8b048e446c8057844517c2fda24e5b9",
-"imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_person_25556.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_person_25556.jpg%22\u0026X-Amz-Signature=88f89e7cba7d3b284bcc8edd8e3df3381127719c1e32fc029e349fdc9d779871",
-"storageBucket": "traffic-ai-engine",
-"eventType": "AI_EVENT_PERSON_RECOGNITION",
-"camName": "MCL12D_AF_C1",
-"cameraId": "91b02ecc-f2cc-4f95-ab2f-7a7e9998c1ff",
-"memberID": "PID 25556 | 5427219",
-"createdAt": "2024-10-28T10:27:41.516926Z",
-"updatedAt": "2024-10-28T10:27:41.516926Z",
-"deletedMark": false,
-"deletedAt": "0001-01-01T00:00:00Z",
-"longtitudeOfCam": 105.9101839240255,
-"latitudeOfCam": 21.047448929910566,
-"eventTypeString": "Sự kiện AI chưa phân loại",
-"location": "NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3",
-"status": "NEW",
-"converTimestamp": "2024-10-28T10:27:27.422Z",
-"cabinID": "00000000-0000-0000-0000-000000000000",
-"result": "PID 25556 | 5427219"
-},
-{
-"id": "cb029640-1e8b-4009-9def-62093be66e6d",
-"description": "Phát hiện người đi qua",
-"timestamp": 1730111251603,
-"timeStart": 1730111258579,
-"image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg%22\u0026X-Amz-Signature=92c7347b708270040673fde0873ece496ef25cfff1dd8fec3cca1a48ef4aa3ce",
-"imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg%22\u0026X-Amz-Signature=92c7347b708270040673fde0873ece496ef25cfff1dd8fec3cca1a48ef4aa3ce",
-"imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_person_25557.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_person_25557.jpg%22\u0026X-Amz-Signature=2d9ae7b728e432bdb7155d149d3d4aaac5dbcd8c5839c6e5c2caf6ea9257a127",
-"storageBucket": "traffic-ai-engine",
-"eventType": "AI_EVENT_PERSON_RECOGNITION",
-"camName": "MCL12D_AF_C3",
-"cameraId": "43fd8c86-f3a4-44da-a48c-f483f118deee",
-"memberID": "PID 25557 | 5438807",
-"createdAt": "2024-10-28T10:27:39.716697Z",
-"updatedAt": "2024-10-28T10:27:39.716697Z",
-"deletedMark": false,
-"deletedAt": "0001-01-01T00:00:00Z",
-"longtitudeOfCam": 105.9101839240255,
-"latitudeOfCam": 21.047448929910566,
-"eventTypeString": "Sự kiện AI chưa phân loại",
-"location": "NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3",
-"status": "NEW",
-"converTimestamp": "2024-10-28T10:27:31.603Z",
-"cabinID": "00000000-0000-0000-0000-000000000000",
-"result": "PID 25557 | 5438807"
-},
-{
-"id": "9f36f490-f21b-4a9d-a407-d955a8503a88",
-"description": "Phát hiện người đi qua",
-"timestamp": 1730111250834,
-"timeStart": 1730111259580,
-"image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg%22\u0026X-Amz-Signature=44478995fb84cb81edda6e5f1efca9c99494fe22d5ba4471c5f6f4e11ce1e394",
-"imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg%22\u0026X-Amz-Signature=44478995fb84cb81edda6e5f1efca9c99494fe22d5ba4471c5f6f4e11ce1e394",
-"imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_person_25560.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_person_25560.jpg%22\u0026X-Amz-Signature=ff09b32256a81cc05e443d6780ff32e70c89ec0aab49f3c5e652e85250273308",
-"storageBucket": "traffic-ai-engine",
-"eventType": "AI_EVENT_PERSON_RECOGNITION",
-"camName": "MCL12D_AF_C3",
-"cameraId": "43fd8c86-f3a4-44da-a48c-f483f118deee",
-"memberID": "PID 25560 | 5438807",
-"createdAt": "2024-10-28T10:27:40.617222Z",
-"updatedAt": "2024-10-28T10:27:40.617222Z",
-"deletedMark": false,
-"deletedAt": "0001-01-01T00:00:00Z",
-"longtitudeOfCam": 105.9101839240255,
-"latitudeOfCam": 21.047448929910566,
-"eventTypeString": "Sự kiện AI chưa phân loại",
-"location": "NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3",
-"status": "NEW",
-"converTimestamp": "2024-10-28T10:27:30.834Z",
-"cabinID": "00000000-0000-0000-0000-000000000000",
-"result": "PID 25560 | 5438807"
-},
-{
-"id": "cf0cc9d4-4b9c-41e1-bbd4-19cc864162cf",
-"description": "Phát hiện người đi qua",
-"timestamp": 1730111247422,
-"timeStart": 1730111260581,
-"image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg%22\u0026X-Amz-Signature=56fb7a077c03cb99da7d3d8e2f8cf463a8b048e446c8057844517c2fda24e5b9",
-"imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg%22\u0026X-Amz-Signature=56fb7a077c03cb99da7d3d8e2f8cf463a8b048e446c8057844517c2fda24e5b9",
-"imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_person_25556.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_person_25556.jpg%22\u0026X-Amz-Signature=88f89e7cba7d3b284bcc8edd8e3df3381127719c1e32fc029e349fdc9d779871",
-"storageBucket": "traffic-ai-engine",
-"eventType": "AI_EVENT_PERSON_RECOGNITION",
-"camName": "MCL12D_AF_C1",
-"cameraId": "91b02ecc-f2cc-4f95-ab2f-7a7e9998c1ff",
-"memberID": "PID 25556 | 5427219",
-"createdAt": "2024-10-28T10:27:41.516926Z",
-"updatedAt": "2024-10-28T10:27:41.516926Z",
-"deletedMark": false,
-"deletedAt": "0001-01-01T00:00:00Z",
-"longtitudeOfCam": 105.9101839240255,
-"latitudeOfCam": 21.047448929910566,
-"eventTypeString": "Sự kiện AI chưa phân loại",
-"location": "NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3",
-"status": "NEW",
-"converTimestamp": "2024-10-28T10:27:27.422Z",
-"cabinID": "00000000-0000-0000-0000-000000000000",
-"result": "PID 25556 | 5427219"
-},
-{
-  "id": "cb029640-1e8b-4009-9def-62093be66e6d",
-  "description": "Phát hiện người đi qua",
-  "timestamp": 1730111251603,
-  "timeStart": 1730111258579,
-  "image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg%22\u0026X-Amz-Signature=92c7347b708270040673fde0873ece496ef25cfff1dd8fec3cca1a48ef4aa3ce",
-  "imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg%22\u0026X-Amz-Signature=92c7347b708270040673fde0873ece496ef25cfff1dd8fec3cca1a48ef4aa3ce",
-  "imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_person_25557.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_person_25557.jpg%22\u0026X-Amz-Signature=2d9ae7b728e432bdb7155d149d3d4aaac5dbcd8c5839c6e5c2caf6ea9257a127",
-  "storageBucket": "traffic-ai-engine",
-  "eventType": "AI_EVENT_PERSON_RECOGNITION",
-  "camName": "MCL12D_AF_C3",
-  "cameraId": "43fd8c86-f3a4-44da-a48c-f483f118deee",
-  "memberID": "PID 25557 | 5438807",
-  "createdAt": "2024-10-28T10:27:39.716697Z",
-  "updatedAt": "2024-10-28T10:27:39.716697Z",
-  "deletedMark": false,
-  "deletedAt": "0001-01-01T00:00:00Z",
-  "longtitudeOfCam": 105.9101839240255,
-  "latitudeOfCam": 21.047448929910566,
-  "eventTypeString": "Sự kiện AI chưa phân loại",
-  "location": "NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3",
-  "status": "NEW",
-  "converTimestamp": "2024-10-28T10:27:31.603Z",
-  "cabinID": "00000000-0000-0000-0000-000000000000",
-  "result": "PID 25557 | 5438807"
-},
-{
-  "id": "9f36f490-f21b-4a9d-a407-d955a8503a88",
-  "description": "Phát hiện người đi qua",
-  "timestamp": 1730111250834,
-  "timeStart": 1730111259580,
-  "image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg%22\u0026X-Amz-Signature=44478995fb84cb81edda6e5f1efca9c99494fe22d5ba4471c5f6f4e11ce1e394",
-  "imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg%22\u0026X-Amz-Signature=44478995fb84cb81edda6e5f1efca9c99494fe22d5ba4471c5f6f4e11ce1e394",
-  "imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_person_25560.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_person_25560.jpg%22\u0026X-Amz-Signature=ff09b32256a81cc05e443d6780ff32e70c89ec0aab49f3c5e652e85250273308",
-  "storageBucket": "traffic-ai-engine",
-  "eventType": "AI_EVENT_PERSON_RECOGNITION",
-  "camName": "MCL12D_AF_C3",
-  "cameraId": "43fd8c86-f3a4-44da-a48c-f483f118deee",
-  "memberID": "PID 25560 | 5438807",
-  "createdAt": "2024-10-28T10:27:40.617222Z",
-  "updatedAt": "2024-10-28T10:27:40.617222Z",
-  "deletedMark": false,
-  "deletedAt": "0001-01-01T00:00:00Z",
-  "longtitudeOfCam": 105.9101839240255,
-  "latitudeOfCam": 21.047448929910566,
-  "eventTypeString": "Sự kiện AI chưa phân loại",
-  "location": "NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3",
-  "status": "NEW",
-  "converTimestamp": "2024-10-28T10:27:30.834Z",
-  "cabinID": "00000000-0000-0000-0000-000000000000",
-  "result": "PID 25560 | 5438807"
-},
-{
-  "id": "cf0cc9d4-4b9c-41e1-bbd4-19cc864162cf",
-  "description": "Phát hiện người đi qua",
-  "timestamp": 1730111247422,
-  "timeStart": 1730111260581,
-  "image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg%22\u0026X-Amz-Signature=56fb7a077c03cb99da7d3d8e2f8cf463a8b048e446c8057844517c2fda24e5b9",
-  "imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg%22\u0026X-Amz-Signature=56fb7a077c03cb99da7d3d8e2f8cf463a8b048e446c8057844517c2fda24e5b9",
-  "imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_person_25556.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_person_25556.jpg%22\u0026X-Amz-Signature=88f89e7cba7d3b284bcc8edd8e3df3381127719c1e32fc029e349fdc9d779871",
-  "storageBucket": "traffic-ai-engine",
-  "eventType": "AI_EVENT_PERSON_RECOGNITION",
-  "camName": "MCL12D_AF_C1",
-  "cameraId": "91b02ecc-f2cc-4f95-ab2f-7a7e9998c1ff",
-  "memberID": "PID 25556 | 5427219",
-  "createdAt": "2024-10-28T10:27:41.516926Z",
-  "updatedAt": "2024-10-28T10:27:41.516926Z",
-  "deletedMark": false,
-  "deletedAt": "0001-01-01T00:00:00Z",
-  "longtitudeOfCam": 105.9101839240255,
-  "latitudeOfCam": 21.047448929910566,
-  "eventTypeString": "Sự kiện AI chưa phân loại",
-  "location": "NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3",
-  "status": "NEW",
-  "converTimestamp": "2024-10-28T10:27:27.422Z",
-  "cabinID": "00000000-0000-0000-0000-000000000000",
-  "result": "PID 25556 | 5427219"
-},
-{
-"id": "cb029640-1e8b-4009-9def-62093be66e6d",
-"description": "Phát hiện người đi qua",
-"timestamp": 1730111251603,
-"timeStart": 1730111258579,
-"image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg%22\u0026X-Amz-Signature=92c7347b708270040673fde0873ece496ef25cfff1dd8fec3cca1a48ef4aa3ce",
-"imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg%22\u0026X-Amz-Signature=92c7347b708270040673fde0873ece496ef25cfff1dd8fec3cca1a48ef4aa3ce",
-"imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_person_25557.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_person_25557.jpg%22\u0026X-Amz-Signature=2d9ae7b728e432bdb7155d149d3d4aaac5dbcd8c5839c6e5c2caf6ea9257a127",
-"storageBucket": "traffic-ai-engine",
-"eventType": "AI_EVENT_PERSON_RECOGNITION",
-"camName": "MCL12D_AF_C3",
-"cameraId": "43fd8c86-f3a4-44da-a48c-f483f118deee",
-"memberID": "PID 25557 | 5438807",
-"createdAt": "2024-10-28T10:27:39.716697Z",
-"updatedAt": "2024-10-28T10:27:39.716697Z",
-"deletedMark": false,
-"deletedAt": "0001-01-01T00:00:00Z",
-"longtitudeOfCam": 105.9101839240255,
-"latitudeOfCam": 21.047448929910566,
-"eventTypeString": "Sự kiện AI chưa phân loại",
-"location": "NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3",
-"status": "NEW",
-"converTimestamp": "2024-10-28T10:27:31.603Z",
-"cabinID": "00000000-0000-0000-0000-000000000000",
-"result": "PID 25557 | 5438807"
-},
-{
-"id": "9f36f490-f21b-4a9d-a407-d955a8503a88",
-"description": "Phát hiện người đi qua",
-"timestamp": 1730111250834,
-"timeStart": 1730111259580,
-"image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg%22\u0026X-Amz-Signature=44478995fb84cb81edda6e5f1efca9c99494fe22d5ba4471c5f6f4e11ce1e394",
-"imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg%22\u0026X-Amz-Signature=44478995fb84cb81edda6e5f1efca9c99494fe22d5ba4471c5f6f4e11ce1e394",
-"imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_person_25560.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_person_25560.jpg%22\u0026X-Amz-Signature=ff09b32256a81cc05e443d6780ff32e70c89ec0aab49f3c5e652e85250273308",
-"storageBucket": "traffic-ai-engine",
-"eventType": "AI_EVENT_PERSON_RECOGNITION",
-"camName": "MCL12D_AF_C3",
-"cameraId": "43fd8c86-f3a4-44da-a48c-f483f118deee",
-"memberID": "PID 25560 | 5438807",
-"createdAt": "2024-10-28T10:27:40.617222Z",
-"updatedAt": "2024-10-28T10:27:40.617222Z",
-"deletedMark": false,
-"deletedAt": "0001-01-01T00:00:00Z",
-"longtitudeOfCam": 105.9101839240255,
-"latitudeOfCam": 21.047448929910566,
-"eventTypeString": "Sự kiện AI chưa phân loại",
-"location": "NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3",
-"status": "NEW",
-"converTimestamp": "2024-10-28T10:27:30.834Z",
-"cabinID": "00000000-0000-0000-0000-000000000000",
-"result": "PID 25560 | 5438807"
-},
-{
-"id": "cf0cc9d4-4b9c-41e1-bbd4-19cc864162cf",
-"description": "Phát hiện người đi qua",
-"timestamp": 1730111247422,
-"timeStart": 1730111260581,
-"image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg%22\u0026X-Amz-Signature=56fb7a077c03cb99da7d3d8e2f8cf463a8b048e446c8057844517c2fda24e5b9",
-"imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg%22\u0026X-Amz-Signature=56fb7a077c03cb99da7d3d8e2f8cf463a8b048e446c8057844517c2fda24e5b9",
-"imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_person_25556.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_person_25556.jpg%22\u0026X-Amz-Signature=88f89e7cba7d3b284bcc8edd8e3df3381127719c1e32fc029e349fdc9d779871",
-"storageBucket": "traffic-ai-engine",
-"eventType": "AI_EVENT_PERSON_RECOGNITION",
-"camName": "MCL12D_AF_C1",
-"cameraId": "91b02ecc-f2cc-4f95-ab2f-7a7e9998c1ff",
-"memberID": "PID 25556 | 5427219",
-"createdAt": "2024-10-28T10:27:41.516926Z",
-"updatedAt": "2024-10-28T10:27:41.516926Z",
-"deletedMark": false,
-"deletedAt": "0001-01-01T00:00:00Z",
-"longtitudeOfCam": 105.9101839240255,
-"latitudeOfCam": 21.047448929910566,
-"eventTypeString": "Sự kiện AI chưa phân loại",
-"location": "NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3",
-"status": "NEW",
-"converTimestamp": "2024-10-28T10:27:27.422Z",
-"cabinID": "00000000-0000-0000-0000-000000000000",
-"result": "PID 25556 | 5427219"
-},
-{
-"id": "cb029640-1e8b-4009-9def-62093be66e6d",
-"description": "Phát hiện người đi qua",
-"timestamp": 1730111251603,
-"timeStart": 1730111258579,
-"image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg%22\u0026X-Amz-Signature=92c7347b708270040673fde0873ece496ef25cfff1dd8fec3cca1a48ef4aa3ce",
-"imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg%22\u0026X-Amz-Signature=92c7347b708270040673fde0873ece496ef25cfff1dd8fec3cca1a48ef4aa3ce",
-"imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_person_25557.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_person_25557.jpg%22\u0026X-Amz-Signature=2d9ae7b728e432bdb7155d149d3d4aaac5dbcd8c5839c6e5c2caf6ea9257a127",
-"storageBucket": "traffic-ai-engine",
-"eventType": "AI_EVENT_PERSON_RECOGNITION",
-"camName": "MCL12D_AF_C3",
-"cameraId": "43fd8c86-f3a4-44da-a48c-f483f118deee",
-"memberID": "PID 25557 | 5438807",
-"createdAt": "2024-10-28T10:27:39.716697Z",
-"updatedAt": "2024-10-28T10:27:39.716697Z",
-"deletedMark": false,
-"deletedAt": "0001-01-01T00:00:00Z",
-"longtitudeOfCam": 105.9101839240255,
-"latitudeOfCam": 21.047448929910566,
-"eventTypeString": "Sự kiện AI chưa phân loại",
-"location": "NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3",
-"status": "NEW",
-"converTimestamp": "2024-10-28T10:27:31.603Z",
-"cabinID": "00000000-0000-0000-0000-000000000000",
-"result": "PID 25557 | 5438807"
-},
-{
-"id": "9f36f490-f21b-4a9d-a407-d955a8503a88",
-"description": "Phát hiện người đi qua",
-"timestamp": 1730111250834,
-"timeStart": 1730111259580,
-"image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg%22\u0026X-Amz-Signature=44478995fb84cb81edda6e5f1efca9c99494fe22d5ba4471c5f6f4e11ce1e394",
-"imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg%22\u0026X-Amz-Signature=44478995fb84cb81edda6e5f1efca9c99494fe22d5ba4471c5f6f4e11ce1e394",
-"imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_person_25560.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_person_25560.jpg%22\u0026X-Amz-Signature=ff09b32256a81cc05e443d6780ff32e70c89ec0aab49f3c5e652e85250273308",
-"storageBucket": "traffic-ai-engine",
-"eventType": "AI_EVENT_PERSON_RECOGNITION",
-"camName": "MCL12D_AF_C3",
-"cameraId": "43fd8c86-f3a4-44da-a48c-f483f118deee",
-"memberID": "PID 25560 | 5438807",
-"createdAt": "2024-10-28T10:27:40.617222Z",
-"updatedAt": "2024-10-28T10:27:40.617222Z",
-"deletedMark": false,
-"deletedAt": "0001-01-01T00:00:00Z",
-"longtitudeOfCam": 105.9101839240255,
-"latitudeOfCam": 21.047448929910566,
-"eventTypeString": "Sự kiện AI chưa phân loại",
-"location": "NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3",
-"status": "NEW",
-"converTimestamp": "2024-10-28T10:27:30.834Z",
-"cabinID": "00000000-0000-0000-0000-000000000000",
-"result": "PID 25560 | 5438807"
-},
-{
-"id": "cf0cc9d4-4b9c-41e1-bbd4-19cc864162cf",
-"description": "Phát hiện người đi qua",
-"timestamp": 1730111247422,
-"timeStart": 1730111260581,
-"image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg%22\u0026X-Amz-Signature=56fb7a077c03cb99da7d3d8e2f8cf463a8b048e446c8057844517c2fda24e5b9",
-"imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg%22\u0026X-Amz-Signature=56fb7a077c03cb99da7d3d8e2f8cf463a8b048e446c8057844517c2fda24e5b9",
-"imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_person_25556.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_person_25556.jpg%22\u0026X-Amz-Signature=88f89e7cba7d3b284bcc8edd8e3df3381127719c1e32fc029e349fdc9d779871",
-"storageBucket": "traffic-ai-engine",
-"eventType": "AI_EVENT_PERSON_RECOGNITION",
-"camName": "MCL12D_AF_C1",
-"cameraId": "91b02ecc-f2cc-4f95-ab2f-7a7e9998c1ff",
-"memberID": "PID 25556 | 5427219",
-"createdAt": "2024-10-28T10:27:41.516926Z",
-"updatedAt": "2024-10-28T10:27:41.516926Z",
-"deletedMark": false,
-"deletedAt": "0001-01-01T00:00:00Z",
-"longtitudeOfCam": 105.9101839240255,
-"latitudeOfCam": 21.047448929910566,
-"eventTypeString": "Sự kiện AI chưa phân loại",
-"location": "NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3",
-"status": "NEW",
-"converTimestamp": "2024-10-28T10:27:27.422Z",
-"cabinID": "00000000-0000-0000-0000-000000000000",
-"result": "PID 25556 | 5427219"
-},
-{
-  "id": "cb029640-1e8b-4009-9def-62093be66e6d",
-  "description": "Phát hiện người đi qua",
-  "timestamp": 1730111251603,
-  "timeStart": 1730111258579,
-  "image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg%22\u0026X-Amz-Signature=92c7347b708270040673fde0873ece496ef25cfff1dd8fec3cca1a48ef4aa3ce",
-  "imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg%22\u0026X-Amz-Signature=92c7347b708270040673fde0873ece496ef25cfff1dd8fec3cca1a48ef4aa3ce",
-  "imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_person_25557.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_person_25557.jpg%22\u0026X-Amz-Signature=2d9ae7b728e432bdb7155d149d3d4aaac5dbcd8c5839c6e5c2caf6ea9257a127",
-  "storageBucket": "traffic-ai-engine",
-  "eventType": "AI_EVENT_PERSON_RECOGNITION",
-  "camName": "MCL12D_AF_C3",
-  "cameraId": "43fd8c86-f3a4-44da-a48c-f483f118deee",
-  "memberID": "PID 25557 | 5438807",
-  "createdAt": "2024-10-28T10:27:39.716697Z",
-  "updatedAt": "2024-10-28T10:27:39.716697Z",
-  "deletedMark": false,
-  "deletedAt": "0001-01-01T00:00:00Z",
-  "longtitudeOfCam": 105.9101839240255,
-  "latitudeOfCam": 21.047448929910566,
-  "eventTypeString": "Sự kiện AI chưa phân loại",
-  "location": "NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3",
-  "status": "NEW",
-  "converTimestamp": "2024-10-28T10:27:31.603Z",
-  "cabinID": "00000000-0000-0000-0000-000000000000",
-  "result": "PID 25557 | 5438807"
-},
-{
-  "id": "9f36f490-f21b-4a9d-a407-d955a8503a88",
-  "description": "Phát hiện người đi qua",
-  "timestamp": 1730111250834,
-  "timeStart": 1730111259580,
-  "image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg%22\u0026X-Amz-Signature=44478995fb84cb81edda6e5f1efca9c99494fe22d5ba4471c5f6f4e11ce1e394",
-  "imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg%22\u0026X-Amz-Signature=44478995fb84cb81edda6e5f1efca9c99494fe22d5ba4471c5f6f4e11ce1e394",
-  "imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_person_25560.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_person_25560.jpg%22\u0026X-Amz-Signature=ff09b32256a81cc05e443d6780ff32e70c89ec0aab49f3c5e652e85250273308",
-  "storageBucket": "traffic-ai-engine",
-  "eventType": "AI_EVENT_PERSON_RECOGNITION",
-  "camName": "MCL12D_AF_C3",
-  "cameraId": "43fd8c86-f3a4-44da-a48c-f483f118deee",
-  "memberID": "PID 25560 | 5438807",
-  "createdAt": "2024-10-28T10:27:40.617222Z",
-  "updatedAt": "2024-10-28T10:27:40.617222Z",
-  "deletedMark": false,
-  "deletedAt": "0001-01-01T00:00:00Z",
-  "longtitudeOfCam": 105.9101839240255,
-  "latitudeOfCam": 21.047448929910566,
-  "eventTypeString": "Sự kiện AI chưa phân loại",
-  "location": "NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3",
-  "status": "NEW",
-  "converTimestamp": "2024-10-28T10:27:30.834Z",
-  "cabinID": "00000000-0000-0000-0000-000000000000",
-  "result": "PID 25560 | 5438807"
-},
-{
-  "id": "cf0cc9d4-4b9c-41e1-bbd4-19cc864162cf",
-  "description": "Phát hiện người đi qua",
-  "timestamp": 1730111247422,
-  "timeStart": 1730111260581,
-  "image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg%22\u0026X-Amz-Signature=56fb7a077c03cb99da7d3d8e2f8cf463a8b048e446c8057844517c2fda24e5b9",
-  "imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg%22\u0026X-Amz-Signature=56fb7a077c03cb99da7d3d8e2f8cf463a8b048e446c8057844517c2fda24e5b9",
-  "imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_person_25556.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_person_25556.jpg%22\u0026X-Amz-Signature=88f89e7cba7d3b284bcc8edd8e3df3381127719c1e32fc029e349fdc9d779871",
-  "storageBucket": "traffic-ai-engine",
-  "eventType": "AI_EVENT_PERSON_RECOGNITION",
-  "camName": "MCL12D_AF_C1",
-  "cameraId": "91b02ecc-f2cc-4f95-ab2f-7a7e9998c1ff",
-  "memberID": "PID 25556 | 5427219",
-  "createdAt": "2024-10-28T10:27:41.516926Z",
-  "updatedAt": "2024-10-28T10:27:41.516926Z",
-  "deletedMark": false,
-  "deletedAt": "0001-01-01T00:00:00Z",
-  "longtitudeOfCam": 105.9101839240255,
-  "latitudeOfCam": 21.047448929910566,
-  "eventTypeString": "Sự kiện AI chưa phân loại",
-  "location": "NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3",
-  "status": "NEW",
-  "converTimestamp": "2024-10-28T10:27:27.422Z",
-  "cabinID": "00000000-0000-0000-0000-000000000000",
-  "result": "PID 25556 | 5427219"
-},
-{
-"id": "cb029640-1e8b-4009-9def-62093be66e6d",
-"description": "Phát hiện người đi qua",
-"timestamp": 1730111251603,
-"timeStart": 1730111258579,
-"image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg%22\u0026X-Amz-Signature=92c7347b708270040673fde0873ece496ef25cfff1dd8fec3cca1a48ef4aa3ce",
-"imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg%22\u0026X-Amz-Signature=92c7347b708270040673fde0873ece496ef25cfff1dd8fec3cca1a48ef4aa3ce",
-"imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_person_25557.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_person_25557.jpg%22\u0026X-Amz-Signature=2d9ae7b728e432bdb7155d149d3d4aaac5dbcd8c5839c6e5c2caf6ea9257a127",
-"storageBucket": "traffic-ai-engine",
-"eventType": "AI_EVENT_PERSON_RECOGNITION",
-"camName": "MCL12D_AF_C3",
-"cameraId": "43fd8c86-f3a4-44da-a48c-f483f118deee",
-"memberID": "PID 25557 | 5438807",
-"createdAt": "2024-10-28T10:27:39.716697Z",
-"updatedAt": "2024-10-28T10:27:39.716697Z",
-"deletedMark": false,
-"deletedAt": "0001-01-01T00:00:00Z",
-"longtitudeOfCam": 105.9101839240255,
-"latitudeOfCam": 21.047448929910566,
-"eventTypeString": "Sự kiện AI chưa phân loại",
-"location": "NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3",
-"status": "NEW",
-"converTimestamp": "2024-10-28T10:27:31.603Z",
-"cabinID": "00000000-0000-0000-0000-000000000000",
-"result": "PID 25557 | 5438807"
-},
-{
-"id": "9f36f490-f21b-4a9d-a407-d955a8503a88",
-"description": "Phát hiện người đi qua",
-"timestamp": 1730111250834,
-"timeStart": 1730111259580,
-"image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg%22\u0026X-Amz-Signature=44478995fb84cb81edda6e5f1efca9c99494fe22d5ba4471c5f6f4e11ce1e394",
-"imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg%22\u0026X-Amz-Signature=44478995fb84cb81edda6e5f1efca9c99494fe22d5ba4471c5f6f4e11ce1e394",
-"imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_person_25560.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_person_25560.jpg%22\u0026X-Amz-Signature=ff09b32256a81cc05e443d6780ff32e70c89ec0aab49f3c5e652e85250273308",
-"storageBucket": "traffic-ai-engine",
-"eventType": "AI_EVENT_PERSON_RECOGNITION",
-"camName": "MCL12D_AF_C3",
-"cameraId": "43fd8c86-f3a4-44da-a48c-f483f118deee",
-"memberID": "PID 25560 | 5438807",
-"createdAt": "2024-10-28T10:27:40.617222Z",
-"updatedAt": "2024-10-28T10:27:40.617222Z",
-"deletedMark": false,
-"deletedAt": "0001-01-01T00:00:00Z",
-"longtitudeOfCam": 105.9101839240255,
-"latitudeOfCam": 21.047448929910566,
-"eventTypeString": "Sự kiện AI chưa phân loại",
-"location": "NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3",
-"status": "NEW",
-"converTimestamp": "2024-10-28T10:27:30.834Z",
-"cabinID": "00000000-0000-0000-0000-000000000000",
-"result": "PID 25560 | 5438807"
-},
-{
-"id": "cf0cc9d4-4b9c-41e1-bbd4-19cc864162cf",
-"description": "Phát hiện người đi qua",
-"timestamp": 1730111247422,
-"timeStart": 1730111260581,
-"image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg%22\u0026X-Amz-Signature=56fb7a077c03cb99da7d3d8e2f8cf463a8b048e446c8057844517c2fda24e5b9",
-"imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg%22\u0026X-Amz-Signature=56fb7a077c03cb99da7d3d8e2f8cf463a8b048e446c8057844517c2fda24e5b9",
-"imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_person_25556.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_person_25556.jpg%22\u0026X-Amz-Signature=88f89e7cba7d3b284bcc8edd8e3df3381127719c1e32fc029e349fdc9d779871",
-"storageBucket": "traffic-ai-engine",
-"eventType": "AI_EVENT_PERSON_RECOGNITION",
-"camName": "MCL12D_AF_C1",
-"cameraId": "91b02ecc-f2cc-4f95-ab2f-7a7e9998c1ff",
-"memberID": "PID 25556 | 5427219",
-"createdAt": "2024-10-28T10:27:41.516926Z",
-"updatedAt": "2024-10-28T10:27:41.516926Z",
-"deletedMark": false,
-"deletedAt": "0001-01-01T00:00:00Z",
-"longtitudeOfCam": 105.9101839240255,
-"latitudeOfCam": 21.047448929910566,
-"eventTypeString": "Sự kiện AI chưa phân loại",
-"location": "NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3",
-"status": "NEW",
-"converTimestamp": "2024-10-28T10:27:27.422Z",
-"cabinID": "00000000-0000-0000-0000-000000000000",
-"result": "PID 25556 | 5427219"
-},
-{
-"id": "cb029640-1e8b-4009-9def-62093be66e6d",
-"description": "Phát hiện người đi qua",
-"timestamp": 1730111251603,
-"timeStart": 1730111258579,
-"image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg%22\u0026X-Amz-Signature=92c7347b708270040673fde0873ece496ef25cfff1dd8fec3cca1a48ef4aa3ce",
-"imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_fullframe.jpg%22\u0026X-Amz-Signature=92c7347b708270040673fde0873ece496ef25cfff1dd8fec3cca1a48ef4aa3ce",
-"imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_person_25557.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111251603_5438807_person_25557.jpg%22\u0026X-Amz-Signature=2d9ae7b728e432bdb7155d149d3d4aaac5dbcd8c5839c6e5c2caf6ea9257a127",
-"storageBucket": "traffic-ai-engine",
-"eventType": "AI_EVENT_PERSON_RECOGNITION",
-"camName": "MCL12D_AF_C3",
-"cameraId": "43fd8c86-f3a4-44da-a48c-f483f118deee",
-"memberID": "PID 25557 | 5438807",
-"createdAt": "2024-10-28T10:27:39.716697Z",
-"updatedAt": "2024-10-28T10:27:39.716697Z",
-"deletedMark": false,
-"deletedAt": "0001-01-01T00:00:00Z",
-"longtitudeOfCam": 105.9101839240255,
-"latitudeOfCam": 21.047448929910566,
-"eventTypeString": "Sự kiện AI chưa phân loại",
-"location": "NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3",
-"status": "NEW",
-"converTimestamp": "2024-10-28T10:27:31.603Z",
-"cabinID": "00000000-0000-0000-0000-000000000000",
-"result": "PID 25557 | 5438807"
-},
-{
-"id": "9f36f490-f21b-4a9d-a407-d955a8503a88",
-"description": "Phát hiện người đi qua",
-"timestamp": 1730111250834,
-"timeStart": 1730111259580,
-"image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg%22\u0026X-Amz-Signature=44478995fb84cb81edda6e5f1efca9c99494fe22d5ba4471c5f6f4e11ce1e394",
-"imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_fullframe.jpg%22\u0026X-Amz-Signature=44478995fb84cb81edda6e5f1efca9c99494fe22d5ba4471c5f6f4e11ce1e394",
-"imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_person_25560.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3_1730111250834_5438807_person_25560.jpg%22\u0026X-Amz-Signature=ff09b32256a81cc05e443d6780ff32e70c89ec0aab49f3c5e652e85250273308",
-"storageBucket": "traffic-ai-engine",
-"eventType": "AI_EVENT_PERSON_RECOGNITION",
-"camName": "MCL12D_AF_C3",
-"cameraId": "43fd8c86-f3a4-44da-a48c-f483f118deee",
-"memberID": "PID 25560 | 5438807",
-"createdAt": "2024-10-28T10:27:40.617222Z",
-"updatedAt": "2024-10-28T10:27:40.617222Z",
-"deletedMark": false,
-"deletedAt": "0001-01-01T00:00:00Z",
-"longtitudeOfCam": 105.9101839240255,
-"latitudeOfCam": 21.047448929910566,
-"eventTypeString": "Sự kiện AI chưa phân loại",
-"location": "NTQ_POC_F10_ADMIN_OUTSIDE_F000051242C3",
-"status": "NEW",
-"converTimestamp": "2024-10-28T10:27:30.834Z",
-"cabinID": "00000000-0000-0000-0000-000000000000",
-"result": "PID 25560 | 5438807"
-},
-{
-"id": "cf0cc9d4-4b9c-41e1-bbd4-19cc864162cf",
-"description": "Phát hiện người đi qua",
-"timestamp": 1730111247422,
-"timeStart": 1730111260581,
-"image": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg%22\u0026X-Amz-Signature=56fb7a077c03cb99da7d3d8e2f8cf463a8b048e446c8057844517c2fda24e5b9",
-"imageResult": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_fullframe.jpg%22\u0026X-Amz-Signature=56fb7a077c03cb99da7d3d8e2f8cf463a8b048e446c8057844517c2fda24e5b9",
-"imageObject": "https://dev-minio-api.basesystem.one/traffic-ai-engine/2024-10-28/NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_person_25556.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256\u0026X-Amz-Credential=PNFIK0TCWXFZQKU0%2F20241028%2Fus-east-1%2Fs3%2Faws4_request\u0026X-Amz-Date=20241028T102745Z\u0026X-Amz-Expires=86400\u0026X-Amz-SignedHeaders=host\u0026response-content-disposition=attachment%3B%20filename%3D%222024-10-28%2FNTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3_1730111247422_5427219_person_25556.jpg%22\u0026X-Amz-Signature=88f89e7cba7d3b284bcc8edd8e3df3381127719c1e32fc029e349fdc9d779871",
-"storageBucket": "traffic-ai-engine",
-"eventType": "AI_EVENT_PERSON_RECOGNITION",
-"camName": "MCL12D_AF_C1",
-"cameraId": "91b02ecc-f2cc-4f95-ab2f-7a7e9998c1ff",
-"memberID": "PID 25556 | 5427219",
-"createdAt": "2024-10-28T10:27:41.516926Z",
-"updatedAt": "2024-10-28T10:27:41.516926Z",
-"deletedMark": false,
-"deletedAt": "0001-01-01T00:00:00Z",
-"longtitudeOfCam": 105.9101839240255,
-"latitudeOfCam": 21.047448929910566,
-"eventTypeString": "Sự kiện AI chưa phân loại",
-"location": "NTQ_POC_F10_SIDEGATE_INSIDE_F000051242D3",
-"status": "NEW",
-"converTimestamp": "2024-10-28T10:27:27.422Z",
-"cabinID": "00000000-0000-0000-0000-000000000000",
-"result": "PID 25556 | 5427219"
-},
-  ];
-  
   const EventList = () => {
     const [openPopup, setOpenPopup] = useState(false);
     const [savedImage, setSavedImage] = useState(null); // State to hold the saved image
     const [numberInput, setNumberInput] = useState(''); // State for number input
     const [selectedCamera, setSelectedCamera] = useState(null); // State for selected camera
     const [results, setResults] = useState([]); // State for search results
+    const [cameras, setCameras] = useState([]); // State for search results
+    const [fakeData, setfakeData] = useState([]); // State for search results
+    const [loading, setLoading] = useState(false); // Loading state
+    const classes = useStyles()
+    const [isOpenView, setIsOpenView] = useState(false)
+    const [eventDetail, setEventDetail] = useState(null)
 
     const handleSearchClick1 = () => {
       setOpenPopup(true);
@@ -966,22 +45,116 @@
       setOpenPopup(false);
     };
 
-    const handleSearchClick = () => {
-      // Sử dụng dữ liệu giả để mô phỏng tìm kiếm
-      const filteredResults = fakeData.filter(item => 
-        item.camName === selectedCamera?.title && 
-        item.memberID.includes(numberInput)
-      );
-      setResults(filteredResults); // Lưu kết quả vào state
-      console.log('Search Results:', filteredResults); // Xem kết quả trong console
+    const Img = React.memo(props => {
+      const [loaded, setLoaded] = useState(false)
+  
+      const { src } = props
+  
+      return (
+        <>
+          <div
+            style={
+              loaded
+                ? { display: 'none' }
+                : {
+                    width: '100px',
+                    height: '100px',
+                    display: 'grid',
+                    backgroundColor: '#C4C4C4',
+                    placeItems: 'center'
+                  }
+            }
+          >
+            <CircularProgress size={20} />
+          </div>
+          <img
+            {...props}
+            src={src}
+            alt='Image'
+            onLoad={() => setLoaded(true)}
+            style={loaded ? { width: '100px', height: '100px' } : { display: 'none' }}
+          />
+        </>
+      )
+    })
+
+    const handleSearchClick = async () => {
+      if ( !savedImage) {
+        console.error("Camera or images not selected");
+        
+        return;
+      }
+  
+      const cameraID = selectedCamera?.id || null; // Assuming selectedCamera has an id property
+      const endtime = Date.now(); // Set your end time
+      const starttime = endtime - 60 * 60 * 1000; // Example: 1 hour before end time
+      setLoading(true);
+
+      const images = savedImage.map(image => ({
+        base64: image.base64 || null, // Ensure you have base64 data in savedImage
+        id: image.id,
+        name: image.name,
+        url: image.url || null// Ensure you have URL in savedImage
+      }));
+  
+      const requestData = {
+        cameraID,
+        images,
+        similarity: 0.6
+      };
+      console.log(requestData, 'payload')
+      try {
+        const response = await axios.post('https://votv.ivms.vn/votv/vms/api/v0/ai-events/search-face', requestData);
+        setResults(response.data); // Assuming you want to store results in state
+        console.log('Search results:', response.data);
+        setLoading(false); 
+
+        setfakeData(response.data)
+      } catch (error) {
+        setLoading(false); 
+
+        console.error('Error calling API:', error);
+      }
     };
   
     const handleImageSave = (imageDataArray) => {
       setSavedImage(imageDataArray); // Save the array of images
       console.log('Saved Images:', imageDataArray); // Handle the saved images as needed
+    
+      // Log the id and name of each image
+      imageDataArray.forEach(image => {
+        console.log('Image ID:', image.id);
+        console.log('Image Name:', image.name);
+      });
     };
 
-    return (
+    const buildUrlWithToken = url => {
+      const token = localStorage.getItem(authConfig.storageTokenKeyName)
+
+      return `${url}?token=${token}`
+    }
+
+    useEffect(() => {
+      const fetchFilteredOrAllUsers = async () => {
+        try {
+          const token = localStorage.getItem(authConfig.storageTokenKeyName)
+    
+          const config = {
+            headers: {
+              Authorization: `Bearer ${token}`
+            },
+          
+          }
+          const response = await axios.get('https://votv.ivms.vn/votv/vms/api/v0/cameras', config)
+          setCameras(response.data)
+        } catch (error) {
+          console.error('Error fetching users:', error)
+        }
+      }
+      fetchFilteredOrAllUsers()
+    }, [])
+    
+return (
       <>
         <Paper elevation={3} style={{ padding: '16px', marginBottom: '16px' }}>
           <Grid container alignItems="center" spacing={2}>
@@ -994,16 +167,15 @@
             <TextField
               label="Similarity"
               variant="outlined"
-              value={numberInput}
-              onChange={(e) => setNumberInput(e.target.value)}
-              type="number"
+              value= '0.6'
               fullWidth
+              disabled
             />
           </Grid>
           <Grid item xs={2}>
             <Autocomplete
               options={cameras}
-              getOptionLabel={(option) => option.title}
+              getOptionLabel={(option) => option.name}
               onChange={(event, newValue) => setSelectedCamera(newValue)}
               renderInput={(params) => <TextField {...params} label="Select camera" variant="outlined" />}
               fullWidth
@@ -1033,12 +205,26 @@
               <Grid item xs={4}>
               {savedImage && (
                   <div>
-                    {savedImage.map((image, index) => (
-                      <img key={index} src={image} alt={`Saved ${index + 1}`} style={{ height: '250px', width: '250px', marginBottom: '10px' }} />
-                    ))} </div>
-                  )}
+                      {savedImage.map((image, index) => {
+      console.log('Image ID:', image.id); // Log ra image.id
+      
+        return (
+          <Img
+          key={index} 
+          src={buildUrlWithToken(
+            `https://dev-ivi.basesystem.one/smc/storage/api/v0/libraries/download/${image.id}`
+          )}
+          style={{ maxWidth: '91px', height: '100%', minWidth: '100%' }}
+        />
+            );
+          })}
+                  </div>
+                )}
+
               </Grid>
               <Grid item xs={8}>
+              <div className={classes.loadingContainer}>
+              {loading && <CircularProgress className={classes.circularProgress} />}
                 <Grid item xs={12}>
                   <Typography variant="h5">Timeline </Typography>
                   <Timeline
@@ -1058,8 +244,19 @@
                           <TimelineConnector />
                         </TimelineSeparator>
                         <TimelineContent>
-                          <Typography variant="h6">{event.location}</Typography>
-                          <Typography sx={{ marginTop: '10px' }}>
+                        <Typography
+                        variant="body2"
+                        sx={{
+                          wordWrap: 'break-word',
+                          overflow: 'hidden',
+                          whiteSpace: 'pre-wrap', // tự động ngắt dòng
+                          maxHeight: '4.8em', // Giới hạn chiều cao để hiển thị tối đa 3 dòng
+                          textOverflow: 'ellipsis'
+                        }}
+                      >
+                        {event.location}
+                      </Typography>                          
+                      <Typography sx={{ marginTop: '10px' }}>
                             {event?.timestamp ? new Date(event?.timestamp).toLocaleString() : 'Date'}
                           </Typography>
                           <Typography variant="p">{event.description}</Typography>
@@ -1068,12 +265,15 @@
                     ))}
                   </Timeline>
                 </Grid>
+                </div>
               </Grid>
             </Grid>
           </Paper>
         </Grid>
 
         <Grid item xs={6} style={{ display: 'flex', flexDirection: 'column' }}>
+          <div className={classes.loadingContainer}>
+          {loading && <CircularProgress className={classes.circularProgress} />}
           <Paper elevation={3} style={{ padding: '16px', flex: 1 }}>
             <h2>Image</h2>
             <CardContent>
@@ -1114,6 +314,10 @@
                                 objectFit: 'contain',
                                 cursor: 'pointer'
                               }}
+                              onClick={() => {
+                                setIsOpenView(true)
+                                setEventDetail(item)
+                              }}
                             />
                           </Box>
                           <Typography sx={{ marginTop: '10px' }}>
@@ -1141,7 +345,16 @@
               )}
             </CardContent>
           </Paper>
+          </div>
         </Grid>
+        {isOpenView && (
+        <EventDetails
+          show={isOpenView}
+          onClose={() => setIsOpenView(false)}
+          data={eventDetail}
+          setReload={() => setReload(reload + 1)}
+        />
+      )}
       </Grid>
       </>
     );

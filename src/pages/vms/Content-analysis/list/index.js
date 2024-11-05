@@ -309,7 +309,7 @@ const ContentAnalysis = () => {
     setLoading(true)
 
     try {
-      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/routine`, params)
+      const res = await axios.get(`https://votv.ivms.vn/votv/vms/api/v0/aievents/routine`, params)
       setDeviceList(res?.data)
       setCount(res.count)
       setTotalPage(Math.ceil(res.count / pageSize))
@@ -356,7 +356,7 @@ const ContentAnalysis = () => {
   const fetchCameraList = async () => {
     try {
       const res = await callApi(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/camera-groups?deviceTypes=NVR&keyword=${keywordCamera}&limit=25&page=1`
+        `https://votv.ivms.vn/votv/vms/api/v0/camera-groups?deviceTypes=NVR&keyword=${keywordCamera}&limit=25&page=1`
       )
       console.log(res, 'res')
 
@@ -481,7 +481,7 @@ const ContentAnalysis = () => {
 
       try {
         const res = await getApi(
-          `https://sbs.basesystem.one/ivis/vms/api/v0/playback/camera/${cameraIds}?startTime=${params.startTime}&endTime=${params.endTime}`
+          `https://votv.ivms.vn/votv/vms/api/v0/playback/camera/${cameraIds}?startTime=${params.startTime}&endTime=${params.endTime}`
         )
 
         const data = res.data.MatchList.map((item, index) => {
@@ -536,7 +536,7 @@ const ContentAnalysis = () => {
           const requests = params.map(async time => {
             try {
               const res = await axios.get(
-                `https://sbs.basesystem.one/ivis/vms/api/v0/video/download?idCamera=${cameraIds}&startTime=${time.start}&endTime=${time.end}`
+                `https://votv.ivms.vn/votv/vms/api/v0/video/download?idCamera=${cameraIds}&startTime=${time.start}&endTime=${time.end}`
               )
               if (
                 res.data &&
@@ -661,7 +661,7 @@ const ContentAnalysis = () => {
       setLoading(true)
 
       axios
-        .delete(`https://sbs.basesystem.one/ivis/vms/api/v0/aievents/${idDelete}`, configWs)
+        .delete(`https://votv.ivms.vn/votv/vms/api/v0/aievents/${idDelete}`, configWs)
         .then(() => {
           toast.success('Deleted successfully')
           setIdDelete(null)

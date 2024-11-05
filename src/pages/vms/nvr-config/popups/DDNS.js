@@ -89,7 +89,7 @@ const TCP = ({ onClose, mtu, nvr }) => {
       }
 
       const response = await axios.get(
-        'https://sbs.basesystem.one/ivis/vms/api/v0/cameras/options/combox?cameraType=network_ddns_type',
+        'https://votv.ivms.vn/votv/vms/api/v0/cameras/options/combox?cameraType=network_ddns_type',
         config
       )
 
@@ -198,7 +198,7 @@ const TCP = ({ onClose, mtu, nvr }) => {
       }
 
       await axios.put(
-        `https://sbs.basesystem.one/ivis/vms/api/v0/nvrs/config/networkconfig/{idNetWorkConfig}?idNetWorkConfig=${nvr.id}&NetWorkConfigType=ddns`,
+        `https://votv.ivms.vn/votv/vms/api/v0/nvrs/config/networkconfig/{idNetWorkConfig}?idNetWorkConfig=${nvr.id}&NetWorkConfigType=ddns`,
         data,
         config
       )

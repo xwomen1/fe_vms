@@ -113,7 +113,7 @@ const ModelAIList = () => {
     }
 
     try {
-      const res = await axios.get(`https://sbs.basesystem.one/ivis/vms/api/v0/camera-model-ai`, params)
+      const res = await axios.get(`https://votv.ivms.vn/votv/vms/api/v0/camera-model-ai`, params)
       setDataList(res.data)
       setTotal(res.data.size)
     } catch (error) {
@@ -196,7 +196,7 @@ const ModelAIList = () => {
       setLoading(true)
 
       try {
-        await axios.delete(`https://sbs.basesystem.one/ivis/vms/api/v0/camera-model-ai/${idDelete}`, config)
+        await axios.delete(`https://votv.ivms.vn/votv/vms/api/v0/camera-model-ai/${idDelete}`, config)
         setReload(reload + 1)
         setIdDelete(null)
         toast.success('Deleted Successfully')
