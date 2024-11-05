@@ -77,6 +77,7 @@ return;
         const imageDataUrl = `data:${downloadResponse.headers['content-type'].toLowerCase()};base64,${base64Image}`;
         newImages.push(imageDataUrl);
       } catch (error) {
+        onClose()
         console.error('Error uploading image:', error);
         Swal.fire('Error', error?.response?.data?.message, 'error');
       }

@@ -100,7 +100,7 @@ const useStyles = makeStyles(() => ({
       const requestData = {
         cameraID,
         images,
-        similarity: 0.6
+        similarity: parseFloat(numberInput) || 0.6
       };
       console.log(requestData, 'payload')
       try {
@@ -163,15 +163,19 @@ return (
                 <Icon icon='tabler:upload' /> 
               </IconButton>
             </Grid>
-          <Grid item xs={2}>
-            <TextField
-              label="Similarity"
-              variant="outlined"
-              value= '0.6'
-              fullWidth
-              disabled
-            />
-          </Grid>
+            <Grid item xs={2}>
+              <TextField
+                label="Similarity"
+                variant="outlined"
+                value={numberInput}
+                fullWidth
+                onChange={(event) => {
+                  const value = event.target.value;
+                    setNumberInput(value);
+                  
+                }}
+              />
+            </Grid>
           <Grid item xs={2}>
             <Autocomplete
               options={cameras}
